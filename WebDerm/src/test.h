@@ -1,0 +1,19 @@
+/*
+ * test.h
+ *
+ *  Created on: Feb 6, 2014
+ *      Author: jason
+ */
+
+#ifndef TEST_H_INCLUDED
+#define TEST_H_INCLUDED
+
+#include "functions.h"
+#include "rgb/rgb.h"
+#include "skin/Skin.h"
+
+String testHysteresis(Mat &img, int row, int col, Size size);
+String testMouseHysteresis(Mat &img, int row, int col, Size size, vector<Vec3b> &vec, vector<String> &colorVec);
+void testMouseColor(Mat img);
+
+#endif /* TEST_H_ */
