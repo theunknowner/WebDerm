@@ -15,12 +15,14 @@ class hsl
 {
 public:
 	bool importThresholds();
+	bool importLumThreshold();
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);
 	void rgb2hsl(double red, double green, double blue);
 	int getHue();
 	double getSat();
 	double getLum();
+	double calcLum(double red, double green, double blue);
 	String getHslColor(double r,double g,double b);
 	void release_memory();
 };

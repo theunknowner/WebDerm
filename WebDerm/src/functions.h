@@ -11,6 +11,8 @@
 #include "hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
+String toString(int val);
+String toString(double val);
 double stdDevY(Mat img);
 double stdDevX(Mat img);
 double functionE(Point pixLoc, Point currLoc, double stdX, double stdY);

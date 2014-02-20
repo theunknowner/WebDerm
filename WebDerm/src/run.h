@@ -10,6 +10,7 @@
 
 #include "functions.h"
 #include "rgb/rgb.h"
+#include "hsl/hsl.h"
 #include "hysteresis/hysteresis.h"
 #include "skin/Skin.h"
 

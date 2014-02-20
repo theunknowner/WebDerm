@@ -22,6 +22,51 @@ void writeSeq2File(vector< vector<String> > &vec, String name)
 	}
 }
 
+void writeSeq2File(vector< vector<String> > &vec, String pathname, String name)
+{
+	String filename = pathname + name + ".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<vec.size(); i++)
+	{
+		for(unsigned int j=0; j<vec.at(i).size(); j++)
+		{
+			fprintf(fp,"%s,", vec.at(i).at(j).c_str());
+		}
+		fprintf(fp, "\n");
+	}
+}
+
+void writeSeq2File(vector< vector<int> > &vec, String pathname, String name)
+{
+	String filename = pathname + name + ".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<vec.size(); i++)
+	{
+		for(unsigned int j=0; j<vec.at(i).size(); j++)
+		{
+			fprintf(fp,"%d,", vec.at(i).at(j));
+		}
+		fprintf(fp, "\n");
+	}
+}
+
+void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
+{
+	String filename = pathname + name + ".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<vec.size(); i++)
+	{
+		for(unsigned int j=0; j<vec.at(i).size(); j++)
+		{
+			fprintf(fp,"%f,", vec.at(i).at(j));
+		}
+		fprintf(fp, "\n");
+	}
+}
+
 //hysteresis moving 1 col/row at a time
 	void hysteresis(Mat img, Size size, String name)
 	{
@@ -58,7 +103,8 @@ void writeSeq2File(vector< vector<String> > &vec, String name)
 							pix = rgb.checkBlack(r,g,b);
 							if(pix=="OTHER")
 							{
-								pix = rgb.pushColor(r,g,b);
+								pix = rgb.getModifier(r,g,b);
+								pix += rgb.pushColor(r,g,b);
 								pixelColorWindow.push_back(pix);
 							}
 							else
@@ -78,7 +124,8 @@ void writeSeq2File(vector< vector<String> > &vec, String name)
 						pix = rgb.checkBlack(r,g,b);
 						if(pix=="OTHER")
 						{
-							pix = rgb.pushColor(r,g,b);
+							pix = rgb.getModifier(r,g,b);
+							pix += rgb.pushColor(r,g,b);
 							pixelColorWindow.pop_front();
 							pixelColorWindow.push_back(pix);
 						}

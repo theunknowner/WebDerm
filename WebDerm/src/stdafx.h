@@ -18,5 +18,6 @@
 #include <fstream>
 #include <deque>
 #include <cstdio>
+#include <sstream>
 
 #endif

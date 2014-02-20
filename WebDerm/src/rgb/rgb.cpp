@@ -80,7 +80,7 @@ bool rgb::importThresholds()
 double rgb::normEucDist(int red, int green, int blue, vector<double> vec)
 	{
 		double result=0;
-		double color[3] = {red,green,blue};
+		double color[3] = {(double)red,(double)green,(double)blue};
 		double normVals[3];
 		for(int i=0; i<3; i++)
 		{
@@ -97,7 +97,7 @@ double rgb::normEucDist(int red, int green, int blue, vector<double> vec)
 double rgb::absEucDist(int red, int green, int blue, vector<double> vec)
 	{
 		double result=0;
-		double color[3] = {red,green,blue};
+		double color[3] = {(double)red,(double)green,(double)blue};
 		for(int i=0; i<3; i++)
 		{
 			color[i] -= vec.at(i);
@@ -275,6 +275,21 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		ind = index[0];
 		return rgbColors[index[0]];
 	}
+
+String rgb::getModifier(int red, int green, int blue)
+{
+	hsl hsl;
+	double lum=0;
+	lum = hsl.calcLum(red,green,blue) * 100;
+	for(unsigned int i=0; i<lumThresh.size(); i++)
+	{
+		if((int)lum>=lumThresh.at(i).at(0) && (int)lum<=lumThresh.at(i).at(1))
+		{
+			return hslColors.at(i);
+		}
+	}
+	return "";
+}
 
 //outputs image window with color of rgb value
 void rgb::showPixelColor(int r, int g, int b, Size size)

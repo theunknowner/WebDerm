@@ -7,6 +7,20 @@
 
 #include "functions.h"
 
+String toString(int val)
+{
+	ostringstream stringStream;
+	stringStream << val;
+	return stringStream.str();
+}
+
+String toString(double val)
+{
+	ostringstream stringStream;
+	stringStream << val;
+	return stringStream.str();
+}
+
 	/* Get Standard Deviation of the Y-axis */
 	double stdDevY(Mat img)
 	{

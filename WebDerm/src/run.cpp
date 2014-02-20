@@ -128,6 +128,7 @@ Mat runResizeImage(String filename, Size size,int write)
 void runHysteresis()
 {
 	rgb rgb;
+	hsl hsl;
 	String filename;
 	String name;
 	String input;
@@ -142,7 +143,8 @@ void runHysteresis()
 	name = getImageName(filename);
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
-	hysteresis(img2,name);
+	hsl.importLumThreshold();
+	hysteresis(img2,Size(3,3),name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 }
@@ -173,6 +175,8 @@ void runHysteresis()
 void runMouseHysteresis()
 {
 	rgb rgb;
+	hsl hsl;
+	hsl.importLumThreshold();
 	rgb.importThresholds();
 	Mat img2, mask;
 	String filename;
@@ -195,6 +199,8 @@ void runMouseHysteresis()
 void runMouseHysteresis2()
 {
 	rgb rgb;
+	hsl hsl;
+	hsl.importLumThreshold();
 	rgb.importThresholds();
 	Mat img2, mask;
 	String filename;

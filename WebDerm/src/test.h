@@ -11,9 +11,11 @@
 #include "functions.h"
 #include "rgb/rgb.h"
 #include "skin/Skin.h"
+#include "hysteresis/hysteresis.h"
 
 String testHysteresis(Mat &img, int row, int col, Size size);
 String testMouseHysteresis(Mat &img, int row, int col, Size size, vector<Vec3b> &vec, vector<String> &colorVec);
 void testMouseColor(Mat img);
+void testLum(Mat &img);
 
 #endif /* TEST_H_ */

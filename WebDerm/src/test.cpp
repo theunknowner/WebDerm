@@ -29,7 +29,8 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER")
 			{
-				pix = rgb.pushColor(r,g,b);
+				pix = rgb.getModifier(r,g,b);
+				pix += rgb.pushColor(r,g,b);
 				pixelColorWindow.push_back(pix);
 			}
 			else
@@ -173,3 +174,35 @@ void testMouseColor(Mat img)
 	imshow("image", img);
 	waitKey(0);
 }
+
+void testLum(Mat &img)
+{
+	hsl hsl;
+	int r,g,b,hue;
+	double lum=0, sat=0;
+	char text[20];
+	vector<String> vec;
+	vector< vector<String> > windowVec;
+	for(int row=0; row<img.rows; row++)
+	{
+		for(int col=0; col<img.cols; col++)
+		{
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			hsl.rgb2hsl(r,g,b);
+			hue = hsl.getHue();
+			lum = hsl.getLum()*100;
+			sat = hsl.getSat()*100;
+			sprintf(text,"(%d;%d;%d)", (int)hue,(int)sat,(int)lum);
+			vec.push_back(text);
+		}
+		windowVec.push_back(vec);
+		vec.clear();
+	}
+	writeSeq2File(windowVec,path,"lum");
+	vector< vector<String> >().swap(windowVec);
+	vector<String>().swap(vec);
+	hsl.release_memory();
+}
+

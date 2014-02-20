@@ -51,6 +51,39 @@ bool hsl::importThresholds()
 	}
 }
 
+bool hsl::importLumThreshold()
+{
+	String folderName = path+"Thresholds/";
+	String filename = folderName+"lum-thresholds.csv";
+	fstream fsThresh(filename.c_str());
+	if(fsThresh.is_open())
+	{
+		String temp;
+		vector<String> vec;
+		vector<double> thresh;
+		while(getline(fsThresh,temp))
+		{
+			getSubstr(temp,',',vec); //gets line to string
+			for(unsigned int i=0; i<vec.size(); i++)
+			{
+				if(i==0) hslColors.push_back(vec.at(i));
+				if(i>=1 && i<=2) thresh.push_back(atof(vec.at(i).c_str()));
+			}
+			lumThresh.push_back(thresh);
+			vec.clear(); thresh.clear();
+		}
+		fsThresh.close();
+		vector<String>().swap(vec);
+		vector<double>().swap(thresh);
+		return true;
+	}
+	else
+	{
+		cout << "Importing Lum-Thresholds Failed!" << endl;
+		return false;
+	}
+}
+
 //gets the minimum between the rgb value
 double hsl::minRGB(double red, double green, double blue)
 	{
@@ -137,6 +170,20 @@ double hsl::minRGB(double red, double green, double blue)
 	double hsl::getLum()
 	{
 		return L;
+	}
+
+	double hsl::calcLum(double red, double green, double blue)
+	{
+		double r,g,b;
+		double min, max;
+		double lum;
+		r = red/255;
+		g = green/255;
+		b = blue/255;
+		min = minRGB(r,g,b);
+		max = maxRGB(r,g,b);
+		lum = (max+min)/2;
+		return lum;
 	}
 
 //return the color of the rgb values using hsl colorspace
