@@ -71,6 +71,9 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 	void hysteresis(Mat img, Size size, String name)
 	{
 		rgb rgb;
+		hsl hsl;
+		String grayLevel;
+		int colorLevel;
 		String filename = name + "_seqCheck.csv";
 		FILE * fSeq;
 		fSeq = fopen(filename.c_str(), "w");
@@ -103,8 +106,21 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 							pix = rgb.checkBlack(r,g,b);
 							if(pix=="OTHER")
 							{
-								pix = rgb.getModifier(r,g,b);
-								pix += rgb.pushColor(r,g,b);
+								hsl.rgb2hsl(r,g,b);
+								grayLevel = rgb.calcGrayLevel(r,g,b);
+								colorLevel = rgb.calcColorLevel(r,g,b);
+								pix = rgb.pushColor(r,g,b);
+								if(pix!="White" && pix!="Black")
+								{
+									if(grayLevel=="Gray")
+									{
+										pix = grayLevel;
+									}
+									else
+									{
+										pix = grayLevel + pix + toString(colorLevel);
+									}
+								}
 								pixelColorWindow.push_back(pix);
 							}
 							else

@@ -143,7 +143,7 @@ void runHysteresis()
 	name = getImageName(filename);
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
-	hsl.importLumThreshold();
+	hsl.importLsThreshold();
 	hysteresis(img2,Size(3,3),name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
@@ -176,7 +176,7 @@ void runMouseHysteresis()
 {
 	rgb rgb;
 	hsl hsl;
-	hsl.importLumThreshold();
+	hsl.importLsThreshold();
 	rgb.importThresholds();
 	Mat img2, mask;
 	String filename;
@@ -200,7 +200,7 @@ void runMouseHysteresis2()
 {
 	rgb rgb;
 	hsl hsl;
-	hsl.importLumThreshold();
+	hsl.importLsThreshold();
 	rgb.importThresholds();
 	Mat img2, mask;
 	String filename;

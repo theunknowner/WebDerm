@@ -22,6 +22,10 @@ public:
 	String pushColor(int red, int green, int blue);
 	String pushColor(int red, int green, int blue, int &ind);
 	String getModifier(int red,  int green, int blue);
+	String calcGrayLevel(int red, int green, int blue);
+	int calcColorLevel(int red, int green, int blue);
+	int getGrayLevel(String color);
+	int getColorLevel(String color);
 	void showPixelColor(int r, int g, int b, Size size);
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 

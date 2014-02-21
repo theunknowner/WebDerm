@@ -11,6 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 
 void hysteresis(Mat img, Size size, String name);
 void hysteresis(Mat img,String name);

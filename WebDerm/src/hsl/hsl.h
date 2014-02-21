@@ -15,7 +15,7 @@ class hsl
 {
 public:
 	bool importThresholds();
-	bool importLumThreshold();
+	bool importLsThreshold();
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);
 	void rgb2hsl(double red, double green, double blue);

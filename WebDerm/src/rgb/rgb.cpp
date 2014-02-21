@@ -283,12 +283,76 @@ String rgb::getModifier(int red, int green, int blue)
 	lum = hsl.calcLum(red,green,blue) * 100;
 	for(unsigned int i=0; i<lumThresh.size(); i++)
 	{
-		if((int)lum>=lumThresh.at(i).at(0) && (int)lum<=lumThresh.at(i).at(1))
+		if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1))
 		{
 			return hslColors.at(i);
 		}
 	}
 	return "";
+}
+
+String rgb::calcGrayLevel(int red, int green, int blue)
+{
+	hsl hsl;
+	double sat=0;
+	//hsl.rgb2hsl(red,green,blue);
+	sat = hsl.getSat();
+	for(unsigned int i=0; i<satThresh.size(); i++)
+	{
+		if(sat>=0.9)
+		{
+			return "";
+		}
+		if(sat<=0.1)
+		{
+			return "Gray";
+		}
+		if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
+		{
+			return "Gray" + toString((int)i);
+		}
+
+	}
+	return "";
+}
+
+int rgb::calcColorLevel(int red, int green, int blue)
+{
+	hsl hsl;
+	double lum=0;
+	//hsl.rgb2hsl(red,green,blue);
+	lum = hsl.getLum();
+	for(unsigned int i=0; i<lumThresh.size(); i++)
+	{
+		if(lum>=lumThresh.at(i).at(1) && lum<=lumThresh.at(i).at(2))
+		{
+			return lumThresh.at(i).at(0);
+		}
+	}
+	return 0;
+}
+
+int rgb::getGrayLevel(String color)
+{
+	size_t pos=0;
+	int level=0;
+	String lvl;
+	pos = color.find("Gray");
+	if(pos!=string::npos)
+	{
+		lvl = color.substr(pos+4,1);
+		level = atoi(lvl.c_str());
+	}
+	return level;
+}
+
+int rgb::getColorLevel(String color)
+{
+	int level=0;
+	String lvl;
+	lvl = color.substr(color.size()-1,1);
+	level = atoi(lvl.c_str());
+	return level;
 }
 
 //outputs image window with color of rgb value
