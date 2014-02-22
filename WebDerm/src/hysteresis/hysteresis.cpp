@@ -71,13 +71,12 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 	void hysteresis(Mat img, Size size, String name)
 	{
 		rgb rgb;
-		hsl hsl;
-		String grayLevel;
-		int colorLevel;
-		String filename = name + "_seqCheck.csv";
-		FILE * fSeq;
-		fSeq = fopen(filename.c_str(), "w");
+		//String filename = name + "_seqCheck.csv";
+		//FILE * fSeq;
+		//fSeq = fopen(filename.c_str(), "w");
 		int matchingScans = (size.width*size.height)/2;
+		int levels[3] = {0};
+		double avg[3] = {0};
 		deque<String> pixelColorWindow;
 		vector<String> colorWindow;
 		vector< vector<String> > windowVec;
@@ -106,21 +105,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 							pix = rgb.checkBlack(r,g,b);
 							if(pix=="OTHER")
 							{
-								hsl.rgb2hsl(r,g,b);
-								grayLevel = rgb.calcGrayLevel(r,g,b);
-								colorLevel = rgb.calcColorLevel(r,g,b);
 								pix = rgb.pushColor(r,g,b);
-								if(pix!="White" && pix!="Black")
-								{
-									if(grayLevel=="Gray")
-									{
-										pix = grayLevel;
-									}
-									else
-									{
-										pix = grayLevel + pix + toString(colorLevel);
-									}
-								}
 								pixelColorWindow.push_back(pix);
 							}
 							else
@@ -140,8 +125,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 						pix = rgb.checkBlack(r,g,b);
 						if(pix=="OTHER")
 						{
-							pix = rgb.getModifier(r,g,b);
-							pix += rgb.pushColor(r,g,b);
+							pix = rgb.pushColor(r,g,b);
 							pixelColorWindow.pop_front();
 							pixelColorWindow.push_back(pix);
 						}
@@ -154,42 +138,65 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				}
 				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 				{
+					if(pixelColorWindow.at(i)=="Black")
+					{
+						levels[0]=0; levels[1]=0; levels[2]=9;
+					}
+					else
+					{
+						rgb.getLevels(pixelColorWindow.at(i),levels);
+					}
+					for(int j=0; j<3; j++)
+					{
+						avg[j] += levels[j];
+					}
 					for(unsigned int j=0; j<mainColors.size(); j++)
 					{
-						count = containsMainColor(pixelColorWindow.at(i),mainColors.at(j));
-						mainColorIndex[j]+=count;
+						if(containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
+							mainColorIndex[j]++;
 					}
 				}
-				count=0;
+				for(int i=0; i<3; i++)
+				{
+					avg[i] /= (size.width*size.height);
+					avg[i] = round(avg[i]);
+				}
 				for(unsigned int j=0; j<mainColors.size(); j++)
 				{
 					if(mainColorIndex[j]>matchingScans)
 					{
-						if(mainColorIndex[j]>(matchingScans*size.height))
-						{
-							index.push_back(j);
-							index.push_back(j);
-						}
-						else
-							index.push_back(j);
+						index.push_back(j);
 					}
 				}
 				if(index.size()!=0)
 				{
 					pix.clear();
-					if(index.size()==1 && mainColors.at(index[0])=="Light")
+					for(unsigned int i=0; i<index.size(); i++)
 					{
-						pix = "White";
-					}
-					else if(index.size()==1 && mainColors.at(index[0])=="Dark")
-					{
-						pix = "Black";
-					}
-					else
-					{
-						for(unsigned int i=0; i<index.size(); i++)
+						if(mainColors.at(index[i])=="Black" || mainColors.at(index[i])=="White")
 						{
-							pix += mainColors.at(index[i]);
+							pix = mainColors.at(index[i]);
+						}
+						else if(index.size()==1 && mainColors.at(index[i])!="Gray")
+						{
+							pix = mainColors.at(index[i]) + toString(avg[2]);
+						}
+						else if(index.size()==1 && mainColors.at(index[i])=="Gray")
+						{
+							pix = mainColors.at(index[i]) + toString(avg[0]);
+						}
+						else if(index.size()==2)
+						{
+							pix = mainColors.at(index[0]) + toString(avg[0]);
+							pix += mainColors.at(index[1]) + toString(avg[2]);
+						}
+						else
+						{
+							if(avg[1]==0)
+							{
+								avg[1]=1;
+							}
+							pix += mainColors.at(index[i]) + toString(avg[i]);
 						}
 					}
 					colorWindow.push_back(pix);
@@ -198,11 +205,14 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				{
 					colorWindow.push_back("NZ");
 				}
+				fill_n(levels,3,0);
+				fill_n(avg,3,0);
 				fill_n(mainColorIndex,mainColors.size(),0);
 				index.clear();
 				++col;
 			}//end while col
 			windowVec.push_back(colorWindow);
+			/*
 			for(unsigned int i=0; i<colorWindow.size(); i++)
 			{
 				if(i==0)
@@ -230,18 +240,18 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 			{
 				fprintf(fSeq, "%s(%d),", color.at(i).c_str(),colorCount.at(i));
 			}
-			fprintf(fSeq,"\n");
-			count=0;
-			colorCount.clear();
-			color.clear();
+			fprintf(fSeq,"\n");*/
+			//count=0;
+			//colorCount.clear();
+			//color.clear();
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			col=0; ++row;
 		}//end while row
 		writeSeq2File(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
-		vector<int>().swap(colorCount);
-		vector<String>().swap(color);
+		//vector<int>().swap(colorCount);
+		//vector<String>().swap(color);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
 		vector<int>().swap(index);

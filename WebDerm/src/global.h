@@ -9,9 +9,6 @@
 
 #include "stdafx.h"
 
-using namespace std;
-using namespace cv;
-
 extern String path;
 
 #endif

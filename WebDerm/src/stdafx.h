@@ -20,4 +20,7 @@
 #include <cstdio>
 #include <sstream>
 
+using namespace std;
+using namespace cv;
+
 #endif

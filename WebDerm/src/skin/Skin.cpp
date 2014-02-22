@@ -22,8 +22,6 @@ void imfill(Mat &img)
 
 void getSkin(Mat &img, Mat &mask)
 {
-	int h;
-	double s;
 	mask = mask.zeros(img.rows,img.cols,CV_8U);
 	int r,g,b;
 	for(int row=0; row<img.rows; row++)

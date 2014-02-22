@@ -10,12 +10,10 @@
 String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
-	hsl hsl;
 	int b,g,r;
-	String grayLevel;
-	int colorLevel=0;
-	double grayAvg=0;
-	double colorAvg=0;
+	int levels[3];
+	double avg[3] = {0};
+	int ind=0;
 	vector<int> index;
 	String pix;
 	deque<String> pixelColorWindow;
@@ -34,50 +32,40 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER")
 			{
-				hsl.rgb2hsl(r,g,b);
-				grayLevel = rgb.calcGrayLevel(r,g,b);
-				colorLevel = rgb.calcColorLevel(r,g,b);
-				pix = rgb.pushColor(r,g,b);
-				if(pix!="White" && pix!="Black")
-				{
-					if(pix=="Gray")
-					{
-						pix += toString(colorLevel);
-						colorAvg += colorLevel;
-					}
-					else if(grayLevel=="Gray")
-					{
-						pix = grayLevel + toString(colorLevel);
-						colorAvg += colorLevel;
-					}
-					else
-					{
-						grayAvg += rgb.getGrayLevel(grayLevel);
-						colorAvg += colorLevel;
-						pix = grayLevel + pix + toString(colorLevel);
-					}
-				}
+				pix = rgb.pushColor(r,g,b,ind);
 				pixelColorWindow.push_back(pix);
 			}
 			else
 			{
 				pixelColorWindow.push_back(pix);
 			}
-			cout << pix << img.at<Vec3b>(y,x) << endl;
+			cout << pix << img.at<Vec3b>(y,x) << "-" << ind << endl;
 		}
 	}
-	colorAvg /= (size.width*size.height);
-	grayAvg /= (size.width*size.height);
-	colorAvg = round(colorAvg);
-	grayAvg = round(grayAvg);
-	int count=0;
 	for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 	{
+		if(pixelColorWindow.at(i)=="Black")
+		{
+			levels[0]=0; levels[1]=0; levels[2]=9;
+		}
+		else
+		{
+			rgb.getLevels(pixelColorWindow.at(i),levels);
+		}
+		for(int j=0; j<3; j++)
+		{
+			avg[j] += levels[j];
+		}
 		for(unsigned int j=0; j<mainColors.size(); j++)
 		{
-			count = containsMainColor(pixelColorWindow.at(i),mainColors.at(j));
-			mainColorIndex[j]+=count;
+			if(containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
+			mainColorIndex[j]++;
 		}
+	}
+	for(int i=0; i<3; i++)
+	{
+		avg[i] /= (size.width*size.height);
+		avg[i] = round(avg[i]);
 	}
 	for(unsigned int j=0; j<mainColors.size(); j++)
 	{
@@ -87,13 +75,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 		}
 		if(mainColorIndex[j]>matchingScans)
 		{
-			if(mainColorIndex[j]>(matchingScans*size.height))
-			{
-				index.push_back(j);
-				index.push_back(j);
-			}
-			else
-				index.push_back(j);
+			index.push_back(j);
 		}
 	}
 	if(index.size()!=0)
@@ -101,16 +83,32 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 		pix.clear();
 		for(unsigned int i=0; i<index.size(); i++)
 		{
-			if(mainColors.at(index[i])=="Gray")
+			if(mainColors.at(index[i])=="Black" || mainColors.at(index[i])=="White")
 			{
-				pix = mainColors.at(index[i]) + toString(grayAvg);
+				pix = mainColors.at(index[i]);
+			}
+			else if(index.size()==1 && mainColors.at(index[i])=="Gray")
+			{
+				pix = mainColors.at(index[i]) + toString(avg[0]);
+			}
+			else if(index.size()==1 && mainColors.at(index[i])!="Gray")
+			{
+				pix = mainColors.at(index[i]) + toString(avg[2]);
+			}
+			else if(index.size()==2)
+			{
+				pix = mainColors.at(index[0]) + toString(avg[0]);
+				pix += mainColors.at(index[1]) + toString(avg[2]);
 			}
 			else
 			{
-				pix += mainColors.at(index[i]);
+				if(avg[1]==0)
+				{
+					avg[1]=1;
+				}
+				pix += mainColors.at(index[i]) + toString(avg[i]);
 			}
 		}
-		pix += toString(colorAvg);
 	}
 	else pix = "NOISE";
 

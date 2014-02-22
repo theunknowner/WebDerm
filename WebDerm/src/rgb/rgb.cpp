@@ -77,10 +77,10 @@ bool rgb::importThresholds()
 }
 
 //calculate the Euclidean Distance betweeen normalized rgb input and colors(vec).
-double rgb::normEucDist(int red, int green, int blue, vector<double> vec)
+double rgb::normEucDist(double red, double green, double blue, vector<double> &vec)
 	{
 		double result=0;
-		double color[3] = {(double)red,(double)green,(double)blue};
+		double color[3] = {red,green,blue};
 		double normVals[3];
 		for(int i=0; i<3; i++)
 		{
@@ -94,10 +94,10 @@ double rgb::normEucDist(int red, int green, int blue, vector<double> vec)
 	}
 
 //calculates the Euclidean Distance between absolute rgb input and colors(vec).
-double rgb::absEucDist(int red, int green, int blue, vector<double> vec)
+double rgb::absEucDist(double red, double green, double blue, vector<double> &vec)
 	{
 		double result=0;
-		double color[3] = {(double)red,(double)green,(double)blue};
+		double color[3] = {red,green,blue};
 		for(int i=0; i<3; i++)
 		{
 			color[i] -= vec.at(i);
@@ -217,6 +217,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		double smallest[length]={0};
 		double val[length]={0};
 		unsigned int index[length]={0};
+		int index2=0;
 		int colorIndex[rgbColors.size()];
 		fill_n(colorIndex,rgbColors.size(),0);
 		double normDistVals[normMeanThresh.size()];
@@ -257,7 +258,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		{
 			for(unsigned int j=0; j<rgbColors.size(); j++)
 			{
-				if(rgbColors.at(index[i])==rgbColors.at(j))
+				if(index[i]==j)
 				{
 					++colorIndex[j];
 				}
@@ -269,11 +270,11 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 			if(colorIndex[i]>greatest)
 			{
 				greatest = colorIndex[i];
-				index[0] = i;
+				index2 = i;
 			}
 		}
-		ind = index[0];
-		return rgbColors[index[0]];
+		ind = index2;
+		return rgbColors[index2];
 	}
 
 String rgb::getModifier(int red, int green, int blue)
@@ -291,7 +292,7 @@ String rgb::getModifier(int red, int green, int blue)
 	return "";
 }
 
-String rgb::calcGrayLevel(int red, int green, int blue)
+int rgb::calcGrayLevel(int red, int green, int blue)
 {
 	hsl hsl;
 	double sat=0;
@@ -299,21 +300,12 @@ String rgb::calcGrayLevel(int red, int green, int blue)
 	sat = hsl.getSat();
 	for(unsigned int i=0; i<satThresh.size(); i++)
 	{
-		if(sat>=0.9)
-		{
-			return "";
-		}
-		if(sat<=0.1)
-		{
-			return "Gray";
-		}
 		if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
 		{
-			return "Gray" + toString((int)i);
+			return i;
 		}
-
 	}
-	return "";
+	return 0;
 }
 
 int rgb::calcColorLevel(int red, int green, int blue)
@@ -346,13 +338,74 @@ int rgb::getGrayLevel(String color)
 	return level;
 }
 
-int rgb::getColorLevel(String color)
+void rgb::getColorLevel(String color, vector<int> &level)
 {
-	int level=0;
+	vector<size_t> posVec;
+	vector<String> colors;
+	int count=0;
+	size_t pos=0;
 	String lvl;
-	lvl = color.substr(color.size()-1,1);
-	level = atoi(lvl.c_str());
-	return level;
+	for(unsigned int i=0; i<mainColors.size(); i++)
+	{
+		pos = color.find(mainColors.at(i));
+		if(pos!=string::npos && mainColors.at(i)!="Gray")
+		{
+			++count;
+			posVec.push_back(pos);
+			colors.push_back(mainColors.at(i));
+		}
+	}
+	for(int i=0; i<count; i++)
+	{
+		lvl = color.substr(posVec.at(i)+colors.at(i).size(),1);
+		level.push_back(atoi(lvl.c_str()));
+	}
+	vector<size_t>().swap(posVec);
+	vector<String>().swap(colors);
+}
+
+void rgb::getLevels(String color, int * level)
+{
+	vector<size_t> posVec;
+	vector<String> colors;
+	int count=0;
+	size_t pos=0;
+	String lvl;
+	pos = color.find("Gray");
+	if(pos!=string::npos)
+	{
+		lvl = color.substr(pos+4,1);
+		level[0] = atoi(lvl.c_str());
+	}
+	else
+	{
+		level[0] = 0;
+	}
+	for(unsigned int i=0; i<mainColors.size(); i++)
+	{
+		pos = color.find(mainColors.at(i));
+		if(pos!=string::npos && mainColors.at(i)!="Gray")
+		{
+			++count;
+			posVec.push_back(pos);
+			colors.push_back(mainColors.at(i));
+		}
+	}
+	if(count==1)
+	{
+		lvl = color.substr(posVec.at(0)+colors.at(0).size(),1);
+		level[1] = 0;
+		level[2] = atoi(lvl.c_str());
+	}
+	if(count==2)
+	{
+		lvl = color.substr(posVec.at(0)+colors.at(0).size(),1);
+		level[1] = atoi(lvl.c_str());
+		lvl = color.substr(posVec.at(1)+colors.at(1).size(),1);
+		level[2] = atoi(lvl.c_str());
+	}
+	vector<size_t>().swap(posVec);
+	vector<String>().swap(colors);
 }
 
 //outputs image window with color of rgb value
