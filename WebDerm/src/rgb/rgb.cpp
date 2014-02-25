@@ -338,30 +338,28 @@ int rgb::getGrayLevel(String color)
 	return level;
 }
 
-void rgb::getColorLevel(String color, vector<int> &level)
+int rgb::getColorLevel(String color, String mainColor)
 {
-	vector<size_t> posVec;
-	vector<String> colors;
-	int count=0;
+	int level=0;
 	size_t pos=0;
-	String lvl;
-	for(unsigned int i=0; i<mainColors.size(); i++)
+	String str;
+	pos = color.find(mainColor);
+	if(mainColor=="Black")
 	{
-		pos = color.find(mainColors.at(i));
-		if(pos!=string::npos && mainColors.at(i)!="Gray")
-		{
-			++count;
-			posVec.push_back(pos);
-			colors.push_back(mainColors.at(i));
-		}
+		level=9;
+		return level;
 	}
-	for(int i=0; i<count; i++)
+	if(mainColor=="White")
 	{
-		lvl = color.substr(posVec.at(i)+colors.at(i).size(),1);
-		level.push_back(atoi(lvl.c_str()));
+		level = 0;
+		return level;
 	}
-	vector<size_t>().swap(posVec);
-	vector<String>().swap(colors);
+	if(pos!=string::npos)
+	{
+		str = color.substr(pos+mainColor.size(),1);
+	}
+	level = atoi(str.c_str());
+	return level;
 }
 
 void rgb::getLevels(String color, int * level)

@@ -75,8 +75,6 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 		//FILE * fSeq;
 		//fSeq = fopen(filename.c_str(), "w");
 		int matchingScans = (size.width*size.height)/2;
-		int levels[3] = {0};
-		double avg[3] = {0};
 		deque<String> pixelColorWindow;
 		vector<String> colorWindow;
 		vector< vector<String> > windowVec;
@@ -85,10 +83,13 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 		vector<int> colorCount;
 		int count=0;
 		int mainColorIndex[mainColors.size()];
+		int mainColorLevels[mainColors.size()];
+		int mainColorLevelAvg[mainColors.size()];
 		String pix;
 		int b,g,r;
 		int row=0, col=0;
 		fill_n(mainColorIndex,mainColors.size(),0);
+		fill_n(mainColorLevelAvg,mainColors.size(),0);
 		while(row<=(img.rows-size.height))
 		{
 			while(col<=(img.cols-size.width))
@@ -138,28 +139,11 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				}
 				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 				{
-					if(pixelColorWindow.at(i)=="Black")
-					{
-						levels[0]=0; levels[1]=0; levels[2]=9;
-					}
-					else
-					{
-						rgb.getLevels(pixelColorWindow.at(i),levels);
-					}
-					for(int j=0; j<3; j++)
-					{
-						avg[j] += levels[j];
-					}
 					for(unsigned int j=0; j<mainColors.size(); j++)
 					{
 						if(containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
 							mainColorIndex[j]++;
 					}
-				}
-				for(int i=0; i<3; i++)
-				{
-					avg[i] /= (size.width*size.height);
-					avg[i] = round(avg[i]);
 				}
 				for(unsigned int j=0; j<mainColors.size(); j++)
 				{
@@ -167,6 +151,19 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 					{
 						index.push_back(j);
 					}
+				}
+				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
+				{
+					for(unsigned int j=0; j<index.size(); j++)
+					{
+						mainColorLevels[index.at(j)] = rgb.getColorLevel(pixelColorWindow.at(i),
+															mainColors.at(index.at(j)));
+						mainColorLevelAvg[index.at(j)] += mainColorLevels[index.at(j)];
+					}
+				}
+				for(unsigned int i=0; i <index.size(); i++)
+				{
+					mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
 				}
 				if(index.size()!=0)
 				{
@@ -177,26 +174,9 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 						{
 							pix = mainColors.at(index[i]);
 						}
-						else if(index.size()==1 && mainColors.at(index[i])!="Gray")
-						{
-							pix = mainColors.at(index[i]) + toString(avg[2]);
-						}
-						else if(index.size()==1 && mainColors.at(index[i])=="Gray")
-						{
-							pix = mainColors.at(index[i]) + toString(avg[0]);
-						}
-						else if(index.size()==2)
-						{
-							pix = mainColors.at(index[0]) + toString(avg[0]);
-							pix += mainColors.at(index[1]) + toString(avg[2]);
-						}
 						else
 						{
-							if(avg[1]==0)
-							{
-								avg[1]=1;
-							}
-							pix += mainColors.at(index[i]) + toString(avg[i]);
+							pix += mainColors.at(index[i]) + toString(mainColorLevelAvg[index.at(i)]);
 						}
 					}
 					colorWindow.push_back(pix);
@@ -205,9 +185,8 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				{
 					colorWindow.push_back("NZ");
 				}
-				fill_n(levels,3,0);
-				fill_n(avg,3,0);
 				fill_n(mainColorIndex,mainColors.size(),0);
+				fill_n(mainColorLevelAvg,mainColors.size(),0);
 				index.clear();
 				++col;
 			}//end while col

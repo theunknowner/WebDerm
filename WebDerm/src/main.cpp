@@ -21,14 +21,14 @@ int main(int argc, char** argv)
 	rgb.importThresholds();
 	hsl.importLsThreshold();
 	Mat img, img2, mask;
-	img = runResizeImage(path+"Images/LPH","img3.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","IMG_0911.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	//cout << rgb.pushColor(88,69,66) << endl;
 	//showPixelColor(148,112,118,Size(400,400));
-	int col = 298;
-	int row = 123;
-	//cout << "Result: " << testHysteresis(img2, row, col, Size(3,3)) << endl;
+	int col = 338;
+	int row = 41;
+	cout << "Result: " << testHysteresis(img2, row, col, Size(3,3)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
 	//imwrite("img.png", img3);
