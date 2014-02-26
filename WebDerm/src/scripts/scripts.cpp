@@ -53,3 +53,31 @@ void colorThreshNamingScript()
 
 	}
 }
+
+void colorThreshScript()
+{
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/colorThresh2.csv","w");
+	hsl hsl;
+	rgb rgb;
+	double r,g,b;
+	String pix;
+	int grayLevel=0;
+	int colorLevel=0;
+	double s,l;
+	fprintf(fp,"Color,S,Slvl,L,Lvl\n");
+	for(unsigned int i=0; i<rgbColors.size(); i++)
+	{
+		r = absMeanThresh.at(i).at(0);
+		g = absMeanThresh.at(i).at(1);
+		b = absMeanThresh.at(i).at(2);
+		hsl.rgb2hsl(r,g,b);
+		s = hsl.getSat();
+		l = hsl.getLum();
+		s = roundDecimal(s,2);
+		l = roundDecimal(l,2);
+		grayLevel = rgb.calcGrayLevel(r,g,b);
+		colorLevel = rgb.calcColorLevel(r,g,b);
+		fprintf(fp,"%s,%f,%d,%f,%d\n", rgbColors.at(i).c_str(), s,grayLevel,l,colorLevel);
+	}
+}

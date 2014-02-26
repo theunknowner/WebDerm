@@ -21,6 +21,15 @@ String toString(double val)
 	return stringStream.str();
 }
 
+double roundDecimal(double num, int places)
+{
+	double val=0;
+	val = num * pow(10,places);
+	val = round(val);
+	val /= pow(10,places);
+	return val;
+}
+
 	/* Get Standard Deviation of the Y-axis */
 	double stdDevY(Mat img)
 	{

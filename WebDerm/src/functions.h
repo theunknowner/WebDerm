@@ -13,6 +13,7 @@
 
 String toString(int val);
 String toString(double val);
+double roundDecimal(double num, int places);
 double stdDevY(Mat img);
 double stdDevX(Mat img);
 double functionE(Point pixLoc, Point currLoc, double stdX, double stdY);

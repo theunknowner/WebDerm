@@ -33,7 +33,7 @@ void getSkin(Mat &img, Mat &mask)
 			r = img.at<Vec3b>(row,col)[2];
 			if(r>g && g>b)
 			{
-				if((b+g)<(2*r) && ((r-g) > 20 || (r-b) > 20) && r>95 && b>55 && b<160 && g>40 && g<200)
+				if((b+g)<(2*r) && ((r-g) > 20 || (r-b) > 20) && r>95 && b>55 && b<200 && g>40 && g<200)
 				{
 					mask.at<uchar>(row,col) = 255;
 				}

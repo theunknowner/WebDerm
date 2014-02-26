@@ -84,7 +84,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 		int count=0;
 		int mainColorIndex[mainColors.size()];
 		int mainColorLevels[mainColors.size()];
-		int mainColorLevelAvg[mainColors.size()];
+		double mainColorLevelAvg[mainColors.size()];
 		String pix;
 		int b,g,r;
 		int row=0, col=0;
@@ -176,7 +176,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 						}
 						else
 						{
-							pix += mainColors.at(index[i]) + toString(mainColorLevelAvg[index.at(i)]);
+							pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 						}
 					}
 					colorWindow.push_back(pix);

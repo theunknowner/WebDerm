@@ -14,5 +14,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
 void colorThreshNamingScript();
+void colorThreshScript();
 
 #endif /* SCRIPTS_H_ */

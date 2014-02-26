@@ -298,6 +298,7 @@ int rgb::calcGrayLevel(int red, int green, int blue)
 	double sat=0;
 	//hsl.rgb2hsl(red,green,blue);
 	sat = hsl.getSat();
+	sat = roundDecimal(sat,2);
 	for(unsigned int i=0; i<satThresh.size(); i++)
 	{
 		if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
@@ -314,6 +315,7 @@ int rgb::calcColorLevel(int red, int green, int blue)
 	double lum=0;
 	//hsl.rgb2hsl(red,green,blue);
 	lum = hsl.getLum();
+	lum = roundDecimal(lum,2);
 	for(unsigned int i=0; i<lumThresh.size(); i++)
 	{
 		if(lum>=lumThresh.at(i).at(1) && lum<=lumThresh.at(i).at(2))

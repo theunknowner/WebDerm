@@ -18,7 +18,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	int colorIndex[rgbColors.size()];
 	int mainColorIndex[mainColors.size()];
 	int mainColorLevels[mainColors.size()];
-	int mainColorLevelAvg[mainColors.size()];
+	double mainColorLevelAvg[mainColors.size()];
 	int matchingScans = (size.width*size.height)/2;
 	fill_n(colorIndex,rgbColors.size(),0);
 	fill_n(mainColorIndex,mainColors.size(),0);
@@ -86,7 +86,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			}
 			else
 			{
-				pix += mainColors.at(index[i]) + toString(mainColorLevelAvg[index.at(i)]);
+				pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 			}
 		}
 	}
@@ -191,7 +191,7 @@ void testMouseColor(Mat img)
 	waitKey(0);
 }
 
-void testLum(Mat &img)
+void testSatLum(Mat &img)
 {
 	hsl hsl;
 	int r,g,b,hue;
@@ -208,17 +208,18 @@ void testLum(Mat &img)
 			b = img.at<Vec3b>(row,col)[0];
 			hsl.rgb2hsl(r,g,b);
 			hue = hsl.getHue();
-			lum = hsl.getLum()*100;
-			sat = hsl.getSat()*100;
+			lum = hsl.getLum();
+			sat = hsl.getSat();
+			lum = roundDecimal(lum,2) * 100;
+			sat = roundDecimal(sat,2) * 100;
 			sprintf(text,"(%d;%d;%d)", (int)hue,(int)sat,(int)lum);
 			vec.push_back(text);
 		}
 		windowVec.push_back(vec);
 		vec.clear();
 	}
-	writeSeq2File(windowVec,path,"lum");
+	writeSeq2File(windowVec,path,"satlum");
 	vector< vector<String> >().swap(windowVec);
 	vector<String>().swap(vec);
 	hsl.release_memory();
 }
-
