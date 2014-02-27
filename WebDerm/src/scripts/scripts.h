@@ -15,5 +15,6 @@
 
 void colorThreshNamingScript();
 void colorThreshScript();
+void outputMeanScript();
 
 #endif /* SCRIPTS_H_ */

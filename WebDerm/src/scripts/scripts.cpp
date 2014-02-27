@@ -81,3 +81,18 @@ void colorThreshScript()
 		fprintf(fp,"%s,%f,%d,%f,%d\n", rgbColors.at(i).c_str(), s,grayLevel,l,colorLevel);
 	}
 }
+
+void outputMeanScript()
+{
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/mean.csv", "w");
+	double r,g,b;
+	fprintf(fp,"Color,R,G,B\n");
+	for(unsigned int i=0; i<rgbColors.size(); i++)
+	{
+		r = absMeanThresh.at(i).at(0);
+		g = absMeanThresh.at(i).at(1);
+		b = absMeanThresh.at(i).at(2);
+		fprintf(fp,"%s,%f,%f,%f\n",rgbColors.at(i).c_str(),r,g,b);
+	}
+}
