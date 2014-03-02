@@ -80,14 +80,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 		pix.clear();
 		for(unsigned int i=0; i<index.size(); i++)
 		{
-			if(mainColors.at(index[i])=="Black" || mainColors.at(index[i])=="White")
-			{
-				pix = mainColors.at(index[i]);
-			}
-			else
-			{
-				pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
-			}
+			pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 		}
 	}
 	else pix = "NOISE";
@@ -222,4 +215,25 @@ void testSatLum(Mat &img)
 	vector< vector<String> >().swap(windowVec);
 	vector<String>().swap(vec);
 	hsl.release_memory();
+}
+
+void testColorIndex(Mat &img, int index)
+{
+	rgb rgb;
+	int r,g,b;
+	int ind;
+	for(int row=0; row<img.rows; row++)
+	{
+		for(int col=0; col<img.cols; col++)
+		{
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			rgb.pushColor(r,g,b,ind);
+			if((ind+2)==index)
+			{
+				printf("%d,%d\n", col,row);
+			}
+		}
+	}
 }

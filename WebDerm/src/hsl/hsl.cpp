@@ -148,7 +148,6 @@ double hsl::minRGB(double red, double green, double blue)
 		{
 			if(L>0.5)
 			{
-				//S = delta/(1-abs((2*L)-1));
 				S = (max-min)/(2.0-max-min);
 			}
 			else

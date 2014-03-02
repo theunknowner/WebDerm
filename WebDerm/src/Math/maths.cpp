@@ -24,7 +24,11 @@ double correlationDist(double * vec1, double * vec2)
 		bottom1 += pow(abs(vec1[i]+(total1/3)),2);
 		bottom2 += pow(abs(vec2[i]+(total2/3)),2);
 	}
-	result = 1 - (top/(sqrt(bottom1)*sqrt(bottom2)));
+	if(top!=0 && bottom1!=0 && bottom2!=0)
+		result = 1 - (top/(sqrt(bottom1)*sqrt(bottom2)));
+	else
+		return -1;
+
 	return result;
 }
 

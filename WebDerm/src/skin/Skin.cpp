@@ -46,6 +46,7 @@ void getSkinUsingThresh(Mat &img, Mat &mask)
 void getSkinUsingCorrelation(Mat &img, Mat &mask)
 {
 	mask = mask.zeros(img.rows,img.cols,CV_8U);
+	double thresh = 0.038;
 	double vec2[3] = {221,183,160}; //skin values for correlation
 	int r,g,b;
 	double dist=0;
@@ -58,7 +59,7 @@ void getSkinUsingCorrelation(Mat &img, Mat &mask)
 			r = img.at<Vec3b>(row,col)[2];
 			double vec1[3] = {(double)r,(double)g,(double)b};
 			dist = correlationDist(vec1,vec2);
-			if(dist<0.038)
+			if(dist<thresh)
 			{
 				mask.at<uchar>(row,col) = 255;
 			}

@@ -113,7 +113,7 @@ String rgb::checkBlack(int r, int g, int b)
 	{
 		if(r<16 && g<16 && b<16)
 		{
-			return "Black";
+			return "Black0";
 		}
 		return "OTHER";
 	}
@@ -161,7 +161,7 @@ String rgb::pushColor(int red, int green, int blue)
 		{
 			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
 			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-			//cout << colors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i],e) << endl;
+			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i],e) << endl;
 		}
 		smallest[0] = normDistVals[0];
 		smallest[1] = absDistVals[0];
@@ -211,6 +211,33 @@ String rgb::pushColor(int red, int green, int blue)
 		return rgbColors[index[0]];
 	}
 
+double rgb::pushColor2(int red, int green, int blue, int &ind)
+	{
+		double smallest=0;
+		double val=0;
+		unsigned int index=0;
+		int colorIndex[rgbColors.size()];
+		fill_n(colorIndex,rgbColors.size(),0);
+		double absDistVals[absMeanThresh.size()];
+		for(unsigned int i=0; i<normMeanThresh.size(); i++)
+		{
+			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
+		}
+		smallest = absDistVals[0];
+		index = 0;
+		for(unsigned int i=0; i<absMeanThresh.size(); i++)
+		{
+			val = absDistVals[i];
+			if(val<smallest)
+			{
+				smallest = val;
+				index = i;
+			}
+		}
+		ind = index;
+		return smallest;
+	}
+
 String rgb::pushColor(int red, int green, int blue, int &ind)
 	{
 		const int length=7;
@@ -226,7 +253,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		{
 			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
 			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-			//cout << colors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i],e) << endl;
+			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i]) << endl;
 		}
 		smallest[0] = normDistVals[0];
 		smallest[1] = absDistVals[0];
@@ -301,7 +328,7 @@ int rgb::calcGrayLevel(int red, int green, int blue)
 	sat = roundDecimal(sat,2);
 	for(unsigned int i=0; i<satThresh.size(); i++)
 	{
-		if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
+		if(sat>satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
 		{
 			return i;
 		}
@@ -318,7 +345,7 @@ int rgb::calcColorLevel(int red, int green, int blue)
 	lum = roundDecimal(lum,2);
 	for(unsigned int i=0; i<lumThresh.size(); i++)
 	{
-		if(lum>=lumThresh.at(i).at(1) && lum<=lumThresh.at(i).at(2))
+		if(lum>lumThresh.at(i).at(1) && lum<=lumThresh.at(i).at(2))
 		{
 			return lumThresh.at(i).at(0);
 		}
@@ -346,19 +373,9 @@ int rgb::getColorLevel(String color, String mainColor)
 	size_t pos=0;
 	String str;
 	pos = color.find(mainColor);
-	if(mainColor=="Black")
-	{
-		level=9;
-		return level;
-	}
-	if(mainColor=="White")
-	{
-		level = 0;
-		return level;
-	}
 	if(pos!=string::npos)
 	{
-		str = color.substr(pos+mainColor.size(),1);
+		str = color.substr(pos+mainColor.size(),color.size()-(pos+mainColor.size()));
 	}
 	level = atoi(str.c_str());
 	return level;
@@ -374,7 +391,7 @@ void rgb::getLevels(String color, int * level)
 	pos = color.find("Gray");
 	if(pos!=string::npos)
 	{
-		lvl = color.substr(pos+4,1);
+		lvl = color.substr(pos+4,color.size()-(pos+4));
 		level[0] = atoi(lvl.c_str());
 	}
 	else
@@ -399,9 +416,11 @@ void rgb::getLevels(String color, int * level)
 	}
 	if(count==2)
 	{
-		lvl = color.substr(posVec.at(0)+colors.at(0).size(),1);
+		lvl = color.substr(posVec.at(0)+colors.at(0).size(),
+				colors.at(0).size()-(posVec.at(0)+colors.at(0).size()));
 		level[1] = atoi(lvl.c_str());
-		lvl = color.substr(posVec.at(1)+colors.at(1).size(),1);
+		lvl = color.substr(posVec.at(1)+colors.at(1).size(),
+				colors.at(0).size()-(posVec.at(0)+colors.at(0).size()));
 		level[2] = atoi(lvl.c_str());
 	}
 	vector<size_t>().swap(posVec);

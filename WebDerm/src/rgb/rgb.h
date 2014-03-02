@@ -21,6 +21,7 @@ public:
 	String pushColor(int red, int green, int blue, double e);
 	String pushColor(int red, int green, int blue);
 	String pushColor(int red, int green, int blue, int &ind);
+	double pushColor2(int red, int green, int blue, int &ind);
 	String getModifier(int red,  int green, int blue);
 	int calcGrayLevel(int red, int green, int blue);
 	int calcColorLevel(int red, int green, int blue);
