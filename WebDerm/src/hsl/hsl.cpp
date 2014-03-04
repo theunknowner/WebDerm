@@ -171,6 +171,42 @@ double hsl::minRGB(double red, double green, double blue)
 		}
 	}
 
+	void hsl::rgb2hsb(double red, double green, double blue)
+	{
+		double r,g,b;
+		double min, max;
+		double delta;
+		r = red/255;
+		g = green/255;
+		b = blue/255;
+		min = minRGB(r,g,b);
+		max = maxRGB(r,g,b);
+		B = max;
+		delta = max-min;
+		if(delta==0)
+		{
+			H=0; S=0;
+		}
+		else
+		{
+			S = (max-min) / B;
+			if(max==r)
+			{
+				H = ((g-b)/delta);
+			}
+			else if(max==g)
+			{
+				H = ((b-r)/delta) + 2;
+			}
+			else
+			{
+				H = ((r-g)/delta) + 4;
+			}
+			H *= 60;
+			if(H<0) H+=360;
+		}
+	}
+
 	int hsl::getHue()
 	{
 		return (int)H;
@@ -186,6 +222,11 @@ double hsl::minRGB(double red, double green, double blue)
 		return L;
 	}
 
+	double hsl::getBrite()
+	{
+		return B;
+	}
+
 	double hsl::calcLum(double red, double green, double blue)
 	{
 		double r,g,b;
@@ -198,6 +239,17 @@ double hsl::minRGB(double red, double green, double blue)
 		max = maxRGB(r,g,b);
 		lum = (max+min)/2;
 		return lum;
+	}
+
+	double hsl::calcBrite(double red, double green, double blue)
+	{
+		double r,g,b;
+		double min, max;
+		r = red/255;
+		g = green/255;
+		b = blue/255;
+		max = maxRGB(r,g,b);
+		return max;
 	}
 
 //return the color of the rgb values using hsl colorspace

@@ -19,10 +19,13 @@ public:
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);
 	void rgb2hsl(double red, double green, double blue);
+	void rgb2hsb(double red, double green, double blue);
 	int getHue();
 	double getSat();
 	double getLum();
+	double getBrite();
 	double calcLum(double red, double green, double blue);
+	double calcBrite(double red, double green, double blue);
 	String getHslColor(double r,double g,double b);
 	void release_memory();
 };

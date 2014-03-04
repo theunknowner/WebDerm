@@ -10,7 +10,7 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/src/global.h"
 
-extern double H, S, L;
+extern double H, S, L, B;
 extern vector<String> hslColors;
 extern vector< vector<int> > hueThresh;
 extern vector< vector<double> > satThresh;

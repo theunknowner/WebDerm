@@ -7,7 +7,7 @@
 
 #include "hsl_global.h"
 
-double H, S, L;
+double H, S, L, B;
 vector<String> hslColors;
 vector< vector<int> > hueThresh;
 vector< vector<double> > satThresh;

@@ -70,7 +70,8 @@ void getSkinUsingCorrelation(Mat &img, Mat &mask)
 
 void getSkin(Mat &img, Mat &mask)
 {
-	int skinCount=98000; //20% of 700x700
+
+	double skinCount=(img.rows*img.cols)*0.2; //20% of 700x700
 	getSkinUsingThresh(img,mask);
 	if(countNonZero(mask)<skinCount)
 	{

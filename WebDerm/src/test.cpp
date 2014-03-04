@@ -222,6 +222,9 @@ void testColorIndex(Mat &img, int index)
 	rgb rgb;
 	int r,g,b;
 	int ind;
+	int count=0;
+	Mat mask = mask.zeros(img.size(), CV_8U);
+	Mat img2;
 	for(int row=0; row<img.rows; row++)
 	{
 		for(int col=0; col<img.cols; col++)
@@ -232,8 +235,15 @@ void testColorIndex(Mat &img, int index)
 			rgb.pushColor(r,g,b,ind);
 			if((ind+2)==index)
 			{
-				printf("%d,%d\n", col,row);
+				//printf("%d,%d\n", col,row);
+				mask.at<uchar>(row,col) = 255;
+				++count;
 			}
 		}
 	}
+	cout << count << endl;
+	img.copyTo(img2,mask);
+	imshow("Img", img);
+	imshow("Img2",img2);
+	waitKey(0);
 }

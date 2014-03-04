@@ -427,6 +427,13 @@ void rgb::getLevels(String color, int * level)
 	vector<String>().swap(colors);
 }
 
+double rgb::calcIntensity(double red, double green, double blue)
+{
+	double result = 0.33 * red + 0.33 * green + 0.33 * blue;
+	result = round(result);
+	return result;
+}
+
 //outputs image window with color of rgb value
 void rgb::showPixelColor(int r, int g, int b, Size size)
 	{
