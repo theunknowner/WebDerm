@@ -155,31 +155,55 @@ String outputCorrelationRGB(int r, int g, int b)
 	return pix;
 }
 
-void outputFreqColor(Mat &img)
+void spreadsheetCompareScript()
 {
-	rgb rgb;
-	int arr[rgbColors.size()];
-	fill_n(arr, rgbColors.size(), 0);
-	int ind=0;
-	int r,g,b;
-	for(int row=0; row<img.rows; row++)
+	String filename;
+	String filename2;
+	String input;
+	cout << "Enter filename of 1st:";
+	cin >> input;
+	filename = input;
+	cout << "Enter filename of 2nd:";
+	cin >> input;
+	filename2 = input;
+	fstream fs(filename.c_str());
+	fstream fs2(filename2.c_str());
+	if(fs.is_open() && fs2.is_open())
 	{
-		for(int col=0; col<img.cols; col++)
+		vector< vector<String> > matVec1;
+		vector <vector<String> > matVec2;
+		vector<String> vec;
+		while(getline(fs,input))
 		{
-			r = img.at<Vec3b>(row,col)[2];
-			g = img.at<Vec3b>(row,col)[1];
-			b = img.at<Vec3b>(row,col)[0];
-			rgb.pushColor(r,g,b,ind);
-			++arr[ind];
+			getSubstr(input,',',vec);
+			matVec1.push_back(vec);
+			vec.clear();
 		}
+		while(getline(fs2,input))
+		{
+			getSubstr(input,',',vec);
+			matVec2.push_back(vec);
+			vec.clear();
+		}
+		fs.close(); fs2.close();
+		FILE * fp;
+		fp = fopen("/home/jason/Desktop/workspace/compare.txt","w");
+		for(unsigned int i=0; i<matVec1.size(); i++)
+		{
+			for(unsigned int j=0; j<matVec1.at(i).size(); j++)
+			{
+				if(matVec1.at(i).at(j)!=matVec2.at(i).at(j))
+				{
+					fprintf(fp,"%d,%d)\n", j+1,i+1);
+				}
+			}
+		}
+		vector< vector<String> >().swap(matVec1);
+		vector< vector<String> >().swap(matVec2);
+		vector<String>().swap(vec);
 	}
-	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/colorFreq.txt","w");
-	for(unsigned int i=0; i<rgbColors.size(); i++)
+	else
 	{
-		if(arr[i]!=0)
-		{
-			fprintf(fp,"%d: %s(%d)\n", i+2, rgbColors.at(i).c_str(), arr[i]);
-		}
+		cout << "File not found!" << endl;
 	}
 }

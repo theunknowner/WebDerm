@@ -13,7 +13,6 @@
 #include "hsl/hsl.h"
 #include "hysteresis/hysteresis.h"
 #include "skin/Skin.h"
-#include "scripts/scripts.h"
 
 void runCheckRGBColor();
 void runCheckList();
@@ -25,6 +24,7 @@ void runGetSkin();
 void getMouseInfo(Mat &img);
 void runMouseHysteresis();
 void runMouseHysteresis2();
+void outputFreqColor(Mat &img);
 void runOutputColorFreq();
 
 #endif /* RUN_H_ */
