@@ -323,7 +323,7 @@ int rgb::calcGrayLevel(int red, int green, int blue)
 {
 	hsl hsl;
 	double sat=0;
-	//hsl.rgb2hsl(red,green,blue);
+	hsl.rgb2hsl(red,green,blue);
 	sat = hsl.getSat();
 	sat = roundDecimal(sat,2);
 	for(unsigned int i=0; i<satThresh.size(); i++)
@@ -336,12 +336,12 @@ int rgb::calcGrayLevel(int red, int green, int blue)
 	return 0;
 }
 
-int rgb::calcColorLevel(int red, int green, int blue)
+int rgb::calcColorLevel(double red, double green, double blue)
 {
 	hsl hsl;
 	double lum=0;
 	//hsl.rgb2hsl(red,green,blue);
-	lum = hsl.getLum();
+	lum = hsl.calcLum(red,green,blue);
 	lum = roundDecimal(lum,2);
 	for(unsigned int i=0; i<lumThresh.size(); i++)
 	{
@@ -466,4 +466,14 @@ void rgb::release_memory()
 	vector< vector<double> >().swap(absThresh);
 	vector<String>().swap(rgbColors);
 	vector<String>().swap(mainColors);
+}
+
+bool rgb::isBrownViolet(int r, int g, int b)
+{
+	if(r>=160&&r<=171&&g>=117&&g<=133&&b>=117&&b<=133)
+	{
+		return true;
+	}
+	return false;
+
 }

@@ -139,6 +139,7 @@ double hsl::minRGB(double red, double green, double blue)
 		min = minRGB(r,g,b);
 		max = maxRGB(r,g,b);
 		L = (max+min)/2;
+		B = max;
 		delta = max-min;
 		if(delta==0)
 		{
@@ -189,7 +190,7 @@ double hsl::minRGB(double red, double green, double blue)
 		}
 		else
 		{
-			S = (max-min) / B;
+			S = max==0 ? 0 : (max-min)/B;
 			if(max==r)
 			{
 				H = ((g-b)/delta);
@@ -250,6 +251,14 @@ double hsl::minRGB(double red, double green, double blue)
 		b = blue/255;
 		max = maxRGB(r,g,b);
 		return max;
+	}
+
+	double hsl::calcRelLum(double red, double green, double blue)
+	{
+		double lum;
+		lum = (0.2126*red) + (0.7152*green) + (0.0722*blue);
+		lum/=255;
+		return lum;
 	}
 
 //return the color of the rgb values using hsl colorspace

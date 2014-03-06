@@ -24,15 +24,15 @@ public:
 	double pushColor2(int red, int green, int blue, int &ind);
 	String getModifier(int red,  int green, int blue);
 	int calcGrayLevel(int red, int green, int blue);
-	int calcColorLevel(int red, int green, int blue);
+	int calcColorLevel(double red, double green, double blue);
 	int getGrayLevel(String color);
 	int getColorLevel(String color, String mainColor);
 	void getLevels(String color, int * levels);
 	double calcIntensity(double red, double green, double blue);
 	void showPixelColor(int r, int g, int b, Size size);
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
-
 	void release_memory();
+	bool isBrownViolet(int r, int g, int b);
 };
 
 

@@ -107,6 +107,11 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 							if(pix=="OTHER")
 							{
 								pix = rgb.pushColor(r,g,b);
+								if(rgb.isBrownViolet(r,g,b)==true)
+								{
+									if(g>b) pix = "Gray14Brown3Pink4";
+									if(b>g) pix = "Gray14Pink3Violet4";
+								}
 								pixelColorWindow.push_back(pix);
 							}
 							else
@@ -127,6 +132,11 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 						if(pix=="OTHER")
 						{
 							pix = rgb.pushColor(r,g,b);
+							if(rgb.isBrownViolet(r,g,b)==true)
+							{
+								if(g>b) pix = "Gray14Brown3Pink4";
+								if(b>g) pix = "Gray14Pink3Violet4";
+							}
 							pixelColorWindow.pop_front();
 							pixelColorWindow.push_back(pix);
 						}

@@ -26,6 +26,7 @@ public:
 	double getBrite();
 	double calcLum(double red, double green, double blue);
 	double calcBrite(double red, double green, double blue);
+	double calcRelLum(double red, double green, double blue);
 	String getHslColor(double r,double g,double b);
 	void release_memory();
 };

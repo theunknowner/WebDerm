@@ -215,4 +215,26 @@ void runMouseHysteresis2()
 	waitKey(0);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
+	hsl.release_memory();
+}
+
+void runOutputColorFreq()
+{
+	rgb rgb;
+	hsl hsl;
+	String filename;
+	String name;
+	String input;
+	cout << "Enter filename: ";
+	cin >> filename;
+	Mat img, img2, mask;
+	img = runResizeImage(filename,Size(700,700),0);
+	getSkin(img, mask);
+	img.copyTo(img2, mask);
+	rgb.importThresholds();
+	hsl.importLsThreshold();
+	outputFreqColor(img2);
+	img.release(); img2.release(); mask.release();
+	rgb.release_memory();
+	hsl.release_memory();
 }

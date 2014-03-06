@@ -247,3 +247,42 @@ void testColorIndex(Mat &img, int index)
 	imshow("Img2",img2);
 	waitKey(0);
 }
+
+void testColor(int r, int g, int b)
+{
+	String pix;
+	int ind=0;
+	rgb rgb;
+	pix = rgb.pushColor(r,g,b,ind);
+	printf("%s(%d)\n",pix.c_str(),ind+2);
+	printf("(%d,%d,%d)\n",r,g,b);
+	if(pix.find("Violet")!=string::npos || pix.find("Brown")!=string::npos)
+	{
+		if(g>b)
+		{
+			cout << "Brown" << endl;
+		}
+		if(b>g)
+		{
+			cout << "Violet" << endl;
+		}
+	}
+}
+
+void testThresh()
+{
+	for(unsigned int i=0; i<absMeanThresh.size(); i++)
+	{
+		if(rgbColors.at(i).find("Violet")!=string::npos || rgbColors.at(i).find("Brown")!=string::npos)
+		{
+			if(absMeanThresh.at(i).at(1)>absMeanThresh.at(i).at(2))
+			{
+				printf("%s(%d) -> Brown\n",rgbColors.at(i).c_str(),i+2);
+			}
+			if(absMeanThresh.at(i).at(2)>absMeanThresh.at(i).at(1))
+			{
+				printf("%s(%d) -> Violet\n",rgbColors.at(i).c_str(),i+2);
+			}
+		}
+	}
+}

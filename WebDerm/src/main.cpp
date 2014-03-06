@@ -16,21 +16,22 @@
 
 int main(int argc, char** argv)
 {
+	runOutputColorFreq();
+	/*
 	hsl hsl;
 	rgb rgb;
 	//hsl.importThresholds();
 	rgb.importThresholds();
 	hsl.importLsThreshold();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph1.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	cout << rgb.calcIntensity(123,101,102);
-	//testColorIndex(img2,28);
+	//testColorIndex(img2,120);
 	//showPixelColor(148,112,118,Size(400,400));
-	int col = 367;
-	int row = 191;
-	//cout << "Result: " << testHysteresis(img2, row, col, Size(3,3)) << endl;
+	int col = 352;
+	int row = 367;
+	cout << "Result: " << testHysteresis(img2, row, col, Size(3,3)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
 	//imwrite("img.png", img3);

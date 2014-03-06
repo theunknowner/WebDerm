@@ -19,5 +19,6 @@ void colorThreshScript();
 void outputMeanScript();
 void outputFarRGB(Mat &img);
 String outputCorrelationRGB(int r, int g, int b);
+void outputFreqColor(Mat &img);
 
 #endif /* SCRIPTS_H_ */

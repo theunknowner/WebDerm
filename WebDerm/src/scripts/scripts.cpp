@@ -36,7 +36,7 @@ void colorThreshNamingScript()
 		}
 		else if(rgbColors.at(i)!="Gray" && grayLevel!=0)
 		{
-			pix = "Gray" + toString(grayLevel) + rgbColors.at(i) + toString(colorLevel);
+			pix = "Gray" + toString(grayLevel) + rgbColors.at(i)+ toString(colorLevel);
 		}
 		else if(rgbColors.at(i)!="Gray" && grayLevel==0)
 		{
@@ -153,4 +153,33 @@ String outputCorrelationRGB(int r, int g, int b)
 	cout << min <<endl;
 	cout << ind +2 << endl;
 	return pix;
+}
+
+void outputFreqColor(Mat &img)
+{
+	rgb rgb;
+	int arr[rgbColors.size()];
+	fill_n(arr, rgbColors.size(), 0);
+	int ind=0;
+	int r,g,b;
+	for(int row=0; row<img.rows; row++)
+	{
+		for(int col=0; col<img.cols; col++)
+		{
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			rgb.pushColor(r,g,b,ind);
+			++arr[ind];
+		}
+	}
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/colorFreq.txt","w");
+	for(unsigned int i=0; i<rgbColors.size(); i++)
+	{
+		if(arr[i]!=0)
+		{
+			fprintf(fp,"%d: %s(%d)\n", i+2, rgbColors.at(i).c_str(), arr[i]);
+		}
+	}
 }
