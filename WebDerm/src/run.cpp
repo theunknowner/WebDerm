@@ -144,7 +144,7 @@ void runHysteresis()
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
 	hsl.importLsThreshold();
-	hysteresis(img2,Size(3,3),name);
+	hysteresis(img2,Size(2,2),name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 }

@@ -19,7 +19,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	int mainColorIndex[mainColors.size()];
 	int mainColorLevels[mainColors.size()];
 	double mainColorLevelAvg[mainColors.size()];
-	int matchingScans = (size.width*size.height)/2;
+	double matchingScans = (size.width*size.height)/2;
 	fill_n(colorIndex,rgbColors.size(),0);
 	fill_n(mainColorIndex,mainColors.size(),0);
 	fill_n(mainColorLevelAvg,mainColors.size(),0);
@@ -57,7 +57,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 		{
 			cout << mainColors.at(j) << ":"<< mainColorIndex[j] << endl;
 		}
-		if(mainColorIndex[j]>matchingScans)
+		if(mainColorIndex[j]>=round(matchingScans))
 		{
 			index.push_back(j);
 		}

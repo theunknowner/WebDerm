@@ -74,7 +74,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 		//String filename = name + "_seqCheck.csv";
 		//FILE * fSeq;
 		//fSeq = fopen(filename.c_str(), "w");
-		int matchingScans = (size.width*size.height)/2;
+		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
 		vector<String> colorWindow;
 		vector< vector<String> > windowVec;
@@ -146,7 +146,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				}
 				for(unsigned int j=0; j<mainColors.size(); j++)
 				{
-					if(mainColorIndex[j]>matchingScans)
+					if(mainColorIndex[j]>=round(matchingScans))
 					{
 						index.push_back(j);
 					}
