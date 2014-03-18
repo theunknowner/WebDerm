@@ -202,7 +202,7 @@ String rgb::pushColor(int red, int green, int blue)
 		int greatest=0;
 		for(unsigned int i=0; i<rgbColors.size(); i++)
 		{
-			if(colorIndex[i]>greatest)
+			if(colorIndex[i]>=greatest)
 			{
 				greatest = colorIndex[i];
 				index[0] = i;
@@ -253,7 +253,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		{
 			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
 			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i]) << endl;
+			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*(normDistVals[i]) << endl;
 		}
 		smallest[0] = normDistVals[0];
 		smallest[1] = absDistVals[0];
@@ -294,7 +294,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		int greatest=0;
 		for(unsigned int i=0; i<rgbColors.size(); i++)
 		{
-			if(colorIndex[i]>greatest)
+			if(colorIndex[i]>=greatest)
 			{
 				greatest = colorIndex[i];
 				index2 = i;
