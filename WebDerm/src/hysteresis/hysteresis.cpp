@@ -85,6 +85,9 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 		int mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
 		String pix;
+		int ind=0;
+		double dist=0;
+		double thresh = 6.0;
 		int b,g,r;
 		int row=0, col=0;
 		fill_n(mainColorIndex,mainColors.size(),0);

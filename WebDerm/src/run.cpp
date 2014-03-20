@@ -15,7 +15,6 @@ void runCheckRGBColor()
 	vector<String> strVec;
 	vector<int> rgbVec;
 	int ch=0;
-	double e=0.25;
 	for(;;)
 	{
 		cout << "Enter RGB: ";
@@ -25,7 +24,7 @@ void runCheckRGBColor()
 		{
 			rgbVec.push_back(atoi(strVec.at(i).c_str()));
 		}
-		cout << "RESULTS: " << rgb.pushColor(rgbVec[0],rgbVec[1],rgbVec[2],e) << endl;
+		cout << "RESULTS: " << rgb.pushColor(rgbVec[0],rgbVec[1],rgbVec[2]) << endl;
 		cout << "Press any key to continue...";
 		getchar();
 		for(;;)
@@ -68,7 +67,7 @@ void runCheckList()
 					rgbVec.push_back(atoi(strVec.at(i).c_str()));
 				}
 			}
- 			str = rgb.pushColor(rgbVec[0],rgbVec[1],rgbVec[2],0.25);
+ 			str = rgb.pushColor(rgbVec[0],rgbVec[1],rgbVec[2]);
  			if(str==strVec.at(3))
  			{
  				flag=true;

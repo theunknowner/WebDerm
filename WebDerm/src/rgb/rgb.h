@@ -17,9 +17,11 @@ public:
 	bool importThresholds();
 	double normEucDist(double red, double green, double blue, vector<double> &vec);
 	double absEucDist(double red, double green, double blue, vector<double> &vec);
+	void outputRGBVals(int red, int green, int blue, Point coord, double dist, String color, int ind);
+	bool checkAbsDist(double dist, double thresh);
 	String checkBlack(int r, int g, int b);
-	String pushColor(int red, int green, int blue, double e);
 	String pushColor(int red, int green, int blue);
+	String pushColor(int red, int green, int blue,double &dist, int &ind);
 	String pushColor(int red, int green, int blue, int &ind);
 	double pushColor2(int red, int green, int blue, int &ind);
 	String getModifier(int red,  int green, int blue);

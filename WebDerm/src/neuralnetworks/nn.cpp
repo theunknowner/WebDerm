@@ -249,7 +249,7 @@ bool getData(String filename)
 				//cout << rgb.at(i).at(j) << endl;
 				rgbVal[j] = RGB.at(i).at(j);
 			}
-			temp = rgb.pushColor(rgbVal[0],rgbVal[1],rgbVal[2],0.25);
+			temp = rgb.pushColor(rgbVal[0],rgbVal[1],rgbVal[2]);
 			//cout << temp << endl;
 			fprintf(fp, "%d,%d,%d,%s\n",rgbVal[0],rgbVal[1],rgbVal[2],temp.c_str());
 			//outFile << rgbVal[0] << "," << rgbVal[1] << "," << rgbVal[2] << "," << temp << endl;

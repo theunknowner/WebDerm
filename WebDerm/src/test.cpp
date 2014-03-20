@@ -14,6 +14,8 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	int ind=0;
 	vector<int> index;
 	String pix;
+	double dist=0;
+	double thresh = 6.0;
 	deque<String> pixelColorWindow;
 	int colorIndex[rgbColors.size()];
 	int mainColorIndex[mainColors.size()];

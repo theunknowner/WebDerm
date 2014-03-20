@@ -155,6 +155,7 @@ String outputCorrelationRGB(int r, int g, int b)
 	return pix;
 }
 
+//compares two spreadsheets
 void spreadsheetCompareScript()
 {
 	String filename;
@@ -205,5 +206,30 @@ void spreadsheetCompareScript()
 	else
 	{
 		cout << "File not found!" << endl;
+	}
+}
+
+//prints out rgb vals and location of matching index
+void outputPixLoc(Mat img,int index)
+{
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/pixLoc.txt", "w");
+	rgb rgb;
+	int r,g,b;
+	String pix;
+	int ind=0;
+	for(int row=0; row<img.rows; row++) {
+		for(int col=0; col<img.cols; col++) {
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			pix = rgb.checkBlack(r,g,b);
+			if(pix=="OTHER") {
+				pix = rgb.pushColor2(r,g,b,ind);
+			}
+			if(ind==(index-2)) {
+				fprintf(fp,"%d,%d,%d - (%d,%d)\n", r,g,b,col+1,row+1);
+			}
+		}
 	}
 }

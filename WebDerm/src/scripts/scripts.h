@@ -20,5 +20,6 @@ void outputMeanScript();
 void outputFarRGB(Mat &img);
 String outputCorrelationRGB(int r, int g, int b);
 void spreadsheetCompareScript();
+void outputPixLoc(Mat img,int index);
 
 #endif /* SCRIPTS_H_ */

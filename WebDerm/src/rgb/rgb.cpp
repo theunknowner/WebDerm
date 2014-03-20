@@ -108,6 +108,23 @@ double rgb::absEucDist(double red, double green, double blue, vector<double> &ve
 		return result;
 	}
 
+void rgb::outputRGBVals(int red, int green, int blue, Point coord, double dist, String color, int ind)
+{
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/Programs/Hysteresis/rgb.txt","a");
+	fprintf(fp,"%d,%d,%d - (%d,%d) - %f - %s - %d\n", red,green,blue,coord.x,coord.y,dist, color.c_str(), ind+2);
+}
+
+//check if dist is greater than thresh
+bool rgb::checkAbsDist(double dist, double thresh)
+{
+	if(dist>thresh)
+	{
+		return true;
+	}
+	return false;
+}
+
 //checks if color is black
 String rgb::checkBlack(int r, int g, int b)
 	{
@@ -116,34 +133,6 @@ String rgb::checkBlack(int r, int g, int b)
 			return "Black25";
 		}
 		return "OTHER";
-	}
-
-//pushes color using Euclidean Distance
-String rgb::pushColor(int red, int green, int blue, double e)
-	{
-		double smallest=0;
-		double val=0;
-		unsigned int index=0;
-		double normDistVals[normMeanThresh.size()];
-		double absDistVals[absMeanThresh.size()];
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
-			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-			//cout << colors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i],e) << endl;
-		}
-		smallest = absDistVals[0] * pow(normDistVals[0],e);
-		index = 0;
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			val = absDistVals[i]*pow(normDistVals[i],e);
-			if(val<smallest)
-			{
-				smallest = val;
-				index = i;
-			}
-		}
-		return rgbColors[index];
 	}
 
 //pushes color using Euclidean Distance with 7 different schemes
@@ -209,6 +198,73 @@ String rgb::pushColor(int red, int green, int blue)
 			}
 		}
 		return rgbColors[index[0]];
+	}
+
+String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
+	{
+		const int length=7;
+		double smallest[length]={0};
+		double val[length]={0};
+		unsigned int index[length]={0};
+		int index2=0;
+		int colorIndex[rgbColors.size()];
+		fill_n(colorIndex,rgbColors.size(),0);
+		double normDistVals[normMeanThresh.size()];
+		double absDistVals[absMeanThresh.size()];
+		for(unsigned int i=0; i<normMeanThresh.size(); i++)
+		{
+			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
+			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
+			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*(normDistVals[i]) << endl;
+		}
+		smallest[0] = normDistVals[0];
+		smallest[1] = absDistVals[0];
+		smallest[2] = absDistVals[0] * pow(normDistVals[0],2);
+		smallest[3] = absDistVals[0] * normDistVals[0];
+		smallest[4] = absDistVals[0] * pow(normDistVals[0],0.25);
+		smallest[5] = absDistVals[0] * pow(normDistVals[0],0.45);
+		smallest[6] = absDistVals[0] * pow(normDistVals[0],0.65);
+		fill_n(index,length,0);
+		for(unsigned int i=0; i<normMeanThresh.size(); i++)
+		{
+			val[0] = normDistVals[i];
+			val[1] = absDistVals[i];
+			val[2] = absDistVals[i] * pow(normDistVals[i],2);
+			val[3] = absDistVals[i] * normDistVals[i];
+			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
+			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
+			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+			for(int j=0; j<length; j++)
+			{
+				if(val[j]<smallest[j])
+				{
+					smallest[j] = val[j];
+					index[j] = i;
+				}
+			}
+		}
+		for(int i=0; i<length; i++)
+		{
+			for(unsigned int j=0; j<rgbColors.size(); j++)
+			{
+				if(index[i]==j)
+				{
+					++colorIndex[j];
+				}
+			}
+		}
+		int greatest=0;
+		for(unsigned int i=0; i<rgbColors.size(); i++)
+		{
+			if(colorIndex[i]>=greatest)
+			{
+				greatest = colorIndex[i];
+				index2 = i;
+			}
+		}
+		dist = absDistVals[index2];
+		ind = index2;
+		return rgbColors[index2];
 	}
 
 double rgb::pushColor2(int red, int green, int blue, int &ind)
@@ -301,6 +357,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 			}
 		}
 		ind = index2;
+		cout << absDistVals[ind] << endl;
 		return rgbColors[index2];
 	}
 
