@@ -10,6 +10,7 @@
 #include "functions2.h"
 #include "hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 String toString(int val);
 String toString(double val);

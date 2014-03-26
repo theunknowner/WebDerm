@@ -10,12 +10,11 @@
 String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
+	Color colorObj;
 	int b,g,r;
 	int ind=0;
 	vector<int> index;
 	String pix;
-	double dist=0;
-	double thresh = 6.0;
 	deque<String> pixelColorWindow;
 	int colorIndex[rgbColors.size()];
 	int mainColorIndex[mainColors.size()];
@@ -49,7 +48,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	{
 		for(unsigned int j=0; j<mainColors.size(); j++)
 		{
-			if(containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
+			if(colorObj.containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
 			mainColorIndex[j]++;
 		}
 	}
@@ -98,6 +97,7 @@ String testMouseHysteresis(Mat &img, int row, int col, Size size,
 						   vector<Vec3b> &vec, vector<String> &colorVec)
 {
 	rgb rgb;
+	Color colorObj;
 	int b,g,r;
 	vector<int> index;
 	String pix;
@@ -133,7 +133,7 @@ String testMouseHysteresis(Mat &img, int row, int col, Size size,
 	{
 		for(unsigned int j=0; j<mainColors.size(); j++)
 		{
-			count = containsMainColor(pixelColorWindow.at(i),mainColors.at(j));
+			count = colorObj.containsMainColor(pixelColorWindow.at(i),mainColors.at(j));
 			mainColorIndex[j]+=count;
 		}
 	}
@@ -248,43 +248,4 @@ void testColorIndex(Mat &img, int index)
 	imshow("Img", img);
 	imshow("Img2",img2);
 	waitKey(0);
-}
-
-void testColor(int r, int g, int b)
-{
-	String pix;
-	int ind=0;
-	rgb rgb;
-	pix = rgb.pushColor(r,g,b,ind);
-	printf("%s(%d)\n",pix.c_str(),ind+2);
-	printf("(%d,%d,%d)\n",r,g,b);
-	if(pix.find("Violet")!=string::npos || pix.find("Brown")!=string::npos)
-	{
-		if(g>b)
-		{
-			cout << "Brown" << endl;
-		}
-		if(b>g)
-		{
-			cout << "Violet" << endl;
-		}
-	}
-}
-
-void testThresh()
-{
-	for(unsigned int i=0; i<absMeanThresh.size(); i++)
-	{
-		if(rgbColors.at(i).find("Violet")!=string::npos || rgbColors.at(i).find("Brown")!=string::npos)
-		{
-			if(absMeanThresh.at(i).at(1)>absMeanThresh.at(i).at(2))
-			{
-				printf("%s(%d) -> Brown\n",rgbColors.at(i).c_str(),i+2);
-			}
-			if(absMeanThresh.at(i).at(2)>absMeanThresh.at(i).at(1))
-			{
-				printf("%s(%d) -> Violet\n",rgbColors.at(i).c_str(),i+2);
-			}
-		}
-	}
 }

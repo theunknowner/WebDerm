@@ -30,41 +30,7 @@ void getSubstr(String str, char delimiter, vector<String> &vec)
 	}
 }
 
-//check if color1 contains color2
-bool containsColor(String color1, String color2)
-{
-	size_t pos=0;
-	pos = color1.find("+");
-	if(pos!=string::npos)
-	{
-		if(color2 == color1.substr(0,pos) || color2 == color1.substr(pos+1,color1.size()-(pos+1)))
-		{
-			return true;
-		}
-	}
-	return false;
-}
 
-int containsMainColor(String color, String mColor)
-{
-	int count=0;
-	size_t pos=0;
-	while((pos=color.find(mColor,pos))!=string::npos)
-	{
-		++count;
-		pos += mColor.length();
-	}
-	return count;
-}
-
-bool isSameColor(String color1, String color2)
-{
-	if(color1.substr(0,color1.size()-1)==color2.substr(0,color2.size()-1))
-	{
-		return true;
-	}
-	return false;
-}
 
 //gets coordinated that matches RGB
 void getCoordinates(Mat &img, int red, int green, int blue)

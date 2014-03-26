@@ -17,7 +17,7 @@ public:
 	bool importThresholds();
 	double normEucDist(double red, double green, double blue, vector<double> &vec);
 	double absEucDist(double red, double green, double blue, vector<double> &vec);
-	void outputRGBVals(int red, int green, int blue, Point coord, double dist, String color, int ind);
+	void outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind);
 	bool checkAbsDist(double dist, double thresh);
 	String checkBlack(int r, int g, int b);
 	String pushColor(int red, int green, int blue);
@@ -34,7 +34,6 @@ public:
 	void showPixelColor(int r, int g, int b, Size size);
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 	void release_memory();
-	bool isBrownViolet(int r, int g, int b);
 };
 
 

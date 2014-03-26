@@ -13,12 +13,14 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 void colorThreshNamingScript();
 void colorThreshScript();
 void outputMeanScript();
-void outputFarRGB(Mat &img);
-String outputCorrelationRGB(int r, int g, int b);
+void outputFarRGB(Mat &img, String name);
+String outputCorrelationRGB(int r, int g, int b, double &m);
+String outputCorrelationRGBnorm(int r, int g, int b, double &m);
 void spreadsheetCompareScript();
 void outputPixLoc(Mat img,int index);
 

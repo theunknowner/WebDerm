@@ -108,10 +108,8 @@ double rgb::absEucDist(double red, double green, double blue, vector<double> &ve
 		return result;
 	}
 
-void rgb::outputRGBVals(int red, int green, int blue, Point coord, double dist, String color, int ind)
+void rgb::outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind)
 {
-	FILE * fp;
-	fp = fopen("/home/jason/Desktop/Programs/Hysteresis/rgb.txt","a");
 	fprintf(fp,"%d,%d,%d - (%d,%d) - %f - %s - %d\n", red,green,blue,coord.x,coord.y,dist, color.c_str(), ind+2);
 }
 
@@ -523,14 +521,4 @@ void rgb::release_memory()
 	vector< vector<double> >().swap(absThresh);
 	vector<String>().swap(rgbColors);
 	vector<String>().swap(mainColors);
-}
-
-bool rgb::isBrownViolet(int r, int g, int b)
-{
-	if(r>=160&&r<=171&&g>=117&&g<=133&&b>=117&&b<=133)
-	{
-		return true;
-	}
-	return false;
-
 }

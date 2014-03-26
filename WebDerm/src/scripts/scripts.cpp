@@ -10,13 +10,15 @@
 void colorThreshNamingScript()
 {
 	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/colorThresh2.csv","w");
+	fp = fopen("/home/jason/Desktop/workspace/colorThresh.csv","w");
 	hsl hsl;
 	rgb rgb;
+	Color color;
 	double r,g,b;
 	String pix;
-	int grayLevel=0;
 	int colorLevel=0;
+	int mainColorIndex[mainColors.size()];
+	fill_n(mainColorIndex,mainColors.size(),0);
 	fprintf(fp,"Color,Rmin,Rmax,Gmin,Gmax,Bmin,Bmax,rMin,rMax,gMin,gMax,bMin,bMax\n");
 	for(unsigned int i=0; i<rgbColors.size(); i++)
 	{
@@ -24,33 +26,27 @@ void colorThreshNamingScript()
 		g = absMeanThresh.at(i).at(1);
 		b = absMeanThresh.at(i).at(2);
 		hsl.rgb2hsl(r,g,b);
-		grayLevel=rgb.calcGrayLevel(r,g,b);
 		colorLevel = rgb.calcColorLevel(r,g,b);
-		if(rgbColors.at(i)=="White" || colorLevel==0)
+		for(unsigned int j=0; j<mainColors.size(); j++)
 		{
-			pix = rgbColors.at(i) + toString(colorLevel);
-		}
-		else if(rgbColors.at(i)=="Black")
-		{
-			pix = rgbColors.at(i) + toString(colorLevel);
-		}
-		else if(rgbColors.at(i)!="Gray" && grayLevel!=0)
-		{
-			pix = "Gray" + toString(grayLevel) + rgbColors.at(i)+ toString(colorLevel);
-		}
-		else if(rgbColors.at(i)!="Gray" && grayLevel==0)
-		{
-			pix = rgbColors.at(i) + toString(colorLevel);
-		}
-		else
-		{
-			pix = rgbColors.at(i) + toString(colorLevel);
+			if(color.containsMainColor(rgbColors.at(i),mainColors.at(j)))
+			{
+				if(mainColors.at(j)=="Gray" && colorLevel>8)
+				{
+					pix = pix + mainColors.at(j) + toString(colorLevel+3);
+				}
+				else
+				{
+					colorLevel = rgb.getColorLevel(rgbColors.at(i),mainColors.at(j));
+					pix = pix + mainColors.at(j) + toString(colorLevel);
+				}
+			}
 		}
 			fprintf(fp,"%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 					pix.c_str(),absThresh[i][0],absThresh[i][1],absThresh[i][2],absThresh[i][3],
 					absThresh[i][4],absThresh[i][5],normThresh[i][0],normThresh[i][1],
 					normThresh[i][2],normThresh[i][3],normThresh[i][4],normThresh[i][5]);
-
+			pix.clear();
 	}
 }
 
@@ -82,6 +78,10 @@ void colorThreshScript()
 	}
 }
 
+void addNewColors() {
+
+}
+
 void outputMeanScript()
 {
 	FILE * fp;
@@ -97,16 +97,17 @@ void outputMeanScript()
 	}
 }
 
-void outputFarRGB(Mat &img)
+void outputFarRGB(Mat &img, String name)
 {
+	String filename = path+name+".txt";
 	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/rgb.csv","w");
+	fp = fopen(filename.c_str(),"w");
 	rgb rgb;
 	int r,g,b;
 	int ind=0;
+	double dist=0;
+	double thresh=6.0;
 	String pix;
-	double min=0;
-	fprintf(fp,"R,G,B,Col,Row,Min\n");
 	for(int row=0; row<img.rows; row++)
 	{
 		for(int col=0; col<img.cols; col++)
@@ -117,18 +118,16 @@ void outputFarRGB(Mat &img)
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER")
 			{
-				min = rgb.pushColor2(r,g,b,ind);
-				if(min>10)
-				{
-					fprintf(fp,"%d,%d,%d,%d,%d,%f,%s,%d\n",r,g,b,col,row,min,
-							rgbColors.at(ind).c_str(),ind+2);
+				pix = rgb.pushColor(r,g,b,dist,ind);
+				if(rgb.checkAbsDist(dist,thresh)) {
+					rgb.outputRGBVals(fp,r,g,b,Point(col+1,row+1),dist,pix,ind);
 				}
 			}
 		}
 	}
 }
 
-String outputCorrelationRGB(int r, int g, int b)
+String outputCorrelationRGB(int r, int g, int b, double &m)
 {
 	double vec1[3] = {(double)r,(double)g,(double)b};
 	double dist=0;
@@ -152,6 +151,35 @@ String outputCorrelationRGB(int r, int g, int b)
 	}
 	cout << min <<endl;
 	cout << ind +2 << endl;
+	m = min;
+	return pix;
+}
+
+String outputCorrelationRGBnorm(int r, int g, int b, double &m)
+{
+	double vec1[3] = {(double)r,(double)g,(double)b};
+	double dist=0;
+	int ind=0;
+	double min=10;
+	String pix;
+	for(unsigned int i=0; i<normMeanThresh.size(); i++)
+	{
+		double vec2[3] = {normMeanThresh.at(i).at(0),normMeanThresh.at(i).at(1),
+				normMeanThresh.at(i).at(2)};
+		dist = correlationDist(vec1,vec2);
+		if(dist!=-1)
+		{
+			if(dist<min)
+			{
+				min = dist;
+				ind = i;
+			}
+			pix = rgbColors.at(ind);
+		}
+	}
+	cout << min <<endl;
+	cout << ind +2 << endl;
+	m=min;
 	return pix;
 }
 

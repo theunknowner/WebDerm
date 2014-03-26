@@ -71,9 +71,10 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 	void hysteresis(Mat img, Size size, String name)
 	{
 		rgb rgb;
-		//String filename = name + "_seqCheck.csv";
-		//FILE * fSeq;
-		//fSeq = fopen(filename.c_str(), "w");
+		Color colorObj;
+		FILE * fp;
+		String filename = path+name+".txt";
+		fp = fopen(filename.c_str(),"w");
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
 		vector<String> colorWindow;
@@ -108,7 +109,10 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 							pix = rgb.checkBlack(r,g,b);
 							if(pix=="OTHER")
 							{
-								pix = rgb.pushColor(r,g,b);
+								pix = rgb.pushColor(r,g,b,dist,ind);
+								if(rgb.checkAbsDist(dist,thresh)) {
+									rgb.outputRGBVals(fp,r,g,b,Point(x,y),dist,pix.c_str(),ind+2);
+								}
 								pixelColorWindow.push_back(pix);
 							}
 							else
@@ -128,7 +132,10 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 						pix = rgb.checkBlack(r,g,b);
 						if(pix=="OTHER")
 						{
-							pix = rgb.pushColor(r,g,b);
+							pix = rgb.pushColor(r,g,b,dist,ind);
+							if(rgb.checkAbsDist(dist,thresh)) {
+								rgb.outputRGBVals(fp,r,g,b,Point(col+(size.width-1),y),dist,pix.c_str(),ind+2);
+							}
 							pixelColorWindow.pop_front();
 							pixelColorWindow.push_back(pix);
 						}
@@ -143,7 +150,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				{
 					for(unsigned int j=0; j<mainColors.size(); j++)
 					{
-						if(containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
+						if(colorObj.containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
 							mainColorIndex[j]++;
 					}
 				}
@@ -234,6 +241,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 	void hysteresis(Mat img,String name)
 	{
 		rgb rgb;
+		Color colorObj;
 		String filename;
 		vector <vector<String> > windowVec;
 		vector<int> index;
@@ -258,7 +266,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				}
 				for(unsigned int i=0; i<mainColors.size(); i++)
 				{
-					count = containsMainColor(pix, mainColors.at(i));
+					count = colorObj.containsMainColor(pix, mainColors.at(i));
 					mainColorIndex[i]+=count;
 				}
 				count=0;

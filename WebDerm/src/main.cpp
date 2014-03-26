@@ -18,20 +18,20 @@ int main(int argc, char** argv)
 {
 	hsl hsl;
 	rgb rgb;
+	Color color;
 	//hsl.importThresholds();
 	rgb.importThresholds();
 	hsl.importLsThreshold();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/Vesicles","vesicles25.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	//outputPixLoc(img2,79);
-	//spreadsheetCompareScript();
-	colorThreshScript();
+	//colorThreshNamingScript();
+	//colorThreshScript();
 	//testColorIndex(img2,133);
 	//rgb.showPixelColor(198,170,160,Size(400,400));
-	int col = 504;
-	int row = 302;
+	int col = 388;
+	int row = 325;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");

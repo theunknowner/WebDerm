@@ -266,3 +266,26 @@ void runOutputColorFreq()
 	rgb.release_memory();
 	hsl.release_memory();
 }
+
+void runOutputFarRGB() {
+	rgb rgb;
+	hsl hsl;
+	String filename;
+	String name;
+	String input;
+	cout << "Enter filename: ";
+	cin >> filename;
+	cout << "Do you want to write image? (y/n) ";
+	cin >> input;
+	Mat img, img2, mask;
+	img = runResizeImage(filename,Size(700,700),0);
+	getSkin(img, mask);
+	img.copyTo(img2, mask);
+	name = getImageName(filename);
+	if(input=="y") imwrite(name+".png",img2);
+	rgb.importThresholds();
+	hsl.importLsThreshold();
+	outputFarRGB(img2,name);
+	img.release(); img2.release(); mask.release();
+	rgb.release_memory(); hsl.release_memory();
+}
