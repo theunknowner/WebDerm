@@ -108,6 +108,20 @@ double rgb::absEucDist(double red, double green, double blue, vector<double> &ve
 		return result;
 	}
 
+double rgb::absEucDist(double red, double green, double blue, vector<int> &vec)
+	{
+		double result=0;
+		double color[3] = {red,green,blue};
+		for(int i=0; i<3; i++)
+		{
+			color[i] -= vec.at(i);
+			color[i] *= color[i];
+			result += color[i];
+		}
+		result = sqrt(result);
+		return result;
+	}
+
 void rgb::outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind)
 {
 	fprintf(fp,"%d,%d,%d - (%d,%d) - %f - %s - %d\n", red,green,blue,coord.x,coord.y,dist, color.c_str(), ind+2);
@@ -348,7 +362,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		int greatest=0;
 		for(unsigned int i=0; i<rgbColors.size(); i++)
 		{
-			if(colorIndex[i]>=greatest)
+			if(colorIndex[i]>greatest)
 			{
 				greatest = colorIndex[i];
 				index2 = i;
@@ -383,7 +397,7 @@ int rgb::calcGrayLevel(int red, int green, int blue)
 	sat = roundDecimal(sat,2);
 	for(unsigned int i=0; i<satThresh.size(); i++)
 	{
-		if(sat>satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
+		if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
 		{
 			return i;
 		}

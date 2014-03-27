@@ -18,7 +18,7 @@
 void colorThreshNamingScript();
 void colorThreshScript();
 void outputMeanScript();
-void outputFarRGB(Mat &img, String name);
+void outputFarRGBScript(Mat &img, String name);
 String outputCorrelationRGB(int r, int g, int b, double &m);
 String outputCorrelationRGBnorm(int r, int g, int b, double &m);
 void spreadsheetCompareScript();

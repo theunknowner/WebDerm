@@ -16,7 +16,9 @@ void colorThreshNamingScript()
 	Color color;
 	double r,g,b;
 	String pix;
+	vector<String> vecColor;
 	int colorLevel=0;
+	int grayLevel=0;
 	int mainColorIndex[mainColors.size()];
 	fill_n(mainColorIndex,mainColors.size(),0);
 	fprintf(fp,"Color,Rmin,Rmax,Gmin,Gmax,Bmin,Bmax,rMin,rMax,gMin,gMax,bMin,bMax\n");
@@ -27,18 +29,26 @@ void colorThreshNamingScript()
 		b = absMeanThresh.at(i).at(2);
 		hsl.rgb2hsl(r,g,b);
 		colorLevel = rgb.calcColorLevel(r,g,b);
-		for(unsigned int j=0; j<mainColors.size(); j++)
+		grayLevel = rgb.calcGrayLevel(r,g,b);
+		color.extractColorFromString(rgbColors.at(i),vecColor);
+		for(unsigned int j=0; j<vecColor.size(); j++)
 		{
-			if(color.containsMainColor(rgbColors.at(i),mainColors.at(j)))
-			{
-				if(mainColors.at(j)=="Gray" && colorLevel>8)
-				{
-					pix = pix + mainColors.at(j) + toString(colorLevel+3);
+			if(vecColor.size()==1) {
+				pix = pix + vecColor.at(j) + toString(colorLevel);
+			} else if(vecColor.size()==2) {
+				if(j==0) {
+					pix = pix + vecColor.at(j) + toString(grayLevel);
 				}
-				else
-				{
-					colorLevel = rgb.getColorLevel(rgbColors.at(i),mainColors.at(j));
-					pix = pix + mainColors.at(j) + toString(colorLevel);
+				else {
+					pix = pix + vecColor.at(j) + toString(colorLevel);
+				}
+			} else if(vecColor.size()==3) {
+				if(j==0) {
+					pix = pix + vecColor.at(j) + toString(grayLevel);
+				}
+				else {
+					colorLevel = rgb.getColorLevel(rgbColors.at(i),vecColor.at(j));
+					pix = pix + vecColor.at(j) + toString(colorLevel);
 				}
 			}
 		}
@@ -46,7 +56,7 @@ void colorThreshNamingScript()
 					pix.c_str(),absThresh[i][0],absThresh[i][1],absThresh[i][2],absThresh[i][3],
 					absThresh[i][4],absThresh[i][5],normThresh[i][0],normThresh[i][1],
 					normThresh[i][2],normThresh[i][3],normThresh[i][4],normThresh[i][5]);
-			pix.clear();
+			pix.clear(); vecColor.clear();
 	}
 }
 
@@ -78,10 +88,6 @@ void colorThreshScript()
 	}
 }
 
-void addNewColors() {
-
-}
-
 void outputMeanScript()
 {
 	FILE * fp;
@@ -97,17 +103,27 @@ void outputMeanScript()
 	}
 }
 
-void outputFarRGB(Mat &img, String name)
+void outputFarRGBScript(Mat &img, String name)
 {
-	String filename = path+name+".txt";
+	Color color;
+	String filename = path+name+"Colors.txt";
 	FILE * fp;
+	FILE * fs;
 	fp = fopen(filename.c_str(),"w");
+	fs = fopen("/home/jason/Desktop/workspace/colorThresh.csv","w");
 	rgb rgb;
 	int r,g,b;
 	int ind=0;
 	double dist=0;
-	double thresh=6.0;
-	String pix;
+	double thresh=8.0;
+	double min1=0, min2=0;
+	int lumLevel=0;
+	String pix, pix2;
+	vector<int> rgbVals;
+	vector< vector<int> > rgbList;
+	vector<String> vecColor;
+	vector<Point> points;
+	fprintf(fs,"Color,Rmin,Rmax,Gmin,Gmax,Bmin,Bmax,rMin,rMax,gMin,gMax,bMin,bMax\n");
 	for(int row=0; row<img.rows; row++)
 	{
 		for(int col=0; col<img.cols; col++)
@@ -120,10 +136,53 @@ void outputFarRGB(Mat &img, String name)
 			{
 				pix = rgb.pushColor(r,g,b,dist,ind);
 				if(rgb.checkAbsDist(dist,thresh)) {
-					rgb.outputRGBVals(fp,r,g,b,Point(col+1,row+1),dist,pix,ind);
+					if(rgbList.size()==0) {
+						points.push_back(Point(col+1,row+1));
+						rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
+						rgbList.push_back(rgbVals);
+						rgbVals.clear();
+					}
+					else {
+						for(unsigned int i=0; i<rgbList.size(); i++) {
+							dist = rgb.absEucDist(r,g,b,rgbList.at(i));
+							if(dist<=thresh) {
+								break;
+							}
+							if(i==(rgbList.size()-1)) { //if no match add to list
+								points.push_back(Point(col+1,row+1));
+								rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
+								rgbList.push_back(rgbVals);
+								rgbVals.clear();
+							}
+						}
+					}
 				}
 			}
 		}
+	}
+	for(unsigned int i=0; i<rgbList.size(); i++) {
+		r = rgbList.at(i).at(0);
+		g = rgbList.at(i).at(1);
+		b = rgbList.at(i).at(2);
+		pix = outputCorrelationRGB(r,g,b,min1);
+		pix2 = outputCorrelationRGBnorm(r,g,b,min2);
+		if(min1<=min2)
+			color.extractColorFromString(pix, vecColor);
+		else
+			color.extractColorFromString(pix2,vecColor);
+
+		lumLevel = rgb.calcColorLevel(r,g,b);
+		pix.clear();
+		for(unsigned int i=0; i<vecColor.size(); i++) {
+			if(vecColor.size()==1 && vecColor.at(i)!="Gray") {
+				pix = pix + "Gray" + toString(lumLevel) + vecColor.at(i) + toString(lumLevel);
+			}
+			else {
+				pix = pix + vecColor.at(i) + toString(lumLevel);
+			}
+		}
+		fprintf(fp,"%d,%d,%d - (%d,%d) - %s\n",r,g,b,points.at(i).x,points.at(i).y,pix.c_str());
+		vecColor.clear();
 	}
 }
 
@@ -149,8 +208,8 @@ String outputCorrelationRGB(int r, int g, int b, double &m)
 			pix = rgbColors.at(ind);
 		}
 	}
-	cout << min <<endl;
-	cout << ind +2 << endl;
+	//cout << min <<endl;
+	//cout << ind +2 << endl;
 	m = min;
 	return pix;
 }
@@ -177,8 +236,8 @@ String outputCorrelationRGBnorm(int r, int g, int b, double &m)
 			pix = rgbColors.at(ind);
 		}
 	}
-	cout << min <<endl;
-	cout << ind +2 << endl;
+	//cout << min <<endl;
+	//cout << ind +2 << endl;
 	m=min;
 	return pix;
 }

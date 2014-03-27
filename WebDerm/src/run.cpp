@@ -96,7 +96,7 @@ Mat runResizeImage(String foldername, String filename, Size size,int write)
 	vector<String> vec;
 	Mat img = imread(file);
 	Mat img2;
-	if(img.cols>size.width || img.rows>size.height)
+	if(img.cols>=size.width || img.rows>=size.height)
 		{resize(img, img2, size,0,0,INTER_AREA);}
 	if(img.cols<size.width || img.rows<size.height)
 		{resize(img, img2, size,0,0, INTER_CUBIC);}
@@ -112,7 +112,7 @@ Mat runResizeImage(String filename, Size size,int write)
 	vector<String> vec;
 	Mat img = imread(filename);
 	Mat img2;
-	if(img.cols>size.width || img.rows>size.height)
+	if(img.cols>=size.width || img.rows>=size.height)
 		{resize(img, img2, size,0,0,INTER_AREA);}
 	if(img.cols<size.width || img.rows<size.height)
 		{resize(img, img2, size,0,0, INTER_CUBIC);}
@@ -285,7 +285,7 @@ void runOutputFarRGB() {
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
 	hsl.importLsThreshold();
-	outputFarRGB(img2,name);
+	outputFarRGBScript(img2,name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory(); hsl.release_memory();
 }

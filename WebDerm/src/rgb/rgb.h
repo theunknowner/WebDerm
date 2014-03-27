@@ -17,6 +17,7 @@ public:
 	bool importThresholds();
 	double normEucDist(double red, double green, double blue, vector<double> &vec);
 	double absEucDist(double red, double green, double blue, vector<double> &vec);
+	double absEucDist(double red, double green, double blue, vector<int> &vec);
 	void outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind);
 	bool checkAbsDist(double dist, double thresh);
 	String checkBlack(int r, int g, int b);
