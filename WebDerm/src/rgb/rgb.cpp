@@ -268,7 +268,7 @@ String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 		int greatest=0;
 		for(unsigned int i=0; i<rgbColors.size(); i++)
 		{
-			if(colorIndex[i]>=greatest)
+			if(colorIndex[i]>greatest)
 			{
 				greatest = colorIndex[i];
 				index2 = i;

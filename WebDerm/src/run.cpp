@@ -285,7 +285,7 @@ void runOutputFarRGB() {
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
 	hsl.importLsThreshold();
-	outputFarRGBScript(img2,name);
+	//outputFarRGBScript(img2,name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory(); hsl.release_memory();
 }

@@ -320,3 +320,30 @@ void outputPixLoc(Mat img,int index)
 		}
 	}
 }
+
+void showPushColorOnImage(Mat &img, int index) {
+	rgb rgb;
+	int r,g,b;
+	int ind=0;
+	int count=0;
+	double dist=0;
+	String pix;
+	for(int row=0; row<img.rows; row++) {
+		for(int col=0; col<img.cols; col++) {
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			pix = rgb.checkBlack(r,g,b);
+			if(pix=="OTHER") {
+				pix = rgb.pushColor(r,g,b,dist,ind);
+				if(ind+2==index) {
+					img.at<Vec3b>(row,col) = Vec3b(0,0,255);
+					++count;
+				}
+			}
+		}
+	}
+	cout << count << endl;
+	imshow("Mask",img);
+	waitKey(0);
+}

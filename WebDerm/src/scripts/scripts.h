@@ -23,5 +23,6 @@ String outputCorrelationRGB(int r, int g, int b, double &m);
 String outputCorrelationRGBnorm(int r, int g, int b, double &m);
 void spreadsheetCompareScript();
 void outputPixLoc(Mat img,int index);
+void showPushColorOnImage(Mat &img, int index);
 
 #endif /* SCRIPTS_H_ */
