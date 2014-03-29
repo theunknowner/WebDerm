@@ -13,6 +13,5 @@
 
 double correlationDist(double * vec1, double * vec2);
 double cosineDist(double * vec1, double * vec2);
-void assignRGBMinMaxFromVec(vector< vector<int> > &vec, int * minRGB, int * maxRGB);
 
 #endif /* MATHS_H_ */

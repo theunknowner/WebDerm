@@ -46,19 +46,3 @@ double cosineDist(double * vec1, double * vec2)
 	result = 1 - (top/(sqrt(bottom1)*sqrt(bottom2)));
 	return result;
 }
-
-void assignRGBMinMaxFromVec(vector< vector<int> > &vec, int * minRGB, int * maxRGB) {
-	int min=255, max=0;
-	for(int i=0; i<3; i++) {
-		for(unsigned int j=0; j<vec.size(); j++) {
-			if(vec.at(j).at(i)<min) {
-				min = vec.at(j).at(i);
-				minRGB[i] = min;
-			}
-			if(vec.at(j).at(i)>max) {
-				max = vec.at(j).at(i);
-				maxRGB[i] = max;
-			}
-		}
-	}
-}

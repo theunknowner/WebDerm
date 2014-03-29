@@ -12,3 +12,5 @@ vector<String> hslColors;
 vector< vector<int> > hueThresh;
 vector< vector<double> > satThresh;
 vector< vector<double> > lumThresh;
+vector< vector<double> > satLevel;
+vector< vector<double> > lumLevel;

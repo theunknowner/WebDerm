@@ -351,53 +351,48 @@ void showPushColorOnImage(Mat &img, int index) {
 //needs manual changes for the name of color
 void addNewColors(Mat &img, Point pt1, Point pt2) {
 	rgb rgb;
+	hsl hsl;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/newColors.csv","w");
 	String pix;
 	String color1 = "Gray";
-	String color2 = "Violet";
-	vector<String> color;
 	vector<int> rgbVals;
-	vector< vector<int> > vecRGB;
-	int r,g,b;
+	int r,g,b, hue;
 	int grayLevel=0, colorLevel=0;
+	double normR, normG, normB;
 	for(int row=pt1.y; row<pt2.y; row++) {
 		for(int col=pt1.x; col<pt2.x; col++) {
 			r = img.at<Vec3b>(row,col)[2];
 			g = img.at<Vec3b>(row,col)[1];
 			b = img.at<Vec3b>(row,col)[0];
 			rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
+			hsl.rgb2hsl(r,g,b);
+			hue = hsl.getHue();
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			colorLevel = rgb.calcColorLevel(r,g,b);
-			pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
-			color.push_back(pix);
-			vecRGB.push_back(rgbVals);
-			rgbVals.clear();
-		}
-	}
-	int minRGB[3];
-	int maxRGB[3];
-	int min=255, max=0;
-	int i=0;
-	vector <vector<int> > vec;
-	vector<int> index;
-	while(color.size()!=0) {
-		for(unsigned int j=0; j<color.size(); j++) {
-			if(color.at(i)==color.at(j)) {
-				vec.push_back(vecRGB.at(j));
-				index.push_back(j);
+			for(unsigned int i=0; i<hueThresh.size(); i++) {
+				if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+					pix = color1 + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
+					normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
+					fprintf(fp,"%s,%d,%d,%d,%f,%f,%f\n",pix.c_str(),r,g,b,
+							normR,normG,normB);
+				}
 			}
 		}
-		//assignRGBMinMaxFromVec(vec,minRGB,maxRGB);
-		fprintf(fp,"%s,",color.at(i).c_str());
-		for(int j=0; j<3; j++) {
-			fprintf(fp,"%d,%d,",minRGB[j],maxRGB[j]);
+	}
+}
+
+void getThresholdColors() {
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/newColors2.csv","w");
+	for(unsigned int i=0; i<absMeanThresh.size(); i++) {
+		fprintf(fp,"%s,",rgbColors.at(i).c_str());
+		for(unsigned int j=0; j<absMeanThresh.at(i).size(); j++) {
+			fprintf(fp,"%f,",absMeanThresh.at(i).at(j));
+		}
+		for(unsigned int j=0; j<normMeanThresh.at(i).size(); j++) {
+			fprintf(fp,"%f,",normMeanThresh.at(i).at(j));
 		}
 		fprintf(fp,"\n");
-		for(unsigned int j=0; j<index.size(); j++) {
-			vecRGB.erase(vecRGB.begin()+index.at(j));
-			color.erase(color.begin()+index.at(j));
-		}
-		vec.clear(); index.clear();
 	}
 }

@@ -25,5 +25,6 @@ void spreadsheetCompareScript();
 void outputPixLoc(Mat img,int index);
 void showPushColorOnImage(Mat &img, int index);
 void addNewColors(Mat &img, Point pt1, Point pt2);
+void getThresholdColors();
 
 #endif /* SCRIPTS_H_ */

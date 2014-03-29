@@ -15,5 +15,7 @@ extern vector<String> hslColors;
 extern vector< vector<int> > hueThresh;
 extern vector< vector<double> > satThresh;
 extern vector< vector<double> > lumThresh;
+extern vector< vector<double> > satLevel;
+extern vector< vector<double> > lumLevel;
 
 #endif /* HSL_GLOBAL_H_ */

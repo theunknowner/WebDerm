@@ -32,8 +32,8 @@ bool hsl::importThresholds()
 				if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
 			}
 			hueThresh.push_back(thresh);
-			satThresh.push_back(thresh2);
-			lumThresh.push_back(thresh3);
+			//satThresh.push_back(thresh2);
+			//lumThresh.push_back(thresh3);
 			vec.clear(); thresh.clear(); thresh2.clear(); thresh3.clear();
 		}
 		fsThresh.close();
@@ -72,7 +72,7 @@ bool hsl::importLsThreshold()
 			{
 				thresh.push_back(atof(vec.at(i).c_str()));
 			}
-			lumThresh.push_back(thresh);
+			lumLevel.push_back(thresh);
 			vec.clear(); thresh.clear();
 		}
 		getline(fsThresh2,temp);
@@ -81,9 +81,9 @@ bool hsl::importLsThreshold()
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++)
 			{
-				if(i>=1 && i<=2) thresh2.push_back(atof(vec.at(i).c_str()));
+				thresh2.push_back(atof(vec.at(i).c_str()));
 			}
-			satThresh.push_back(thresh2);
+			satLevel.push_back(thresh2);
 			vec.clear(); thresh2.clear();
 		}
 		fsThresh.close(); fsThresh2.close();

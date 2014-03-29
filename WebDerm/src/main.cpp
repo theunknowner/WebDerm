@@ -18,20 +18,15 @@ int main(int argc, char** argv)
 {
 	hsl hsl;
 	rgb rgb;
-	//hsl.importThresholds();
 	rgb.importThresholds();
 	hsl.importLsThreshold();
+	hsl.importThresholds();
 	Mat img, img2,img3, mask;
 	img = runResizeImage(path+"Images/LPH","lph9.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	addNewColors(img2,Point(270,350), Point(282,360));
-	//showPushColorOnImage(img2,34);
-	//outputFarRGBScript(img2,"vesicles18");
-	//colorThreshNamingScript();
-	//colorThreshScript();
+	//addNewColors(img2,Point(270,350), Point(282,360));
 	//testColorIndex(img2,133);
-	//rgb.showPixelColor(198,170,160,Size(400,400));
 	int col = 273;
 	int row = 359;
 	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;

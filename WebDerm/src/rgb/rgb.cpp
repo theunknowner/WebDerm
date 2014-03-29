@@ -21,7 +21,6 @@ bool rgb::importThresholds()
 		vector<String> vec;
 		vector<double> thresh;
 		vector<double> thresh2;
-		double absValue, normValue;
 		while(getline(fsColors,temp))
 		{
 			mainColors.push_back(temp);
@@ -36,31 +35,18 @@ bool rgb::importThresholds()
 				{
 					rgbColors.push_back(vec.at(j));
 				}
-				if(j>=1 && j<=6)
+				if(j>=1 && j<=3)
 				{
 					thresh.push_back(atof(vec.at(j).c_str()));
 				}
-				if(j>=7 && j<=12)
+				if(j>=4 && j<=6)
 				{
 					thresh2.push_back(atof(vec.at(j).c_str()));
 				}
 			}
-			absThresh.push_back(thresh);
-			normThresh.push_back(thresh2);
-			vec.clear(); thresh.clear(); thresh2.clear();
-		}
-		for(unsigned int i=0; i<absThresh.size(); i++)
-		{
-			for(unsigned int j=0; j<6; j+=2)
-			{
-				absValue = (absThresh.at(i).at(j) + absThresh.at(i).at(j+1))/2;
-				normValue = (normThresh.at(i).at(j) + normThresh.at(i).at(j+1))/2;
-				thresh.push_back(absValue);
-				thresh2.push_back(normValue);
-			}
 			absMeanThresh.push_back(thresh);
 			normMeanThresh.push_back(thresh2);
-			thresh.clear(); thresh2.clear();
+			vec.clear(); thresh.clear(); thresh2.clear();
 		}
 		fsColors.close(); fsThresh.close();
 		vector<String>().swap(vec);
@@ -373,21 +359,6 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		return rgbColors[index2];
 	}
 
-String rgb::getModifier(int red, int green, int blue)
-{
-	hsl hsl;
-	double lum=0;
-	lum = hsl.calcLum(red,green,blue) * 100;
-	for(unsigned int i=0; i<lumThresh.size(); i++)
-	{
-		if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1))
-		{
-			return hslColors.at(i);
-		}
-	}
-	return "";
-}
-
 int rgb::calcGrayLevel(int red, int green, int blue)
 {
 	hsl hsl;
@@ -395,11 +366,11 @@ int rgb::calcGrayLevel(int red, int green, int blue)
 	hsl.rgb2hsl(red,green,blue);
 	sat = hsl.getSat();
 	sat = roundDecimal(sat,2);
-	for(unsigned int i=0; i<satThresh.size(); i++)
+	for(unsigned int i=0; i<satLevel.size(); i++)
 	{
-		if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
+		if(sat>=satLevel.at(i).at(1) && sat<=satLevel.at(i).at(2))
 		{
-			return i;
+			return satLevel.at(i).at(0);
 		}
 	}
 	return 0;
@@ -412,11 +383,11 @@ int rgb::calcColorLevel(double red, double green, double blue)
 	//hsl.rgb2hsl(red,green,blue);
 	lum = hsl.calcLum(red,green,blue);
 	lum = roundDecimal(lum,2);
-	for(unsigned int i=0; i<lumThresh.size(); i++)
+	for(unsigned int i=0; i<lumLevel.size(); i++)
 	{
-		if(lum>lumThresh.at(i).at(1) && lum<=lumThresh.at(i).at(2))
+		if(lum>lumLevel.at(i).at(1) && lum<=lumLevel.at(i).at(2))
 		{
-			return lumThresh.at(i).at(0);
+			return lumLevel.at(i).at(0);
 		}
 	}
 	return 0;
