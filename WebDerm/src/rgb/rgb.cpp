@@ -359,7 +359,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 		return rgbColors[index2];
 	}
 
-int rgb::calcGrayLevel(int red, int green, int blue)
+double rgb::calcGrayLevel(int red, int green, int blue)
 {
 	hsl hsl;
 	double sat=0;
@@ -376,7 +376,7 @@ int rgb::calcGrayLevel(int red, int green, int blue)
 	return 0;
 }
 
-int rgb::calcColorLevel(double red, double green, double blue)
+double rgb::calcColorLevel(double red, double green, double blue)
 {
 	hsl hsl;
 	double lum=0;
@@ -393,23 +393,23 @@ int rgb::calcColorLevel(double red, double green, double blue)
 	return 0;
 }
 
-int rgb::getGrayLevel(String color)
+double rgb::getGrayLevel(String color)
 {
 	size_t pos=0;
-	int level=0;
+	double level=0;
 	String lvl;
 	pos = color.find("Gray");
 	if(pos!=string::npos)
 	{
 		lvl = color.substr(pos+4,1);
-		level = atoi(lvl.c_str());
+		level = atof(lvl.c_str());
 	}
 	return level;
 }
 
-int rgb::getColorLevel(String color, String mainColor)
+double rgb::getColorLevel(String color, String mainColor)
 {
-	int level=0;
+	double level=0;
 	size_t pos=0;
 	String str;
 	pos = color.find(mainColor);
@@ -417,7 +417,7 @@ int rgb::getColorLevel(String color, String mainColor)
 	{
 		str = color.substr(pos+mainColor.size(),color.size()-(pos+mainColor.size()));
 	}
-	level = atoi(str.c_str());
+	level = atof(str.c_str());
 	return level;
 }
 
@@ -506,4 +506,29 @@ void rgb::release_memory()
 	vector< vector<double> >().swap(absThresh);
 	vector<String>().swap(rgbColors);
 	vector<String>().swap(mainColors);
+}
+
+String rgb::calcColor(int red, int green, int blue) {
+	hsl hsl;
+	String pix = "OTHER";
+	int hue;
+	double grayLevel, colorLevel;
+	hsl.rgb2hsl(red,green,blue);
+	hue = hsl.getHue();
+	for(unsigned int i=0; i<hueThresh.size(); i++) {
+		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+			if(hslColors.at(i)!="Pink") { //would be changed later with deeper implementations
+				grayLevel = calcGrayLevel(red,green,blue);
+				colorLevel = calcColorLevel(red,green,blue);
+				if(grayLevel==0) {
+					pix = hslColors.at(i) + toString(colorLevel);
+				}
+				else {
+					pix = "Gray" + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
+				}
+				return pix;
+			}
+		}
+	}
+	return pix;
 }

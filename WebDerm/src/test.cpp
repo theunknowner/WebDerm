@@ -18,7 +18,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	deque<String> pixelColorWindow;
 	int colorIndex[rgbColors.size()];
 	int mainColorIndex[mainColors.size()];
-	int mainColorLevels[mainColors.size()];
+	double mainColorLevels[mainColors.size()];
 	double mainColorLevelAvg[mainColors.size()];
 	double matchingScans = (size.width*size.height)/2;
 	fill_n(colorIndex,rgbColors.size(),0);
@@ -34,7 +34,10 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER")
 			{
-				pix = rgb.pushColor(r,g,b,ind);
+				pix = rgb.calcColor(r,g,b);
+				if(pix=="OTHER") {
+					pix = rgb.pushColor(r,g,b,ind);
+				}
 				pixelColorWindow.push_back(pix);
 			}
 			else

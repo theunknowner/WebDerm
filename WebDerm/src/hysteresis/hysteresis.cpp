@@ -80,7 +80,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 		vector<String> color;
 		vector<int> colorCount;
 		int mainColorIndex[mainColors.size()];
-		int mainColorLevels[mainColors.size()];
+		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
 		String pix;
 		int ind=0;
@@ -106,7 +106,10 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 							pix = rgb.checkBlack(r,g,b);
 							if(pix=="OTHER")
 							{
-								pix = rgb.pushColor(r,g,b,dist,ind);
+								pix = rgb.calcColor(r,g,b);
+								if(pix=="OTHER") {
+									pix = rgb.pushColor(r,g,b,dist,ind);
+								}
 								pixelColorWindow.push_back(pix);
 							}
 							else
@@ -126,7 +129,10 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 						pix = rgb.checkBlack(r,g,b);
 						if(pix=="OTHER")
 						{
-							pix = rgb.pushColor(r,g,b,dist,ind);
+							pix = rgb.calcColor(r,g,b);
+							if(pix=="OTHER") {
+								pix = rgb.pushColor(r,g,b,dist,ind);
+							}
 							pixelColorWindow.pop_front();
 							pixelColorWindow.push_back(pix);
 						}

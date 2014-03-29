@@ -25,15 +25,16 @@ public:
 	String pushColor(int red, int green, int blue,double &dist, int &ind);
 	String pushColor(int red, int green, int blue, int &ind);
 	double pushColor2(int red, int green, int blue, int &ind);
-	int calcGrayLevel(int red, int green, int blue);
-	int calcColorLevel(double red, double green, double blue);
-	int getGrayLevel(String color);
-	int getColorLevel(String color, String mainColor);
+	double calcGrayLevel(int red, int green, int blue);
+	double calcColorLevel(double red, double green, double blue);
+	double getGrayLevel(String color);
+	double getColorLevel(String color, String mainColor);
 	void getLevels(String color, int * levels);
 	double calcIntensity(double red, double green, double blue);
 	void showPixelColor(int r, int g, int b, Size size);
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 	void release_memory();
+	String calcColor(int red, int green, int blue);
 };
 
 

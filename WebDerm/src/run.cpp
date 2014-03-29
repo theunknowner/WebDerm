@@ -142,6 +142,7 @@ void runHysteresis()
 	name = getImageName(filename);
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
+	hsl.importThresholds();
 	hsl.importLsThreshold();
 	hysteresis(img2,Size(2,2),name);
 	img.release(); img2.release(); mask.release();
