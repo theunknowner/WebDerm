@@ -19,6 +19,7 @@
 #include <deque>
 #include <cstdio>
 #include <sstream>
+#include <algorithm>
 
 using namespace std;
 using namespace cv;

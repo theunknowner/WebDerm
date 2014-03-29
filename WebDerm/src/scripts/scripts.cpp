@@ -347,3 +347,57 @@ void showPushColorOnImage(Mat &img, int index) {
 	imshow("Mask",img);
 	waitKey(0);
 }
+
+//needs manual changes for the name of color
+void addNewColors(Mat &img, Point pt1, Point pt2) {
+	rgb rgb;
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/newColors.csv","w");
+	String pix;
+	String color1 = "Gray";
+	String color2 = "Violet";
+	vector<String> color;
+	vector<int> rgbVals;
+	vector< vector<int> > vecRGB;
+	int r,g,b;
+	int grayLevel=0, colorLevel=0;
+	for(int row=pt1.y; row<pt2.y; row++) {
+		for(int col=pt1.x; col<pt2.x; col++) {
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
+			grayLevel = rgb.calcGrayLevel(r,g,b);
+			colorLevel = rgb.calcColorLevel(r,g,b);
+			pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
+			color.push_back(pix);
+			vecRGB.push_back(rgbVals);
+			rgbVals.clear();
+		}
+	}
+	int minRGB[3];
+	int maxRGB[3];
+	int min=255, max=0;
+	int i=0;
+	vector <vector<int> > vec;
+	vector<int> index;
+	while(color.size()!=0) {
+		for(unsigned int j=0; j<color.size(); j++) {
+			if(color.at(i)==color.at(j)) {
+				vec.push_back(vecRGB.at(j));
+				index.push_back(j);
+			}
+		}
+		//assignRGBMinMaxFromVec(vec,minRGB,maxRGB);
+		fprintf(fp,"%s,",color.at(i).c_str());
+		for(int j=0; j<3; j++) {
+			fprintf(fp,"%d,%d,",minRGB[j],maxRGB[j]);
+		}
+		fprintf(fp,"\n");
+		for(unsigned int j=0; j<index.size(); j++) {
+			vecRGB.erase(vecRGB.begin()+index.at(j));
+			color.erase(color.begin()+index.at(j));
+		}
+		vec.clear(); index.clear();
+	}
+}
