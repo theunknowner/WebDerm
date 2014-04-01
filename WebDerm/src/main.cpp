@@ -22,14 +22,14 @@ int main(int argc, char** argv)
 	hsl.importLsThreshold();
 	hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	//colorThreshScript();
-	addNewColors(img2,Point(411,231), Point(414,239));
+	addNewColors(img2,Point(356,300), Point(361,302),"Gray","");
 	//testColorIndex(img2,133);
-	int col = 140;
-	int row = 35;
+	int col = 346;
+	int row = 313;
 	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");

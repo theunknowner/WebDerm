@@ -210,6 +210,7 @@ double hsl::minRGB(double red, double green, double blue)
 
 	int hsl::getHue()
 	{
+		H = round(H);
 		return (int)H;
 	}
 

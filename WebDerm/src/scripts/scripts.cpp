@@ -348,32 +348,37 @@ void showPushColorOnImage(Mat &img, int index) {
 }
 
 //needs manual changes for the name of color
-void addNewColors(Mat &img, Point pt1, Point pt2) {
+void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 	rgb rgb;
 	hsl hsl;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/newColors.csv","w");
 	String pix;
-	String color1 = "Gray";
-	int r,g,b, hue;
+	vector<int> vecRGB;
+	int r,g,b, hue,flag=0;
 	double lum,sat;
 	double grayLevel=0, colorLevel=0;
 	double normR, normG, normB;
-	for(int row=pt1.y; row<pt2.y; row++) {
-		for(int col=pt1.x; col<pt2.x; col++) {
+	double dist=0;
+	for(int row=(pt1.y-1); row<=(pt2.y-1); row++) {
+		for(int col=(pt1.x-1); col<=(pt2.x-1); col++) {
 			r = img.at<Vec3b>(row,col)[2];
 			g = img.at<Vec3b>(row,col)[1];
 			b = img.at<Vec3b>(row,col)[0];
-			hsl.rgb2hsl(r,g,b);
-			hue = hsl.getHue();
-			lum = hsl.getLum();
-			sat = hsl.getSat();
-			grayLevel = rgb.calcGrayLevel(r,g,b);
-			colorLevel = rgb.calcColorLevel(r,g,b);
-			if(sat<0.13 && lum<0.90 && lum>0.10) {
-				pix = "Gray" + toString(grayLevel+colorLevel);
+			for(unsigned int i=0; i<absMeanThresh.size(); i++) {
+				dist = rgb.absEucDist(r,g,b,absMeanThresh.at(i));
+				if(dist<=3) {
+					flag=1;
+					break;
+				}
 			}
-			else {
+			if(flag==0) {
+				hsl.rgb2hsl(r,g,b);
+				hue = hsl.getHue();
+				lum = roundDecimal(hsl.getLum(),2);
+				sat = roundDecimal(hsl.getSat(),2);
+				grayLevel = rgb.calcGrayLevel(r,g,b);
+				colorLevel = rgb.calcColorLevel(r,g,b);
 				for(unsigned int i=0; i<hueThresh.size(); i++) {
 					if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
 						if(grayLevel==0) {
@@ -382,28 +387,20 @@ void addNewColors(Mat &img, Point pt1, Point pt2) {
 						else {
 							pix = color1 + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
 						}
+						break;
+					} else if(sat<0.13 && lum<0.90 && lum>0.10) {
+						pix = "Gray" + toString(grayLevel+colorLevel);
+					}
+					else {
+						pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
 					}
 				}
+				normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
+				fprintf(fp,"%s,%d,%d,%d,%f,%f,%f,%d,%f,%f\n",pix.c_str(),r,g,b,
+						normR,normG,normB,hue,sat,lum);
+				pix.clear();
 			}
-			normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
-			fprintf(fp,"%s,%d,%d,%d,%f,%f,%f\n",pix.c_str(),r,g,b,
-					normR,normG,normB);
+			flag=0;
 		}
 	}
 }
-
-void getThresholdColors() {
-	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/newColors2.csv","w");
-	for(unsigned int i=0; i<absMeanThresh.size(); i++) {
-		fprintf(fp,"%s,",rgbColors.at(i).c_str());
-		for(unsigned int j=0; j<absMeanThresh.at(i).size(); j++) {
-			fprintf(fp,"%f,",absMeanThresh.at(i).at(j));
-		}
-		for(unsigned int j=0; j<normMeanThresh.at(i).size(); j++) {
-			fprintf(fp,"%f,",normMeanThresh.at(i).at(j));
-		}
-		fprintf(fp,"\n");
-	}
-}
-

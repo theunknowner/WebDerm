@@ -24,7 +24,6 @@ String outputCorrelationRGBnorm(int r, int g, int b, double &m);
 void spreadsheetCompareScript();
 void outputPixLoc(Mat img,int index);
 void showPushColorOnImage(Mat &img, int index);
-void addNewColors(Mat &img, Point pt1, Point pt2);
-void getThresholdColors();
+void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2);
 
 #endif /* SCRIPTS_H_ */
