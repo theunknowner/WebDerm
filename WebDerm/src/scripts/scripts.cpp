@@ -354,7 +354,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/newColors.csv","w");
 	String pix;
-	vector<int> vecRGB;
+	vector<double> rgbVals;
+	vector< vector<double> > rgbVec;
 	int r,g,b, hue,flag=0;
 	double lum,sat;
 	double grayLevel=0, colorLevel=0;
@@ -365,6 +366,11 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			r = img.at<Vec3b>(row,col)[2];
 			g = img.at<Vec3b>(row,col)[1];
 			b = img.at<Vec3b>(row,col)[0];
+			if(rgbVec.size()==0) {
+				rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
+				rgbVec.push_back(rgbVals);
+				rgbVals.clear();
+			}
 			for(unsigned int i=0; i<absMeanThresh.size(); i++) {
 				dist = rgb.absEucDist(r,g,b,absMeanThresh.at(i));
 				if(dist<=3) {
@@ -373,34 +379,53 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 				}
 			}
 			if(flag==0) {
-				hsl.rgb2hsl(r,g,b);
-				hue = hsl.getHue();
-				lum = roundDecimal(hsl.getLum(),2);
-				sat = roundDecimal(hsl.getSat(),2);
-				grayLevel = rgb.calcGrayLevel(r,g,b);
-				colorLevel = rgb.calcColorLevel(r,g,b);
-				for(unsigned int i=0; i<hueThresh.size(); i++) {
-					if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-						if(grayLevel==0) {
-							pix = hslColors.at(i) + toString(colorLevel);
-						}
-						else {
-							pix = color1 + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
-						}
+				for(unsigned int i=0; i<rgbVec.size(); i++) {
+					dist = rgb.absEucDist(r,g,b,rgbVec.at(i));
+					if(dist<=3) {
+						flag=1;
 						break;
-					} else if(sat<0.13 && lum<0.90 && lum>0.10) {
-						pix = "Gray" + toString(grayLevel+colorLevel);
-					}
-					else {
-						pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
 					}
 				}
-				normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
-				fprintf(fp,"%s,%d,%d,%d,%f,%f,%f,%d,%f,%f\n",pix.c_str(),r,g,b,
-						normR,normG,normB,hue,sat,lum);
-				pix.clear();
+			}
+			if(flag==0) {
+				rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
+				rgbVec.push_back(rgbVals);
+				rgbVals.clear();
 			}
 			flag=0;
+		}
+	}
+	if(rgbVec.size()>0) {
+		for(unsigned int i=0; i<rgbVec.size(); i++) {
+			r = rgbVec.at(i).at(0);
+			g = rgbVec.at(i).at(1);
+			b = rgbVec.at(i).at(2);
+			hsl.rgb2hsl(r,g,b);
+			hue = hsl.getHue();
+			lum = roundDecimal(hsl.getLum(),2);
+			sat = roundDecimal(hsl.getSat(),2);
+			grayLevel = rgb.calcGrayLevel(r,g,b);
+			colorLevel = rgb.calcColorLevel(r,g,b);
+			for(unsigned int i=0; i<hueThresh.size(); i++) {
+				if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+					if(grayLevel==0) {
+						pix = hslColors.at(i) + toString(colorLevel);
+					}
+					else {
+						pix = color1 + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
+					}
+					break;
+				} else if(sat<0.13 && lum<0.90 && lum>0.10) {
+					pix = "Gray" + toString(grayLevel+colorLevel);
+				}
+				else {
+					pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
+				}
+			}
+			normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
+			fprintf(fp,"%s,%d,%d,%d,%f,%f,%f,%d,%f,%f\n",pix.c_str(),r,g,b,
+					normR,normG,normB,hue,sat,lum);
+			pix.clear();
 		}
 	}
 }
