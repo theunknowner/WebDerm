@@ -69,36 +69,52 @@ void colorThreshScript()
 	String pix;
 	double grayLevel=0;
 	int colorLevel=0;
-	double s,l;
-	fprintf(fp,"Color,S,Slvl,L,Lvl\n");
+	int hue;
+	double sat,lum;
+	fprintf(fp,"Color,H,S,L,SatLvl,LumLvl\n");
 	for(unsigned int i=0; i<rgbColors.size(); i++)
 	{
 		r = absMeanThresh.at(i).at(0);
 		g = absMeanThresh.at(i).at(1);
 		b = absMeanThresh.at(i).at(2);
 		hsl.rgb2hsl(r,g,b);
-		s = hsl.getSat();
-		l = hsl.getLum();
-		s = roundDecimal(s,2);
-		l = roundDecimal(l,2);
+		hue = hsl.getHue();
+		sat =roundDecimal(hsl.getSat(),2);
+		lum = roundDecimal(hsl.getLum(),2);
 		grayLevel = rgb.calcGrayLevel(r,g,b);
 		colorLevel = rgb.calcColorLevel(r,g,b);
-		fprintf(fp,"%s,%f,%f,%f,%d\n", rgbColors.at(i).c_str(), s, grayLevel, l, colorLevel);
+		fprintf(fp,"%s,%d,%f,%f,%f,%d\n", rgbColors.at(i).c_str(),hue,sat,lum,grayLevel,colorLevel);
 	}
 }
 
-void outputMeanScript()
-{
+void sortColorThreshold(String color1, String color2) {
 	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/mean.csv", "w");
-	double r,g,b;
-	fprintf(fp,"Color,R,G,B\n");
-	for(unsigned int i=0; i<rgbColors.size(); i++)
-	{
-		r = absMeanThresh.at(i).at(0);
-		g = absMeanThresh.at(i).at(1);
-		b = absMeanThresh.at(i).at(2);
-		fprintf(fp,"%s,%f,%f,%f\n",rgbColors.at(i).c_str(),r,g,b);
+	fp = fopen("/home/jason/Desktop/workspace/sortColor.csv","w");
+	fprintf(fp,"Color,Hue,Sat,Lum,R,G,B,Index\n");
+	hsl hsl;
+	String pix;
+	int arr[10] = {0,6,7,13,339,345,346,352,353,359};
+	int r,g,b;
+	int hue;
+	double sat,lum;
+	for(int i=0; i<10; i+=2) {
+		for(int j=1; j<=16; j++) {
+			for(double k=1; k<=9; k+=0.5) {
+				pix = color1 + toString(k) + color2 + toString(j);
+				for(unsigned int m=0; m<rgbColors.size(); m++) {
+					r = absMeanThresh.at(m).at(0);
+					g = absMeanThresh.at(m).at(1);
+					b = absMeanThresh.at(m).at(2);
+					hsl.rgb2hsl(r,g,b);
+					hue = hsl.getHue();
+					if(hue>=arr[i] && hue<=arr[i+1] && pix==rgbColors.at(m)) {
+						sat = roundDecimal(hsl.getSat(),2);
+						lum = roundDecimal(hsl.getLum(),2);
+						fprintf(fp,"%s,%d,%f,%f,%d,%d,%d,%d\n",pix.c_str(),hue,sat,lum,r,g,b,m+2);
+					}
+				}
+			}
+		}
 	}
 }
 

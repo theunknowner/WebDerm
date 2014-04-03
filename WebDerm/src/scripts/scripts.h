@@ -14,10 +14,12 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/SpreadSheet/ssheet.h"
 
 void colorThreshNamingScript();
 void colorThreshScript();
-void outputMeanScript();
+void sortColorThreshold(String color1, String color2);
 void outputFarRGBScript(Mat &img, String name);
 String outputCorrelationRGB(int r, int g, int b, double &m);
 String outputCorrelationRGBnorm(int r, int g, int b, double &m);
