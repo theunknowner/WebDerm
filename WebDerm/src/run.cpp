@@ -131,6 +131,7 @@ void runHysteresis()
 	String filename;
 	String name;
 	String input;
+	Size size = Size(2,2);
 	cout << "Enter filename: ";
 	cin >> filename;
 	cout << "Do you want to write image? (y/n) ";
@@ -144,7 +145,11 @@ void runHysteresis()
 	rgb.importThresholds();
 	hsl.importThresholds();
 	hsl.importLsThreshold();
-	hysteresis(img2,Size(2,2),name);
+	if(size.height==1 && size.width==1)
+		hysteresis1x1(img2,name);
+	else
+		hysteresis(img2,Size(2,2),name);
+
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 }

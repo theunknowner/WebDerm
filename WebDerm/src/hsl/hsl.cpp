@@ -32,8 +32,8 @@ bool hsl::importThresholds()
 				if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
 			}
 			hueThresh.push_back(thresh);
-			//satThresh.push_back(thresh2);
-			//lumThresh.push_back(thresh3);
+			satThresh.push_back(thresh2);
+			lumThresh.push_back(thresh3);
 			vec.clear(); thresh.clear(); thresh2.clear(); thresh3.clear();
 		}
 		fsThresh.close();

@@ -190,128 +190,43 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				++col;
 			}//end while col
 			windowVec.push_back(colorWindow);
-			/*
-			for(unsigned int i=0; i<colorWindow.size(); i++)
-			{
-				if(i==0)
-				{
-					color.push_back(colorWindow.at(i));
-					++count;
-				}
-				else
-				{
-					if(colorWindow.at(i)==color.at(color.size()-1))
-					{
-						++count;
-					}
-					else
-					{
-						colorCount.push_back(count);
-						color.push_back(colorWindow.at(i));
-						count=0;
-						++count;
-					}
-				}
-			}
-			colorCount.push_back(count);
-			for(unsigned int i=0; i<color.size(); i++)
-			{
-				fprintf(fSeq, "%s(%d),", color.at(i).c_str(),colorCount.at(i));
-			}
-			fprintf(fSeq,"\n");*/
-			//count=0;
-			//colorCount.clear();
-			//color.clear();
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			col=0; ++row;
 		}//end while row
 		writeSeq2File(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
-		//vector<int>().swap(colorCount);
-		//vector<String>().swap(color);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
 		vector<int>().swap(index);
 	}
 
-	void hysteresis(Mat img,String name)
-	{
+	void hysteresis1x1(Mat img, String name) {
 		rgb rgb;
-		Color colorObj;
-		String filename;
-		vector <vector<String> > windowVec;
-		vector<int> index;
-		vector<String> color;
-		vector<int> colorCount;
-		int count=0;
-		int mainColorIndex[mainColors.size()];
+		int r,g,b;
 		String pix;
-		int b,g,r;
-		fill_n(mainColorIndex,mainColors.size(),0);
-		for(int row=0; row<img.rows; row++)
-		{
-			for(int col=0; col<img.cols; col++)
-			{
-				b = img.at<Vec3b>(row,col)[0];
-				g = img.at<Vec3b>(row,col)[1];
+		vector<String> colorWindow;
+		vector< vector<String> > windowVec;
+		double dist=0;
+		int ind=0;
+		for(int row=0; row<img.rows; row++) {
+			for(int col=0; col<img.cols; col++) {
 				r = img.at<Vec3b>(row,col)[2];
+				g = img.at<Vec3b>(row,col)[1];
+				b = img.at<Vec3b>(row,col)[0];
 				pix = rgb.checkBlack(r,g,b);
-				if(pix=="OTHER")
-				{
-					pix = rgb.pushColor(r,g,b);
-				}
-				for(unsigned int i=0; i<mainColors.size(); i++)
-				{
-					count = colorObj.containsMainColor(pix, mainColors.at(i));
-					mainColorIndex[i]+=count;
-				}
-				count=0;
-				for(unsigned int j=0; j<mainColors.size(); j++)
-				{
-					if(mainColorIndex[j]>0)
-					{
-						if(mainColorIndex[j]>1)
-						{
-							index.push_back(j);
-							index.push_back(j);
-						}
-						else
-							index.push_back(j);
+				if(pix=="OTHER") {
+					pix = rgb.calcColor(r,g,b);
+					if(pix=="OTHER") {
+						pix = rgb.pushColor(r,g,b,dist,ind);
 					}
 				}
-				if(index.size()!=0)
-				{
-					pix.clear();
-					if(index.size()==1 && mainColors.at(index[0])=="Light")
-					{
-						pix = "White";
-					}
-					else if(index.size()==1 && mainColors.at(index[0])=="Dark")
-					{
-						pix = "Black";
-					}
-					else
-					{
-						for(unsigned int i=0; i<index.size(); i++)
-						{
-							pix += mainColors.at(index[i]);
-						}
-					}
-					color.push_back(pix);
-				}
-				else
-				{
-					color.push_back("NZ");
-				}
-				fill_n(mainColorIndex,mainColors.size(),0);
-				index.clear();
+				colorWindow.push_back(pix);
 			}
-			windowVec.push_back(color);
-			color.clear();
+			windowVec.push_back(colorWindow);
+			colorWindow.clear();
 		}
 		writeSeq2File(windowVec,name);
-		vector<String>().swap(color);
+		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
-		vector<int>().swap(index);
 	}

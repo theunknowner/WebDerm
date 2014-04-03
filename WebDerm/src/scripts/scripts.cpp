@@ -366,17 +366,17 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			r = img.at<Vec3b>(row,col)[2];
 			g = img.at<Vec3b>(row,col)[1];
 			b = img.at<Vec3b>(row,col)[0];
-			if(rgbVec.size()==0) {
-				rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
-				rgbVec.push_back(rgbVals);
-				rgbVals.clear();
-			}
 			for(unsigned int i=0; i<absMeanThresh.size(); i++) {
 				dist = rgb.absEucDist(r,g,b,absMeanThresh.at(i));
 				if(dist<=3) {
 					flag=1;
 					break;
 				}
+			}
+			if(rgbVec.size()==0 && flag==0) {
+				rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
+				rgbVec.push_back(rgbVals);
+				rgbVals.clear();
 			}
 			if(flag==0) {
 				for(unsigned int i=0; i<rgbVec.size(); i++) {
@@ -408,15 +408,23 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			colorLevel = rgb.calcColorLevel(r,g,b);
 			for(unsigned int i=0; i<hueThresh.size(); i++) {
 				if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-					if(grayLevel==0) {
-						pix = hslColors.at(i) + toString(colorLevel);
+					if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
+						if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
+							pix = hslColors.at(i);
+							if(pix=="White" || pix=="Black") break;
+							if(color1=="Gray" && color2=="Gray") {
+								pix = color1 + toString(grayLevel+colorLevel);
+								break;
+							}
+							if(grayLevel==0) {
+								pix = hslColors.at(i) + toString(colorLevel);
+							}
+							else {
+								pix = color1 + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
+							}
+							break;
+						}
 					}
-					else {
-						pix = color1 + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
-					}
-					break;
-				} else if(sat<0.13 && lum<0.90 && lum>0.10) {
-					pix = "Gray" + toString(grayLevel+colorLevel);
 				}
 				else {
 					pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);

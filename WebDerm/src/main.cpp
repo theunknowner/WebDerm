@@ -25,8 +25,10 @@ int main(int argc, char** argv)
 	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
+	cout << rgb.calcColor(170,130,150) << endl;
+	cout << rgb.pushColor(170,130,150) << endl;
 	//colorThreshScript();
-	addNewColors(img2,Point(356,300), Point(361,302),"Gray","");
+	//addNewColors(img2,Point(356,300), Point(361,302),"Gray","");
 	//testColorIndex(img2,133);
 	int col = 346;
 	int row = 313;
