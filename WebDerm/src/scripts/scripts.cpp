@@ -412,10 +412,10 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 		}
 	}
 	if(rgbVec.size()>0) {
-		for(unsigned int i=0; i<rgbVec.size(); i++) {
-			r = rgbVec.at(i).at(0);
-			g = rgbVec.at(i).at(1);
-			b = rgbVec.at(i).at(2);
+		for(unsigned int j=0; j<rgbVec.size(); j++) {
+			r = rgbVec.at(j).at(0);
+			g = rgbVec.at(j).at(1);
+			b = rgbVec.at(j).at(2);
 			hsl.rgb2hsl(r,g,b);
 			hue = hsl.getHue();
 			lum = roundDecimal(hsl.getLum(),2);
@@ -428,6 +428,10 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 						if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
 							pix = hslColors.at(i);
 							if(pix=="White" || pix=="Black") break;
+							if(pix=="Gray") {
+								pix += toString(grayLevel+colorLevel);
+								break;
+							}
 							if(color1=="Gray" && color2=="Gray") {
 								pix = color1 + toString(grayLevel+colorLevel);
 								break;
@@ -452,4 +456,10 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			pix.clear();
 		}
 	}
+	String min = minFormulaR1C1(1,rgbVec.size());
+	String max = maxFormulaR1C1(1,rgbVec.size());
+	fprintf(fp,",,,,,,,%s,%s,%s\n",min.c_str(),min.c_str(),min.c_str());
+	fprintf(fp,",,,,,,,%s,%s,%s\n",max.c_str(),max.c_str(),max.c_str());
 }
+
+

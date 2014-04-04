@@ -524,13 +524,18 @@ String rgb::calcColor(int red, int green, int blue) {
 		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
 			if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
 				if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
-					if(hslColors.at(i)!="Pink") { //would be changed later with deeper implementations
+					if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
 						pix = hslColors.at(i);
 						if(pix=="White" || pix=="Black") return pix;
+						if(pix=="Gray") {
+							pix += toString(grayLevel+colorLevel);
+							return pix;
+						}
 						if(grayLevel==0) {
 							pix = hslColors.at(i) + toString(colorLevel);
 						}
 						else {
+							//cout << pix << endl;
 							pix = "Gray" + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
 						}
 						return pix;

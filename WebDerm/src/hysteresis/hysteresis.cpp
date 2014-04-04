@@ -24,7 +24,7 @@ void writeSeq2File(vector< vector<String> > &vec, String name)
 
 void writeSeq2File(vector< vector<String> > &vec, String pathname, String name)
 {
-	String filename = pathname + name + ".csv";
+	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<vec.size(); i++)
@@ -37,9 +37,9 @@ void writeSeq2File(vector< vector<String> > &vec, String pathname, String name)
 	}
 }
 
-void writeSeq2File(vector< vector<int> > &vec, String pathname, String name)
+void writeSeq2File(vector< vector<int> > &vec, String name)
 {
-	String filename = pathname + name + ".csv";
+	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<vec.size(); i++)
@@ -67,25 +67,41 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 	}
 }
 
+int calcHueAvg(deque<int> &vec) {
+	int hue=0;
+	int total=0;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		hue = vec.at(i);
+		if(hue>=0 && hue<=13) {
+			hue += 360;
+		}
+		total += hue;
+	}
+	total /= vec.size();
+	if(total>=360) total -= 360;
+	return total;
+}
+
 //hysteresis moving 1 col/row at a time
 	void hysteresis(Mat img, Size size, String name)
 	{
 		rgb rgb;
+		hsl hsl;
 		Color colorObj;
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
 		vector<String> colorWindow;
 		vector< vector<String> > windowVec;
 		vector<int> index;
-		vector<String> color;
-		vector<int> colorCount;
+		//deque<int>	hueVals;
+		//vector<int> hueAvg;
+		//vector< vector<int> > hueVec;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
 		String pix;
 		int ind=0;
 		double dist=0;
-		double thresh = 6.0;
 		int b,g,r;
 		int row=0, col=0;
 		fill_n(mainColorIndex,mainColors.size(),0);
@@ -94,6 +110,7 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 		{
 			while(col<=(img.cols-size.width))
 			{
+
 				if(col==0)
 				{
 					for(int x=col; x<(col+size.width); x++)
@@ -104,18 +121,16 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 							g = img.at<Vec3b>(y,x)[1];
 							r = img.at<Vec3b>(y,x)[2];
 							pix = rgb.checkBlack(r,g,b);
+							//hsl.rgb2hsl(r,g,b);
+							//hueVals.push_back(hsl.getHue());
 							if(pix=="OTHER")
 							{
 								pix = rgb.calcColor(r,g,b);
 								if(pix=="OTHER") {
 									pix = rgb.pushColor(r,g,b,dist,ind);
 								}
-								pixelColorWindow.push_back(pix);
 							}
-							else
-							{
-								pixelColorWindow.push_back(pix);
-							}
+							pixelColorWindow.push_back(pix);
 						}
 					}
 				}
@@ -127,22 +142,21 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 						g = img.at<Vec3b>(y,col+(size.width-1))[1];
 						r = img.at<Vec3b>(y,col+(size.width-1))[2];
 						pix = rgb.checkBlack(r,g,b);
+						//hsl.rgb2hsl(r,g,b);
+						//hueVals.pop_front();
+						//hueVals.push_back(hsl.getHue());
 						if(pix=="OTHER")
 						{
 							pix = rgb.calcColor(r,g,b);
 							if(pix=="OTHER") {
 								pix = rgb.pushColor(r,g,b,dist,ind);
 							}
-							pixelColorWindow.pop_front();
-							pixelColorWindow.push_back(pix);
 						}
-						else
-						{
-							pixelColorWindow.pop_front();
-							pixelColorWindow.push_back(pix);
-						}
+						pixelColorWindow.pop_front();
+						pixelColorWindow.push_back(pix);
 					}
 				}
+				//hueAvg.push_back(calcHueAvg(hueVals));
 				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 				{
 					for(unsigned int j=0; j<mainColors.size(); j++)
@@ -189,7 +203,10 @@ void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
 				index.clear();
 				++col;
 			}//end while col
+			//hueVec.push_back(hueAvg);
 			windowVec.push_back(colorWindow);
+			//hueAvg.clear();
+			//hueVals.clear();
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			col=0; ++row;

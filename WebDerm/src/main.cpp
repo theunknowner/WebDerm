@@ -20,18 +20,26 @@ int main(int argc, char** argv)
 	rgb rgb;
 	rgb.importThresholds();
 	hsl.importLsThreshold();
-	hsl.importThresholds();
+	hsl.importHslThresholds();
+	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/CLP","clp10.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
+/*
+	double dist=0;
+	int ind=0;
+	cout << rgb.calcColor(118,98,82) << endl;
+	cout << rgb.pushColor(118,98,82,dist,ind) << endl;
+	cout << dist << endl << ind+2 << endl;
+	/**/
 	//sortColorThreshold("Gray","Pink");
 	//colorThreshScript();
-	addNewColors(img2,Point(273,260), Point(283,271),"Gray","OTHER");
+	//addNewColors(img2,Point(386,220), Point(387,221),"Gray","OTHER");
 	//testColorIndex(img2,133);
-	int col = 254;
-	int row = 443;
-	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	int col = 351;
+	int row = 330;
+	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
 	//imwrite("img.png", img3);

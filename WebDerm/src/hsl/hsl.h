@@ -14,6 +14,7 @@
 class hsl
 {
 public:
+	bool importHslThresholds();
 	bool importThresholds();
 	bool importLsThreshold();
 	double minRGB(double red, double green, double blue);
