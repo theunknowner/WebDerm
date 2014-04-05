@@ -508,6 +508,18 @@ void rgb::release_memory()
 	vector<String>().swap(mainColors);
 }
 
+double rgb::calcGrayLevel2(double satLevel, double lum) {
+	double grayLevel=0;
+	double lumInt = lum * 100;
+	if(lum<0.5) {
+		grayLevel = 20 + ((satLevel-20)/40) * (lumInt-10);
+	}
+	else {
+		grayLevel = satLevel - (satLevel/40) * (lumInt-50);
+	}
+	return round(grayLevel);
+}
+
 String rgb::calcColor(int red, int green, int blue) {
 	hsl hsl;
 	String pix = "OTHER";
@@ -519,6 +531,7 @@ String rgb::calcColor(int red, int green, int blue) {
 	lum = roundDecimal(hsl.getLum(),2);
 	sat = roundDecimal(hsl.getSat(),2);
 	grayLevel = calcGrayLevel(red,green,blue);
+	grayLevel = calcGrayLevel2(grayLevel,lum);
 	colorLevel = calcColorLevel(red,green,blue);
 	for(unsigned int i=0; i<hueThresh.size(); i++) {
 		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
@@ -527,8 +540,11 @@ String rgb::calcColor(int red, int green, int blue) {
 					if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
 						pix = hslColors.at(i);
 						if(pix=="White" || pix=="Black") return pix;
-						if(pix=="Gray") {
-							pix += toString(grayLevel+colorLevel);
+						if(pix=="Gray" && grayLevel==0) {
+							return "White";
+						}
+						if(pix=="Gray" && grayLevel!=0) {
+							pix += toString(grayLevel);
 							return pix;
 						}
 						if(grayLevel==0) {
@@ -539,7 +555,7 @@ String rgb::calcColor(int red, int green, int blue) {
 							pix = "Gray" + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
 						}
 						return pix;
-			}
+					}
 				}
 			}
 		}

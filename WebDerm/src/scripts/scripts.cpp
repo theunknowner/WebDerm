@@ -15,6 +15,7 @@ void colorThreshNamingScript()
 	rgb rgb;
 	Color color;
 	double r,g,b;
+	double lum=0;
 	String pix;
 	vector<String> vecColor;
 	int colorLevel=0;
@@ -28,28 +29,18 @@ void colorThreshNamingScript()
 		g = absMeanThresh.at(i).at(1);
 		b = absMeanThresh.at(i).at(2);
 		hsl.rgb2hsl(r,g,b);
+		lum = roundDecimal(hsl.getLum(),2);
 		colorLevel = rgb.calcColorLevel(r,g,b);
 		grayLevel = rgb.calcGrayLevel(r,g,b);
+		grayLevel = rgb.calcGrayLevel2(grayLevel,lum);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
 		{
-			if(vecColor.size()==1) {
-				pix = pix + vecColor.at(j) + toString(colorLevel+grayLevel);
-			} else if(vecColor.size()==2) {
-				if(j==0) {
-					pix = pix + vecColor.at(j) + toString(grayLevel);
-				}
-				else {
-					pix = pix + vecColor.at(j) + toString(colorLevel);
-				}
-			} else if(vecColor.size()==3) {
-				if(j==0) {
-					pix = pix + vecColor.at(j) + toString(grayLevel);
-				}
-				else {
-					colorLevel = rgb.getColorLevel(rgbColors.at(i),vecColor.at(j));
-					pix = pix + vecColor.at(j) + toString(colorLevel);
-				}
+			if(vecColor.at(j)=="Gray" && grayLevel!=0) {
+				pix += "Gray" + toString(grayLevel);
+			}
+			else {
+				pix += vecColor.at(j) + toString(colorLevel);
 			}
 		}
 			fprintf(fp,"%s,%f,%f,%f,%f,%f,%f\n",
@@ -428,12 +419,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 						if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
 							pix = hslColors.at(i);
 							if(pix=="White" || pix=="Black") break;
-							if(pix=="Gray") {
-								pix += toString(grayLevel+colorLevel);
-								break;
-							}
-							if(color1=="Gray" && color2=="Gray") {
-								pix = color1 + toString(grayLevel+colorLevel);
+							if(pix=="Gray")	{
+								pix += toString(grayLevel);
 								break;
 							}
 							if(grayLevel==0) {
@@ -461,5 +448,3 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 	fprintf(fp,",,,,,,,%s,%s,%s\n",min.c_str(),min.c_str(),min.c_str());
 	fprintf(fp,",,,,,,,%s,%s,%s\n",max.c_str(),max.c_str(),max.c_str());
 }
-
-

@@ -100,6 +100,7 @@ int calcHueAvg(deque<int> &vec) {
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
 		String pix;
+		int count=0;
 		int ind=0;
 		double dist=0;
 		int b,g,r;
@@ -110,7 +111,6 @@ int calcHueAvg(deque<int> &vec) {
 		{
 			while(col<=(img.cols-size.width))
 			{
-
 				if(col==0)
 				{
 					for(int x=col; x<(col+size.width); x++)
@@ -127,6 +127,7 @@ int calcHueAvg(deque<int> &vec) {
 							{
 								pix = rgb.calcColor(r,g,b);
 								if(pix=="OTHER") {
+									++count;
 									pix = rgb.pushColor(r,g,b,dist,ind);
 								}
 							}
@@ -149,6 +150,7 @@ int calcHueAvg(deque<int> &vec) {
 						{
 							pix = rgb.calcColor(r,g,b);
 							if(pix=="OTHER") {
+								++count;
 								pix = rgb.pushColor(r,g,b,dist,ind);
 							}
 						}
@@ -211,6 +213,7 @@ int calcHueAvg(deque<int> &vec) {
 			pixelColorWindow.clear();
 			col=0; ++row;
 		}//end while row
+		cout << count << endl;
 		writeSeq2File(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
