@@ -86,7 +86,6 @@ int calcHueAvg(deque<int> &vec) {
 	void hysteresis(Mat img, Size size, String name)
 	{
 		rgb rgb;
-		hsl hsl;
 		Color colorObj;
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
@@ -100,7 +99,6 @@ int calcHueAvg(deque<int> &vec) {
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
 		String pix;
-		int count=0;
 		int ind=0;
 		double dist=0;
 		int b,g,r;
@@ -127,7 +125,6 @@ int calcHueAvg(deque<int> &vec) {
 							{
 								pix = rgb.calcColor(r,g,b);
 								if(pix=="OTHER") {
-									++count;
 									pix = rgb.pushColor(r,g,b,dist,ind);
 								}
 							}
@@ -150,7 +147,6 @@ int calcHueAvg(deque<int> &vec) {
 						{
 							pix = rgb.calcColor(r,g,b);
 							if(pix=="OTHER") {
-								++count;
 								pix = rgb.pushColor(r,g,b,dist,ind);
 							}
 						}
@@ -185,7 +181,7 @@ int calcHueAvg(deque<int> &vec) {
 				}
 				for(unsigned int i=0; i <index.size(); i++)
 				{
-					mainColorLevelAvg[index.at(i)] /= (size.width*size.height);
+					mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
 				}
 				if(index.size()!=0)
 				{
@@ -213,7 +209,6 @@ int calcHueAvg(deque<int> &vec) {
 			pixelColorWindow.clear();
 			col=0; ++row;
 		}//end while row
-		cout << count << endl;
 		writeSeq2File(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);

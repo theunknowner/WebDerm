@@ -23,14 +23,14 @@ int main(int argc, char** argv)
 	hsl.importHslThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	//colorThreshNamingScript();
 	//addNewColors(img2,Point(386,220), Point(387,221),"Gray","OTHER");
 	//testColorIndex(img2,133);
-	int col = 431;
-	int row = 421;
+	int col = 411;
+	int row = 232;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");

@@ -167,6 +167,9 @@ String rgb::pushColor(int red, int green, int blue)
 			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
 			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
 			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+			if(val[1]<=3) {
+				return rgbColors[i];
+			}
 			for(int j=0; j<length; j++)
 			{
 				if(val[j]<smallest[j])
@@ -232,6 +235,11 @@ String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
 			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
 			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+			if(val[1]<=3) {
+				dist = val[1];
+				ind = i;
+				return rgbColors[i];
+			}
 			for(int j=0; j<length; j++)
 			{
 				if(val[j]<smallest[j])
@@ -263,33 +271,6 @@ String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 		dist = absDistVals[index2];
 		ind = index2;
 		return rgbColors[index2];
-	}
-
-double rgb::pushColor2(int red, int green, int blue, int &ind)
-	{
-		double smallest=0;
-		double val=0;
-		unsigned int index=0;
-		int colorIndex[rgbColors.size()];
-		fill_n(colorIndex,rgbColors.size(),0);
-		double absDistVals[absMeanThresh.size()];
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-		}
-		smallest = absDistVals[0];
-		index = 0;
-		for(unsigned int i=0; i<absMeanThresh.size(); i++)
-		{
-			val = absDistVals[i];
-			if(val<smallest)
-			{
-				smallest = val;
-				index = i;
-			}
-		}
-		ind = index;
-		return smallest;
 	}
 
 String rgb::pushColor(int red, int green, int blue, int &ind)
@@ -326,6 +307,11 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
 			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
 			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+			if(val[1]<=3) {
+				ind = i;
+				cout << absDistVals[ind] << endl;
+				return rgbColors[i];
+			}
 			for(int j=0; j<length; j++)
 			{
 				if(val[j]<smallest[j])

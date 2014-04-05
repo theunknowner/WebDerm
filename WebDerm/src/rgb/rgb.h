@@ -24,7 +24,6 @@ public:
 	String pushColor(int red, int green, int blue);
 	String pushColor(int red, int green, int blue,double &dist, int &ind);
 	String pushColor(int red, int green, int blue, int &ind);
-	double pushColor2(int red, int green, int blue, int &ind);
 	double calcGrayLevel(int red, int green, int blue);
 	double calcGrayLevel2(double satLevel, double lum);
 	double calcColorLevel(double red, double green, double blue);

@@ -77,7 +77,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	}
 	for(unsigned int i=0; i <index.size(); i++)
 	{
-		mainColorLevelAvg[index.at(i)] /= (size.width*size.height);
+		mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
 	}
 	if(index.size()!=0)
 	{

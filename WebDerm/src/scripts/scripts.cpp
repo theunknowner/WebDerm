@@ -318,7 +318,7 @@ void outputPixLoc(Mat img,int index)
 			b = img.at<Vec3b>(row,col)[0];
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER") {
-				pix = rgb.pushColor2(r,g,b,ind);
+				pix = rgb.pushColor(r,g,b,ind);
 			}
 			if(ind==(index-2)) {
 				fprintf(fp,"%d,%d,%d - (%d,%d)\n", r,g,b,col+1,row+1);
