@@ -235,6 +235,7 @@ String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
 			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
 			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+
 			if(val[1]<=3) {
 				dist = val[1];
 				ind = i;

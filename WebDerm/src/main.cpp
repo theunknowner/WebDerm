@@ -26,11 +26,12 @@ int main(int argc, char** argv)
 	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
+	//changeColors(img2,Point(392,244),Point(395,250));
 	//colorThreshNamingScript();
-	//addNewColors(img2,Point(386,220), Point(387,221),"Gray","OTHER");
+	//addNewColors(img2,Point(385,209), Point(386,210),"Gray","OTHER");
 	//testColorIndex(img2,133);
-	int col = 411;
-	int row = 232;
+	int col = 425;
+	int row = 259;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
