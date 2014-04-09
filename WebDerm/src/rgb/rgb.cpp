@@ -372,7 +372,7 @@ double rgb::calcColorLevel(double red, double green, double blue)
 	lum = roundDecimal(lum,2);
 	for(unsigned int i=0; i<lumLevel.size(); i++)
 	{
-		if(lum>lumLevel.at(i).at(1) && lum<=lumLevel.at(i).at(2))
+		if(lum>=lumLevel.at(i).at(1) && lum<=lumLevel.at(i).at(2))
 		{
 			return lumLevel.at(i).at(0);
 		}

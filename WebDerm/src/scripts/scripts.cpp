@@ -446,7 +446,10 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 					}
 				}
 				else {
-					pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
+					if(color2=="Gray")
+						pix = color2 + toString(grayLevel);
+					else
+						pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
 				}
 			}
 			normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
