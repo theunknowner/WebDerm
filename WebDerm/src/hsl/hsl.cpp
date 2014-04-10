@@ -7,6 +7,14 @@
 
 #include "hsl.h"
 
+bool hsl::isThreshImported() {
+	return THRESH_IMPORTED;
+}
+
+void hsl::setThreshImported(bool flag) {
+	THRESH_IMPORTED = flag;
+}
+
 //import main HSL thresholds
 bool hsl::importHslThresholds() {
 	String foldername = path+"Thresholds/";
@@ -41,51 +49,8 @@ bool hsl::importHslThresholds() {
 	vector<double>().swap(thresh2);
 	vector<double>().swap(thresh3);
 	String().swap(temp);
+	setThreshImported(true);
 	return true;
-}
-
-//import HSL colorspace thresholds.
-bool hsl::importThresholds()
-{
-	String folderName = path+"Thresholds/";
-	String filename = folderName+"hsl-thresholds.csv";
-	fstream fsThresh(filename.c_str());
-	if(fsThresh.is_open())
-	{
-		String temp;
-		vector<String> vec;
-		vector<int> thresh;
-		vector<double> thresh2;
-		vector<double> thresh3;
-		getline(fsThresh,temp); //skips first line
-		while(getline(fsThresh,temp))
-		{
-			getSubstr(temp,',',vec); //gets line to string
-			for(unsigned int i=0; i<vec.size(); i++)
-			{
-				if(i==0) hslColors.push_back(vec.at(i));
-				if(i>=1 && i<=2) thresh.push_back(atoi(vec.at(i).c_str()));
-				if(i>=3 && i<=4) thresh2.push_back(atof(vec.at(i).c_str()));
-				if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
-			}
-			hueThresh.push_back(thresh);
-			satThresh.push_back(thresh2);
-			lumThresh.push_back(thresh3);
-			vec.clear(); thresh.clear(); thresh2.clear(); thresh3.clear();
-		}
-		fsThresh.close();
-		vector<String>().swap(vec);
-		vector<int>().swap(thresh);
-		vector<double>().swap(thresh2);
-		vector<double>().swap(thresh3);
-		String().swap(temp);
-		return true;
-	}
-	else
-	{
-		cout << "Importing Colors and Thresholds Failed!" << endl;
-		return false;
-	}
 }
 
 bool hsl::importLsThreshold()

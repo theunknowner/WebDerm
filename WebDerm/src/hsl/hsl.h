@@ -13,9 +13,12 @@
 
 class hsl
 {
+private:
+	bool THRESH_IMPORTED = false;
 public:
+	bool isThreshImported();
+	void setThreshImported(bool flag);
 	bool importHslThresholds();
-	bool importThresholds();
 	bool importLsThreshold();
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);

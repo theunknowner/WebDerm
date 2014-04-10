@@ -7,6 +7,22 @@
 
 #include "rgb.h"
 
+
+bool rgb::isThreshImported()	{
+	return THRESH_IMPORTED;
+}
+
+void rgb::setThreshImported(bool flag) {
+	THRESH_IMPORTED = true;
+}
+
+int rgb::getIndex(String color) {
+	for(unsigned int i=0; i<mainColors.size(); i++) {
+		if(color==mainColors.at(i))
+			return i;
+	}
+	return -1;
+}
 //imports RGB colorspace thresholds
 bool rgb::importThresholds()
 {
@@ -53,6 +69,7 @@ bool rgb::importThresholds()
 		vector<double>().swap(thresh);
 		vector<double>().swap(thresh2);
 		String().swap(temp);
+		setThreshImported(true);
 		return true;
 	}
 	else

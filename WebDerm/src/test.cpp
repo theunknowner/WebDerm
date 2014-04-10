@@ -6,15 +6,30 @@
  */
 
 #include "test.h"
-
+int calcHueAvg2(deque<int> &vec) {
+	int hue=0;
+	int total=0;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		hue = vec.at(i);
+		if(hue>=0 && hue<=13) {
+			hue += 360;
+		}
+		total += hue;
+	}
+	total /= vec.size();
+	if(total>=360) total -= 360;
+	return total;
+}
 String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
+	hsl hsl;
 	Color colorObj;
 	int b,g,r;
 	int ind=0;
 	vector<int> index;
 	String pix;
+	deque<int> hueVals;
 	deque<String> pixelColorWindow;
 	int colorIndex[rgbColors.size()];
 	int mainColorIndex[mainColors.size()];
@@ -32,6 +47,8 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			g = img.at<Vec3b>(y,x)[1];
 			r = img.at<Vec3b>(y,x)[2];
 			pix = rgb.checkBlack(r,g,b);
+			hsl.rgb2hsl(r,g,b);
+			hueVals.push_back(hsl.getHue());
 			if(pix=="OTHER")
 			{
 				pix = rgb.calcColor(r,g,b);
@@ -44,9 +61,10 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			{
 				pixelColorWindow.push_back(pix);
 			}
-			cout << pix << img.at<Vec3b>(y,x) << "-" << ind+2 << endl;
+			cout << pix << img.at<Vec3b>(y,x) << "-" << ind+2 << "-" << hsl.getHue()<< endl;
 		}
 	}
+	cout << calcHueAvg2(hueVals) << endl;
 	for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 	{
 		for(unsigned int j=0; j<mainColors.size(); j++)

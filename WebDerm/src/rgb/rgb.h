@@ -13,7 +13,12 @@
 
 class rgb
 {
+private:
+	bool THRESH_IMPORTED=false;
 public:
+	bool isThreshImported();
+	void setThreshImported(bool flag);
+	int getIndex(String color);
 	bool importThresholds();
 	double normEucDist(double red, double green, double blue, vector<double> &vec);
 	double absEucDist(double red, double green, double blue, vector<double> &vec);

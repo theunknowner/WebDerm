@@ -13,25 +13,27 @@
 #include "test/testfunctions.h"
 #include "scripts/scripts.h"
 #include "Math/maths.h"
+#include "Contrast/contrast.h"
 
 int main(int argc, char** argv)
 {
 	hsl hsl;
 	rgb rgb;
+	contrast con;
 	rgb.importThresholds();
 	hsl.importLsThreshold();
 	hsl.importHslThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph9.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
+	//cout<< con.calcContrast(14,16,"Gray6Pink7","Gray6Pink7");
 	//changeColors(img2,Point(367,193),Point(368,201));
 	//colorThreshNamingScript();
 	//addNewColors(img2,Point(386,245),Point(389,249),"Gray","Gray");
-	//testColorIndex(img2,133);
-	int col = 258;
-	int row = 218;
+	int col = 336;
+	int row = 190;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");

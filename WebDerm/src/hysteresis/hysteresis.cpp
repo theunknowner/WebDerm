@@ -52,9 +52,9 @@ void writeSeq2File(vector< vector<int> > &vec, String name)
 	}
 }
 
-void writeSeq2File(vector< vector<double> > &vec, String pathname, String name)
+void writeSeq2File(vector< vector<double> > &vec, String name)
 {
-	String filename = pathname + name + ".csv";
+	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<vec.size(); i++)
@@ -86,15 +86,17 @@ int calcHueAvg(deque<int> &vec) {
 	void hysteresis(Mat img, Size size, String name)
 	{
 		rgb rgb;
+		hsl hsl;
+		contrast con;
 		Color colorObj;
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
 		vector<String> colorWindow;
 		vector< vector<String> > windowVec;
 		vector<int> index;
-		//deque<int>	hueVals;
-		//vector<int> hueAvg;
-		//vector< vector<int> > hueVec;
+		deque<int> hueVals;
+		vector<int> hueAvg;
+		vector< vector<int> > hueVec;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -119,8 +121,8 @@ int calcHueAvg(deque<int> &vec) {
 							g = img.at<Vec3b>(y,x)[1];
 							r = img.at<Vec3b>(y,x)[2];
 							pix = rgb.checkBlack(r,g,b);
-							//hsl.rgb2hsl(r,g,b);
-							//hueVals.push_back(hsl.getHue());
+							hsl.rgb2hsl(r,g,b);
+							hueVals.push_back(hsl.getHue());
 							if(pix=="OTHER")
 							{
 								pix = rgb.calcColor(r,g,b);
@@ -140,9 +142,9 @@ int calcHueAvg(deque<int> &vec) {
 						g = img.at<Vec3b>(y,col+(size.width-1))[1];
 						r = img.at<Vec3b>(y,col+(size.width-1))[2];
 						pix = rgb.checkBlack(r,g,b);
-						//hsl.rgb2hsl(r,g,b);
-						//hueVals.pop_front();
-						//hueVals.push_back(hsl.getHue());
+						hsl.rgb2hsl(r,g,b);
+						hueVals.pop_front();
+						hueVals.push_back(hsl.getHue());
 						if(pix=="OTHER")
 						{
 							pix = rgb.calcColor(r,g,b);
@@ -154,7 +156,7 @@ int calcHueAvg(deque<int> &vec) {
 						pixelColorWindow.push_back(pix);
 					}
 				}
-				//hueAvg.push_back(calcHueAvg(hueVals));
+				hueAvg.push_back(calcHueAvg(hueVals));
 				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 				{
 					for(unsigned int j=0; j<mainColors.size(); j++)
@@ -201,18 +203,23 @@ int calcHueAvg(deque<int> &vec) {
 				index.clear();
 				++col;
 			}//end while col
-			//hueVec.push_back(hueAvg);
+			hueVec.push_back(hueAvg);
 			windowVec.push_back(colorWindow);
-			//hueAvg.clear();
-			//hueVals.clear();
+			hueAvg.clear();
+			hueVals.clear();
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			col=0; ++row;
 		}//end while row
-		writeSeq2File(windowVec,name);
+		//writeSeq2File(windowVec,name);
+		writeSeq2File(hueVec,"hue");
+		con.calcContrastFromMatrix(windowVec,hueVec);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
+		deque<int>().swap(hueVals);
+		vector<int>().swap(hueAvg);
+		vector< vector<int> >().swap(hueVec);
 		vector<int>().swap(index);
 	}
 

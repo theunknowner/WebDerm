@@ -22,6 +22,7 @@ bool Color::containsColor(String color1, String color2)
 	return false;
 }
 
+//returns the amount of time pixels contain main color
 int Color::containsMainColor(String color, String mColor)
 {
 	int count=0;

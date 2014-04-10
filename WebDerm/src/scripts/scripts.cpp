@@ -190,12 +190,12 @@ void outputFarRGBScript(Mat &img, String name)
 
 		lumLevel = rgb.calcColorLevel(r,g,b);
 		pix.clear();
-		for(unsigned int i=0; i<vecColor.size(); i++) {
-			if(vecColor.size()==1 && vecColor.at(i)!="Gray") {
-				pix = pix + "Gray" + toString(lumLevel) + vecColor.at(i) + toString(lumLevel);
+		for(unsigned int j=0; j<vecColor.size(); j++) {
+			if(vecColor.size()==1 && vecColor.at(j)!="Gray") {
+				pix = pix + "Gray" + toString(lumLevel) + vecColor.at(j) + toString(lumLevel);
 			}
 			else {
-				pix = pix + vecColor.at(i) + toString(lumLevel);
+				pix = pix + vecColor.at(j) + toString(lumLevel);
 			}
 		}
 		fprintf(fp,"%d,%d,%d - (%d,%d) - %s\n",r,g,b,points.at(i).x,points.at(i).y,pix.c_str());
