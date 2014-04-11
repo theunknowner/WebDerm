@@ -6,20 +6,7 @@
  */
 
 #include "test.h"
-int calcHueAvg2(deque<int> &vec) {
-	int hue=0;
-	int total=0;
-	for(unsigned int i=0; i<vec.size(); i++) {
-		hue = vec.at(i);
-		if(hue>=0 && hue<=13) {
-			hue += 360;
-		}
-		total += hue;
-	}
-	total /= vec.size();
-	if(total>=360) total -= 360;
-	return total;
-}
+
 String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
@@ -64,7 +51,6 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			cout << pix << img.at<Vec3b>(y,x) << "-" << ind+2 << "-" << hsl.getHue()<< endl;
 		}
 	}
-	cout << calcHueAvg2(hueVals) << endl;
 	for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 	{
 		for(unsigned int j=0; j<mainColors.size(); j++)

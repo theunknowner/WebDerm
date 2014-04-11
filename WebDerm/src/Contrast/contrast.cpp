@@ -7,27 +7,20 @@
 
 #include "contrast.h"
 
-double contrast::calcContrastHue(int hue) {
-	double h=0;
-	h = ((hue+180)%360);
-	h /= 360;
-	return h;
-}
-
 double contrast::calcColorfulness(double contrastHue, double colorLevel) {
 	double contrast=0;
 	contrast = colorLevel * contrastHue;
 	return contrast;
 }
 
-double contrast::calcContrast(int hue1, int hue2, String color1, String color2) {
+double contrast::calcContrast(double hue1, double hue2, String color1, String color2) {
 	rgb rgb;
 	double colorLevel1=0, colorLevel2=0;
-	double cHue1=0, cHue2=0;
+	double cHue1, cHue2;
 	double colorfn1=0, colorfn2=0;
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
-		cHue1 = calcContrastHue(hue1);
-		cHue2 = calcContrastHue(hue2);
+		cHue1 = hue1;
+		cHue2 = hue2;
 		if(color1.find(mainColors.at(i))!=string::npos) {
 			colorLevel1 = rgb.getColorLevel(color1,mainColors.at(i));
 			if(color1.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
@@ -46,7 +39,7 @@ double contrast::calcContrast(int hue1, int hue2, String color1, String color2) 
 	return colorfn2-colorfn1;
 }
 
-void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<int> > &hueVec) {
+void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec) {
 	double contrast=0;
 	vector<double> vec;
 	vector< vector<double> > vec2;

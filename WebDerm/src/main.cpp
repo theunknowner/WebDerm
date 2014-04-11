@@ -17,6 +17,8 @@
 
 int main(int argc, char** argv)
 {
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
@@ -28,12 +30,12 @@ int main(int argc, char** argv)
 	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	//cout<< con.calcContrast(14,16,"Gray6Pink7","Gray6Pink7");
+	//cout<< con.calcContrast(0.559028,0.553472,"Gray6Brown6","Gray6Brown6") << endl;
 	//changeColors(img2,Point(367,193),Point(368,201));
 	//colorThreshNamingScript();
 	//addNewColors(img2,Point(386,245),Point(389,249),"Gray","Gray");
-	int col = 336;
-	int row = 190;
+	int col = 378;
+	int row = 187;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");

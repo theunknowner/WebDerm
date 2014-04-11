@@ -67,18 +67,15 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 	}
 }
 
-int calcHueAvg(deque<int> &vec) {
-	int hue=0;
-	int total=0;
+double calcHueAvg(deque<int> &vec) {
+	double hue=0;
+	double total=0;
 	for(unsigned int i=0; i<vec.size(); i++) {
-		hue = vec.at(i);
-		if(hue>=0 && hue<=13) {
-			hue += 360;
-		}
+		hue = (vec.at(i)+180)%360;
 		total += hue;
 	}
 	total /= vec.size();
-	if(total>=360) total -= 360;
+	total /= 360;
 	return total;
 }
 
@@ -95,8 +92,8 @@ int calcHueAvg(deque<int> &vec) {
 		vector< vector<String> > windowVec;
 		vector<int> index;
 		deque<int> hueVals;
-		vector<int> hueAvg;
-		vector< vector<int> > hueVec;
+		vector<double> hueAvg;
+		vector< vector<double> > hueVec;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -212,14 +209,14 @@ int calcHueAvg(deque<int> &vec) {
 			col=0; ++row;
 		}//end while row
 		//writeSeq2File(windowVec,name);
-		writeSeq2File(hueVec,"hue");
+		//writeSeq2File(hueVec,"hue");
 		con.calcContrastFromMatrix(windowVec,hueVec);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
 		deque<int>().swap(hueVals);
-		vector<int>().swap(hueAvg);
-		vector< vector<int> >().swap(hueVec);
+		vector<double>().swap(hueAvg);
+		vector< vector<double> >().swap(hueVec);
 		vector<int>().swap(index);
 	}
 
