@@ -124,14 +124,13 @@ Mat runResizeImage(String filename, Size size,int write)
 	return img2;
 }
 
-void runHysteresis()
+void runHysteresis(Size size)
 {
 	rgb rgb;
 	hsl hsl;
 	String filename;
 	String name;
 	String input;
-	Size size = Size(2,2);
 	cout << "Enter filename: ";
 	cin >> filename;
 	cout << "Do you want to write image? (y/n) ";

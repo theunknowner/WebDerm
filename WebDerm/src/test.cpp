@@ -11,6 +11,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
 	hsl hsl;
+	contrast con;
 	Color colorObj;
 	int b,g,r;
 	int ind=0;
@@ -48,9 +49,10 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			{
 				pixelColorWindow.push_back(pix);
 			}
-			cout << pix << img.at<Vec3b>(y,x) << "-" << ind+2 << "-" << hsl.getHue()<< endl;
+			cout << pix << img.at<Vec3b>(y,x) << "-" << ind+2 << endl;
 		}
 	}
+	cout << "Hue Avg: " << hsl.calcHueAvg(hueVals) << endl;
 	for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 	{
 		for(unsigned int j=0; j<mainColors.size(); j++)

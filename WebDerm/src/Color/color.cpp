@@ -52,3 +52,13 @@ void Color::extractColorFromString(String color, vector<String> &vecColor) {
 	}
 }
 
+//returns the amount of different colors in the string
+int Color::countColors(String color) {
+	int count=0;
+	for(unsigned int i=0; i<mainColors.size(); i++) {
+		if(color.find(mainColors.at(i))!=string::npos) {
+			++count;
+		}
+	}
+	return count;
+}

@@ -306,3 +306,17 @@ void hsl::release_memory()
 	vector< vector<double> >().swap(satThresh);
 	vector< vector<double> >().swap(lumThresh);
 }
+
+//customize calcuation of hue avg
+double hsl::calcHueAvg(deque<int> &vec) {
+	double hue=0;
+	double total=0;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		hue = (vec.at(i)+180)%360;
+		//cout << hue << endl;
+		total += hue;
+	}
+	total /= vec.size();
+	total /= 360;
+	return total;
+}

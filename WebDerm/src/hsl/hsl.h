@@ -33,6 +33,7 @@ public:
 	double calcRelLum(double red, double green, double blue);
 	String getHslColor(double r,double g,double b);
 	void release_memory();
+	double calcHueAvg(deque<int> &vec);
 };
 
 #endif /* HSL_H_ */

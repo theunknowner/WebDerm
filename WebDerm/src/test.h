@@ -12,6 +12,8 @@
 #include "rgb/rgb.h"
 #include "skin/Skin.h"
 #include "hysteresis/hysteresis.h"
+#include "hsl/hsl.h"
+#include "Contrast/contrast.h"
 
 String testHysteresis(Mat &img, int row, int col, Size size);
 String testMouseHysteresis(Mat &img, int row, int col, Size size, vector<Vec3b> &vec, vector<String> &colorVec);

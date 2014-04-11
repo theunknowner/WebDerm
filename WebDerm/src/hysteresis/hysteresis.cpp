@@ -67,18 +67,6 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 	}
 }
 
-double calcHueAvg(deque<int> &vec) {
-	double hue=0;
-	double total=0;
-	for(unsigned int i=0; i<vec.size(); i++) {
-		hue = (vec.at(i)+180)%360;
-		total += hue;
-	}
-	total /= vec.size();
-	total /= 360;
-	return total;
-}
-
 //hysteresis moving 1 col/row at a time
 	void hysteresis(Mat img, Size size, String name)
 	{
@@ -153,7 +141,7 @@ double calcHueAvg(deque<int> &vec) {
 						pixelColorWindow.push_back(pix);
 					}
 				}
-				hueAvg.push_back(calcHueAvg(hueVals));
+				hueAvg.push_back(hsl.calcHueAvg(hueVals));
 				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 				{
 					for(unsigned int j=0; j<mainColors.size(); j++)
@@ -210,7 +198,7 @@ double calcHueAvg(deque<int> &vec) {
 		}//end while row
 		//writeSeq2File(windowVec,name);
 		//writeSeq2File(hueVec,"hue");
-		con.calcContrastFromMatrix(windowVec,hueVec);
+		con.calcContrastFromMatrix(windowVec,hueVec,name);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
@@ -222,8 +210,13 @@ double calcHueAvg(deque<int> &vec) {
 
 	void hysteresis1x1(Mat img, String name) {
 		rgb rgb;
+		hsl hsl;
+		contrast con;
 		int r,g,b;
 		String pix;
+		deque<int> hueVals;
+		vector<double> hueAvg;
+		vector< vector<double> > hueVec;
 		vector<String> colorWindow;
 		vector< vector<String> > windowVec;
 		double dist=0;
@@ -234,18 +227,25 @@ double calcHueAvg(deque<int> &vec) {
 				g = img.at<Vec3b>(row,col)[1];
 				b = img.at<Vec3b>(row,col)[0];
 				pix = rgb.checkBlack(r,g,b);
+				hsl.rgb2hsl(r,g,b);
+				hueVals.push_back(hsl.getHue());
 				if(pix=="OTHER") {
 					pix = rgb.calcColor(r,g,b);
 					if(pix=="OTHER") {
 						pix = rgb.pushColor(r,g,b,dist,ind);
 					}
 				}
+				hueAvg.push_back(hsl.calcHueAvg(hueVals));
+				hueVals.clear();
 				colorWindow.push_back(pix);
 			}
+			hueVec.push_back(hueAvg);
+			hueAvg.clear();
 			windowVec.push_back(colorWindow);
 			colorWindow.clear();
 		}
-		writeSeq2File(windowVec,name);
+		con.calcContrastFromMatrix(windowVec,hueVec,name);
+		//writeSeq2File(windowVec,name);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
 	}

@@ -20,7 +20,7 @@ class contrast {
 public:
 	double calcColorfulness(double contrastHue, double colorLevel);
 	double calcContrast(double hue1, double hue2, String color1, String color2);
-	void calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec);
+	void calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
 };
 
 #endif /* CONTRAST_H_ */

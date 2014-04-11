@@ -19,7 +19,7 @@ void runCheckRGBColor();
 void runCheckList();
 Mat runResizeImage(String foldername, String filename, Size size,int write);
 Mat runResizeImage(String filename, Size size,int write);
-void runHysteresis();
+void runHysteresis(Size size);
 void runCheckSequence(Mat &img, int row, int col, Size size);
 void runGetSkin();
 void getMouseInfo(Mat &img);
