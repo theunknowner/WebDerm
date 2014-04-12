@@ -14,7 +14,7 @@
 class hsl
 {
 private:
-	bool THRESH_IMPORTED = false;
+	bool THRESH_IMPORTED;
 public:
 	bool isThreshImported();
 	void setThreshImported(bool flag);

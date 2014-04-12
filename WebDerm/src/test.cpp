@@ -258,3 +258,28 @@ void testColorIndex(Mat &img, int index)
 	imshow("Img2",img2);
 	waitKey(0);
 }
+
+String testColorAtLoc(Mat &img, Point pt) {
+	rgb rgb;
+	hsl hsl;
+	contrast con;
+	int r,g,b;
+	int ind= -3;
+	double hue;
+	String pix;
+	r = img.at<Vec3b>(pt.y-1,pt.x-1)[2];
+	g = img.at<Vec3b>(pt.y-1,pt.x-1)[1];
+	b = img.at<Vec3b>(pt.y-1,pt.x-1)[0];
+	pix = rgb.checkBlack(r,g,b);
+	hsl.rgb2hsl(r,g,b);
+	if(pix=="OTHER") {
+		pix = rgb.calcColor(r,g,b);
+		if(pix=="OTHER") {
+			pix = rgb.pushColor(r,g,b,ind);
+		}
+	}
+	hue = (hsl.getHue()+180)%360;
+	hue /= 360;
+	cout << pix << img.at<Vec3b>(pt.y-1,pt.x-1) << ";" << ind+2 << ";" << hue<< endl;
+	return pix;
+}
