@@ -31,7 +31,9 @@ public:
 	String pushColor(int red, int green, int blue, int &ind);
 	double calcGrayLevel(int red, int green, int blue);
 	double calcGrayLevel2(double satLevel, double lum);
+	double calcGrayLevel2(int red, int green, int blue);
 	double calcColorLevel(double red, double green, double blue);
+	double calcColorLevel2(double red, double green, double blue);
 	double getGrayLevel(String color);
 	double getColorLevel(String color, String mainColor);
 	void getLevels(String color, int * levels);
@@ -40,6 +42,7 @@ public:
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 	void release_memory();
 	String calcColor(int red, int green, int blue);
+	String calcColor2(int red, int green, int blue);
 };
 
 

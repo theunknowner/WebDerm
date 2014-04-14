@@ -14,6 +14,7 @@
 #include "hysteresis/hysteresis.h"
 #include "skin/Skin.h"
 #include "scripts/scripts.h"
+#include "Contrast/contrast.h"
 
 void runCheckRGBColor();
 void runCheckList();
@@ -28,5 +29,6 @@ void runMouseHysteresis2();
 void outputFreqColor(Mat &img);
 void runOutputColorFreq();
 void runOutputFarRGB();
+void runColorfulnessMatrix1x1();
 
 #endif /* RUN_H_ */

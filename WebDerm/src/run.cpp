@@ -294,3 +294,24 @@ void runOutputFarRGB() {
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory(); hsl.release_memory();
 }
+
+void runColorfulnessMatrix1x1() {
+	rgb rgb;
+	hsl hsl;
+	contrast con;
+	String filename;
+	String name;
+	cout << "Enter filename: ";
+	cin >> filename;
+	Mat img, img2, mask;
+	img = runResizeImage(filename,Size(700,700),0);
+	getSkin(img, mask);
+	img.copyTo(img2, mask);
+	name = getImageName(filename);
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	hsl.importLsThreshold();
+	con.colorfulnessMatrix1x1(img2,name);
+	img.release(); img2.release(); mask.release();
+	rgb.release_memory();
+}

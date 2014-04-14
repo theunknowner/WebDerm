@@ -30,9 +30,9 @@ void colorThreshNamingScript()
 		b = absMeanThresh.at(i).at(2);
 		hsl.rgb2hsl(r,g,b);
 		lum = roundDecimal(hsl.getLum(),2);
-		colorLevel = rgb.calcColorLevel(r,g,b);
-		grayLevel = rgb.calcGrayLevel(r,g,b);
-		grayLevel = rgb.calcGrayLevel2(grayLevel,lum);
+		colorLevel = rgb.calcColorLevel2(r,g,b);
+		//grayLevel = rgb.calcGrayLevel(r,g,b);
+		grayLevel = rgb.calcGrayLevel2(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
 		{

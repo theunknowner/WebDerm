@@ -28,18 +28,25 @@ int main(int argc, char** argv)
 	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	cout << con.calcContrast(0.566667,0.563889,"Gray8Brown9","Gray9Brown9") << endl;
+	//cout << con.calcContrast(0.566667,0.563889,"Gray8Brown9","Gray9Brown9") << endl;
 	//changeColors(img2,Point(367,193),Point(368,201));
 	//colorThreshNamingScript();
 	//addNewColors(img2,Point(386,245),Point(389,249),"Gray","Gray");
 	//int col = 313;
-		int row = 219;
-		int i=1;
-		for(int col=304; col<=327; col++) {
-			cout << i << ") " << col <<  ": ";
-			testColorAtLoc(img2, Point(col,row));
-			i++;
-		}
+	int row = 172;
+	int i=1;
+	String pix;
+	double hue=0;
+	for(int col=355; col<=382; col++) {
+		cout << i << ") " << col <<  ": ";
+		pix = testColorAtLoc(img2, Point(col,row),hue);
+		cout << "Colorfn0: " << con.calcColorfulness2(hue,pix) << endl;
+		i++;
+	}
+	//cout << "Colorfn0: " << con.calcColorfulness2(0.586111,"Gray77Brown47") << endl;
+	//cout << "Colorfn1: " << con.calcColorfulness2(0.527778,"Gray5Pink7") << endl;
+	//cout << "Colorfn2: " << con.calcColorfulness2(0.536111,"Gray46Pink42") << endl;
+	//cout << "Colorfn3: " << con.calcColorfulness2(0.530556,"Gray44Pink40") << endl;
 	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");

@@ -8,9 +8,9 @@
 #include "contrast.h"
 
 double contrast::calcColorfulness(double contrastHue, double colorLevel) {
-	double contrast=0;
-	contrast = colorLevel * contrastHue;
-	return contrast;
+	double colorfn=0;
+	colorfn = colorLevel * contrastHue;
+	return colorfn;
 }
 
 double contrast::calcContrast(double hue1, double hue2, String color1, String color2) {
@@ -37,8 +37,8 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 			colorfn2 += calcColorfulness(cHue2, colorLevel2);
 		}
 	}
-	printf("Colorfn1: %f\n",colorfn1);
-	printf("Colorfn2: %f\n",colorfn2);
+	//printf("Colorfn1: %f\n",colorfn1);
+	//printf("Colorfn2: %f\n",colorfn2);
 	return colorfn2-colorfn1;
 }
 
@@ -75,4 +75,60 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 	writeSeq2File(vec2,file);
 	vector<double>().swap(vec);
 	vector< vector<double> >().swap(vec2);
+}
+
+double contrast::calcColorfulness2(double hue, String color) {
+	rgb rgb;
+	double grayHue = -0.25;
+	double colorLevel1=0;
+	double cHue1;
+	double colorfn1=0;
+	for(unsigned int i=0; i<mainColors.size(); i++)	{
+		cHue1 = hue;
+		if(color.find(mainColors.at(i))!=string::npos) {
+			colorLevel1 = rgb.getColorLevel(color,mainColors.at(i));
+			if(color.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
+				cHue1 = grayHue;
+			}
+			colorfn1 += calcColorfulness(cHue1, colorLevel1);
+		}
+	}
+	return colorfn1;
+}
+
+void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
+	rgb rgb;
+	hsl hsl;
+	String filename = name + "Colorfn";
+	contrast con;
+	double colorfn;
+	double hue;
+	vector<double> clrfn;
+	vector< vector<double> > clrfnVec;
+	int ind=0;
+	double dist=0;
+	String pix;
+	int r,g,b;
+	for(int row=0; row<img.rows; row++) {
+		for(int col=0; col<img.cols; col++) {
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			pix = rgb.checkBlack(r,g,b);
+			hsl.rgb2hsl(r,g,b);
+			if(pix=="OTHER") {
+				pix = rgb.calcColor2(r,g,b);
+				if(pix=="OTHER") {
+					pix = rgb.pushColor(r,g,b,dist,ind);
+				}
+			}
+			hue = (hsl.getHue()+180)%360;
+			hue /=360;
+			colorfn = con.calcColorfulness2(hue,pix);
+			clrfn.push_back(colorfn);
+		}
+		clrfnVec.push_back(clrfn);
+		clrfn.clear();
+	}
+	writeSeq2File(clrfnVec,filename);
 }

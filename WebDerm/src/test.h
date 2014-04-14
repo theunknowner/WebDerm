@@ -20,6 +20,6 @@ String testMouseHysteresis(Mat &img, int row, int col, Size size, vector<Vec3b> 
 void testMouseColor(Mat img);
 void testSatLum(Mat &img);
 void testColorIndex(Mat &img, int index);
-String testColorAtLoc(Mat &img, Point pt);
+String testColorAtLoc(Mat &img, Point pt, double &hue);
 
 #endif /* TEST_H_ */
