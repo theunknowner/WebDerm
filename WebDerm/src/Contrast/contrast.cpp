@@ -37,8 +37,8 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 			colorfn2 += calcColorfulness(cHue2, colorLevel2);
 		}
 	}
-	//printf("Colorfn1: %f\n",colorfn1);
-	//printf("Colorfn2: %f\n",colorfn2);
+	printf("Colorfn1: %f\n",colorfn1);
+	printf("Colorfn2: %f\n",colorfn2);
 	return colorfn2-colorfn1;
 }
 

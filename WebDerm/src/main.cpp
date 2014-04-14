@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	//cout << con.calcContrast(0.511806,0.507639,"Gray8Pink9","Gray8Pink8") << endl;
+	cout << con.calcContrast(0.566667,0.563889,"Gray8Brown9","Gray9Brown9") << endl;
 	//changeColors(img2,Point(367,193),Point(368,201));
 	//colorThreshNamingScript();
 	//addNewColors(img2,Point(386,245),Point(389,249),"Gray","Gray");
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 		int row = 219;
 		int i=1;
 		for(int col=304; col<=327; col++) {
-			cout << i << ") ";
+			cout << i << ") " << col <<  ": ";
 			testColorAtLoc(img2, Point(col,row));
 			i++;
 		}
