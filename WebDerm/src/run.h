@@ -20,7 +20,7 @@ void runCheckRGBColor();
 void runCheckList();
 Mat runResizeImage(String foldername, String filename, Size size,int write);
 Mat runResizeImage(String filename, Size size,int write);
-void runHysteresis(Size size);
+void runHysteresis();
 void runCheckSequence(Mat &img, int row, int col, Size size);
 void runGetSkin();
 void getMouseInfo(Mat &img);
@@ -29,6 +29,6 @@ void runMouseHysteresis2();
 void outputFreqColor(Mat &img);
 void runOutputColorFreq();
 void runOutputFarRGB();
-void runColorfulnessMatrix1x1();
+void runColorfulnessMatrix();
 
 #endif /* RUN_H_ */

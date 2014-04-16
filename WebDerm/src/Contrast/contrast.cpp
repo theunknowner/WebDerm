@@ -132,3 +132,171 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 	}
 	writeSeq2File(clrfnVec,filename);
 }
+
+void contrast::calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec,String name) {
+	Color c;
+	String file;
+	int count1;
+	double colorfn=0;
+	String color1;
+	double hue1;
+	vector<double> vec;
+	vector< vector<double> > vec2;
+	for(unsigned int i=0; i<windowVec.size(); i++) {
+		for(unsigned int j=0; j<(windowVec.at(i).size()-1); j++) {
+			color1 = windowVec.at(i).at(j);
+			hue1 = hueVec.at(i).at(j);
+			count1 = c.countColors(color1);
+			if(count1==3)
+				color1=windowVec.at(i).at(j-1);
+
+			colorfn = calcColorfulness2(hue1,color1);
+			vec.push_back(colorfn);
+		}
+		vec2.push_back(vec);
+		vec.clear();
+	}
+	file = name + "Colorfn2x2";
+	writeSeq2File(vec2,file);
+	vector<double>().swap(vec);
+	vector< vector<double> >().swap(vec2);
+}
+
+void contrast::colorfulMatrix(Mat img, Size size, String name)
+	{
+		rgb rgb;
+		hsl hsl;
+		contrast con;
+		Color colorObj;
+		double matchingScans = (size.width*size.height)/2;
+		deque<String> pixelColorWindow;
+		vector<String> colorWindow;
+		vector< vector<String> > windowVec;
+		vector<int> index;
+		deque<int> hueVals;
+		vector<double> hueAvg;
+		vector< vector<double> > hueVec;
+		int mainColorIndex[mainColors.size()];
+		double mainColorLevels[mainColors.size()];
+		double mainColorLevelAvg[mainColors.size()];
+		String pix;
+		int ind=0;
+		double dist=0;
+		int b,g,r;
+		int row=0, col=0;
+		fill_n(mainColorIndex,mainColors.size(),0);
+		fill_n(mainColorLevelAvg,mainColors.size(),0);
+		while(row<=(img.rows-size.height))
+		{
+			while(col<=(img.cols-size.width))
+			{
+				if(col==0)
+				{
+					for(int x=col; x<(col+size.width); x++)
+					{
+						for(int y=row; y<(row+size.height); y++)
+						{
+							b = img.at<Vec3b>(y,x)[0];
+							g = img.at<Vec3b>(y,x)[1];
+							r = img.at<Vec3b>(y,x)[2];
+							pix = rgb.checkBlack(r,g,b);
+							hsl.rgb2hsl(r,g,b);
+							hueVals.push_back(hsl.getHue());
+							if(pix=="OTHER")
+							{
+								pix = rgb.calcColor(r,g,b);
+								if(pix=="OTHER") {
+									pix = rgb.pushColor(r,g,b,dist,ind);
+								}
+							}
+							pixelColorWindow.push_back(pix);
+						}
+					}
+				}
+				else
+				{
+					for(int y=row; y<(row+size.height); y++)
+					{
+						b = img.at<Vec3b>(y,col+(size.width-1))[0];
+						g = img.at<Vec3b>(y,col+(size.width-1))[1];
+						r = img.at<Vec3b>(y,col+(size.width-1))[2];
+						pix = rgb.checkBlack(r,g,b);
+						hsl.rgb2hsl(r,g,b);
+						hueVals.pop_front();
+						hueVals.push_back(hsl.getHue());
+						if(pix=="OTHER")
+						{
+							pix = rgb.calcColor2(r,g,b);
+							if(pix=="OTHER") {
+								pix = rgb.pushColor(r,g,b,dist,ind);
+							}
+						}
+						pixelColorWindow.pop_front();
+						pixelColorWindow.push_back(pix);
+					}
+				}
+				hueAvg.push_back(hsl.calcHueAvg(hueVals));
+				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
+				{
+					for(unsigned int j=0; j<mainColors.size(); j++)
+					{
+						if(colorObj.containsMainColor(pixelColorWindow.at(i),mainColors.at(j))!=0)
+							mainColorIndex[j]++;
+					}
+				}
+				for(unsigned int j=0; j<mainColors.size(); j++)
+				{
+					if(mainColorIndex[j]>=round(matchingScans))
+					{
+						index.push_back(j);
+					}
+				}
+				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
+				{
+					for(unsigned int j=0; j<index.size(); j++)
+					{
+						mainColorLevels[index.at(j)] = rgb.getColorLevel(pixelColorWindow.at(i),
+															mainColors.at(index.at(j)));
+						mainColorLevelAvg[index.at(j)] += mainColorLevels[index.at(j)];
+					}
+				}
+				for(unsigned int i=0; i <index.size(); i++)
+				{
+					mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
+				}
+				if(index.size()!=0)
+				{
+					pix.clear();
+					for(unsigned int i=0; i<index.size(); i++)
+					{
+						pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
+					}
+					colorWindow.push_back(pix);
+				}
+				else
+				{
+					colorWindow.push_back("NZ");
+				}
+				fill_n(mainColorIndex,mainColors.size(),0);
+				fill_n(mainColorLevelAvg,mainColors.size(),0);
+				index.clear();
+				++col;
+			}//end while col
+			hueVec.push_back(hueAvg);
+			windowVec.push_back(colorWindow);
+			hueAvg.clear();
+			hueVals.clear();
+			colorWindow.clear();
+			pixelColorWindow.clear();
+			col=0; ++row;
+		}//end while row
+		//writeSeq2File(windowVec,name);
+		con.calcColorfulnessMatrix(windowVec,hueVec,name);
+		deque<String>().swap(pixelColorWindow);
+		vector<String>().swap(colorWindow);
+		vector< vector<String> >().swap(windowVec);
+		deque<int>().swap(hueVals);
+		vector<double>().swap(hueAvg);
+		vector< vector<double> >().swap(hueVec);
+		vector<int>().swap(index);
+	}

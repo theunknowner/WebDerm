@@ -23,6 +23,8 @@ public:
 	void calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
 	double calcColorfulness2(double hue, String color);
 	void colorfulnessMatrix1x1(Mat &img, String name);
+	void calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
+	void colorfulMatrix(Mat img, Size size, String name);
 };
 
 #endif /* CONTRAST_H_ */

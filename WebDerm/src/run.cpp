@@ -124,30 +124,32 @@ Mat runResizeImage(String filename, Size size,int write)
 	return img2;
 }
 
-void runHysteresis(Size size)
+void runHysteresis()
 {
 	rgb rgb;
 	hsl hsl;
 	String filename;
 	String name;
 	String input;
+	Size size;
 	cout << "Enter filename: ";
 	cin >> filename;
-	cout << "Do you want to write image? (y/n) ";
+	cout << "1) Size(1x1)" << endl << "2) Size(2x2)" << endl;
 	cin >> input;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	name = getImageName(filename);
-	if(input=="y") imwrite(name+".png",img2);
+	if(input=="1") size = Size(1,1);
+	if(input=="2") size = Size(2,2);
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	hsl.importLsThreshold();
 	if(size.height==1 && size.width==1)
 		hysteresis1x1(img2,name);
 	else
-		hysteresis(img2,Size(2,2),name);
+		hysteresis(img2,size,name);
 
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
@@ -295,23 +297,32 @@ void runOutputFarRGB() {
 	rgb.release_memory(); hsl.release_memory();
 }
 
-void runColorfulnessMatrix1x1() {
+void runColorfulnessMatrix() {
 	rgb rgb;
 	hsl hsl;
 	contrast con;
+	Size size;
 	String filename;
+	String input;
 	String name;
 	cout << "Enter filename: ";
 	cin >> filename;
+	cout << "1) Size(1x1)" << endl << "2) Size(2x2)" << endl;
+	cin >> input;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	name = getImageName(filename);
+	if(input=="1") size = Size(1,1);
+	if(input=="2") size = Size(2,2);
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	hsl.importLsThreshold();
-	con.colorfulnessMatrix1x1(img2,name);
+	if(size.height==1 && size.width==1)
+		con.colorfulnessMatrix1x1(img2,name);
+	else
+		con.colorfulMatrix(img2,size,name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 }
