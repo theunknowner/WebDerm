@@ -21,7 +21,7 @@ bool hsl::importHslThresholds() {
 	String filename = foldername+"hslcolor-thresholds.csv";
 	fstream fsThresh(filename.c_str());
 	if(!fsThresh.is_open()) {
-		cerr << "Importing Colors and Thresholds Failed!" << endl;
+		cerr << "Importing HslColors and Thresholds Failed!" << endl;
 		return false;
 	}
 	String temp;

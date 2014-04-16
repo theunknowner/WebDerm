@@ -15,6 +15,8 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	Color colorObj;
 	int b,g,r;
 	int ind=0;
+	double hue=0;
+	double colorfn=0;
 	vector<int> index;
 	String pix;
 	deque<int> hueVals;
@@ -49,7 +51,11 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			{
 				pixelColorWindow.push_back(pix);
 			}
-			cout << pix << img.at<Vec3b>(y,x) << "-" << ind+2 << endl;
+			hue = (hsl.getHue()+180)%360;
+			hue /= 360;
+			colorfn = con.calcColorfulness2(hue,pix);
+			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << hue << endl;
+			cout << "Colorfn: " << colorfn << endl;
 		}
 	}
 	cout << "Hue Avg: " << hsl.calcHueAvg(hueVals) << endl;

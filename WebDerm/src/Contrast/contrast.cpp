@@ -15,10 +15,11 @@ double contrast::calcColorfulness(double contrastHue, double colorLevel) {
 
 double contrast::calcContrast(double hue1, double hue2, String color1, String color2) {
 	rgb rgb;
-	double grayHue = -0.25;
+	double grayHue = -1.1;
 	double colorLevel1=0, colorLevel2=0;
 	double cHue1, cHue2;
 	double colorfn1=0, colorfn2=0;
+	int count1=0, count2=0;
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
 		cHue1 = hue1;
 		cHue2 = hue2;
@@ -27,14 +28,20 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 			if(color1.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
 				cHue1 = grayHue;
 			}
-			colorfn1 += calcColorfulness(cHue1, colorLevel1);
+			if(count1<2)
+				colorfn1 += calcColorfulness(cHue1, colorLevel1);
+
+			++count1;
 		}
 		if(color2.find(mainColors.at(i))!=string::npos) {
 			colorLevel2 = rgb.getColorLevel(color2,mainColors.at(i));
 			if(color2.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
 				cHue2 = grayHue;
 			}
-			colorfn2 += calcColorfulness(cHue2, colorLevel2);
+			if(count2<2)
+				colorfn2 += calcColorfulness(cHue2, colorLevel2);
+
+			++count2;
 		}
 	}
 	//printf("Colorfn1: %f\n",colorfn1);
@@ -44,7 +51,6 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 
 void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec,String name) {
 	Color c;
-	String file;
 	int count1,count2;
 	double contrast=0;
 	String color1,color2;
@@ -52,7 +58,7 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 	vector<double> vec;
 	vector< vector<double> > vec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
-		for(unsigned int j=0; j<(windowVec.at(i).size()-1); j++) {
+		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
 			color1 = windowVec.at(i).at(j);
 			color2 = windowVec.at(i).at(j+1);
 			hue1 = hueVec.at(i).at(j);
@@ -71,15 +77,14 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 		vec2.push_back(vec);
 		vec.clear();
 	}
-	file = name + "Contrast";
-	writeSeq2File(vec2,file);
+	writeSeq2File(vec2,name);
 	vector<double>().swap(vec);
 	vector< vector<double> >().swap(vec2);
 }
 
 double contrast::calcColorfulness2(double hue, String color) {
 	rgb rgb;
-	double grayHue = -0.25;
+	double grayHue = -1.1;
 	double colorLevel1=0;
 	double cHue1;
 	double colorfn1=0;
@@ -147,8 +152,10 @@ void contrast::calcColorfulnessMatrix(vector< vector<String> > &windowVec, vecto
 			color1 = windowVec.at(i).at(j);
 			hue1 = hueVec.at(i).at(j);
 			count1 = c.countColors(color1);
-			if(count1==3)
+			if(count1==3) {
 				color1=windowVec.at(i).at(j-1);
+				windowVec.at(i).at(j) = color1;
+			}
 
 			colorfn = calcColorfulness2(hue1,color1);
 			vec.push_back(colorfn);

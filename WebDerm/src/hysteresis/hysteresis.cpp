@@ -132,7 +132,7 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 						hueVals.push_back(hsl.getHue());
 						if(pix=="OTHER")
 						{
-							pix = rgb.calcColor(r,g,b);
+							pix = rgb.calcColor2(r,g,b);
 							if(pix=="OTHER") {
 								pix = rgb.pushColor(r,g,b,dist,ind);
 							}
@@ -197,7 +197,8 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 			col=0; ++row;
 		}//end while row
 		//writeSeq2File(windowVec,name);
-		con.calcContrastFromMatrix(windowVec,hueVec,name);
+		String filename = name + "Contrast2x2";
+		con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
@@ -211,7 +212,6 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 		rgb rgb;
 		hsl hsl;
 		contrast con;
-		double colorfn;
 		int r,g,b;
 		String pix;
 		deque<int> hueVals;
@@ -244,8 +244,9 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 			windowVec.push_back(colorWindow);
 			colorWindow.clear();
 		}
-		writeSeq2File(windowVec,name);
-		//con.calcContrastFromMatrix(windowVec,hueVec,name);
+		String filename = name + "Contrast1x1";
+		//writeSeq2File(windowVec,name);
+		con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
 	}

@@ -610,10 +610,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 					if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
 						pix = hslColors.at(i);
 						if(pix=="White" || pix=="Black") return pix;
-						if(pix=="Gray" && grayLevel==0) {
-							return "White";
-						}
-						if(pix=="Gray" && grayLevel!=0) {
+						if(pix=="Gray") {
 							pix += toString(grayLevel);
 							return pix;
 						}

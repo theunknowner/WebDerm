@@ -61,6 +61,55 @@ void colorThreshNamingScript()
 	}
 }
 
+void colorThreshRenamingScript()
+{
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/colorThresh.csv","w");
+	hsl hsl;
+	rgb rgb;
+	Color color;
+	double r,g,b;
+	double hue=0;
+	String pix;
+	vector<String> vecColor;
+	int colorLevel=0;
+	double grayLevel=0;
+	int mainColorIndex[mainColors.size()];
+	fill_n(mainColorIndex,mainColors.size(),0);
+	fprintf(fp,"Color,R,G,B,NormR,NormG,NormB\n");
+	for(unsigned int i=0; i<rgbColors.size(); i++)
+	{
+		r = absMeanThresh.at(i).at(0);
+		g = absMeanThresh.at(i).at(1);
+		b = absMeanThresh.at(i).at(2);
+		hsl.rgb2hsl(r,g,b);
+		hue = hsl.getHue();
+		colorLevel = rgb.calcColorLevel2(r,g,b);
+		grayLevel = rgb.calcGrayLevel2(r,g,b);
+		color.extractColorFromString(rgbColors.at(i),vecColor);
+		for(unsigned int j=0; j<vecColor.size(); j++)
+		{
+			if(vecColor.at(j)=="Gray" && vecColor.size()==1) {
+				for(unsigned int k=0; k<hueThresh.size(); k++) {
+					if(hue>=hueThresh.at(k).at(0) && hue<=hueThresh.at(k).at(1)) {
+						pix = "Gray" + toString(grayLevel) + hslColors.at(k) + toString(colorLevel);
+					}
+				}
+			}
+			else if(vecColor.at(j)=="Gray") {
+				pix += "Gray" + toString(grayLevel);
+			}
+			else {
+				pix += vecColor.at(j) + toString(colorLevel);
+			}
+		}
+			fprintf(fp,"%s,%f,%f,%f,%f,%f,%f\n",
+					pix.c_str(),absMeanThresh[i][0],absMeanThresh[i][1],absMeanThresh[i][2],
+					normMeanThresh[i][0],normMeanThresh[i][1],normMeanThresh[i][2]);
+			pix.clear(); vecColor.clear();
+	}
+}
+
 void colorThreshScript()
 {
 	FILE * fp;
@@ -422,9 +471,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			hue = hsl.getHue();
 			lum = roundDecimal(hsl.getLum(),2);
 			sat = roundDecimal(hsl.getSat(),2);
-			grayLevel = rgb.calcGrayLevel(r,g,b);
-			grayLevel=rgb.calcGrayLevel2(grayLevel,lum);
-			colorLevel = rgb.calcColorLevel(r,g,b);
+			grayLevel = rgb.calcGrayLevel2(r,g,b);
+			colorLevel = rgb.calcColorLevel2(r,g,b);
 			for(unsigned int i=0; i<hueThresh.size(); i++) {
 				if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
 					if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
