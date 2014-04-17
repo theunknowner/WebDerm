@@ -18,13 +18,15 @@
 
 class contrast {
 public:
-	double calcColorfulness(double contrastHue, double colorLevel);
+	double calcColorfulness(double Hue, double colorLevel);
 	double calcContrast(double hue1, double hue2, String color1, String color2);
 	void calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
 	double calcColorfulness2(double hue, String color);
 	void colorfulnessMatrix1x1(Mat &img, String name);
 	void calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
 	void colorfulMatrix(Mat img, Size size, String name);
+	double calcContrast2(double hue1, double hue2, String color1, String color2);
+	double calcContrastAngle(double hue1, double hue2, double colorfn1, double colorfn2);
 };
 
 #endif /* CONTRAST_H_ */

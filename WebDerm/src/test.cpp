@@ -101,6 +101,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	}
 	else pix = "NOISE";
 
+	cout << "COLORFN:" << con.calcColorfulness2(hsl.calcHueAvg(hueVals),pix) << endl;
 	vector<int>().swap(index);
 	deque<String>().swap(pixelColorWindow);
 	//img.release();

@@ -34,7 +34,7 @@ double correlationDist(double * vec1, double * vec2)
 
 double cosineDist(double * vec1, double * vec2)
 {
-	int size=3;
+	int size=2;
 	double top=0, bottom1=0,bottom2=0;
 	double result=0;
 	for(int i=0; i<size; i++)
