@@ -66,11 +66,16 @@ double contrast::calcColorfulness2(double hue, String color) {
 //calculates contrast between two colors
 double contrast::calcContrast(double hue1, double hue2, String color1, String color2) {
 	double colorfn1=0, colorfn2=0;
+	double contrast=0;
 	colorfn1 = calcColorfulness2(hue1,color1);
 	colorfn2 = calcColorfulness2(hue2,color2);
 	//printf("Colorfn1: %f\n",colorfn1);
 	//printf("Colorfn2: %f\n",colorfn2);
-	return colorfn2-colorfn1;
+	contrast = colorfn2-colorfn1;
+	contrast = roundDecimal(contrast,1);
+	if(contrast<2.5 && contrast>-2.5) contrast=0;
+
+	return contrast;
 }
 //calculates contrast angle between two colors
 double contrast::getContrastAngle(double hue1, double hue2, String color1, String color2) {
