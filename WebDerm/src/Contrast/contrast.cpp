@@ -16,46 +16,73 @@ double contrast::calcColorfulness(double Hue, double colorLevel) {
 	colorfn = colorLevel * Hue;
 	return colorfn;
 }
-//calculates contrast between two colors
-double contrast::calcContrast(double hue1, double hue2, String color1, String color2) {
+
+//uses calcColorfulness to calculate colorfulness
+double contrast::calcColorfulness2(double hue, String color) {
 	rgb rgb;
-	double grayHue = -1.1; //gray gets a constant hue value
-	double colorLevel1=0, colorLevel2=0;
-	double cHue1, cHue2;
-	double colorfn1=0, colorfn2=0;
-	int count1=0, count2=0;
+	double grayHue = 0.5;
+	double colorLevel[mainColors.size()];
+	double cHue[mainColors.size()];
+	double colorfn[mainColors.size()];
+	fill_n(colorLevel,mainColors.size(),0);
+	fill_n(cHue,mainColors.size(),0);
+	fill_n(colorfn,mainColors.size(),0);
+	double totalLevel=0;
+	double totalColorfn=0;
+	vector<int> index;
+	vector<double> vec,vec2;
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
-		cHue1 = hue1;
-		cHue2 = hue2;
-		if(color1.find(mainColors.at(i))!=string::npos) {
-			colorLevel1 = rgb.getColorLevel(color1,mainColors.at(i));
-			if(color1.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
-				cHue1 = grayHue;
+		cHue[i] = hue;
+		if(color.find(mainColors.at(i))!=string::npos) {
+			colorLevel[i] = rgb.getColorLevel(color,mainColors.at(i));
+			index.push_back(i);
+			if(mainColors.at(i)!="Gray") {
+				totalLevel+=colorLevel[i];
 			}
-			if(count1<2)
-				colorfn1 += calcColorfulness(cHue1, colorLevel1);
-
-			++count1;
-		}
-		if(color2.find(mainColors.at(i))!=string::npos) {
-			colorLevel2 = rgb.getColorLevel(color2,mainColors.at(i));
-			if(color2.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
-				cHue2 = grayHue;
+			if(color.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
+				cHue[i] = grayHue;
 			}
-			if(count2<2)
-				colorfn2 += calcColorfulness(cHue2, colorLevel2);
-
-			++count2;
+			if(color.find("Pink")!=string::npos && mainColors.at(i)=="Pink")  {
+				cHue[i] = 176/360.;
+			}
+			if(color.find("Brown")!=string::npos && mainColors.at(i)=="Brown")  {
+				cHue[i] = 207/360.;
+			}
+			if(color.find("Violet")!=string::npos && mainColors.at(i)=="Violet")  {
+				cHue[i] = 140/360.;
+			}
 		}
 	}
+	for(unsigned int i=0; i<index.size(); i++) {
+		colorfn[index.at(i)] = colorLevel[index.at(i)] * cHue[index.at(i)];
+		if(mainColors.at(index.at(i))!="Gray") {
+			colorfn[index.at(i)] *= (colorLevel[index.at(i)]/totalLevel);
+		}
+		totalColorfn += colorfn[index.at(i)];
+	}
+	return totalColorfn;
+}
+
+//calculates contrast between two colors
+double contrast::calcContrast(double hue1, double hue2, String color1, String color2) {
+	double colorfn1=0, colorfn2=0;
+	colorfn1 = calcColorfulness2(hue1,color1);
+	colorfn2 = calcColorfulness2(hue2,color2);
 	//printf("Colorfn1: %f\n",colorfn1);
 	//printf("Colorfn2: %f\n",colorfn2);
 	return colorfn2-colorfn1;
 }
-
+//calculates contrast angle between two colors
+double contrast::getContrastAngle(double hue1, double hue2, String color1, String color2) {
+	double colorfn1=0, colorfn2=0;
+	double angleContrast = 0;
+	colorfn1 = calcColorfulness2(hue1,color1);
+	colorfn2 = calcColorfulness2(hue2,color2);
+	angleContrast = calcContrastAngle(hue1, hue2, colorfn1, colorfn2);
+	return angleContrast;
+}
+//change between calcContrast and calcContrast2 for diff options
 void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec,String name) {
-	Color c;
-	int count1,count2;
 	double contrast=0;
 	String color1,color2;
 	double hue1,hue2;
@@ -67,15 +94,7 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 			color2 = windowVec.at(i).at(j+1);
 			hue1 = hueVec.at(i).at(j);
 			hue2 = hueVec.at(i).at(j+1);
-			count1 = c.countColors(color1);
-			count2 = c.countColors(color2);
-			if((count1+count2)==5) {
-				if(count1==3)
-					color1=windowVec.at(i).at(j-1);
-				else
-					color2=windowVec.at(i).at(j+2);
-			}
-			contrast = calcContrast2(hue1, hue2, color1, color2);
+			contrast = calcContrast(hue1, hue2, color1, color2);
 			vec.push_back(contrast);
 		}
 		vec2.push_back(vec);
@@ -84,25 +103,6 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 	writeSeq2File(vec2,name);
 	vector<double>().swap(vec);
 	vector< vector<double> >().swap(vec2);
-}
-
-double contrast::calcColorfulness2(double hue, String color) {
-	rgb rgb;
-	double grayHue = -1.1;
-	double colorLevel1=0;
-	double cHue1;
-	double colorfn1=0;
-	for(unsigned int i=0; i<mainColors.size(); i++)	{
-		cHue1 = hue;
-		if(color.find(mainColors.at(i))!=string::npos) {
-			colorLevel1 = rgb.getColorLevel(color,mainColors.at(i));
-			if(color.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
-				cHue1 = grayHue;
-			}
-			colorfn1 += calcColorfulness(cHue1, colorLevel1);
-		}
-	}
-	return colorfn1;
 }
 
 void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
@@ -141,27 +141,19 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 	}
 	writeSeq2File(clrfnVec,filename);
 }
-
+//used for calculating 2x2 colorfulness
 void contrast::calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec,String name) {
-	Color c;
 	String file;
-	int count1;
 	double colorfn=0;
-	String color1;
-	double hue1;
+	String color;
+	double hue;
 	vector<double> vec;
 	vector< vector<double> > vec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<(windowVec.at(i).size()-1); j++) {
-			color1 = windowVec.at(i).at(j);
-			hue1 = hueVec.at(i).at(j);
-			count1 = c.countColors(color1);
-			if(count1==3) {
-				color1=windowVec.at(i).at(j-1);
-				windowVec.at(i).at(j) = color1;
-			}
-
-			colorfn = calcColorfulness2(hue1,color1);
+			color = windowVec.at(i).at(j);
+			hue = hueVec.at(i).at(j);
+			colorfn = calcColorfulness2(hue,color);
 			vec.push_back(colorfn);
 		}
 		vec2.push_back(vec);
@@ -311,61 +303,6 @@ void contrast::colorfulMatrix(Mat img, Size size, String name)
 		vector< vector<double> >().swap(hueVec);
 		vector<int>().swap(index);
 	}
-
-//calculates contrast angle between two colors
-double contrast::calcContrast2(double hue1, double hue2, String color1, String color2) {
-	rgb rgb;
-	double grayHue = -1.1; //gray gets a constant hue value
-	double colorLevel1=0, colorLevel2=0;
-	double cHue1, cHue2;
-	double colorfn1=0, colorfn2=0;
-	int count1=0, count2=0;
-	double angleContrast = 0;
-	for(unsigned int i=0; i<mainColors.size(); i++)	{
-		cHue1 = hue1;
-		cHue2 = hue2;
-		if(color1.find(mainColors.at(i))!=string::npos) {
-			colorLevel1 = rgb.getColorLevel(color1,mainColors.at(i));
-			if(color1.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
-				cHue1 = grayHue;
-			}
-			if(color1.find("Pink")!=string::npos && mainColors.at(i)=="Pink")  {
-				cHue1 = 176/360.;
-			}
-			if(color1.find("Brown")!=string::npos && mainColors.at(i)=="Brown")  {
-				cHue1 = 207/360.;
-			}
-			if(color1.find("Violet")!=string::npos && mainColors.at(i)=="Violet")  {
-				cHue1 = 140/360.;
-			}
-			if(count1<2)
-				colorfn1 += calcColorfulness(cHue1, colorLevel1);
-
-			++count1;
-		}
-		if(color2.find(mainColors.at(i))!=string::npos) {
-			colorLevel2 = rgb.getColorLevel(color2,mainColors.at(i));
-			if(color2.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
-				cHue2 = grayHue;
-			}
-			if(color1.find("Pink")!=string::npos && mainColors.at(i)=="Pink")  {
-				cHue1 = 176/360.;
-			}
-			if(color1.find("Brown")!=string::npos && mainColors.at(i)=="Brown")  {
-				cHue1 = 207/360.;
-			}
-			if(color1.find("Violet")!=string::npos && mainColors.at(i)=="Violet")  {
-				cHue1 = 140/360.;
-			}
-			if(count2<2)
-				colorfn2 += calcColorfulness(cHue2, colorLevel2);
-
-			++count2;
-		}
-	}
-		angleContrast = calcContrastAngle(hue1, hue2, colorfn1, colorfn2);
-		return angleContrast;
-}
 
 double contrast::calcContrastAngle(double hue1, double hue2, double colorfn1, double colorfn2) {
 	const double c = 65.0;

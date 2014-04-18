@@ -17,6 +17,8 @@
 
 int main(int argc, char** argv)
 {
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
@@ -28,29 +30,27 @@ int main(int argc, char** argv)
 	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	//double vec1[] = {-65.4972,33.628465};
-	//double vec2[] = {-66.4083,33.402785};
-	//cout << cosineDist(vec1,vec2) * 1000;
 	//colorThreshRenamingScript();
 	//addNewColors(img2,Point(386,245),Point(389,249),"Gray","Gray");
+	//cout << rgb.calcGrayLevel2(117, 91, 88) << endl;
+	//cout << rgb.calcColorLevel2(117, 91, 88) << endl;
 	/*
 	int i=1;
 	String pix;
 	double hue=0;
 	for(int row=248; row<=248; row++) {
-		for(int col=333; col<=465; col++) {
+		for(int col=312; col<=370; col++) {
 			cout << i << ") " << col <<  ": ";
 			pix = testColorAtLoc(img2, Point(col,row),hue);
 			cout << "Colorfn0: " << con.calcColorfulness2(hue,pix) << endl;
 			i++;
 		};
-	}*/
-	//cout << "Angle: " << con.calcContrast2(0.50625,0.488889,"Gray89Pink61","Gray90Pink62") << endl;
-	//cout << "Angle: " << con.calcContrast2(0.517361,0.513889,"Gray84Pink52","Gray87Pink57") << endl;
-	//cout << "Angle: " << con.calcContrast2(0.513889,0.50625,"Gray87Pink57","Gray89Pink61") << endl;
-	int col = 328;
+	}
+	cout << con.calcColorfulness2(0.4,"Gray85Pink60") << endl;
+	int col = 330;
 	int row = 248;
-	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	//cout << con.calcContrast(0.50,0.555,"Gray67Brown43","Gray67Brown43") << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
 	//imwrite("img.png", img3);

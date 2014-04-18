@@ -36,3 +36,25 @@ void drawOutlineOnMouse(Mat &img)
 	}
 	waitKey(0);
 }
+
+void graphHue(Mat &img) {
+	hsl hsl;
+	int r,g,b;
+	double hue=0;
+	vector<double> hueVals;
+	vector< vector<double> > hueVec;
+	for(int row=0; row<img.rows; row++) {
+		for(int col=0; col<img.cols; col++) {
+			r = img.at<Vec3b>(row,col)[2];
+			g = img.at<Vec3b>(row,col)[1];
+			b = img.at<Vec3b>(row,col)[0];
+			hsl.rgb2hsl(r,g,b);
+			hue = (hsl.getHue()+180)%360;
+			hue /= 360;
+			hueVals.push_back(hue);
+		}
+		hueVec.push_back(hueVals);
+		hueVals.clear();
+	}
+	writeSeq2File(hueVec,"huegraph");
+}

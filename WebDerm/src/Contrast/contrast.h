@@ -25,7 +25,7 @@ public:
 	void colorfulnessMatrix1x1(Mat &img, String name);
 	void calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
 	void colorfulMatrix(Mat img, Size size, String name);
-	double calcContrast2(double hue1, double hue2, String color1, String color2);
+	double getContrastAngle(double hue1, double hue2, String color1, String color2);
 	double calcContrastAngle(double hue1, double hue2, double colorfn1, double colorfn2);
 };
 
