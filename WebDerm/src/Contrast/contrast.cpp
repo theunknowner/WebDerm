@@ -39,17 +39,20 @@ double contrast::calcColorfulness2(double hue, String color) {
 			if(mainColors.at(i)!="Gray") {
 				totalLevel+=colorLevel[i];
 			}
-			if(color.find("Gray")!=string::npos && mainColors.at(i)=="Gray")  {
+			if(mainColors.at(i)=="Gray")  {
 				cHue[i] = grayHue;
 			}
-			if(color.find("Pink")!=string::npos && mainColors.at(i)=="Pink")  {
-				cHue[i] = 176/360.;
+			if(mainColors.at(i)=="Pink")  {
+				cHue[i] = 1;
 			}
-			if(color.find("Brown")!=string::npos && mainColors.at(i)=="Brown")  {
-				cHue[i] = 207/360.;
+			if(mainColors.at(i)=="Brown")  {
+				cHue[i] = 0;
 			}
-			if(color.find("Violet")!=string::npos && mainColors.at(i)=="Violet")  {
-				cHue[i] = 140/360.;
+			if(mainColors.at(i)=="Violet")  {
+				cHue[i] = 0;
+			}
+			if(mainColors.at(i)=="Yellow")  {
+				cHue[i] = -1;
 			}
 		}
 	}
@@ -115,6 +118,7 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 	hsl hsl;
 	String filename = name + "Colorfn";
 	contrast con;
+	Color c;
 	double colorfn;
 	double hue;
 	vector<double> clrfn;
@@ -134,6 +138,8 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 				pix = rgb.calcColor2(r,g,b);
 				if(pix=="OTHER") {
 					pix = rgb.pushColor(r,g,b,dist,ind);
+					if(dist>4)
+						pix = c.reassignLevels(pix,r,g,b);
 				}
 			}
 			hue = (hsl.getHue()+180)%360;
@@ -215,6 +221,8 @@ void contrast::colorfulMatrix(Mat img, Size size, String name)
 								pix = rgb.calcColor(r,g,b);
 								if(pix=="OTHER") {
 									pix = rgb.pushColor(r,g,b,dist,ind);
+									if(dist>4)
+										pix = colorObj.reassignLevels(pix,r,g,b);
 								}
 							}
 							pixelColorWindow.push_back(pix);
@@ -237,6 +245,8 @@ void contrast::colorfulMatrix(Mat img, Size size, String name)
 							pix = rgb.calcColor2(r,g,b);
 							if(pix=="OTHER") {
 								pix = rgb.pushColor(r,g,b,dist,ind);
+								if(dist>4)
+									pix = colorObj.reassignLevels(pix,r,g,b);
 							}
 						}
 						pixelColorWindow.pop_front();

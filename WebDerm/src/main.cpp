@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 	hsl.importHslThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	//colorThreshRenamingScript();
@@ -46,8 +46,8 @@ int main(int argc, char** argv)
 		};
 	}*/
 	//cout << con.calcColorfulness2(0.4,"Gray85Pink60") << endl;
-	int col = 342;
-	int row = 336;
+	int col = 344;
+	int row = 194;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << con.calcContrast(0.50,0.555,"Gray67Brown43","Gray67Brown43") << endl;
 	//runNeuralNetworkTraining("data.csv");

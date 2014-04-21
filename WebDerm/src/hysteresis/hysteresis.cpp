@@ -199,10 +199,10 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 			pixelColorWindow.clear();
 			col=0; ++row;
 		}//end while row
-		writeSeq2File(windowVec,name);
+		//writeSeq2File(windowVec,name);
 		String filename = name + "Contrast2x2";
 		contrast con;
-		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
+		con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
@@ -239,7 +239,7 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 					if(pix=="OTHER") {
 						pix = rgb.pushColor(r,g,b,dist,ind);
 						if(dist>4)
-							pix - colorObj.reassignLevels(pix,r,g,b);
+							pix = colorObj.reassignLevels(pix,r,g,b);
 					}
 				}
 				hueAvg.push_back(hsl.calcHueAvg(hueVals));
