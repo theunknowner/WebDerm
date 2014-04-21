@@ -62,3 +62,22 @@ int Color::countColors(String color) {
 	}
 	return count;
 }
+
+//gets color and recalculates gray and color levels
+String Color::reassignLevels(String color, int r, int g, int b) {
+	rgb rgb;
+	vector<String> colorVec;
+	String pix;
+	double grayLevel=0;
+	double colorLevel=0;
+	extractColorFromString(color, colorVec);
+	grayLevel = rgb.calcGrayLevel2(r,g,b);
+	colorLevel = rgb.calcColorLevel2(r,g,b);
+	for(unsigned int i=0; i<colorVec.size(); i++) {
+		if(colorVec.at(i)=="Gray")
+			pix += colorVec.at(i) + toString(grayLevel);
+		else
+			pix += colorVec.at(i) + toString(colorLevel);
+	}
+	return pix;
+}

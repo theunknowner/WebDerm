@@ -73,7 +73,7 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 	//printf("Colorfn2: %f\n",colorfn2);
 	contrast = colorfn2-colorfn1;
 	contrast = roundDecimal(contrast,1);
-	if(contrast<2.5 && contrast>-2.5) contrast=0;
+	//if(contrast<2.5 && contrast>-2.5) contrast=0;
 
 	return contrast;
 }

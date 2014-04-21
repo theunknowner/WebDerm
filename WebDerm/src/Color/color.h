@@ -10,6 +10,7 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
 class Color {
 public:
@@ -18,5 +19,6 @@ public:
 	bool isSameColor(String color1, String color2);
 	void extractColorFromString(String color, vector<String> &vecColor);
 	int countColors(String color);
+	String reassignLevels(String color, int r, int g, int b);
 };
 #endif /* COLOR_H_ */
