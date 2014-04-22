@@ -37,9 +37,21 @@ int Color::containsMainColor(String color, String mColor)
 
 bool Color::isSameColor(String color1, String color2)
 {
-	if(color1.substr(0,color1.size()-1)==color2.substr(0,color2.size()-1))
-	{
-		return true;
+	int count1,count2;
+	vector<String> vec1, vec2;
+	extractColorFromString(color1,vec1);
+	extractColorFromString(color2, vec2);
+	if(vec1.size()>=3 || vec2.size()>=3) {
+		if(vec1.size()!=vec2.size())
+			return false;
+	}
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		for(unsigned int j=0; j<vec2.size(); j++) {
+			if(vec1.at(i)!="Gray" && vec2.at(j)!="Gray") {
+				if(vec1.at(i)==vec2.at(j))
+					return true;
+			}
+		}
 	}
 	return false;
 }

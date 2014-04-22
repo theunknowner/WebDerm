@@ -20,7 +20,7 @@ double contrast::calcColorfulness(double Hue, double colorLevel) {
 //uses calcColorfulness to calculate colorfulness
 double contrast::calcColorfulness2(double hue, String color) {
 	rgb rgb;
-	double grayHue = 0.5;
+	double grayHue = -0.5;
 	double colorLevel[mainColors.size()];
 	double cHue[mainColors.size()];
 	double colorfn[mainColors.size()];
@@ -51,8 +51,11 @@ double contrast::calcColorfulness2(double hue, String color) {
 			if(mainColors.at(i)=="Violet")  {
 				cHue[i] = 0;
 			}
-			if(mainColors.at(i)=="Yellow")  {
+			if(mainColors.at(i)=="Green")  {
 				cHue[i] = -1;
+			}
+			if(mainColors.at(i)=="Yellow")  {
+				cHue[i] = -2;
 			}
 		}
 	}
@@ -68,6 +71,7 @@ double contrast::calcColorfulness2(double hue, String color) {
 
 //calculates contrast between two colors
 double contrast::calcContrast(double hue1, double hue2, String color1, String color2) {
+	Color c;
 	double colorfn1=0, colorfn2=0;
 	double contrast=0;
 	colorfn1 = calcColorfulness2(hue1,color1);
@@ -75,7 +79,9 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 	//printf("Colorfn1: %f\n",colorfn1);
 	//printf("Colorfn2: %f\n",colorfn2);
 	contrast = colorfn2-colorfn1;
-	contrast = roundDecimal(contrast,1);
+	if(c.isSameColor(color1,color2))
+		contrast *= 20;
+	//contrast = roundDecimal(contrast,1);
 	//if(contrast<2.5 && contrast>-2.5) contrast=0;
 
 	return contrast;
@@ -96,6 +102,7 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 	double hue1,hue2;
 	vector<double> vec;
 	vector< vector<double> > vec2;
+
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
 			color1 = windowVec.at(i).at(j);
