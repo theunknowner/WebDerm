@@ -20,7 +20,7 @@ double contrast::calcColorfulness(double Hue, double colorLevel) {
 //uses calcColorfulness to calculate colorfulness
 double contrast::calcColorfulness2(double hue, String color) {
 	rgb rgb;
-	double grayHue = -0.5;
+	//double grayHue = -0.5;
 	double colorLevel[mainColors.size()];
 	double cHue[mainColors.size()];
 	double colorfn[mainColors.size()];
@@ -40,22 +40,22 @@ double contrast::calcColorfulness2(double hue, String color) {
 				totalLevel+=colorLevel[i];
 			}
 			if(mainColors.at(i)=="Gray")  {
-				cHue[i] = grayHue;
+				cHue[i] = 5;
 			}
 			if(mainColors.at(i)=="Pink")  {
-				cHue[i] = 1;
+				cHue[i] = 6;
 			}
 			if(mainColors.at(i)=="Brown")  {
-				cHue[i] = 0;
+				cHue[i] = 4;
 			}
 			if(mainColors.at(i)=="Violet")  {
-				cHue[i] = 0;
+				cHue[i] = 7;
 			}
 			if(mainColors.at(i)=="Green")  {
-				cHue[i] = -1;
+				cHue[i] = 2;
 			}
 			if(mainColors.at(i)=="Yellow")  {
-				cHue[i] = -2;
+				cHue[i] = 1;
 			}
 		}
 	}
@@ -98,11 +98,13 @@ double contrast::getContrastAngle(double hue1, double hue2, String color1, Strin
 //change between calcContrast and calcContrast2 for diff options
 void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec,String name) {
 	double contrast=0;
+	double feature=0;
 	String color1,color2;
 	double hue1,hue2;
 	vector<double> vec;
 	vector< vector<double> > vec2;
-
+	vector<double> fVec1;
+	vector< vector<double> > fVec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
 			color1 = windowVec.at(i).at(j);
@@ -110,12 +112,19 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 			hue1 = hueVec.at(i).at(j);
 			hue2 = hueVec.at(i).at(j+1);
 			contrast = calcContrast(hue1, hue2, color1, color2);
+			feature = (0.75 * feature) + (0.25 * contrast);
 			vec.push_back(contrast);
+			fVec1.push_back(feature);
 		}
+		fVec2.push_back(fVec1);
 		vec2.push_back(vec);
 		vec.clear();
+		fVec1.clear();
+		feature =0;
 	}
-	writeSeq2File(vec2,name);
+	//writeSeq2File(vec2,name);
+	String filename = name + "Feature";
+	writeSeq2File(fVec2,filename);
 	vector<double>().swap(vec);
 	vector< vector<double> >().swap(vec2);
 }

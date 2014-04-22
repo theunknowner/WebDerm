@@ -17,8 +17,6 @@
 
 int main(int argc, char** argv)
 {
-	runHysteresis();
-	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
@@ -35,12 +33,11 @@ int main(int argc, char** argv)
 	//addNewColors(img2,Point(389,27),Point(396,34),"Gray","Gray");
 	//cout << rgb.calcGrayLevel2(134, 82, 85) << endl;
 	//cout << rgb.calcColorLevel2(134, 82, 85) << endl;
-	/*
 	int i=1;
 	String pix;
 	double hue=0;
-	for(int row=240; row<=240; row++) {
-		for(int col=312; col<=370; col++) {
+	for(int row=324; row<=324; row++) {
+		for(int col=320; col<=406; col++) {
 			cout << i << ") " << col <<  ": ";
 			pix = testColorAtLoc(img2, Point(col,row),hue);
 			cout << "Colorfn0: " << con.calcColorfulness2(hue,pix) << endl;
@@ -50,7 +47,7 @@ int main(int argc, char** argv)
 	//cout << con.calcColorfulness2(0.4,"Gray85Pink60") << endl;
 	int col = 432;
 	int row = 422;
-	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << con.calcContrast(0.50,0.555,"Gray67Brown43","Gray67Brown43") << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
