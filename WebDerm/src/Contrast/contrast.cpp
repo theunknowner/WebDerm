@@ -39,23 +39,35 @@ double contrast::calcColorfulness2(double hue, String color) {
 			if(mainColors.at(i)!="Gray") {
 				totalLevel+=colorLevel[i];
 			}
-			if(mainColors.at(i)=="Gray")  {
-				cHue[i] = 5;
+			if(mainColors.at(i)=="White") {
+				cHue[i] = 0;
 			}
-			if(mainColors.at(i)=="Pink")  {
-				cHue[i] = 6;
-			}
-			if(mainColors.at(i)=="Brown")  {
-				cHue[i] = 4;
-			}
-			if(mainColors.at(i)=="Violet")  {
-				cHue[i] = 7;
+			if(mainColors.at(i)=="Yellow")  {
+				cHue[i] = 1;
 			}
 			if(mainColors.at(i)=="Green")  {
 				cHue[i] = 2;
 			}
-			if(mainColors.at(i)=="Yellow")  {
-				cHue[i] = 1;
+			if(mainColors.at(i)=="Brown")  {
+				cHue[i] = 3;
+			}
+			if(mainColors.at(i)=="Gray")  {
+				cHue[i] = 4;
+			}
+			if(mainColors.at(i)=="Pink")  {
+				cHue[i] = 5;
+			}
+			if(mainColors.at(i)=="Red") {
+				cHue[i] = 6;
+			}
+			if(mainColors.at(i)=="Violet")  {
+				cHue[i] = 7;
+			}
+			if(mainColors.at(i)=="Blue")  {
+				cHue[i] = 8;
+			}
+			if(mainColors.at(i)=="Black")  {
+				cHue[i] = 9;
 			}
 		}
 	}
@@ -122,9 +134,9 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 		fVec1.clear();
 		feature =0;
 	}
-	writeSeq2File(vec2,name);
-	//String filename = name + "Feature";
-	//writeSeq2File(fVec2,filename);
+	//writeSeq2File(vec2,name);
+	String filename = name + "Feature";
+	writeSeq2File(fVec2,filename);
 	vector<double>().swap(vec);
 	vector< vector<double> >().swap(vec2);
 }

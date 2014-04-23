@@ -147,9 +147,9 @@ void runHysteresis()
 	hsl.importHslThresholds();
 	hsl.importLsThreshold();
 	if(size.height==1 && size.width==1)
-		hysteresis1x1(img2,name);
+		hysteresis1x1(img,name);
 	else
-		hysteresis(img2,size,name);
+		hysteresis(img,size,name);
 
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();

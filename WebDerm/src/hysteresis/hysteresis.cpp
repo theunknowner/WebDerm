@@ -199,7 +199,7 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 			pixelColorWindow.clear();
 			col=0; ++row;
 		}//end while row
-		//writeSeq2File(windowVec,name);
+		writeSeq2File(windowVec,name);
 		String filename = name + "Contrast2x2";
 		contrast con;
 		con.calcContrastFromMatrix(windowVec,hueVec,filename);

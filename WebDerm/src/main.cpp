@@ -26,11 +26,11 @@ int main(int argc, char** argv)
 	hsl.importHslThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/","img1.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	//colorThreshRenamingScript();
-	//addNewColors(img2,Point(389,27),Point(396,34),"Gray","Gray");
+	//addNewColors(img,Point(518,526),Point(534,536),"Gray","Gray");
 	//cout << rgb.calcGrayLevel2(134, 82, 85) << endl;
 	//cout << rgb.calcColorLevel2(134, 82, 85) << endl;
 	/*
@@ -46,10 +46,10 @@ int main(int argc, char** argv)
 		};
 	}*/
 	//cout << con.calcColorfulness2(0.4,"Gray85Pink60") << endl;
-	int col = 360;
-	int row = 185;
-	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
-	//cout << con.calcContrast(0.50,0.555,"Gray67Brown43","Gray67Brown43") << endl;
+	int col = 581;
+	int row = 538;
+	cout << "Result: " << testHysteresis(img, row, col, Size(2,2)) << endl;
+	cout << con.calcContrast(0.50,0.555,"Gray76Blue47","Gray81Blue49") << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
 	//imwrite("img.png", img3);
