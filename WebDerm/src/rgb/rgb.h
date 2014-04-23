@@ -28,7 +28,7 @@ public:
 	String checkBlack(int r, int g, int b);
 	String pushColor(int red, int green, int blue);
 	String pushColor(int red, int green, int blue,double &dist, int &ind);
-	String pushColor(int red, int green, int blue, int &ind);
+	String pushColor(int red, int green, int blue, int &ind, double &dist);
 	double calcGrayLevel(int red, int green, int blue);
 	double calcGrayLevel2(double satLevel, double lum);
 	double calcGrayLevel2(int red, int green, int blue);

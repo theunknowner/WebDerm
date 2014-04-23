@@ -122,9 +122,9 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 		fVec1.clear();
 		feature =0;
 	}
-	//writeSeq2File(vec2,name);
-	String filename = name + "Feature";
-	writeSeq2File(fVec2,filename);
+	writeSeq2File(vec2,name);
+	//String filename = name + "Feature";
+	//writeSeq2File(fVec2,filename);
 	vector<double>().swap(vec);
 	vector< vector<double> >().swap(vec2);
 }

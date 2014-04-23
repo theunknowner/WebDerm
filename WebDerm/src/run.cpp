@@ -230,6 +230,7 @@ void outputFreqColor(Mat &img)
 	int arr[rgbColors.size()];
 	fill_n(arr, rgbColors.size(), 0);
 	int ind=0;
+	double dist=0;
 	int r,g,b;
 	for(int row=0; row<img.rows; row++)
 	{
@@ -238,7 +239,7 @@ void outputFreqColor(Mat &img)
 			r = img.at<Vec3b>(row,col)[2];
 			g = img.at<Vec3b>(row,col)[1];
 			b = img.at<Vec3b>(row,col)[0];
-			rgb.pushColor(r,g,b,ind);
+			rgb.pushColor(r,g,b,ind,dist);
 			++arr[ind];
 		}
 	}

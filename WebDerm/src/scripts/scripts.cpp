@@ -371,6 +371,7 @@ void outputPixLoc(Mat img,int index)
 	int r,g,b;
 	String pix;
 	int ind=0;
+	double dist=0;
 	for(int row=0; row<img.rows; row++) {
 		for(int col=0; col<img.cols; col++) {
 			r = img.at<Vec3b>(row,col)[2];
@@ -378,7 +379,7 @@ void outputPixLoc(Mat img,int index)
 			b = img.at<Vec3b>(row,col)[0];
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER") {
-				pix = rgb.pushColor(r,g,b,ind);
+				pix = rgb.pushColor(r,g,b,ind,dist);
 			}
 			if(ind==(index-2)) {
 				fprintf(fp,"%d,%d,%d - (%d,%d)\n", r,g,b,col+1,row+1);

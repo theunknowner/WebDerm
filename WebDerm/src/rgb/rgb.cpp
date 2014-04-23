@@ -291,7 +291,7 @@ String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 		return rgbColors[index2];
 	}
 
-String rgb::pushColor(int red, int green, int blue, int &ind)
+String rgb::pushColor(int red, int green, int blue, int &ind, double &dist)
 	{
 		const int length=7;
 		double smallest[length]={0};
@@ -359,6 +359,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind)
 			}
 		}
 		ind = index2;
+		dist = absDistVals[ind];
 		cout << absDistVals[ind] << endl;
 		return rgbColors[index2];
 	}

@@ -15,6 +15,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	Color colorObj;
 	int b,g,r;
 	int ind=0;
+	double dist=0;
 	double hue=0;
 	double colorfn=0;
 	vector<int> index;
@@ -43,7 +44,9 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			{
 				pix = rgb.calcColor2(r,g,b);
 				if(pix=="OTHER") {
-					pix = rgb.pushColor(r,g,b,ind);
+					pix = rgb.pushColor(r,g,b,ind,dist);
+					if(dist>4)
+						pix = colorObj.reassignLevels(pix,r,g,b);
 				}
 				pixelColorWindow.push_back(pix);
 			}
@@ -239,7 +242,8 @@ void testColorIndex(Mat &img, int index)
 {
 	rgb rgb;
 	int r,g,b;
-	int ind;
+	int ind=0;
+	double dist=0;
 	int count=0;
 	Mat mask = mask.zeros(img.size(), CV_8U);
 	Mat img2;
@@ -250,7 +254,7 @@ void testColorIndex(Mat &img, int index)
 			r = img.at<Vec3b>(row,col)[2];
 			g = img.at<Vec3b>(row,col)[1];
 			b = img.at<Vec3b>(row,col)[0];
-			rgb.pushColor(r,g,b,ind);
+			rgb.pushColor(r,g,b,ind,dist);
 			if((ind+2)==index)
 			{
 				//printf("%d,%d\n", col,row);
@@ -271,6 +275,7 @@ String testColorAtLoc(Mat &img, Point pt, double &h) {
 	hsl hsl;
 	int r,g,b;
 	int ind= -3;
+	double dist=0;
 	double hue;
 	String pix;
 	r = img.at<Vec3b>(pt.y-1,pt.x-1)[2];
@@ -281,7 +286,7 @@ String testColorAtLoc(Mat &img, Point pt, double &h) {
 	if(pix=="OTHER") {
 		pix = rgb.calcColor2(r,g,b);
 		if(pix=="OTHER") {
-			pix = rgb.pushColor(r,g,b,ind);
+			pix = rgb.pushColor(r,g,b,ind,dist);
 		}
 	}
 	hue = (hsl.getHue()+180)%360;

@@ -137,7 +137,7 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 							if(pix=="OTHER") {
 								pix = rgb.pushColor(r,g,b,dist,ind);
 								if(dist>4)
-									pix = colorObj.reassignLevels(pix,r,g,b);
+									{pix = colorObj.reassignLevels(pix,r,g,b);}
 							}
 						}
 						pixelColorWindow.pop_front();
