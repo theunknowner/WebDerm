@@ -16,5 +16,6 @@ extern vector< vector<double> > absThresh;
 extern vector< vector<double> > normThresh;
 extern vector<String> rgbColors;
 extern vector<String> mainColors;
+extern vector<double> colorFactors;
 
 #endif /* RGB_GLOBAL_H_ */

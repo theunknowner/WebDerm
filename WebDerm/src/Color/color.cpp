@@ -93,3 +93,12 @@ String Color::reassignLevels(String color, int r, int g, int b) {
 	}
 	return pix;
 }
+
+String Color::getMainColor(String color) {
+	String pix;
+	for(unsigned int i=0; i<mainColors.size(); i++) {
+		if(color.find(mainColors.at(i))!=string::npos && mainColors.at(i)!="Gray")
+			pix += mainColors.at(i);
+	}
+	return pix;
+}

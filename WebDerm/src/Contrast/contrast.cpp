@@ -7,9 +7,6 @@
 
 #include "contrast.h"
 
-#define PI 3.14159265
-#define RAD 180.0/PI
-
 //calculating colorfulness using colorlevel and hue value
 double contrast::calcColorfulness(double Hue, double colorLevel) {
 	double colorfn=0;
@@ -20,7 +17,6 @@ double contrast::calcColorfulness(double Hue, double colorLevel) {
 //uses calcColorfulness to calculate colorfulness
 double contrast::calcColorfulness2(double hue, String color) {
 	rgb rgb;
-	//double grayHue = -0.5;
 	double colorLevel[mainColors.size()];
 	double cHue[mainColors.size()];
 	double colorfn[mainColors.size()];
@@ -39,36 +35,7 @@ double contrast::calcColorfulness2(double hue, String color) {
 			if(mainColors.at(i)!="Gray") {
 				totalLevel+=colorLevel[i];
 			}
-			if(mainColors.at(i)=="White") {
-				cHue[i] = 0;
-			}
-			if(mainColors.at(i)=="Yellow")  {
-				cHue[i] = 1;
-			}
-			if(mainColors.at(i)=="Green")  {
-				cHue[i] = 2;
-			}
-			if(mainColors.at(i)=="Brown")  {
-				cHue[i] = 3;
-			}
-			if(mainColors.at(i)=="Gray")  {
-				cHue[i] = 4;
-			}
-			if(mainColors.at(i)=="Pink")  {
-				cHue[i] = 5;
-			}
-			if(mainColors.at(i)=="Red") {
-				cHue[i] = 6;
-			}
-			if(mainColors.at(i)=="Violet")  {
-				cHue[i] = 7;
-			}
-			if(mainColors.at(i)=="Blue")  {
-				cHue[i] = 8;
-			}
-			if(mainColors.at(i)=="Black")  {
-				cHue[i] = 9;
-			}
+			cHue[i] = colorFactors.at(i);
 		}
 	}
 	for(unsigned int i=0; i<index.size(); i++) {
@@ -93,8 +60,6 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 	contrast = colorfn2-colorfn1;
 	if(c.isSameColor(color1,color2))
 		contrast *= 20;
-	//contrast = roundDecimal(contrast,1);
-	//if(contrast<2.5 && contrast>-2.5) contrast=0;
 
 	return contrast;
 }
@@ -121,20 +86,24 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
 			color1 = windowVec.at(i).at(j);
 			color2 = windowVec.at(i).at(j+1);
-			hue1 = hueVec.at(i).at(j);
-			hue2 = hueVec.at(i).at(j+1);
-			contrast = calcContrast(hue1, hue2, color1, color2);
-			feature = (0.75 * feature) + (0.25 * contrast);
-			vec.push_back(contrast);
-			fVec1.push_back(feature);
+			if(color1.find("Black")==string::npos && color2.find("Black")==string::npos) {
+				hue1 = hueVec.at(i).at(j);
+				hue2 = hueVec.at(i).at(j+1);
+				contrast = calcContrast(hue1, hue2, color1, color2);
+				feature = (0.75 * feature) + (0.25 * contrast);
+				vec.push_back(contrast);
+				fVec1.push_back(feature);
+			}
 		}
-		fVec2.push_back(fVec1);
-		vec2.push_back(vec);
+		if(fVec1.size()!=0)
+			fVec2.push_back(fVec1);
+		if(vec.size()!=0)
+			vec2.push_back(vec);
 		vec.clear();
 		fVec1.clear();
-		feature =0;
+		feature=0;
 	}
-	//writeSeq2File(vec2,name);
+	writeSeq2File(vec2,name);
 	String filename = name + "Feature";
 	writeSeq2File(fVec2,filename);
 	vector<double>().swap(vec);
@@ -359,4 +328,103 @@ double contrast::calcContrastAngle(double hue1, double hue2, double colorfn1, do
 	angle = top/bottom;
 	angle = pow(angle,root);
 	return angle;
+}
+
+void contrast::shadeOfFeature(vector<double> &feature) {
+	min = feature.at(0);
+	max = feature.at(1);
+	for(unsigned int i=0; i<feature.size(); i++) {
+		if(feature.at(i)>max) {
+			max = feature.at(i);
+		}
+		if(feature.at(i)<min) {
+			min = feature.at(i);
+		}
+	}
+	range = max - min;
+}
+
+String contrast::getShade(double feature) {
+	String shade;
+	double range1 = min+(range/4);
+	double range2 = min+(range*3)/4;
+	double light[] = {min,range1};
+	double reg[] = {range1,range2};
+	double dark[] = {range2,max};
+	if(feature>=light[0] && feature<=light[1])
+		shade = "Light";
+	else if(feature>=reg[0] && feature<=reg[1])
+		shade = "";
+	else if(feature>=dark[0] && feature<=dark[1])
+		shade = "Dark";
+
+	return shade;
+}
+
+void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String name) {
+	double contrast=0;
+	double feature=0;
+	Point pt; //pointer to hold x,y of color window
+	String color1,color2;
+	vector<double> vec;
+	vector< vector<double> > vec2;
+	vector<double> fVec1;
+	vector< vector<double> > fVec2;
+	vector<Point> ptVec1; //pointerVec to hold all pointers
+	vector <vector<Point> > ptVec2;
+	for(unsigned int i=0; i<windowVec.size(); i++) {
+		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
+			color1 = windowVec.at(i).at(j);
+			color2 = windowVec.at(i).at(j+1);
+			if(color1.find("Black")==string::npos && color2.find("Black")==string::npos) {
+				pt.x = j;
+				pt.y = i;
+				contrast = calcContrast(0, 0, color1, color2);
+				feature = (0.75 * feature) + (0.25 * contrast);
+				vec.push_back(contrast);
+				fVec1.push_back(feature);
+				ptVec1.push_back(pt);
+			}
+		}if(ptVec1.size()!=0)
+			ptVec2.push_back(ptVec1);
+		if(fVec1.size()!=0)
+			fVec2.push_back(fVec1);
+		if(vec.size()!=0)
+			vec2.push_back(vec);
+		ptVec1.clear();
+		vec.clear();
+		fVec1.clear();
+		feature=0;
+	}
+	Color c;
+	int x=0,y=0;
+	String pix;
+	String shade;
+	vector<String> strVec;
+	vector< vector<String> > strVec2;
+	for(unsigned int i=0; i<ptVec2.size(); i++) {
+		shadeOfFeature(fVec2.at(i));
+		for(unsigned int j=0; j<ptVec2.at(i).size(); j++) {
+			x = ptVec2.at(i).at(j).x;
+			y = ptVec2.at(i).at(j).y;
+			pix = windowVec.at(y).at(x);
+			pix = c.getMainColor(pix);
+			shade = getShade(fVec2.at(i).at(j));
+			if(pix!="Black" && pix!="White")
+				pix = shade + pix;
+			strVec.push_back(pix);
+		}
+		strVec2.push_back(strVec);
+		strVec.clear();
+	}
+	String filename = name +"MainColors";
+	writeSeq2File(strVec2,filename);
+	vector<double>().swap(vec);
+	vector<double>().swap(fVec1);
+	vector< vector<double> >().swap(vec2);
+	vector< vector<double> >().swap(fVec2);
+	vector<String>().swap(strVec);
+	vector< vector<String> >().swap(strVec2);
+	vector<Point>().swap(ptVec1);
+	vector< vector<Point> >().swap(ptVec2);
 }

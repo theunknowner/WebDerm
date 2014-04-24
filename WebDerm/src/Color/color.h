@@ -20,5 +20,6 @@ public:
 	void extractColorFromString(String color, vector<String> &vecColor);
 	int countColors(String color);
 	String reassignLevels(String color, int r, int g, int b);
+	String getMainColor(String color);
 };
 #endif /* COLOR_H_ */

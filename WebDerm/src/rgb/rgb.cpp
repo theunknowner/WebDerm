@@ -39,7 +39,12 @@ bool rgb::importThresholds()
 		vector<double> thresh2;
 		while(getline(fsColors,temp))
 		{
-			mainColors.push_back(temp);
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0) mainColors.push_back(vec.at(i));
+				if(i==1) colorFactors.push_back(atof(vec.at(i).c_str()));
+			}
+			vec.clear();
 		}
 		getline(fsThresh,temp);
 		while(getline(fsThresh,temp))
@@ -145,7 +150,7 @@ String rgb::checkBlack(int r, int g, int b)
 	{
 		if(r<16 && g<16 && b<16)
 		{
-			return "Black25";
+			return "Black94";
 		}
 		return "OTHER";
 	}

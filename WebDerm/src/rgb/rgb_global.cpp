@@ -13,3 +13,4 @@ vector< vector<double> > absThresh;
 vector< vector<double> > normThresh;
 vector<String> rgbColors;
 vector<String> mainColors;
+vector<double> colorFactors;

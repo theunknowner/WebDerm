@@ -17,6 +17,8 @@
 
 int main(int argc, char** argv)
 {
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
@@ -26,7 +28,7 @@ int main(int argc, char** argv)
 	hsl.importHslThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/","img1.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	//colorThreshRenamingScript();
@@ -44,12 +46,11 @@ int main(int argc, char** argv)
 			cout << "Colorfn0: " << con.calcColorfulness2(hue,pix) << endl;
 			i++;
 		};
-	}*/
-	//cout << con.calcColorfulness2(0.4,"Gray85Pink60") << endl;
-	int col = 581;
-	int row = 538;
-	cout << "Result: " << testHysteresis(img, row, col, Size(2,2)) << endl;
-	cout << con.calcContrast(0.50,0.555,"Gray76Blue47","Gray81Blue49") << endl;
+	}
+	int col = 415;
+	int row = 422;
+	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
 	//imwrite("img.png", img3);

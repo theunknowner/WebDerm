@@ -17,6 +17,10 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 class contrast {
+private:
+	double min;
+	double max;
+	double range;
 public:
 	double calcColorfulness(double Hue, double colorLevel);
 	double calcContrast(double hue1, double hue2, String color1, String color2);
@@ -27,6 +31,9 @@ public:
 	void colorfulMatrix(Mat img, Size size, String name);
 	double getContrastAngle(double hue1, double hue2, String color1, String color2);
 	double calcContrastAngle(double hue1, double hue2, double colorfn1, double colorfn2);
+	void shadeOfFeature(vector<double> &feature);
+	String getShade(double feature);
+	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
 };
 
 #endif /* CONTRAST_H_ */
