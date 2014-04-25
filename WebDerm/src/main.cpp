@@ -17,6 +17,8 @@
 
 int main(int argc, char** argv)
 {
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
@@ -44,10 +46,11 @@ int main(int argc, char** argv)
 			cout << "Colorfn0: " << con.calcColorfulness2(hue,pix) << endl;
 			i++;
 		};
-	}*/
+	}
 	int col = 465;
 	int row = 420;
-	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");

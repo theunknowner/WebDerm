@@ -40,17 +40,15 @@ double Intensity::calcIntensity(String color) {
 }
 
 void Intensity::setMaxIntensityOfFeature(vector<double> &feature) {
-	min = feature.at(0);
-	max = feature.at(1);
+	min = 0;
+	max = 1;
 	for(unsigned int i=0; i<feature.size(); i++) {
-		if(feature.at(i)>max) {
+		if(feature.at(i)>max && feature.at(i)!=900) {
 			max = feature.at(i);
-		}
-		if(feature.at(i)<min) {
-			min = feature.at(i);
 		}
 	}
 	range = max - min;
+	range /= max;
 }
 
 String Intensity::getShade(double inten) {
