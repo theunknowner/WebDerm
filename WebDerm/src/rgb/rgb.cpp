@@ -150,7 +150,7 @@ String rgb::checkBlack(int r, int g, int b)
 	{
 		if(r<16 && g<16 && b<16)
 		{
-			return "Black94";
+			return "Black100";
 		}
 		return "OTHER";
 	}

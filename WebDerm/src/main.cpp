@@ -17,12 +17,10 @@
 
 int main(int argc, char** argv)
 {
-	runHysteresis();
-	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
-	Color c;
+	Intensity in;
 	rgb.importThresholds();
 	hsl.importLsThreshold();
 	hsl.importHslThresholds();
@@ -34,7 +32,7 @@ int main(int argc, char** argv)
 	//colorThreshRenamingScript();
 	//addNewColors(img,Point(518,526),Point(534,536),"Gray","Gray");
 	//cout << rgb.calcGrayLevel2(134, 82, 85) << endl;
-	//cout << rgb.calcColorLevel2(134, 82, 85) << endl;
+	//cout << rgb.calcColorLevel2(0, 0, 0) << endl;
 	/*
 	int i=1;
 	String pix;
@@ -46,11 +44,11 @@ int main(int argc, char** argv)
 			cout << "Colorfn0: " << con.calcColorfulness2(hue,pix) << endl;
 			i++;
 		};
-	}
-	int col = 415;
-	int row = 422;
-	//cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
-	cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
+	}*/
+	int col = 465;
+	int row = 420;
+	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
+	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
 	//runNeuralNetworkTraining("data.csv");
 	//createDataFile("rgb.txt", "NN_Data1.csv");
 	//imwrite("img.png", img3);

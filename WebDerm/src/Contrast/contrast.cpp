@@ -7,15 +7,8 @@
 
 #include "contrast.h"
 
-//calculating colorfulness using colorlevel and hue value
-double contrast::calcColorfulness(double Hue, double colorLevel) {
-	double colorfn=0;
-	colorfn = colorLevel * Hue;
-	return colorfn;
-}
-
 //uses calcColorfulness to calculate colorfulness
-double contrast::calcColorfulness2(double hue, String color) {
+double contrast::calcColorfulness(double hue, String color) {
 	rgb rgb;
 	double colorLevel[mainColors.size()];
 	double cHue[mainColors.size()];
@@ -53,13 +46,13 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 	Color c;
 	double colorfn1=0, colorfn2=0;
 	double contrast=0;
-	colorfn1 = calcColorfulness2(hue1,color1);
-	colorfn2 = calcColorfulness2(hue2,color2);
+	colorfn1 = calcColorfulness(hue1,color1);
+	colorfn2 = calcColorfulness(hue2,color2);
 	//printf("Colorfn1: %f\n",colorfn1);
 	//printf("Colorfn2: %f\n",colorfn2);
 	contrast = colorfn2-colorfn1;
 	if(c.isSameColor(color1,color2))
-		contrast *= 20;
+		contrast *= 4;
 
 	return contrast;
 }
@@ -67,8 +60,8 @@ double contrast::calcContrast(double hue1, double hue2, String color1, String co
 double contrast::getContrastAngle(double hue1, double hue2, String color1, String color2) {
 	double colorfn1=0, colorfn2=0;
 	double angleContrast = 0;
-	colorfn1 = calcColorfulness2(hue1,color1);
-	colorfn2 = calcColorfulness2(hue2,color2);
+	colorfn1 = calcColorfulness(hue1,color1);
+	colorfn2 = calcColorfulness(hue2,color2);
 	angleContrast = calcContrastAngle(hue1, hue2, colorfn1, colorfn2);
 	return angleContrast;
 }
@@ -141,7 +134,7 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 			}
 			hue = (hsl.getHue()+180)%360;
 			hue /=360;
-			colorfn = con.calcColorfulness2(hue,pix);
+			colorfn = con.calcColorfulness(hue,pix);
 			clrfn.push_back(colorfn);
 		}
 		clrfnVec.push_back(clrfn);
@@ -161,7 +154,7 @@ void contrast::calcColorfulnessMatrix(vector< vector<String> > &windowVec, vecto
 		for(unsigned int j=0; j<(windowVec.at(i).size()-1); j++) {
 			color = windowVec.at(i).at(j);
 			hue = hueVec.at(i).at(j);
-			colorfn = calcColorfulness2(hue,color);
+			colorfn = calcColorfulness(hue,color);
 			vec.push_back(colorfn);
 		}
 		vec2.push_back(vec);
@@ -284,7 +277,12 @@ void contrast::colorfulMatrix(Mat img, Size size, String name)
 					pix.clear();
 					for(unsigned int i=0; i<index.size(); i++)
 					{
-						pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
+						if(mainColors.at(index[i])=="Black") {
+							pix = mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
+							break;
+						}
+						else
+							pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 					}
 					colorWindow.push_back(pix);
 				}
@@ -364,6 +362,7 @@ String contrast::getShade(double feature) {
 void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String name) {
 	double contrast=0;
 	double feature=0;
+	int flag=0;
 	Point pt; //pointer to hold x,y of color window
 	String color1,color2;
 	vector<double> vec;
@@ -384,13 +383,15 @@ void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String 
 				vec.push_back(contrast);
 				fVec1.push_back(feature);
 				ptVec1.push_back(pt);
+				flag=1;
 			}
-		}if(ptVec1.size()!=0)
+		}
+		if(flag==1) {
 			ptVec2.push_back(ptVec1);
-		if(fVec1.size()!=0)
 			fVec2.push_back(fVec1);
-		if(vec.size()!=0)
 			vec2.push_back(vec);
+		}
+		flag=0;
 		ptVec1.clear();
 		vec.clear();
 		fVec1.clear();
@@ -412,6 +413,7 @@ void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String 
 			shade = getShade(fVec2.at(i).at(j));
 			if(pix!="Black" && pix!="White")
 				pix = shade + pix;
+			pix += "("+toString(x+1) + ";" + toString(y+1)+")";
 			strVec.push_back(pix);
 		}
 		strVec2.push_back(strVec);

@@ -11,13 +11,13 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
 	hsl hsl;
-	contrast con;
+	Intensity in;
 	Color colorObj;
 	int b,g,r;
 	int ind=0;
 	double dist=0;
 	double hue=0;
-	double colorfn=0;
+	double colorIntensity=0;
 	vector<int> index;
 	String pix;
 	deque<int> hueVals;
@@ -56,9 +56,9 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			}
 			hue = (hsl.getHue()+180)%360;
 			hue /= 360;
-			colorfn = con.calcColorfulness2(hue,pix);
+			colorIntensity = in.calcIntensity(pix);
 			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << hue << endl;
-			cout << "Colorfn: " << colorfn << endl;
+			cout << "ColorInt: " << colorIntensity << endl;
 		}
 	}
 	cout << "Hue Avg: " << hsl.calcHueAvg(hueVals) << endl;
@@ -99,12 +99,17 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 		pix.clear();
 		for(unsigned int i=0; i<index.size(); i++)
 		{
-			pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
+			if(mainColors.at(index[i])=="Black") {
+				pix = mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
+				break;
+			}
+			else
+				pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 		}
 	}
 	else pix = "NOISE";
 
-	cout << "COLORFN:" << con.calcColorfulness2(hsl.calcHueAvg(hueVals),pix) << endl;
+	cout << "COLORINT:" << in.calcIntensity(pix) << endl;
 	vector<int>().swap(index);
 	deque<String>().swap(pixelColorWindow);
 	//img.release();
