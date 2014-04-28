@@ -17,7 +17,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 class contrast {
-private:
+public:
 	double max;
 	double min;
 	double range;
@@ -25,6 +25,7 @@ public:
 	double calcColorfulness(double hue, String color);
 	double calcContrast(double hue1, double hue2, String color1, String color2);
 	void calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
+	vector< vector<double> > calcContrastFromMatrix(vector< vector<double> > &intensityVec);
 	double calcIntensity(double hue, String color);
 	void colorfulnessMatrix1x1(Mat &img, String name);
 	void calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
@@ -34,6 +35,9 @@ public:
 	void shadeOfFeature(vector<double> &feature);
 	String getShade(double feature);
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
+
+	vector< vector<double> > calcCumulativeContrast(vector< vector<double> > &vec);
+	void writeCumulativeContrast(vector< vector<double> > &vec, String name);
 };
 
 #endif /* CONTRAST_H_ */

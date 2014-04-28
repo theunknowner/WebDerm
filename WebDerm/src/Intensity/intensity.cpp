@@ -39,135 +39,120 @@ double Intensity::calcIntensity(String color) {
 	return totalColorIntensity;
 }
 
-void Intensity::setMaxIntensityOfFeature(vector<double> &feature) {
-	min = 0;
-	max = 1;
-	for(unsigned int i=0; i<feature.size(); i++) {
-		if(feature.at(i)>max && feature.at(i)!=900) {
-			max = feature.at(i);
-		}
+void Intensity::setMinMax(double intensity) {
+	static int flag=0;
+	if(flag==0) {
+		min=900;
+		max=0;
+		flag=1;
 	}
-	range = max - min;
-	range /= max;
+	if(intensity>max && intensity!=900)
+		max = intensity;
+	if(intensity<min)
+		min = intensity;
+
+	range = max-min;
+	range /= range;
 }
 
 String Intensity::getShade(double inten) {
 	String shade;
-	min=0;
-	max=722;
-	range = max-min;
-	range /=max;
-	double thresh1 = range*0.20;
-	double thresh2 = range*0.755;
+	shadeArr = {"Light","","Dark"};
+	double thresh1 = range*0.25;
+	double thresh2 = range*0.75;
 	double intensity = inten/max;
-	intensity = pow(intensity,2);
+	intensity = pow(intensity,power);
 	if(intensity<=thresh1)
-		shade = "Light";
+		shade = shadeArr[0];
 	if(intensity>thresh1 && intensity<=thresh2)
-		shade = "";
+		shade = shadeArr[1];
 	if(intensity>thresh2)
-		shade = "Dark";
+		shade = shadeArr[2];
 
 	return shade;
 }
 
-void Intensity::writeNormalizedIntensityMatrix(vector< vector<double> > vec,String name) {
+vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector<double> > vec) {
 	double intensity=0;
 	vector<double> iVec1;
 	vector< vector<double> > iVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		for(unsigned int j=0; j<vec.at(i).size(); j++) {
-			intensity = vec.at(i).at(j)/max;
-			intensity = pow(intensity,2);
+			intensity = (vec.at(i).at(j)-min)/range;
+			intensity = pow(intensity,power);
 			iVec1.push_back(intensity);
 		}
 		iVec2.push_back(iVec1);
 		iVec1.clear();
 	}
-	String filename = name+"NormIntensity2x2";
-	writeSeq2File(iVec2,filename);
-	vector<double>().swap(iVec1);
-	vector< vector<double> >().swap(iVec2);
+	return iVec2;
 }
 
-void Intensity::writeIntensityFromMatrix(vector <vector<String> > &windowVec, String name) {
-	String file;
+vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> > &windowVec) {
 	double colorIntensity=0;
 	String color;
 	vector<double> vec;
 	vector< vector<double> > vec2;
 	max=0;
+	min=900;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
-		for(unsigned int j=0; j<(windowVec.at(i).size()-1); j++) {
+		for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
 			color = windowVec.at(i).at(j);
 			colorIntensity = calcIntensity(color);
-			if(colorIntensity>max && colorIntensity!=900) max = colorIntensity;
+			setMinMax(colorIntensity);
 			vec.push_back(colorIntensity);
 		}
 		vec2.push_back(vec);
 		vec.clear();
 	}
-	file = name + "ColorIntense2x2";
-	writeSeq2File(vec2,file);
-	writeNormalizedIntensityMatrix(vec2,name);
-	vector<double>().swap(vec);
-	vector< vector<double> >().swap(vec2);
+	return vec2;
+}
+
+vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec) {
+	contrast con;
+	Color c;
+	String pix, shade;
+	vector< vector<double> > intensityVec;
+	vector< vector<double> > normIntensityVec;
+	vector< vector<double> > contrastVec;
+	vector< vector<double> > cumConVec;
+	vector< vector<String> > colorVec;
+	intensityVec = calcIntensityMatrix(windowVec);
+	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
+	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
+	cumConVec = con.calcCumulativeContrast(contrastVec);
+	for(unsigned int i=0; i<cumConVec.size(); i++) {
+		for(unsigned int j=0; j<cumConVec.at(i).size(); j++) {
+			pix = windowVec.at(i).at(j);
+			pix = c.getMainColor(pix);
+			shade = getShade(normIntensityVec.at(i).at(j));
+			if(cumConVec.at(i).at(j)>0.1) {
+
+			}
+		}
+	}
+}
+
+void Intensity::writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name) {
+	vector< vector<double> > normVec;
+	normVec = calcNormalizedIntensityMatrix(vec);
+	String filename = name + "NormIntensity";
+	writeSeq2File(normVec,filename);
+	vector< vector<double> >().swap(normVec);
+}
+
+void Intensity::writeIntensityMatrix(vector< vector<String> > &windowVec, String name) {
+	vector< vector<double> > intVec;
+	intVec = calcIntensityMatrix(windowVec);
+	String filename = name + "ColorIntensity";
+	writeSeq2File(intVec,filename);
+	vector< vector<double> >().swap(intVec);
 }
 
 void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String name) {
-	int flag=0;
-	double colorIntensity=0;
-	Point pt; //pointer to hold x,y of color window
-	String color;
-	vector<double> vec;
-	vector< vector<double> > vec2;
-	vector<Point> ptVec1; //pointerVec to hold all pointers
-	vector <vector<Point> > ptVec2;
-	for(unsigned int i=0; i<windowVec.size(); i++) {
-		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
-			color = windowVec.at(i).at(j);
-				pt.x = j;
-				pt.y = i;
-				colorIntensity = calcIntensity(color);
-				if(colorIntensity>max && colorIntensity!=900) max = colorIntensity;
-				vec.push_back(colorIntensity);
-				ptVec1.push_back(pt);
-		}
-		if(flag==0) {
-			ptVec2.push_back(ptVec1);
-			vec2.push_back(vec);
-		}
-		flag=0;
-		ptVec1.clear();
-		vec.clear();
-	}
-	Color c;
-	int x=0,y=0;
-	String pix;
-	String shade;
-	vector<String> strVec;
-	vector< vector<String> > strVec2;
-	for(unsigned int i=0; i<ptVec2.size(); i++) {
-		for(unsigned int j=0; j<ptVec2.at(i).size(); j++) {
-			x = ptVec2.at(i).at(j).x;
-			y = ptVec2.at(i).at(j).y;
-			pix = windowVec.at(y).at(x);
-			pix = c.getMainColor(pix);
-			shade = getShade(vec2.at(i).at(j));
-			if(pix!="Black" && pix!="White")
-				pix = shade + pix;
-			pix += "("+toString(x+1) + ";" + toString(y+1)+")";
-			strVec.push_back(pix);
-		}
-		strVec2.push_back(strVec);
-		strVec.clear();
-	}
-	String filename = name +"MainColors";
-	writeSeq2File(strVec2,filename);
-	vector<double>().swap(vec);
-	vector< vector<double> >().swap(vec2);
-	vector<String>().swap(strVec);
-	vector< vector<String> >().swap(strVec2);
-	vector<Point>().swap(ptVec1);
-	vector< vector<Point> >().swap(ptVec2);
+	vector< vector<String> > colorVec;
+	colorVec = calcMainColorMatrix(windowVec);
+	String filename = name + "MainColors";
+	writeSeq2File(colorVec,filename);
+	vector< vector<String> >().swap(colorVec);
 }

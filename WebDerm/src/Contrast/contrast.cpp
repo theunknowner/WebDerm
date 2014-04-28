@@ -430,3 +430,42 @@ void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String 
 	vector<Point>().swap(ptVec1);
 	vector< vector<Point> >().swap(ptVec2);
 }
+
+vector< vector<double> > contrast::calcContrastFromMatrix(vector< vector<double> > &intensityVec) {
+	double contrast=0;
+	vector<double> vec1;
+	vector< vector<double> > vec2;
+	for(unsigned int i=0; i<intensityVec.size(); i++) {
+		for(unsigned int j=0; j<(intensityVec.at(i).size()-1); j++) {
+			contrast = intensityVec.at(i).at(j+1) - intensityVec.at(i).at(j);
+			vec1.push_back(contrast);
+		}
+		vec2.push_back(vec1);
+		vec1.clear();
+	}
+	return vec2;
+}
+
+vector< vector<double> > contrast::calcCumulativeContrast(vector< vector<double> > &vec) {
+	double contrast=0;
+	vector<double>	contrastVec1;
+	vector< vector<double> > contrastVec2;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		for(unsigned int j=0; j<(vec.at(i).size()-1); j++) {
+			contrast += vec.at(i).at(j);
+			contrastVec1.push_back(contrast);
+		}
+		contrastVec2.push_back(contrastVec1);
+		contrastVec1.clear();
+		contrast=0;
+	}
+	return contrastVec2;
+}
+
+void contrast::writeCumulativeContrast(vector< vector<double> > &vec, String name) {
+	vector< vector<double> > conVec;
+	conVec = calcCumulativeContrast(vec);
+	String filename = name + "CumulContrast";
+	writeSeq2File(conVec,filename);
+	vector< vector<double> >().swap(conVec);
+}

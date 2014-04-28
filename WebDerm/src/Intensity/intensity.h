@@ -15,18 +15,24 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 
 class Intensity {
 private:
+	static const int power = 3;
 	double max;
 	double min;
 	double range;
+	String shadeArr[];
 public:
 	double calcIntensity(String color);
-	void setMaxIntensityOfFeature(vector<double> &feature);
-	void writeNormalizedIntensityMatrix(vector< vector<double> > vec, String name);
+	void setMinMax(double intensity);
 	String getShade(double inten);
-	void writeIntensityFromMatrix(vector< vector<String> > &windowVec, String name);
+	vector< vector<double> > calcNormalizedIntensityMatrix(vector< vector<double> > vec);
+	vector< vector<double> > calcIntensityMatrix(vector< vector<String> > &windowVec);
+	vector< vector<String> > calcMainColorMatrix(vector< vector<String> > &windowVec);
+	void writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name);
+	void writeIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
 };
 

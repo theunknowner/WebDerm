@@ -205,12 +205,11 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 			col=0; ++row;
 		}//end while row
 		writeSeq2File(windowVec,name);
-		//String filename = name + "Contrast2x2";
 		//contrast con;
 		//con.writeMainColorMatrix(windowVec,name);
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
-		in.writeIntensityFromMatrix(windowVec,name);
+		in.writeIntensityMatrix(windowVec,name);
 		in.writeMainColorMatrix(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
@@ -265,7 +264,7 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 		//String filename = name + "Contrast1x1";
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
-		in.writeIntensityFromMatrix(windowVec,name);
+		in.writeIntensityMatrix(windowVec,name);
 		in.writeMainColorMatrix(windowVec,name);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
