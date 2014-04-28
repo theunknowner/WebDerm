@@ -53,8 +53,12 @@ void Intensity::setMaxIntensityOfFeature(vector<double> &feature) {
 
 String Intensity::getShade(double inten) {
 	String shade;
-	double thresh1 = range/4;
-	double thresh2 = (range*3)/4;
+	min=0;
+	max=722;
+	range = max-min;
+	range /=max;
+	double thresh1 = range*0.20;
+	double thresh2 = range*0.755;
 	double intensity = inten/max;
 	intensity = pow(intensity,2);
 	if(intensity<=thresh1)
@@ -72,7 +76,6 @@ void Intensity::writeNormalizedIntensityMatrix(vector< vector<double> > vec,Stri
 	vector<double> iVec1;
 	vector< vector<double> > iVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
-		setMaxIntensityOfFeature(vec.at(i));
 		for(unsigned int j=0; j<vec.at(i).size(); j++) {
 			intensity = vec.at(i).at(j)/max;
 			intensity = pow(intensity,2);
@@ -93,10 +96,12 @@ void Intensity::writeIntensityFromMatrix(vector <vector<String> > &windowVec, St
 	String color;
 	vector<double> vec;
 	vector< vector<double> > vec2;
+	max=0;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<(windowVec.at(i).size()-1); j++) {
 			color = windowVec.at(i).at(j);
 			colorIntensity = calcIntensity(color);
+			if(colorIntensity>max && colorIntensity!=900) max = colorIntensity;
 			vec.push_back(colorIntensity);
 		}
 		vec2.push_back(vec);
@@ -124,6 +129,7 @@ void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String
 				pt.x = j;
 				pt.y = i;
 				colorIntensity = calcIntensity(color);
+				if(colorIntensity>max && colorIntensity!=900) max = colorIntensity;
 				vec.push_back(colorIntensity);
 				ptVec1.push_back(pt);
 		}
@@ -142,7 +148,6 @@ void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String
 	vector<String> strVec;
 	vector< vector<String> > strVec2;
 	for(unsigned int i=0; i<ptVec2.size(); i++) {
-		setMaxIntensityOfFeature(vec2.at(i));
 		for(unsigned int j=0; j<ptVec2.at(i).size(); j++) {
 			x = ptVec2.at(i).at(j).x;
 			y = ptVec2.at(i).at(j).y;

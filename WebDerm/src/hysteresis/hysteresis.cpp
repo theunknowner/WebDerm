@@ -178,7 +178,7 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 					pix.clear();
 					for(unsigned int i=0; i<index.size(); i++)
 					{
-						if(mainColors.at(index[i])=="Black") {
+						if(mainColors.at(index[i])=="Black" || mainColors.at(index[i])=="White") {
 							pix = mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 							break;
 						}
