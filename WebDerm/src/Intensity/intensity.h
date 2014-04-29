@@ -20,17 +20,16 @@
 class Intensity {
 private:
 	static const int power = 3;
-	double max;
-	double min;
-	double range;
-	String shadeArr[];
 public:
 	double calcIntensity(String color);
 	void setMinMax(double intensity);
-	String getShade(double inten);
+	String getShade(int index);
+	int getShadeIndex(String shade);
+	String calcShade(double inten);
 	vector< vector<double> > calcNormalizedIntensityMatrix(vector< vector<double> > vec);
 	vector< vector<double> > calcIntensityMatrix(vector< vector<String> > &windowVec);
 	vector< vector<String> > calcMainColorMatrix(vector< vector<String> > &windowVec);
+	void writeNormalizedIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name);
 	void writeIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);

@@ -433,13 +433,22 @@ void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String 
 
 vector< vector<double> > contrast::calcContrastFromMatrix(vector< vector<double> > &intensityVec) {
 	double contrast=0;
+	double flag=0;
 	vector<double> vec1;
 	vector< vector<double> > vec2;
 	for(unsigned int i=0; i<intensityVec.size(); i++) {
-		for(unsigned int j=0; j<(intensityVec.at(i).size()-1); j++) {
-			contrast = intensityVec.at(i).at(j+1) - intensityVec.at(i).at(j);
+		for(unsigned int j=0; j<intensityVec.at(i).size(); j++) {
+			if(intensityVec.at(i).at(j)<1 && flag!=0) {//no black color
+				contrast = intensityVec.at(i).at(j) - intensityVec.at(i).at(j-1);
+			}
+			if(intensityVec.at(i).at(j)<1 && flag==0) {
+				contrast=0;
+				flag=1;
+			}
 			vec1.push_back(contrast);
 		}
+		flag=0;
+		contrast=0;
 		vec2.push_back(vec1);
 		vec1.clear();
 	}
@@ -451,7 +460,7 @@ vector< vector<double> > contrast::calcCumulativeContrast(vector< vector<double>
 	vector<double>	contrastVec1;
 	vector< vector<double> > contrastVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
-		for(unsigned int j=0; j<(vec.at(i).size()-1); j++) {
+		for(unsigned int j=0; j<vec.at(i).size(); j++) {
 			contrast += vec.at(i).at(j);
 			contrastVec1.push_back(contrast);
 		}

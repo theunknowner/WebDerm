@@ -261,8 +261,8 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 		}
 		writeSeq2File(windowVec,name);
 		//con.writeMainColorMatrix(windowVec,name);
-		//String filename = name + "Contrast1x1";
-		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
+		//String filename = name + "Contrast";
+		//con.calcContrastFromMatrix(windowVec,filename);
 		Intensity in;
 		in.writeIntensityMatrix(windowVec,name);
 		in.writeMainColorMatrix(windowVec,name);
