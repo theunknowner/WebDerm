@@ -50,9 +50,13 @@ void Intensity::setMinMax(double intensity) {
 	range = maxIntensity-minIntensity;
 }
 
-const int shadeCount=5;
+const int shadeCount=7; //changes with varying amt of shades
 String Intensity::getShade(int index) {
-	String shadeArr[] = {"White","Light","","Dark","Black"};
+	String shadeArr[] = {"White","Light","Light","","","",
+			"Dark","Dark","Black"};
+	//String shadeArr[] = {"White","White","White","Light","Light","Light",
+	//		"","","","Dark","Dark","Dark","Black","Black","Black"};
+	//String shadeArr[] = {"White","Light","","Dark","Black"};
 	int ind=index;
 	if(ind<0) ind=0;
 	if(ind>(shadeCount-1)) ind=(shadeCount-1);
@@ -63,7 +67,8 @@ int Intensity::getShadeIndex(String shade) {
 	int index=0;
 	for(int i=0; i<shadeCount; i++) {
 		if(shade==getShade(i)) {
-			index=i;
+			if(shade=="") index = 5;
+			else index=i;
 			break;
 		}
 	}
@@ -123,17 +128,18 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec) {
 	contrast con;
 	Color c;
-	int flag=0,change=0;
-	double threshold = 0.55;
-	String pix, shade, shadePrev;
-	double indexChange=0, ccCurr=0, ccPrev=0,shadePrevIndex=0, shadeIndex=0;
-	double contrast=0, currLevel=0, prevLevel=0;
+	int flag=0, counter=0;
+	double threshold = 0.15; //using round
+	String pix, shade;
+	double indexChange=0, ccCurr=0,shadeIndex=0;
+	double localMinCC=0, localMinIndex=0;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
 	vector< vector<double> > cumConVec;
 	vector< vector<String> > colorVec2;
 	vector<String> colorVec1;
+	deque<double> localIndexes;
 	intensityVec = calcIntensityMatrix(windowVec);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
@@ -142,35 +148,54 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 		for(unsigned int j=0; j<cumConVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix = c.getMainColor(pix);
+			ccCurr = cumConVec.at(i).at(j);
 			if(flag==0 && pix!="Black") { //initial first pixel-area
 				shade = calcShade(intensityVec.at(i).at(j));
 				shadeIndex = getShadeIndex(shade);
-				ccCurr = cumConVec.at(i).at(j)/threshold;
-				currLevel = ccCurr/threshold;
-				currLevel = trunc(currLevel);
+				localMinCC = ccCurr;
+				localMinIndex = shadeIndex;
 				pix = shade + pix;
 				++flag;
 			}
 			else if(flag!=0) {
-				ccCurr = cumConVec.at(i).at(j);
-				//contrast = contrastVec.at(i).at(j);
-				currLevel = ccCurr/threshold;
-				currLevel = trunc(currLevel);
-				indexChange = currLevel - prevLevel;
-				shadeIndex = shadePrevIndex + indexChange;
+				if(i==4 && j==277) {
+					cout << "ccCurr: " << ccCurr << endl;
+					cout << "localMin: " << localMinCC << endl;
+					cout << "localMinIndex: " << localMinIndex << endl;
+				}
+				indexChange = round(ccCurr/threshold) - round(localMinCC/threshold);
+				shadeIndex = localMinIndex + indexChange;
 				shade = getShade(shadeIndex);
+				if(ccCurr<localMinCC) {
+					localMinCC = ccCurr;
+					localMinIndex = shadeIndex;
+					counter=0;
+				}
 			}
+			if(localIndexes.size()==20) localIndexes.pop_front();
+			localIndexes.push_back(shadeIndex);
+
+			if(counter==20) {
+				localMinCC=1000;
+				int n=(counter-1);
+				int tempCounter=0;
+				for(unsigned int k=j; k>(j-counter); k--) {
+					if(cumConVec.at(i).at(k)<localMinCC) {
+						localMinCC = cumConVec.at(i).at(k);
+						localMinIndex = localIndexes.at(n);
+						tempCounter=n;
+					}
+					n--;
+				}
+				counter=tempCounter;
+			}
+			++counter;
 			if(pix!="Black" && pix!="White")
 				pix = shade + pix;
-
 			colorVec1.push_back(pix);
-			shadePrev = shade;
-			shadePrevIndex = shadeIndex;
-			prevLevel = currLevel;
-			ccPrev = ccCurr;
 		}
 		flag=0;
-		change=0;
+		counter=0;
 		colorVec2.push_back(colorVec1);
 		colorVec1.clear();
 	}
