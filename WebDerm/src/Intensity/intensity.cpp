@@ -124,10 +124,10 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	contrast con;
 	Color c;
 	int flag=0,change=0;
-	double threshold = 0.1;
+	double threshold = 0.55;
 	String pix, shade, shadePrev;
 	double indexChange=0, ccCurr=0, ccPrev=0,shadePrevIndex=0, shadeIndex=0;
-	double contrast=0, cumCon=0, currLevel=0, prevLevel=0;
+	double contrast=0, currLevel=0, prevLevel=0;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
@@ -142,31 +142,32 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 		for(unsigned int j=0; j<cumConVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix = c.getMainColor(pix);
-			if(flag==0 && pix!="Black") {
-				shadePrev = calcShade(intensityVec.at(i).at(j));
-				shadePrevIndex = getShadeIndex(shadePrev);
-				ccPrev = cumConVec.at(i).at(j)/threshold;
-				pix = shadePrev + pix;
+			if(flag==0 && pix!="Black") { //initial first pixel-area
+				shade = calcShade(intensityVec.at(i).at(j));
+				shadeIndex = getShadeIndex(shade);
+				ccCurr = cumConVec.at(i).at(j)/threshold;
+				currLevel = ccCurr/threshold;
+				currLevel = trunc(currLevel);
+				pix = shade + pix;
 				++flag;
 			}
 			else if(flag!=0) {
-				cumCon = cumConVec.at(i).at(j);
+				ccCurr = cumConVec.at(i).at(j);
 				//contrast = contrastVec.at(i).at(j);
-				if(abs(cumCon)>=threshold) {
-					currLevel = cumCon/threshold;
-				}
-				else {
-					shade = shadePrev;
-					shadeIndex = shadePrevIndex;
-				}
-					ccCurr = cumConVec.at(i).at(j)/threshold;
-					indexChange = floor(ccCurr) - floor(ccPrev);
-					shadeIndex = shadePrevIndex + indexChange;
-					shade = getShade(shadeIndex);
-				if(pix!="Black" && pix!="White")
-					pix = shade + pix;
+				currLevel = ccCurr/threshold;
+				currLevel = trunc(currLevel);
+				indexChange = currLevel - prevLevel;
+				shadeIndex = shadePrevIndex + indexChange;
+				shade = getShade(shadeIndex);
 			}
+			if(pix!="Black" && pix!="White")
+				pix = shade + pix;
+
 			colorVec1.push_back(pix);
+			shadePrev = shade;
+			shadePrevIndex = shadeIndex;
+			prevLevel = currLevel;
+			ccPrev = ccCurr;
 		}
 		flag=0;
 		change=0;
