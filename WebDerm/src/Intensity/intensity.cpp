@@ -126,8 +126,8 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	int flag=0,change=0;
 	double threshold = 0.1;
 	String pix, shade, shadePrev;
-	double indexChange=0, ccCurr=0, ccPrev=0,shadePrevIndex=0, shadeCurrIndex=0;
-	double contrast=0;
+	double indexChange=0, ccCurr=0, ccPrev=0,shadePrevIndex=0, shadeIndex=0;
+	double contrast=0, cumCon=0, currLevel=0, prevLevel=0;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
@@ -150,22 +150,19 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 				++flag;
 			}
 			else if(flag!=0) {
-				if(intensityVec.at(i).at(j)==intensityVec.at(i).at(j-1)) {
-					shade = shadePrev;
-					shadeCurrIndex = shadePrevIndex;
+				cumCon = cumConVec.at(i).at(j);
+				//contrast = contrastVec.at(i).at(j);
+				if(abs(cumCon)>=threshold) {
+					currLevel = cumCon/threshold;
 				}
 				else {
-					if(change==0) {
-						contrast = contrastVec.at(i).at(j);
-						if(contrast>0) ccPrev = 0.01;
-						if(contrast<0) ccPrev = -0.01;
-						change=1;
-					}
+					shade = shadePrev;
+					shadeIndex = shadePrevIndex;
+				}
 					ccCurr = cumConVec.at(i).at(j)/threshold;
 					indexChange = floor(ccCurr) - floor(ccPrev);
-					shadeCurrIndex = shadePrevIndex + indexChange;
-					shade = getShade(shadeCurrIndex);
-				}
+					shadeIndex = shadePrevIndex + indexChange;
+					shade = getShade(shadeIndex);
 				if(pix!="Black" && pix!="White")
 					pix = shade + pix;
 			}
