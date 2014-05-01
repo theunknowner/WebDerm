@@ -77,8 +77,8 @@ int Intensity::getShadeIndex(String shade) {
 
 String Intensity::calcShade(double inten) {
 	String shade;
-	double thresh1 = 0.25;
-	double thresh2 = 0.75;
+	double thresh1 = 0.48;
+	double thresh2 = 0.755;
 	double intensity = (inten-minIntensity)/range;
 	intensity = pow(intensity,power);
 	if(intensity<=thresh1)
@@ -126,13 +126,17 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 }
 
 vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec) {
+	FILE * fp;
+	fp = fopen("localMins.csv","w");
 	contrast con;
 	Color c;
-	int flag=0, counter=0;
+	int flag=0;
 	double threshold = 0.15; //using round
 	String pix, shade;
-	double indexChange=0, ccCurr=0,shadeIndex=0;
-	double localMinCC=0, localMinIndex=0;
+	double indexChange=0, ccCurr=0;
+	int shadeIndex=0, localMinIndex=0;
+	double localMinCC=0;
+	Point pt;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
@@ -156,46 +160,47 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 				localMinIndex = shadeIndex;
 				pix = shade + pix;
 				++flag;
+				pt.x = j; pt.y = i;
 			}
 			else if(flag!=0) {
-				if(i==4 && j==277) {
+				/*if(i==341 && j==344) {
 					cout << "ccCurr: " << ccCurr << endl;
 					cout << "localMin: " << localMinCC << endl;
 					cout << "localMinIndex: " << localMinIndex << endl;
-				}
-				indexChange = round(ccCurr/threshold) - round(localMinCC/threshold);
+					printf("(%d,%d)\n",pt.x,pt.y);
+				}*/
+				indexChange = round((ccCurr-localMinCC)/threshold);
 				shadeIndex = localMinIndex + indexChange;
 				shade = getShade(shadeIndex);
 				if(ccCurr<localMinCC) {
 					localMinCC = ccCurr;
 					localMinIndex = shadeIndex;
-					counter=0;
+					pt.x = j; pt.y = i;
 				}
 			}
 			if(localIndexes.size()==20) localIndexes.pop_front();
 			localIndexes.push_back(shadeIndex);
 
-			if(counter==20) {
+			if((j-pt.x)==20) {
 				localMinCC=1000;
-				int n=(counter-1);
-				int tempCounter=0;
-				for(unsigned int k=j; k>(j-counter); k--) {
+				int n=localIndexes.size()-1;
+				unsigned int ptX = pt.x;
+				for(unsigned int k=j; k>ptX; k--) {
 					if(cumConVec.at(i).at(k)<localMinCC) {
 						localMinCC = cumConVec.at(i).at(k);
 						localMinIndex = localIndexes.at(n);
-						tempCounter=n;
+						pt.x = k; pt.y = i;
 					}
 					n--;
 				}
-				counter=tempCounter;
 			}
-			++counter;
 			if(pix!="Black" && pix!="White")
-				pix = shade + pix;
+				pix = shade + pix + toString(shadeIndex);
 			colorVec1.push_back(pix);
+			fprintf(fp,"%f;%d(%d.%d),",localMinCC,localMinIndex,pt.x+1,pt.y+1);
 		}
+		fprintf(fp,"\n");
 		flag=0;
-		counter=0;
 		colorVec2.push_back(colorVec1);
 		colorVec1.clear();
 	}
