@@ -19,9 +19,12 @@
 
 class Intensity {
 private:
-	const int power = 3;
+	const int power = 1;
+	const int minRange = -20;
+	const int maxRange = 20;
 public:
 	double calcIntensity(String color);
+	double sigmoidFn(double intensity);
 	void setMinMax(double intensity);
 	String getShade(int index);
 	int getShadeIndex(String shade);

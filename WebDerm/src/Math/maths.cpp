@@ -46,3 +46,12 @@ double cosineDist(double * vec1, double * vec2)
 	result = 1 - (top/(sqrt(bottom1)*sqrt(bottom2)));
 	return result;
 }
+
+double normalizeToRange(double value, int min, int max) {
+	double result=0;
+	int range = min-max;
+	if(range<0) range = abs(min-max);
+	else range = -range;
+	result = (value * range) + min;
+	return result;
+}

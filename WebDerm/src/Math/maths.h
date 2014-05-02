@@ -13,5 +13,6 @@
 
 double correlationDist(double * vec1, double * vec2);
 double cosineDist(double * vec1, double * vec2);
+double normalizeToRange(double value, int min, int max);
 
 #endif /* MATHS_H_ */
