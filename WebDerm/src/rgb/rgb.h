@@ -43,6 +43,7 @@ public:
 	void release_memory();
 	String calcColor(int red, int green, int blue);
 	String calcColor2(int red, int green, int blue);
+	double calcRelLum(double red, double green, double blue);
 };
 
 

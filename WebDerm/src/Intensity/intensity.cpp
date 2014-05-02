@@ -77,10 +77,13 @@ int Intensity::getShadeIndex(String shade) {
 
 String Intensity::calcShade(double inten) {
 	String shade;
+	double intensity=inten;
 	double thresh1 = 0.48;
 	double thresh2 = 0.755;
-	double intensity = (inten-minIntensity)/range;
-	intensity = pow(intensity,power);
+	if(inten>1) {
+		intensity = (inten-minIntensity)/range;
+		intensity = pow(intensity,power);
+	}
 	if(intensity<=thresh1)
 		shade = "Light";
 	if(intensity>thresh1 && intensity<=thresh2)
@@ -126,17 +129,8 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 }
 
 vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec) {
-	FILE * fp;
-	fp = fopen("localMins.csv","w");
-	contrast con;
 	Color c;
-	int flag=0;
-	double threshold = 0.15; //using round
 	String pix, shade;
-	double indexChange=0, ccCurr=0;
-	int shadeIndex=0, localMinIndex=0;
-	double localMinCC=0;
-	Point pt;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
@@ -146,61 +140,17 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	deque<double> localIndexes;
 	intensityVec = calcIntensityMatrix(windowVec);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
-	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
-	cumConVec = con.calcCumulativeContrast(contrastVec);
-	for(unsigned int i=0; i<cumConVec.size(); i++) {
-		for(unsigned int j=0; j<cumConVec.at(i).size(); j++) {
-			pix = windowVec.at(i).at(j);
+	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
+	//cumConVec = con.calcCumulativeContrast(contrastVec);
+	for(unsigned int y=0; y<normIntensityVec.size(); y++) {
+		for(unsigned int x=0; x<normIntensityVec.at(y).size(); x++) {
+			pix = windowVec.at(y).at(x);
 			pix = c.getMainColor(pix);
-			ccCurr = cumConVec.at(i).at(j);
-			if(flag==0 && pix!="Black") { //initial first pixel-area
-				shade = calcShade(intensityVec.at(i).at(j));
-				shadeIndex = getShadeIndex(shade);
-				localMinCC = ccCurr;
-				localMinIndex = shadeIndex;
-				pix = shade + pix;
-				++flag;
-				pt.x = j; pt.y = i;
-			}
-			else if(flag!=0) {
-				/*if(i==341 && j==344) {
-					cout << "ccCurr: " << ccCurr << endl;
-					cout << "localMin: " << localMinCC << endl;
-					cout << "localMinIndex: " << localMinIndex << endl;
-					printf("(%d,%d)\n",pt.x,pt.y);
-				}*/
-				indexChange = round((ccCurr-localMinCC)/threshold);
-				shadeIndex = localMinIndex + indexChange;
-				shade = getShade(shadeIndex);
-				if(ccCurr<localMinCC) {
-					localMinCC = ccCurr;
-					localMinIndex = shadeIndex;
-					pt.x = j; pt.y = i;
-				}
-			}
-			if(localIndexes.size()==20) localIndexes.pop_front();
-			localIndexes.push_back(shadeIndex);
-
-			if((j-pt.x)==20) {
-				localMinCC=1000;
-				int n=localIndexes.size()-1;
-				unsigned int ptX = pt.x;
-				for(unsigned int k=j; k>ptX; k--) {
-					if(cumConVec.at(i).at(k)<localMinCC) {
-						localMinCC = cumConVec.at(i).at(k);
-						localMinIndex = localIndexes.at(n);
-						pt.x = k; pt.y = i;
-					}
-					n--;
-				}
-			}
+			shade = calcShade(normIntensityVec.at(y).at(x));
 			if(pix!="Black" && pix!="White")
-				pix = shade + pix + toString(shadeIndex);
+				pix = shade + pix;
 			colorVec1.push_back(pix);
-			fprintf(fp,"%f;%d(%d.%d),",localMinCC,localMinIndex,pt.x+1,pt.y+1);
 		}
-		fprintf(fp,"\n");
-		flag=0;
 		colorVec2.push_back(colorVec1);
 		colorVec1.clear();
 	}

@@ -479,10 +479,17 @@ void rgb::getLevels(String color, int * level)
 
 double rgb::calcIntensity(double red, double green, double blue)
 {
-	double result = 0.33 * red + 0.33 * green + 0.33 * blue;
+	double result = (red+green+blue)/3;
 	result = round(result);
 	return result;
 }
+
+double rgb::calcRelLum(double red, double green, double blue)
+	{
+		double lum;
+		lum = (0.2126*red) + (0.7152*green) + (0.0722*blue);
+		return lum;
+	}
 
 //outputs image window with color of rgb value
 void rgb::showPixelColor(int r, int g, int b, Size size)
