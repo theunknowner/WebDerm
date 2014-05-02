@@ -32,9 +32,9 @@ int main(int argc,char** argv)
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	//colorThreshRenamingScript();
-	//addNewColors(img,Point(518,526),Point(534,536),"Gray","Gray");
-	//cout << rgb.calcGrayLevel2(134, 82, 85) << endl;
-	//cout << rgb.calcColorLevel2(0, 0, 0) << endl;
+	//addNewColors(img,Point(363,314),Point(365,316),"Gray","Gray");
+	//cout << rgb.calcGrayLevel2(202, 192, 193) << endl;
+	//cout << rgb.calcColorLevel2(202, 192, 193) << endl;
 	/*
 	int i=1;
 	String pix;
@@ -47,8 +47,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 99;
-	int row = 2;
+	int col = 363;
+	int row = 314;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

@@ -19,7 +19,7 @@
 
 class Intensity {
 private:
-	static const int power = 3;
+	const int power = 3;
 public:
 	double calcIntensity(String color);
 	void setMinMax(double intensity);

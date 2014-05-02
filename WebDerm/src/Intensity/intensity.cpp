@@ -36,6 +36,7 @@ double Intensity::calcIntensity(String color) {
 		}
 		totalColorIntensity += colorIntensity[index.at(i)];
 	}
+	totalColorIntensity = round(totalColorIntensity);
 	return totalColorIntensity;
 }
 static double minIntensity = 900;
@@ -78,7 +79,7 @@ int Intensity::getShadeIndex(String shade) {
 String Intensity::calcShade(double inten) {
 	String shade;
 	double intensity=inten;
-	double thresh1 = 0.48;
+	double thresh1 = 0.20;
 	double thresh2 = 0.755;
 	if(inten>1) {
 		intensity = (inten-minIntensity)/range;
@@ -130,6 +131,7 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 
 vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec) {
 	Color c;
+	contrast con;
 	String pix, shade;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
@@ -139,6 +141,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	vector<String> colorVec1;
 	deque<double> localIndexes;
 	intensityVec = calcIntensityMatrix(windowVec);
+	printf("%f;%f\n",minIntensity,maxIntensity);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
 	//cumConVec = con.calcCumulativeContrast(contrastVec);
