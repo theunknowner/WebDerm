@@ -19,9 +19,9 @@
 
 class Intensity {
 private:
-	const int power = 1;
-	const int minRange = -20;
-	const int maxRange = 20;
+	static const int power = 1;
+	static const int minRange = -20;
+	static const int maxRange = 20;
 public:
 	double calcIntensity(String color);
 	double sigmoidFn(double intensity);

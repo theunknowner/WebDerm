@@ -12,6 +12,12 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
+template< class T, size_t N >
+std::size_t length(const T (&)[N] )
+{
+  return N;
+};
+
 String toString(int val);
 String toString(double val);
 double roundDecimal(double num, int places);
