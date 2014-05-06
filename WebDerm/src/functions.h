@@ -8,8 +8,8 @@
 #define FUNCTIONS_H_INCLUDED
 
 #include "functions2.h"
-#include "algos.h"
 #include "hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 

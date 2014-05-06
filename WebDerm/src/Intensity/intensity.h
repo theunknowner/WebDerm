@@ -29,7 +29,7 @@ public:
 	String getShade(int index);
 	int getShadeIndex(String shade);
 	String calcShade(double inten);
-	vector< vector<double> > calcNormalizedIntensityMatrix(vector< vector<double> > vec);
+	vector< vector<double> > calcNormalizedIntensityMatrix(vector< vector<double> > &vec);
 	vector< vector<double> > calcIntensityMatrix(vector< vector<String> > &windowVec);
 	vector< vector<String> > calcMainColorMatrix(vector< vector<String> > &windowVec);
 	void writeNormalizedIntensityMatrix(vector< vector<String> > &windowVec, String name);

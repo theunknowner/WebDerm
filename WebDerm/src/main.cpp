@@ -19,6 +19,12 @@ int main(int argc,char** argv)
 {
 	runHysteresis();
 	/*
+	Intensity in;
+	vector< vector<double> > vec;
+	vector< vector<double> > vec2;
+	importMatrix2Double2D("/home/jason/Desktop/Programs/Hysteresis/vesicles18ColorIntensity.csv",vec);
+	in.setMinMax(vec);
+	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
