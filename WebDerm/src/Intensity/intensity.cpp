@@ -53,7 +53,7 @@ double Intensity::sigmoidFn(double intensity) {
 	return result;
 }
 
-void Intensity::setMinMax(double intensity) {
+inline void _setMinMax(double intensity) {
 	if(intensity>maxIntensity && intensity!=900)
 		maxIntensity = intensity;
 	if(intensity<minIntensity)
@@ -62,8 +62,31 @@ void Intensity::setMinMax(double intensity) {
 	range = maxIntensity-minIntensity;
 }
 
+void Intensity::setMinMax(vector< vector<double> > &input) {
+	deque<double> vec;
+	double intensity=0;
+	double thresh = 0.025;
+	for(unsigned int i=0; i<input.size(); i++) {
+		for(unsigned int j=0; j<input.at(i).size(); j++) {
+			intensity = input.at(i).at(j);
+			if(intensity!=900)
+				vec.push_back(intensity);
+		}
+	}
+	quicksort(vec,0,vec.size()-1);
+	double t = vec.size()*thresh;
+	t = round(t);
+	for(int i=0; i<t; i++) {
+		vec.pop_back();
+		vec.pop_front();
+	}
+	for(unsigned int i=0; i<vec.size(); i++) {
+		_setMinMax(vec.at(i));
+	}
+}
+
 unsigned int shadeCount=0;
-String shadeArr[] = {"White","Light","",
+String shadeArr[] = {"White","Light","","",
 			"Dark","Black"};
 String Intensity::getShade(int index) {
 	//String shadeArr[] = {"White","White","White","Light","Light","Light",
@@ -81,7 +104,7 @@ int Intensity::getShadeIndex(String shade) {
 	shadeCount = length(shadeArr);
 	for(unsigned int i=0; i<shadeCount; i++) {
 		if(shade==getShade(i)) {
-			if(shade=="") index = 2;
+			if(shade=="") index = 3;
 			else index=i;
 			break;
 		}
@@ -117,10 +140,11 @@ vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector
 			//normalize between 0:1
 			intensity = (vec.at(i).at(j)-minIntensity)/range;
 			//normalize between minRange:maxRange
-			intensity = normalizeToRange(intensity,minRange,maxRange);
+			//intensity = normalizeToRange(intensity,minRange,maxRange);
 			//Differential Inverse Sigmoid Function
-			intensity = sigmoidFn(intensity);
-			intensity /=sigmoidFn(maxRange);
+			//intensity = sigmoidFn(intensity);
+			//intensity /=sigmoidFn(maxRange);
+			//intensity /= 20;
 			iVec1.push_back(intensity);
 		}
 		iVec2.push_back(iVec1);
@@ -138,7 +162,6 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 		for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
 			color = windowVec.at(i).at(j);
 			colorIntensity = calcIntensity(color);
-			setMinMax(colorIntensity);
 			vec.push_back(colorIntensity);
 		}
 		vec2.push_back(vec);
@@ -151,8 +174,8 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	Color c;
 	contrast con;
 	int flag=0;
-	double threshold = 0.67; //using round
-	unsigned int localScanSize=5;
+	double threshold = 0.2; //using round
+	unsigned int localScanSize=10;
 	String pix, shade;
 	double indexChange=0, ccCurr=0;
 	int shadeIndex=0, localMinIndex=0;
@@ -165,6 +188,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	vector<String> colorVec1;
 	deque<double> localIndexes;
 	intensityVec = calcIntensityMatrix(windowVec);
+	setMinMax(intensityVec);
 	printf("%f;%f\n",minIntensity,maxIntensity);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
@@ -178,6 +202,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 				//shade = calcShade(intensityVec.at(i).at(j));
 				shade = "";
 				shadeIndex = getShadeIndex(shade);
+				shadeIndex = 3;
 				localMinCC = ccCurr;
 				localMinIndex = shadeIndex;
 				flag=1;

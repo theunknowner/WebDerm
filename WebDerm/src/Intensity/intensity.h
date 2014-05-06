@@ -25,7 +25,7 @@ private:
 public:
 	double calcIntensity(String color);
 	double sigmoidFn(double intensity);
-	void setMinMax(double intensity);
+	void setMinMax(vector< vector<double> > &input);
 	String getShade(int index);
 	int getShadeIndex(String shade);
 	String calcShade(double inten);
