@@ -67,7 +67,7 @@ inline void _setMinMax(double intensity) {
 void Intensity::setMinMax(vector< vector<double> > &input) {
 	deque<double> vec;
 	double intensity=0;
-	double thresh = 0.005;
+	double thresh = 0.01;
 	for(unsigned int i=0; i<input.size(); i++) {
 		for(unsigned int j=0; j<input.at(i).size(); j++) {
 			intensity = input.at(i).at(j);
@@ -139,13 +139,15 @@ vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector
 	vector< vector<double> > iVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		for(unsigned int j=0; j<vec.at(i).size(); j++) {
-			//normalize between 0:1
+			//normalize to %
 			intensity = (vec.at(i).at(j)-minIntensity)/range;
 			//normalize between minRange:maxRange
-			intensity = normalizeToRange(intensity,minRange,maxRange);
+			//intensity = normalizeToRange(intensity,minRange,maxRange);
 			//Differential Inverse Sigmoid Function
-			intensity = sigmoidFn(intensity);
-			intensity /=sigmoidFn(maxRange);
+			//intensity = sigmoidFn(vec.at(i).at(j));
+			//normalize to %
+			//intensity = (intensity - sigmoidFn(minIntensity))/(sigmoidFn(range));
+			//intensity /=sigmoidFn(maxRange);
 			//intensity /= 20;
 			iVec1.push_back(intensity);
 		}
@@ -170,6 +172,7 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 		vec.clear();
 	}
 	setMinMax(vec2);
+	printf("%f;%f\n",minIntensity,maxIntensity);
 	return vec2;
 }
 
@@ -191,7 +194,6 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	vector<String> colorVec1;
 	deque<double> localIndexes;
 	intensityVec = calcIntensityMatrix(windowVec);
-	printf("%f;%f\n",minIntensity,maxIntensity);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
 	cumConVec = con.calcCumulativeContrast(contrastVec);
@@ -297,4 +299,33 @@ void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
 	vector< vector<String> >().swap(colorVec);
+}
+
+vector< vector<long double> > Intensity::exptIntensity(vector< vector<double> > &vec) {
+	long double sigIntensity=0;
+	long double sigMin = sigmoidFn(minIntensity);
+	long double sigMax = sigmoidFn(maxIntensity);
+	long double sigRange = sigMax - sigMin;
+	vector<long double> iVec1;
+	vector< vector<long double> > iVec2;
+	for(unsigned int y=0; y<vec.size(); y++) {
+		for(unsigned int x=0; x<vec.at(y).size(); x++) {
+			sigIntensity = sigmoidFn(vec.at(y).at(x));
+			sigIntensity = (sigIntensity-sigMin)/sigRange;
+			iVec1.push_back(sigIntensity);
+		}
+		iVec2.push_back(iVec1);
+		iVec1.clear();
+	}
+	return iVec2;
+}
+
+void Intensity::writeExptIntensity(vector< vector<String> > &windowVec,String name) {
+	vector< vector<double> > intensityVec;
+	vector< vector<long double> > exptVec1;
+	intensityVec = calcIntensityMatrix(windowVec);
+	printf("%f;%f,%f\n",minIntensity,maxIntensity,range);
+	exptVec1 = exptIntensity(intensityVec);
+	String filename = name + "sigVec";
+	writeSeq2File(exptVec1, filename);
 }

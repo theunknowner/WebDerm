@@ -21,9 +21,10 @@ int main(int argc,char** argv)
 	/*
 	Intensity in;
 	vector< vector<double> > vec;
-	vector< vector<double> > vec2;
-	importMatrix2Double2D("/home/jason/Desktop/Programs/Hysteresis/vesicles18ColorIntensity.csv",vec);
+	vector< vector<long double> > vec2;
+	importMatrix2Double2D("/home/jason/Desktop/Programs/Hysteresis/lph4ColorIntensity.csv",vec);
 	in.setMinMax(vec);
+	vec2 = in.exptIntensity(vec);
 	/*
 	hsl hsl;
 	rgb rgb;

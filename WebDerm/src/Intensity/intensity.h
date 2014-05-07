@@ -36,6 +36,8 @@ public:
 	void writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name);
 	void writeIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
+	vector< vector<long double> > exptIntensity(vector< vector<double> > &vec);
+	void writeExptIntensity(vector< vector<String > > &windowVec,String name);
 };
 
 #endif /* INTENSITY_H_ */

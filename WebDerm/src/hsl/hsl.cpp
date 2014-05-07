@@ -248,7 +248,7 @@ double hsl::minRGB(double red, double green, double blue)
 	double hsl::calcBrite(double red, double green, double blue)
 	{
 		double r,g,b;
-		double min, max;
+		double max;
 		r = red/255;
 		g = green/255;
 		b = blue/255;

@@ -7,65 +7,7 @@
 
 #include "hysteresis.h"
 
-void writeSeq2File(vector< vector<String> > &vec, String name)
-{
-	String filename = name + ".csv";
-	FILE * fp;
-	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
-		{
-			fprintf(fp,"[%s],", vec.at(i).at(j).c_str());
-		}
-		fprintf(fp, "\n");
-	}
-}
 
-void writeSeq2File(vector< vector<String> > &vec, String pathname, String name)
-{
-	String filename = name + ".csv";
-	FILE * fp;
-	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
-		{
-			fprintf(fp,"%s,", vec.at(i).at(j).c_str());
-		}
-		fprintf(fp, "\n");
-	}
-}
-
-void writeSeq2File(vector< vector<int> > &vec, String name)
-{
-	String filename = name + ".csv";
-	FILE * fp;
-	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
-		{
-			fprintf(fp,"%d,", vec.at(i).at(j));
-		}
-		fprintf(fp, "\n");
-	}
-}
-
-void writeSeq2File(vector< vector<double> > &vec, String name)
-{
-	String filename = name + ".csv";
-	FILE * fp;
-	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
-		{
-			fprintf(fp,"%f,", vec.at(i).at(j));
-		}
-		fprintf(fp, "\n");
-	}
-}
 
 //hysteresis moving 1 col/row at a time
 	void hysteresis(Mat img, Size size, String name)
@@ -216,7 +158,8 @@ void writeSeq2File(vector< vector<double> > &vec, String name)
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
 		in.writeIntensityMatrix(windowVec,name);
-		in.writeMainColorMatrix(windowVec,name);
+		//in.writeExptIntensity(windowVec,name);
+		//in.writeMainColorMatrix(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
