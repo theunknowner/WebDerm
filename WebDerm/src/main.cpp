@@ -19,13 +19,6 @@ int main(int argc,char** argv)
 {
 	runHysteresis();
 	/*
-	Intensity in;
-	vector< vector<double> > vec;
-	vector< vector<long double> > vec2;
-	importMatrix2Double2D("/home/jason/Desktop/Programs/Hysteresis/lph4ColorIntensity.csv",vec);
-	in.setMinMax(vec);
-	vec2 = in.exptIntensity(vec);
-	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
@@ -54,8 +47,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 129;
-	int row = 9;
+	int col = 361;
+	int row = 321;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

@@ -20,8 +20,8 @@
 class Intensity {
 private:
 	static const int power = 1;
-	static const int minRange = -20;
-	static const int maxRange = 20;
+	static const int minRange = -1;
+	static const int maxRange = 1;
 public:
 	double calcIntensity(String color);
 	double sigmoidFn(double intensity);
@@ -36,8 +36,6 @@ public:
 	void writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name);
 	void writeIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
-	vector< vector<long double> > exptIntensity(vector< vector<double> > &vec);
-	void writeExptIntensity(vector< vector<String > > &windowVec,String name);
 };
 
 #endif /* INTENSITY_H_ */

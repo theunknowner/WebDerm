@@ -46,8 +46,8 @@ double Intensity::calcIntensity(String color) {
 
 double Intensity::sigmoidFn(double intensity) {
 	double x=intensity;
-	const int a=1,b=1,c=0;
-	const double k=0.25;
+	const int a=1,b=1,c=22028;
+	const double k=5;
 	double result=0;
 	result = (a*exp(k*x)-(a*exp(-k*x))+(2*b*x)+c);
 	return result;
@@ -88,8 +88,7 @@ void Intensity::setMinMax(vector< vector<double> > &input) {
 }
 
 unsigned int shadeCount=0;
-String shadeArr[] = {"White","Light","","","",
-			"Dark","Black"};
+String shadeArr[] = {"Light","Low","High","Dark"};
 String Intensity::getShade(int index) {
 	//String shadeArr[] = {"White","White","White","Light","Light","Light",
 	//		"","","","Dark","Dark","Dark","Black","Black","Black"};
@@ -106,8 +105,7 @@ int Intensity::getShadeIndex(String shade) {
 	shadeCount = length(shadeArr);
 	for(unsigned int i=0; i<shadeCount; i++) {
 		if(shade==getShade(i)) {
-			if(shade=="") index = 3;
-			else index=i;
+			index=i;
 			break;
 		}
 	}
@@ -135,18 +133,24 @@ String Intensity::calcShade(double inten) {
 
 vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector<double> > &vec) {
 	double intensity=0;
+	double sigMin = sigmoidFn(minRange);
+	double sigMax = sigmoidFn(maxRange);
+	double sigRange = sigMax-sigMin;
 	vector<double> iVec1;
 	vector< vector<double> > iVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		for(unsigned int j=0; j<vec.at(i).size(); j++) {
-			//normalize to %
-			intensity = (vec.at(i).at(j)-minIntensity)/range;
+			intensity = vec.at(i).at(j);
+			//convert to %
+			intensity = (intensity-minIntensity)/range;
 			//normalize between minRange:maxRange
-			//intensity = normalizeToRange(intensity,minRange,maxRange);
+			intensity = normalizeToRange(intensity,minRange,maxRange);
 			//Differential Inverse Sigmoid Function
-			//intensity = sigmoidFn(vec.at(i).at(j));
+			if(intensity>maxRange) intensity = maxRange+0.1;
+			if(intensity<minRange) intensity = minRange-0.1;
+			intensity = sigmoidFn(intensity);
 			//normalize to %
-			//intensity = (intensity - sigmoidFn(minIntensity))/(sigmoidFn(range));
+			intensity = (intensity-sigMin)/sigRange;
 			//intensity /=sigmoidFn(maxRange);
 			//intensity /= 20;
 			iVec1.push_back(intensity);
@@ -183,9 +187,9 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	double threshold = 0.2; //using round
 	unsigned int localScanSize=10;
 	String pix, shade;
-	double indexChange=0, ccCurr=0;
-	int shadeIndex=0, localMinIndex=0;
-	double localMinCC=0;
+	double indexChange=0, ccCurr=0, ccPrev=0, localCC=0;
+	int shadeIndex=0, localMinIndex=0, localMaxIndex=0, localIndex=0;
+	double localMinCC=0, localMaxCC=0;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
@@ -193,6 +197,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	vector< vector<String> > colorVec2;
 	vector<String> colorVec1;
 	deque<double> localIndexes;
+	deque<double> localCCs;
 	intensityVec = calcIntensityMatrix(windowVec);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
@@ -204,34 +209,48 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 			ccCurr = cumConVec.at(i).at(j);
 			if(flag==0 && pix!="Black") { //initial first pixel-area
 				//shade = calcShade(intensityVec.at(i).at(j));
-				shade = "";
+				shade = "High";
 				shadeIndex = getShadeIndex(shade);
-				shadeIndex = 3;
-				localMinCC = ccCurr;
-				localMinIndex = shadeIndex;
+				shadeIndex = 2;
+				localCC = ccCurr;
+				localIndex = shadeIndex;
 				flag=1;
 			}
 			else if(flag!=0) {
-				if(localIndexes.size()==localScanSize) {
-					localMinIndex=localIndexes.at(0);
-					localMinCC = cumConVec.at(i).at(j-localScanSize);
+				ccPrev = cumConVec.at(i).at(j-1);
+				if((ccCurr-ccPrev)<0) {
+					localCC = localMaxCC;
+					localIndex = localMaxIndex;
 				}
-				indexChange = round((ccCurr-localMinCC)/threshold);
-				shadeIndex = localMinIndex + indexChange;
+				if((ccCurr-ccPrev)>0) {
+					localCC = localMinCC;
+					localIndex = localMinIndex;
+				}
+				indexChange = round((ccCurr-localCC)/threshold);
+				shadeIndex = localIndex + indexChange;
 				shade = getShade(shadeIndex);
 			}
 			if(pix!="Black") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
+				if(localCCs.size()==localScanSize) localCCs.pop_front();
 				localIndexes.push_back(shadeIndex);
+				localCCs.push_back(ccCurr);
+				int index = distance(localCCs.begin(),max_element(localCCs.begin(),localCCs.end()));
+				localMaxCC = localCCs.at(index);
+				localMaxIndex = localIndexes.at(index);
+				index = distance(localCCs.begin(),min_element(localCCs.begin(),localCCs.end()));
+				localMinCC = localCCs.at(index);
+				localMinIndex = localIndexes.at(index);
 			}
-			if(normIntensityVec.at(i).at(j)<(-1)) shade = "DarkOutlier";
-			if(normIntensityVec.at(i).at(j)>1) shade = "LightOutlier";
+			if(normIntensityVec.at(i).at(j)<0) shade = "White";
+			if(normIntensityVec.at(i).at(j)>1) shade = "Black";
 			if(pix!="Black" && pix!="White")
 				pix = shade + pix + toString(shadeIndex);
 			colorVec1.push_back(pix);
 		}
 		flag=0;
 		localIndexes.clear();
+		localCCs.clear();
 		colorVec2.push_back(colorVec1);
 		colorVec1.clear();
 	}
@@ -299,33 +318,4 @@ void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
 	vector< vector<String> >().swap(colorVec);
-}
-
-vector< vector<long double> > Intensity::exptIntensity(vector< vector<double> > &vec) {
-	long double sigIntensity=0;
-	long double sigMin = sigmoidFn(minIntensity);
-	long double sigMax = sigmoidFn(maxIntensity);
-	long double sigRange = sigMax - sigMin;
-	vector<long double> iVec1;
-	vector< vector<long double> > iVec2;
-	for(unsigned int y=0; y<vec.size(); y++) {
-		for(unsigned int x=0; x<vec.at(y).size(); x++) {
-			sigIntensity = sigmoidFn(vec.at(y).at(x));
-			sigIntensity = (sigIntensity-sigMin)/sigRange;
-			iVec1.push_back(sigIntensity);
-		}
-		iVec2.push_back(iVec1);
-		iVec1.clear();
-	}
-	return iVec2;
-}
-
-void Intensity::writeExptIntensity(vector< vector<String> > &windowVec,String name) {
-	vector< vector<double> > intensityVec;
-	vector< vector<long double> > exptVec1;
-	intensityVec = calcIntensityMatrix(windowVec);
-	printf("%f;%f,%f\n",minIntensity,maxIntensity,range);
-	exptVec1 = exptIntensity(intensityVec);
-	String filename = name + "sigVec";
-	writeSeq2File(exptVec1, filename);
 }

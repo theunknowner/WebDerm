@@ -158,8 +158,7 @@
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
 		in.writeIntensityMatrix(windowVec,name);
-		//in.writeExptIntensity(windowVec,name);
-		//in.writeMainColorMatrix(windowVec,name);
+		in.writeMainColorMatrix(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
 		vector<String>().swap(colorWindow);
 		vector< vector<String> >().swap(windowVec);
