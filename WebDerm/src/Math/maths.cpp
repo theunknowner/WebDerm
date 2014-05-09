@@ -53,3 +53,13 @@ double normalizeToRange(double value, int min, int max) {
 	result = (value * range) + min;
 	return result;
 }
+
+double myRound(double value) {
+	double result=trunc(value);
+	result=value-result;
+	if(abs(result)>0.79999999) {
+		result=round(value);
+	}
+	else result=trunc(value);
+	return result;
+}

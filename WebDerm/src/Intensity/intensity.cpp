@@ -87,14 +87,14 @@ void Intensity::setMinMax(vector< vector<double> > &input) {
 	}
 }
 
-unsigned int shadeCount=0;
+int shadeCount=0;
 String shadeArr[] = {"Light","Low","High","Dark"};
 String Intensity::getShade(int index) {
 	//String shadeArr[] = {"White","White","White","Light","Light","Light",
 	//		"","","","Dark","Dark","Dark","Black","Black","Black"};
 	//String shadeArr[] = {"White","Light","","Dark","Black"};
 	shadeCount = length(shadeArr);
-	unsigned int ind=index;
+	int ind=index;
 	if(ind<0) ind=0;
 	if(ind>(shadeCount-1)) ind=(shadeCount-1);
 	return shadeArr[ind];
@@ -103,7 +103,7 @@ String Intensity::getShade(int index) {
 int Intensity::getShadeIndex(String shade) {
 	unsigned int index=0;
 	shadeCount = length(shadeArr);
-	for(unsigned int i=0; i<shadeCount; i++) {
+	for(int i=0; i<shadeCount; i++) {
 		if(shade==getShade(i)) {
 			index=i;
 			break;
@@ -133,9 +133,9 @@ String Intensity::calcShade(double inten) {
 
 vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector<double> > &vec) {
 	double intensity=0;
-	double sigMin = sigmoidFn(minRange);
-	double sigMax = sigmoidFn(maxRange);
-	double sigRange = sigMax-sigMin;
+	//double sigMin = sigmoidFn(minRange);
+	//double sigMax = sigmoidFn(maxRange);
+	//double sigRange = sigMax-sigMin;
 	vector<double> iVec1;
 	vector< vector<double> > iVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
@@ -144,13 +144,13 @@ vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector
 			//convert to %
 			intensity = (intensity-minIntensity)/range;
 			//normalize between minRange:maxRange
-			intensity = normalizeToRange(intensity,minRange,maxRange);
+			//intensity = normalizeToRange(intensity,minRange,maxRange);
 			//Differential Inverse Sigmoid Function
-			if(intensity>maxRange) intensity = maxRange+0.1;
-			if(intensity<minRange) intensity = minRange-0.1;
-			intensity = sigmoidFn(intensity);
+			//if(intensity>maxRange) intensity = maxRange+0.1;
+			//if(intensity<minRange) intensity = minRange-0.1;
+			//intensity = sigmoidFn(intensity);
 			//normalize to %
-			intensity = (intensity-sigMin)/sigRange;
+			//intensity = (intensity-sigMin)/sigRange;
 			//intensity /=sigmoidFn(maxRange);
 			//intensity /= 20;
 			iVec1.push_back(intensity);
@@ -185,7 +185,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	contrast con;
 	int flag=0;
 	double threshold = 0.2; //using round
-	unsigned int localScanSize=10;
+	unsigned int localScanSize=7;
 	String pix, shade;
 	double indexChange=0, ccCurr=0, ccPrev=0, localCC=0;
 	int shadeIndex=0, localMinIndex=0, localMaxIndex=0, localIndex=0;
@@ -226,7 +226,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 					localCC = localMinCC;
 					localIndex = localMinIndex;
 				}
-				indexChange = round((ccCurr-localCC)/threshold);
+				indexChange = myRound((ccCurr-localCC)/threshold);
 				shadeIndex = localIndex + indexChange;
 				shade = getShade(shadeIndex);
 			}
