@@ -19,5 +19,6 @@ void writeSeq2File(vector< vector<int> > &vec, String name);
 void writeSeq2File(vector< vector<double> > &vec, String name);
 void writeSeq2File(vector<double> &vec, String name);
 void writeSeq2File(vector< vector<long double> > &vec, String name);
+void writeSeq2File(vector<Point> &ptVec, String name);
 
 #endif /* WRITE_H_ */

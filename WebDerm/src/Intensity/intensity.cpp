@@ -180,80 +180,81 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 	return vec2;
 }
 
-vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec) {
+vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec, String name) {
 	Color c;
-	contrast con;
+	//contrast con;
 	int flag=0;
 	double threshold = 0.2; //using round
-	unsigned int localScanSize=7;
-	String pix, shade;
-	double indexChange=0, ccCurr=0, ccPrev=0, localCC=0;
-	int shadeIndex=0, localMinIndex=0, localMaxIndex=0, localIndex=0;
-	double localMinCC=0, localMaxCC=0;
+	//unsigned int localScanSize=7;
+	String pix, shade, maxShade, minShade;
+	double indexChange=0, ccCurr=0, localCC=0;
+	int shadeIndex=0, localIndex=0, minShadeIndex=100, maxShadeIndex=-100;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
-	vector< vector<double> > cumConVec;
+	//vector< vector<double> > cumConVec;
 	vector< vector<String> > colorVec2;
 	vector<String> colorVec1;
-	deque<double> localIndexes;
-	deque<double> localCCs;
+	Point pt;
+	vector<Point> ptVec;
 	intensityVec = calcIntensityMatrix(windowVec);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
-	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
-	cumConVec = con.calcCumulativeContrast(contrastVec);
-	for(unsigned int i=0; i<cumConVec.size(); i++) {
-		for(unsigned int j=0; j<cumConVec.at(i).size(); j++) {
+	contrastVec = calcUniDimensionContrast(normIntensityVec);
+	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
+	//cumConVec = con.calcCumulativeContrast(contrastVec);
+	for(unsigned int i=0; i<normIntensityVec.size(); i++) {
+		for(unsigned int j=0; j<normIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix = c.getMainColor(pix);
-			ccCurr = cumConVec.at(i).at(j);
+			ccCurr = normIntensityVec.at(i).at(j);
 			if(flag==0 && pix!="Black") { //initial first pixel-area
 				//shade = calcShade(intensityVec.at(i).at(j));
 				shade = "High";
 				shadeIndex = getShadeIndex(shade);
-				shadeIndex = 2;
+				//shadeIndex = 2;
+				if(shadeIndex<minShadeIndex) minShadeIndex=getShadeIndex(shade);
+				if(shadeIndex>maxShadeIndex) maxShadeIndex=getShadeIndex(shade);
 				localCC = ccCurr;
 				localIndex = shadeIndex;
 				flag=1;
 			}
 			else if(flag!=0) {
-				ccPrev = cumConVec.at(i).at(j-1);
-				if((ccCurr-ccPrev)<0) {
-					localCC = localMaxCC;
-					localIndex = localMaxIndex;
-				}
-				if((ccCurr-ccPrev)>0) {
-					localCC = localMinCC;
-					localIndex = localMinIndex;
-				}
 				indexChange = myRound((ccCurr-localCC)/threshold);
-				shadeIndex = localIndex + indexChange;
+				shadeIndex = localIndex + (int)indexChange;
 				shade = getShade(shadeIndex);
+				if(shadeIndex<minShadeIndex) minShadeIndex=getShadeIndex(shade);
+				if(shadeIndex>maxShadeIndex) maxShadeIndex=getShadeIndex(shade);
+				if(ccCurr<0 || ccCurr>1) {
+					shade=""; //no shade assigned to outliers
+					pt.x = j;
+					pt.y = i;
+					ptVec.push_back(pt); //store (x,y) of outliers
+				}
 			}
-			if(pix!="Black") {
-				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
-				if(localCCs.size()==localScanSize) localCCs.pop_front();
-				localIndexes.push_back(shadeIndex);
-				localCCs.push_back(ccCurr);
-				int index = distance(localCCs.begin(),max_element(localCCs.begin(),localCCs.end()));
-				localMaxCC = localCCs.at(index);
-				localMaxIndex = localIndexes.at(index);
-				index = distance(localCCs.begin(),min_element(localCCs.begin(),localCCs.end()));
-				localMinCC = localCCs.at(index);
-				localMinIndex = localIndexes.at(index);
-			}
-			if(normIntensityVec.at(i).at(j)<0) shade = "White";
-			if(normIntensityVec.at(i).at(j)>1) shade = "Black";
 			if(pix!="Black" && pix!="White")
 				pix = shade + pix + toString(shadeIndex);
 			colorVec1.push_back(pix);
 		}
 		flag=0;
-		localIndexes.clear();
-		localCCs.clear();
 		colorVec2.push_back(colorVec1);
 		colorVec1.clear();
 	}
+	//assigning shades to outliers
+	int x=0,y=0;
+	for(unsigned int i=0; i<ptVec.size(); i++) {
+		x = ptVec.at(i).x;
+		y = ptVec.at(i).y;
+		pix = colorVec2.at(y).at(x);
+		minShade = getShade(minShadeIndex-1);
+		maxShade = getShade(maxShadeIndex+1);
+		if(normIntensityVec.at(y).at(x)<0)
+			pix = minShade+pix;
+		else if(normIntensityVec.at(y).at(x)>1)
+			pix = maxShade+pix;
+		colorVec2.at(y).at(x) = pix;
+	}
+	writeIntensityMatrix(intensityVec,name);
+	writeNormalizedIntensityMatrix(normIntensityVec,name);
 	return colorVec2;
 }
 
@@ -269,11 +270,13 @@ void Intensity::writeNormalizedIntensityMatrix(vector< vector<String> > &windowV
 }
 
 void Intensity::writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name) {
-	vector< vector<double> > normVec;
-	normVec = calcNormalizedIntensityMatrix(vec);
 	String filename = name + "NormIntensity";
-	writeSeq2File(normVec,filename);
-	vector< vector<double> >().swap(normVec);
+	writeSeq2File(vec,filename);
+}
+
+void Intensity::writeIntensityMatrix(vector< vector<double> > &intensityVec, String name) {
+	String filename = name + "ColorIntensity";
+	writeSeq2File(intensityVec,filename);
 }
 
 void Intensity::writeIntensityMatrix(vector< vector<String> > &windowVec, String name) {
@@ -314,8 +317,44 @@ void Intensity::writeIntensityMatrix(vector< vector<String> > &windowVec, String
 
 void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String name) {
 	vector< vector<String> > colorVec;
-	colorVec = calcMainColorMatrix(windowVec);
+	colorVec = calcMainColorMatrix(windowVec, name);
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
 	vector< vector<String> >().swap(colorVec);
 }
+
+vector< vector<double> > Intensity::calcUniDimensionContrast(vector< vector<double> > &intensityVec) {
+	vector< vector<double> > vec2;
+	vector<double> vec1;
+	double contrast=0,intensity=0;
+	int flag=0,counter=0;
+	for(unsigned int i=0; i<intensityVec.size(); i++) {
+		for(unsigned int j=0; j<intensityVec.at(i).size(); i++) {
+			intensity = intensityVec.at(i).at(j);
+			intensity=(intensity*range)+minIntensity;
+			if(intensity<=900 && intensity>=0 && flag==0) {
+				contrast=0;
+				flag=1;
+			}
+			if(flag==1 && counter<10) {
+				counter++;
+			}
+			if(counter==10) {
+				if(intensity>=900) contrast=0;
+				else {
+					contrast = intensityVec.at(i+2).at(j+3) + intensityVec.at(i+1).at(j+3) +
+					intensityVec.at(i).at(j+3) - intensityVec.at(i+2).at(j) -
+					intensityVec.at(i+1).at(j) - intensityVec.at(i).at(j);
+				}
+			}
+			vec1.push_back(contrast);
+		}
+		flag=0;
+		counter=0;
+		contrast=0;
+		vec2.push_back(vec1);
+		vec1.clear();
+	}
+	return vec2;
+}
+

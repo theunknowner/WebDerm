@@ -436,7 +436,7 @@ vector< vector<double> > contrast::calcContrastFromMatrix(vector< vector<double>
 	double flag=0;
 	vector<double> vec1;
 	vector< vector<double> > vec2;
-	for(unsigned int i=0; i<intensityVec.size(); i++) {
+	for(unsigned int i=10; i<intensityVec.size(); i++) {
 		for(unsigned int j=0; j<intensityVec.at(i).size(); j++) {
 			if(intensityVec.at(i).at(j)<=1 && intensityVec.at(i).at(j)>=0 && flag!=0) {//no black color
 				contrast = intensityVec.at(i).at(j) - intensityVec.at(i).at(j-1);

@@ -31,11 +31,13 @@ public:
 	String calcShade(double inten);
 	vector< vector<double> > calcNormalizedIntensityMatrix(vector< vector<double> > &vec);
 	vector< vector<double> > calcIntensityMatrix(vector< vector<String> > &windowVec);
-	vector< vector<String> > calcMainColorMatrix(vector< vector<String> > &windowVec);
+	vector< vector<String> > calcMainColorMatrix(vector< vector<String> > &windowVec,String name);
 	void writeNormalizedIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name);
+	void writeIntensityMatrix(vector< vector<double> > &intensityVec, String name);
 	void writeIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
+	vector< vector<double> > calcUniDimensionContrast(vector< vector<double> > &intensityVec);
 };
 
 #endif /* INTENSITY_H_ */
