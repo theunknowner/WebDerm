@@ -37,6 +37,8 @@ public:
 	void writeIntensityMatrix(vector< vector<double> > &intensityVec, String name);
 	void writeIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
+	void writeContrastMatrix(vector< vector<double> > &vec, String name);
+	void writeCumConMatrix(vector< vector<double> > &vec, String name);
 	vector< vector<double> > calcUniDimensionContrast(vector< vector<double> > &intensityVec);
 };
 

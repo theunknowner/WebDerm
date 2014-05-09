@@ -182,7 +182,7 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 
 vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec, String name) {
 	Color c;
-	//contrast con;
+	contrast con;
 	int flag=0;
 	double threshold = 0.2; //using round
 	//unsigned int localScanSize=7;
@@ -192,7 +192,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
 	vector< vector<double> > contrastVec;
-	//vector< vector<double> > cumConVec;
+	vector< vector<double> > cumConVec;
 	vector< vector<String> > colorVec2;
 	vector<String> colorVec1;
 	Point pt;
@@ -201,7 +201,7 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	contrastVec = calcUniDimensionContrast(normIntensityVec);
 	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
-	//cumConVec = con.calcCumulativeContrast(contrastVec);
+	cumConVec = con.calcCumulativeContrast(contrastVec);
 	for(unsigned int i=0; i<normIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<normIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -255,6 +255,8 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	}
 	writeIntensityMatrix(intensityVec,name);
 	writeNormalizedIntensityMatrix(normIntensityVec,name);
+	writeContrastMatrix(contrastVec,name);
+	writeCumConMatrix(cumConVec,name);
 	return colorVec2;
 }
 
@@ -294,7 +296,8 @@ void Intensity::writeIntensityMatrix(vector< vector<String> > &windowVec, String
 	/* write contrast */
 	contrast con;
 	vector< vector<double> > conVec;
-	conVec = con.calcContrastFromMatrix(normVec);
+	//conVec = con.calcContrastFromMatrix(normVec);
+	conVec = calcUniDimensionContrast(normVec);
 	filename = name + "ContrastNormIntensity";
 	writeSeq2File(conVec,filename);
 
@@ -323,24 +326,33 @@ void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String
 	vector< vector<String> >().swap(colorVec);
 }
 
+void Intensity::writeContrastMatrix(vector< vector<double> > &vec, String name) {
+	String filename = name + "ContrastNormIntensity";
+	writeSeq2File(vec,filename);
+}
+
+void Intensity::writeCumConMatrix(vector< vector<double> > &vec, String name) {
+	String filename = name + "CumulContrast";
+	writeSeq2File(vec,filename);
+}
+
 vector< vector<double> > Intensity::calcUniDimensionContrast(vector< vector<double> > &intensityVec) {
 	vector< vector<double> > vec2;
 	vector<double> vec1;
 	double contrast=0,intensity=0;
 	int flag=0,counter=0;
 	for(unsigned int i=0; i<intensityVec.size(); i++) {
-		for(unsigned int j=0; j<intensityVec.at(i).size(); i++) {
+		for(unsigned int j=0; j<intensityVec.at(i).size(); j++) {
 			intensity = intensityVec.at(i).at(j);
 			intensity=(intensity*range)+minIntensity;
-			if(intensity<=900 && intensity>=0 && flag==0) {
-				contrast=0;
+			if(intensity<900 && intensity>=0 && flag==0) {
 				flag=1;
 			}
 			if(flag==1 && counter<10) {
 				counter++;
 			}
 			if(counter==10) {
-				if(intensity>=900) contrast=0;
+				if(i>575 || j>575) contrast=0;
 				else {
 					contrast = intensityVec.at(i+2).at(j+3) + intensityVec.at(i+1).at(j+3) +
 					intensityVec.at(i).at(j+3) - intensityVec.at(i+2).at(j) -
