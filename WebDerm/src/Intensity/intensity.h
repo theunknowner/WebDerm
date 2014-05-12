@@ -31,6 +31,7 @@ public:
 	String calcShade(double inten);
 	vector< vector<double> > calcNormalizedIntensityMatrix(vector< vector<double> > &vec);
 	vector< vector<double> > calcIntensityMatrix(vector< vector<String> > &windowVec);
+	vector< vector<double> > calcSmoothedIntensityMatrix(vector< vector<double> > &intensityVec);
 	vector< vector<String> > calcMainColorMatrix(vector< vector<String> > &windowVec,String name);
 	void writeNormalizedIntensityMatrix(vector< vector<String> > &windowVec, String name);
 	void writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name);
@@ -39,6 +40,7 @@ public:
 	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
 	void writeContrastMatrix(vector< vector<double> > &vec, String name);
 	void writeCumConMatrix(vector< vector<double> > &vec, String name);
+	void writeSmoothIntensityMatrix(vector< vector<double> > &vec, String name);
 	vector< vector<double> > calcUniDimensionContrast(vector< vector<double> > &intensityVec);
 };
 

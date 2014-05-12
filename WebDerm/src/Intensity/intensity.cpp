@@ -180,33 +180,91 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 	return vec2;
 }
 
+vector< vector<double> > Intensity::calcSmoothedIntensityMatrix(vector< vector<double> > &intensityVec) {
+	double intensity=0;
+	double totalIntensity=0;
+	int flag=0;
+	int counter=0;
+	vector<double> vec1;
+	vector< vector<double> > vec2;
+	unsigned int x=0,y=0;
+	int scanSize=3; //3x3
+	unsigned int tempX=scanSize, tempY=scanSize; //scan size
+	while(y<intensityVec.size()) {
+		while(x<intensityVec.at(y).size()) {
+			if(x>intensityVec.size()-tempX) tempX--;
+			if(y>intensityVec.size()-tempY) tempY--;
+			for(unsigned int i=y; i<y+tempY; i++) {
+				for(unsigned int j=x; j<x+tempX; j++) {
+					intensity = intensityVec.at(i).at(j);
+					intensity = (intensity*range)+minIntensity;
+					if(i==y && j==x) {
+						if(intensity>=900)
+							flag=1;
+					}
+					if(flag==0) {
+						if(intensity<900) {
+							totalIntensity+=intensityVec.at(i).at(j);
+							counter++;
+						}
+					}
+					else {
+						totalIntensity=intensityVec.at(i).at(j);
+						goto break_nested_loop;
+					}
+				}
+			}
+break_nested_loop:
+			if(flag==0) totalIntensity /= counter;
+			vec1.push_back(totalIntensity);
+			totalIntensity=0;
+			flag=0;
+			counter=0;
+			x++;
+		}
+		vec2.push_back(vec1);
+		vec1.clear();
+		y++;
+		x=0;
+		tempX=scanSize;
+	}
+	return vec2;
+}
+
 vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec, String name) {
+	FILE * fp;
+	fp = fopen("variables.txt","w");
 	Color c;
 	contrast con;
 	int flag=0;
 	double threshold = 0.2; //using round
-	//unsigned int localScanSize=7;
+	unsigned int localScanSize=7;
 	String pix, shade, maxShade, minShade;
-	double indexChange=0, ccCurr=0, localCC=0;
-	int shadeIndex=0, localIndex=0, minShadeIndex=100, maxShadeIndex=-100;
+	double indexChange=0, ccCurr=0, localCC=0, ccPrev=0;;
+	int shadeIndex=0, localIndex=0, localMaxIndex=0, localMinIndex=0,minShadeIndex=100, maxShadeIndex=-100;
+	double localMinCC=0, localMaxCC=0;
 	vector< vector<double> > intensityVec;
 	vector< vector<double> > normIntensityVec;
+	vector< vector<double> > smoothNormIntensityVec;
 	vector< vector<double> > contrastVec;
 	vector< vector<double> > cumConVec;
 	vector< vector<String> > colorVec2;
 	vector<String> colorVec1;
 	Point pt;
 	vector<Point> ptVec;
+	deque<double> localIndexes;
+	deque<double> localCCs;
 	intensityVec = calcIntensityMatrix(windowVec);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
+	//smoothNormIntensityVec = calcSmoothedIntensityMatrix(normIntensityVec);
 	contrastVec = calcUniDimensionContrast(normIntensityVec);
 	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
 	cumConVec = con.calcCumulativeContrast(contrastVec);
-	for(unsigned int i=0; i<normIntensityVec.size(); i++) {
-		for(unsigned int j=0; j<normIntensityVec.at(i).size(); j++) {
+	for(unsigned int i=0; i<cumConVec.size(); i++) {
+		for(unsigned int j=0; j<cumConVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix = c.getMainColor(pix);
-			ccCurr = normIntensityVec.at(i).at(j);
+			ccCurr = cumConVec.at(i).at(j);
 			if(flag==0 && pix!="Black") { //initial first pixel-area
 				//shade = calcShade(intensityVec.at(i).at(j));
 				shade = "High";
@@ -219,17 +277,38 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 				flag=1;
 			}
 			else if(flag!=0) {
+				ccPrev = cumConVec.at(i).at(j-1);
+				if((ccCurr-ccPrev)<0) {
+					localCC = localMaxCC;
+					localIndex = localMaxIndex;
+				}
+				if((ccCurr-ccPrev)>0) {
+					localCC = localMinCC;
+					localIndex = localMinIndex;
+				}
 				indexChange = myRound((ccCurr-localCC)/threshold);
 				shadeIndex = localIndex + (int)indexChange;
 				shade = getShade(shadeIndex);
 				if(shadeIndex<minShadeIndex) minShadeIndex=getShadeIndex(shade);
 				if(shadeIndex>maxShadeIndex) maxShadeIndex=getShadeIndex(shade);
-				if(ccCurr<0 || ccCurr>1) {
+				if(normIntensityVec.at(i).at(j)<0 || normIntensityVec.at(i).at(j)>1) {
 					shade=""; //no shade assigned to outliers
 					pt.x = j;
 					pt.y = i;
 					ptVec.push_back(pt); //store (x,y) of outliers
 				}
+			}
+			if(pix!="Black") {
+				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
+				if(localCCs.size()==localScanSize) localCCs.pop_front();
+				localIndexes.push_back(shadeIndex);
+				localCCs.push_back(ccCurr);
+				int index = distance(localCCs.begin(),max_element(localCCs.begin(),localCCs.end()));
+				localMaxCC = localCCs.at(index);
+				localMaxIndex = localIndexes.at(index);
+				index = distance(localCCs.begin(),min_element(localCCs.begin(),localCCs.end()));
+				localMinCC = localCCs.at(index);
+				localMinIndex = localIndexes.at(index);
 			}
 			if(pix!="Black" && pix!="White")
 				pix = shade + pix + toString(shadeIndex);
@@ -253,8 +332,11 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 			pix = maxShade+pix;
 		colorVec2.at(y).at(x) = pix;
 	}
+	fprintf(fp,"MinShadeIndex: %d\n",minShadeIndex);
+	fprintf(fp,"MaxShadeIndex: %d\n",maxShadeIndex);
 	writeIntensityMatrix(intensityVec,name);
 	writeNormalizedIntensityMatrix(normIntensityVec,name);
+	writeSmoothIntensityMatrix(smoothNormIntensityVec,name);
 	writeContrastMatrix(contrastVec,name);
 	writeCumConMatrix(cumConVec,name);
 	return colorVec2;
@@ -336,6 +418,11 @@ void Intensity::writeCumConMatrix(vector< vector<double> > &vec, String name) {
 	writeSeq2File(vec,filename);
 }
 
+void Intensity::writeSmoothIntensityMatrix(vector< vector<double> > &vec, String name) {
+	String filename = name + "SmoothNormIntensity";
+	writeSeq2File(vec,filename);
+}
+
 vector< vector<double> > Intensity::calcUniDimensionContrast(vector< vector<double> > &intensityVec) {
 	vector< vector<double> > vec2;
 	vector<double> vec1;
@@ -358,6 +445,7 @@ vector< vector<double> > Intensity::calcUniDimensionContrast(vector< vector<doub
 					intensityVec.at(i).at(j+3) - intensityVec.at(i+2).at(j) -
 					intensityVec.at(i+1).at(j) - intensityVec.at(i).at(j);
 				}
+				contrast /= 3;
 			}
 			vec1.push_back(contrast);
 		}
