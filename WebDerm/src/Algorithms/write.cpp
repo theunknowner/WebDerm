@@ -99,3 +99,12 @@ void writeSeq2File(vector<Point> &ptVec, String name) {
 		fprintf(fp,"(%d,%d)\n",ptVec.at(i).x, ptVec.at(i).y);
 	}
 }
+
+void writeSeq2File(double * arr, int length, String name) {
+	String filename = name + ".txt";
+	FILE * fp;
+	fp = fopen(filename.c_str(), "w");
+	for(int i=0; i<length; i++) {
+		fprintf(fp,"%d: %d\n",i,arr[i]);
+	}
+}
