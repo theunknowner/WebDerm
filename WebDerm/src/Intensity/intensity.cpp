@@ -238,7 +238,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	//unsigned int localScanSize=7;
 	String pix, shade, maxShade, minShade;
 	double indexChange=0, ccCurr=0, localCC=0;
-	int shadeIndex=0, localIndex=0, minShadeIndex=100, maxShadeIndex=-100;
+	int shadeIndex=0, localIndex=0;
 	deque< deque<double> > intensityVec;
 	deque< deque<double> > normIntensityVec;
 	deque< deque<double> > smoothNormIntensityVec;
@@ -265,9 +265,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				//shade = calcShade(intensityVec.at(i).at(j));
 				shade = "High";
 				shadeIndex = getShadeIndex(shade);
-				//shadeIndex = 2;
-				//if(shadeIndex<minShadeIndex) minShadeIndex=getShadeIndex(shade);
-				//if(shadeIndex>maxShadeIndex) maxShadeIndex=getShadeIndex(shade);
 				localCC = ccCurr;
 				localIndex = shadeIndex;
 				flag=1;
@@ -278,8 +275,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				if(ccCurr<0) shade = "White";
 				else if(ccCurr>1) shade = "Dark";
 				else shade = getShade(shadeIndex);
-				//if(shadeIndex<minShadeIndex) minShadeIndex=getShadeIndex(shade);
-				//if(shadeIndex>maxShadeIndex) maxShadeIndex=getShadeIndex(shade);
 				/*if(smoothNormIntensityVec.at(i).at(j)<0 || smoothNormIntensityVec.at(i).at(j)>1) {
 					shade=""; //no shade assigned to outliers
 					pt.x = j;
