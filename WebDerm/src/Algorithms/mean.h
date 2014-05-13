@@ -1,18 +1,17 @@
 /*
- * median.h
+ * mean.h
  *
  *  Created on: May 12, 2014
  *      Author: jason
  */
 
-#ifndef MEDIAN_H_
-#define MEDIAN_H_
+#ifndef MEAN_H_
+#define MEAN_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/global.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
 
-double medianSorted(deque<double> &vec);
-double medianUnsorted(deque<double> &vec);
+double mean(deque<double> &vec);
 
-#endif /* MEDIAN_H_ */
+#endif /* MEAN_H_ */

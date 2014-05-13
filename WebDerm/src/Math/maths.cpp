@@ -63,3 +63,38 @@ double myRound(double value) {
 	else result=trunc(value);
 	return result;
 }
+
+double medianAbsDev(deque<double> &vec) {
+	double median=0,val=0;
+	deque<double> vec1;
+	median = medianUnsorted(vec);
+	for(unsigned int i=0; i<vec.size(); i++) {
+		val = abs(vec.at(i)-median);
+		vec1.push_back(val);
+	}
+	median = medianUnsorted(vec1);
+	return median;
+}
+
+double meanAbsDev(deque<double> &vec) {
+	double avg=0,val=0;
+	deque<double> vec1;
+	avg = mean(vec);
+	for(unsigned int i=0; i<vec.size(); i++) {
+		val = abs(vec.at(i)-avg);
+		vec1.push_back(val);
+	}
+	avg = mean(vec1);
+	return avg;
+}
+
+double standardD(deque<double> &vec) {
+	double avg=0,var=0;
+	avg = 336;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		var += pow(vec.at(i)-avg,2);
+	}
+	var /= vec.size();
+	var = sqrt(var);
+	return var;
+}

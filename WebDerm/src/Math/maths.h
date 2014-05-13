@@ -10,10 +10,14 @@
 
 
 #include "/home/jason/git/WebDerm/WebDerm/src/stdafx.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"
 
 double correlationDist(double * vec1, double * vec2);
 double cosineDist(double * vec1, double * vec2);
 double normalizeToRange(double value, int min, int max);
 double myRound(double value);
+double medianAbsDev(deque<double> &vec);
+double meanAbsDev(deque<double> &vec);
+double standardD(deque<double> &vec);
 
 #endif /* MATHS_H_ */

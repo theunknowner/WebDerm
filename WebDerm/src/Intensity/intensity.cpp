@@ -77,6 +77,7 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	}
 	quicksort(vec,0,vec.size()-1);
 	//freqOfList(vec);
+	cout << standardD(vec) << endl;
 	double t = vec.size()*thresh;
 	t = round(t);
 	for(int i=0; i<t; i++) {
