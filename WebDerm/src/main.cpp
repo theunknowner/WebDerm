@@ -47,8 +47,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 365;
-	int row = 327;
+	int col = 368;
+	int row = 324;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

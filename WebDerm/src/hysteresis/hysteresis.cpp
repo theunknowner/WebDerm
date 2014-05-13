@@ -15,16 +15,12 @@
 		FILE * fp;
 		fp = fopen("farColors.csv","w");
 		rgb rgb;
-		hsl hsl;
 		Color colorObj;
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
 		deque<String> colorWindow;
 		deque< deque<String> > windowVec;
 		deque<int> index;
-		deque<int> hueVals;
-		deque<double> hueAvg;
-		deque< deque<double> > hueVec;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -49,8 +45,6 @@
 							g = img.at<Vec3b>(y,x)[1];
 							r = img.at<Vec3b>(y,x)[2];
 							pix = rgb.checkBlack(r,g,b);
-							hsl.rgb2hsl(r,g,b);
-							hueVals.push_back(hsl.getHue());
 							if(pix=="OTHER")
 							{
 								pix = rgb.calcColor2(r,g,b);
@@ -74,9 +68,6 @@
 						g = img.at<Vec3b>(y,col+(size.width-1))[1];
 						r = img.at<Vec3b>(y,col+(size.width-1))[2];
 						pix = rgb.checkBlack(r,g,b);
-						hsl.rgb2hsl(r,g,b);
-						hueVals.pop_front();
-						hueVals.push_back(hsl.getHue());
 						if(pix=="OTHER")
 						{
 							pix = rgb.calcColor2(r,g,b);
@@ -92,7 +83,6 @@
 						pixelColorWindow.push_back(pix);
 					}
 				}
-				hueAvg.push_back(hsl.calcHueAvg(hueVals));
 				for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 				{
 					for(unsigned int j=0; j<mainColors.size(); j++)
@@ -144,10 +134,7 @@
 				index.clear();
 				++col;
 			}//end while col
-			hueVec.push_back(hueAvg);
 			windowVec.push_back(colorWindow);
-			hueAvg.clear();
-			hueVals.clear();
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			col=0; ++row;
@@ -162,9 +149,6 @@
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
-		deque<int>().swap(hueVals);
-		deque<double>().swap(hueAvg);
-		deque< deque<double> >().swap(hueVec);
 		deque<int>().swap(index);
 	}
 

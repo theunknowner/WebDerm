@@ -18,6 +18,7 @@ double normalizeToRange(double value, int min, int max);
 double myRound(double value);
 double medianAbsDev(deque<double> &vec);
 double meanAbsDev(deque<double> &vec);
-double standardD(deque<double> &vec);
+double standardDevSort(deque<double> &vec);
+double standardDevNoSort(deque<double> &vec);
 
 #endif /* MATHS_H_ */

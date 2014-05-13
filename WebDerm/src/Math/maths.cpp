@@ -88,13 +88,34 @@ double meanAbsDev(deque<double> &vec) {
 	return avg;
 }
 
-double standardD(deque<double> &vec) {
+//standardDev with sorting
+double standardDevSort(deque<double> &vec) {
 	double avg=0,var=0;
-	avg = 336;
+	quicksort(vec,0,vec.size()-1);
+	double min = vec.at(0);
+	double max = vec.at(vec.size()-1);
+	avg = (min+max)/2;
+	//avg = mean(vec);
 	for(unsigned int i=0; i<vec.size(); i++) {
 		var += pow(vec.at(i)-avg,2);
 	}
 	var /= vec.size();
 	var = sqrt(var);
+	return var;
+}
+
+//requires sorting before hand
+double standardDevNoSort(deque<double> &vec) {
+	double avg=0,var=0;
+	double min = vec.at(0);
+	double max = vec.at(vec.size()-1);
+	avg = (min+max)/2;
+	//avg = mean(vec);
+	for(unsigned int i=0; i<vec.size(); i++) {
+		var += pow(vec.at(i)-avg,2);
+	}
+	var /= vec.size();
+	var = sqrt(var);
+	var = round(var);
 	return var;
 }

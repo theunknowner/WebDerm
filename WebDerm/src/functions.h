@@ -13,6 +13,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/mean.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/stddev.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
