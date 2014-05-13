@@ -10,7 +10,7 @@
 void drawOutlineOnMouseEvent(int evt, int x, int y, int flags, void* param)
 {
 	Mat* img = (Mat*) param;
-	static vector<Point> vecPoints;
+	static deque<Point> vecPoints;
 	if(evt == CV_EVENT_LBUTTONDOWN)
 	{
 		if(vecPoints.size()==0)
@@ -41,8 +41,8 @@ void graphHue(Mat &img) {
 	hsl hsl;
 	int r,g,b;
 	double hue=0;
-	vector<double> hueVals;
-	vector< vector<double> > hueVec;
+	deque<double> hueVals;
+	deque< deque<double> > hueVec;
 	for(int row=0; row<img.rows; row++) {
 		for(int col=0; col<img.cols; col++) {
 			r = img.at<Vec3b>(row,col)[2];

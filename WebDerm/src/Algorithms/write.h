@@ -13,12 +13,12 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/global.h"
 
-void writeSeq2File(vector< vector<String> > &vec, String name);
-void writeSeq2File(vector< vector<String> > &vec, String pathname,String name);
-void writeSeq2File(vector< vector<int> > &vec, String name);
-void writeSeq2File(vector< vector<double> > &vec, String name);
-void writeSeq2File(vector<double> &vec, String name);
-void writeSeq2File(vector< vector<long double> > &vec, String name);
-void writeSeq2File(vector<Point> &ptVec, String name);
+void writeSeq2File(deque< deque<String> > &vec, String name);
+void writeSeq2File(deque< deque<String> > &vec, String pathname,String name);
+void writeSeq2File(deque< deque<int> > &vec, String name);
+void writeSeq2File(deque< deque<double> > &vec, String name);
+void writeSeq2File(deque<double> &vec, String name);
+void writeSeq2File(deque< deque<long double> > &vec, String name);
+void writeSeq2File(deque<Point> &ptVec, String name);
 
 #endif /* WRITE_H_ */

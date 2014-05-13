@@ -18,7 +18,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	double dist=0;
 	double hue=0;
 	double colorIntensity=0;
-	vector<int> index;
+	deque<int> index;
 	String pix;
 	deque<int> hueVals;
 	deque<String> pixelColorWindow;
@@ -110,7 +110,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	else pix = "NOISE";
 
 	cout << "COLORINT:" << in.calcIntensity(pix) << endl;
-	vector<int>().swap(index);
+	deque<int>().swap(index);
 	deque<String>().swap(pixelColorWindow);
 	//img.release();
 	return pix;
@@ -118,12 +118,12 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 
 //hysteresis with info output to image window using vectors
 String testMouseHysteresis(Mat &img, int row, int col, Size size,
-						   vector<Vec3b> &vec, vector<String> &colorVec)
+						   deque<Vec3b> &vec, deque<String> &colorVec)
 {
 	rgb rgb;
 	Color colorObj;
 	int b,g,r;
-	vector<int> index;
+	deque<int> index;
 	String pix;
 	deque<String> pixelColorWindow;
 	int colorIndex[rgbColors.size()];
@@ -195,7 +195,7 @@ String testMouseHysteresis(Mat &img, int row, int col, Size size,
 	}
 	else pix = "NOISE";
 
-	vector<int>().swap(index);
+	deque<int>().swap(index);
 	deque<String>().swap(pixelColorWindow);
 	//img.release();
 	return pix;
@@ -216,8 +216,8 @@ void testSatLum(Mat &img)
 	int r,g,b,hue;
 	double lum=0, sat=0;
 	char text[20];
-	vector<String> vec;
-	vector< vector<String> > windowVec;
+	deque<String> vec;
+	deque< deque<String> > windowVec;
 	for(int row=0; row<img.rows; row++)
 	{
 		for(int col=0; col<img.cols; col++)
@@ -238,8 +238,8 @@ void testSatLum(Mat &img)
 		vec.clear();
 	}
 	writeSeq2File(windowVec,path,"satlum");
-	vector< vector<String> >().swap(windowVec);
-	vector<String>().swap(vec);
+	deque< deque<String> >().swap(windowVec);
+	deque<String>().swap(vec);
 	hsl.release_memory();
 }
 

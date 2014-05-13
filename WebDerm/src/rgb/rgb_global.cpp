@@ -7,10 +7,10 @@
 
 #include "rgb_global.h"
 
-vector< vector<double> > normMeanThresh;
-vector< vector<double> > absMeanThresh;
-vector< vector<double> > absThresh;
-vector< vector<double> > normThresh;
-vector<String> rgbColors;
-vector<String> mainColors;
-vector<double> colorFactors;
+deque< deque<double> > normMeanThresh;
+deque< deque<double> > absMeanThresh;
+deque< deque<double> > absThresh;
+deque< deque<double> > normThresh;
+deque<String> rgbColors;
+deque<String> mainColors;
+deque<double> colorFactors;

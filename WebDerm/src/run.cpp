@@ -12,8 +12,8 @@ void runCheckRGBColor()
 	rgb rgb;
 	rgb.importThresholds();
 	String str;
-	vector<String> strVec;
-	vector<int> rgbVec;
+	deque<String> strVec;
+	deque<int> rgbVec;
 	int ch=0;
 	for(;;)
 	{
@@ -36,8 +36,8 @@ void runCheckRGBColor()
 				break;
 			}
 		}
-		vector<String>().swap(strVec);
-		vector<int>().swap(rgbVec);
+		deque<String>().swap(strVec);
+		deque<int>().swap(rgbVec);
 	}
 }
 
@@ -52,8 +52,8 @@ void runCheckList()
 	{
 		rgb.importThresholds();
 		String temp, str;
-		vector<int> rgbVec;
-		vector<String> strVec;
+		deque<int> rgbVec;
+		deque<String> strVec;
 		char delimit = ',';
 		bool flag;
 		getline(fs,temp);
@@ -80,8 +80,8 @@ void runCheckList()
 			strVec.clear();
 			rgbVec.clear();
 		}
-		vector<int>().swap(rgbVec);
-		vector<String>().swap(strVec);
+		deque<int>().swap(rgbVec);
+		deque<String>().swap(strVec);
 		fs.close();
 	}
 	else
@@ -93,7 +93,7 @@ void runCheckList()
 Mat runResizeImage(String foldername, String filename, Size size,int write)
 {
 	String file = foldername+"/"+filename;
-	vector<String> vec;
+	deque<String> vec;
 	Mat img = imread(file);
 	Mat img2;
 	if(img.cols>=size.width || img.rows>=size.height)
@@ -103,13 +103,13 @@ Mat runResizeImage(String foldername, String filename, Size size,int write)
 	getSubstr(filename,'.',vec);
 	if(write==1) imwrite(vec[0]+".png",img2);
 
-	vector<String>().swap(vec);
+	deque<String>().swap(vec);
 	return img2;
 }
 
 Mat runResizeImage(String filename, Size size,int write)
 {
-	vector<String> vec;
+	deque<String> vec;
 	Mat img = imread(filename);
 	Mat img2;
 	if(img.cols>=size.width || img.rows>=size.height)
@@ -120,7 +120,7 @@ Mat runResizeImage(String filename, Size size,int write)
 	if(write==1) imwrite(vec[0]+".png",img2);
 
 	img.release();
-	vector<String>().swap(vec);
+	deque<String>().swap(vec);
 	return img2;
 }
 

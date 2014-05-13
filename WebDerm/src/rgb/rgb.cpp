@@ -34,9 +34,9 @@ bool rgb::importThresholds()
 	if(fsThresh.is_open() && fsColors.is_open())
 	{
 		String temp;
-		vector<String> vec;
-		vector<double> thresh;
-		vector<double> thresh2;
+		deque<String> vec;
+		deque<double> thresh;
+		deque<double> thresh2;
 		while(getline(fsColors,temp))
 		{
 			getSubstr(temp,',',vec);
@@ -70,9 +70,9 @@ bool rgb::importThresholds()
 			vec.clear(); thresh.clear(); thresh2.clear();
 		}
 		fsColors.close(); fsThresh.close();
-		vector<String>().swap(vec);
-		vector<double>().swap(thresh);
-		vector<double>().swap(thresh2);
+		deque<String>().swap(vec);
+		deque<double>().swap(thresh);
+		deque<double>().swap(thresh2);
 		String().swap(temp);
 		setThreshImported(true);
 		return true;
@@ -85,7 +85,7 @@ bool rgb::importThresholds()
 }
 
 //calculate the Euclidean Distance betweeen normalized rgb input and colors(vec).
-double rgb::normEucDist(double red, double green, double blue, vector<double> &vec)
+double rgb::normEucDist(double red, double green, double blue, deque<double> &vec)
 	{
 		double result=0;
 		double color[3] = {red,green,blue};
@@ -102,7 +102,7 @@ double rgb::normEucDist(double red, double green, double blue, vector<double> &v
 	}
 
 //calculates the Euclidean Distance between absolute rgb input and colors(vec).
-double rgb::absEucDist(double red, double green, double blue, vector<double> &vec)
+double rgb::absEucDist(double red, double green, double blue, deque<double> &vec)
 	{
 		double result=0;
 		double color[3] = {red,green,blue};
@@ -116,7 +116,7 @@ double rgb::absEucDist(double red, double green, double blue, vector<double> &ve
 		return result;
 	}
 
-double rgb::absEucDist(double red, double green, double blue, vector<int> &vec)
+double rgb::absEucDist(double red, double green, double blue, deque<int> &vec)
 	{
 		double result=0;
 		double color[3] = {red,green,blue};
@@ -433,8 +433,8 @@ double rgb::getColorLevel(String color, String mainColor)
 
 void rgb::getLevels(String color, int * level)
 {
-	vector<size_t> posVec;
-	vector<String> colors;
+	deque<size_t> posVec;
+	deque<String> colors;
 	int count=0;
 	size_t pos=0;
 	String lvl;
@@ -473,8 +473,8 @@ void rgb::getLevels(String color, int * level)
 				colors.at(0).size()-(posVec.at(0)+colors.at(0).size()));
 		level[2] = atoi(lvl.c_str());
 	}
-	vector<size_t>().swap(posVec);
-	vector<String>().swap(colors);
+	deque<size_t>().swap(posVec);
+	deque<String>().swap(colors);
 }
 
 double rgb::calcIntensity(double red, double green, double blue)
@@ -517,12 +517,12 @@ void rgb::showPixelColorAtLoc(Mat img, int row, int col, Size size)
 
 void rgb::release_memory()
 {
-	vector< vector<double> >().swap(normMeanThresh);
-	vector< vector<double> >().swap(absMeanThresh);
-	vector< vector<double> >().swap(normThresh);
-	vector< vector<double> >().swap(absThresh);
-	vector<String>().swap(rgbColors);
-	vector<String>().swap(mainColors);
+	deque< deque<double> >().swap(normMeanThresh);
+	deque< deque<double> >().swap(absMeanThresh);
+	deque< deque<double> >().swap(normThresh);
+	deque< deque<double> >().swap(absThresh);
+	deque<String>().swap(rgbColors);
+	deque<String>().swap(mainColors);
 }
 
 double rgb::calcGrayLevel2(double satLevel, double lum) {

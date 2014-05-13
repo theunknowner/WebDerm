@@ -24,20 +24,20 @@ public:
 public:
 	double calcColorfulness(double hue, String color);
 	double calcContrast(double hue1, double hue2, String color1, String color2);
-	void calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
-	vector< vector<double> > calcContrastFromMatrix(vector< vector<double> > &intensityVec);
+	void calcContrastFromMatrix(deque< deque<String> > &windowVec, deque< deque<double> > &hueVec, String name);
+	deque< deque<double> > calcContrastFromMatrix(deque< deque<double> > &intensityVec);
 	double calcIntensity(double hue, String color);
 	void colorfulnessMatrix1x1(Mat &img, String name);
-	void calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec, String name);
+	void calcColorfulnessMatrix(deque< deque<String> > &windowVec, deque< deque<double> > &hueVec, String name);
 	void colorfulMatrix(Mat img, Size size, String name);
 	double getContrastAngle(double hue1, double hue2, String color1, String color2);
 	double calcContrastAngle(double hue1, double hue2, double colorfn1, double colorfn2);
-	void shadeOfFeature(vector<double> &feature);
+	void shadeOfFeature(deque<double> &feature);
 	String getShade(double feature);
-	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
+	void writeMainColorMatrix(deque< deque<String> > &windowVec, String name);
 
-	vector< vector<double> > calcCumulativeContrast(vector< vector<double> > &vec);
-	void writeCumulativeContrast(vector< vector<double> > &vec, String name);
+	deque< deque<double> > calcCumulativeContrast(deque< deque<double> > &vec);
+	void writeCumulativeContrast(deque< deque<double> > &vec, String name);
 };
 
 #endif /* CONTRAST_H_ */

@@ -1,17 +1,18 @@
 /*
- * stddev.h
+ * median.h
  *
- *  Created on: May 6, 2014
+ *  Created on: May 12, 2014
  *      Author: jason
  */
 
-#ifndef STDDEV_H_
-#define STDDEV_H_
+#ifndef MEDIAN_H_
+#define MEDIAN_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/global.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
 
-double standardDev(deque<double> &input);
+double medianSorted(deque<double> &vec);
+double medianUnSorted(deque<double> &vec);
 
-#endif /* STDDEV_H_ */
+#endif /* MEDIAN_H_ */

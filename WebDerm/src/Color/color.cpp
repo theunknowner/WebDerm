@@ -38,7 +38,7 @@ int Color::containsMainColor(String color, String mColor)
 bool Color::isSameColor(String color1, String color2)
 {
 	int count1,count2;
-	vector<String> vec1, vec2;
+	deque<String> vec1, vec2;
 	extractColorFromString(color1,vec1);
 	extractColorFromString(color2, vec2);
 	if(vec1.size()>=3 || vec2.size()>=3) {
@@ -56,7 +56,7 @@ bool Color::isSameColor(String color1, String color2)
 	return false;
 }
 
-void Color::extractColorFromString(String color, vector<String> &vecColor) {
+void Color::extractColorFromString(String color, deque<String> &vecColor) {
 	for(unsigned int i=0; i<mainColors.size(); i++) {
 		if(containsMainColor(color,mainColors.at(i))) {
 			vecColor.push_back(mainColors.at(i));
@@ -78,7 +78,7 @@ int Color::countColors(String color) {
 //gets color and recalculates gray and color levels
 String Color::reassignLevels(String color, int r, int g, int b) {
 	rgb rgb;
-	vector<String> colorVec;
+	deque<String> colorVec;
 	String pix;
 	double grayLevel=0;
 	double colorLevel=0;

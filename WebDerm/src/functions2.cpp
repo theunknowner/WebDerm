@@ -9,7 +9,7 @@
 #include "test.h"
 
 //generic getSubstr function
-void getSubstr(String str, char delimiter, vector<String> &vec)
+void getSubstr(String str, char delimiter, deque<String> &vec)
 {
 	String temp;
 	int j=0;
@@ -115,8 +115,8 @@ void onMouseHysteresis2(int evt, int x, int y, int flags, void* param) {
 	char arrText[9][50];
 	int ptY = 30;
 	String color;
-	vector<Vec3b> vecRGB;
-	vector<String> colorVec;
+	deque<Vec3b> vecRGB;
+	deque<String> colorVec;
     Mat* rgb = (Mat*) param;
     Mat img2 = img2.zeros(Size(300,300),(*rgb).type());
     Mat img3 = (*rgb).clone();
@@ -170,12 +170,12 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param)
     imshow("Info",img3);
 }
 
-void importMatrix2Double2D(String filename, vector< vector<double> > &matrix) {
+void importMatrix2Double2D(String filename, deque< deque<double> > &matrix) {
 	fstream fs(filename.c_str());
 	if(fs.is_open()) {
 		String temp;
-		vector<String> vec;
-		vector<double> vec1;
+		deque<String> vec;
+		deque<double> vec1;
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {

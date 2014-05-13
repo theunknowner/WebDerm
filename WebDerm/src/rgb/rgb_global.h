@@ -10,12 +10,12 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/src/global.h"
 
-extern vector< vector<double> > normMeanThresh;
-extern vector< vector<double> > absMeanThresh;
-extern vector< vector<double> > absThresh;
-extern vector< vector<double> > normThresh;
-extern vector<String> rgbColors;
-extern vector<String> mainColors;
-extern vector<double> colorFactors;
+extern deque< deque<double> > normMeanThresh;
+extern deque< deque<double> > absMeanThresh;
+extern deque< deque<double> > absThresh;
+extern deque< deque<double> > normThresh;
+extern deque<String> rgbColors;
+extern deque<String> mainColors;
+extern deque<double> colorFactors;
 
 #endif /* RGB_GLOBAL_H_ */

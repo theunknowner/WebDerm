@@ -11,11 +11,11 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/global.h"
 
 extern double H, S, L, B;
-extern vector<String> hslColors;
-extern vector< vector<int> > hueThresh;
-extern vector< vector<double> > satThresh;
-extern vector< vector<double> > lumThresh;
-extern vector< vector<double> > satLevel;
-extern vector< vector<double> > lumLevel;
+extern deque<String> hslColors;
+extern deque< deque<int> > hueThresh;
+extern deque< deque<double> > satThresh;
+extern deque< deque<double> > lumThresh;
+extern deque< deque<double> > satLevel;
+extern deque< deque<double> > lumLevel;
 
 #endif /* HSL_GLOBAL_H_ */

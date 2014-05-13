@@ -8,9 +8,9 @@
 #include "hsl_global.h"
 
 double H, S, L, B;
-vector<String> hslColors;
-vector< vector<int> > hueThresh;
-vector< vector<double> > satThresh;
-vector< vector<double> > lumThresh;
-vector< vector<double> > satLevel;
-vector< vector<double> > lumLevel;
+deque<String> hslColors;
+deque< deque<int> > hueThresh;
+deque< deque<double> > satThresh;
+deque< deque<double> > lumThresh;
+deque< deque<double> > satLevel;
+deque< deque<double> > lumLevel;

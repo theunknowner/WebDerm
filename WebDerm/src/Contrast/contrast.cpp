@@ -18,8 +18,8 @@ double contrast::calcColorfulness(double hue, String color) {
 	fill_n(colorfn,mainColors.size(),0);
 	double totalLevel=0;
 	double totalColorfn=0;
-	vector<int> index;
-	vector<double> vec,vec2;
+	deque<int> index;
+	deque<double> vec,vec2;
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
 		cHue[i] = hue;
 		if(color.find(mainColors.at(i))!=string::npos) {
@@ -66,15 +66,15 @@ double contrast::getContrastAngle(double hue1, double hue2, String color1, Strin
 	return angleContrast;
 }
 //change between calcContrast and calcContrast2 for diff options
-void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec,String name) {
+void contrast::calcContrastFromMatrix(deque< deque<String> > &windowVec, deque< deque<double> > &hueVec,String name) {
 	double contrast=0;
 	double feature=0;
 	String color1,color2;
 	double hue1,hue2;
-	vector<double> vec;
-	vector< vector<double> > vec2;
-	vector<double> fVec1;
-	vector< vector<double> > fVec2;
+	deque<double> vec;
+	deque< deque<double> > vec2;
+	deque<double> fVec1;
+	deque< deque<double> > fVec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
 			color1 = windowVec.at(i).at(j);
@@ -99,8 +99,8 @@ void contrast::calcContrastFromMatrix(vector< vector<String> > &windowVec, vecto
 	writeSeq2File(vec2,name);
 	String filename = name + "Feature";
 	writeSeq2File(fVec2,filename);
-	vector<double>().swap(vec);
-	vector< vector<double> >().swap(vec2);
+	deque<double>().swap(vec);
+	deque< deque<double> >().swap(vec2);
 }
 
 void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
@@ -111,8 +111,8 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 	Color c;
 	double colorfn;
 	double hue;
-	vector<double> clrfn;
-	vector< vector<double> > clrfnVec;
+	deque<double> clrfn;
+	deque< deque<double> > clrfnVec;
 	int ind=0;
 	double dist=0;
 	String pix;
@@ -143,13 +143,13 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 	writeSeq2File(clrfnVec,filename);
 }
 //used for calculating 2x2 colorfulness
-void contrast::calcColorfulnessMatrix(vector< vector<String> > &windowVec, vector< vector<double> > &hueVec,String name) {
+void contrast::calcColorfulnessMatrix(deque< deque<String> > &windowVec, deque< deque<double> > &hueVec,String name) {
 	String file;
 	double colorfn=0;
 	String color;
 	double hue;
-	vector<double> vec;
-	vector< vector<double> > vec2;
+	deque<double> vec;
+	deque< deque<double> > vec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<(windowVec.at(i).size()-1); j++) {
 			color = windowVec.at(i).at(j);
@@ -162,8 +162,8 @@ void contrast::calcColorfulnessMatrix(vector< vector<String> > &windowVec, vecto
 	}
 	file = name + "Colorfn2x2";
 	writeSeq2File(vec2,file);
-	vector<double>().swap(vec);
-	vector< vector<double> >().swap(vec2);
+	deque<double>().swap(vec);
+	deque< deque<double> >().swap(vec2);
 }
 
 void contrast::colorfulMatrix(Mat img, Size size, String name)
@@ -174,12 +174,12 @@ void contrast::colorfulMatrix(Mat img, Size size, String name)
 		Color colorObj;
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
-		vector<String> colorWindow;
-		vector< vector<String> > windowVec;
-		vector<int> index;
+		deque<String> colorWindow;
+		deque< deque<String> > windowVec;
+		deque<int> index;
 		deque<int> hueVals;
-		vector<double> hueAvg;
-		vector< vector<double> > hueVec;
+		deque<double> hueAvg;
+		deque< deque<double> > hueVec;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -306,12 +306,12 @@ void contrast::colorfulMatrix(Mat img, Size size, String name)
 		//writeSeq2File(windowVec,name);
 		con.calcColorfulnessMatrix(windowVec,hueVec,name);
 		deque<String>().swap(pixelColorWindow);
-		vector<String>().swap(colorWindow);
-		vector< vector<String> >().swap(windowVec);
+		deque<String>().swap(colorWindow);
+		deque< deque<String> >().swap(windowVec);
 		deque<int>().swap(hueVals);
-		vector<double>().swap(hueAvg);
-		vector< vector<double> >().swap(hueVec);
-		vector<int>().swap(index);
+		deque<double>().swap(hueAvg);
+		deque< deque<double> >().swap(hueVec);
+		deque<int>().swap(index);
 	}
 
 double contrast::calcContrastAngle(double hue1, double hue2, double colorfn1, double colorfn2) {
@@ -328,7 +328,7 @@ double contrast::calcContrastAngle(double hue1, double hue2, double colorfn1, do
 	return angle;
 }
 
-void contrast::shadeOfFeature(vector<double> &feature) {
+void contrast::shadeOfFeature(deque<double> &feature) {
 	min = feature.at(0);
 	max = feature.at(1);
 	for(unsigned int i=0; i<feature.size(); i++) {
@@ -359,18 +359,18 @@ String contrast::getShade(double feature) {
 	return shade;
 }
 
-void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String name) {
+void contrast::writeMainColorMatrix(deque< deque<String> > &windowVec, String name) {
 	double contrast=0;
 	double feature=0;
 	int flag=0;
 	Point pt; //pointer to hold x,y of color window
 	String color1,color2;
-	vector<double> vec;
-	vector< vector<double> > vec2;
-	vector<double> fVec1;
-	vector< vector<double> > fVec2;
-	vector<Point> ptVec1; //pointerVec to hold all pointers
-	vector <vector<Point> > ptVec2;
+	deque<double> vec;
+	deque< deque<double> > vec2;
+	deque<double> fVec1;
+	deque< deque<double> > fVec2;
+	deque<Point> ptVec1; //pointerVec to hold all pointers
+	deque <deque<Point> > ptVec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<(windowVec.at(i).size()-2); j++) {
 			color1 = windowVec.at(i).at(j);
@@ -401,8 +401,8 @@ void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String 
 	int x=0,y=0;
 	String pix;
 	String shade;
-	vector<String> strVec;
-	vector< vector<String> > strVec2;
+	deque<String> strVec;
+	deque< deque<String> > strVec2;
 	for(unsigned int i=0; i<ptVec2.size(); i++) {
 		shadeOfFeature(fVec2.at(i));
 		for(unsigned int j=0; j<ptVec2.at(i).size(); j++) {
@@ -421,21 +421,21 @@ void contrast::writeMainColorMatrix(vector< vector<String> > &windowVec, String 
 	}
 	String filename = name +"MainColors";
 	writeSeq2File(strVec2,filename);
-	vector<double>().swap(vec);
-	vector<double>().swap(fVec1);
-	vector< vector<double> >().swap(vec2);
-	vector< vector<double> >().swap(fVec2);
-	vector<String>().swap(strVec);
-	vector< vector<String> >().swap(strVec2);
-	vector<Point>().swap(ptVec1);
-	vector< vector<Point> >().swap(ptVec2);
+	deque<double>().swap(vec);
+	deque<double>().swap(fVec1);
+	deque< deque<double> >().swap(vec2);
+	deque< deque<double> >().swap(fVec2);
+	deque<String>().swap(strVec);
+	deque< deque<String> >().swap(strVec2);
+	deque<Point>().swap(ptVec1);
+	deque< deque<Point> >().swap(ptVec2);
 }
 
-vector< vector<double> > contrast::calcContrastFromMatrix(vector< vector<double> > &intensityVec) {
+deque< deque<double> > contrast::calcContrastFromMatrix(deque< deque<double> > &intensityVec) {
 	double contrast=0;
 	double flag=0;
-	vector<double> vec1;
-	vector< vector<double> > vec2;
+	deque<double> vec1;
+	deque< deque<double> > vec2;
 	for(unsigned int i=10; i<intensityVec.size(); i++) {
 		for(unsigned int j=0; j<intensityVec.at(i).size(); j++) {
 			if(intensityVec.at(i).at(j)<=1 && intensityVec.at(i).at(j)>=0 && flag!=0) {//no black color
@@ -459,10 +459,10 @@ vector< vector<double> > contrast::calcContrastFromMatrix(vector< vector<double>
 	return vec2;
 }
 
-vector< vector<double> > contrast::calcCumulativeContrast(vector< vector<double> > &vec) {
+deque< deque<double> > contrast::calcCumulativeContrast(deque< deque<double> > &vec) {
 	double contrast=0;
-	vector<double>	contrastVec1;
-	vector< vector<double> > contrastVec2;
+	deque<double>	contrastVec1;
+	deque< deque<double> > contrastVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		for(unsigned int j=0; j<vec.at(i).size(); j++) {
 			contrast += vec.at(i).at(j);
@@ -475,10 +475,10 @@ vector< vector<double> > contrast::calcCumulativeContrast(vector< vector<double>
 	return contrastVec2;
 }
 
-void contrast::writeCumulativeContrast(vector< vector<double> > &vec, String name) {
-	vector< vector<double> > conVec;
+void contrast::writeCumulativeContrast(deque< deque<double> > &vec, String name) {
+	deque< deque<double> > conVec;
 	conVec = calcCumulativeContrast(vec);
 	String filename = name + "CumulContrast";
 	writeSeq2File(conVec,filename);
-	vector< vector<double> >().swap(conVec);
+	deque< deque<double> >().swap(conVec);
 }

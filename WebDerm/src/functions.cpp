@@ -428,7 +428,7 @@ double roundDecimal(double num, int places)
 		return img2;
 	}
 
-	void match_color_seq(char colorSequence[], int length, vector<String> strArr, int * seq, FILE *fp)
+	void match_color_seq(char colorSequence[], int length, deque<String> strArr, int * seq, FILE *fp)
 	{
 		String temp;
 		String str(colorSequence, length);

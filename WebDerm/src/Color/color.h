@@ -19,7 +19,7 @@ public:
 	bool containsColor(String color1, String color2);
 	int containsMainColor(String color, String mColor);
 	bool isSameColor(String color1, String color2);
-	void extractColorFromString(String color, vector<String> &vecColor);
+	void extractColorFromString(String color, deque<String> &vecColor);
 	int countColors(String color);
 	String reassignLevels(String color, int r, int g, int b);
 	String getMainColor(String color);

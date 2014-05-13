@@ -14,9 +14,9 @@ const int delta=1;
 double biasWeight[SIZE];
 double normWeight[SIZE][SIZE];
 double absWeight[SIZE][SIZE];
-vector<double> normVector;
-vector<double> absVector;
-vector<double> outputVector;
+deque<double> normVector;
+deque<double> absVector;
+deque<double> outputVector;
 
 bool getData(String filename)
 	{
@@ -30,7 +30,7 @@ bool getData(String filename)
 	void importTrainingData(ifstream &data)
 	{
 		String temp, token;
-		vector<String> str;
+		deque<String> str;
 		int line=0;
 		size_t pos=0;
 		String delimiter = ",";
@@ -227,8 +227,8 @@ bool getData(String filename)
 		fp = fopen(outFileData.c_str(), "a");
 		fstream inFile(inFileRGB.c_str());
 		String temp;
-		vector<int> val;
-		vector<vector<int> > RGB;
+		deque<int> val;
+		deque<deque<int> > RGB;
 		double normDistVals[normMeanThresh.size()];
 		double absDistVals[absMeanThresh.size()];
 		int rgbVal[3];

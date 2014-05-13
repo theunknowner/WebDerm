@@ -25,10 +25,10 @@ bool hsl::importHslThresholds() {
 		return false;
 	}
 	String temp;
-	vector<String> vec;
-	vector<int> thresh;
-	vector<double> thresh2;
-	vector<double> thresh3;
+	deque<String> vec;
+	deque<int> thresh;
+	deque<double> thresh2;
+	deque<double> thresh3;
 	getline(fsThresh,temp);
 	while(getline(fsThresh,temp)) {
 		getSubstr(temp,',',vec);
@@ -44,10 +44,10 @@ bool hsl::importHslThresholds() {
 		vec.clear(); thresh.clear(); thresh2.clear(); thresh3.clear();
 	}
 	fsThresh.close();
-	vector<String>().swap(vec);
-	vector<int>().swap(thresh);
-	vector<double>().swap(thresh2);
-	vector<double>().swap(thresh3);
+	deque<String>().swap(vec);
+	deque<int>().swap(thresh);
+	deque<double>().swap(thresh2);
+	deque<double>().swap(thresh3);
 	String().swap(temp);
 	setThreshImported(true);
 	return true;
@@ -63,9 +63,9 @@ bool hsl::importLsThreshold()
 	if(fsThresh.is_open() && fsThresh2.is_open())
 	{
 		String temp;
-		vector<String> vec;
-		vector<double> thresh;
-		vector<double> thresh2;
+		deque<String> vec;
+		deque<double> thresh;
+		deque<double> thresh2;
 		getline(fsThresh,temp);
 		while(getline(fsThresh,temp))
 		{
@@ -89,9 +89,9 @@ bool hsl::importLsThreshold()
 			vec.clear(); thresh2.clear();
 		}
 		fsThresh.close(); fsThresh2.close();
-		vector<String>().swap(vec);
-		vector<double>().swap(thresh);
-		vector<double>().swap(thresh2);
+		deque<String>().swap(vec);
+		deque<double>().swap(thresh);
+		deque<double>().swap(thresh2);
 		return true;
 	}
 	else
@@ -268,7 +268,7 @@ double hsl::minRGB(double red, double green, double blue)
 String hsl::getHslColor(double r,double g,double b)
 {
 	int flag[3];
-	vector<int> index;
+	deque<int> index;
 	String color;
 	rgb2hsl(r,g,b);
 	for(unsigned int i=0; i<hslColors.size(); i++)
@@ -295,16 +295,16 @@ String hsl::getHslColor(double r,double g,double b)
 	{
 		color += hslColors.at(index[i]);
 	}
-	vector<int>().swap(index);
+	deque<int>().swap(index);
 	return color;
 }
 
 void hsl::release_memory()
 {
-	vector<String>().swap(hslColors);
-	vector< vector<int> >().swap(hueThresh);
-	vector< vector<double> >().swap(satThresh);
-	vector< vector<double> >().swap(lumThresh);
+	deque<String>().swap(hslColors);
+	deque< deque<int> >().swap(hueThresh);
+	deque< deque<double> >().swap(satThresh);
+	deque< deque<double> >().swap(lumThresh);
 }
 
 //customize calcuation of hue avg

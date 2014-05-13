@@ -11,13 +11,13 @@
 #include "global.h"
 #include "functions.h"
 
-void getSubstr(String str, char delimiter, vector<String> &vec);
+void getSubstr(String str, char delimiter, deque<String> &vec);
 void getCoordinates(Mat &img, int red, int green, int blue);
 String getImageName(String filename);
 void mouseEvent(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis2(int evt, int x, int y, int flags, void* param);
 void onMouseCheckColor(int event, int x, int y, int flags, void* param);
-void importMatrix2Double2D(String filename, vector< vector<double> > &matrix);
+void importMatrix2Double2D(String filename, deque< deque<double> > &matrix);
 
 #endif /* FUNCTIONS2_H_ */

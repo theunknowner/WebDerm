@@ -21,8 +21,8 @@ double Intensity::calcIntensity(String color) {
 	fill_n(colorIntensity,mainColors.size(),0);
 	double totalLevel=0;
 	double totalColorIntensity=0;
-	vector<int> index;
-	vector<double> vec,vec2;
+	deque<int> index;
+	deque<double> vec,vec2;
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
 		if(color.find(mainColors.at(i))!=string::npos) {
 			colorLevel[i] = rgb.getColorLevel(color,mainColors.at(i));
@@ -64,7 +64,7 @@ inline void _setMinMax(double intensity) {
 	range = maxIntensity-minIntensity;
 }
 
-void Intensity::setMinMax(vector< vector<double> > &input) {
+void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double> vec;
 	double intensity=0;
 	double thresh = 0.01;
@@ -76,7 +76,7 @@ void Intensity::setMinMax(vector< vector<double> > &input) {
 		}
 	}
 	quicksort(vec,0,vec.size()-1);
-	freqOfList(vec);
+	//freqOfList(vec);
 	double t = vec.size()*thresh;
 	t = round(t);
 	for(int i=0; i<t; i++) {
@@ -132,13 +132,13 @@ String Intensity::calcShade(double inten) {
 	return shade;
 }
 
-vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector<double> > &vec) {
+deque< deque<double> > Intensity::calcNormalizedIntensityMatrix(deque< deque<double> > &vec) {
 	double intensity=0;
 	//double sigMin = sigmoidFn(minRange);
 	//double sigMax = sigmoidFn(maxRange);
 	//double sigRange = sigMax-sigMin;
-	vector<double> iVec1;
-	vector< vector<double> > iVec2;
+	deque<double> iVec1;
+	deque< deque<double> > iVec2;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		for(unsigned int j=0; j<vec.at(i).size(); j++) {
 			intensity = vec.at(i).at(j);
@@ -162,11 +162,11 @@ vector< vector<double> > Intensity::calcNormalizedIntensityMatrix(vector< vector
 	return iVec2;
 }
 
-vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> > &windowVec) {
+deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &windowVec) {
 	double colorIntensity=0;
 	String color;
-	vector<double> vec;
-	vector< vector<double> > vec2;
+	deque<double> vec;
+	deque< deque<double> > vec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
 			color = windowVec.at(i).at(j);
@@ -181,13 +181,13 @@ vector< vector<double> > Intensity::calcIntensityMatrix(vector <vector<String> >
 	return vec2;
 }
 
-vector< vector<double> > Intensity::calcSmoothedIntensityMatrix(vector< vector<double> > &intensityVec) {
+deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec) {
 	double intensity=0;
 	double totalIntensity=0;
 	int flag=0;
 	int counter=0;
-	vector<double> vec1;
-	vector< vector<double> > vec2;
+	deque<double> vec1;
+	deque< deque<double> > vec2;
 	unsigned int x=0,y=0;
 	int scanSize=3; //3x3
 	unsigned int tempX=scanSize, tempY=scanSize; //scan size
@@ -232,7 +232,7 @@ break_nested_loop:
 	return vec2;
 }
 
-vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> > &windowVec, String name) {
+deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &windowVec, String name) {
 	FILE * fp;
 	fp = fopen("variables.txt","w");
 	Color c;
@@ -243,15 +243,15 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	String pix, shade, maxShade, minShade;
 	double indexChange=0, ccCurr=0, localCC=0;
 	int shadeIndex=0, localIndex=0, minShadeIndex=100, maxShadeIndex=-100;
-	vector< vector<double> > intensityVec;
-	vector< vector<double> > normIntensityVec;
-	vector< vector<double> > smoothNormIntensityVec;
-	vector< vector<double> > contrastVec;
-	vector< vector<double> > cumConVec;
-	vector< vector<String> > colorVec2;
-	vector<String> colorVec1;
+	deque< deque<double> > intensityVec;
+	deque< deque<double> > normIntensityVec;
+	deque< deque<double> > smoothNormIntensityVec;
+	deque< deque<double> > contrastVec;
+	deque< deque<double> > cumConVec;
+	deque< deque<String> > colorVec2;
+	deque<String> colorVec1;
 	Point pt;
-	vector<Point> ptVec;
+	deque<Point> ptVec;
 	deque<double> localIndexes;
 	deque<double> localCCs;
 	intensityVec = calcIntensityMatrix(windowVec);
@@ -321,90 +321,90 @@ vector< vector<String> > Intensity::calcMainColorMatrix(vector< vector<String> >
 	return colorVec2;
 }
 
-void Intensity::writeNormalizedIntensityMatrix(vector< vector<String> > &windowVec, String name) {
-	vector< vector<double> > normVec;
-	vector< vector<double> > intVec;
+void Intensity::writeNormalizedIntensityMatrix(deque< deque<String> > &windowVec, String name) {
+	deque< deque<double> > normVec;
+	deque< deque<double> > intVec;
 	intVec = calcIntensityMatrix(windowVec);
 	normVec = calcNormalizedIntensityMatrix(intVec);
 	String filename = name + "NormIntensity";
 	writeSeq2File(normVec,name);
-	vector< vector<double> >().swap(normVec);
-	vector< vector<double> >().swap(intVec);
+	deque< deque<double> >().swap(normVec);
+	deque< deque<double> >().swap(intVec);
 }
 
-void Intensity::writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name) {
+void Intensity::writeNormalizedIntensityMatrix(deque< deque<double> > &vec, String name) {
 	String filename = name + "NormIntensity";
 	writeSeq2File(vec,filename);
 }
 
-void Intensity::writeIntensityMatrix(vector< vector<double> > &intensityVec, String name) {
+void Intensity::writeIntensityMatrix(deque< deque<double> > &intensityVec, String name) {
 	String filename = name + "ColorIntensity";
 	writeSeq2File(intensityVec,filename);
 }
 
-void Intensity::writeIntensityMatrix(vector< vector<String> > &windowVec, String name) {
-	vector< vector<double> > intVec;
+void Intensity::writeIntensityMatrix(deque< deque<String> > &windowVec, String name) {
+	deque< deque<double> > intVec;
 	intVec = calcIntensityMatrix(windowVec);
 	String filename = name + "ColorIntensity";
 	writeSeq2File(intVec,filename);
 
 	/* write normalizeIntensity */
-	vector< vector<double> > normVec;
+	deque< deque<double> > normVec;
 	normVec = calcNormalizedIntensityMatrix(intVec);
 	filename = name + "NormIntensity";
 	writeSeq2File(normVec,filename);
 
 	/* write contrast */
 	contrast con;
-	vector< vector<double> > conVec;
+	deque< deque<double> > conVec;
 	//conVec = con.calcContrastFromMatrix(normVec);
 	conVec = calcUniDimensionContrast(normVec);
 	filename = name + "ContrastNormIntensity";
 	writeSeq2File(conVec,filename);
 
 	/*write cumulative contrast */
-	vector< vector<double> > cumConVec;
+	deque< deque<double> > cumConVec;
 	cumConVec = con.calcCumulativeContrast(conVec);
 	filename = name + "CumulContrast";
 	writeSeq2File(cumConVec,filename);
-	vector< vector<double> >().swap(cumConVec);
+	deque< deque<double> >().swap(cumConVec);
 	/* end write cumulative contrast */
 
-	vector< vector<double> >().swap(conVec);
+	deque< deque<double> >().swap(conVec);
 	/* end write contrast */
 
-	vector< vector<double> >().swap(normVec);
+	deque< deque<double> >().swap(normVec);
 	/* end write normalizedIntensity */
 
-	vector< vector<double> >().swap(intVec);
+	deque< deque<double> >().swap(intVec);
 }
 
-void Intensity::writeMainColorMatrix(vector< vector<String> > &windowVec, String name) {
-	vector< vector<String> > colorVec;
+void Intensity::writeMainColorMatrix(deque< deque<String> > &windowVec, String name) {
+	deque< deque<String> > colorVec;
 	colorVec = calcMainColorMatrix(windowVec, name);
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
-	vector< vector<String> >().swap(colorVec);
+	deque< deque<String> >().swap(colorVec);
 }
 
-void Intensity::writeContrastMatrix(vector< vector<double> > &vec, String name) {
+void Intensity::writeContrastMatrix(deque< deque<double> > &vec, String name) {
 	String filename = name + "ContrastNormIntensity";
 	writeSeq2File(vec,filename);
 }
 
-void Intensity::writeCumConMatrix(vector< vector<double> > &vec, String name) {
+void Intensity::writeCumConMatrix(deque< deque<double> > &vec, String name) {
 	String filename = name + "CumulContrast";
 	writeSeq2File(vec,filename);
 }
 
-void Intensity::writeSmoothIntensityMatrix(vector< vector<double> > &vec, String name) {
+void Intensity::writeSmoothIntensityMatrix(deque< deque<double> > &vec, String name) {
 	String filename = name + "SmoothNormIntensity";
 	writeSeq2File(vec,filename);
 }
 
-vector< vector<double> > Intensity::calcUniDimensionContrast(vector< vector<double> > &intensityVec) {
-	vector< vector<double> > vec2;
-	vector<double> vec1;
+deque< deque<double> > Intensity::calcUniDimensionContrast(deque< deque<double> > &intensityVec) {
+	deque< deque<double> > vec2;
+	deque<double> vec1;
 	double contrast=0,intensity=0;
 	int flag=0,counter=0;
 	for(unsigned int i=0; i<intensityVec.size(); i++) {

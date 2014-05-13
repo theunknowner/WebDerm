@@ -17,7 +17,7 @@ void colorThreshNamingScript()
 	double r,g,b;
 	double lum=0;
 	String pix;
-	vector<String> vecColor;
+	deque<String> vecColor;
 	int colorLevel=0;
 	double grayLevel=0;
 	int mainColorIndex[mainColors.size()];
@@ -71,7 +71,7 @@ void colorThreshRenamingScript()
 	double r,g,b;
 	double hue=0;
 	String pix;
-	vector<String> vecColor;
+	deque<String> vecColor;
 	int colorLevel=0;
 	double grayLevel=0;
 	int mainColorIndex[mainColors.size()];
@@ -185,10 +185,10 @@ void outputFarRGBScript(Mat &img, String name)
 	double min1=0, min2=0;
 	int lumLevel=0;
 	String pix, pix2;
-	vector<int> rgbVals;
-	vector< vector<int> > rgbList;
-	vector<String> vecColor;
-	vector<Point> points;
+	deque<int> rgbVals;
+	deque< deque<int> > rgbList;
+	deque<String> vecColor;
+	deque<Point> points;
 	fprintf(fs,"Color,Rmin,Rmax,Gmin,Gmax,Bmin,Bmax,rMin,rMax,gMin,gMax,bMin,bMax\n");
 	for(int row=0; row<img.rows; row++)
 	{
@@ -324,9 +324,9 @@ void spreadsheetCompareScript()
 	fstream fs2(filename2.c_str());
 	if(fs.is_open() && fs2.is_open())
 	{
-		vector< vector<String> > matVec1;
-		vector <vector<String> > matVec2;
-		vector<String> vec;
+		deque< deque<String> > matVec1;
+		deque <deque<String> > matVec2;
+		deque<String> vec;
 		while(getline(fs,input))
 		{
 			getSubstr(input,',',vec);
@@ -352,9 +352,9 @@ void spreadsheetCompareScript()
 				}
 			}
 		}
-		vector< vector<String> >().swap(matVec1);
-		vector< vector<String> >().swap(matVec2);
-		vector<String>().swap(vec);
+		deque< deque<String> >().swap(matVec1);
+		deque< deque<String> >().swap(matVec2);
+		deque<String>().swap(vec);
 	}
 	else
 	{
@@ -422,8 +422,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/newColors.csv","w");
 	String pix;
-	vector<double> rgbVals;
-	vector< vector<double> > rgbVec;
+	deque<double> rgbVals;
+	deque< deque<double> > rgbVec;
 	int r,g,b, hue,flag=0;
 	double lum,sat;
 	double grayLevel=0, colorLevel=0;

@@ -19,12 +19,12 @@
 		Color colorObj;
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
-		vector<String> colorWindow;
-		vector< vector<String> > windowVec;
-		vector<int> index;
+		deque<String> colorWindow;
+		deque< deque<String> > windowVec;
+		deque<int> index;
 		deque<int> hueVals;
-		vector<double> hueAvg;
-		vector< vector<double> > hueVec;
+		deque<double> hueAvg;
+		deque< deque<double> > hueVec;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -160,12 +160,12 @@
 		//in.writeIntensityMatrix(windowVec,name);
 		in.writeMainColorMatrix(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
-		vector<String>().swap(colorWindow);
-		vector< vector<String> >().swap(windowVec);
+		deque<String>().swap(colorWindow);
+		deque< deque<String> >().swap(windowVec);
 		deque<int>().swap(hueVals);
-		vector<double>().swap(hueAvg);
-		vector< vector<double> >().swap(hueVec);
-		vector<int>().swap(index);
+		deque<double>().swap(hueAvg);
+		deque< deque<double> >().swap(hueVec);
+		deque<int>().swap(index);
 	}
 
 	void hysteresis1x1(Mat img, String name) {
@@ -176,10 +176,10 @@
 		int r,g,b;
 		String pix;
 		deque<int> hueVals;
-		vector<double> hueAvg;
-		vector< vector<double> > hueVec;
-		vector<String> colorWindow;
-		vector< vector<String> > windowVec;
+		deque<double> hueAvg;
+		deque< deque<double> > hueVec;
+		deque<String> colorWindow;
+		deque< deque<String> > windowVec;
 		double dist=0;
 		int ind=0;
 		for(int row=0; row<img.rows; row++) {
@@ -214,6 +214,6 @@
 		Intensity in;
 		in.writeIntensityMatrix(windowVec,name);
 		in.writeMainColorMatrix(windowVec,name);
-		vector<String>().swap(colorWindow);
-		vector< vector<String> >().swap(windowVec);
+		deque<String>().swap(colorWindow);
+		deque< deque<String> >().swap(windowVec);
 	}

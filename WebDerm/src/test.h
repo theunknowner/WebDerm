@@ -17,7 +17,7 @@
 #include "Intensity/intensity.h"
 
 String testHysteresis(Mat &img, int row, int col, Size size);
-String testMouseHysteresis(Mat &img, int row, int col, Size size, vector<Vec3b> &vec, vector<String> &colorVec);
+String testMouseHysteresis(Mat &img, int row, int col, Size size, deque<Vec3b> &vec, deque<String> &colorVec);
 void testMouseColor(Mat img);
 void testSatLum(Mat &img);
 void testColorIndex(Mat &img, int index);

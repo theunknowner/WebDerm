@@ -25,23 +25,23 @@ private:
 public:
 	double calcIntensity(String color);
 	double sigmoidFn(double intensity);
-	void setMinMax(vector< vector<double> > &input);
+	void setMinMax(deque< deque<double> > &input);
 	String getShade(int index);
 	int getShadeIndex(String shade);
 	String calcShade(double inten);
-	vector< vector<double> > calcNormalizedIntensityMatrix(vector< vector<double> > &vec);
-	vector< vector<double> > calcIntensityMatrix(vector< vector<String> > &windowVec);
-	vector< vector<double> > calcSmoothedIntensityMatrix(vector< vector<double> > &intensityVec);
-	vector< vector<String> > calcMainColorMatrix(vector< vector<String> > &windowVec,String name);
-	void writeNormalizedIntensityMatrix(vector< vector<String> > &windowVec, String name);
-	void writeNormalizedIntensityMatrix(vector< vector<double> > &vec, String name);
-	void writeIntensityMatrix(vector< vector<double> > &intensityVec, String name);
-	void writeIntensityMatrix(vector< vector<String> > &windowVec, String name);
-	void writeMainColorMatrix(vector< vector<String> > &windowVec, String name);
-	void writeContrastMatrix(vector< vector<double> > &vec, String name);
-	void writeCumConMatrix(vector< vector<double> > &vec, String name);
-	void writeSmoothIntensityMatrix(vector< vector<double> > &vec, String name);
-	vector< vector<double> > calcUniDimensionContrast(vector< vector<double> > &intensityVec);
+	deque< deque<double> > calcNormalizedIntensityMatrix(deque< deque<double> > &vec);
+	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
+	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);
+	deque< deque<String> > calcMainColorMatrix(deque< deque<String> > &windowVec,String name);
+	void writeNormalizedIntensityMatrix(deque< deque<String> > &windowVec, String name);
+	void writeNormalizedIntensityMatrix(deque< deque<double> > &vec, String name);
+	void writeIntensityMatrix(deque< deque<double> > &intensityVec, String name);
+	void writeIntensityMatrix(deque< deque<String> > &windowVec, String name);
+	void writeMainColorMatrix(deque< deque<String> > &windowVec, String name);
+	void writeContrastMatrix(deque< deque<double> > &vec, String name);
+	void writeCumConMatrix(deque< deque<double> > &vec, String name);
+	void writeSmoothIntensityMatrix(deque< deque<double> > &vec, String name);
+	deque< deque<double> > calcUniDimensionContrast(deque< deque<double> > &intensityVec);
 };
 
 #endif /* INTENSITY_H_ */
