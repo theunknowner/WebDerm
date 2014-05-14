@@ -16,11 +16,9 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	int b,g,r;
 	int ind=0;
 	double dist=0;
-	double hue=0;
 	double colorIntensity=0;
 	deque<int> index;
 	String pix;
-	deque<int> hueVals;
 	deque<String> pixelColorWindow;
 	int colorIndex[rgbColors.size()];
 	int mainColorIndex[mainColors.size()];
@@ -38,8 +36,6 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			g = img.at<Vec3b>(y,x)[1];
 			r = img.at<Vec3b>(y,x)[2];
 			pix = rgb.checkBlack(r,g,b);
-			hsl.rgb2hsl(r,g,b);
-			hueVals.push_back(hsl.getHue());
 			if(pix=="OTHER")
 			{
 				pix = rgb.calcColor2(r,g,b);
@@ -54,14 +50,11 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			{
 				pixelColorWindow.push_back(pix);
 			}
-			hue = (hsl.getHue()+180)%360;
-			hue /= 360;
 			colorIntensity = in.calcIntensity(pix);
-			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << hue << endl;
+			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << endl;
 			cout << "ColorInt: " << colorIntensity << endl;
 		}
 	}
-	cout << "Hue Avg: " << hsl.calcHueAvg(hueVals) << endl;
 	for(unsigned int i=0; i<pixelColorWindow.size(); i++)
 	{
 		for(unsigned int j=0; j<mainColors.size(); j++)
