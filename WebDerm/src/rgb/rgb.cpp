@@ -556,7 +556,7 @@ double rgb::calcGrayLevel2(int red, int green, int blue) {
 
 double rgb::calcColorLevel2(double red, double green, double blue) {
 	hsl hsl;
-	double lum = roundDecimal(hsl.calcLum(red, green, blue),2) * 100;
+	double lum = roundDecimal(hsl.calcRelLum(red, green, blue),2) * 100;
 	lum = 100 - lum;
 	return lum;
 }

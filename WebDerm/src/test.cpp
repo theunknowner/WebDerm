@@ -41,7 +41,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 				pix = rgb.calcColor2(r,g,b);
 				if(pix=="OTHER") {
 					pix = rgb.pushColor(r,g,b,ind,dist);
-					if(dist>4)
+					//if(dist>4)
 						pix = colorObj.reassignLevels(pix,r,g,b);
 				}
 				pixelColorWindow.push_back(pix);
