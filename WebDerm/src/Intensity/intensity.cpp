@@ -11,6 +11,13 @@ static double minIntensity = 900;
 static double maxIntensity = 0;
 static double range=0;
 
+double Intensity::getMinIntensity() {
+	return minIntensity;
+}
+
+double Intensity::getMaxIntensity() {
+	return maxIntensity;
+}
 double Intensity::calcIntensity(String color) {
 	rgb rgb;
 	double colorLevel[mainColors.size()];
@@ -236,7 +243,7 @@ break_nested_loop:
 
 deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &windowVec, String name) {
 	Color c;
-	//contrast con;
+	contrast con;
 	int flag=0;
 	double threshold = 0.2; //using round
 	unsigned int localScanSize=10;
@@ -247,8 +254,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	deque< deque<double> > intensityVec;
 	deque< deque<double> > normIntensityVec;
 	deque< deque<double> > smoothNormIntensityVec;
-	//deque< deque<double> > contrastVec;
-	//deque< deque<double> > cumConVec;
+	deque< deque<double> > contrastVec;
+	deque< deque<double> > cumConVec;
 	deque< deque<String> > colorVec2;
 	deque<String> colorVec1;
 	Point pt;
@@ -259,8 +266,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	smoothNormIntensityVec = calcSmoothedIntensityMatrix(normIntensityVec);
 	//contrastVec = calcUniDimensionContrast(normIntensityVec);
-	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
-	//cumConVec = con.calcCumulativeContrast(contrastVec);
+	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
+	cumConVec = con.calcCumulativeContrast(contrastVec);
 	for(unsigned int i=0; i<smoothNormIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<smoothNormIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -269,7 +276,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			if(flag==0) { //initial first pixel-area
 				if(ccCurr<=1 && ccCurr>=0 && pix!="Black") {
 					//shade = calcShade(intensityVec.at(i).at(j));
-					shade = "High";
+					shade = "Dark";
 					shadeIndex = getShadeIndex(shade);
 					localCC = ccCurr;
 					localIndex = shadeIndex;

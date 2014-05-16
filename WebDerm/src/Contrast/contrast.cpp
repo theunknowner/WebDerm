@@ -432,20 +432,26 @@ void contrast::writeMainColorMatrix(deque< deque<String> > &windowVec, String na
 }
 
 deque< deque<double> > contrast::calcContrastFromMatrix(deque< deque<double> > &intensityVec) {
-	double contrast=0;
+	Intensity in;
+	double contrast=0, intensity=0;
+	double minIntensity = in.getMinIntensity();
+	double maxIntensity = in.getMaxIntensity();
+	double rangeIntensity = maxIntensity-minIntensity;
 	double flag=0;
 	deque<double> vec1;
 	deque< deque<double> > vec2;
-	for(unsigned int i=10; i<intensityVec.size(); i++) {
+	for(unsigned int i=0; i<intensityVec.size(); i++) {
 		for(unsigned int j=0; j<intensityVec.at(i).size(); j++) {
-			if(intensityVec.at(i).at(j)<=1 && intensityVec.at(i).at(j)>=0 && flag!=0) {//no black color
+			intensity = intensityVec.at(i).at(j);
+			intensity = (intensity*rangeIntensity)+minIntensity;
+			if(intensity<900 && flag!=0) {//no black color
 				contrast = intensityVec.at(i).at(j) - intensityVec.at(i).at(j-1);
 			}
-			if(intensityVec.at(i).at(j)<=1 && intensityVec.at(i).at(j)>=0 && flag==0) {
+			if(intensity<900 && flag==0) {
 				contrast=0;
 				flag=1;
 			}
-			if(intensityVec.at(i).at(j)>1 && flag!=0) { //no black color in between other colors
+			if(intensity>=900 && flag!=0) { //no black color in between other colors
 				contrast=0;
 				flag=0;
 			}

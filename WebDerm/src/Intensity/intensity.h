@@ -23,6 +23,8 @@ private:
 	static const int minRange = -1;
 	static const int maxRange = 1;
 public:
+	double getMinIntensity();
+	double getMaxIntensity();
 	double calcIntensity(String color);
 	double sigmoidFn(double intensity);
 	void setMinMax(deque< deque<double> > &input);
