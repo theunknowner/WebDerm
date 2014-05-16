@@ -239,10 +239,11 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	//contrast con;
 	int flag=0;
 	double threshold = 0.2; //using round
-	//unsigned int localScanSize=7;
+	unsigned int localScanSize=10;
 	String pix, shade, maxShade, minShade;
-	double indexChange=0, ccCurr=0, localCC=0;
-	int shadeIndex=0, localIndex=0;
+	double indexChange=0, ccCurr=0, localCC=0, ccPrev=0;
+	int shadeIndex=0, localIndex=0, localMaxIndex=0, localMinIndex=0;
+	double localMinCC=0, localMaxCC=0;
 	deque< deque<double> > intensityVec;
 	deque< deque<double> > normIntensityVec;
 	deque< deque<double> > smoothNormIntensityVec;
@@ -268,7 +269,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			if(flag==0) { //initial first pixel-area
 				if(ccCurr<=1 && ccCurr>=0 && pix!="Black") {
 					//shade = calcShade(intensityVec.at(i).at(j));
-					shade = "Dark";
+					shade = "High";
 					shadeIndex = getShadeIndex(shade);
 					localCC = ccCurr;
 					localIndex = shadeIndex;
@@ -278,10 +279,27 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				else if(ccCurr>1 && pix!="Black") shade = "Darkk";
 			}
 			else if(flag!=0) {
+				ccPrev = smoothNormIntensityVec.at(i).at(j-1);
+				if((ccCurr-ccPrev)<0) {
+					localCC = localMaxCC;
+					localIndex = localMaxIndex;
+				}
+				if((ccCurr-ccPrev)>0) {
+					localCC = localMinCC;
+					localIndex = localMinIndex;
+				}
 				indexChange = trunc((ccCurr-localCC)/threshold);
 				shadeIndex = localIndex + (int)indexChange;
-				if(ccCurr<0) shade = "White";
-				else if(ccCurr>1) shade = "Darkk";
+				if(localCC>1) shadeIndex--;
+				if(localCC<0) shadeIndex++;
+				if(ccCurr<0) {
+					shade = "White";
+					shadeIndex--;
+				}
+				else if(ccCurr>1) {
+					shade = "Darkk";
+					shadeIndex++;
+				}
 				else shade = getShade(shadeIndex);
 				/*if(smoothNormIntensityVec.at(i).at(j)<0 || smoothNormIntensityVec.at(i).at(j)>1) {
 					shade=""; //no shade assigned to outliers
@@ -290,13 +308,25 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 					ptVec.push_back(pt); //store (x,y) of outliers
 				}*/
 			}
-			if(ccCurr<=1 && ccCurr>=0 && pix!="Black")
+			if(pix!="Black") {
+				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
+				if(localCCs.size()==localScanSize) localCCs.pop_front();
+				localIndexes.push_back(shadeIndex);
+				localCCs.push_back(ccCurr);
+				int index = distance(localCCs.begin(),max_element(localCCs.begin(),localCCs.end()));
+				localMaxCC = localCCs.at(index);
+				localMaxIndex = localIndexes.at(index);
+				index = distance(localCCs.begin(),min_element(localCCs.begin(),localCCs.end()));
+				localMinCC = localCCs.at(index);
+				localMinIndex = localIndexes.at(index);
+			}
+			if(pix!="Black")
 				pix = shade + pix + toString(shadeIndex);
-			else if(pix!="Black")
-				pix = shade + pix;
 			colorVec1.push_back(pix);
 		}
 		flag=0;
+		localIndexes.clear();
+		localCCs.clear();
 		colorVec2.push_back(colorVec1);
 		colorVec1.clear();
 	}
