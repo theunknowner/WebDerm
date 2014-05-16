@@ -74,7 +74,7 @@ inline void _setMinMax(double intensity) {
 void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double> vec;
 	double intensity=0;
-	//double thresh = 0.01;
+	double thresh = 0.01;
 	for(unsigned int i=0; i<input.size(); i++) {
 		for(unsigned int j=0; j<input.at(i).size(); j++) {
 			intensity = input.at(i).at(j);
@@ -83,19 +83,28 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 		}
 	}
 	quicksort(vec,0,vec.size()-1);
-	double stdDev = standardDevNoSort(vec);
 	minIntensity = vec.at(0);
 	maxIntensity = vec.at(vec.size()-1);
 	printf("%f;%f\n",minIntensity,maxIntensity);
-	double avg = (minIntensity+maxIntensity)/2;
-	minIntensity = avg-(2*stdDev);
-	maxIntensity = avg+(2*stdDev);
+	double t = vec.size()*thresh;
+	t = round(t);
+	for(int i=0; i<t; i++) {
+		vec.pop_back();
+		vec.pop_front();
+	}
+	//double stdDev = standardDevNoSort(vec);
+	minIntensity = vec.at(0);
+	maxIntensity = vec.at(vec.size()-1);
+	//double avg = (minIntensity+maxIntensity)/2;
+	//minIntensity = avg-(2*stdDev);
+	//maxIntensity = avg+(2*stdDev);
 	range = maxIntensity-minIntensity;
 	//freqOfList(vec);
 }
 
 int shadeCount=0;
-String shadeArr[] = {"Light","Low","Reg","High","Dark"};
+int shadeAmt=0;
+String shadeArr[] = {"Light","Low","High","Dark"};
 String Intensity::getShade(int index) {
 	//String shadeArr[] = {"White","White","White","Light","Light","Light",
 	//		"","","","Dark","Dark","Dark","Black","Black","Black"};
@@ -122,17 +131,16 @@ int Intensity::getShadeIndex(String shade) {
 String Intensity::calcShade(double inten) {
 	String shade;
 	double intensity=inten;
-	double thresh1 = 0.20;
-	double thresh2 = 0.755;
-	if(inten>1) {
-		intensity = (inten-minIntensity)/range;
-		intensity = pow(intensity,power);
-	}
+	double thresh1 = 0.25;
+	double thresh2 = 0.5;
+	double thresh3 = 0.75;
 	if(intensity<=thresh1)
 		shade = "Light";
 	if(intensity>thresh1 && intensity<=thresh2)
-		shade = "";
-	if(intensity>thresh2)
+		shade = "Low";
+	if(intensity>thresh2 && intensity<=thresh3)
+		shade = "High";
+	if(intensity>thresh3)
 		shade = "Dark";
 
 	return shade;
@@ -245,9 +253,9 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	Color c;
 	contrast con;
 	int flag=0;
-	double threshold = 0.2; //using round
 	unsigned int localScanSize=10;
 	String pix, shade, maxShade, minShade;
+	int maxIndex=0, minIndex=0;
 	double indexChange=0, ccCurr=0, localCC=0, ccPrev=0;
 	int shadeIndex=0, localIndex=0, localMaxIndex=0, localMinIndex=0;
 	double localMinCC=0, localMaxCC=0;
@@ -268,6 +276,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	//contrastVec = calcUniDimensionContrast(normIntensityVec);
 	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
 	cumConVec = con.calcCumulativeContrast(contrastVec);
+	maxShade = "Dark";
+	minShade = "Light";
+	maxIndex = getShadeIndex(maxShade);
+	minIndex = getShadeIndex(minShade);
+	shadeAmt = (maxIndex-minIndex)+1;
+	double thresh = 1.0/shadeAmt;
 	for(unsigned int i=0; i<smoothNormIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<smoothNormIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -275,15 +289,21 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			ccCurr = smoothNormIntensityVec.at(i).at(j);
 			if(flag==0) { //initial first pixel-area
 				if(ccCurr<=1 && ccCurr>=0 && pix!="Black") {
-					//shade = calcShade(intensityVec.at(i).at(j));
-					shade = "Dark";
+					shade = calcShade(ccCurr);
+					//shade = "High";
 					shadeIndex = getShadeIndex(shade);
 					localCC = ccCurr;
 					localIndex = shadeIndex;
 					flag=1;
 				}
-				else if(ccCurr<0 && pix!="Black") shade = "White";
-				else if(ccCurr>1 && pix!="Black") shade = "Darkk";
+				else if(ccCurr<0 && pix!="Black") {
+					shadeIndex = minIndex-1;
+					shade = getShade(shadeIndex);
+				}
+				else if(ccCurr>1 && pix!="Black") {
+					shadeIndex = maxIndex+1;
+					shade = getShade(shadeIndex);
+				}
 			}
 			else if(flag!=0) {
 				ccPrev = smoothNormIntensityVec.at(i).at(j-1);
@@ -295,19 +315,20 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 					localCC = localMinCC;
 					localIndex = localMinIndex;
 				}
-				indexChange = trunc((ccCurr-localCC)/threshold);
+				shade = calcShade(ccCurr);
+				indexChange = myRound((ccCurr-localCC)/(thresh));
+				//indexChange = trunc((ccCurr-localCC)/threshold);
 				shadeIndex = localIndex + (int)indexChange;
 				if(localCC>1) shadeIndex--;
 				if(localCC<0) shadeIndex++;
 				if(ccCurr<0) {
-					shade = "White";
+					shade = getShade(minIndex-1);
 					shadeIndex--;
 				}
 				else if(ccCurr>1) {
-					shade = "Darkk";
+					shade = getShade(maxIndex+1);
 					shadeIndex++;
 				}
-				else shade = getShade(shadeIndex);
 				/*if(smoothNormIntensityVec.at(i).at(j)<0 || smoothNormIntensityVec.at(i).at(j)>1) {
 					shade=""; //no shade assigned to outliers
 					pt.x = j;
