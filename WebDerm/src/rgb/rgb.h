@@ -43,7 +43,7 @@ public:
 	String calcColor(int red, int green, int blue);
 	String calcColor2(int red, int green, int blue);
 	double calcRelLum(double red, double green, double blue);
-	double calcPereivedBrightness(double red, double green, double blue);
+	double calcPerceivedBrightness(double red, double green, double blue);
 };
 
 

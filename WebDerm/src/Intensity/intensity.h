@@ -26,6 +26,7 @@ public:
 	double getMinIntensity();
 	double getMaxIntensity();
 	double calcIntensity(String pix);
+	void removeOutliers(deque<double> &vec);
 	double calcDarkness(String pix);
 	double sigmoidFn(double intensity);
 	void setMinMax(deque< deque<double> > &input);

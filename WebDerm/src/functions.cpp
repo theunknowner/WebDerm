@@ -466,13 +466,13 @@ double roundDecimal(double num, int places)
 	void freqOfList(deque<double> &vec) {
 		FILE * fp;
 		fp = fopen("Freq.txt","w");
-		int arr[900]={0};
+		int arr[255]={0};
 		int val=0;
 		for(unsigned int i=0; i<vec.size(); i++) {
 			val=vec.at(i);
 			arr[val]++;
 		}
-		for(int i=0; i<900; i++) {
+		for(int i=0; i<255; i++) {
 			fprintf(fp,"%d: %d\n",i,arr[i]);
 		}
 	}

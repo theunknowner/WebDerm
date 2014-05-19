@@ -148,7 +148,7 @@ bool rgb::checkAbsDist(double dist, double thresh)
 //checks if color is black
 String rgb::checkBlack(int r, int g, int b)
 	{
-		if(r<16 && g<16 && b<16)
+		if(r<30 && g<30 && b<30)
 		{
 			return "Black100";
 		}
@@ -478,7 +478,7 @@ double rgb::calcRelLum(double red, double green, double blue)
 		return lum;
 	}
 
-double rgb::calcPereivedBrightness(double red, double green, double blue) {
+double rgb::calcPerceivedBrightness(double red, double green, double blue) {
 	double lum;
 	lum = sqrt((0.299*red*red) + (0.587*green*green) + (0.114*blue*blue));
 	lum /= 255;
@@ -548,8 +548,7 @@ double rgb::calcGrayLevel2(int red, int green, int blue) {
 }
 
 double rgb::calcColorLevel2(double red, double green, double blue) {
-	hsl hsl;
-	double lum = roundDecimal(hsl.calcRelLum(red, green, blue),2) * 100;
+	double lum = roundDecimal(calcPerceivedBrightness(red, green, blue),2) * 100;
 	lum = 100 - lum;
 	return lum;
 }
@@ -609,7 +608,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 	sat = roundDecimal(hsl.getSat(),2);
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
-	if(grayLevel>=95)
+	if(grayLevel>=90 && lum>0.20)
 		pix = "Grey" + toString(colorLevel);
 	else {
 		for(unsigned int i=0; i<hueThresh.size(); i++) {
