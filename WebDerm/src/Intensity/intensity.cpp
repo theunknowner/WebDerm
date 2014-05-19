@@ -18,7 +18,37 @@ double Intensity::getMinIntensity() {
 double Intensity::getMaxIntensity() {
 	return maxIntensity;
 }
+
 double Intensity::calcIntensity(String color) {
+	rgb rgb;
+	double colorLevel[mainColors.size()];
+	double colorIntensity[mainColors.size()];
+	fill_n(colorLevel,mainColors.size(),0);
+	fill_n(colorIntensity,mainColors.size(),0);
+	double totalLevel=0;
+	double totalColorIntensity=0;
+	deque<int> index;
+	deque<double> vec,vec2;
+	for(unsigned int i=0; i<mainColors.size(); i++)	{
+		if(color.find(mainColors.at(i))!=string::npos) {
+			colorLevel[i] = rgb.getColorLevel(color,mainColors.at(i));
+			index.push_back(i);
+			if(mainColors.at(i)!="Gray") {
+				totalLevel+=colorLevel[i];
+			}
+		}
+	}
+	for(unsigned int i=0; i<index.size(); i++) {
+		if(mainColors.at(index.at(i))!="Gray") {
+			colorIntensity[index.at(i)] = (100-colorLevel[index.at(i)])/100;
+			colorIntensity[index.at(i)] *= 255;
+			colorIntensity[index.at(i)] *= (colorLevel[index.at(i)]/totalLevel);
+		}
+		totalColorIntensity += colorIntensity[index.at(i)];
+	}
+	return totalColorIntensity;
+}
+double Intensity::calcDarkness(String color) {
 	rgb rgb;
 	double colorLevel[mainColors.size()];
 	double cHue[mainColors.size()];

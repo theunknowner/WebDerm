@@ -26,6 +26,7 @@ public:
 	double getMinIntensity();
 	double getMaxIntensity();
 	double calcIntensity(String color);
+	double calcDarkness(String color);
 	double sigmoidFn(double intensity);
 	void setMinMax(deque< deque<double> > &input);
 	String getShade(int index);

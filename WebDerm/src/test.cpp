@@ -50,7 +50,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			{
 				pixelColorWindow.push_back(pix);
 			}
-			colorIntensity = in.calcIntensity(pix);
+			colorIntensity = in.calcDarkness(pix);
 			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << endl;
 			cout << "ColorInt: " << colorIntensity << endl;
 		}
@@ -102,7 +102,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	}
 	else pix = "NOISE";
 
-	cout << "COLORINT:" << in.calcIntensity(pix) << endl;
+	cout << "COLORINT:" << in.calcDarkness(pix) << endl;
 	deque<int>().swap(index);
 	deque<String>().swap(pixelColorWindow);
 	//img.release();

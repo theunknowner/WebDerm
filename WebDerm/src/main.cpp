@@ -17,8 +17,6 @@
 
 int main(int argc,char** argv)
 {
-	runHysteresis();
-	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;

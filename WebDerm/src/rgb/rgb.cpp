@@ -375,15 +375,9 @@ double rgb::calcGrayLevel(int red, int green, int blue)
 	double sat=0;
 	hsl.rgb2hsl(red,green,blue);
 	sat = hsl.getSat();
-	sat = roundDecimal(sat,2);
-	for(unsigned int i=0; i<satLevel.size(); i++)
-	{
-		if(sat>=satLevel.at(i).at(1) && sat<=satLevel.at(i).at(2))
-		{
-			return satLevel.at(i).at(0);
-		}
-	}
-	return 0;
+	sat = roundDecimal(sat,2) * 100;
+	sat = 100 - sat;
+	return sat;
 }
 
 double rgb::calcColorLevel(double red, double green, double blue)
