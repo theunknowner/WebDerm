@@ -17,6 +17,8 @@
 
 int main(int argc,char** argv)
 {
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	contrast con;
@@ -45,8 +47,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 350;
-	int row = 348;
+	int col = 357;
+	int row = 347;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

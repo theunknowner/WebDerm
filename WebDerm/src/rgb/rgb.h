@@ -37,13 +37,13 @@ public:
 	double getGrayLevel(String color);
 	double getColorLevel(String color, String mainColor);
 	void getLevels(String color, int * levels);
-	double calcIntensity(double red, double green, double blue);
 	void showPixelColor(int r, int g, int b, Size size);
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 	void release_memory();
 	String calcColor(int red, int green, int blue);
 	String calcColor2(int red, int green, int blue);
 	double calcRelLum(double red, double green, double blue);
+	double calcPereivedBrightness(double red, double green, double blue);
 };
 
 

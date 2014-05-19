@@ -37,10 +37,13 @@ int Color::containsMainColor(String color, String mColor)
 
 bool Color::isSameColor(String color1, String color2)
 {
-	int count1,count2;
 	deque<String> vec1, vec2;
 	extractColorFromString(color1,vec1);
 	extractColorFromString(color2, vec2);
+	if(vec1.size()!=vec2.size()) return false;
+	if(vec1.size()==1 && vec2.size()==1) {
+		if(vec1.at(0)==vec2.at(0)) return true;
+	}
 	if(vec1.size()>=3 || vec2.size()>=3) {
 		if(vec1.size()!=vec2.size())
 			return false;
@@ -76,22 +79,22 @@ int Color::countColors(String color) {
 }
 
 //gets color and recalculates gray and color levels
-String Color::reassignLevels(String color, int r, int g, int b) {
+String Color::reassignLevels(String pix, int r, int g, int b) {
 	rgb rgb;
 	deque<String> colorVec;
-	String pix;
+	String pix2;
 	double grayLevel=0;
 	double colorLevel=0;
-	extractColorFromString(color, colorVec);
-	grayLevel = rgb.calcGrayLevel2(r,g,b);
+	extractColorFromString(pix, colorVec);
+	grayLevel = rgb.calcGrayLevel(r,g,b);
 	colorLevel = rgb.calcColorLevel2(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
 		if(colorVec.at(i)=="Gray")
-			pix += colorVec.at(i) + toString(grayLevel);
+			pix2 += colorVec.at(i) + toString(grayLevel);
 		else
-			pix += colorVec.at(i) + toString(colorLevel);
+			pix2 += colorVec.at(i) + toString(colorLevel);
 	}
-	return pix;
+	return pix2;
 }
 
 String Color::getMainColor(String color) {

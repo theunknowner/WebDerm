@@ -7,9 +7,9 @@
 
 #include "intensity.h"
 
-static double minIntensity = 900;
-static double maxIntensity = 0;
-static double range=0;
+static double minIntensity = 0;
+static double maxIntensity = 255;
+static double range=maxIntensity-minIntensity;
 
 double Intensity::getMinIntensity() {
 	return minIntensity;
@@ -19,8 +19,10 @@ double Intensity::getMaxIntensity() {
 	return maxIntensity;
 }
 
-double Intensity::calcIntensity(String color) {
+double Intensity::calcIntensity(String pix) {
 	rgb rgb;
+	Color c;
+	String color;
 	double colorLevel[mainColors.size()];
 	double colorIntensity[mainColors.size()];
 	fill_n(colorLevel,mainColors.size(),0);
@@ -29,26 +31,23 @@ double Intensity::calcIntensity(String color) {
 	double totalColorIntensity=0;
 	deque<int> index;
 	deque<double> vec,vec2;
+	color = c.getMainColor(pix);
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
 		if(color.find(mainColors.at(i))!=string::npos) {
-			colorLevel[i] = rgb.getColorLevel(color,mainColors.at(i));
+			colorLevel[i] = rgb.getColorLevel(pix,mainColors.at(i));
 			index.push_back(i);
-			if(mainColors.at(i)!="Gray") {
-				totalLevel+=colorLevel[i];
-			}
+			totalLevel+=colorLevel[i];
 		}
 	}
 	for(unsigned int i=0; i<index.size(); i++) {
-		if(mainColors.at(index.at(i))!="Gray") {
-			colorIntensity[index.at(i)] = (100-colorLevel[index.at(i)])/100;
-			colorIntensity[index.at(i)] *= 255;
-			colorIntensity[index.at(i)] *= (colorLevel[index.at(i)]/totalLevel);
-		}
+		colorIntensity[index.at(i)] = colorLevel[index.at(i)]/100;
+		colorIntensity[index.at(i)] *= 255;
+		colorIntensity[index.at(i)] *= (colorLevel[index.at(i)]/totalLevel);
 		totalColorIntensity += colorIntensity[index.at(i)];
 	}
 	return totalColorIntensity;
 }
-double Intensity::calcDarkness(String color) {
+double Intensity::calcDarkness(String pix) {
 	rgb rgb;
 	double colorLevel[mainColors.size()];
 	double cHue[mainColors.size()];
@@ -61,8 +60,8 @@ double Intensity::calcDarkness(String color) {
 	deque<int> index;
 	deque<double> vec,vec2;
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
-		if(color.find(mainColors.at(i))!=string::npos) {
-			colorLevel[i] = rgb.getColorLevel(color,mainColors.at(i));
+		if(pix.find(mainColors.at(i))!=string::npos) {
+			colorLevel[i] = rgb.getColorLevel(pix,mainColors.at(i));
 			index.push_back(i);
 			if(mainColors.at(i)!="Gray") {
 				totalLevel+=colorLevel[i];
@@ -93,7 +92,7 @@ double Intensity::sigmoidFn(double intensity) {
 
 
 inline void _setMinMax(double intensity) {
-	if(intensity>maxIntensity && intensity!=900)
+	if(intensity>maxIntensity && intensity!=255)
 		maxIntensity = intensity;
 	if(intensity<minIntensity)
 		minIntensity = intensity;
@@ -104,32 +103,20 @@ inline void _setMinMax(double intensity) {
 void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double> vec;
 	double intensity=0;
-	double thresh = 0.01;
+	//double thresh = 0.01;
 	for(unsigned int i=0; i<input.size(); i++) {
 		for(unsigned int j=0; j<input.at(i).size(); j++) {
 			intensity = input.at(i).at(j);
-			if(intensity!=900)
+			if(intensity!=255)
 				vec.push_back(intensity);
 		}
 	}
 	quicksort(vec,0,vec.size()-1);
 	minIntensity = vec.at(0);
 	maxIntensity = vec.at(vec.size()-1);
-	printf("%f;%f\n",minIntensity,maxIntensity);
-	double t = vec.size()*thresh;
-	t = round(t);
-	for(int i=0; i<t; i++) {
-		vec.pop_back();
-		vec.pop_front();
-	}
-	//double stdDev = standardDevNoSort(vec);
-	minIntensity = vec.at(0);
-	maxIntensity = vec.at(vec.size()-1);
-	//double avg = (minIntensity+maxIntensity)/2;
-	//minIntensity = avg-(2*stdDev);
-	//maxIntensity = avg+(2*stdDev);
+	minIntensity /= 2;
+	maxIntensity += (255-maxIntensity)/2;
 	range = maxIntensity-minIntensity;
-	//freqOfList(vec);
 }
 
 int shadeCount=0;
@@ -208,16 +195,16 @@ deque< deque<double> > Intensity::calcNormalizedIntensityMatrix(deque< deque<dou
 
 deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &windowVec) {
 	double colorIntensity=0;
-	String color;
+	String pix;
 	deque<double> vec;
 	deque< deque<double> > vec2;
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
-			color = windowVec.at(i).at(j);
-			if(color.find("Black")!=string::npos)
-				colorIntensity = 900;
+			pix = windowVec.at(i).at(j);
+			if(pix.find("Black")!=string::npos)
+				colorIntensity = 255;
 			else
-				colorIntensity = calcIntensity(color);
+				colorIntensity = calcIntensity(pix);
 			vec.push_back(colorIntensity);
 		}
 		vec2.push_back(vec);
@@ -247,11 +234,11 @@ deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<doubl
 					intensity = intensityVec.at(i).at(j);
 					intensity = (intensity*range)+minIntensity;
 					if(i==y && j==x) {
-						if(intensity>=900)
+						if(intensity>=255)
 							flag=1;
 					}
 					if(flag==0) {
-						if(intensity<900) {
+						if(intensity<255) {
 							totalIntensity+=intensityVec.at(i).at(j);
 							counter++;
 						}
@@ -281,7 +268,7 @@ break_nested_loop:
 
 deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &windowVec, String name) {
 	Color c;
-	contrast con;
+	//contrast con;
 	int flag=0;
 	unsigned int localScanSize=10;
 	String pix, shade, maxShade, minShade;
@@ -291,9 +278,9 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	double localMinCC=0, localMaxCC=0;
 	deque< deque<double> > intensityVec;
 	deque< deque<double> > normIntensityVec;
-	deque< deque<double> > smoothNormIntensityVec;
-	deque< deque<double> > contrastVec;
-	deque< deque<double> > cumConVec;
+	//deque< deque<double> > smoothNormIntensityVec;
+	//deque< deque<double> > contrastVec;
+	//deque< deque<double> > cumConVec;
 	deque< deque<String> > colorVec2;
 	deque<String> colorVec1;
 	Point pt;
@@ -302,21 +289,21 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	deque<double> localCCs;
 	intensityVec = calcIntensityMatrix(windowVec);
 	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
-	smoothNormIntensityVec = calcSmoothedIntensityMatrix(normIntensityVec);
+	//smoothNormIntensityVec = calcSmoothedIntensityMatrix(normIntensityVec);
 	//contrastVec = calcUniDimensionContrast(normIntensityVec);
-	contrastVec = con.calcContrastFromMatrix(normIntensityVec);
-	cumConVec = con.calcCumulativeContrast(contrastVec);
+	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
+	//cumConVec = con.calcCumulativeContrast(contrastVec);
 	maxShade = "Dark";
 	minShade = "Light";
 	maxIndex = getShadeIndex(maxShade);
 	minIndex = getShadeIndex(minShade);
 	shadeAmt = (maxIndex-minIndex)+1;
 	double thresh = 1.0/shadeAmt;
-	for(unsigned int i=0; i<smoothNormIntensityVec.size(); i++) {
-		for(unsigned int j=0; j<smoothNormIntensityVec.at(i).size(); j++) {
+	for(unsigned int i=0; i<normIntensityVec.size(); i++) {
+		for(unsigned int j=0; j<normIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix = c.getMainColor(pix);
-			ccCurr = smoothNormIntensityVec.at(i).at(j);
+			ccCurr = normIntensityVec.at(i).at(j);
 			if(flag==0) { //initial first pixel-area
 				if(ccCurr<=1 && ccCurr>=0 && pix!="Black") {
 					shade = calcShade(ccCurr);
@@ -330,13 +317,13 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 					shadeIndex = minIndex-1;
 					shade = getShade(shadeIndex);
 				}
-				else if(ccCurr>1 && pix!="Black") {
+				else if(ccCurr>=1 && pix!="Black") {
 					shadeIndex = maxIndex+1;
 					shade = getShade(shadeIndex);
 				}
 			}
 			else if(flag!=0) {
-				ccPrev = smoothNormIntensityVec.at(i).at(j-1);
+				ccPrev = normIntensityVec.at(i).at(j-1);
 				if((ccCurr-ccPrev)<0) {
 					localCC = localMaxCC;
 					localIndex = localMaxIndex;
@@ -346,7 +333,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 					localIndex = localMinIndex;
 				}
 				shade = calcShade(ccCurr);
-				indexChange = myRound((ccCurr-localCC)/(thresh));
+				indexChange = round((ccCurr-localCC)/(thresh));
 				//indexChange = trunc((ccCurr-localCC)/threshold);
 				shadeIndex = localIndex + (int)indexChange;
 				if(localCC>1) shadeIndex--;
@@ -408,7 +395,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	}*/
 	writeIntensityMatrix(intensityVec,name);
 	writeNormalizedIntensityMatrix(normIntensityVec,name);
-	writeSmoothIntensityMatrix(smoothNormIntensityVec,name);
+	//writeSmoothIntensityMatrix(smoothNormIntensityVec,name);
 	//writeContrastMatrix(contrastVec,name);
 	//writeCumConMatrix(cumConVec,name);
 	return colorVec2;
@@ -447,7 +434,13 @@ void Intensity::writeIntensityMatrix(deque< deque<String> > &windowVec, String n
 	filename = name + "NormIntensity";
 	writeSeq2File(normVec,filename);
 
-	/* write contrast */
+	/* write smoothIntensity */
+	deque< deque<double> > smoothVec;
+	smoothVec = calcSmoothedIntensityMatrix(normVec);
+	filename = name + "SmoothIntensity";
+	writeSeq2File(smoothVec,filename);
+
+	/* write contrast
 	contrast con;
 	deque< deque<double> > conVec;
 	//conVec = con.calcContrastFromMatrix(normVec);
@@ -455,19 +448,22 @@ void Intensity::writeIntensityMatrix(deque< deque<String> > &windowVec, String n
 	filename = name + "ContrastNormIntensity";
 	writeSeq2File(conVec,filename);
 
-	/*write cumulative contrast */
+	/*write cumulative contrast
 	deque< deque<double> > cumConVec;
 	cumConVec = con.calcCumulativeContrast(conVec);
 	filename = name + "CumulContrast";
 	writeSeq2File(cumConVec,filename);
 	deque< deque<double> >().swap(cumConVec);
-	/* end write cumulative contrast */
+	/* end write cumulative contrast
 
 	deque< deque<double> >().swap(conVec);
 	/* end write contrast */
 
 	deque< deque<double> >().swap(normVec);
 	/* end write normalizedIntensity */
+
+	deque< deque<double> >().swap(smoothVec);
+	/* end write smoothedIntensity */
 
 	deque< deque<double> >().swap(intVec);
 }
