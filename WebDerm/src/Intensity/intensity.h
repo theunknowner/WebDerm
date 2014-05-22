@@ -20,19 +20,17 @@
 class Intensity {
 private:
 	static const int power = 1;
-	static const int minRange = -1;
-	static const int maxRange = 1;
 public:
 	double getMinIntensity();
 	double getMaxIntensity();
 	double calcIntensity(String pix);
-	void removeOutliers(deque<double> &vec);
 	double calcDarkness(String pix);
 	double sigmoidFn(double intensity);
 	void setMinMax(deque< deque<double> > &input);
 	String getShade(int index);
 	int getShadeIndex(String shade);
 	String calcShade(double inten);
+	String calcShade2(double inten);
 	deque< deque<double> > calcNormalizedIntensityMatrix(deque< deque<double> > &vec);
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);

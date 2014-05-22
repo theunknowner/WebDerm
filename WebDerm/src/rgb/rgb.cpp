@@ -608,7 +608,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 	sat = roundDecimal(hsl.getSat(),2);
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
-	if(grayLevel>=90 && lum>0.20)
+	if(grayLevel>=95 && lum>0.20)
 		pix = "Grey" + toString(colorLevel);
 	else {
 		for(unsigned int i=0; i<hueThresh.size(); i++) {
