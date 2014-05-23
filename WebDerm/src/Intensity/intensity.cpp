@@ -378,7 +378,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
 	//cumConVec = con.calcCumulativeContrast(contrastVec);
 	maxShade = "Dark";
-	minShade = "Light";
+	minShade = "Low";
 	maxIndex = getShadeIndex(maxShade);
 	minIndex = getShadeIndex(minShade);
 	int shadeAmt = (maxIndex-minIndex)+1;
@@ -393,6 +393,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 					shade = calcShade2(ccCurr);
 					//shade = "High";
 					shadeIndex = getShadeIndex(shade);
+					if(ccCurr>1) shadeIndex++;
+					if(ccCurr<0) shadeIndex--;
 					localCC = ccCurr;
 					localIndex = shadeIndex;
 					flag=1;
@@ -420,8 +422,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				indexChange = myRound((ccCurr-localCC)/(thresh));
 				//indexChange = trunc((ccCurr-localCC)/threshold);
 				shadeIndex = localIndex + (int)indexChange;
-				if(localCC>1) shadeIndex--;
-				if(localCC<0) shadeIndex++;
+				//if(localCC>1) shadeIndex--;
+				//if(localCC<0) shadeIndex++;
 				/*if(ccCurr<0) {
 					shade = getShade(minIndex-1);
 					shadeIndex--;
