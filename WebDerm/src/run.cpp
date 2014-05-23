@@ -128,6 +128,7 @@ void runHysteresis()
 {
 	rgb rgb;
 	hsl hsl;
+	Intensity in;
 	String filename;
 	String name;
 	String input;
@@ -146,6 +147,7 @@ void runHysteresis()
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	hsl.importLsThreshold();
+	in.importThresholds();
 	if(size.height==1 && size.width==1)
 		hysteresis1x1(img2,name);
 	else

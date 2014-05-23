@@ -14,5 +14,6 @@
 
 void drawOutlineOnMouse(Mat &img);
 void graphHue(Mat &img);
+void Mat2Image(deque< deque<double> > &input, Mat &output);
 
 #endif /* TESTFUNCTIONS_H_ */

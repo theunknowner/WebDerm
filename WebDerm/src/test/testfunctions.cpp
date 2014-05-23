@@ -58,3 +58,12 @@ void graphHue(Mat &img) {
 	}
 	writeSeq2File(hueVec,"huegraph");
 }
+
+void Mat2Image(deque< deque<double> > &input, Mat &output) {
+	output = output.zeros(input.size(),input.at(0).size(),CV_8U);
+	for(unsigned int i=0; i<input.size(); i++) {
+		for(unsigned int j=0; j<input.at(i).size(); j++) {
+			output.at<uchar>(i,j) = 255-input.at(i).at(j);
+		}
+	}
+}

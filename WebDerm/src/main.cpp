@@ -26,6 +26,7 @@ int main(int argc,char** argv)
 	rgb.importThresholds();
 	hsl.importLsThreshold();
 	hsl.importHslThresholds();
+	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
 	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);

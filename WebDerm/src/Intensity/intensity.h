@@ -23,6 +23,7 @@ private:
 public:
 	double getMinIntensity();
 	double getMaxIntensity();
+	bool importThresholds();
 	double calcIntensity(String pix);
 	double calcDarkness(String pix);
 	double sigmoidFn(double intensity);

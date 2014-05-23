@@ -7,10 +7,13 @@
 
 #include "intensity.h"
 
-static double minIntensity = 25;
-static double maxIntensity = 225;
+static double minIntensity = 57;
+static double maxIntensity = 255;
 static double range=maxIntensity-minIntensity;
-String minShade,maxShade;
+String status = "NA";
+String gMinShade=status,gMaxShade=status;
+deque<String> gShades;
+deque< deque<double> > gShadeThresh;
 
 double Intensity::getMinIntensity() {
 	return minIntensity;
@@ -18,6 +21,36 @@ double Intensity::getMinIntensity() {
 
 double Intensity::getMaxIntensity() {
 	return maxIntensity;
+}
+
+bool Intensity::importThresholds() {
+	String folderName = path+"Thresholds/";
+	String filename = folderName+"shade-thresholds.csv";
+	fstream fsThresh(filename.c_str());
+	if(fsThresh.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<double> thresh;
+		getline(fsThresh,temp);
+		while(getline(fsThresh,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0)
+					gShades.push_back(vec.at(i));
+				if(i>=1 && i<=2)
+					thresh.push_back(atof(vec.at(i).c_str()));
+			}
+			gShadeThresh.push_back(thresh);
+			thresh.clear(); vec.clear();
+		}
+		fsThresh.close();
+		deque<double>().swap(thresh);
+		return true;
+	}
+	else {
+		cout << "Importing Shade Thresholds Failed!" << endl;
+		return false;
+	}
 }
 
 double Intensity::calcIntensity(String pix) {
@@ -99,7 +132,24 @@ inline void _setMinMax(double intensity) {
 
 	range = maxIntensity-minIntensity;
 }
+//assigns min/max shades to an image. Only runs once per image.
+void setMinMaxShades() {
+	double min,max;
+	for(unsigned int i=0; i<gShadeThresh.size(); i++) {
+		min = gShadeThresh.at(i).at(0);
+		max = gShadeThresh.at(i).at(1);
+		if(minIntensity>=min && minIntensity<max)
+			gMinShade = gShades.at(i);
+		if(maxIntensity>=min && maxIntensity<max)
+			gMaxShade = gShades.at(i);
+		if(maxIntensity>=gShadeThresh.at(gShadeThresh.size()-1).at(1))
+			gMaxShade = gShades.at(gShades.size()-1);
+		if(gMinShade!=status && gMaxShade!=status) break;
+	}
+}
 
+//sets the min/max intensity of image.
+//also sets min/max shades using setMinMaxShades()
 void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double> vec;
 	double intensity=0;
@@ -127,6 +177,9 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	minIntensity = vec.at(0);
 	maxIntensity = vec.at(vec.size()-1);
 	range = maxIntensity-minIntensity;
+	printf("%f;%f\n",minIntensity,maxIntensity);
+	//assign min/max shade to image.
+	setMinMaxShades();
 }
 
 int shadeCount=0;
@@ -200,8 +253,8 @@ String Intensity::calcShade(double inten) {
 
 String Intensity::calcShade2(double inten) {
 	static int flag=0;
-	static int minIndex = getShadeIndex(minShade);
-	static int maxIndex = getShadeIndex(maxShade);
+	static int minIndex = getShadeIndex(gMinShade);
+	static int maxIndex = getShadeIndex(gMaxShade);
 	static int shadeAmt = (maxIndex-minIndex)+1;
 	static double interval = 1.0/shadeAmt;
 	static double minOutlier = -0.1;
@@ -211,14 +264,17 @@ String Intensity::calcShade2(double inten) {
 	if(flag==0) {
 		thresh = new double[shadeAmt]();
 		shadeIndex = new int[shadeAmt]();
+		//initialize thresholds to array
 		for(int i=0; i<shadeAmt; i++) {
 			thresh[i] = i*interval;
-			if(i==0) thresh[0] = minOutlier;
-			shadeIndex[i] = getShadeIndex(minShade) + i;
+			if(i==0) thresh[i] = minOutlier;
+			shadeIndex[i] = getShadeIndex(gMinShade) + i;
 		}
 		flag=1;
 	}
 	String shade;
+	double indexChange=0;
+	//calculate shade
 	for(int i=0; i<shadeAmt; i++) {
 		if(i<(shadeAmt-1)) {
 			if(inten>thresh[i] && inten<=thresh[i+1]) {
@@ -226,7 +282,11 @@ String Intensity::calcShade2(double inten) {
 				break;
 			}
 			if(inten<=minOutlier) {
-				shade = getShade(minIndex-1);
+				indexChange = (inten-minOutlier)/interval;
+				indexChange = floor(indexChange);
+				shade = getShade(minIndex+indexChange);
+				gMinShade = shade;
+				minIndex = getShadeIndex(gMinShade);
 				break;
 			}
 		}
@@ -236,7 +296,11 @@ String Intensity::calcShade2(double inten) {
 				break;
 			}
 			if(inten>maxOutlier) {
-				shade = getShade(maxIndex+1);
+				indexChange = (inten-maxOutlier)/interval;
+				indexChange = ceil(indexChange);
+				shade = getShade(maxIndex+indexChange);
+				gMaxShade = shade;
+				maxIndex = getShadeIndex(gMaxShade);
 				break;
 			}
 		}
@@ -294,7 +358,6 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 		vec.clear();
 	}
 	setMinMax(vec2);
-	printf("%f;%f\n",minIntensity,maxIntensity);
 	return vec2;
 }
 
@@ -367,8 +430,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	//deque< deque<double> > cumConVec;
 	deque< deque<String> > colorVec2;
 	deque<String> colorVec1;
-	Point pt;
-	deque<Point> ptVec;
 	deque<double> localIndexes;
 	deque<double> localCCs;
 	intensityVec = calcIntensityMatrix(windowVec);
@@ -377,10 +438,32 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	//contrastVec = calcUniDimensionContrast(normIntensityVec);
 	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
 	//cumConVec = con.calcCumulativeContrast(contrastVec);
-	maxShade = "Dark";
-	minShade = "Low";
-	maxIndex = getShadeIndex(maxShade);
-	minIndex = getShadeIndex(minShade);
+	for(unsigned int i=0; i<smoothNormIntensityVec.size(); i++) {
+		for(unsigned int j=0; j<smoothNormIntensityVec.at(i).size(); j++) {
+			pix = windowVec.at(i).at(j);
+			pix = c.getMainColor(pix);
+			ccCurr = smoothNormIntensityVec.at(i).at(j);
+			if(flag==0) { //initial first pixel-area
+				if(pix!="Black") {
+					shade = calcShade2(ccCurr);
+					flag=1;
+				}
+			}
+			else if(flag!=0) {
+				if(pix!="Black")
+					shade = calcShade2(ccCurr);
+				else
+					shade = "";
+			}
+			colorVec1.push_back(shade);
+		}
+		flag=0;
+		colorVec2.push_back(colorVec1);
+		colorVec1.clear();
+	}
+	maxIndex = getShadeIndex(gMaxShade);
+	minIndex = getShadeIndex(gMinShade);
+	cout << gMinShade << endl << gMaxShade << endl;
 	int shadeAmt = (maxIndex-minIndex)+1;
 	double thresh = 1.0/shadeAmt;
 	for(unsigned int i=0; i<smoothNormIntensityVec.size(); i++) {
@@ -390,26 +473,20 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			ccCurr = smoothNormIntensityVec.at(i).at(j);
 			if(flag==0) { //initial first pixel-area
 				if(pix!="Black") {
-					shade = calcShade2(ccCurr);
-					//shade = "High";
+					shade = colorVec2.at(i).at(j);
+					//shade = calcShade2(ccCurr);
 					shadeIndex = getShadeIndex(shade);
-					if(ccCurr>1) shadeIndex++;
-					if(ccCurr<0) shadeIndex--;
+					//if(ccCurr>1) shadeIndex++;
+					//if(ccCurr<0) shadeIndex--;
 					localCC = ccCurr;
 					localIndex = shadeIndex;
+					ccPrev = ccCurr;
 					flag=1;
 				}
-				/*else if(ccCurr<0 && pix!="Black") {
-					shadeIndex = minIndex-1;
-					shade = getShade(shadeIndex);
-				}
-				else if(ccCurr>=1 && pix!="Black") {
-					shadeIndex = maxIndex+1;
-					shade = getShade(shadeIndex);
-				}*/
 			}
-			else if(flag!=0) {
-				ccPrev = smoothNormIntensityVec.at(i).at(j-1);
+			else if(flag!=0 && pix!="Black") {
+				if(windowVec.at(i).at(j-1)!="Black")
+					ccPrev = smoothNormIntensityVec.at(i).at(j-1);
 				if((ccCurr-ccPrev)<0) {
 					localCC = localMaxCC;
 					localIndex = localMaxIndex;
@@ -418,26 +495,11 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 					localCC = localMinCC;
 					localIndex = localMinIndex;
 				}
-				shade = calcShade2(ccCurr);
+				shade = colorVec2.at(i).at(j);
+				//shade = calcShade2(ccCurr);
 				indexChange = myRound((ccCurr-localCC)/(thresh));
-				//indexChange = trunc((ccCurr-localCC)/threshold);
 				shadeIndex = localIndex + (int)indexChange;
-				//if(localCC>1) shadeIndex--;
-				//if(localCC<0) shadeIndex++;
-				/*if(ccCurr<0) {
-					shade = getShade(minIndex-1);
-					shadeIndex--;
-				}
-				else if(ccCurr>1) {
-					shade = getShade(maxIndex+1);
-					shadeIndex++;
-				}*/
-				/*if(smoothNormIntensityVec.at(i).at(j)<0 || smoothNormIntensityVec.at(i).at(j)>1) {
-					shade=""; //no shade assigned to outliers
-					pt.x = j;
-					pt.y = i;
-					ptVec.push_back(pt); //store (x,y) of outliers
-				}*/
+				ccPrev=ccCurr;
 			}
 			if(pix!="Black") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
@@ -453,32 +515,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			}
 			if(pix!="Black")
 				pix = shade + pix + toString(shadeIndex);
-			colorVec1.push_back(pix);
+			colorVec2.at(i).at(j) = pix;
 		}
 		flag=0;
 		localIndexes.clear();
 		localCCs.clear();
-		colorVec2.push_back(colorVec1);
-		colorVec1.clear();
 	}
-	//assigning shades to outliers
-/*	int x=0,y=0;
-	for(unsigned int i=0; i<ptVec.size(); i++) {
-		x = ptVec.at(i).x;
-		y = ptVec.at(i).y;
-		pix = colorVec2.at(y).at(x);
-		minShadeIndex -= 1;
-		maxShadeIndex += 1;
-		if(minShadeIndex<0) minShade = "White";
-		else minShade = getShade(minShadeIndex);
-		if(maxShadeIndex>=shadeCount) maxShade = "Black";
-		else maxShade = getShade(maxShadeIndex);
-		if(smoothNormIntensityVec.at(y).at(x)<0)
-			pix = minShade+pix;
-		else if(smoothNormIntensityVec.at(y).at(x)>1)
-			pix = maxShade+pix;
-		colorVec2.at(y).at(x) = pix;
-	}*/
 	writeIntensityMatrix(intensityVec,name);
 	writeNormalizedIntensityMatrix(normIntensityVec,name);
 	writeSmoothIntensityMatrix(smoothNormIntensityVec,name);
