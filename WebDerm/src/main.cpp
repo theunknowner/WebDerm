@@ -21,7 +21,7 @@ int main(int argc,char** argv)
 	/*
 	hsl hsl;
 	rgb rgb;
-	contrast con;
+	Color c;
 	Intensity in;
 	rgb.importThresholds();
 	hsl.importLsThreshold();

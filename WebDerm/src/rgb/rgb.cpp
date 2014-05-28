@@ -399,17 +399,18 @@ double rgb::calcColorLevel(double red, double green, double blue)
 
 double rgb::getGrayLevel(String color)
 {
-	size_t pos=0;
 	double level=0;
-	String lvl;
-	pos = color.find("Gray");
+	size_t pos=0;
+	String str, mainColor="Gray";
+	pos = color.find(mainColor);
 	if(pos!=string::npos)
 	{
-		lvl = color.substr(pos+4,1);
-		level = atof(lvl.c_str());
+		str = color.substr(pos+mainColor.size(),color.size()-(pos+mainColor.size()));
 	}
+	level = atof(str.c_str());
 	return level;
 }
+
 
 double rgb::getColorLevel(String color, String mainColor)
 {
@@ -425,52 +426,20 @@ double rgb::getColorLevel(String color, String mainColor)
 	return level;
 }
 
-void rgb::getLevels(String color, int * level)
-{
-	deque<size_t> posVec;
-	deque<String> colors;
-	int count=0;
+double rgb::getColorLevel(String pix) {
+	double level=0;
 	size_t pos=0;
-	String lvl;
-	pos = color.find("Gray");
-	if(pos!=string::npos)
-	{
-		lvl = color.substr(pos+4,color.size()-(pos+4));
-		level[0] = atoi(lvl.c_str());
-	}
-	else
-	{
-		level[0] = 0;
-	}
-	for(unsigned int i=0; i<mainColors.size(); i++)
-	{
-		pos = color.find(mainColors.at(i));
-		if(pos!=string::npos && mainColors.at(i)!="Gray")
-		{
-			++count;
-			posVec.push_back(pos);
-			colors.push_back(mainColors.at(i));
+	String str;
+	for(unsigned int i=0; i<mainColors.size(); i++) {
+		if(mainColors.at(i)!="Gray") {
+			pos = pix.find(mainColors.at(i));
+			if(pos!=string::npos)
+				str = pix.substr(pos+mainColors.at(i).size(),pix.size()-(pos+mainColors.at(i).size()));
 		}
 	}
-	if(count==1)
-	{
-		lvl = color.substr(posVec.at(0)+colors.at(0).size(),1);
-		level[1] = 0;
-		level[2] = atoi(lvl.c_str());
-	}
-	if(count==2)
-	{
-		lvl = color.substr(posVec.at(0)+colors.at(0).size(),
-				colors.at(0).size()-(posVec.at(0)+colors.at(0).size()));
-		level[1] = atoi(lvl.c_str());
-		lvl = color.substr(posVec.at(1)+colors.at(1).size(),
-				colors.at(0).size()-(posVec.at(0)+colors.at(0).size()));
-		level[2] = atoi(lvl.c_str());
-	}
-	deque<size_t>().swap(posVec);
-	deque<String>().swap(colors);
+	level = atof(str.c_str());
+	return level;
 }
-
 double rgb::calcRelLum(double red, double green, double blue)
 	{
 		double lum;

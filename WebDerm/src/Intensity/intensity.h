@@ -16,6 +16,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
+#include "rules.h"
 
 class Intensity {
 private:
@@ -23,6 +24,10 @@ private:
 public:
 	double getMinIntensity();
 	double getMaxIntensity();
+	String getOldMinShade();
+	String getOldMaxShade();
+	String getNewMinShade();
+	String getNewMaxShade();
 	bool importThresholds();
 	double calcIntensity(String pix);
 	double calcDarkness(String pix);
