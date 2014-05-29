@@ -532,7 +532,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			}
 			if(pix2!="Black") {
 				pix2 = shade + pix2 + toString(shadeIndex);
-				shade = newShade(pix, indexChange,shade,shadeVec1.at(shadeVec1.size()-10));
+				shade = newShade(pix, indexChange,shade,shadeVec1.at(shadeVec1.size()-1));
 				shadeVec1.push_back(shade);
 			}
 			else
