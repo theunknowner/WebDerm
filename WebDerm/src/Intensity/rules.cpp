@@ -17,13 +17,16 @@ String newShade(String pix, double indexChange, String shade, String shadePrev) 
 
 	String White = "White";
 	String Dark = "Dark";
-
+	int index=in.getShadeIndex(shadePrev);
+	index += indexChange;
+	return in.getShade(index);
+/*
 	if(colorLevel<=25)	return White;
 	if(grayLevel>=85 && colorLevel<=30) return White;
-	if(indexChange<=(-2) && (grayLevel>=85 || color=="Grey" || colorLevel<=25)) return White;
+	if(indexChange<=(-2) && (grayLevel>=91 || color=="Grey" || colorLevel<=25)) return White;
 	if(indexChange>=2) return Dark;
 	if(shadePrev==White && indexChange==0) {
 		return shadePrev;
-	}
-	else return shade;
+	}*/
+	//return shade;
 }

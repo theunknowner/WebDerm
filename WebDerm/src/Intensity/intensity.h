@@ -36,7 +36,6 @@ public:
 	String getShade(int index);
 	int getShadeIndex(String shade);
 	String calcShade(double inten);
-	String calcShade2(double inten);
 	deque< deque<double> > calcNormalizedIntensityMatrix(deque< deque<double> > &vec);
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);

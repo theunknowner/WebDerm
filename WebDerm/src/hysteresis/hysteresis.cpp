@@ -27,7 +27,7 @@
 		String pix;
 		int ind=0;
 		double dist=0;
-		int b,g,r;
+		int b=0,g=0,r=0;
 		int row=0, col=0;
 		fill_n(mainColorIndex,mainColors.size(),0);
 		fill_n(mainColorLevelAvg,mainColors.size(),0);
@@ -123,6 +123,8 @@
 						else
 							pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 					}
+					if(colorObj.getMainColor(pix)=="Gray")
+						pix = "Grey" + toString(rgb.calcColorLevel2(r,g,b));
 					colorWindow.push_back(pix);
 				}
 				else
