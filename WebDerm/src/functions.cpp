@@ -465,14 +465,27 @@ double roundDecimal(double num, int places)
 
 	void freqOfList(deque<double> &vec) {
 		FILE * fp;
-		fp = fopen("Freq.txt","w");
+		fp = fopen("Freq.csv","w");
 		int arr[255]={0};
 		int val=0;
+		double total=0;
+		double percent=0;
 		for(unsigned int i=0; i<vec.size(); i++) {
 			val=vec.at(i);
 			arr[val]++;
 		}
 		for(int i=0; i<255; i++) {
-			fprintf(fp,"%d: %d\n",i,arr[i]);
+			fprintf(fp,"%d,",i);
 		}
+		fprintf(fp,"\n");
+		for(int i=0;i<255; i++) {
+			fprintf(fp,"%d,",arr[i]);
+			total += arr[i];
+		}
+		fprintf(fp,"\n");
+		for(int i=0; i<255; i++) {
+			percent = arr[i]/total;
+			fprintf(fp,"%f,",percent);
+		}
+		cout << total << endl;
 	}

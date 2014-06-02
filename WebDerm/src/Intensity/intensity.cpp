@@ -176,7 +176,7 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 		}
 	}
 	quicksort(vec,0,vec.size()-1);
-	//freqOfList(vec);
+	freqOfList(vec);
 	minIntensity = vec.at(0);
 	maxIntensity = vec.at(vec.size()-1);
 	printf("%f;%f\n",minIntensity,maxIntensity);
