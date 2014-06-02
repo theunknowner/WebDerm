@@ -7,7 +7,7 @@
 
 #include "intensity.h"
 
-static double minIntensity = 57;
+static double minIntensity = 0;
 static double maxIntensity = 255;
 static double range=maxIntensity-minIntensity;
 String status = "NA";
@@ -83,11 +83,16 @@ double Intensity::calcIntensity(String pix) {
 	for(unsigned int i=0; i<mainColors.size(); i++)	{
 		if(color.find(mainColors.at(i))!=string::npos) {
 			colorLevel[i] = rgb.getColorLevel(pix,mainColors.at(i));
+			colorLevel[i] = 100 - colorLevel[i];
 			index.push_back(i);
 			totalLevel+=colorLevel[i];
 		}
 	}
 	for(unsigned int i=0; i<index.size(); i++) {
+		if(totalLevel==0) {
+			totalColorIntensity=0;
+			break;
+		}
 		colorIntensity[index.at(i)] = colorLevel[index.at(i)]/100;
 		colorIntensity[index.at(i)] *= 255;
 		colorIntensity[index.at(i)] *= (colorLevel[index.at(i)]/totalLevel);
@@ -167,16 +172,16 @@ void setMinMaxShades() {
 void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double> vec;
 	double intensity=0;
-	double thresh = 0.2; //percentage of outlier removal
+	double thresh = 0.05; //percentage of outlier removal
 	for(unsigned int i=0; i<input.size(); i++) {
 		for(unsigned int j=0; j<input.at(i).size(); j++) {
 			intensity = input.at(i).at(j);
-			if(intensity!=255)
+			if(intensity!=0)
 				vec.push_back(intensity);
 		}
 	}
 	quicksort(vec,0,vec.size()-1);
-	freqOfList(vec);
+	//freqOfList(vec);
 	minIntensity = vec.at(0);
 	maxIntensity = vec.at(vec.size()-1);
 	printf("%f;%f\n",minIntensity,maxIntensity);
@@ -195,11 +200,14 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	range = maxIntensity-minIntensity;
 	printf("%f;%f\n",minIntensity,maxIntensity);
 	//assign min/max shade to image.
-	setMinMaxShades();
+	//setMinMaxShades();
+	oldMinShade = "Dark";
+	oldMaxShade = "Low";
 }
 
 int shadeCount=0;
-String shadeArr[] = {"White","Light","Low","High","Dark"};
+//String shadeArr[] = {"White","Light","Low","High","Dark"};
+String shadeArr[] = {"Dark","High","Low","Light","White"};
 String Intensity::getShade(int index) {
 	//String shadeArr[] = {"White","White","White","Light","Light","Light",
 	//		"","","","Dark","Dark","Dark","Black","Black","Black"};
@@ -320,7 +328,7 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 		for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			if(pix.find("Black")!=string::npos)
-				colorIntensity = 255;
+				colorIntensity = 0;
 			else
 				colorIntensity = calcIntensity(pix);
 			colorIntensity = round(colorIntensity);
@@ -352,11 +360,11 @@ deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<doubl
 					intensity = intensityVec.at(i).at(j);
 					intensity = (intensity*range)+minIntensity;
 					if(i==y && j==x) {
-						if(intensity>=255)
+						if(intensity<=0)
 							flag=1;
 					}
 					if(flag==0) {
-						if(intensity<255) {
+						if(intensity>0) {
 							totalIntensity+=intensityVec.at(i).at(j);
 							counter++;
 						}
