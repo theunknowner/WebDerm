@@ -201,8 +201,10 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	printf("%f;%f\n",minIntensity,maxIntensity);
 	//assign min/max shade to image.
 	//setMinMaxShades();
-	oldMinShade = "Dark";
-	oldMaxShade = "Low";
+	oldMinShade = "High";
+	oldMaxShade = "Light";
+	newMinShade = oldMinShade;
+	newMaxShade = oldMaxShade;
 }
 
 int shadeCount=0;
@@ -236,9 +238,11 @@ String Intensity::calcShade(double inten) {
 	static int minIndex = getShadeIndex(oldMinShade);
 	static int maxIndex = getShadeIndex(oldMaxShade);
 	static int shadeAmt = (maxIndex-minIndex)+1;
-	static double interval = 1.0/shadeAmt;
-	static double minOutlier = -0.1;
-	static double maxOutlier = 1.1;
+	static double interval = range/shadeAmt;
+	//static double minOutlier = -0.1;
+	//static double maxOutlier = 1.1;
+	static double minOutlier = minIntensity - (minIntensity*0.1);
+	static double maxOutlier = maxIntensity + (minIntensity*0.1);
 	static double *thresh;
 	static int *shadeIndex;
 	if(flag==0) {
@@ -246,7 +250,7 @@ String Intensity::calcShade(double inten) {
 		shadeIndex = new int[shadeAmt]();
 		//initialize thresholds to array
 		for(int i=0; i<shadeAmt; i++) {
-			thresh[i] = i*interval;
+			thresh[i] = minIntensity + (i*interval);
 			if(i==0) thresh[i] = minOutlier;
 			shadeIndex[i] = getShadeIndex(oldMinShade) + i;
 		}
@@ -399,7 +403,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	int flag=0;
 	unsigned int localScanSize=10;
 	String pix, pix2, shade,localMinShade,localMaxShade,localShade;
-	int maxShadeIndex=0, minShadeIndex=0, maxIndex=0,minIndex=0,index=0;
+	int maxShadeIndex=0, minShadeIndex=0, maxIndex=0,minIndex=0,index=0,loc=0;
 	double indexChange=0, ccCurr=0, localCC=0, ccPrev=0;
 	int shadeIndex=0, localIndex=0, localMaxIndex=0, localMinIndex=0;
 	double localMinCC=0, localMaxCC=0;
@@ -417,16 +421,16 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	deque<double> localCCs;
 	deque<String> localShades;
 	intensityVec = calcIntensityMatrix(windowVec);
-	normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
-	smoothNormIntensityVec = calcSmoothedIntensityMatrix(normIntensityVec);
+	//normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
+	//smoothNormIntensityVec = calcSmoothedIntensityMatrix(normIntensityVec);
 	//contrastVec = calcUniDimensionContrast(normIntensityVec);
 	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
 	//cumConVec = con.calcCumulativeContrast(contrastVec);
-	for(unsigned int i=0; i<smoothNormIntensityVec.size(); i++) {
-		for(unsigned int j=0; j<smoothNormIntensityVec.at(i).size(); j++) {
+	for(unsigned int i=0; i<intensityVec.size(); i++) {
+		for(unsigned int j=0; j<intensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix2 = c.getMainColor(pix);
-			ccCurr = smoothNormIntensityVec.at(i).at(j);
+			ccCurr = intensityVec.at(i).at(j);
 			if(flag==0) { //initial first pixel-area
 				if(pix!="Black") {
 					shade = calcShade(ccCurr);
@@ -450,12 +454,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	printf("%s;%s\n",oldMinShade.c_str(),oldMaxShade.c_str());
 	printf("%s;%s\n",newMinShade.c_str(),newMaxShade.c_str());
 	int shadeAmt = (maxShadeIndex-minShadeIndex)+1;
-	double thresh = 1.0/shadeAmt;
-	for(unsigned int i=0; i<smoothNormIntensityVec.size(); i++) {
-		for(unsigned int j=0; j<smoothNormIntensityVec.at(i).size(); j++) {
+	double thresh = range/shadeAmt;
+	for(unsigned int i=0; i<intensityVec.size(); i++) {
+		for(unsigned int j=0; j<intensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix2 = c.getMainColor(pix);
-			ccCurr = smoothNormIntensityVec.at(i).at(j);
+			ccCurr = intensityVec.at(i).at(j);
 			if(flag==0) { //initial first pixel-area
 				if(pix2!="Black") {
 					shade = colorVec2.at(i).at(j);
@@ -472,7 +476,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			}
 			else if(flag!=0 && pix2!="Black") {
 				if(windowVec.at(i).at(j-1)!="Black")
-					ccPrev = smoothNormIntensityVec.at(i).at(j-1);
+					ccPrev = intensityVec.at(i).at(j-1);
 				if((ccCurr-ccPrev)<0) {
 					localCC = localMaxCC;
 					localIndex = localMaxIndex;
@@ -492,9 +496,9 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				ccPrev=ccCurr;
 			}
 			if(pix2!="Black") {
-				index = j-(localScanSize-index)+1;
+				loc = j-(localIndexes.size()-index)+1;
 				//shade = newShade(pix,indexChange,shade,localShade);
-				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(index);
+				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(loc);
 				shadeVec1.push_back(shade);
 			}
 			else
@@ -521,13 +525,14 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 		shadeVec1.clear();
 		flag=0;
 		indexChange=0;
+		index=0;
 		localIndexes.clear();
 		localCCs.clear();
 		localShades.clear();
 	}
 	writeIntensityMatrix(intensityVec,name);
-	writeNormalizedIntensityMatrix(normIntensityVec,name);
-	writeSmoothIntensityMatrix(smoothNormIntensityVec,name);
+	//writeNormalizedIntensityMatrix(normIntensityVec,name);
+	//writeSmoothIntensityMatrix(smoothNormIntensityVec,name);
 	writeSeq2File(shadeVec2,"shadeVec");
 	//writeContrastMatrix(contrastVec,name);
 	//writeCumConMatrix(cumConVec,name);
