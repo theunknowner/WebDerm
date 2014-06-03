@@ -184,7 +184,7 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	//freqOfList(vec);
 	minIntensity = vec.at(0);
 	maxIntensity = vec.at(vec.size()-1);
-	printf("%f;%f\n",minIntensity,maxIntensity);
+	printf("Before: %f;%f\n",minIntensity,maxIntensity);
 	double t = vec.size()*thresh;
 	t = round(t);
 	/*for(int i=0; i<t; i++) {
@@ -198,11 +198,11 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	minIntensity = vec.at(0);
 	maxIntensity = vec.at(vec.size()-1);
 	range = maxIntensity-minIntensity;
-	printf("%f;%f\n",minIntensity,maxIntensity);
-	//assign min/max shade to image.
-	//setMinMaxShades();
-	oldMinShade = "High";
-	oldMaxShade = "Light";
+	printf("After: %f;%f\n",minIntensity,maxIntensity);
+	//assign initial min/max shade to image.
+	setMinMaxShades();
+	//oldMinShade = "High";
+	//oldMaxShade = "Low";
 	newMinShade = oldMinShade;
 	newMaxShade = oldMaxShade;
 }
@@ -233,7 +233,7 @@ int Intensity::getShadeIndex(String shade) {
 	return index;
 }
 
-String Intensity::calcShade(double inten) {
+String Intensity::calcShade(double inten, int x, int y) {
 	static int flag=0;
 	static int minIndex = getShadeIndex(oldMinShade);
 	static int maxIndex = getShadeIndex(oldMaxShade);
@@ -241,8 +241,8 @@ String Intensity::calcShade(double inten) {
 	static double interval = range/shadeAmt;
 	//static double minOutlier = -0.1;
 	//static double maxOutlier = 1.1;
-	static double minOutlier = minIntensity - (minIntensity*0.1);
-	static double maxOutlier = maxIntensity + (minIntensity*0.1);
+	static double minOutlier = minIntensity - 4;
+	static double maxOutlier = maxIntensity + 4;
 	static double *thresh;
 	static int *shadeIndex;
 	if(flag==0) {
@@ -253,8 +253,10 @@ String Intensity::calcShade(double inten) {
 			thresh[i] = minIntensity + (i*interval);
 			if(i==0) thresh[i] = minOutlier;
 			shadeIndex[i] = getShadeIndex(oldMinShade) + i;
+			cout << thresh[i] << ";";
 		}
 		flag=1;
+		cout << maxOutlier << endl;
 	}
 	String shade;
 	double indexChange=0;
@@ -270,7 +272,6 @@ String Intensity::calcShade(double inten) {
 				indexChange = floor(indexChange);
 				shade = getShade(minIndex+indexChange);
 				newMinShade = shade;
-				minIndex = getShadeIndex(newMinShade);
 				break;
 			}
 		}
@@ -284,7 +285,6 @@ String Intensity::calcShade(double inten) {
 				indexChange = ceil(indexChange);
 				shade = getShade(maxIndex+indexChange);
 				newMaxShade = shade;
-				maxIndex = getShadeIndex(newMaxShade);
 				break;
 			}
 		}
@@ -433,13 +433,13 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			ccCurr = intensityVec.at(i).at(j);
 			if(flag==0) { //initial first pixel-area
 				if(pix!="Black") {
-					shade = calcShade(ccCurr);
+					shade = calcShade(ccCurr, j,i);
 					flag=1;
 				}
 			}
 			else if(flag!=0) {
 				if(pix!="Black")
-					shade = calcShade(ccCurr);
+					shade = calcShade(ccCurr,j,i);
 				else
 					shade = "";
 			}
@@ -483,12 +483,13 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 					localShade = localMaxShade;
 					index = maxIndex;
 				}
-				if((ccCurr-ccPrev)>0) {
+				else if((ccCurr-ccPrev)>0) {
 					localCC = localMinCC;
 					localIndex = localMinIndex;
 					localShade = localMinShade;
 					index = minIndex;
 				}
+				else index--;
 				shade = colorVec2.at(i).at(j);
 				//shade = calcShade(ccCurr);
 				indexChange = myRound((ccCurr-localCC)/(thresh));
