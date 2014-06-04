@@ -111,3 +111,15 @@ String Color::getMainColor(String color) {
 	}
 	return pix;
 }
+
+void Color::output2Image(deque< deque<double> > &input) {
+	Mat img = img.zeros(Size(700,700),CV_8U);
+	for(unsigned int y=0; y<input.size(); y++) {
+		for(unsigned int x=0; x<input.at(y).size(); x++) {
+			img.at<uchar>(y,x) = input.at(y).at(x);
+		}
+	}
+	//imwrite("3x3imgBw.png",img);
+	imshow("BW",img);
+	waitKey(0);
+}
