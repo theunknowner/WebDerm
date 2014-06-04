@@ -17,9 +17,7 @@ String newShade(String pix, double indexChange, String shade, String shadePrev) 
 
 	String White = "White";
 	String Dark = "Dark";
-	int index=in.getShadeIndex(shadePrev);
-	index += indexChange;
-	return in.getShade(index);
+
 /*
 	if(colorLevel<=25)	return White;
 	if(grayLevel>=85 && colorLevel<=30) return White;

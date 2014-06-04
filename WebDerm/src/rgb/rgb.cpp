@@ -148,7 +148,7 @@ bool rgb::checkAbsDist(double dist, double thresh)
 //checks if color is black
 String rgb::checkBlack(int r, int g, int b)
 	{
-		if(r<30 && g<30 && b<30)
+		if(r<35 && g<35 && b<35)
 		{
 			return "Black100";
 		}
@@ -570,13 +570,14 @@ String rgb::calcColor2(int red, int green, int blue) {
 	String pix = "OTHER";
 	int hue;
 	double lum,sat;
-	double grayLevel, colorLevel;
+	double grayLevel=0, colorLevel=0, grayLumLevel=0;
 	hsl.rgb2hsl(red,green,blue);
 	hue = hsl.getHue();
 	lum = roundDecimal(hsl.getLum(),2);
 	sat = roundDecimal(hsl.getSat(),2);
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
+	//grayLumLevel = calcGrayLevel2(red,green,blue);
 	if(grayLevel>=95 && lum>0.20)
 		pix = "Grey" + toString(colorLevel);
 	else {
