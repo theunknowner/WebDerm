@@ -19,8 +19,6 @@
 #include "rules.h"
 
 class Intensity {
-private:
-	int shadeCount;
 public:
 	double getMinIntensity();
 	double getMaxIntensity();

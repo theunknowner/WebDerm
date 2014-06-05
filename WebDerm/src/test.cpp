@@ -99,6 +99,8 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			else
 				pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 		}
+		if(colorObj.getMainColor(pix)=="Gray")
+			pix = "Grey" + toString(rgb.calcColorLevel2(r,g,b));
 	}
 	else pix = "NOISE";
 

@@ -118,8 +118,9 @@ String Color::getMainColor(String color) {
 			flag=1;
 		}
 	}
+	//return gray not grey!
 	if(flag==0) {
-		pix = "Grey";
+		pix = "Gray";
 	}
 	return pix;
 }
@@ -134,6 +135,7 @@ void Color::output2Image(deque< deque<double> > &input) {
 	imwrite("2x2imgBw.png",img);
 	//imshow("BW",img);
 	//waitKey(0);
+	img.release();
 }
 
 void Color::output2Image2(deque< deque<String> > &input, String name) {
@@ -156,6 +158,7 @@ void Color::output2Image2(deque< deque<String> > &input, String name) {
 	}
 	String str = "5shadesBW2x2" + name + ".png";
 	imwrite(str,img);
+	img.release();
 }
 
 void Color::output2Image3(deque< deque<String> > &window, String name) {
@@ -206,5 +209,7 @@ void Color::output2Image3(deque< deque<String> > &window, String name) {
 		}
 		String file = "outputShades2x2" + name + ".png";
 		imwrite(file,img);
+		img.release();
+		fs.close();
 	}
 }

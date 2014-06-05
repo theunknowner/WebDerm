@@ -7,6 +7,7 @@
 
 #include "intensity.h"
 
+int shadeCount=0;
 String shadeArr[] = {"Dark","High","Low","Light","White"};
 static double minIntensity = 0;
 static double maxIntensity = 255;
