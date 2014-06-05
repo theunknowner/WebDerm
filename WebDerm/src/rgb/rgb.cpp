@@ -575,7 +575,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 	hue = hsl.getHue();
 	lum = roundDecimal(hsl.getLum(),2);
 	sat = roundDecimal(hsl.getSat(),2);
-	grayLevel = calcGrayLevel(red,green,blue);
+	grayLevel = calcGrayLevel2(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
 	//grayLumLevel = calcGrayLevel2(red,green,blue);
 	if(grayLevel>=95 && lum>0.20)

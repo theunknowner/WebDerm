@@ -16,7 +16,7 @@ String newShade(String pix, double indexChange, String shade, String shadePrev) 
 	//double colorLevel = rgb.getColorLevel(pix);
 	double indexChangeThresh=2.25;
 
-	if(indexChange>=indexChangeThresh) {
+	if(abs(indexChange)>=indexChangeThresh) {
 		int index = in.getShadeIndex(shade);
 		index += (indexChange/indexChangeThresh);
 		shade = in.getShade(index);

@@ -98,7 +98,7 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	double grayLevel=0;
 	double colorLevel=0;
 	extractColorFromString(pix, colorVec);
-	grayLevel = rgb.calcGrayLevel(r,g,b);
+	grayLevel = rgb.calcGrayLevel2(r,g,b);
 	colorLevel = rgb.calcColorLevel2(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
 		if(colorVec.at(i)=="Gray")
@@ -211,5 +211,9 @@ void Color::output2Image3(deque< deque<String> > &window, String name) {
 		imwrite(file,img);
 		img.release();
 		fs.close();
+		deque<String>().swap(vec);
+		deque<String>().swap(color);
+		deque<int>().swap(thresh1);
+		deque< deque<int> >().swap(values);
 	}
 }

@@ -17,8 +17,6 @@
 
 int main(int argc,char** argv)
 {
-	runHysteresis();
-	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -32,6 +30,12 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
+	int ind=0;
+	double dist=0;
+	cout << rgb.calcColor2(193, 155, 153) << endl;
+	cout << rgb.calcColor2(162, 132, 131) << endl;
+	cout << rgb.pushColor(162, 132, 131,dist,ind) << endl;
+	//cout << dist << endl;
 	//colorThreshRenamingScript();
 	//addNewColors(img,Point(363,314),Point(365,316),"Gray","Gray");
 	//cout << rgb.calcGrayLevel2(202, 192, 193) << endl;
