@@ -8,16 +8,19 @@
 #include "rules.h"
 
 String newShade(String pix, double indexChange, String shade, String shadePrev) {
-	rgb rgb;
+	//rgb rgb;
 	Color c;
 	Intensity in;
 	String color = c.getMainColor(pix);
-	double grayLevel = rgb.getGrayLevel(pix);
-	double colorLevel = rgb.getColorLevel(pix);
+	//double grayLevel = rgb.getGrayLevel(pix);
+	//double colorLevel = rgb.getColorLevel(pix);
+	double indexChangeThresh=2.25;
 
-	String White = "White";
-	String Dark = "Dark";
-
+	if(indexChange>=indexChangeThresh) {
+		int index = in.getShadeIndex(shade);
+		index += (indexChange/indexChangeThresh);
+		shade = in.getShade(index);
+	}
 /*
 	if(colorLevel<=25)	return White;
 	if(grayLevel>=85 && colorLevel<=30) return White;
@@ -26,5 +29,5 @@ String newShade(String pix, double indexChange, String shade, String shadePrev) 
 	if(shadePrev==White && indexChange==0) {
 		return shadePrev;
 	}*/
-	//return shade;
+	return shade;
 }

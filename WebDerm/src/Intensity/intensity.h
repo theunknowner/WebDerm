@@ -20,7 +20,7 @@
 
 class Intensity {
 private:
-	static const int power = 1;
+	int shadeCount;
 public:
 	double getMinIntensity();
 	double getMaxIntensity();
@@ -28,6 +28,7 @@ public:
 	String getOldMaxShade();
 	String getNewMinShade();
 	String getNewMaxShade();
+	int getShadeCount();
 	bool importThresholds();
 	double calcIntensity(String pix);
 	double calcDarkness(String pix);

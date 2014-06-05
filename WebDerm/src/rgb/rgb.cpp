@@ -570,7 +570,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 	String pix = "OTHER";
 	int hue;
 	double lum,sat;
-	double grayLevel=0, colorLevel=0, grayLumLevel=0;
+	double grayLevel=0, colorLevel=0;
 	hsl.rgb2hsl(red,green,blue);
 	hue = hsl.getHue();
 	lum = roundDecimal(hsl.getLum(),2);
@@ -593,6 +593,10 @@ String rgb::calcColor2(int red, int green, int blue) {
 							else {
 								if(pix=="Black")
 									pix += toString(colorLevel);
+								else if(pix=="Grey")
+									pix += toString(colorLevel);
+								else if(pix!="Violet" && grayLevel>=90)
+									pix = "Grey" + toString(colorLevel);
 								else
 									pix = "Gray" + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
 							}

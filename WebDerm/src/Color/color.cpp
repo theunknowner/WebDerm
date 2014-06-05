@@ -67,6 +67,18 @@ void Color::extractColorFromString(String color, deque<String> &vecColor) {
 	}
 }
 
+String Color::extractShade(String pix) {
+	Intensity in;
+	int shadeCount = in.getShadeCount();
+	String shade = "";
+	if(pix=="Black") return pix;
+	for(int i=0; i<shadeCount; i++) {
+		shade = in.getShade(i);
+		if(pix.find(shade)!=string::npos)
+			break;
+	}
+	return shade;
+}
 //returns the amount of different colors in the string
 int Color::countColors(String color) {
 	int count=0;
@@ -107,7 +119,7 @@ String Color::getMainColor(String color) {
 		}
 	}
 	if(flag==0) {
-		pix = "Gray";
+		pix = "Grey";
 	}
 	return pix;
 }
@@ -122,4 +134,77 @@ void Color::output2Image(deque< deque<double> > &input) {
 	imwrite("2x2imgBw.png",img);
 	//imshow("BW",img);
 	//waitKey(0);
+}
+
+void Color::output2Image2(deque< deque<String> > &input, String name) {
+	Mat img = img.zeros(Size(700,700),CV_8U);
+	for(unsigned int y=0; y<input.size(); y++) {
+		for(unsigned int x=0; x<input.at(y).size(); x++) {
+			if(input.at(y).at(x)=="Black")
+				img.at<uchar>(y,x) = 0;
+			if(input.at(y).at(x)=="Dark")
+				img.at<uchar>(y,x) = 60;
+			if(input.at(y).at(x)=="High")
+				img.at<uchar>(y,x) = 110;
+			if(input.at(y).at(x)=="Low")
+				img.at<uchar>(y,x) = 155;
+			if(input.at(y).at(x)=="Light")
+				img.at<uchar>(y,x) = 185;
+			if(input.at(y).at(x)=="White")
+				img.at<uchar>(y,x) = 255;
+		}
+	}
+	String str = "5shadesBW2x2" + name + ".png";
+	imwrite(str,img);
+}
+
+void Color::output2Image3(deque< deque<String> > &window, String name) {
+	String filename = path+"Thresholds/output-shades.csv";
+	fstream fs(filename.c_str());
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<String> color;
+		deque<int>	thresh1;
+		deque< deque<int> > values;
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0) color.push_back(vec.at(i));
+				if(i>0) thresh1.push_back(atoi(vec.at(i).c_str()));
+			}
+			values.push_back(thresh1);
+			thresh1.clear();
+			vec.clear();
+		}
+		String shade;
+		Mat img = img.zeros(Size(700,700),16);
+		for(unsigned int i=0; i<window.size(); i++) {
+			for(unsigned int j=0; j<window.at(i).size(); j++) {
+				shade = extractShade(window.at(i).at(j));
+				if(shade=="Black") {
+					img.at<Vec3b>(i,j)[2] = 0;
+					img.at<Vec3b>(i,j)[1] = 0;
+					img.at<Vec3b>(i,j)[0] = 0;
+				}
+				else if(shade=="White") {
+					img.at<Vec3b>(i,j)[2] = 255;
+					img.at<Vec3b>(i,j)[1] = 255;
+					img.at<Vec3b>(i,j)[0] = 255;
+				}
+				else {
+					for(unsigned int k=0; k<color.size(); k++) {
+						if(window.at(i).at(j).find(color.at(k))!=string::npos) {
+							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
+							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
+							img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
+							break;
+						}
+					}
+				}
+			}
+		}
+		String file = "outputShades2x2" + name + ".png";
+		imwrite(file,img);
+	}
 }

@@ -50,10 +50,10 @@
 								pix = rgb.calcColor2(r,g,b);
 								if(pix=="OTHER") {
 									pix = rgb.pushColor(r,g,b,dist,ind);
-									pix = colorObj.reassignLevels(pix,r,g,b);
-									if(dist>4) {
+									if(dist>4)
+										pix = colorObj.reassignLevels(pix,r,g,b);
+									if(dist>10)
 										fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
-									}
 								}
 							}
 							pixelColorWindow.push_back(pix);
@@ -73,10 +73,10 @@
 							pix = rgb.calcColor2(r,g,b);
 							if(pix=="OTHER") {
 								pix = rgb.pushColor(r,g,b,dist,ind);
-								pix = colorObj.reassignLevels(pix,r,g,b);
-								if(dist>4) {
+								if(dist>4)
+									pix = colorObj.reassignLevels(pix,r,g,b);
+								if(dist>10)
 									fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
-								}
 							}
 						}
 						pixelColorWindow.pop_front();

@@ -85,7 +85,7 @@ void colorThreshRenamingScript()
 		hsl.rgb2hsl(r,g,b);
 		hue = hsl.getHue();
 		colorLevel = rgb.calcColorLevel2(r,g,b);
-		grayLevel = rgb.calcGrayLevel2(r,g,b);
+		grayLevel = rgb.calcGrayLevel(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
 		{
@@ -103,6 +103,8 @@ void colorThreshRenamingScript()
 				pix += vecColor.at(j) + toString(colorLevel);
 			}
 		}
+		if(grayLevel>=93) pix = "Grey" + toString(colorLevel);
+		if(vecColor.at(0)=="Black") pix = "Black" + toString(colorLevel);
 			fprintf(fp,"%s,%f,%f,%f,%f,%f,%f\n",
 					pix.c_str(),absMeanThresh[i][0],absMeanThresh[i][1],absMeanThresh[i][2],
 					normMeanThresh[i][0],normMeanThresh[i][1],normMeanThresh[i][2]);
