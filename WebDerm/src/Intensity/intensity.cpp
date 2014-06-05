@@ -359,7 +359,7 @@ deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<doubl
 	deque<double> vec1;
 	deque< deque<double> > vec2;
 	unsigned int x=0,y=0;
-	int scanSize=3; //3x3
+	int scanSize=2; //3x3
 	unsigned int tempX=scanSize, tempY=scanSize; //scan size
 	while(y<intensityVec.size()) {
 		while(x<intensityVec.at(y).size()) {
@@ -538,7 +538,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 		localCCs.clear();
 		localShades.clear();
 	}
-	//c.output2Image(smoothIntensityVec);
+	c.output2Image(smoothIntensityVec);
 	writeIntensityMatrix(intensityVec,name);
 	//writeNormalizedIntensityMatrix(normIntensityVec,name);
 	writeSmoothIntensityMatrix(smoothIntensityVec,name);

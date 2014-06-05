@@ -144,15 +144,23 @@ void runHysteresis()
 	name = getImageName(filename);
 	if(input=="1") size = Size(1,1);
 	if(input=="2") size = Size(2,2);
-	rgb.importThresholds();
-	hsl.importHslThresholds();
-	hsl.importLsThreshold();
-	in.importThresholds();
-	if(size.height==1 && size.width==1)
-		hysteresis1x1(img2,name);
-	else
-		hysteresis(img2,size,name);
-
+	bool flag[4];
+	flag[0]=rgb.importThresholds();
+	flag[1]=hsl.importHslThresholds();
+	flag[2]=hsl.importLsThreshold();
+	flag[3]=in.importThresholds();
+	for(int i=0; i<4; i++) {
+		if(flag[i]==false) {
+			flag[0] = false;
+			break;
+		}
+	}
+	if(flag[0]==true) {
+		if(size.height==1 && size.width==1)
+			hysteresis1x1(img2,name);
+		else
+			hysteresis(img2,size,name);
+	}
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 }

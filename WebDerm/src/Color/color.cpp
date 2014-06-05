@@ -119,7 +119,7 @@ void Color::output2Image(deque< deque<double> > &input) {
 			img.at<uchar>(y,x) = input.at(y).at(x);
 		}
 	}
-	//imwrite("3x3imgBw.png",img);
-	imshow("BW",img);
-	waitKey(0);
+	imwrite("2x2imgBw.png",img);
+	//imshow("BW",img);
+	//waitKey(0);
 }
