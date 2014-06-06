@@ -249,8 +249,8 @@ String Intensity::calcShade(double inten, int x, int y) {
 	static double *thresh;
 	static int *shadeIndex;
 	if(flag==0) {
-		thresh = new double[shadeAmt]();
-		shadeIndex = new int[shadeAmt]();
+		thresh = new double[shadeAmt];
+		shadeIndex = new int[shadeAmt];
 		//initialize thresholds to array
 		for(int i=0; i<shadeAmt; i++) {
 			thresh[i] = minIntensity + (i*interval);
@@ -293,8 +293,8 @@ String Intensity::calcShade(double inten, int x, int y) {
 		}
 	}
 	if(x==698 && y==698) {
-		delete thresh;
-		delete shadeIndex;
+		delete[] thresh;
+		delete[] shadeIndex;
 		thresh = NULL;
 		shadeIndex = NULL;
 	}

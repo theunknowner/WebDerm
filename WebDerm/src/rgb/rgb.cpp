@@ -399,6 +399,7 @@ double rgb::calcColorLevel(double red, double green, double blue)
 
 double rgb::getGrayLevel(String color)
 {
+	Color c;
 	double level=0;
 	size_t pos=0;
 	String str, mainColor="Gray";
@@ -575,10 +576,14 @@ String rgb::calcColor2(int red, int green, int blue) {
 	hue = hsl.getHue();
 	lum = roundDecimal(hsl.getLum(),2);
 	sat = roundDecimal(hsl.getSat(),2);
-	grayLevel = calcGrayLevel2(red,green,blue);
+	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
-	//grayLumLevel = calcGrayLevel2(red,green,blue);
+	double grayLumLevel = calcGrayLevel2(red,green,blue);
+	double ratio = grayLevel/colorLevel;
+	ratio = roundDecimal(ratio,2);
 	if(grayLevel>=95 && lum>0.20)
+		pix = "Grey" + toString(colorLevel);
+	if(grayLumLevel>85 && ratio<1.68)
 		pix = "Grey" + toString(colorLevel);
 	else {
 		for(unsigned int i=0; i<hueThresh.size(); i++) {
@@ -598,7 +603,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 								else if(pix!="Violet" && grayLevel>=90)
 									pix = "Grey" + toString(colorLevel);
 								else
-									pix = "Gray" + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
+									pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
 							}
 							return pix;
 						}

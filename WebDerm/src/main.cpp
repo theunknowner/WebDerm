@@ -17,25 +17,25 @@
 
 int main(int argc,char** argv)
 {
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
 	Intensity in;
 	rgb.importThresholds();
+	//rgb.importThresholds();
 	hsl.importLsThreshold();
 	hsl.importHslThresholds();
 	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	int ind=0;
-	double dist=0;
-	cout << rgb.calcColor2(193, 155, 153) << endl;
-	cout << rgb.calcColor2(162, 132, 131) << endl;
-	cout << rgb.pushColor(162, 132, 131,dist,ind) << endl;
-	//cout << dist << endl;
+	cout << rgb.calcGrayLevel(114, 82, 79) << endl;
+	cout << rgb.calcGrayLevel2(114, 82, 79) << endl;
+	cout << rgb.calcColorLevel2(114, 82, 79) << endl;
 	//colorThreshRenamingScript();
 	//addNewColors(img,Point(363,314),Point(365,316),"Gray","Gray");
 	//cout << rgb.calcGrayLevel2(202, 192, 193) << endl;
@@ -52,8 +52,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 626;
-	int row = 588;
+	int col = 384;
+	int row = 246;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

@@ -26,5 +26,6 @@ public:
 	void output2Image(deque< deque<double> > &input);
 	void output2Image2(deque< deque<String> > &input, String name);
 	void output2Image3(deque< deque<String> > &window, String name);
+	String fixColors(String pix, double r, double g, double b);
 };
 #endif /* COLOR_H_ */

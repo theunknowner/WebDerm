@@ -11,7 +11,9 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "intensity.h"
 
 String newShade(String pix, double indexChange,String shade, String shadePrev);
+void checkGrayRatio(deque< deque<String> > &windowVec);
 #endif /* RULES_H_ */

@@ -10,16 +10,10 @@
 //check if color1 contains color2
 bool Color::containsColor(String color1, String color2)
 {
-	size_t pos=0;
-	pos = color1.find("+");
-	if(pos!=string::npos)
-	{
-		if(color2 == color1.substr(0,pos) || color2 == color1.substr(pos+1,color1.size()-(pos+1)))
-		{
-			return true;
-		}
-	}
-	return false;
+	if(color1.find(color2)!=string::npos)
+		return true;
+	else
+		return false;
 }
 
 //returns the amount of time pixels contain main color
@@ -72,6 +66,7 @@ String Color::extractShade(String pix) {
 	int shadeCount = in.getShadeCount();
 	String shade = "";
 	if(pix=="Black") return pix;
+	if(pix.find("Gray")!=string::npos) return "Gray";
 	for(int i=0; i<shadeCount; i++) {
 		shade = in.getShade(i);
 		if(pix.find(shade)!=string::npos)
@@ -98,11 +93,12 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	double grayLevel=0;
 	double colorLevel=0;
 	extractColorFromString(pix, colorVec);
-	grayLevel = rgb.calcGrayLevel2(r,g,b);
+	grayLevel = rgb.calcGrayLevel(r,g,b);
 	colorLevel = rgb.calcColorLevel2(r,g,b);
+	double grayLumLevel = rgb.calcGrayLevel2(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
 		if(colorVec.at(i)=="Gray")
-			pix2 += colorVec.at(i) + toString(grayLevel);
+			pix2 += colorVec.at(i) + toString(grayLumLevel);
 		else
 			pix2 += colorVec.at(i) + toString(colorLevel);
 	}
@@ -216,4 +212,15 @@ void Color::output2Image3(deque< deque<String> > &window, String name) {
 		deque<int>().swap(thresh1);
 		deque< deque<int> >().swap(values);
 	}
+}
+
+String Color::fixColors(String pix, double r, double g, double b) {
+	rgb rgb;
+	String color=pix;
+	double colorLevel = rgb.calcColorLevel2(r,g,b);
+	if(getMainColor(pix)=="Gray")
+		color = "Grey" + toString(colorLevel);
+	if(containsColor(pix,"Gray") && containsColor(pix,"Grey"))
+		color = "Grey" + toString(colorLevel);
+	return color;
 }
