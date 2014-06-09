@@ -508,7 +508,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			}
 			if(pix2!="Black") {
 				loc = j-(localIndexes.size()-index)+1;
-				shade = newShade(pix,indexChange,shade,localShade);
+				bool flag = specialRules(pix,indexChange,shade,localShade,ccCurr);
+				if(flag==true) pix2 = c.getMainColor(pix);
 				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(loc);
 				shadeVec1.push_back(shade);
 			}

@@ -451,7 +451,7 @@ double rgb::calcRelLum(double red, double green, double blue)
 double rgb::calcPerceivedBrightness(double red, double green, double blue) {
 	double lum;
 	lum = sqrt((0.299*red*red) + (0.587*green*green) + (0.114*blue*blue));
-	lum /= 255;
+	//lum /= 255;
 	return lum;
 }
 //outputs image window with color of rgb value
@@ -518,7 +518,9 @@ double rgb::calcGrayLevel2(int red, int green, int blue) {
 }
 
 double rgb::calcColorLevel2(double red, double green, double blue) {
-	double lum = roundDecimal(calcPerceivedBrightness(red, green, blue),2) * 100;
+	double lum = calcPerceivedBrightness(red, green, blue);
+	lum /=255;
+	lum = roundDecimal(lum,2) * 100;
 	lum = 100 - lum;
 	return lum;
 }
@@ -579,12 +581,12 @@ String rgb::calcColor2(int red, int green, int blue) {
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
 	double grayLumLevel = calcGrayLevel2(red,green,blue);
-	double ratio = grayLevel/colorLevel;
+	double ratio = grayLumLevel/colorLevel;
 	ratio = roundDecimal(ratio,2);
 	if(grayLevel>=95 && lum>0.20)
 		pix = "Grey" + toString(colorLevel);
-	if(grayLumLevel>85 && ratio<1.68)
-		pix = "Grey" + toString(colorLevel);
+	//if(grayLumLevel>85 && ratio<1.68)
+		//pix = "Grey" + toString(colorLevel);
 	else {
 		for(unsigned int i=0; i<hueThresh.size(); i++) {
 			if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {

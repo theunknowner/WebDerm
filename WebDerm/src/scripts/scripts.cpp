@@ -542,3 +542,37 @@ void changeColors(Mat &img, Point pt1, Point pt2) {
 		}
 	}
 }
+
+void generateColorRegionTable(Mat &img, Point pt, Size size) {
+	int ptY = pt.y-1;
+	int ptX = pt.x-1;
+	int width = size.width;
+	int height = size.height;
+	int r,g,b;
+	String pix;
+	double dist = -1.0;
+	int ind=0;
+	double lum=0, grayLevel=0, colorLevel=0;
+	rgb rgb;
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
+	fprintf(fp,"Coord,Color,Dist Push,GrayLevel,ColorLevel,Darkness\n");
+	for(int y=ptY; y<ptY+height; y++) {
+		for(int x=ptX; x<ptX+width; x++) {
+			r = img.at<Vec3b>(y,x)[2];
+			g = img.at<Vec3b>(y,x)[1];
+			b = img.at<Vec3b>(y,x)[0];
+			pix = rgb.calcColor2(r,g,b);
+			if(pix=="OTHER")
+				pix = rgb.pushColor(r,g,b,dist,ind);
+			dist = roundDecimal(dist,1);
+			lum = rgb.calcPerceivedBrightness(r,g,b);
+			lum = round(lum);
+			grayLevel = rgb.calcGrayLevel2(r,g,b);
+			colorLevel = rgb.calcColorLevel2(r,g,b);
+			fprintf(fp,"(%d;%d),%s,%f,%f,%f,%f\n",x+1,y+1,pix.c_str(),dist,
+					grayLevel,colorLevel,lum);
+			dist = -1.0;
+		}
+	}
+}

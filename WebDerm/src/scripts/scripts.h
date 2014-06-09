@@ -28,5 +28,6 @@ void showPushColorOnImage(Mat &img, int index);
 void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2);
 void changeColors(Mat &img, Point pt1, Point pt2);
 void colorThreshRenamingScript();
+void generateColorRegionTable(Mat &img, Point pt, Size size);
 
 #endif /* SCRIPTS_H_ */

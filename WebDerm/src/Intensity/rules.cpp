@@ -7,34 +7,47 @@
 
 #include "rules.h"
 
-String newShade(String pix, double indexChange, String shade, String shadePrev) {
+
+
+bool specialRules(String &pix, double &indexChange, String &shade, String &shadePrev, double &darkness) {
+	bool flag=false;
 	rgb rgb;
 	Color c;
 	Intensity in;
+	String newShade = shade;
+	String newPix = pix;
+	double grayLevel = rgb.getGrayLevel(pix);
+	double colorLevel = rgb.getColorLevel(pix);
 
 /** provisional rule #1 **/
 	double indexChangeThresh=2.25;
 	if(abs(indexChange)>=indexChangeThresh) {
 		int index = in.getShadeIndex(shade);
 		index += (indexChange/indexChangeThresh);
-		shade = in.getShade(index);
+		newShade = in.getShade(index);
+		flag=true;
 	}
-/** provisional rule #2 **/
+
+/** provisional rule #2 - Determining Gray **/
+	if(grayLevel>=90) {
+		if(colorLevel>=60 && darkness<=105) {
+			newShade = "Dark";
+		}
+		else
+			pix = "Grey" + toString(colorLevel);
+		flag=true;
+	}
+/** provisional rule #3 for Grayish Pink ONLY **/
 	String color = c.getMainColor(pix);
-	double grayLevel = rgb.getGrayLevel(pix);
-	double colorLevel = rgb.getColorLevel(pix);
-	double ratio=grayLevel/colorLevel;
-	if(grayLevel>85 && ratio>1.75 && color=="Pink")
-		shade = "Gray";
-/*
-	if(colorLevel<=25)	return White;
-	if(grayLevel>=85 && colorLevel<=30) return White;
-	if(indexChange<=(-2) && (grayLevel>=91 || color=="Grey" || colorLevel<=25)) return White;
-	if(indexChange>=2) return Dark;
-	if(shadePrev==White && indexChange==0) {
-		return shadePrev;
-	}*/
-	return shade;
+	if(color=="Pink") {
+		if(grayLevel>=75 && colorLevel>=45 && colorLevel<=50) {
+			newShade = "Gray";
+			flag = true;
+		}
+	}
+	shade = newShade;
+	pix = newPix;
+	return flag;
 }
 
 void checkGrayRatio(deque< deque<String> > &windowVec) {

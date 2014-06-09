@@ -17,8 +17,6 @@
 
 int main(int argc,char** argv)
 {
-	runHysteresis();
-	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -30,12 +28,39 @@ int main(int argc,char** argv)
 	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph8.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	cout << rgb.calcGrayLevel(114, 82, 79) << endl;
-	cout << rgb.calcGrayLevel2(114, 82, 79) << endl;
-	cout << rgb.calcColorLevel2(114, 82, 79) << endl;
+	//cout << rgb.calcPerceivedBrightness(117, 93, 90) << endl;
+	//cout << rgb.calcPerceivedBrightness(118, 113, 112) << endl;
+	cout << rgb.calcGrayLevel2(147, 119, 118) << endl;
+	cout << rgb.calcColorLevel2(147, 119, 118) << endl;
+	//generateColorRegionTable(img2, Point(275,574), Size(3,3));
+	/*
+	int ind=0;
+	double dist=0;
+	String pix;
+	int r,g,b;
+	int x=352-1;
+	int y=347-1;
+	for(int i=y; i<y+3; i++) {
+		for(int j=x; j<x+3; j++) {
+			r = img2.at<Vec3b>(i,j)[2];
+			g = img2.at<Vec3b>(i,j)[1];
+			b = img2.at<Vec3b>(i,j)[0];
+			cout << j+1 << "," << i+1 << endl;
+			pix = rgb.calcColor2(r,g,b);
+			cout << pix << endl;
+			if(pix=="OTHER") {
+				cout << rgb.pushColor(r,g,b,dist,ind) << endl;
+				cout << "Dist: " << dist << endl;
+				cout << "Index: " << ind+2 << endl;
+			}
+			cout << "Brightness: " << rgb.calcPerceivedBrightness(r,g,b) << endl;
+			cout << "GrayLevel: " << rgb.calcGrayLevel2(r,g,b) << endl;
+			cout << "ColorLevel: " << rgb.calcColorLevel2(r,g,b) << endl;
+		}
+	}
 	//colorThreshRenamingScript();
 	//addNewColors(img,Point(363,314),Point(365,316),"Gray","Gray");
 	//cout << rgb.calcGrayLevel2(202, 192, 193) << endl;
@@ -52,8 +77,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 384;
-	int row = 246;
+	int col = 385;
+	int row = 339;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
