@@ -31,11 +31,9 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/LPH","lph8.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	//cout << rgb.calcPerceivedBrightness(117, 93, 90) << endl;
-	//cout << rgb.calcPerceivedBrightness(118, 113, 112) << endl;
-	cout << rgb.calcGrayLevel2(147, 119, 118) << endl;
-	cout << rgb.calcColorLevel2(147, 119, 118) << endl;
-	//generateColorRegionTable(img2, Point(275,574), Size(3,3));
+	//cout << rgb.calcPerceivedBrightness(138, 145, 127) << endl;
+	//cout << rgb.calcPerceivedBrightness(140,137,137) << endl;
+	generateColorRegionTable(img2, Point(328,521), Size(3,3));
 	/*
 	int ind=0;
 	double dist=0;

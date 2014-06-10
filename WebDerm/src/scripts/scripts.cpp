@@ -549,14 +549,16 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 	int width = size.width;
 	int height = size.height;
 	int r,g,b;
-	String pix;
+	String pix,pix2;
 	double dist = -1.0;
 	int ind=0;
-	double lum=0, grayLevel=0, colorLevel=0;
+	double lum=0, grayLevel=0, colorLevel=0, grayLumLevel=0;
+	double ratio=0, ratio2=0;
 	rgb rgb;
+	Color c;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
-	fprintf(fp,"Coord,Color,Dist Push,GrayLevel,ColorLevel,Darkness\n");
+	fprintf(fp,"Coord,Color,RGB,Dist Push,GrayLevel,GrayLumLevel,ColorLevel,Darkness,GL/CL,GLL/CL\n");
 	for(int y=ptY; y<ptY+height; y++) {
 		for(int x=ptX; x<ptX+width; x++) {
 			r = img.at<Vec3b>(y,x)[2];
@@ -565,13 +567,18 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 			pix = rgb.calcColor2(r,g,b);
 			if(pix=="OTHER")
 				pix = rgb.pushColor(r,g,b,dist,ind);
+			pix2 = c.getMainColor(pix);
 			dist = roundDecimal(dist,1);
 			lum = rgb.calcPerceivedBrightness(r,g,b);
 			lum = round(lum);
-			grayLevel = rgb.calcGrayLevel2(r,g,b);
+			grayLumLevel = rgb.calcGrayLevel2(r,g,b);
+			grayLevel = rgb.calcGrayLevel(r,g,b);
+			//if(pix2=="Grey") grayLevel = 100;
 			colorLevel = rgb.calcColorLevel2(r,g,b);
-			fprintf(fp,"(%d;%d),%s,%f,%f,%f,%f\n",x+1,y+1,pix.c_str(),dist,
-					grayLevel,colorLevel,lum);
+			ratio2 = grayLumLevel/colorLevel;
+			ratio = grayLevel/colorLevel;
+			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),%f,%f,%f,%f,%f,%f,%f\n",x+1,y+1,pix.c_str(),r,g,b,dist,
+					grayLevel,grayLumLevel,colorLevel,lum,ratio,ratio2);
 			dist = -1.0;
 		}
 	}

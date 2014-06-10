@@ -30,11 +30,10 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 
 /** provisional rule #2 - Determining Gray **/
 	if(grayLevel>=90) {
-		if(colorLevel>=60 && darkness<=105) {
+		newPix = "Grey" + toString(colorLevel);
+		if(colorLevel>=60) {
 			newShade = "Dark";
 		}
-		else
-			pix = "Grey" + toString(colorLevel);
 		flag=true;
 	}
 /** provisional rule #3 for Grayish Pink ONLY **/

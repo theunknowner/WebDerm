@@ -544,7 +544,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	}
 	//c.output2Image(smoothIntensityVec);
 	//c.output2Image2(shadeVec2,name);
-	c.output2Image3(colorVec2,name);
+	c.output2ImageColor(colorVec2,name);
 	writeIntensityMatrix(intensityVec,name);
 	//writeNormalizedIntensityMatrix(normIntensityVec,name);
 	writeSmoothIntensityMatrix(smoothIntensityVec,name);

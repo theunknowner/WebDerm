@@ -23,9 +23,8 @@ public:
 	String reassignLevels(String color, int r, int g, int b);
 	String getMainColor(String color);
 	String extractShade(String pix);
-	void output2Image(deque< deque<double> > &input);
-	void output2Image2(deque< deque<String> > &input, String name);
-	void output2Image3(deque< deque<String> > &window, String name);
+	void output2ImageGray(deque< deque<String> > &input, String name);
+	void output2ImageColor(deque< deque<String> > &window, String name);
 	String fixColors(String pix, double r, double g, double b);
 };
 #endif /* COLOR_H_ */

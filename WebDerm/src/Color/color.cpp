@@ -121,20 +121,7 @@ String Color::getMainColor(String color) {
 	return pix;
 }
 
-void Color::output2Image(deque< deque<double> > &input) {
-	Mat img = img.zeros(Size(700,700),CV_8U);
-	for(unsigned int y=0; y<input.size(); y++) {
-		for(unsigned int x=0; x<input.at(y).size(); x++) {
-			img.at<uchar>(y,x) = input.at(y).at(x);
-		}
-	}
-	imwrite("2x2imgBw.png",img);
-	//imshow("BW",img);
-	//waitKey(0);
-	img.release();
-}
-
-void Color::output2Image2(deque< deque<String> > &input, String name) {
+void Color::output2ImageGray(deque< deque<String> > &input, String name) {
 	Mat img = img.zeros(Size(700,700),CV_8U);
 	for(unsigned int y=0; y<input.size(); y++) {
 		for(unsigned int x=0; x<input.at(y).size(); x++) {
@@ -157,7 +144,7 @@ void Color::output2Image2(deque< deque<String> > &input, String name) {
 	img.release();
 }
 
-void Color::output2Image3(deque< deque<String> > &window, String name) {
+void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 	String filename = path+"Thresholds/output-shades.csv";
 	fstream fs(filename.c_str());
 	if(fs.is_open()) {
