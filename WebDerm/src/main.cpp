@@ -17,6 +17,8 @@
 
 int main(int argc,char** argv)
 {
+	//runHysteresis();
+
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -28,19 +30,19 @@ int main(int argc,char** argv)
 	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph8.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	//cout << rgb.calcPerceivedBrightness(138, 145, 127) << endl;
-	//cout << rgb.calcPerceivedBrightness(140,137,137) << endl;
-	generateColorRegionTable(img2, Point(328,521), Size(3,3));
-	/*
+	cout << rgb.calcColorLevel2(192, 191, 185) <<endl;
+	//cout << rgb.calcColorLevel2(30, 29, 52) <<endl;
+	//generateColorRegionTable(img2, Point(341,172), Size(3,3));
+/*
 	int ind=0;
 	double dist=0;
 	String pix;
 	int r,g,b;
-	int x=352-1;
-	int y=347-1;
+	int x=218-1;
+	int y=298-1;
 	for(int i=y; i<y+3; i++) {
 		for(int j=x; j<x+3; j++) {
 			r = img2.at<Vec3b>(i,j)[2];
@@ -55,7 +57,8 @@ int main(int argc,char** argv)
 				cout << "Index: " << ind+2 << endl;
 			}
 			cout << "Brightness: " << rgb.calcPerceivedBrightness(r,g,b) << endl;
-			cout << "GrayLevel: " << rgb.calcGrayLevel2(r,g,b) << endl;
+			cout << "GrayLevel: " << rgb.calcGrayLevel(r,g,b) << endl ;
+			cout << "GrayLumLevel: " << rgb.calcGrayLevel2(r,g,b) << endl;
 			cout << "ColorLevel: " << rgb.calcColorLevel2(r,g,b) << endl;
 		}
 	}
@@ -75,8 +78,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 385;
-	int row = 339;
+	int col = 353;
+	int row = 360;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

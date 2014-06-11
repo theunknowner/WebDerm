@@ -10,6 +10,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "rgb_global.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Intensity/rules.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 class rgb
 {
@@ -30,7 +32,6 @@ public:
 	String pushColor(int red, int green, int blue,double &dist, int &ind);
 	String pushColor(int red, int green, int blue, int &ind, double &dist);
 	double calcGrayLevel(int red, int green, int blue);
-	double calcGrayLevel2(double satLevel, double lum);
 	double calcGrayLevel2(int red, int green, int blue);
 	double calcColorLevel(double red, double green, double blue);
 	double calcColorLevel2(double red, double green, double blue);
@@ -40,8 +41,8 @@ public:
 	void showPixelColor(int r, int g, int b, Size size);
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 	void release_memory();
-	String calcColor(int red, int green, int blue);
 	String calcColor2(int red, int green, int blue);
+	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	double calcRelLum(double red, double green, double blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
 };

@@ -45,15 +45,10 @@
 							g = img.at<Vec3b>(y,x)[1];
 							r = img.at<Vec3b>(y,x)[2];
 							pix = rgb.checkBlack(r,g,b);
-							if(pix=="OTHER")
-							{
-								pix = rgb.calcColor2(r,g,b);
-								if(pix=="OTHER") {
-									pix = rgb.pushColor(r,g,b,dist,ind);
-									pix = colorObj.reassignLevels(pix,r,g,b);
-									if(dist>10)
-										fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
-								}
+							if(pix=="OTHER") {
+								pix = rgb.calcColor(r,g,b,dist,ind);
+								if(dist>10)
+									fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
 							}
 							pixelColorWindow.push_back(pix);
 						}
@@ -67,15 +62,10 @@
 						g = img.at<Vec3b>(y,col+(size.width-1))[1];
 						r = img.at<Vec3b>(y,col+(size.width-1))[2];
 						pix = rgb.checkBlack(r,g,b);
-						if(pix=="OTHER")
-						{
-							pix = rgb.calcColor2(r,g,b);
-							if(pix=="OTHER") {
-								pix = rgb.pushColor(r,g,b,dist,ind);
-								pix = colorObj.reassignLevels(pix,r,g,b);
-								if(dist>10)
-									fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
-							}
+						if(pix=="OTHER") {
+							pix = rgb.calcColor(r,g,b,dist,ind);
+							if(dist>10)
+								fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
 						}
 						pixelColorWindow.pop_front();
 						pixelColorWindow.push_back(pix);
@@ -154,13 +144,9 @@
 	void hysteresis1x1(Mat img, String name) {
 		rgb rgb;
 		hsl hsl;
-		contrast con;
 		Color colorObj;
 		int r,g,b;
 		String pix;
-		deque<int> hueVals;
-		deque<double> hueAvg;
-		deque< deque<double> > hueVec;
 		deque<String> colorWindow;
 		deque< deque<String> > windowVec;
 		double dist=0;
@@ -171,22 +157,11 @@
 				g = img.at<Vec3b>(row,col)[1];
 				b = img.at<Vec3b>(row,col)[0];
 				pix = rgb.checkBlack(r,g,b);
-				hsl.rgb2hsl(r,g,b);
-				hueVals.push_back(hsl.getHue());
 				if(pix=="OTHER") {
-					pix = rgb.calcColor2(r,g,b);
-					if(pix=="OTHER") {
-						pix = rgb.pushColor(r,g,b,dist,ind);
-						if(dist>4)
-							pix = colorObj.reassignLevels(pix,r,g,b);
-					}
+					pix = rgb.calcColor(r,g,b,dist,ind);
 				}
-				hueAvg.push_back(hsl.calcHueAvg(hueVals));
-				hueVals.clear();
 				colorWindow.push_back(pix);
 			}
-			hueVec.push_back(hueAvg);
-			hueAvg.clear();
 			windowVec.push_back(colorWindow);
 			colorWindow.clear();
 		}

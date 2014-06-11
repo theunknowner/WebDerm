@@ -7,7 +7,24 @@
 
 #include "rules.h"
 
+String specialRules(String pix, int r, int g, int b) {
+	Color c;
+	rgb rgb;
+	String pix2 = pix;
+	String color = c.getMainColor(pix);
+	double grayLevel = rgb.calcGrayLevel(r,g,b);
+	double colorLevel = rgb.calcColorLevel2(r,g,b);
 
+	/** rule 1 **/
+	if(color!="Violet" && grayLevel>=90)
+		pix2 = "Grey" + toString(colorLevel);
+
+	/** rule 2 **/
+	if(color=="Pink" && grayLevel>=80 && colorLevel>=60)
+		pix2 = "Grey" + toString(colorLevel);
+
+	return pix2;
+}
 
 bool specialRules(String &pix, double &indexChange, String &shade, String &shadePrev, double &darkness) {
 	bool flag=false;
@@ -18,6 +35,7 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 	String newPix = pix;
 	double grayLevel = rgb.getGrayLevel(pix);
 	double colorLevel = rgb.getColorLevel(pix);
+	String color = c.getMainColor(pix);
 
 /** provisional rule #1 **/
 	double indexChangeThresh=2.25;
@@ -29,21 +47,26 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 	}
 
 /** provisional rule #2 - Determining Gray **/
-	if(grayLevel>=90) {
+	if(grayLevel>=90 && color!="Violet") {
 		newPix = "Grey" + toString(colorLevel);
 		if(colorLevel>=60) {
 			newShade = "Dark";
 		}
 		flag=true;
 	}
+
 /** provisional rule #3 for Grayish Pink ONLY **/
-	String color = c.getMainColor(pix);
 	if(color=="Pink") {
 		if(grayLevel>=75 && colorLevel>=45 && colorLevel<=50) {
 			newShade = "Gray";
 			flag = true;
 		}
+		if(grayLevel>=75 && colorLevel>=55 && colorLevel<=66) {
+			newShade = "Gray";
+			flag=true;
+		}
 	}
+
 	shade = newShade;
 	pix = newPix;
 	return flag;

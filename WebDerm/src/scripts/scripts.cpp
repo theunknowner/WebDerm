@@ -110,6 +110,7 @@ void colorThreshRenamingScript()
 					normMeanThresh[i][0],normMeanThresh[i][1],normMeanThresh[i][2]);
 			pix.clear(); vecColor.clear();
 	}
+	fclose(fp);
 }
 
 void colorThreshScript()
@@ -138,6 +139,7 @@ void colorThreshScript()
 		colorLevel = rgb.calcColorLevel(r,g,b);
 		fprintf(fp,"%s,%d,%f,%f,%f,%d\n", rgbColors.at(i).c_str(),hue,sat,lum,grayLevel,colorLevel);
 	}
+	fclose(fp);
 }
 
 void sortColorThreshold(String color1, String color2) {
@@ -513,60 +515,36 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 	String max = maxFormulaR1C1(1,rgbVec.size());
 	fprintf(fp,",,,,,,,%s,%s,%s\n",min.c_str(),min.c_str(),min.c_str());
 	fprintf(fp,",,,,,,,%s,%s,%s\n",max.c_str(),max.c_str(),max.c_str());
+	fclose(fp);
 }
 
-void changeColors(Mat &img, Point pt1, Point pt2) {
-	rgb rgb;
-	hsl hsl;
-	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/newColors.csv","w");
-	int r,g,b;
-	double dist=0;
-	int ind=0;
-	double grayLevel=0,lum=0;
-	int colorLevel=0;
-	String pix;
-	fprintf(fp,"Color,R,G,B,Dist,Index,GrayLvl,LumLvl\n");
-	for(int row=(pt1.y-1); row<pt2.y; row++) {
-		for(int col=(pt1.x-1); col<pt2.x; col++) {
-			r = img.at<Vec3b>(row,col)[2];
-			g = img.at<Vec3b>(row,col)[1];
-			b = img.at<Vec3b>(row,col)[0];
-			hsl.rgb2hsl(r,g,b);
-			lum = roundDecimal(hsl.getLum(),2);
-			colorLevel = rgb.calcColorLevel(r,g,b);
-			grayLevel = rgb.calcGrayLevel(r,g,b);
-			grayLevel = rgb.calcGrayLevel2(grayLevel,lum);
-			pix = rgb.pushColor(r,g,b,dist,ind);
-			fprintf(fp, "%s,%d,%d,%d,%f,%d,%f,%d\n",pix.c_str(),r,g,b,dist,ind+2,grayLevel,colorLevel);
-		}
-	}
-}
-
+//generates a csv file with info of specified pixel-location
 void generateColorRegionTable(Mat &img, Point pt, Size size) {
 	int ptY = pt.y-1;
 	int ptX = pt.x-1;
 	int width = size.width;
 	int height = size.height;
 	int r,g,b;
+	double h,s,l;
 	String pix,pix2;
 	double dist = -1.0;
 	int ind=0;
 	double lum=0, grayLevel=0, colorLevel=0, grayLumLevel=0;
 	double ratio=0, ratio2=0;
 	rgb rgb;
+	hsl hsl;
 	Color c;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
-	fprintf(fp,"Coord,Color,RGB,Dist Push,GrayLevel,GrayLumLevel,ColorLevel,Darkness,GL/CL,GLL/CL\n");
+	fprintf(fp,"Coord,Color,RGB,Hue,Dist Push,GrayLevel,GrayLumLevel,ColorLevel,Darkness,GL/CL,GLL/CL\n");
 	for(int y=ptY; y<ptY+height; y++) {
 		for(int x=ptX; x<ptX+width; x++) {
 			r = img.at<Vec3b>(y,x)[2];
 			g = img.at<Vec3b>(y,x)[1];
 			b = img.at<Vec3b>(y,x)[0];
-			pix = rgb.calcColor2(r,g,b);
-			if(pix=="OTHER")
-				pix = rgb.pushColor(r,g,b,dist,ind);
+			hsl.rgb2hsl(r,g,b);
+			h = hsl.getHue();
+			pix = rgb.calcColor(r,g,b,dist,ind);
 			pix2 = c.getMainColor(pix);
 			dist = roundDecimal(dist,1);
 			lum = rgb.calcPerceivedBrightness(r,g,b);
@@ -577,9 +555,10 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 			colorLevel = rgb.calcColorLevel2(r,g,b);
 			ratio2 = grayLumLevel/colorLevel;
 			ratio = grayLevel/colorLevel;
-			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),%f,%f,%f,%f,%f,%f,%f\n",x+1,y+1,pix.c_str(),r,g,b,dist,
-					grayLevel,grayLumLevel,colorLevel,lum,ratio,ratio2);
+			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),%f,%f,%f,%f,%f,%f,%f,%f\n",x+1,y+1,pix.c_str(),r,g,b,h,
+					dist,grayLevel,grayLumLevel,colorLevel,lum,ratio,ratio2);
 			dist = -1.0;
 		}
 	}
+	fclose(fp);
 }

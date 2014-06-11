@@ -488,18 +488,6 @@ void rgb::release_memory()
 	deque<String>().swap(mainColors);
 }
 
-double rgb::calcGrayLevel2(double satLevel, double lum) {
-	double grayLevel=0;
-	double lumInt = lum * 100;
-	if(lum<0.5) {
-		grayLevel = 100 + ((satLevel-100)/40) * (lumInt-10);
-	}
-	else {
-		grayLevel = satLevel - (satLevel/40) * (lumInt-50);
-	}
-	return round(grayLevel);
-}
-
 double rgb::calcGrayLevel2(int red, int green, int blue) {
 	hsl hsl;
 	double grayLevel=0,lum=0,sat=0;
@@ -525,49 +513,6 @@ double rgb::calcColorLevel2(double red, double green, double blue) {
 	return lum;
 }
 
-String rgb::calcColor(int red, int green, int blue) {
-	hsl hsl;
-	String pix = "OTHER";
-	int hue;
-	double lum,sat;
-	double grayLevel, colorLevel;
-	hsl.rgb2hsl(red,green,blue);
-	hue = hsl.getHue();
-	lum = roundDecimal(hsl.getLum(),2);
-	sat = roundDecimal(hsl.getSat(),2);
-	grayLevel = calcGrayLevel(red,green,blue);
-	grayLevel = calcGrayLevel2(grayLevel,lum);
-	colorLevel = calcColorLevel(red,green,blue);
-	for(unsigned int i=0; i<hueThresh.size(); i++) {
-		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-			if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
-				if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
-					if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
-						pix = hslColors.at(i);
-						if(pix=="White" || pix=="Black") return pix;
-						if(pix=="Gray" && grayLevel==0) {
-							return "White";
-						}
-						if(pix=="Gray" && grayLevel!=0) {
-							pix += toString(grayLevel);
-							return pix;
-						}
-						if(grayLevel==0) {
-							pix = hslColors.at(i) + toString(colorLevel);
-						}
-						else {
-							//cout << pix << endl;
-							pix = "Gray" + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
-						}
-						return pix;
-					}
-				}
-			}
-		}
-	}
-	return pix;
-}
-
 String rgb::calcColor2(int red, int green, int blue) {
 	hsl hsl;
 	String pix = "OTHER";
@@ -581,12 +526,8 @@ String rgb::calcColor2(int red, int green, int blue) {
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
 	double grayLumLevel = calcGrayLevel2(red,green,blue);
-	double ratio = grayLumLevel/colorLevel;
-	ratio = roundDecimal(ratio,2);
 	if(grayLevel>=95 && lum>0.20)
 		pix = "Grey" + toString(colorLevel);
-	//if(grayLumLevel>85 && ratio<1.68)
-		//pix = "Grey" + toString(colorLevel);
 	else {
 		for(unsigned int i=0; i<hueThresh.size(); i++) {
 			if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
@@ -602,8 +543,6 @@ String rgb::calcColor2(int red, int green, int blue) {
 									pix += toString(colorLevel);
 								else if(pix=="Grey")
 									pix += toString(colorLevel);
-								else if(pix!="Violet" && grayLevel>=90)
-									pix = "Grey" + toString(colorLevel);
 								else
 									pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
 							}
@@ -614,5 +553,16 @@ String rgb::calcColor2(int red, int green, int blue) {
 			}
 		}
 	}
+	return pix;
+}
+
+String rgb::calcColor(int red, int blue, int green, double &dist, int &ind) {
+	Color c;
+	String pix;
+	pix = calcColor2(red,blue,green);
+	if(pix=="OTHER")
+		pix = pushColor(red,green,blue,dist,ind);
+	pix = c.reassignLevels(pix,red,green,blue);
+	pix = specialRules(pix,red,green,blue);
 	return pix;
 }

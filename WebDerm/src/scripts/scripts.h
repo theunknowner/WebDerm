@@ -15,6 +15,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/SpreadSheet/ssheet.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/MD5/md5.h"
 
 void colorThreshNamingScript();
 void colorThreshScript();
@@ -26,7 +27,6 @@ void spreadsheetCompareScript();
 void outputPixLoc(Mat img,int index);
 void showPushColorOnImage(Mat &img, int index);
 void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2);
-void changeColors(Mat &img, Point pt1, Point pt2);
 void colorThreshRenamingScript();
 void generateColorRegionTable(Mat &img, Point pt, Size size);
 

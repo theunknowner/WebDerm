@@ -38,12 +38,9 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER")
 			{
-				pix = rgb.calcColor2(r,g,b);
-				if(pix=="OTHER") {
-					pix = rgb.pushColor(r,g,b,ind,dist);
-					//if(dist>4)
-						pix = colorObj.reassignLevels(pix,r,g,b);
-				}
+				pix = rgb.calcColor(r,g,b,dist,ind);
+				pix = colorObj.reassignLevels(pix,r,g,b);
+				cout << dist << endl;
 				pixelColorWindow.push_back(pix);
 			}
 			else

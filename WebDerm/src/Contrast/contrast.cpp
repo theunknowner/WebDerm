@@ -208,7 +208,7 @@ void contrast::colorfulMatrix(Mat img, Size size, String name)
 							hueVals.push_back(hsl.getHue());
 							if(pix=="OTHER")
 							{
-								pix = rgb.calcColor(r,g,b);
+								pix = rgb.calcColor2(r,g,b);
 								if(pix=="OTHER") {
 									pix = rgb.pushColor(r,g,b,dist,ind);
 									if(dist>4)
