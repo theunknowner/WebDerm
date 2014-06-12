@@ -24,7 +24,6 @@ int main(int argc,char** argv)
 	Color c;
 	Intensity in;
 	rgb.importThresholds();
-	//rgb.importThresholds();
 	hsl.importLsThreshold();
 	hsl.importHslThresholds();
 	in.importThresholds();
@@ -33,8 +32,9 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	cout << rgb.calcColorLevel2(192, 191, 185) <<endl;
-	//cout << rgb.calcColorLevel2(30, 29, 52) <<endl;
+	cout << rgb.calcColorLevel2(132, 123, 124) << endl;
+	cout << rgb.calcColorLevel2(132, 123, 124);
+	//cout << checkEucDist(141,116,121) << endl;
 	//generateColorRegionTable(img2, Point(341,172), Size(3,3));
 /*
 	int ind=0;

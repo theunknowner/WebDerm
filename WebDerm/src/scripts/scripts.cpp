@@ -562,3 +562,44 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 	}
 	fclose(fp);
 }
+
+double checkEucDist(int r,int g, int b) {
+	String folderName = path+"Thresholds/";
+	String filename = folderName+"color-thresholds.csv";
+	fstream fsThresh(filename.c_str());
+	double dist=-1;
+	if(fsThresh.is_open()) {
+		rgb rgb;
+		String temp;
+		deque<String> vec;
+		deque<double> thresh;
+		int index=0,minIndex=0;
+		double distPrev=500;
+		getline(fsThresh,temp);
+		while(getline(fsThresh,temp)) {
+			index++;
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i>=1 && i<=3) {
+					thresh.push_back(atof(vec.at(i).c_str()));
+				}
+			}
+			dist = rgb.absEucDist(r,g,b,thresh);
+			if(dist<distPrev) {
+				distPrev = dist;
+				minIndex=index;
+			}
+			thresh.clear();
+			vec.clear();
+			if(dist<8) break;
+		}
+		cout << minIndex+1 << endl;
+		fsThresh.close();
+		deque<String>().swap(vec);
+		deque<double>().swap(thresh);
+	}
+	else
+		cout << "Importing color-thresholds.csv failed!" << endl;
+
+	return dist;
+}
