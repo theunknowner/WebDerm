@@ -21,6 +21,7 @@ public:
 	bool isThreshImported();
 	void setThreshImported(bool flag);
 	int getIndex(String color);
+	bool importColorThresholds();
 	bool importThresholds();
 	double normEucDist(double red, double green, double blue, deque<double> &vec);
 	double absEucDist(double red, double green, double blue, deque<double> &vec);
@@ -45,6 +46,8 @@ public:
 	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	double calcRelLum(double red, double green, double blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
+	double calcGrayLevel3(double red, double green, double blue);
+	bool importGrayLUT();
 };
 
 

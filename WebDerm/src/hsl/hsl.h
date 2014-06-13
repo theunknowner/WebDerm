@@ -22,9 +22,9 @@ public:
 	bool importLsThreshold();
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);
-	void rgb2hsl(double red, double green, double blue);
-	void rgb2hsb(double red, double green, double blue);
-	int getHue();
+	double *rgb2hsl(double red, double green, double blue);
+	double *hsl2rgb(double hue, double sat, double lum);
+	double getHue();
 	double getSat();
 	double getLum();
 	double getBrite();

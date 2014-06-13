@@ -272,7 +272,7 @@ String testColorAtLoc(Mat &img, Point pt, double &h) {
 	int r,g,b;
 	int ind= -3;
 	double dist=0;
-	double hue;
+	int hue=0;
 	String pix;
 	r = img.at<Vec3b>(pt.y-1,pt.x-1)[2];
 	g = img.at<Vec3b>(pt.y-1,pt.x-1)[1];
@@ -285,7 +285,8 @@ String testColorAtLoc(Mat &img, Point pt, double &h) {
 			pix = rgb.pushColor(r,g,b,ind,dist);
 		}
 	}
-	hue = (hsl.getHue()+180)%360;
+	hue = (hsl.getHue()+180);
+	hue %= 360;
 	hue /= 360;
 	h = hue;
 	cout << pix << img.at<Vec3b>(pt.y-1,pt.x-1) << ";" << ind+2 << ";" << hue<< endl;

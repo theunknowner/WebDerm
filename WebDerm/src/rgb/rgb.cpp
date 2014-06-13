@@ -23,8 +23,16 @@ int rgb::getIndex(String color) {
 	}
 	return -1;
 }
+
+bool rgb::importThresholds() {
+	bool flag1 = importColorThresholds();
+	bool flag2 = importGrayLUT();
+	if(flag1==true && flag2==true)
+		return true;
+	return false;
+}
 //imports RGB colorspace thresholds
-bool rgb::importThresholds()
+bool rgb::importColorThresholds()
 {
 	String folderName = path+"Thresholds/";
 	String filename = folderName+"color-thresholds.csv";
@@ -525,7 +533,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 	sat = roundDecimal(hsl.getSat(),2);
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
-	double grayLumLevel = calcGrayLevel2(red,green,blue);
+	double grayLumLevel = calcGrayLevel3(red,green,blue);
 	if(grayLevel>=95 && lum>0.20)
 		pix = "Grey" + toString(colorLevel);
 	else {
@@ -556,13 +564,54 @@ String rgb::calcColor2(int red, int green, int blue) {
 	return pix;
 }
 
-String rgb::calcColor(int red, int blue, int green, double &dist, int &ind) {
+String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	Color c;
 	String pix;
-	pix = calcColor2(red,blue,green);
+	pix = calcColor2(red,green,blue);
 	if(pix=="OTHER")
 		pix = pushColor(red,green,blue,dist,ind);
 	pix = c.reassignLevels(pix,red,green,blue);
 	pix = specialRules(pix,red,green,blue);
 	return pix;
+}
+
+bool rgb::importGrayLUT() {
+	String foldername = path+"Thresholds/";
+	String filename = foldername+"GrayLevelLUT.csv";
+	fstream fsThresh(filename.c_str());
+	if(fsThresh.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<double> thresh1;
+		getline(fsThresh,temp);
+		while(getline(fsThresh,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i>0)
+					thresh1.push_back(atof(vec.at(i).c_str()));
+			}
+			grayLUT.push_back(thresh1);
+			thresh1.clear();
+			vec.clear();
+		}
+		fsThresh.close();
+		deque<String>().swap(vec);
+		deque<double>().swap(thresh1);
+		return true;
+	}
+	else
+		cout << "Importing grayLUTs failed!" << endl;
+	return false;
+}
+
+double rgb::calcGrayLevel3(double red, double green, double blue) {
+	hsl hsl;
+	double grayLevel=0;
+	double *HSL = hsl.rgb2hsl(red,green,blue);
+	double sat = roundDecimal(HSL[1],2) *100;
+	double lum = roundDecimal(HSL[2],2) * 100;
+	grayLevel = grayLUT.at(sat).at(lum);
+	//grayLevel = ((100-sat)*(100-lum))/100;
+	//return round(grayLevel);
+	return grayLevel;
 }

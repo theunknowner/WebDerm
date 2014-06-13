@@ -130,11 +130,12 @@ double hsl::minRGB(double red, double green, double blue)
 	}
 
 //converts rgb values to hsl values
-	void hsl::rgb2hsl(double red, double green, double blue)
+	double *hsl::rgb2hsl(double red, double green, double blue)
 	{
 		double r,g,b;
 		double min, max;
 		double delta;
+		static double HSL[3];
 		r = red/255;
 		g = green/255;
 		b = blue/255;
@@ -172,48 +173,14 @@ double hsl::minRGB(double red, double green, double blue)
 			H *= 60;
 			if(H<0) H+=360;
 		}
+		HSL[0] = H; HSL[1] = S; HSL[2] = L;
+		return HSL;
 	}
 
-	void hsl::rgb2hsb(double red, double green, double blue)
-	{
-		double r,g,b;
-		double min, max;
-		double delta;
-		r = red/255;
-		g = green/255;
-		b = blue/255;
-		min = minRGB(r,g,b);
-		max = maxRGB(r,g,b);
-		B = max;
-		delta = max-min;
-		if(delta==0)
-		{
-			H=0; S=0;
-		}
-		else
-		{
-			S = max==0 ? 0 : (max-min)/B;
-			if(max==r)
-			{
-				H = ((g-b)/delta);
-			}
-			else if(max==g)
-			{
-				H = ((b-r)/delta) + 2;
-			}
-			else
-			{
-				H = ((r-g)/delta) + 4;
-			}
-			H *= 60;
-			if(H<0) H+=360;
-		}
-	}
-
-	int hsl::getHue()
+	double hsl::getHue()
 	{
 		H = round(H);
-		return (int)H;
+		return H;
 	}
 
 	double hsl::getSat()
@@ -319,4 +286,35 @@ double hsl::calcHueAvg(deque<int> &vec) {
 	total /= vec.size();
 	total /= 360;
 	return total;
+}
+
+inline double hue2rgb(double var1, double var2, double vH) {
+	if(vH<0) vH+=1;
+	if(vH>1) vH-=1;
+	if((6*vH)<1) return (var1+(var2-var1)*6*vH);
+	if((2*vH)<1) return var2;
+	if((3*vH)<2) return (var1+(var2-var1)*(0.666-vH)*6);
+	return var1;
+}
+
+double *hsl::hsl2rgb(double hue, double sat, double lum) {
+	static double RGB[3];
+	if(sat==0) {
+		RGB[0] = round(lum * 255);
+		RGB[1] = round(lum * 255);
+		RGB[2] = round(lum * 255);
+	}
+	else {
+		double temp1, temp2;
+		if(lum<0.5)
+			temp1 = lum*(1+sat);
+		else
+			temp1 = (lum+sat) - (lum*sat);
+		temp2 = (2*lum) - temp1;
+		hue /= 360;
+		RGB[0] = round(255*hue2rgb(temp2,temp1,(hue+0.333)));
+		RGB[1] = round(255*hue2rgb(temp2,temp1,hue));
+		RGB[2] = round(255*hue2rgb(temp2,temp1,(hue-0.333)));
+	}
+	return RGB;
 }

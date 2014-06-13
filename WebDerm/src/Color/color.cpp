@@ -93,9 +93,9 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	double grayLevel=0;
 	double colorLevel=0;
 	extractColorFromString(pix, colorVec);
-	grayLevel = rgb.calcGrayLevel(r,g,b);
+	//grayLevel = rgb.calcGrayLevel(r,g,b);
 	colorLevel = rgb.calcColorLevel2(r,g,b);
-	double grayLumLevel = rgb.calcGrayLevel2(r,g,b);
+	double grayLumLevel = rgb.calcGrayLevel3(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
 		if(colorVec.at(i)=="Gray")
 			pix2 += colorVec.at(i) + toString(grayLumLevel);

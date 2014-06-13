@@ -110,7 +110,7 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 	contrast con;
 	Color c;
 	double colorfn;
-	double hue;
+	int hue;
 	deque<double> clrfn;
 	deque< deque<double> > clrfnVec;
 	int ind=0;
@@ -132,7 +132,8 @@ void contrast::colorfulnessMatrix1x1(Mat &img, String name) {
 						pix = c.reassignLevels(pix,r,g,b);
 				}
 			}
-			hue = (hsl.getHue()+180)%360;
+			hue = (hsl.getHue()+180);
+			hue %= 360;
 			hue /=360;
 			colorfn = con.calcColorfulness(hue,pix);
 			clrfn.push_back(colorfn);
