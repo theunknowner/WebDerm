@@ -32,7 +32,7 @@ void colorThreshNamingScript()
 		lum = roundDecimal(hsl.getLum(),2);
 		colorLevel = rgb.calcColorLevel2(r,g,b);
 		//grayLevel = rgb.calcGrayLevel(r,g,b);
-		grayLevel = rgb.calcGrayLevel2(r,g,b);
+		grayLevel = rgb.calcGrayLevel3(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
 		{
@@ -549,7 +549,7 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 			dist = roundDecimal(dist,1);
 			lum = rgb.calcPerceivedBrightness(r,g,b);
 			lum = round(lum);
-			grayLumLevel = rgb.calcGrayLevel2(r,g,b);
+			grayLumLevel = rgb.calcGrayLevel3(r,g,b);
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			//if(pix2=="Grey") grayLevel = 100;
 			colorLevel = rgb.calcColorLevel2(r,g,b);

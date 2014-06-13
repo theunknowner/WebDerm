@@ -33,7 +33,7 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 	Intensity in;
 	String newShade = shade;
 	String newPix = pix;
-	double grayLevel = rgb.getGrayLevel(pix);
+	double grayLumLevel = rgb.getGrayLevel(pix);
 	double colorLevel = rgb.getColorLevel(pix);
 	String color = c.getMainColor(pix);
 
@@ -47,7 +47,7 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 	}
 
 /** provisional rule #2 - Determining Gray **/
-	if(grayLevel>=90 && color!="Violet") {
+	if(grayLumLevel>=90 && color!="Violet") {
 		newPix = "Grey" + toString(colorLevel);
 		if(colorLevel>=60) {
 			newShade = "Dark";
@@ -57,11 +57,11 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 
 /** provisional rule #3 for Grayish Pink ONLY **/
 	if(color=="Pink") {
-		if(grayLevel>=75 && colorLevel>=45 && colorLevel<=50) {
+		if(grayLumLevel>=75 && colorLevel>=45 && colorLevel<=50) {
 			newShade = "Gray";
 			flag = true;
 		}
-		if(grayLevel>=75 && colorLevel>=55 && colorLevel<=66) {
+		if(grayLumLevel>=75 && colorLevel>=55 && colorLevel<=66) {
 			newShade = "Gray";
 			flag=true;
 		}

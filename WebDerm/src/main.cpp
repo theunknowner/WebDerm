@@ -17,8 +17,8 @@
 
 int main(int argc,char** argv)
 {
-	//runHysteresis();
-
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -29,13 +29,11 @@ int main(int argc,char** argv)
 	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	cout << rgb.calcColorLevel2(132, 123, 124) << endl;
-	cout << rgb.calcColorLevel2(132, 123, 124);
 	//cout << checkEucDist(141,116,121) << endl;
-	//generateColorRegionTable(img2, Point(341,172), Size(3,3));
+	//generateColorRegionTable(img2, Point(414,212), Size(3,3));
 /*
 	int ind=0;
 	double dist=0;
@@ -78,8 +76,8 @@ int main(int argc,char** argv)
 			i++;
 		};
 	}
-	int col = 353;
-	int row = 360;
+	int col = 414;
+	int row = 212;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
