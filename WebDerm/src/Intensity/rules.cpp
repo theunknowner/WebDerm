@@ -57,11 +57,11 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 
 /** provisional rule #3 for Grayish Pink ONLY **/
 	if(color=="Pink") {
-		if(grayLumLevel>=75 && colorLevel>=45 && colorLevel<=50) {
+		if(grayLumLevel>=39 && colorLevel>=45 && colorLevel<=50) {
 			newShade = "Gray";
 			flag = true;
 		}
-		if(grayLumLevel>=75 && colorLevel>=55 && colorLevel<=66) {
+		if(grayLumLevel>=39 && colorLevel>=55 && colorLevel<=66) {
 			newShade = "Gray";
 			flag=true;
 		}
