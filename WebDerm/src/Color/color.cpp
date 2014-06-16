@@ -185,6 +185,8 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 					for(unsigned int k=0; k<color.size(); k++) {
 						if(pix.find("BrownPink")!=string::npos)
 							pix = "BrownPink";
+						if(pix.find("GreyPink")!=string::npos)
+							pix = "GreyPink";
 						if(pix.find(color.at(k))!=string::npos) {
 							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
 							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);

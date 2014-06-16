@@ -137,7 +137,7 @@ void runHysteresis()
 	cin >> filename;
 	cout << "1) Size(1x1)" << endl << "2) Size(2x2)" << endl;
 	cin >> input;
-	Mat img, img2, mask;
+	Mat img, img2,img3, mask;
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);

@@ -16,5 +16,4 @@
 
 String specialRules(String pix, int r, int g, int b);
 bool specialRules(String &pix, double &indexChange,String &shade, String &shadePrev, double &darkness);
-void checkGrayRatio(deque< deque<String> > &windowVec);
 #endif /* RULES_H_ */

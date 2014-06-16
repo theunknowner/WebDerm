@@ -32,7 +32,7 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	//generateColorRegionTable(img2, Point(232,130), Size(3,3));
+	generateColorRegionTable(img2, Point(340,180), Size(3,3));
 /*
 	int ind=0;
 	double dist=0;
