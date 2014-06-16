@@ -26,5 +26,6 @@ public:
 	void output2ImageGray(deque< deque<String> > &input, String name);
 	void output2ImageColor(deque< deque<String> > &window, String name);
 	String fixColors(String pix, double r, double g, double b);
+	Mat changeImageBrightness(Mat &img, double amt);
 };
 #endif /* COLOR_H_ */

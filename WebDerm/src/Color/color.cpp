@@ -90,7 +90,7 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	rgb rgb;
 	deque<String> colorVec;
 	String pix2;
-	double grayLevel=0;
+	//double grayLevel=0;
 	double colorLevel=0;
 	extractColorFromString(pix, colorVec);
 	//grayLevel = rgb.calcGrayLevel(r,g,b);
@@ -215,4 +215,30 @@ String Color::fixColors(String pix, double r, double g, double b) {
 	if(containsColor(pix,"Gray") && containsColor(pix,"Grey"))
 		color = "Grey" + toString(colorLevel);
 	return color;
+}
+
+Mat Color::changeImageBrightness(Mat &img, double amt) {
+	hsl hsl;
+	Mat img2 = img.clone();
+	int r,g,b;
+	double *HSL;
+	double *RGB;
+	for(int i=0; i<img2.rows; i++) {
+		for(int j=0; j<img2.cols; j++) {
+			r = img2.at<Vec3b>(i,j)[2];
+			g = img2.at<Vec3b>(i,j)[1];
+			b = img2.at<Vec3b>(i,j)[0];
+			if(r!=0 && g!=0 && b!=0) {
+				HSL = hsl.rgb2hsl(r,g,b);
+				HSL[2] += amt;
+				if(HSL[2]>1.0) HSL[2] = 1.0;
+				if(HSL[2]<0) HSL[2] = 0;
+				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+				img2.at<Vec3b>(i,j)[2] = RGB[0];
+				img2.at<Vec3b>(i,j)[1] = RGB[1];
+				img2.at<Vec3b>(i,j)[0] = RGB[2];
+			}
+		}
+	}
+	return img2;
 }

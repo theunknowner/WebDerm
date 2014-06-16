@@ -13,6 +13,7 @@ String specialRules(String pix, int r, int g, int b) {
 	String pix2 = pix;
 	String color = c.getMainColor(pix);
 	double grayLevel = rgb.calcGrayLevel(r,g,b);
+	double grayLumLevel = rgb.calcGrayLevel3(r,g,b);
 	double colorLevel = rgb.calcColorLevel2(r,g,b);
 
 	/** rule 1 **/
@@ -56,7 +57,7 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 	}
 
 /** provisional rule #3 for Grayish Pink ONLY **/
-	if(color=="Pink") {
+	if(color=="Pink" || color=="BrownPink") {
 		if(grayLumLevel>=39 && colorLevel>=45 && colorLevel<=50) {
 			newShade = "Gray";
 			flag = true;
@@ -65,6 +66,7 @@ bool specialRules(String &pix, double &indexChange, String &shade, String &shade
 			newShade = "Gray";
 			flag=true;
 		}
+		newPix="Pink";
 	}
 
 	shade = newShade;
