@@ -20,6 +20,7 @@ void writeSeq2File(deque< deque<String> > &vec, String name)
 		}
 		fprintf(fp, "\n");
 	}
+	fclose(fp);
 }
 
 void writeSeq2File(deque< deque<String> > &vec, String pathname, String name)
@@ -35,6 +36,7 @@ void writeSeq2File(deque< deque<String> > &vec, String pathname, String name)
 		}
 		fprintf(fp, "\n");
 	}
+	fclose(fp);
 }
 
 void writeSeq2File(deque< deque<int> > &vec, String name)
@@ -50,6 +52,7 @@ void writeSeq2File(deque< deque<int> > &vec, String name)
 		}
 		fprintf(fp, "\n");
 	}
+	fclose(fp);
 }
 
 void writeSeq2File(deque< deque<double> > &vec, String name)
@@ -65,6 +68,7 @@ void writeSeq2File(deque< deque<double> > &vec, String name)
 		}
 		fprintf(fp, "\n");
 	}
+	fclose(fp);
 }
 
 void writeSeq2File(deque<double> &vec, String name) {
@@ -74,6 +78,7 @@ void writeSeq2File(deque<double> &vec, String name) {
 	for(unsigned int i=0; i<vec.size(); i++) {
 		fprintf(fp,"%f,",vec.at(i));
 	}
+	fclose(fp);
 }
 
 void writeSeq2File(deque< deque<long double> > &vec, String name)
@@ -89,6 +94,7 @@ void writeSeq2File(deque< deque<long double> > &vec, String name)
 		}
 		fprintf(fp, "\n");
 	}
+	fclose(fp);
 }
 
 void writeSeq2File(deque<Point> &ptVec, String name) {
@@ -98,6 +104,7 @@ void writeSeq2File(deque<Point> &ptVec, String name) {
 	for(unsigned int i=0; i<ptVec.size(); i++) {
 		fprintf(fp,"(%d,%d)\n",ptVec.at(i).x, ptVec.at(i).y);
 	}
+	fclose(fp);
 }
 
 void writeSeq2File(double * arr, int length, String name) {
@@ -107,4 +114,5 @@ void writeSeq2File(double * arr, int length, String name) {
 	for(int i=0; i<length; i++) {
 		fprintf(fp,"%d: %d\n",i,arr[i]);
 	}
+	fclose(fp);
 }

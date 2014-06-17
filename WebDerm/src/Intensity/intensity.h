@@ -16,6 +16,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/table.h"
 #include "rules.h"
 
 class Intensity {

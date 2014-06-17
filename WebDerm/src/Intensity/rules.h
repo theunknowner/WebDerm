@@ -15,5 +15,5 @@
 #include "intensity.h"
 
 String specialRules(String pix, int r, int g, int b);
-bool specialRules(String &pix, double &indexChange,String &shade, String &shadePrev, double &darkness);
+bool specialRules(String &pix, double &indexChange,String &shade, String &shadePrev, double &darkness, deque<int> &ruleNo);
 #endif /* RULES_H_ */

@@ -408,8 +408,12 @@ break_nested_loop:
 }
 
 deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &windowVec, String name) {
+	rgb rgb;
 	Color c;
-	//contrast con;
+	FILE *fp;
+	String filename = name + "_Rule_Table.csv";
+	fp=fopen(filename.c_str(),"w");
+	fprintf(fp,"Color,NewColor,GLL,CL,Shade,NewShade,IndexChange,Rules,Coord,Image\n");
 	int flag=0;
 	unsigned int localScanSize=10;
 	String pix, pix2, shade,localMinShade,localMaxShade,localShade;
@@ -418,24 +422,17 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	int shadeIndex=0, localIndex=0, localMaxIndex=0, localMinIndex=0;
 	double localMinCC=0, localMaxCC=0;
 	deque< deque<double> > intensityVec;
-	//deque< deque<double> > normIntensityVec;
 	deque< deque<double> > smoothIntensityVec;
-	//deque< deque<double> > contrastVec;
-	//deque< deque<double> > cumConVec;
 	deque< deque<String> > colorVec2;
 	deque<String> colorVec1;
-	deque<String> shadeVec1;
-	deque< deque<String> > shadeVec2;
 	deque< deque<String> > colorVec3;
 	deque<double> localIndexes;
 	deque<double> localCCs;
 	deque<String> localShades;
+	deque<int> ruleNo;
+	deque<String> strVec1;
 	intensityVec = calcIntensityMatrix(windowVec);
-	//normIntensityVec = calcNormalizedIntensityMatrix(intensityVec);
 	smoothIntensityVec = calcSmoothedIntensityMatrix(intensityVec);
-	//contrastVec = calcUniDimensionContrast(normIntensityVec);
-	//contrastVec = con.calcContrastFromMatrix(normIntensityVec);
-	//cumConVec = con.calcCumulativeContrast(contrastVec);
 	for(unsigned int i=0; i<smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -473,10 +470,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 			if(flag==0) { //initial first pixel-area
 				if(pix2!="Black") {
 					shade = colorVec2.at(i).at(j);
-					//shade = calcShade(ccCurr);
 					shadeIndex = getShadeIndex(shade);
-					//if(ccCurr>1) shadeIndex++;
-					//if(ccCurr<0) shadeIndex--;
 					localCC = ccCurr;
 					localIndex = shadeIndex;
 					localShade = shade;
@@ -501,21 +495,16 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				}
 				else index--;
 				shade = colorVec2.at(i).at(j);
-				//shade = calcShade(ccCurr);
 				indexChange = myRound((ccCurr-localCC)/(thresh));
 				shadeIndex = localIndex + (int)indexChange;
 				ccPrev=ccCurr;
 			}
 			if(pix2!="Black") {
 				loc = j-(localIndexes.size()-index)+1;
-				bool flag = specialRules(pix,indexChange,shade,localShade,ccCurr);
+				bool flag = specialRules(pix,indexChange,shade,localShade,ccCurr, ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(loc);
-				shadeVec1.push_back(shade);
 			}
-			else
-				shadeVec1.push_back(pix2);
-			colorVec2.at(i).at(j) = pix2;
 			if(pix2!="Black") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
 				if(localCCs.size()==localScanSize) localCCs.pop_front();
@@ -532,9 +521,34 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				localMinIndex = localIndexes.at(minIndex);
 				localMinShade = localShades.at(minIndex);
 			}
+			if(ruleNo.size()>0) {
+				char buffer[40];
+				sprintf(buffer,"(%d;%d)",j+1,i+1);
+				String coord(buffer);
+				String ruleNum;
+				String oldPix = windowVec.at(i).at(j);
+				String oldShade = colorVec2.at(i).at(j);
+				double grayLumLevel = rgb.getGrayLevel(oldPix);
+				double colorLevel = rgb.getColorLevel(oldPix);
+				strVec1.push_back(oldPix);
+				strVec1.push_back(pix);
+				strVec1.push_back(toString(grayLumLevel));
+				strVec1.push_back(toString(colorLevel));
+				strVec1.push_back(oldShade);
+				strVec1.push_back(shade);
+				strVec1.push_back(toString(indexChange));
+				for(unsigned int n=0; n<ruleNo.size(); n++) {
+					ruleNum += toString(ruleNo.at(n)) + ";";
+				}
+				strVec1.push_back(ruleNum);
+				strVec1.push_back(coord);
+				strVec1.push_back(name);
+				generateTable(fp,strVec1);
+				strVec1.clear();
+			}
+			colorVec2.at(i).at(j) = pix2;
+			ruleNo.clear();
 		}
-		shadeVec2.push_back(shadeVec1);
-		shadeVec1.clear();
 		flag=0;
 		indexChange=0;
 		index=0;
@@ -542,15 +556,11 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 		localCCs.clear();
 		localShades.clear();
 	}
-	//c.output2Image(smoothIntensityVec);
-	//c.output2Image2(shadeVec2,name);
+	fclose(fp);
 	c.output2ImageColor(colorVec2,name);
 	writeIntensityMatrix(intensityVec,name);
-	//writeNormalizedIntensityMatrix(normIntensityVec,name);
 	writeSmoothIntensityMatrix(smoothIntensityVec,name);
 	//writeSeq2File(shadeVec2,"shadeVec");
-	//writeContrastMatrix(contrastVec,name);
-	//writeCumConMatrix(cumConVec,name);
 	return colorVec2;
 }
 

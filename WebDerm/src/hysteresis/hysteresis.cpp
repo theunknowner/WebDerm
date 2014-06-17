@@ -133,12 +133,12 @@
 		//con.writeMainColorMatrix(windowVec,name);
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
-		//in.writeIntensityMatrix(windowVec,name);
 		in.writeMainColorMatrix(windowVec,name);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
 		deque<int>().swap(index);
+		fclose(fp);
 	}
 
 	void hysteresis1x1(Mat img, String name) {
