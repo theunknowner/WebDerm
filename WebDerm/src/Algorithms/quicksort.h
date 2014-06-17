@@ -8,9 +8,9 @@
 #ifndef QUICKSORT_H_
 #define QUICKSORT_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 void quicksort(deque<double> &input, int p, int r);
 

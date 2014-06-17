@@ -5,9 +5,9 @@
  *      Author: jason
  */
 
-#include "run.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 #include "rgb/rgb.h"
-#include "test.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/test.h"
 #include "hsl/hsl.h"
 #include "skin/Skin.h"
 #include "test/testfunctions.h"
@@ -32,7 +32,7 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	generateColorRegionTable(img2, Point(340,180), Size(3,3));
+	generateColorRegionTable(img2, Point(412,238), Size(3,3));
 /*
 	int ind=0;
 	double dist=0;

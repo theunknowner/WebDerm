@@ -8,9 +8,9 @@
 #ifndef MEDIAN_H_
 #define MEDIAN_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 double medianSorted(deque<double> &vec);
 double medianUnsorted(deque<double> &vec);

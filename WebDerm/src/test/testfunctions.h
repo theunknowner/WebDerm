@@ -8,7 +8,7 @@
 #ifndef TESTFUNCTIONS_H_
 #define TESTFUNCTIONS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
 

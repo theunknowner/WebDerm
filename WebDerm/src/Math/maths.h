@@ -9,7 +9,7 @@
 #define MATHS_H_
 
 
-#include "/home/jason/git/WebDerm/WebDerm/src/stdafx.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/stdafx.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"
 
 double correlationDist(double * vec1, double * vec2);

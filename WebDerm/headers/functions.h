@@ -8,7 +8,7 @@
 #define FUNCTIONS_H_INCLUDED
 
 #include "functions2.h"
-#include "hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"

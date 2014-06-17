@@ -9,12 +9,12 @@
 #define RUN_H_INCLUDED
 
 #include "functions.h"
-#include "rgb/rgb.h"
-#include "hsl/hsl.h"
-#include "hysteresis/hysteresis.h"
-#include "skin/Skin.h"
-#include "scripts/scripts.h"
-#include "Contrast/contrast.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/skin/Skin.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/scripts/scripts.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 
 void runCheckRGBColor();
 void runCheckList();

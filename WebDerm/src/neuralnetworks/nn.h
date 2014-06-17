@@ -8,7 +8,7 @@
 #ifndef NN_H_INCLUDED
 #define NN_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
 bool getData(String filename);

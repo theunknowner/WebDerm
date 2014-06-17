@@ -5,6 +5,6 @@
  *      Author: jason
  */
 
-#include "global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 String path = "/home/jason/Desktop/workspace/";

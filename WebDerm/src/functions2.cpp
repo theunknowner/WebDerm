@@ -5,8 +5,8 @@
  *      Author: jason
  */
 
-#include "functions2.h"
-#include "test.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/test.h"
 
 //generic getSubstr function
 void getSubstr(String str, char delimiter, deque<String> &vec)

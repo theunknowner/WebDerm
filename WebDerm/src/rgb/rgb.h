@@ -7,7 +7,7 @@
 
 #ifndef RGB_H_INCLUDED
 #define RGB_H_INCLUDED
-#include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "rgb_global.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Intensity/rules.h"

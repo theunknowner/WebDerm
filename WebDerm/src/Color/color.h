@@ -8,8 +8,8 @@
 #ifndef COLOR_H_
 #define COLOR_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 

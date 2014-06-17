@@ -9,9 +9,9 @@
 #define WRITE_H_
 
 
-#include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 void writeSeq2File(deque< deque<String> > &vec, String name);
 void writeSeq2File(deque< deque<String> > &vec, String pathname,String name);

@@ -8,7 +8,7 @@
 #ifndef RGB_GLOBAL_H_
 #define RGB_GLOBAL_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 extern deque< deque<double> > normMeanThresh;
 extern deque< deque<double> > absMeanThresh;

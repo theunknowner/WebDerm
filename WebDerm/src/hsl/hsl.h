@@ -8,7 +8,7 @@
 #ifndef HSL_H
 #define HSL_H
 
-#include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 #include "hsl_global.h"
 
 class hsl

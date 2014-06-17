@@ -5,7 +5,7 @@
  *      Author: jason
  */
 
-#include "test.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/test.h"
 
 String testHysteresis(Mat &img, int row, int col, Size size)
 {

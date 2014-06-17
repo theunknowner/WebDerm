@@ -8,7 +8,7 @@
 #ifndef HSL_GLOBAL_H_
 #define HSL_GLOBAL_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 extern double H, S, L, B;
 extern deque<String> hslColors;

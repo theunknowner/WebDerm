@@ -8,9 +8,9 @@
 #ifndef INTENSITY_H_
 #define INTENSITY_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"

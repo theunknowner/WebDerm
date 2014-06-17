@@ -8,8 +8,8 @@
 #ifndef SSHEET_H_
 #define SSHEET_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 String minFormulaR1C1(int begin, int end);
 String maxFormulaR1C1(int begin, int end);
