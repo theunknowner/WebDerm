@@ -32,7 +32,7 @@ void colorThreshNamingScript()
 		lum = roundDecimal(hsl.getLum(),2);
 		colorLevel = rgb.calcColorLevel2(r,g,b);
 		//grayLevel = rgb.calcGrayLevel(r,g,b);
-		grayLevel = rgb.calcGrayLevel3(r,g,b);
+		grayLevel = rgb.calcGrayLumLevel(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
 		{
@@ -525,7 +525,7 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 	int width = size.width;
 	int height = size.height;
 	int r,g,b;
-	double h,s,l;
+	double h;
 	String pix,pix2;
 	double dist = -1.0;
 	int ind=0;
@@ -549,7 +549,7 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 			dist = roundDecimal(dist,1);
 			lum = rgb.calcPerceivedBrightness(r,g,b);
 			lum = round(lum);
-			grayLumLevel = rgb.calcGrayLevel3(r,g,b);
+			grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			//if(pix2=="Grey") grayLevel = 100;
 			colorLevel = rgb.calcColorLevel2(r,g,b);
@@ -568,7 +568,7 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 	int ptY = pt.y-1;
 	int ptX = pt.x-1;
 	int r,g,b;
-	double h,s,l;
+	double h;
 	String pix,pix2;
 	double dist = -1.0;
 	int ind=0;
@@ -592,7 +592,7 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 			dist = roundDecimal(dist,1);
 			lum = rgb.calcPerceivedBrightness(r,g,b);
 			lum = round(lum);
-			grayLumLevel = rgb.calcGrayLevel3(r,g,b);
+			grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			//if(pix2=="Grey") grayLevel = 100;
 			colorLevel = rgb.calcColorLevel2(r,g,b);

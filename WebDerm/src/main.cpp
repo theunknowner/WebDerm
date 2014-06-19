@@ -17,6 +17,8 @@
 
 int main(int argc,char** argv)
 {
+	runHysteresis();
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -27,10 +29,11 @@ int main(int argc,char** argv)
 	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/CLP","clp3.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	generateColorRegionTable(img2, Point(307,459), Point(311,463));
+	//generateColorRegionTable(img2, Point(393,244), Point(394,251));
+	//generateColorRegionTable(img2, Point(284,270), Size(2,2));
 /*
 	int ind=0;
 	double dist=0;

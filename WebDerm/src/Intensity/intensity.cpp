@@ -528,7 +528,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				String ruleNum;
 				String oldPix = windowVec.at(i).at(j);
 				String oldShade = colorVec2.at(i).at(j);
-				double grayLumLevel = rgb.getGrayLevel(oldPix);
+				double grayLumLevel = rgb.getGrayLevel2(oldPix);
 				double colorLevel = rgb.getColorLevel(oldPix);
 				strVec1.push_back(oldPix);
 				strVec1.push_back(pix);

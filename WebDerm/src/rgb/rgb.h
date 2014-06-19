@@ -36,7 +36,8 @@ public:
 	double calcGrayLevel2(int red, int green, int blue);
 	double calcColorLevel(double red, double green, double blue);
 	double calcColorLevel2(double red, double green, double blue);
-	double getGrayLevel(String color);
+	double getGrayLevel1(String color);
+	double getGrayLevel2(String color);
 	double getColorLevel(String color, String mainColor);
 	double getColorLevel(String pix);
 	void showPixelColor(int r, int g, int b, Size size);
@@ -46,7 +47,7 @@ public:
 	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	double calcRelLum(double red, double green, double blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
-	double calcGrayLevel3(double red, double green, double blue);
+	double calcGrayLumLevel(double red, double green, double blue);
 	bool importGrayLUT();
 };
 

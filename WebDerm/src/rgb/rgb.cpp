@@ -405,18 +405,38 @@ double rgb::calcColorLevel(double red, double green, double blue)
 	return 0;
 }
 
-double rgb::getGrayLevel(String color)
+double rgb::getGrayLevel2(String color)
 {
-	Color c;
 	double level=0;
 	size_t pos=0;
 	String str, mainColor="Gray";
 	pos = color.find(mainColor);
-	if(pos!=string::npos)
-	{
+	if(pos!=string::npos) {
 		str = color.substr(pos+mainColor.size(),color.size()-(pos+mainColor.size()));
+		level = atof(str.c_str());
 	}
-	level = atof(str.c_str());
+	if(color.find("Grey")!=string::npos)
+		level = 100;
+
+	return level;
+}
+
+double rgb::getGrayLevel1(String color) {
+	double level=0;
+	size_t pos=0;
+	String str, mainColor="Gray";
+	pos = color.find(mainColor);
+	if(pos!=string::npos) {
+		str = color.substr(0,pos);
+		level = atof(str.c_str());
+	}
+	else {
+		pos = color.find("Grey");
+		if(pos!=string::npos) {
+			str = color.substr(0,pos);
+			level = atof(str.c_str());
+		}
+	}
 	return level;
 }
 
@@ -533,7 +553,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 	sat = roundDecimal(hsl.getSat(),2);
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
-	double grayLumLevel = calcGrayLevel3(red,green,blue);
+	double grayLumLevel = calcGrayLumLevel(red,green,blue);
 	if(grayLevel>=95 && lum>0.20)
 		pix = "Grey" + toString(colorLevel);
 	else {
@@ -552,7 +572,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 								else if(pix=="Grey")
 									pix += toString(colorLevel);
 								else
-									pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
+									pix = toString(grayLevel) + "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
 							}
 							return pix;
 						}
@@ -604,7 +624,7 @@ bool rgb::importGrayLUT() {
 	return false;
 }
 
-double rgb::calcGrayLevel3(double red, double green, double blue) {
+double rgb::calcGrayLumLevel(double red, double green, double blue) {
 	hsl hsl;
 	double grayLevel=0;
 	double *HSL = hsl.rgb2hsl(red,green,blue);
