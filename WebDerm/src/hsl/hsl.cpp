@@ -173,7 +173,7 @@ double hsl::minRGB(double red, double green, double blue)
 			H *= 60;
 			if(H<0) H+=360;
 		}
-		HSL[0] = H; HSL[1] = S; HSL[2] = L;
+		HSL[0] = round(H); HSL[1] = S; HSL[2] = L;
 		return HSL;
 	}
 
@@ -272,6 +272,8 @@ void hsl::release_memory()
 	deque< deque<int> >().swap(hueThresh);
 	deque< deque<double> >().swap(satThresh);
 	deque< deque<double> >().swap(lumThresh);
+	deque< deque<double> >().swap(satLevel);
+	deque< deque<double> >().swap(lumLevel);
 }
 
 //customize calcuation of hue avg

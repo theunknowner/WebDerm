@@ -38,5 +38,5 @@ int checkTransitions(Mat img);
 Mat fillEdges2(Mat img);
 Mat fillEdges3(Mat img);
 void freqOfList(deque<double> &vec);
-
+Mat kMeansClustering(Mat &src);
 #endif

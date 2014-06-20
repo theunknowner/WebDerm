@@ -137,7 +137,7 @@ void runHysteresis()
 	cin >> filename;
 	cout << "1) Size(1x1)" << endl << "2) Size(2x2)" << endl;
 	cin >> input;
-	Mat img, img2,img3, mask;
+	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
@@ -163,6 +163,42 @@ void runHysteresis()
 	}
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
+	hsl.release_memory();
+	in.release_memory();
+}
+
+void runAllHysteresis(String *filenames, int fileSize) {
+	rgb rgb;
+	hsl hsl;
+	Intensity in;
+	String name;
+	String input;
+	Size size(2,2);
+	Mat img, img2,img3, mask;
+	bool flag[4];
+	flag[0]=rgb.importThresholds();
+	flag[1]=hsl.importHslThresholds();
+	flag[2]=hsl.importLsThreshold();
+	flag[3]=in.importThresholds();
+	for(int i=0; i<4; i++) {
+		if(flag[i]==false) {
+			flag[0] = false;
+			break;
+		}
+	}
+	if(flag[0]==true) {
+		for(int i=0; i<fileSize; i++) {
+			img = runResizeImage(filenames[i],Size(700,700),0);
+			getSkin(img, mask);
+			img.copyTo(img2, mask);
+			name = getImageName(filenames[i]);
+			hysteresis(img2,size,name);
+			img.release(); img2.release(); mask.release();
+		}
+	}
+	rgb.release_memory();
+	hsl.release_memory();
+	in.release_memory();
 }
 
  void runGetSkin()
@@ -306,34 +342,4 @@ void runOutputFarRGB() {
 	//outputFarRGBScript(img2,name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory(); hsl.release_memory();
-}
-
-void runColorfulnessMatrix() {
-	rgb rgb;
-	hsl hsl;
-	contrast con;
-	Size size;
-	String filename;
-	String input;
-	String name;
-	cout << "Enter filename: ";
-	cin >> filename;
-	cout << "1) Size(1x1)" << endl << "2) Size(2x2)" << endl;
-	cin >> input;
-	Mat img, img2, mask;
-	img = runResizeImage(filename,Size(700,700),0);
-	getSkin(img, mask);
-	img.copyTo(img2, mask);
-	name = getImageName(filename);
-	if(input=="1") size = Size(1,1);
-	if(input=="2") size = Size(2,2);
-	rgb.importThresholds();
-	hsl.importHslThresholds();
-	hsl.importLsThreshold();
-	if(size.height==1 && size.width==1)
-		con.colorfulnessMatrix1x1(img2,name);
-	else
-		con.colorfulMatrix(img2,size,name);
-	img.release(); img2.release(); mask.release();
-	rgb.release_memory();
 }

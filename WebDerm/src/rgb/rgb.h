@@ -44,6 +44,7 @@ public:
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 	void release_memory();
 	String calcColor2(int red, int green, int blue);
+	String calcColor2(int red, int gree, int blue, int &ind);
 	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	double calcRelLum(double red, double green, double blue);
 	double calcPerceivedBrightness(double red, double green, double blue);

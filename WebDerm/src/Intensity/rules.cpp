@@ -24,6 +24,10 @@ String specialRules(String pix, int r, int g, int b) {
 	if(color=="Pink" && grayLevel>=80 && colorLevel>=60)
 		pix2 = "Grey" + toString(colorLevel);
 
+	/** rule 3 **/
+	if(color=="Brown" && colorLevel>=70 && grayLevel>=80)
+		pix2 = "Grey" + toString(colorLevel);
+
 	return pix2;
 }
 
@@ -119,10 +123,11 @@ int rule5(String &pix, String &newPix, String &newShade) {
 	rgb rgb;
 	Color c;
 	String color = c.getMainColor(pix);
+	double grayLevel = rgb.getGrayLevel1(pix);
 	double grayLumLevel = rgb.getGrayLevel2(pix);
 	double colorLevel = rgb.getColorLevel(pix);
 	double ratio = roundDecimal(grayLumLevel/colorLevel,2);
-	if(color=="Pink" || color=="BrownPink")
+	if((color=="Pink" || color=="BrownPink"))
 		if(newShade=="Dark")
 			if(ratio>=1.17) {
 				newShade="Dark";
@@ -130,7 +135,7 @@ int rule5(String &pix, String &newPix, String &newShade) {
 				flag=true;
 			}
 
-	if(color=="Brown")
+	if(color=="Brown" && grayLevel>=70)
 		if(newShade=="Dark")
 			if(ratio>=1.2) {
 				newShade = "Dark";

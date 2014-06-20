@@ -17,8 +17,13 @@
 
 int main(int argc,char** argv)
 {
-	runHysteresis();
-	/*
+	/*String filename[]= {path+"Images/CLP/clp3.jpg",
+						path+"Images/LPH/lph4.jpg",
+						path+"Images/LPH/lph6.jpg",
+						path+"Images/Vesicles/vesicles18.jpg"};
+	int fileSize = length(filename);
+	runAllHysteresis(filename,fileSize);
+	/**/
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -32,8 +37,11 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
+	addNewColors(img2, Point(335,257), Point(337,258),"Gray", "Violet");
+	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
+	checkColorsFromList(img2,Point(335,257), Point(337,258));
 	//generateColorRegionTable(img2, Point(393,244), Point(394,251));
-	//generateColorRegionTable(img2, Point(284,270), Size(2,2));
+	//generateColorRegionTable(img2, Point(351,244), Size(2,2));
 /*
 	int ind=0;
 	double dist=0;
@@ -60,7 +68,6 @@ int main(int argc,char** argv)
 			cout << "ColorLevel: " << rgb.calcColorLevel2(r,g,b) << endl;
 		}
 	}
-	//colorThreshRenamingScript();
 	//addNewColors(img,Point(363,314),Point(365,316),"Gray","Gray");
 	//cout << rgb.calcGrayLevel2(202, 192, 193) << endl;
 	//cout << rgb.calcColorLevel2(202, 192, 193) << endl;

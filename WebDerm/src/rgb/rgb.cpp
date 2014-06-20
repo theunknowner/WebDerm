@@ -50,7 +50,6 @@ bool rgb::importColorThresholds()
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
 				if(i==0) mainColors.push_back(vec.at(i));
-				if(i==1) colorFactors.push_back(atof(vec.at(i).c_str()));
 			}
 			vec.clear();
 		}
@@ -197,7 +196,7 @@ String rgb::pushColor(int red, int green, int blue)
 			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
 			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
 			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
-			if(val[1]<=3) {
+			if(val[1]<=2) {
 				return rgbColors[i];
 			}
 			for(int j=0; j<length; j++)
@@ -266,7 +265,7 @@ String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
 			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
 
-			if(val[1]<=3) {
+			if(val[1]<=2) {
 				dist = val[1];
 				ind = i;
 				return rgbColors[i];
@@ -338,7 +337,7 @@ String rgb::pushColor(int red, int green, int blue, int &ind, double &dist)
 			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
 			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
 			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
-			if(val[1]<=3) {
+			if(val[1]<=2) {
 				ind = i;
 				cout << absDistVals[ind] << endl;
 				return rgbColors[i];
@@ -514,6 +513,7 @@ void rgb::release_memory()
 	deque< deque<double> >().swap(absThresh);
 	deque<String>().swap(rgbColors);
 	deque<String>().swap(mainColors);
+	deque< deque<double> >().swap(grayLUT);
 }
 
 double rgb::calcGrayLevel2(int red, int green, int blue) {
@@ -572,7 +572,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 								else if(pix=="Grey")
 									pix += toString(colorLevel);
 								else
-									pix = toString(grayLevel) + "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
+									pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
 							}
 							return pix;
 						}
@@ -584,14 +584,61 @@ String rgb::calcColor2(int red, int green, int blue) {
 	return pix;
 }
 
+String rgb::calcColor2(int red, int green, int blue, int &ind) {
+	hsl hsl;
+	String pix = "OTHER";
+	int hue;
+	double lum,sat;
+	double grayLevel=0, colorLevel=0;
+	hsl.rgb2hsl(red,green,blue);
+	hue = hsl.getHue();
+	lum = roundDecimal(hsl.getLum(),2);
+	sat = roundDecimal(hsl.getSat(),2);
+	grayLevel = calcGrayLevel(red,green,blue);
+	colorLevel = calcColorLevel2(red,green,blue);
+	double grayLumLevel = calcGrayLumLevel(red,green,blue);
+	if(grayLevel>=95 && lum>0.20)
+		pix = "Grey" + toString(colorLevel);
+	else {
+		for(unsigned int i=0; i<hueThresh.size(); i++) {
+			if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+				if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
+					if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
+						if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
+							pix = hslColors.at(i);
+							if(grayLevel==0) {
+								pix = hslColors.at(i) + toString(colorLevel);
+							}
+							else {
+								if(pix=="Black")
+									pix += toString(colorLevel);
+								else if(pix=="Grey")
+									pix += toString(colorLevel);
+								else
+									pix = toString(grayLevel) + "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
+							}
+							ind = i+2;
+							return pix;
+						}
+					}
+				}
+			}
+		}
+	}
+	ind=-1;
+	return pix;
+}
+
 String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	Color c;
 	String pix;
 	pix = calcColor2(red,green,blue);
+	double grayLevel = calcGrayLevel(red,green,blue);
 	if(pix=="OTHER")
 		pix = pushColor(red,green,blue,dist,ind);
 	pix = c.reassignLevels(pix,red,green,blue);
 	pix = specialRules(pix,red,green,blue);
+	pix = toString(grayLevel) + pix;
 	return pix;
 }
 

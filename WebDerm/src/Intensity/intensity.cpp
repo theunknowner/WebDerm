@@ -7,16 +7,27 @@
 
 #include "intensity.h"
 
+int global_flag=0;
 int shadeCount=0;
 String shadeArr[] = {"Dark","High","Low","Light","White"};
-static double minIntensity = 0;
-static double maxIntensity = 255;
-static double range=maxIntensity-minIntensity;
+double minIntensity = 0;
+double maxIntensity = 255;
+double range=0;
 String status = "NA";
 String oldMinShade=status,oldMaxShade=status;
 String newMinShade=status,newMaxShade=status;
 deque<String> gShades;
 deque< deque<double> > gShadeThresh;
+
+void reset_globals() {
+	global_flag=0;
+	shadeCount=0;
+	minIntensity=0;
+	maxIntensity=255;
+	range=0;
+	oldMinShade=status; oldMaxShade=status;
+	newMinShade=status; newMaxShade=status;
+}
 
 double Intensity::getMinIntensity() {
 	return minIntensity;
@@ -41,6 +52,11 @@ String Intensity::getNewMaxShade() {
 
 int Intensity::getShadeCount() {
 	return shadeCount;
+}
+
+void Intensity::release_memory() {
+	deque<String>().swap(gShades);
+	deque< deque<double> >().swap(gShadeThresh);
 }
 
 bool Intensity::importThresholds() {
@@ -104,39 +120,6 @@ double Intensity::calcIntensity(String pix) {
 		colorIntensity[index.at(i)] *= (colorLevel[index.at(i)]/totalLevel);
 		totalColorIntensity += colorIntensity[index.at(i)];
 	}
-	return totalColorIntensity;
-}
-
-double Intensity::calcDarkness(String pix) {
-	rgb rgb;
-	double colorLevel[mainColors.size()];
-	double cHue[mainColors.size()];
-	double colorIntensity[mainColors.size()];
-	fill_n(colorLevel,mainColors.size(),0);
-	fill_n(cHue,mainColors.size(),0);
-	fill_n(colorIntensity,mainColors.size(),0);
-	double totalLevel=0;
-	double totalColorIntensity=0;
-	deque<int> index;
-	deque<double> vec,vec2;
-	for(unsigned int i=0; i<mainColors.size(); i++)	{
-		if(pix.find(mainColors.at(i))!=string::npos) {
-			colorLevel[i] = rgb.getColorLevel(pix,mainColors.at(i));
-			index.push_back(i);
-			if(mainColors.at(i)!="Gray") {
-				totalLevel+=colorLevel[i];
-			}
-			cHue[i] = colorFactors.at(i);
-		}
-	}
-	for(unsigned int i=0; i<index.size(); i++) {
-		colorIntensity[index.at(i)] = colorLevel[index.at(i)] * cHue[index.at(i)];
-		if(mainColors.at(index.at(i))!="Gray") {
-			colorIntensity[index.at(i)] *= (colorLevel[index.at(i)]/totalLevel);
-		}
-		totalColorIntensity += colorIntensity[index.at(i)];
-	}
-	totalColorIntensity = round(totalColorIntensity);
 	return totalColorIntensity;
 }
 
@@ -211,6 +194,7 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	//oldMaxShade = "Low";
 	newMinShade = oldMinShade;
 	newMaxShade = oldMaxShade;
+	deque<double>().swap(vec);
 }
 
 String Intensity::getShade(int index) {
@@ -237,18 +221,21 @@ int Intensity::getShadeIndex(String shade) {
 }
 
 String Intensity::calcShade(double inten, int x, int y) {
-	static int flag=0;
 	static int minIndex = getShadeIndex(oldMinShade);
 	static int maxIndex = getShadeIndex(oldMaxShade);
 	static int shadeAmt = (maxIndex-minIndex)+1;
 	static double interval = range/shadeAmt;
-	//static double minOutlier = -0.1;
-	//static double maxOutlier = 1.1;
 	static double minOutlier = minIntensity - 4;
 	static double maxOutlier = maxIntensity + 4;
 	static double *thresh;
 	static int *shadeIndex;
-	if(flag==0) {
+	if(global_flag==0) {
+		minIndex = getShadeIndex(oldMinShade);
+		maxIndex = getShadeIndex(oldMaxShade);
+		shadeAmt = (maxIndex-minIndex)+1;
+		interval = range/shadeAmt;
+		minOutlier = minIntensity - 4;
+		maxOutlier = maxIntensity + 4;
 		thresh = new double[shadeAmt];
 		shadeIndex = new int[shadeAmt];
 		//initialize thresholds to array
@@ -258,7 +245,7 @@ String Intensity::calcShade(double inten, int x, int y) {
 			shadeIndex[i] = getShadeIndex(oldMinShade) + i;
 			cout << thresh[i] << ";";
 		}
-		flag=1;
+		global_flag=1;
 		cout << maxOutlier << endl;
 	}
 	String shade;
@@ -560,6 +547,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	c.output2ImageColor(colorVec2,name);
 	writeIntensityMatrix(intensityVec,name);
 	writeSmoothIntensityMatrix(smoothIntensityVec,name);
+	reset_globals();
 	//writeSeq2File(shadeVec2,"shadeVec");
 	return colorVec2;
 }

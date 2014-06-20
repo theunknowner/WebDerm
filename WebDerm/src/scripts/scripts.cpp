@@ -85,7 +85,7 @@ void colorThreshRenamingScript()
 		hsl.rgb2hsl(r,g,b);
 		hue = hsl.getHue();
 		colorLevel = rgb.calcColorLevel2(r,g,b);
-		grayLevel = rgb.calcGrayLevel(r,g,b);
+		grayLevel = rgb.calcGrayLumLevel(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
 		{
@@ -103,7 +103,7 @@ void colorThreshRenamingScript()
 				pix += vecColor.at(j) + toString(colorLevel);
 			}
 		}
-		if(grayLevel>=93) pix = "Grey" + toString(colorLevel);
+		//if(grayLevel>=93) pix = "Grey" + toString(colorLevel);
 		if(vecColor.at(0)=="Black") pix = "Black" + toString(colorLevel);
 			fprintf(fp,"%s,%f,%f,%f,%f,%f,%f\n",
 					pix.c_str(),absMeanThresh[i][0],absMeanThresh[i][1],absMeanThresh[i][2],
@@ -430,7 +430,7 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 	deque< deque<double> > rgbVec;
 	int r,g,b, hue,flag=0;
 	double lum,sat;
-	double grayLevel=0, colorLevel=0;
+	double grayLumLevel=0, colorLevel=0,grayLevel=0;
 	double normR, normG, normB;
 	double dist=0;
 	for(int row=(pt1.y-1); row<pt2.y; row++) {
@@ -440,7 +440,7 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			b = img.at<Vec3b>(row,col)[0];
 			for(unsigned int i=0; i<absMeanThresh.size(); i++) {
 				dist = rgb.absEucDist(r,g,b,absMeanThresh.at(i));
-				if(dist<=3) {
+				if(dist<=2) {
 					flag=1;
 					break;
 				}
@@ -453,7 +453,7 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			if(flag==0) {
 				for(unsigned int i=0; i<rgbVec.size(); i++) {
 					dist = rgb.absEucDist(r,g,b,rgbVec.at(i));
-					if(dist<=3) {
+					if(dist<=2) {
 						flag=1;
 						break;
 					}
@@ -476,8 +476,9 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			hue = hsl.getHue();
 			lum = roundDecimal(hsl.getLum(),2);
 			sat = roundDecimal(hsl.getSat(),2);
-			grayLevel = rgb.calcGrayLevel2(r,g,b);
+			grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 			colorLevel = rgb.calcColorLevel2(r,g,b);
+			grayLevel = rgb.calcGrayLevel(r,g,b);
 			for(unsigned int i=0; i<hueThresh.size(); i++) {
 				if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
 					if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
@@ -485,24 +486,24 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 							pix = hslColors.at(i);
 							if(pix=="White" || pix=="Black") break;
 							if(pix=="Gray")	{
-								pix += toString(grayLevel);
+								pix += toString(grayLumLevel);
 								break;
 							}
 							if(grayLevel==0) {
 								pix = hslColors.at(i) + toString(colorLevel);
 							}
 							else {
-								pix = color1 + toString(grayLevel) + hslColors.at(i) + toString(colorLevel);
+								pix = color1 + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
 							}
 							break;
 						}
 					}
 				}
 				else {
-					if(color2=="Gray")
-						pix = color2 + toString(grayLevel);
+					if(color2=="Grey")
+						pix = color2 + toString(colorLevel);
 					else
-						pix = color1 + toString(grayLevel) + color2 + toString(colorLevel);
+						pix = color1 + toString(grayLumLevel) + color2 + toString(colorLevel);
 				}
 			}
 			normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
@@ -511,10 +512,6 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			pix.clear();
 		}
 	}
-	String min = minFormulaR1C1(1,rgbVec.size());
-	String max = maxFormulaR1C1(1,rgbVec.size());
-	fprintf(fp,",,,,,,,%s,%s,%s\n",min.c_str(),min.c_str(),min.c_str());
-	fprintf(fp,",,,,,,,%s,%s,%s\n",max.c_str(),max.c_str(),max.c_str());
 	fclose(fp);
 }
 
@@ -645,4 +642,34 @@ double checkEucDist(int r,int g, int b) {
 		cout << "Importing color-thresholds.csv failed!" << endl;
 
 	return dist;
+}
+
+void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
+	rgb rgb;
+	hsl hsl;
+	Color c;
+	int r,g,b;
+	double *HSL;
+	String pix;
+	double dist=0;
+	int ind=0,ind2=0;
+	FILE *fp;
+	fp = fopen("/home/jason/Desktop/workspace/checkColors.csv","w");
+	fprintf(fp,"R,G,B,H,S,L,CalcColorIndex,Color,Dist,Index\n");
+	for(int i=(pt1.y-1); i<pt2.y; i++) {
+		for(int j=(pt1.x-1); j<pt2.x; j++) {
+			r = img.at<Vec3b>(i,j)[2];
+			g = img.at<Vec3b>(i,j)[1];
+			b = img.at<Vec3b>(i,j)[0];
+			pix = rgb.pushColor(r,g,b,dist,ind);
+			pix = c.reassignLevels(pix,r,g,b);
+			rgb.calcColor2(r,g,b,ind2);
+			HSL = hsl.rgb2hsl(r,g,b);
+			HSL[1] = roundDecimal(HSL[1],2);
+			HSL[2] = roundDecimal(HSL[2],2);
+			fprintf(fp,"%d,%d,%d,%f,%f,%f,%d,%s,%f,%d\n",r,g,b,HSL[0],HSL[1],HSL[2],
+					ind2,pix.c_str(),dist,ind+2);
+		}
+	}
+	fclose(fp);
 }

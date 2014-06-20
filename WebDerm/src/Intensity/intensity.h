@@ -28,9 +28,9 @@ public:
 	String getNewMinShade();
 	String getNewMaxShade();
 	int getShadeCount();
+	void release_memory();
 	bool importThresholds();
 	double calcIntensity(String pix);
-	double calcDarkness(String pix);
 	double sigmoidFn(double intensity);
 	void setMinMax(deque< deque<double> > &input);
 	String getShade(int index);
