@@ -50,6 +50,7 @@ public:
 	double calcPerceivedBrightness(double red, double green, double blue);
 	double calcGrayLumLevel(double red, double green, double blue);
 	bool importGrayLUT();
+	bool importGrayRGB();
 };
 
 

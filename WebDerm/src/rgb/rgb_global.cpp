@@ -14,3 +14,4 @@ deque< deque<double> > normThresh;
 deque<String> rgbColors;
 deque<String> mainColors;
 deque< deque<double> > grayLUT;
+deque< deque<double> > grayRGB;

@@ -428,6 +428,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 	String pix;
 	deque<double> rgbVals;
 	deque< deque<double> > rgbVec;
+	Point pt;
+	deque<Point> ptVec;
 	int r,g,b, hue,flag=0;
 	double lum,sat;
 	double grayLumLevel=0, colorLevel=0,grayLevel=0;
@@ -449,6 +451,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 				rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
 				rgbVec.push_back(rgbVals);
 				rgbVals.clear();
+				pt.x = col; pt.y = row;
+				ptVec.push_back(pt);
 			}
 			if(flag==0) {
 				for(unsigned int i=0; i<rgbVec.size(); i++) {
@@ -463,6 +467,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 				rgbVals.push_back(r); rgbVals.push_back(g); rgbVals.push_back(b);
 				rgbVec.push_back(rgbVals);
 				rgbVals.clear();
+				pt.x = col; pt.y = row;
+				ptVec.push_back(pt);
 			}
 			flag=0;
 		}
@@ -507,8 +513,8 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 				}
 			}
 			normR = (double)r/(r+g+b); normG = (double)g/(r+g+b); normB = (double)b/(r+g+b);
-			fprintf(fp,"%s,%d,%d,%d,%f,%f,%f,%d,%f,%f\n",pix.c_str(),r,g,b,
-					normR,normG,normB,hue,sat,lum);
+			fprintf(fp,"%s,%d,%d,%d,%f,%f,%f,(%d;%d)\n",pix.c_str(),r,g,b,
+					normR,normG,normB,ptVec.at(j).x+1,ptVec.at(j).y+1);
 			pix.clear();
 		}
 	}
@@ -672,4 +678,50 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 		}
 	}
 	fclose(fp);
+}
+
+void dataDeduplication(double thresh) {
+	String folderName = path+"Thresholds/";
+	String filename = folderName+"gray-rgbs.csv";
+	fstream fs(filename.c_str());
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<double> thresh;
+		deque< deque<double> > thresh2;
+		double r,g,b;
+		double dist=0;
+		int flag=0;
+		getline(fs,temp);
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				thresh.push_back(atof(vec.at(i).c_str()));
+			}
+			thresh2.push_back(thresh);
+			thresh.clear();
+			vec.clear();
+		}
+		rgb rgb;
+		deque< deque<double> > rgbVec;
+		int i=0,j=0, size=thresh2.size();
+		while(i<size) {
+			j=i+1;
+			r = thresh2.at(i).at(0);
+			g = thresh2.at(i).at(1);
+			b = thresh2.at(i).at(2);
+			while(j<size) {
+				dist = rgb.absEucDist(r,g,b,thresh2.at(j));
+				if(dist<4) {
+					thresh2.erase(thresh2.begin()+j);
+					size = thresh2.size();
+					flag=1;
+				}
+				if(flag==0 || j==(size-1))
+					++j;
+				flag=0;
+			}
+		++i;
+		}
+	}
 }

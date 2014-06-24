@@ -25,11 +25,16 @@ int rgb::getIndex(String color) {
 }
 
 bool rgb::importThresholds() {
-	bool flag1 = importColorThresholds();
-	bool flag2 = importGrayLUT();
-	if(flag1==true && flag2==true)
-		return true;
-	return false;
+	int size=3;
+	bool flag[size];
+	flag[0] = importColorThresholds();
+	flag[1] = importGrayLUT();
+	flag[2] = importGrayRGB();
+	for(int i=0; i<size; i++)
+		if(flag[i]!=true)
+			return false;
+
+	return true;
 }
 //imports RGB colorspace thresholds
 bool rgb::importColorThresholds()
@@ -89,6 +94,34 @@ bool rgb::importColorThresholds()
 		cout << "Importing Colors and Thresholds Failed!" << endl;
 		return false;
 	}
+}
+
+bool rgb::importGrayRGB() {
+	String folderName = path+"Thresholds/";
+	String filename = folderName+"gray-rgbs.csv";
+	fstream fsThresh(filename.c_str());
+	if(fsThresh.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<double> thresh1;
+		getline(fsThresh,temp);
+		while(getline(fsThresh,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				thresh1.push_back(atof(vec.at(i).c_str()));
+			}
+			grayRGB.push_back(thresh1);
+			thresh1.clear();
+			vec.clear();
+		}
+		deque<String>().swap(vec);
+		deque<double>().swap(thresh1);
+		fsThresh.close();
+		return true;
+	}
+	else
+		cout << "Importing GrayRGBs failed!" << endl;
+	return false;
 }
 
 //calculate the Euclidean Distance betweeen normalized rgb input and colors(vec).
@@ -637,7 +670,7 @@ String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	if(pix=="OTHER")
 		pix = pushColor(red,green,blue,dist,ind);
 	pix = c.reassignLevels(pix,red,green,blue);
-	pix = specialRules(pix,red,green,blue);
+	//pix = init_specialRules(pix,red,green,blue);
 	pix = toString(grayLevel) + pix;
 	return pix;
 }

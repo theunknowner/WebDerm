@@ -19,5 +19,6 @@ extern deque<String> rgbColors;
 extern deque<String> mainColors;
 extern deque<double> colorFactors;
 extern deque< deque<double> > grayLUT;
+extern deque< deque<double> > grayRGB;
 
 #endif /* RGB_GLOBAL_H_ */

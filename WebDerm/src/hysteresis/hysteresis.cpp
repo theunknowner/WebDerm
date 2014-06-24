@@ -27,6 +27,7 @@
 		String pix;
 		int ind=0;
 		double dist=0;
+		double grayLevel=0;
 		int b=0,g=0,r=0;
 		int row=0, col=0;
 		fill_n(mainColorIndex,mainColors.size(),0);
@@ -94,6 +95,7 @@
 															mainColors.at(index.at(j)));
 						mainColorLevelAvg[index.at(j)] += mainColorLevels[index.at(j)];
 					}
+					grayLevel += rgb.getGrayLevel1(pixelColorWindow.at(i));
 				}
 				for(unsigned int i=0; i <index.size(); i++)
 				{
@@ -112,12 +114,15 @@
 							pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 					}
 					pix  = colorObj.fixColors(pix,r,g,b);
+					grayLevel = round(grayLevel/(size.width*size.height));
+					pix = toString(grayLevel) + pix;
 					colorWindow.push_back(pix);
 				}
 				else
 				{
 					colorWindow.push_back("NZ");
 				}
+				grayLevel=0;
 				fill_n(mainColorIndex,mainColors.size(),0);
 				fill_n(mainColorLevelAvg,mainColors.size(),0);
 				index.clear();
@@ -133,7 +138,7 @@
 		//con.writeMainColorMatrix(windowVec,name);
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
-		in.writeMainColorMatrix(windowVec,name);
+		in.writeMainColorMatrix(img, windowVec,name);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
@@ -171,7 +176,7 @@
 		//con.calcContrastFromMatrix(windowVec,filename);
 		Intensity in;
 		in.writeIntensityMatrix(windowVec,name);
-		in.writeMainColorMatrix(windowVec,name);
+		in.writeMainColorMatrix(img, windowVec,name);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
 	}

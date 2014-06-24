@@ -7,7 +7,7 @@
 
 #include "rules.h"
 
-String specialRules(String pix, int r, int g, int b) {
+String init_specialRules(String pix, int r, int g, int b) {
 	Color c;
 	rgb rgb;
 	String pix2 = pix;
@@ -16,22 +16,35 @@ String specialRules(String pix, int r, int g, int b) {
 	//double grayLumLevel = rgb.calcGrayLevel3(r,g,b);
 	double colorLevel = rgb.calcColorLevel2(r,g,b);
 
-	/** rule 1 **/
-	if(color!="Violet" && grayLevel>=90)
+	/** rule 1 **
+	if(color.find("Violet")==string::npos && grayLevel>=90)
 		pix2 = "Grey" + toString(colorLevel);
 
 	/** rule 2 **/
-	if(color=="Pink" && grayLevel>=80 && colorLevel>=60)
+	if(color.find("Pink")!=string::npos && grayLevel>=80 && colorLevel>=60)
+		pix2 = "Grey" + toString(colorLevel);
+
+	/** rule 2a **/
+	if(color.find("Pink")!=string::npos && grayLevel>=85 && colorLevel>=54)
 		pix2 = "Grey" + toString(colorLevel);
 
 	/** rule 3 **/
 	if(color=="Brown" && colorLevel>=70 && grayLevel>=80)
 		pix2 = "Grey" + toString(colorLevel);
 
+	/** rule 4 **/
+	if(color=="Green" && grayLevel>=90)
+		pix2 = "Grey" + toString(colorLevel);
+
+	/** rule 5 **/
+	if(color=="Violet" && grayLevel>=85 && colorLevel>=55) {
+		pix2 = "Grey" + toString(colorLevel);
+	}
+
 	return pix2;
 }
 
-/** provisional rule #1 **/
+/** provisional rule #1 - Contrast with IndexChange**/
 int rule1(double &indexChange, String &shade, String &newShade) {
 	Intensity in;
 	bool flag=false;
@@ -117,9 +130,12 @@ int rule4(String &pix, String &newPix, String &newShade) {
 }
 
 /** Rule #5 - Determining Dark Grey **/
-int rule5(String &pix, String &newPix, String &newShade) {
+int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 	int ruleNum=5;
 	bool flag=false;
+	double r,g,b;
+	int rgbFlag=0;
+	double dist=0;
 	rgb rgb;
 	Color c;
 	String color = c.getMainColor(pix);
@@ -127,7 +143,7 @@ int rule5(String &pix, String &newPix, String &newShade) {
 	double grayLumLevel = rgb.getGrayLevel2(pix);
 	double colorLevel = rgb.getColorLevel(pix);
 	double ratio = roundDecimal(grayLumLevel/colorLevel,2);
-	if((color=="Pink" || color=="BrownPink"))
+	if(color.find("Pink")!=string::npos && grayLevel>=85)
 		if(newShade=="Dark")
 			if(ratio>=1.17) {
 				newShade="Dark";
@@ -135,6 +151,34 @@ int rule5(String &pix, String &newPix, String &newShade) {
 				flag=true;
 			}
 
+		for(int i=pt.y; i<(pt.y+2); i++) {
+			for(int j=pt.x; j<(pt.x+2); j++) {
+				r = img.at<Vec3b>(i,j)[2];
+				g = img.at<Vec3b>(i,j)[1];
+				b = img.at<Vec3b>(i,j)[0];
+				for(unsigned int k=0; k<grayRGB.size(); k++) {
+					dist = rgb.absEucDist(r,g,b,grayRGB.at(k));
+					if(dist<10) {
+						rgbFlag++;
+						break;
+					}
+				}
+			}
+		}
+		if(rgbFlag>=4) {
+			newShade="Dark";
+			newPix = "Grey";
+			flag=true;
+		}
+/*
+	if(color.find("Pink")!=string::npos && grayLevel>=85)
+		if(newShade=="High")
+			if(ratio>=1.17) {
+				newShade="High";
+				newPix="Grey";
+				flag=true;
+			}
+/*
 	if(color=="Brown" && grayLevel>=70)
 		if(newShade=="Dark")
 			if(ratio>=1.2) {
@@ -149,29 +193,33 @@ int rule5(String &pix, String &newPix, String &newShade) {
 				newShade= "Dark";
 				newPix = "Grey";
 				flag=true;
-			}
+			}*/
 	if(flag==true) return ruleNum;
 
 	return 0;
 }
 
-bool specialRules(String &pix, double &indexChange, String &shade, String &shadePrev, double &darkness, deque<int> &ruleNo) {
+bool specialRules(Mat &img, String &pix, double &indexChange, String &shade, String &shadePrev, Point pt, deque<int> &ruleNo) {
 	bool flag=false;
 	String newShade = shade;
 	String newPix = pix;
+	deque<int> ruleNumVec;
 
-	ruleNo.push_back(rule1(indexChange, shade, newShade));
-	ruleNo.push_back(rule5(pix,newPix,newShade));
+	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
+	ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
 
-	for(unsigned int i=0; i<ruleNo.size(); i++) {
-		if(ruleNo.at(i)!=0)
+	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
+		if(ruleNumVec.at(i)!=0) {
+			ruleNo.push_back(ruleNumVec.at(i));
 			flag=true;
+		}
 	}
 
 	//rule2(pix, newPix, newShade, flag, ruleNo);
 	//rule3(pix,newPix, flag, ruleNo);
 	//rule4(pix, newPix, newShade, flag, ruleNo);
 
+	deque<int>().swap(ruleNumVec);
 	shade = newShade;
 	pix = newPix;
 	return flag;

@@ -14,6 +14,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "intensity.h"
 
-String specialRules(String pix, int r, int g, int b);
-bool specialRules(String &pix, double &indexChange,String &shade, String &shadePrev, double &darkness, deque<int> &ruleNo);
+String init_specialRules(String pix, int r, int g, int b);
+bool specialRules(Mat &img, String &pix, double &indexChange,String &shade, String &shadePrev, Point pt, deque<int> &ruleNo);
 #endif /* RULES_H_ */

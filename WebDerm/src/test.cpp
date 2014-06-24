@@ -16,6 +16,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	int b,g,r;
 	int ind=0;
 	double dist=0;
+	double grayLevel=0;
 	double colorIntensity=0;
 	deque<int> index;
 	String pix;
@@ -39,8 +40,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			if(pix=="OTHER")
 			{
 				pix = rgb.calcColor(r,g,b,dist,ind);
-				pix = colorObj.reassignLevels(pix,r,g,b);
-				cout << dist << endl;
+				cout << "Dist: " << dist << endl;
 				pixelColorWindow.push_back(pix);
 			}
 			else
@@ -49,7 +49,6 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			}
 			colorIntensity = in.calcIntensity(pix);
 			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << endl;
-			cout << "ColorInt: " << colorIntensity << endl;
 		}
 	}
 	for(unsigned int i=0; i<pixelColorWindow.size(); i++)
@@ -100,7 +99,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	}
 	else pix = "NOISE";
 
-	cout << "COLORINT:" << in.calcIntensity(pix) << endl;
+	//cout << "COLORINT:" << in.calcIntensity(pix) << endl;
 	deque<int>().swap(index);
 	deque<String>().swap(pixelColorWindow);
 	//img.release();

@@ -17,13 +17,14 @@
 
 int main(int argc,char** argv)
 {
+	runHysteresis();
 	/*String filename[]= {path+"Images/CLP/clp3.jpg",
 						path+"Images/LPH/lph4.jpg",
 						path+"Images/LPH/lph6.jpg",
 						path+"Images/Vesicles/vesicles18.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -34,57 +35,19 @@ int main(int argc,char** argv)
 	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	addNewColors(img2, Point(335,257), Point(337,258),"Gray", "Violet");
+	Point pt1(429,259);
+	Point pt2(431,261);
+	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
-	checkColorsFromList(img2,Point(335,257), Point(337,258));
-	//generateColorRegionTable(img2, Point(393,244), Point(394,251));
-	//generateColorRegionTable(img2, Point(351,244), Size(2,2));
-/*
-	int ind=0;
-	double dist=0;
-	String pix;
-	int r,g,b;
-	int x=218-1;
-	int y=298-1;
-	for(int i=y; i<y+3; i++) {
-		for(int j=x; j<x+3; j++) {
-			r = img2.at<Vec3b>(i,j)[2];
-			g = img2.at<Vec3b>(i,j)[1];
-			b = img2.at<Vec3b>(i,j)[0];
-			cout << j+1 << "," << i+1 << endl;
-			pix = rgb.calcColor2(r,g,b);
-			cout << pix << endl;
-			if(pix=="OTHER") {
-				cout << rgb.pushColor(r,g,b,dist,ind) << endl;
-				cout << "Dist: " << dist << endl;
-				cout << "Index: " << ind+2 << endl;
-			}
-			cout << "Brightness: " << rgb.calcPerceivedBrightness(r,g,b) << endl;
-			cout << "GrayLevel: " << rgb.calcGrayLevel(r,g,b) << endl ;
-			cout << "GrayLumLevel: " << rgb.calcGrayLevel2(r,g,b) << endl;
-			cout << "ColorLevel: " << rgb.calcColorLevel2(r,g,b) << endl;
-		}
-	}
-	//addNewColors(img,Point(363,314),Point(365,316),"Gray","Gray");
-	//cout << rgb.calcGrayLevel2(202, 192, 193) << endl;
-	//cout << rgb.calcColorLevel2(202, 192, 193) << endl;
+	//checkColorsFromList(img2,pt1,pt2);
+	//generateColorRegionTable(img2, pt1,pt2);
+	//generateColorRegionTable(img2, Point(386,439), Size(3,3));
 	/*
-	int i=1;
-	String pix;
-	double hue=0;
-	for(int row=185; row<=185; row++) {
-		for(int col=345; col<=420; col++) {
-			cout << i << ") " << col <<  ": ";
-			pix = testColorAtLoc(img2, Point(col,row),hue);
-			cout << "Colorfn0: " << con.calcColorfulness2(hue,pix) << endl;
-			i++;
-		};
-	}
-	int col = 414;
-	int row = 212;
+	int col = 361;
+	int row = 253;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

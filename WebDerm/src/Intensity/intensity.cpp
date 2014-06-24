@@ -394,13 +394,13 @@ break_nested_loop:
 	return vec2;
 }
 
-deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &windowVec, String name) {
+deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec, String name) {
 	rgb rgb;
 	Color c;
 	FILE *fp;
 	String filename = name + "_Rule_Table.csv";
 	fp=fopen(filename.c_str(),"w");
-	fprintf(fp,"Color,NewColor,GLL,CL,Shade,NewShade,IndexChange,Rules,Coord,Image\n");
+	fprintf(fp,"Color,NewColor,GL,GLL,CL,Shade,NewShade,IndexChange,Rules,Coord,Image\n");
 	int flag=0;
 	unsigned int localScanSize=10;
 	String pix, pix2, shade,localMinShade,localMaxShade,localShade;
@@ -418,6 +418,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 	deque<String> localShades;
 	deque<int> ruleNo;
 	deque<String> strVec1;
+	Point pt;
 	intensityVec = calcIntensityMatrix(windowVec);
 	smoothIntensityVec = calcSmoothedIntensityMatrix(intensityVec);
 	for(unsigned int i=0; i<smoothIntensityVec.size(); i++) {
@@ -487,8 +488,9 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				ccPrev=ccCurr;
 			}
 			if(pix2!="Black") {
+				pt.x = j; pt.y=i;
 				loc = j-(localIndexes.size()-index)+1;
-				bool flag = specialRules(pix,indexChange,shade,localShade,ccCurr, ruleNo);
+				bool flag = specialRules(img, pix,indexChange,shade,localShade,pt,ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(loc);
 			}
@@ -515,10 +517,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(deque< deque<String> > &wi
 				String ruleNum;
 				String oldPix = windowVec.at(i).at(j);
 				String oldShade = colorVec2.at(i).at(j);
+				double grayLevel = rgb.getGrayLevel1(oldPix);
 				double grayLumLevel = rgb.getGrayLevel2(oldPix);
 				double colorLevel = rgb.getColorLevel(oldPix);
 				strVec1.push_back(oldPix);
 				strVec1.push_back(pix);
+				strVec1.push_back(toString(grayLevel));
 				strVec1.push_back(toString(grayLumLevel));
 				strVec1.push_back(toString(colorLevel));
 				strVec1.push_back(oldShade);
@@ -619,9 +623,9 @@ void Intensity::writeIntensityMatrix(deque< deque<String> > &windowVec, String n
 	deque< deque<double> >().swap(intVec);
 }
 
-void Intensity::writeMainColorMatrix(deque< deque<String> > &windowVec, String name) {
+void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec, String name) {
 	deque< deque<String> > colorVec;
-	colorVec = calcMainColorMatrix(windowVec, name);
+	colorVec = calcMainColorMatrix(img, windowVec, name);
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
 	deque< deque<String> >().swap(colorVec);
