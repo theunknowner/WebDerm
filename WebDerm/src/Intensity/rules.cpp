@@ -151,22 +151,21 @@ int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 				flag=true;
 			}
 
-		for(int i=pt.y; i<(pt.y+2); i++) {
-			for(int j=pt.x; j<(pt.x+2); j++) {
-				r = img.at<Vec3b>(i,j)[2];
-				g = img.at<Vec3b>(i,j)[1];
-				b = img.at<Vec3b>(i,j)[0];
-				for(unsigned int k=0; k<grayRGB.size(); k++) {
-					dist = rgb.absEucDist(r,g,b,grayRGB.at(k));
-					if(dist<10) {
-						rgbFlag++;
-						break;
+		if(flag==false)
+			for(int i=pt.y; i<(pt.y+2); i++)
+				for(int j=pt.x; j<(pt.x+2); j++) {
+					r = img.at<Vec3b>(i,j)[2];
+					g = img.at<Vec3b>(i,j)[1];
+					b = img.at<Vec3b>(i,j)[0];
+					for(unsigned int k=0; k<grayRGB.size(); k++) {
+						dist = rgb.absEucDist(r,g,b,grayRGB.at(k));
+						if(dist<2) {
+							rgbFlag++;
+							break;
+						}
 					}
 				}
-			}
-		}
 		if(rgbFlag>=4) {
-			newShade="Dark";
 			newPix = "Grey";
 			flag=true;
 		}

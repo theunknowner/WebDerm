@@ -108,7 +108,8 @@ bool rgb::importGrayRGB() {
 		while(getline(fsThresh,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
-				thresh1.push_back(atof(vec.at(i).c_str()));
+				if(i<3)
+					thresh1.push_back(atof(vec.at(i).c_str()));
 			}
 			grayRGB.push_back(thresh1);
 			thresh1.clear();

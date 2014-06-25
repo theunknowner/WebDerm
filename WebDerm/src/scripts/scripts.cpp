@@ -680,7 +680,9 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 	fclose(fp);
 }
 
-void dataDeduplication(double thresh) {
+//script to remove data less than the set threshold
+// set threshold -> 0 to remove duplicates
+void dataDeduplicationGrayRGB(double threshold) {
 	String folderName = path+"Thresholds/";
 	String filename = folderName+"gray-rgbs.csv";
 	fstream fs(filename.c_str());
@@ -689,6 +691,7 @@ void dataDeduplication(double thresh) {
 		deque<String> vec;
 		deque<double> thresh;
 		deque< deque<double> > thresh2;
+		deque<String> imgName;
 		double r,g,b;
 		double dist=0;
 		int flag=0;
@@ -696,7 +699,10 @@ void dataDeduplication(double thresh) {
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
-				thresh.push_back(atof(vec.at(i).c_str()));
+				if(i<3)
+					thresh.push_back(atof(vec.at(i).c_str()));
+				if(i>=3)
+					imgName.push_back(vec.at(i));
 			}
 			thresh2.push_back(thresh);
 			thresh.clear();
@@ -705,6 +711,7 @@ void dataDeduplication(double thresh) {
 		rgb rgb;
 		deque< deque<double> > rgbVec;
 		int i=0,j=0, size=thresh2.size();
+		int counter=0;
 		while(i<size) {
 			j=i+1;
 			r = thresh2.at(i).at(0);
@@ -712,9 +719,11 @@ void dataDeduplication(double thresh) {
 			b = thresh2.at(i).at(2);
 			while(j<size) {
 				dist = rgb.absEucDist(r,g,b,thresh2.at(j));
-				if(dist<4) {
+				if(dist<=threshold) {
 					thresh2.erase(thresh2.begin()+j);
+					imgName.erase(imgName.begin()+j);
 					size = thresh2.size();
+					++counter;
 					flag=1;
 				}
 				if(flag==0 || j==(size-1))
@@ -723,5 +732,17 @@ void dataDeduplication(double thresh) {
 			}
 		++i;
 		}
+		cout << counter << " entries removed!" << endl;
+		FILE *fp;
+		fp = fopen("/home/jason/Desktop/workspace/graysDedupe.csv","w");
+		fprintf(fp,"R,G,B,Image\n");
+		for(unsigned int i=0; i<thresh2.size(); i++) {
+			r = thresh2.at(i).at(0);
+			g = thresh2.at(i).at(1);
+			b = thresh2.at(i).at(2);
+			fprintf(fp,"%f,%f,%f,%s\n",r,g,b,imgName.at(i).c_str());
+		}
+		fclose(fp);
+		fs.close();
 	}
 }

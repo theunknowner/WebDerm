@@ -32,6 +32,6 @@ void generateColorRegionTable(Mat &img, Point pt, Size size);
 void generateColorRegionTable(Mat &img, Point pt, Point pt2);
 double checkEucDist(int r,int g, int b);
 void checkColorsFromList(Mat &img, Point pt1, Point pt2);
-void dataDeduplication(double thresh);
+void dataDeduplicationGrayRGB(double threshold);
 
 #endif /* SCRIPTS_H_ */
