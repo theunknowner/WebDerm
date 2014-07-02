@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <sstream>
 #include <algorithm>
+#include <cstdarg>
 
 using namespace std;
 using namespace cv;

@@ -20,5 +20,7 @@ double medianAbsDev(deque<double> &vec);
 double meanAbsDev(deque<double> &vec);
 double standardDevSort(deque<double> &vec);
 double standardDevNoSort(deque<double> &vec);
+int max(int argNum, ...);
+double max(double numArr[], int length);
 
 #endif /* MATHS_H_ */

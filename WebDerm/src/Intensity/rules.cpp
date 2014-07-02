@@ -137,12 +137,14 @@ int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 	int rgbFlag=0;
 	double dist=0;
 	rgb rgb;
+	hsl hsl;
 	Color c;
 	String color = c.getMainColor(pix);
 	double grayLevel = rgb.getGrayLevel1(pix);
 	double grayLumLevel = rgb.getGrayLevel2(pix);
 	double colorLevel = rgb.getColorLevel(pix);
 	double ratio = roundDecimal(grayLumLevel/colorLevel,2);
+
 	if(color.find("Pink")!=string::npos && grayLevel>=85)
 		if(newShade=="Dark")
 			if(ratio>=1.17) {
@@ -157,18 +159,27 @@ int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 					r = img.at<Vec3b>(i,j)[2];
 					g = img.at<Vec3b>(i,j)[1];
 					b = img.at<Vec3b>(i,j)[0];
+					if(hsl.maxRGB(r,g,b)<100)
+						if(g<=r && r<=(g*1.25))
+							if((0.8*b)<=g && g<=(b*1.2)) {
+								newShade = "Dark";
+								newPix = "Grey";
+								flag=true;
+								continue;
+							}
+
 					for(unsigned int k=0; k<grayRGB.size(); k++) {
 						dist = rgb.absEucDist(r,g,b,grayRGB.at(k));
-						if(dist<2) {
+						if(dist<1.5) {
 							rgbFlag++;
 							break;
 						}
 					}
+					if(rgbFlag>=4) {
+						newPix = "Grey";
+						flag=true;
+					}
 				}
-		if(rgbFlag>=4) {
-			newPix = "Grey";
-			flag=true;
-		}
 /*
 	if(color.find("Pink")!=string::npos && grayLevel>=85)
 		if(newShade=="High")
@@ -177,7 +188,7 @@ int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 				newPix="Grey";
 				flag=true;
 			}
-/*
+
 	if(color=="Brown" && grayLevel>=70)
 		if(newShade=="Dark")
 			if(ratio>=1.2) {
@@ -185,7 +196,7 @@ int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 				newPix = "Grey";
 				flag=true;
 			}
-
+/*
 	if(color=="Grey")
 		if(newShade=="High" || newShade=="Dark")
 			if(ratio>=1.15) {
@@ -198,6 +209,49 @@ int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 	return 0;
 }
 
+/** rule 6 - fix colors base on contrast**/
+int rule6(Mat &img, String &pix, String &newPix, double &indexChange, Point pt) {
+	int ruleNum = 6;
+	bool flag = false;
+	rgb rgb;
+	hsl hsl;
+	Color c;
+	double r,g,b,grayLevel=0;
+	double hue=0;
+	String color = c.getMainColor(pix);
+	grayLevel = rgb.getGrayLevel1(pix);
+	r = img.at<Vec3b>(pt.y,pt.x)[2];
+	g = img.at<Vec3b>(pt.y,pt.x)[1];
+	b = img.at<Vec3b>(pt.y,pt.x)[0];
+	hsl.rgb2hsl(r,g,b);
+	hue = hsl.getHue();
+	if(color=="Grey" && grayLevel<=90 && grayLevel>=80)
+		if(hue>=320 || (hue>=0 && hue<=10))
+			if(indexChange>=1) {
+				newPix = "Pink";
+				flag=true;
+			}
+
+	if(flag==true) return ruleNum;
+
+	return 0;
+}
+
+/** rule 7 - All violets are pinks **/
+int rule7(String &pix, String &newPix) {
+	int ruleNum = 7;
+	bool flag=false;
+	Color c;
+	String color = c.getMainColor(pix);
+	if(color=="Violet" || color=="VioletPink") {
+		newPix = "Pink";
+		flag=true;
+	}
+	if(flag==true) return ruleNum;
+
+	return 0;
+}
+
 bool specialRules(Mat &img, String &pix, double &indexChange, String &shade, String &shadePrev, Point pt, deque<int> &ruleNo) {
 	bool flag=false;
 	String newShade = shade;
@@ -205,7 +259,9 @@ bool specialRules(Mat &img, String &pix, double &indexChange, String &shade, Str
 	deque<int> ruleNumVec;
 
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
-	ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
+	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
+	//ruleNumVec.push_back(rule6(img,pix,newPix,indexChange,pt));
+	ruleNumVec.push_back(rule7(pix,newPix));
 
 	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
 		if(ruleNumVec.at(i)!=0) {

@@ -657,8 +657,8 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 	int r,g,b;
 	double *HSL;
 	String pix;
-	double dist=0;
-	int ind=0,ind2=0;
+	double dist=-1;
+	int ind=-1,ind2=-1;
 	FILE *fp;
 	fp = fopen("/home/jason/Desktop/workspace/checkColors.csv","w");
 	fprintf(fp,"R,G,B,H,S,L,CalcColorIndex,Color,Dist,Index\n");
@@ -667,9 +667,11 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 			r = img.at<Vec3b>(i,j)[2];
 			g = img.at<Vec3b>(i,j)[1];
 			b = img.at<Vec3b>(i,j)[0];
-			pix = rgb.pushColor(r,g,b,dist,ind);
+			pix = rgb.calcColor2(r,g,b,ind2);
+			if(pix=="OTHER")
+				pix = rgb.pushColor(r,g,b,dist,ind);
 			pix = c.reassignLevels(pix,r,g,b);
-			rgb.calcColor2(r,g,b,ind2);
+
 			HSL = hsl.rgb2hsl(r,g,b);
 			HSL[1] = roundDecimal(HSL[1],2);
 			HSL[2] = roundDecimal(HSL[2],2);
@@ -745,4 +747,37 @@ void dataDeduplicationGrayRGB(double threshold) {
 		fclose(fp);
 		fs.close();
 	}
+}
+
+void testCases() {
+	fstream fs("/home/jason/Desktop/workspace/Thresholds/Test-Cases.csv");
+	if(fs.is_open()) {
+		rgb rgb;
+		String temp,color;
+		deque<String> vec;
+		deque<int> thresh;
+		double dist=0;
+		int ind=0;
+		getline(fs,temp);
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				thresh.push_back(atoi(vec.at(i).c_str()));
+			}
+			for(unsigned int k=0; k<grayRGB.size(); k++) {
+				dist = rgb.absEucDist(thresh.at(0),thresh.at(1),thresh.at(2),grayRGB.at(k));
+				if(dist<1.5) {
+					ind = k;
+					break;
+				}
+			}
+			printf("(%d,%d,%d)->",thresh.at(0),thresh.at(1),thresh.at(2));
+			printf("%s->%f->%d\n",color.c_str(),dist,ind+2);
+			vec.clear();
+			thresh.clear();
+		}
+		fs.close();
+	}
+	else
+		cout << "Test-Cases failed to load!" << endl;
 }

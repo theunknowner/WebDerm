@@ -676,6 +676,21 @@ String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	return pix;
 }
 
+String rgb::calcColor(int red, int green, int blue) {
+	Color c;
+	String pix;
+	double dist=0;
+	int ind=0;
+	pix = calcColor2(red,green,blue);
+	double grayLevel = calcGrayLevel(red,green,blue);
+	if(pix=="OTHER")
+		pix = pushColor(red,green,blue,dist,ind);
+	pix = c.reassignLevels(pix,red,green,blue);
+	//pix = init_specialRules(pix,red,green,blue);
+	pix = toString(grayLevel) + pix;
+	return pix;
+}
+
 bool rgb::importGrayLUT() {
 	String foldername = path+"Thresholds/";
 	String filename = foldername+"GrayLevelLUT.csv";

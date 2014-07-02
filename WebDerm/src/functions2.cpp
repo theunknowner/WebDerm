@@ -152,21 +152,31 @@ void onMouseHysteresis2(int evt, int x, int y, int flags, void* param) {
 void onMouseCheckColor(int event, int x, int y, int flags, void* param)
 {
 	rgb rgb;
+	hsl hsl;
 	Mat *img = (Mat*) param;
 	Mat img2 = (*img).clone();
 	Mat img3 = img3.zeros(Size(300,300),img2.type());
 	String color;
+	double * HSL;
+	int h, s,l;
     char text[100];
+    char hslText[100];
     char c[30];
     Vec3b rgbVec = img2.at<Vec3b>(y,x);
+    HSL = hsl.rgb2hsl(rgbVec[2],rgbVec[1],rgbVec[0]);
+    h = (int)HSL[0];
+    s = roundDecimal(HSL[1],2) * 100;
+    l = roundDecimal(HSL[2],2) * 100;
     color = rgb.checkBlack(rgbVec[2],rgbVec[1],rgbVec[0]);
     if(color=="OTHER")
     	color = rgb.pushColor(rgbVec[2],rgbVec[1],rgbVec[0]);
 
     sprintf(text, "(%d,%d) - [%d,%d,%d]", x, y,rgbVec[2],rgbVec[1],rgbVec[0]);
+    sprintf(hslText,"{%d,%d,%d}",h,s,l);
     sprintf(c, "%s", color.c_str());
     putText(img3, text, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-    putText(img3, c, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+    putText(img3, hslText, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+    putText(img3, c, Point(5,45), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
     imshow("Info",img3);
 }
 

@@ -244,3 +244,22 @@ Mat Color::changeImageBrightness(Mat &img, double amt) {
 	}
 	return img2;
 }
+
+void Color::changeContrast(double r, double g, double b, double alpha, double beta) {
+	Mat img = img.zeros(400,400,CV_8UC3);
+	double contrast[3];
+	contrast[2] = round((alpha * r) + beta);
+	contrast[1] = round((alpha * g) + beta);
+	contrast[0] = round((alpha * b) + beta);
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			for(int k=0; k<img.channels(); k++) {
+				if(contrast[k]>255) contrast[k] = 255;
+				if(contrast[k]<0) contrast[k] = 0;
+				img.at<Vec3b>(i,j)[k] = contrast[k];
+			}
+		}
+	}
+	imshow("Color",img);
+	waitKey(0);
+}

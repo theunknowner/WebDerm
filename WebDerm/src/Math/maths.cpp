@@ -119,3 +119,24 @@ double standardDevNoSort(deque<double> &vec) {
 	var = round(var);
 	return var;
 }
+int max(int argNum, ...) {
+	int val, largest = 0;
+	va_list vl;
+	va_start(vl,argNum);
+	largest = va_arg(vl,int);
+	for(int i=1; i<argNum; i++) {
+		val = va_arg(vl,int);
+		largest=(largest>val)?largest:val;
+	}
+	va_end(vl);
+	return largest;
+}
+
+double max(double numArr[], int length) {
+	double largest=numArr[0];
+	for(int i=0; i<length; i++) {
+		if(largest<numArr[i])
+			largest = numArr[i];
+	}
+	return largest;
+}
