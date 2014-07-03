@@ -33,8 +33,6 @@ public:
 	String pushColor(int red, int green, int blue,double &dist, int &ind);
 	String pushColor(int red, int green, int blue, int &ind, double &dist);
 	double calcGrayLevel(int red, int green, int blue);
-	double calcGrayLevel2(int red, int green, int blue);
-	double calcColorLevel(double red, double green, double blue);
 	double calcColorLevel2(double red, double green, double blue);
 	double getGrayLevel1(String color);
 	double getGrayLevel2(String color);
@@ -47,9 +45,9 @@ public:
 	String calcColor2(int red, int gree, int blue, int &ind);
 	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	String calcColor(int red, int green, int blue);
-	double calcRelLum(double red, double green, double blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
 	double calcGrayLumLevel(double red, double green, double blue);
+	double colorLevel2Brightness(double colorLevel);
 	bool importGrayLUT();
 	bool importGrayRGB();
 };

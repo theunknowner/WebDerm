@@ -113,35 +113,6 @@ void colorThreshRenamingScript()
 	fclose(fp);
 }
 
-void colorThreshScript()
-{
-	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/colorThresh2.csv","w");
-	hsl hsl;
-	rgb rgb;
-	double r,g,b;
-	String pix;
-	double grayLevel=0;
-	int colorLevel=0;
-	int hue;
-	double sat,lum;
-	fprintf(fp,"Color,H,S,L,SatLvl,LumLvl\n");
-	for(unsigned int i=0; i<rgbColors.size(); i++)
-	{
-		r = absMeanThresh.at(i).at(0);
-		g = absMeanThresh.at(i).at(1);
-		b = absMeanThresh.at(i).at(2);
-		hsl.rgb2hsl(r,g,b);
-		hue = hsl.getHue();
-		sat =roundDecimal(hsl.getSat(),2);
-		lum = roundDecimal(hsl.getLum(),2);
-		grayLevel = rgb.calcGrayLevel(r,g,b);
-		colorLevel = rgb.calcColorLevel(r,g,b);
-		fprintf(fp,"%s,%d,%f,%f,%f,%d\n", rgbColors.at(i).c_str(),hue,sat,lum,grayLevel,colorLevel);
-	}
-	fclose(fp);
-}
-
 void sortColorThreshold(String color1, String color2) {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/sortColor.csv","w");
@@ -241,7 +212,7 @@ void outputFarRGBScript(Mat &img, String name)
 		else
 			color.extractColorFromString(pix2,vecColor);
 
-		lumLevel = rgb.calcColorLevel(r,g,b);
+		lumLevel = rgb.calcColorLevel2(r,g,b);
 		pix.clear();
 		for(unsigned int j=0; j<vecColor.size(); j++) {
 			if(vecColor.size()==1 && vecColor.at(j)!="Gray") {

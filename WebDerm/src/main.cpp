@@ -34,17 +34,17 @@ int main(int argc,char** argv)
 	in.importThresholds();
 	//hsl.importThresholds();
 	Mat img, img2,img3, mask;
-	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph10.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(383,252);
-	Point pt2(384,253);
+	Point pt1(297,316);
+	Point pt2(298,317);
 	//cout << rgb.calcColor2(79,52,54) << endl;
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	checkColorsFromList(img2,pt1,pt2);
-	//generateColorRegionTable(img2, pt1,pt2);
+	generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 	/*
 	int col = 361;

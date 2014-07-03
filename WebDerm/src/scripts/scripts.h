@@ -18,7 +18,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/MD5/md5.h"
 
 void colorThreshNamingScript();
-void colorThreshScript();
 void sortColorThreshold(String color1, String color2);
 void outputFarRGBScript(Mat &img, String name);
 String outputCorrelationRGB(int r, int g, int b, double &m);

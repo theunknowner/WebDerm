@@ -421,23 +421,6 @@ double rgb::calcGrayLevel(int red, int green, int blue)
 	return sat;
 }
 
-double rgb::calcColorLevel(double red, double green, double blue)
-{
-	hsl hsl;
-	double lum=0;
-	//hsl.rgb2hsl(red,green,blue);
-	lum = hsl.calcLum(red,green,blue);
-	lum = roundDecimal(lum,2);
-	for(unsigned int i=0; i<lumLevel.size(); i++)
-	{
-		if(lum>=lumLevel.at(i).at(1) && lum<=lumLevel.at(i).at(2))
-		{
-			return lumLevel.at(i).at(0);
-		}
-	}
-	return 0;
-}
-
 double rgb::getGrayLevel2(String color)
 {
 	double level=0;
@@ -502,12 +485,6 @@ double rgb::getColorLevel(String pix) {
 	level = atof(str.c_str());
 	return level;
 }
-double rgb::calcRelLum(double red, double green, double blue)
-	{
-		double lum;
-		lum = (0.2126*red) + (0.7152*green) + (0.0722*blue);
-		return lum;
-	}
 
 double rgb::calcPerceivedBrightness(double red, double green, double blue) {
 	double lum;
@@ -548,23 +525,6 @@ void rgb::release_memory()
 	deque<String>().swap(rgbColors);
 	deque<String>().swap(mainColors);
 	deque< deque<double> >().swap(grayLUT);
-}
-
-double rgb::calcGrayLevel2(int red, int green, int blue) {
-	hsl hsl;
-	double grayLevel=0,lum=0,sat=0;
-	hsl.rgb2hsl(red,green,blue);
-	lum = roundDecimal(hsl.getLum(),2);
-	sat = roundDecimal(hsl.getSat(),2) * 100;
-	double satInt = 100 - sat;
-	double lumInt = lum * 100;
-	if(lum<0.5) {
-		grayLevel = 100 + ((satInt-100)/40) * (lumInt-10);
-	}
-	else {
-		grayLevel = satInt - (satInt/40) * (lumInt-50);
-	}
-	return round(grayLevel);
 }
 
 double rgb::calcColorLevel2(double red, double green, double blue) {
@@ -730,4 +690,12 @@ double rgb::calcGrayLumLevel(double red, double green, double blue) {
 	//grayLevel = ((100-sat)*(100-lum))/100;
 	//return round(grayLevel);
 	return grayLevel;
+}
+
+double rgb::colorLevel2Brightness(double colorLevel) {
+	double result=0;
+	result = 100 - colorLevel;
+	result /= 100;
+	result *= 255;
+	return round(result);
 }

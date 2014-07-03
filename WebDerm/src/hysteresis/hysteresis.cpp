@@ -15,12 +15,22 @@
 		//FILE * fp;
 		//fp = fopen("farColors.csv","w");
 		rgb rgb;
+		hsl hsl;
 		Color colorObj;
 		double matchingScans = (size.width*size.height)/2;
 		deque<String> pixelColorWindow;
 		deque<String> colorWindow;
 		deque< deque<String> > windowVec;
 		deque<int> index;
+		deque<double> hueWindow;
+		deque<double> satWindow;
+		deque<double> lumWindow;
+		deque<double> hueVec;
+		deque<double> satVec;
+		deque<double> lumVec;
+		deque< deque<double> > hueMat;
+		deque< deque<double> > satMat;
+		deque< deque<double> > lumMat;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -29,6 +39,9 @@
 		double dist=0;
 		double grayLevel=0;
 		int b=0,g=0,r=0;
+		double* HSL;
+		int hue;
+		double hslAvg[3]={0};
 		int row=0, col=0;
 		fill_n(mainColorIndex,mainColors.size(),0);
 		fill_n(mainColorLevelAvg,mainColors.size(),0);
@@ -51,6 +64,12 @@
 								//if(dist>10)
 									//fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
 							}
+							HSL = hsl.rgb2hsl(r,g,b);
+							HSL[1] = roundDecimal(HSL[1],2);
+							HSL[2] = roundDecimal(HSL[2],2);
+							hueWindow.push_back(HSL[0]);
+							satWindow.push_back(HSL[1]);
+							lumWindow.push_back(HSL[2]);
 							pixelColorWindow.push_back(pix);
 						}
 					}
@@ -68,6 +87,15 @@
 							//if(dist>10)
 								//fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
 						}
+						HSL = hsl.rgb2hsl(r,g,b);
+						HSL[1] = roundDecimal(HSL[1],2);
+						HSL[2] = roundDecimal(HSL[2],2);
+						hueWindow.pop_front();
+						satWindow.pop_front();
+						lumWindow.pop_front();
+						hueWindow.push_back(HSL[0]);
+						satWindow.push_back(HSL[1]);
+						lumWindow.push_back(HSL[2]);
 						pixelColorWindow.pop_front();
 						pixelColorWindow.push_back(pix);
 					}
@@ -96,6 +124,12 @@
 						mainColorLevelAvg[index.at(j)] += mainColorLevels[index.at(j)];
 					}
 					grayLevel += rgb.getGrayLevel1(pixelColorWindow.at(i));
+					hue =  hueWindow.at(i) + 180;
+					if(hue>360) hslAvg[0] = 0;
+					hue %= 360;
+					hslAvg[0] += hue;
+					hslAvg[1] += satWindow.at(i);
+					hslAvg[2] += lumWindow.at(i);
 				}
 				for(unsigned int i=0; i <index.size(); i++)
 				{
@@ -115,6 +149,14 @@
 					}
 					pix  = colorObj.fixColors(pix,r,g,b);
 					grayLevel = round(grayLevel/(size.width*size.height));
+					hslAvg[0] = round(hslAvg[0]/(size.width*size.height));
+					hslAvg[1] = round(hslAvg[1]/(size.width*size.height));
+					hslAvg[2] = round(hslAvg[2]/(size.width*size.height));
+					hslAvg[0] -= 180;
+					if(hslAvg[0]<0) hslAvg[0] += 360;
+					hueVec.push_back(hslAvg[0]);
+					satVec.push_back(hslAvg[1]);
+					lumVec.push_back(hslAvg[2]);
 					pix = toString(grayLevel) + pix;
 					colorWindow.push_back(pix);
 				}
@@ -123,14 +165,23 @@
 					colorWindow.push_back("NZ");
 				}
 				grayLevel=0;
+				hslAvg[0] = 0;
+				hslAvg[1] = 0;
+				hslAvg[2] = 0;
 				fill_n(mainColorIndex,mainColors.size(),0);
 				fill_n(mainColorLevelAvg,mainColors.size(),0);
 				index.clear();
 				++col;
 			}//end while col
+			hueMat.push_back(hueVec);
+			satMat.push_back(satVec);
+			lumMat.push_back(lumVec);
 			windowVec.push_back(colorWindow);
 			colorWindow.clear();
 			pixelColorWindow.clear();
+			hueWindow.clear();
+			satWindow.clear();
+			lumWindow.clear();
 			col=0; ++row;
 		}//end while row
 		writeSeq2File(windowVec,name);
