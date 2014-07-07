@@ -125,8 +125,7 @@
 					}
 					grayLevel += rgb.getGrayLevel1(pixelColorWindow.at(i));
 					hue =  hueWindow.at(i) + 180;
-					if(hue>360) hslAvg[0] = 0;
-					hue %= 360;
+					if(hue>=360) hue %= 360;
 					hslAvg[0] += hue;
 					hslAvg[1] += satWindow.at(i);
 					hslAvg[2] += lumWindow.at(i);
@@ -150,8 +149,8 @@
 					pix  = colorObj.fixColors(pix,r,g,b);
 					grayLevel = round(grayLevel/(size.width*size.height));
 					hslAvg[0] = round(hslAvg[0]/(size.width*size.height));
-					hslAvg[1] = round(hslAvg[1]/(size.width*size.height));
-					hslAvg[2] = round(hslAvg[2]/(size.width*size.height));
+					hslAvg[1] = roundDecimal(hslAvg[1]/(size.width*size.height),2);
+					hslAvg[2] = roundDecimal(hslAvg[2]/(size.width*size.height),2);
 					hslAvg[0] -= 180;
 					if(hslAvg[0]<0) hslAvg[0] += 360;
 					hueVec.push_back(hslAvg[0]);
@@ -182,9 +181,15 @@
 			hueWindow.clear();
 			satWindow.clear();
 			lumWindow.clear();
+			hueVec.clear();
+			satVec.clear();
+			lumVec.clear();
 			col=0; ++row;
 		}//end while row
 		writeSeq2File(windowVec,name);
+		writeSeq2File(hueMat,"lph10hue");
+		writeSeq2File(satMat,"lph10sat");
+		writeSeq2File(lumMat,"lph10lum");
 		//contrast con;
 		//con.writeMainColorMatrix(windowVec,name);
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
@@ -194,6 +199,15 @@
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
 		deque<int>().swap(index);
+		deque< deque<double> >().swap(hueMat);
+		deque< deque<double> >().swap(satMat);
+		deque< deque<double> >().swap(lumMat);
+		deque<double>().swap(hueWindow);
+		deque<double>().swap(satWindow);
+		deque<double>().swap(lumWindow);
+		deque<double>().swap(hueVec);
+		deque<double>().swap(satVec);
+		deque<double>().swap(lumVec);
 		//fclose(fp);
 	}
 
