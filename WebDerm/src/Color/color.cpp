@@ -163,6 +163,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			thresh1.clear();
 			vec.clear();
 		}
+		Color c;
 		String shade;
 		String pix;
 		Mat img = img.zeros(Size(700,700),16);
@@ -170,7 +171,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
 				pix = getMainColor(window.at(i).at(j));
-				pix = shade+pix;
+				if(c.countColors(pix)<2) pix = shade+pix;
 				if(shade=="Black") {
 					img.at<Vec3b>(i,j)[2] = 0;
 					img.at<Vec3b>(i,j)[1] = 0;
@@ -183,10 +184,6 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 				}
 				else {
 					for(unsigned int k=0; k<color.size(); k++) {
-						if(pix.find("BrownPink")!=string::npos)
-							pix = "BrownPink";
-						if(pix.find("GreyPink")!=string::npos)
-							pix = "GreyPink";
 						if(pix.find(color.at(k))!=string::npos) {
 							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
 							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);

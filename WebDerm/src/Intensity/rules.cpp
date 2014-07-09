@@ -279,7 +279,7 @@ bool specialRules(Mat &img, String &pix, double &indexChange, String &shade, Str
 
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
-	ruleNumVec.push_back(rule6(pix,newPix,newShade));
+	//ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule7(pix,newPix));
 
 	for(unsigned int i=0; i<ruleNumVec.size(); i++) {

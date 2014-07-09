@@ -627,12 +627,13 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 	Color c;
 	int r,g,b;
 	double *HSL;
+	double hRound,lRound;
 	String pix;
 	double dist=-1;
 	int ind=-1,ind2=-1;
 	FILE *fp;
 	fp = fopen("/home/jason/Desktop/workspace/checkColors.csv","w");
-	fprintf(fp,"R,G,B,H,S,L,CalcColorIndex,Color,Dist,Index\n");
+	fprintf(fp,"R,G,B,H,S,L,CalcColorIndex,Color,Dist,Index,H Rounded,L Rounded\n");
 	for(int i=(pt1.y-1); i<pt2.y; i++) {
 		for(int j=(pt1.x-1); j<pt2.x; j++) {
 			r = img.at<Vec3b>(i,j)[2];
@@ -646,8 +647,10 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 			HSL = hsl.rgb2hsl(r,g,b);
 			HSL[1] = roundDecimal(HSL[1],2);
 			HSL[2] = roundDecimal(HSL[2],2);
-			fprintf(fp,"%d,%d,%d,%f,%f,%f,%d,%s,%f,%d\n",r,g,b,HSL[0],HSL[1],HSL[2],
-					ind2,pix.c_str(),dist,ind+2);
+			hRound = roundDecimal(HSL[0],-1);
+			lRound = roundDecimal(HSL[2],1);
+			fprintf(fp,"%d,%d,%d,%f,%f,%f,%d,%s,%f,%d,%f,%f\n",r,g,b,HSL[0],HSL[1],HSL[2],
+					ind2,pix.c_str(),dist,ind+2,hRound,lRound);
 		}
 	}
 	fclose(fp);
@@ -751,4 +754,42 @@ void testCases() {
 	}
 	else
 		cout << "Test-Cases failed to load!" << endl;
+}
+
+void push500Colors(double r, double g, double b) {
+	fstream fsColors("/home/jason/Desktop/workspace/Thresholds/500Colors.csv");
+	if(fsColors.is_open()) {
+		rgb rgb;
+		String temp;
+		deque<String> vec;
+		deque<String> color;
+		deque<double> thresh;
+		double count=0;
+		double min=1000,dist=0;
+		int index=0;
+		getline(fsColors,temp);
+		while(getline(fsColors,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0) color.push_back(vec.at(i));
+				if(i>=1 && i<=3)
+					thresh.push_back(atof(vec.at(i).c_str()));
+			}
+			dist = rgb.absEucDist(r,g,b,thresh);
+			if(dist<min) {
+				min = dist;
+				index = count;
+			}
+			vec.clear();
+			thresh.clear();
+			++count;
+		}
+		cout << color.at(index) << ": " << index+1 << " : " << min << endl;
+		deque<String>().swap(vec);
+		deque<String>().swap(color);
+		deque<double>().swap(thresh);
+		fsColors.close();
+	}
+	else
+		cout << "Importing 500COlors.csv failed!" << endl;
 }

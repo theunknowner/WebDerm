@@ -33,5 +33,6 @@ double checkEucDist(int r,int g, int b);
 void checkColorsFromList(Mat &img, Point pt1, Point pt2);
 void dataDeduplicationGrayRGB(double threshold);
 void testCases();
+void push500Colors(double r, double g, double b);
 
 #endif /* SCRIPTS_H_ */

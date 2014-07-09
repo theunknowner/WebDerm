@@ -144,12 +144,12 @@ void runHysteresis()
 	name = getImageName(filename);
 	if(input=="1") size = Size(1,1);
 	if(input=="2") size = Size(2,2);
-	bool flag[4];
+	int s = 3;
+	bool flag[s];
 	flag[0]=rgb.importThresholds();
 	flag[1]=hsl.importHslThresholds();
-	flag[2]=hsl.importLsThreshold();
-	flag[3]=in.importThresholds();
-	for(int i=0; i<4; i++) {
+	flag[2]=in.importThresholds();
+	for(int i=0; i<s; i++) {
 		if(flag[i]==false) {
 			flag[0] = false;
 			break;
