@@ -394,7 +394,10 @@ break_nested_loop:
 	return vec2;
 }
 
-deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec, String name) {
+deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
+												deque< deque<double> > &hueMat,
+												deque< deque<double> > &satMat,
+												deque< deque<double> > &lumMat,String name) {
 	rgb rgb;
 	Color c;
 	FILE *fp;
@@ -490,7 +493,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			if(pix2!="Black") {
 				pt.x = j; pt.y=i;
 				loc = j-(localIndexes.size()-index)+1;
-				bool flag = specialRules(img, pix,indexChange,shade,localShade,pt,ruleNo);
+				bool flag = specialRules(img, pix,indexChange,shade,localShade,pt,ruleNo,hueMat,satMat,lumMat);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(loc);
 			}
@@ -623,9 +626,12 @@ void Intensity::writeIntensityMatrix(deque< deque<String> > &windowVec, String n
 	deque< deque<double> >().swap(intVec);
 }
 
-void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec, String name) {
+void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
+									deque< deque<double> > &hueMat,
+									deque< deque<double> > &satMat,
+									deque< deque<double> > &lumMat, String name) {
 	deque< deque<String> > colorVec;
-	colorVec = calcMainColorMatrix(img, windowVec, name);
+	colorVec = calcMainColorMatrix(img, windowVec, hueMat, satMat, lumMat, name);
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
 	deque< deque<String> >().swap(colorVec);

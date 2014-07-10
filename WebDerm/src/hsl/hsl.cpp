@@ -231,38 +231,19 @@ double hsl::minRGB(double red, double green, double blue)
 		return lum;
 	}
 
-//return the color of the rgb values using hsl colorspace
-String hsl::getHslColor(double r,double g,double b)
+//return the color of the hsl values using hsl colorspace
+String hsl::getHslColor(double hue, double sat, double lum, int &ind)
 {
-	int flag[3];
-	deque<int> index;
-	String color;
-	rgb2hsl(r,g,b);
+	String color = "NONE";
 	for(unsigned int i=0; i<hslColors.size(); i++)
-	{
-		if((int)H>=hueThresh.at(i).at(0) && (int)H<=hueThresh.at(i).at(1))
-		{
-			flag[0]=1;
-		}
-		if(S>=satThresh.at(i).at(0) && S<=satThresh.at(i).at(1))
-		{
-			flag[1]=1;
-		}
-		if(L>=lumThresh.at(i).at(0) && L<=lumThresh.at(i).at(1))
-		{
-			flag[2]=1;
-		}
-		if(flag[0]==1 && flag[1]==1 && flag[2]==1)
-		{
-			index.push_back(i);
-		}
-		fill_n(flag,3,0);
-	}
-	for(unsigned int i=0; i<index.size(); i++)
-	{
-		color += hslColors.at(index[i]);
-	}
-	deque<int>().swap(index);
+		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1))
+			if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
+				if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
+					color = hslColors.at(i);
+					ind = i;
+					return color;
+				}
+
 	return color;
 }
 

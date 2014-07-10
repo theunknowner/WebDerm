@@ -21,6 +21,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdarg>
+#include <cstdlib>
 
 using namespace std;
 using namespace cv;

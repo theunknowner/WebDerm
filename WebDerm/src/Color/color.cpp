@@ -166,7 +166,8 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		Color c;
 		String shade;
 		String pix;
-		Mat img = img.zeros(Size(700,700),16);
+		Size size(window.at(0).size(),window.size());
+		Mat img = img.zeros(size,16);
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
@@ -195,6 +196,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			}
 		}
 		String file = "outputShades2x2" + name + ".png";
+		//resize(img,img,Size(700,700),INTER_CUBIC);
 		imwrite(file,img);
 		img.release();
 		fs.close();

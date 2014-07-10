@@ -587,29 +587,25 @@ String rgb::calcColor2(int red, int green, int blue, int &ind) {
 	grayLevel = calcGrayLevel(red,green,blue);
 	colorLevel = calcColorLevel2(red,green,blue);
 	double grayLumLevel = calcGrayLumLevel(red,green,blue);
-	if(grayLevel>=95 && lum>0.20)
-		pix = "Grey" + toString(colorLevel);
-	else {
-		for(unsigned int i=0; i<hueThresh.size(); i++) {
-			if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-				if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
-					if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
-						if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
-							pix = hslColors.at(i);
-							if(grayLevel==0) {
-								pix = hslColors.at(i) + toString(colorLevel);
-							}
-							else {
-								if(pix=="Black")
-									pix += toString(colorLevel);
-								else if(pix=="Grey")
-									pix += toString(colorLevel);
-								else
-									pix = toString(grayLevel) + "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
-							}
-							ind = i+2;
-							return pix;
+	for(unsigned int i=0; i<hueThresh.size(); i++) {
+		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+			if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
+				if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
+					if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
+						pix = hslColors.at(i);
+						if(grayLevel==0) {
+							pix = hslColors.at(i) + toString(colorLevel);
 						}
+						else {
+							if(pix=="Black")
+								pix += toString(colorLevel);
+							else if(pix=="Grey")
+								pix += toString(colorLevel);
+							else
+								pix = toString(grayLevel) + "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
+						}
+						ind = i+2;
+						return pix;
 					}
 				}
 			}

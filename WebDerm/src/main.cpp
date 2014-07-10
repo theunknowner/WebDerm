@@ -17,6 +17,7 @@
 
 int main(int argc,char** argv)
 {
+	runHysteresis();
 	/*
 	String filename[]= {path+"Images/CLP/clp3.jpg",
 						path+"Images/LPH/lph4.jpg",
@@ -25,7 +26,7 @@ int main(int argc,char** argv)
 						path+"Images/Vesicles/vesicles18.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -43,7 +44,7 @@ int main(int argc,char** argv)
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
-	checkColorsFromList(img2,pt1,pt2);
+	//checkColorsFromList(img2,pt1,pt2);
 	//generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 	/*

@@ -45,11 +45,10 @@ String init_specialRules(String pix, int r, int g, int b) {
 }
 
 /** provisional rule #1 - Contrast with IndexChange**/
-int rule1(double &indexChange, String &shade, String &newShade) {
+int rule1(double &indexChange, double &indexChangeThresh, String &shade, String &newShade) {
 	Intensity in;
 	bool flag=false;
 	int ruleNum=1;
-	double indexChangeThresh=2.25;
 	if(abs(indexChange)>=indexChangeThresh) {
 		int index = in.getShadeIndex(shade);
 		index += (indexChange/indexChangeThresh);
@@ -275,17 +274,52 @@ int rule7(String &pix, String &newPix) {
 	return 0;
 }
 
-bool specialRules(Mat &img, String &pix, double &indexChange, String &shade, String &shadePrev, Point pt, deque<int> &ruleNo) {
+/** rule 8 - Using indexChange to promote colors on boundaries **/
+int rule8(String &newPix, double &indexChange, double &indexChangeThresh,
+			deque< deque<double> > &hueMat, deque< deque<double> > &satMat,
+			deque< deque<double> > &lumMat, Point pt) {
+	int ruleNum = 8;
+	bool flag=false;
+	hsl hsl;
+	Color c;
+	String color = c.getMainColor(newPix);
+	int ind=-1;
+	double hue,sat,lum;
+	hue = hueMat.at(pt.y).at(pt.x);
+	sat = satMat.at(pt.y).at(pt.x);
+	lum = lumMat.at(pt.y).at(pt.x);
+	double fSat=0;
+	if(abs(indexChange)>=indexChangeThresh) {
+		if(color=="Grey") {
+			hsl.getHslColor(hue,sat,lum,ind);
+			fSat = (sat-satThresh.at(ind).at(0));
+			fSat /= (satThresh.at(ind).at(1)-satThresh.at(ind).at(0));
+			fSat *= 1.25;
+			if(fSat>1) {
+				newPix = hslColors.at(ind+1);
+				flag = true;
+			}
+		}
+	}
+	if(flag==true) return ruleNum;
+
+	return 0;
+}
+
+bool specialRules(Mat &img, String &pix, double &indexChange, String &shade, String &shadePrev,
+					Point pt, deque<int> &ruleNo, deque< deque<double> > &hueMat,
+					deque< deque<double> > &satMat, deque< deque<double> > &lumMat) {
 	bool flag=false;
 	String newShade = shade;
 	String newPix = pix;
 	deque<int> ruleNumVec;
+	double indexChangeThresh=2.25;
 
-	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
+	ruleNumVec.push_back(rule1(indexChange, indexChangeThresh, shade, newShade));
 	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
 	//ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule7(pix,newPix));
-
+	ruleNumVec.push_back(rule8(newPix,indexChange,indexChangeThresh,hueMat,satMat,lumMat,pt));
 	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
 		if(ruleNumVec.at(i)!=0) {
 			ruleNo.push_back(ruleNumVec.at(i));

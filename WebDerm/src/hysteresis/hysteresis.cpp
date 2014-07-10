@@ -49,7 +49,7 @@
 		{
 			while(col<=(img.cols-size.width))
 			{
-				if(col==0)
+				if(pixelColorWindow.size()==0)
 				{
 					for(int x=col; x<(col+size.width); x++)
 					{
@@ -170,7 +170,12 @@
 				fill_n(mainColorIndex,mainColors.size(),0);
 				fill_n(mainColorLevelAvg,mainColors.size(),0);
 				index.clear();
-				++col;
+				/* remove window clears when using FIFO
+				hueWindow.clear();
+				satWindow.clear();
+				lumWindow.clear();
+				pixelColorWindow.clear();*/
+				col++;
 			}//end while col
 			hueMat.push_back(hueVec);
 			satMat.push_back(satVec);
@@ -184,7 +189,7 @@
 			hueVec.clear();
 			satVec.clear();
 			lumVec.clear();
-			col=0; ++row;
+			col=0; row++;
 		}//end while row
 		writeSeq2File(windowVec,name);
 		writeSeq2File(hueMat,"lph10hue");
@@ -194,7 +199,7 @@
 		//con.writeMainColorMatrix(windowVec,name);
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
-		in.writeMainColorMatrix(img, windowVec,name);
+		in.writeMainColorMatrix(img, windowVec,hueMat, satMat, lumMat, name);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
@@ -202,23 +207,29 @@
 		deque< deque<double> >().swap(hueMat);
 		deque< deque<double> >().swap(satMat);
 		deque< deque<double> >().swap(lumMat);
-		deque<double>().swap(hueWindow);
-		deque<double>().swap(satWindow);
-		deque<double>().swap(lumWindow);
 		deque<double>().swap(hueVec);
 		deque<double>().swap(satVec);
 		deque<double>().swap(lumVec);
+		deque<double>().swap(hueWindow);
+		deque<double>().swap(satWindow);
+		deque<double>().swap(lumWindow);
 		//fclose(fp);
 	}
 
 	void hysteresis1x1(Mat img, String name) {
 		rgb rgb;
 		hsl hsl;
-		Color colorObj;
 		int r,g,b;
+		double* HSL;
 		String pix;
 		deque<String> colorWindow;
 		deque< deque<String> > windowVec;
+		deque<double> hueVec;
+		deque<double> satVec;
+		deque<double> lumVec;
+		deque< deque<double> > hueMat;
+		deque< deque<double> > satMat;
+		deque< deque<double> > lumMat;
 		double dist=0;
 		int ind=0;
 		for(int row=0; row<img.rows; row++) {
@@ -230,8 +241,17 @@
 				if(pix=="OTHER") {
 					pix = rgb.calcColor(r,g,b,dist,ind);
 				}
+				HSL = hsl.rgb2hsl(r,g,b);
+				HSL[1] = roundDecimal(HSL[1],2);
+				HSL[2] = roundDecimal(HSL[2],2);
+				hueVec.push_back(HSL[0]);
+				satVec.push_back(HSL[1]);
+				lumVec.push_back(HSL[2]);
 				colorWindow.push_back(pix);
 			}
+			hueMat.push_back(hueVec);
+			satMat.push_back(satVec);
+			lumMat.push_back(lumVec);
 			windowVec.push_back(colorWindow);
 			colorWindow.clear();
 		}
@@ -241,7 +261,13 @@
 		//con.calcContrastFromMatrix(windowVec,filename);
 		Intensity in;
 		in.writeIntensityMatrix(windowVec,name);
-		in.writeMainColorMatrix(img, windowVec,name);
+		in.writeMainColorMatrix(img, windowVec,hueMat, satMat, lumMat, name);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
+		deque< deque<double> >().swap(hueMat);
+		deque< deque<double> >().swap(satMat);
+		deque< deque<double> >().swap(lumMat);
+		deque<double>().swap(hueVec);
+		deque<double>().swap(satVec);
+		deque<double>().swap(lumVec);
 	}
