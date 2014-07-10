@@ -175,12 +175,12 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	String input;
 	Size size(2,2);
 	Mat img, img2,img3, mask;
-	bool flag[4];
+	int s = 3;
+	bool flag[s];
 	flag[0]=rgb.importThresholds();
 	flag[1]=hsl.importHslThresholds();
-	flag[2]=hsl.importLsThreshold();
-	flag[3]=in.importThresholds();
-	for(int i=0; i<4; i++) {
+	flag[2]=in.importThresholds();
+	for(int i=0; i<s; i++) {
 		if(flag[i]==false) {
 			flag[0] = false;
 			break;

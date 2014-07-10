@@ -17,9 +17,11 @@
 
 int main(int argc,char** argv)
 {
-	/*String filename[]= {path+"Images/CLP/clp3.jpg",
+	/*
+	String filename[]= {path+"Images/CLP/clp3.jpg",
 						path+"Images/LPH/lph4.jpg",
 						path+"Images/LPH/lph6.jpg",
+						path+"Images/LPH/lph10.jpg",
 						path+"Images/Vesicles/vesicles18.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
@@ -36,8 +38,8 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/Vesicles","vesicles18.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(369,333);
-	Point pt2(369,333);
+	Point pt1(354,345);
+	Point pt2(355,346);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");

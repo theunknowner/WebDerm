@@ -255,13 +255,17 @@ int rule6(String& pix, String& newPix, String& newShade) {
 	return 0;
 }
 
-/** rule 7 - All violets are pinks **/
+/** rule 7 - All violets are pinks, fixes other colors**/
 int rule7(String &pix, String &newPix) {
 	int ruleNum = 7;
 	bool flag=false;
 	Color c;
 	String color = c.getMainColor(newPix);
-	if(color.find("Pink")!=string::npos || color.find("Violet")!=string::npos) {
+	if(color.find("Blue")!=string::npos && color.find("Purple")!=string::npos) {
+		newPix = "Purple";
+		flag=true;
+	}
+	if(color.find("Violet")!=string::npos) {
 		newPix = "Pink";
 		flag=true;
 	}
