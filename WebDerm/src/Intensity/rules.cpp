@@ -45,10 +45,11 @@ String init_specialRules(String pix, int r, int g, int b) {
 }
 
 /** provisional rule #1 - Contrast with IndexChange**/
-int rule1(double &indexChange, double &indexChangeThresh, String &shade, String &newShade) {
+int rule1(double &indexChange, String &shade, String &newShade) {
 	Intensity in;
 	bool flag=false;
 	int ruleNum=1;
+	double indexChangeThresh = 2.25; // different than thresh for contrast of colors
 	if(abs(indexChange)>=indexChangeThresh) {
 		int index = in.getShadeIndex(shade);
 		index += (indexChange/indexChangeThresh);
@@ -228,6 +229,7 @@ int rule6(String& pix, String& newPix, String& newShade) {
 			flag=true;
 		}
 	}
+	/*
 	else if(newShade=="High" || newShade=="Low") {
 		if(grayLevel>=85) {
 			if(color.find("Pink")!=string::npos || color.find("Violet")!=string::npos) {
@@ -247,7 +249,7 @@ int rule6(String& pix, String& newPix, String& newShade) {
 				flag=true;
 			}
 		}
-	}
+	}*/
 
 	if(flag==true) return ruleNum;
 
@@ -275,51 +277,67 @@ int rule7(String &pix, String &newPix) {
 }
 
 /** rule 8 - Using indexChange to promote colors on boundaries **/
-int rule8(String &newPix, double &indexChange, double &indexChangeThresh,
-			deque< deque<double> > &hueMat, deque< deque<double> > &satMat,
-			deque< deque<double> > &lumMat, Point pt) {
+int rule8(String &newPix, double &indexChange, Point pt,
+			deque< deque<String> > &windowVec, deque< deque<double> > &hueMat,
+			deque< deque<double> > &satMat, deque< deque<double> > &lumMat) {
 	int ruleNum = 8;
 	bool flag=false;
 	hsl hsl;
 	Color c;
 	String color = c.getMainColor(newPix);
+	String prevColor = c.getMainColor(windowVec.at(pt.y).at(pt.x-1));
 	int ind=-1;
+	double indexChangeThresh = 1.0; //different than thresh for contrast of shades
+	double pThreshMove = 1.35;
 	double hue,sat,lum;
 	hue = hueMat.at(pt.y).at(pt.x);
 	sat = satMat.at(pt.y).at(pt.x);
 	lum = lumMat.at(pt.y).at(pt.x);
 	double fSat=0;
-	if(abs(indexChange)>=indexChangeThresh) {
+	if(indexChange>=indexChangeThresh) {
 		if(color=="Grey") {
 			hsl.getHslColor(hue,sat,lum,ind);
 			fSat = (sat-satThresh.at(ind).at(0));
 			fSat /= (satThresh.at(ind).at(1)-satThresh.at(ind).at(0));
-			fSat *= 1.25;
+			fSat *= pThreshMove;
 			if(fSat>1) {
 				newPix = hslColors.at(ind+1);
 				flag = true;
 			}
 		}
 	}
+	else {
+		if(color=="Grey" && prevColor=="Grey") {
+			hsl.getHslColor(hue,sat,lum,ind);
+			fSat = (sat-satThresh.at(ind).at(0));
+			fSat /= (satThresh.at(ind).at(1)-satThresh.at(ind).at(0));
+			fSat *= pThreshMove;
+			if(fSat>1) {
+				newPix = hslColors.at(ind+1);
+				flag = true;
+			}
+		}
+	}
+
 	if(flag==true) return ruleNum;
 
 	return 0;
 }
 
-bool specialRules(Mat &img, String &pix, double &indexChange, String &shade, String &shadePrev,
+bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, double &indexChange,
+					String &shade, String &shadePrev,
 					Point pt, deque<int> &ruleNo, deque< deque<double> > &hueMat,
 					deque< deque<double> > &satMat, deque< deque<double> > &lumMat) {
 	bool flag=false;
 	String newShade = shade;
 	String newPix = pix;
 	deque<int> ruleNumVec;
-	double indexChangeThresh=2.25;
 
-	ruleNumVec.push_back(rule1(indexChange, indexChangeThresh, shade, newShade));
+	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
-	//ruleNumVec.push_back(rule6(pix,newPix,newShade));
+	ruleNumVec.push_back(rule6(pix,newPix,newShade));
+	//ruleNumVec.push_back(rule8(newPix,indexChange,pt,windowVec,hueMat,satMat,lumMat));
 	ruleNumVec.push_back(rule7(pix,newPix));
-	ruleNumVec.push_back(rule8(newPix,indexChange,indexChangeThresh,hueMat,satMat,lumMat,pt));
 	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
 		if(ruleNumVec.at(i)!=0) {
 			ruleNo.push_back(ruleNumVec.at(i));

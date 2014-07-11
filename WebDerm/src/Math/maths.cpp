@@ -54,6 +54,7 @@ double normalizeToRange(double value, int min, int max) {
 	return result;
 }
 
+/** rounds 8 and above **/
 double myRound(double value) {
 	double result=trunc(value);
 	result=value-result;

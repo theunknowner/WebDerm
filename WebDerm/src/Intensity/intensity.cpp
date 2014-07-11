@@ -493,7 +493,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			if(pix2!="Black") {
 				pt.x = j; pt.y=i;
 				loc = j-(localIndexes.size()-index)+1;
-				bool flag = specialRules(img, pix,indexChange,shade,localShade,pt,ruleNo,hueMat,satMat,lumMat);
+				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ruleNo,hueMat,satMat,lumMat);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(loc);
 			}
