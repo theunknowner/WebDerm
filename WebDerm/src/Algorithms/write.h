@@ -20,5 +20,6 @@ void writeSeq2File(deque< deque<double> > &vec, String name);
 void writeSeq2File(deque<double> &vec, String name);
 void writeSeq2File(deque< deque<long double> > &vec, String name);
 void writeSeq2File(deque<Point> &ptVec, String name);
+bool doesFileExist(String filename);
 
 #endif /* WRITE_H_ */

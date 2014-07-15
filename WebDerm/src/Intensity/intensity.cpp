@@ -395,9 +395,7 @@ break_nested_loop:
 }
 
 deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-												deque< deque<double> > &hueMat,
-												deque< deque<double> > &satMat,
-												deque< deque<double> > &lumMat,String name) {
+									deque< deque<String> > &hslMat,String name) {
 	rgb rgb;
 	Color c;
 	FILE *fp;
@@ -493,9 +491,10 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			if(pix2!="Black") {
 				pt.x = j; pt.y=i;
 				loc = j-(localIndexes.size()-index)+1;
-				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ruleNo,hueMat,satMat,lumMat);
+				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ruleNo,hslMat);
 				if(flag==true) pix2 = c.getMainColor(pix);
-				pix2 = shade + pix2 + toString(indexChange) + ";" + toString(loc);
+				String str = "(" + hslMat.at(i).at(j) + ")";
+				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc);
 			}
 			if(pix2!="Black") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
@@ -513,6 +512,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				localMinIndex = localIndexes.at(minIndex);
 				localMinShade = localShades.at(minIndex);
 			}
+			/** generate rule table **/
 			if(ruleNo.size()>0) {
 				char buffer[40];
 				sprintf(buffer,"(%d;%d)",j+1,i+1);
@@ -627,11 +627,9 @@ void Intensity::writeIntensityMatrix(deque< deque<String> > &windowVec, String n
 }
 
 void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-									deque< deque<double> > &hueMat,
-									deque< deque<double> > &satMat,
-									deque< deque<double> > &lumMat, String name) {
+									deque< deque<String> > &hslMat,String name) {
 	deque< deque<String> > colorVec;
-	colorVec = calcMainColorMatrix(img, windowVec, hueMat, satMat, lumMat, name);
+	colorVec = calcMainColorMatrix(img, windowVec, hslMat, name);
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
 	deque< deque<String> >().swap(colorVec);

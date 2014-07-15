@@ -90,7 +90,7 @@ void writeSeq2File(deque< deque<long double> > &vec, String name)
 	{
 		for(unsigned int j=0; j<vec.at(i).size(); j++)
 		{
-			fprintf(fp,"%f,", vec.at(i).at(j));
+			fprintf(fp,"%Lf,", vec.at(i).at(j));
 		}
 		fprintf(fp, "\n");
 	}
@@ -112,7 +112,16 @@ void writeSeq2File(double * arr, int length, String name) {
 	FILE * fp;
 	fp = fopen(filename.c_str(), "w");
 	for(int i=0; i<length; i++) {
-		fprintf(fp,"%d: %d\n",i,arr[i]);
+		fprintf(fp,"%d: %f\n",i,arr[i]);
 	}
 	fclose(fp);
+}
+
+bool doesFileExist(String filename) {
+	fstream fs(filename.c_str());
+	if(fs.is_open()) {
+		fs.close();
+		return true;
+	}
+	return false;
 }

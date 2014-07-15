@@ -7,6 +7,25 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
+/* return value up to Nth occurrence = first,second,third... of delimiter */
+double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
+	double result=0;
+	String substr;
+	unsigned int pos=0;
+	int count=0;
+	for(unsigned int i=0; i<inputString.length(); i++) {
+		if((inputString[i]==delimiter) || (i==inputString.length()-1)) {
+			cout << i << endl;
+			substr = inputString.substr(pos,i+1);
+			pos = i+1;
+			count++;
+			result = atof(substr.c_str());
+		}
+		if(count==occurrence) break;
+	}
+	return result;
+}
+
 String toString(int val)
 {
 	ostringstream stringStream;

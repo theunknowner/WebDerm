@@ -17,7 +17,9 @@
 		rgb rgb;
 		hsl hsl;
 		Color colorObj;
-		double matchingScans = (size.width*size.height)/2;
+		int dimension = size.width*size.height;
+		int matchingScans = dimension/2;
+		int windowFlags[dimension];
 		deque<String> pixelColorWindow;
 		deque<String> colorWindow;
 		deque< deque<String> > windowVec;
@@ -25,12 +27,8 @@
 		deque<double> hueWindow;
 		deque<double> satWindow;
 		deque<double> lumWindow;
-		deque<double> hueVec;
-		deque<double> satVec;
-		deque<double> lumVec;
-		deque< deque<double> > hueMat;
-		deque< deque<double> > satMat;
-		deque< deque<double> > lumMat;
+		//deque<String> hslVec;
+		//deque< deque<String> > hslMat;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -40,9 +38,11 @@
 		double grayLevel=0;
 		int b=0,g=0,r=0;
 		double* HSL;
-		int hue;
+		int hue=0;
 		double hslAvg[3]={0};
 		int row=0, col=0;
+		int count=0; //stores the amount of pixels hit
+		fill_n(windowFlags,dimension,0);
 		fill_n(mainColorIndex,mainColors.size(),0);
 		fill_n(mainColorLevelAvg,mainColors.size(),0);
 		while(row<=(img.rows-size.height))
@@ -122,14 +122,22 @@
 						mainColorLevels[index.at(j)] = rgb.getColorLevel(pixelColorWindow.at(i),
 															mainColors.at(index.at(j)));
 						mainColorLevelAvg[index.at(j)] += mainColorLevels[index.at(j)];
+						//if(pixelColorWindow.at(i).find(mainColors.at(index.at(j)))!=string::npos) {
+							//windowFlags[i] = 1;
+						//}
 					}
-					grayLevel += rgb.getGrayLevel1(pixelColorWindow.at(i));
-					hue =  hueWindow.at(i) + 180;
-					if(hue>=360) hue %= 360;
-					hslAvg[0] += hue;
-					hslAvg[1] += satWindow.at(i);
-					hslAvg[2] += lumWindow.at(i);
-				}
+				}/*
+				for(int i=0; i<dimension; i++) {
+					if(windowFlags[i]==true) {
+						grayLevel += rgb.getGrayLevel1(pixelColorWindow.at(i));
+						hue =  hueWindow.at(i) + 180;
+						if(hue>=360) hue %= 360;
+						hslAvg[0] += hue;
+						hslAvg[1] += satWindow.at(i);
+						hslAvg[2] += lumWindow.at(i);
+						count++;
+					}
+				}*/
 				for(unsigned int i=0; i <index.size(); i++)
 				{
 					mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
@@ -147,15 +155,17 @@
 							pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 					}
 					pix  = colorObj.fixColors(pix,r,g,b);
-					grayLevel = round(grayLevel/(size.width*size.height));
-					hslAvg[0] = round(hslAvg[0]/(size.width*size.height));
-					hslAvg[1] = roundDecimal(hslAvg[1]/(size.width*size.height),2);
-					hslAvg[2] = roundDecimal(hslAvg[2]/(size.width*size.height),2);
+					grayLevel = round(grayLevel/count);
+					hslAvg[0] = round(hslAvg[0]/count);
+					hslAvg[1] = roundDecimal(hslAvg[1]/count,2);
+					hslAvg[2] = roundDecimal(hslAvg[2]/count,2);
 					hslAvg[0] -= 180;
 					if(hslAvg[0]<0) hslAvg[0] += 360;
-					hueVec.push_back(hslAvg[0]);
-					satVec.push_back(hslAvg[1]);
-					lumVec.push_back(hslAvg[2]);
+					//int h = hslAvg[0];
+					//int s = hslAvg[1]*100;
+					//int l = hslAvg[2]*100;
+					//String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
+					//hslVec.push_back(hslStr);
 					pix = toString(grayLevel) + pix;
 					colorWindow.push_back(pix);
 				}
@@ -167,6 +177,8 @@
 				hslAvg[0] = 0;
 				hslAvg[1] = 0;
 				hslAvg[2] = 0;
+				count=0;
+				//fill_n(windowFlags,dimension,0);
 				fill_n(mainColorIndex,mainColors.size(),0);
 				fill_n(mainColorLevelAvg,mainColors.size(),0);
 				index.clear();
@@ -177,97 +189,30 @@
 				pixelColorWindow.clear();*/
 				col++;
 			}//end while col
-			hueMat.push_back(hueVec);
-			satMat.push_back(satVec);
-			lumMat.push_back(lumVec);
+			//hslMat.push_back(hslVec);
 			windowVec.push_back(colorWindow);
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			hueWindow.clear();
 			satWindow.clear();
 			lumWindow.clear();
-			hueVec.clear();
-			satVec.clear();
-			lumVec.clear();
-			col=0; row++;
+			//hslVec.clear();
 		}//end while row
 		writeSeq2File(windowVec,name);
-		writeSeq2File(hueMat,"lph10hue");
-		writeSeq2File(satMat,"lph10sat");
-		writeSeq2File(lumMat,"lph10lum");
+		//writeSeq2File(hslMat,name+"_HSL");
 		//contrast con;
 		//con.writeMainColorMatrix(windowVec,name);
 		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
 		Intensity in;
-		in.writeMainColorMatrix(img, windowVec,hueMat, satMat, lumMat, name);
+		//in.writeMainColorMatrix(img, windowVec,hslMat,name);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
 		deque<int>().swap(index);
-		deque< deque<double> >().swap(hueMat);
-		deque< deque<double> >().swap(satMat);
-		deque< deque<double> >().swap(lumMat);
-		deque<double>().swap(hueVec);
-		deque<double>().swap(satVec);
-		deque<double>().swap(lumVec);
+		//deque< deque<String> >().swap(hslMat);
+		//deque<String>().swap(hslVec);
 		deque<double>().swap(hueWindow);
 		deque<double>().swap(satWindow);
 		deque<double>().swap(lumWindow);
 		//fclose(fp);
-	}
-
-	void hysteresis1x1(Mat img, String name) {
-		rgb rgb;
-		hsl hsl;
-		int r,g,b;
-		double* HSL;
-		String pix;
-		deque<String> colorWindow;
-		deque< deque<String> > windowVec;
-		deque<double> hueVec;
-		deque<double> satVec;
-		deque<double> lumVec;
-		deque< deque<double> > hueMat;
-		deque< deque<double> > satMat;
-		deque< deque<double> > lumMat;
-		double dist=0;
-		int ind=0;
-		for(int row=0; row<img.rows; row++) {
-			for(int col=0; col<img.cols; col++) {
-				r = img.at<Vec3b>(row,col)[2];
-				g = img.at<Vec3b>(row,col)[1];
-				b = img.at<Vec3b>(row,col)[0];
-				pix = rgb.checkBlack(r,g,b);
-				if(pix=="OTHER") {
-					pix = rgb.calcColor(r,g,b,dist,ind);
-				}
-				HSL = hsl.rgb2hsl(r,g,b);
-				HSL[1] = roundDecimal(HSL[1],2);
-				HSL[2] = roundDecimal(HSL[2],2);
-				hueVec.push_back(HSL[0]);
-				satVec.push_back(HSL[1]);
-				lumVec.push_back(HSL[2]);
-				colorWindow.push_back(pix);
-			}
-			hueMat.push_back(hueVec);
-			satMat.push_back(satVec);
-			lumMat.push_back(lumVec);
-			windowVec.push_back(colorWindow);
-			colorWindow.clear();
-		}
-		writeSeq2File(windowVec,name);
-		//con.writeMainColorMatrix(windowVec,name);
-		//String filename = name + "Contrast";
-		//con.calcContrastFromMatrix(windowVec,filename);
-		Intensity in;
-		in.writeIntensityMatrix(windowVec,name);
-		in.writeMainColorMatrix(img, windowVec,hueMat, satMat, lumMat, name);
-		deque<String>().swap(colorWindow);
-		deque< deque<String> >().swap(windowVec);
-		deque< deque<double> >().swap(hueMat);
-		deque< deque<double> >().swap(satMat);
-		deque< deque<double> >().swap(lumMat);
-		deque<double>().swap(hueVec);
-		deque<double>().swap(satVec);
-		deque<double>().swap(lumVec);
 	}

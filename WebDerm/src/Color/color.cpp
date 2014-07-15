@@ -172,7 +172,8 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
 				pix = getMainColor(window.at(i).at(j));
-				if(c.countColors(pix)<2) pix = shade+pix;
+				if(c.countColors(pix)>2) pix = shrinkColor(pix,2);
+				pix = shade+pix;
 				if(shade=="Black") {
 					img.at<Vec3b>(i,j)[2] = 0;
 					img.at<Vec3b>(i,j)[1] = 0;
@@ -185,7 +186,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 				}
 				else {
 					for(unsigned int k=0; k<color.size(); k++) {
-						if(pix.find(color.at(k))!=string::npos) {
+						if(pix==color.at(k)) {
 							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
 							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
 							img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
@@ -261,4 +262,18 @@ void Color::changeContrast(double r, double g, double b, double alpha, double be
 	}
 	imshow("Color",img);
 	waitKey(0);
+}
+
+String Color::shrinkColor(String pix, int number) {
+	int count=0;
+	String color;
+	for(unsigned int i=0; i<mainColors.size(); i++) {
+		if(pix.find(mainColors.at(i))!=string::npos) {
+			color += mainColors.at(i);
+			count++;
+		}
+		if(count==number)
+			break;
+	}
+	return color;
 }

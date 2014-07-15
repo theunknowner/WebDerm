@@ -278,8 +278,7 @@ int rule7(String &pix, String &newPix) {
 
 /** rule 8 - Using indexChange to promote colors on boundaries **/
 int rule8(String &newPix, double &indexChange, Point pt,
-			deque< deque<String> > &windowVec, deque< deque<double> > &hueMat,
-			deque< deque<double> > &satMat, deque< deque<double> > &lumMat) {
+			deque< deque<String> > &windowVec, deque< deque<String> > &hslMat) {
 	int ruleNum = 8;
 	bool flag=false;
 	hsl hsl;
@@ -290,9 +289,9 @@ int rule8(String &newPix, double &indexChange, Point pt,
 	double indexChangeThresh = 1.0; //different than thresh for contrast of shades
 	double pThreshMove = 1.35;
 	double hue,sat,lum;
-	hue = hueMat.at(pt.y).at(pt.x);
-	sat = satMat.at(pt.y).at(pt.x);
-	lum = lumMat.at(pt.y).at(pt.x);
+	hue = getDelimitedValuesFromString(hslMat.at(pt.y).at(pt.x),';',1);
+	sat = getDelimitedValuesFromString(hslMat.at(pt.y).at(pt.x),';',2)/100;
+	lum = getDelimitedValuesFromString(hslMat.at(pt.y).at(pt.x),';',3)/100;
 	double fSat=0;
 	if(indexChange>=indexChangeThresh) {
 		if(color=="Grey") {
@@ -326,8 +325,7 @@ int rule8(String &newPix, double &indexChange, Point pt,
 
 bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, double &indexChange,
 					String &shade, String &shadePrev,
-					Point pt, deque<int> &ruleNo, deque< deque<double> > &hueMat,
-					deque< deque<double> > &satMat, deque< deque<double> > &lumMat) {
+					Point pt, deque<int> &ruleNo, deque< deque<String> > &hslMat) {
 	bool flag=false;
 	String newShade = shade;
 	String newPix = pix;

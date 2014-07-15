@@ -16,7 +16,5 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Intensity/intensity.h"
 
 void hysteresis(Mat img, Size size, String name);
-void hysteresis1x1(Mat img,String name);
-
 
 #endif /* HYSTERESIS_H_ */

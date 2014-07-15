@@ -40,17 +40,13 @@ public:
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);
 	deque< deque<String> > calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-												deque< deque<double> > &hueMat,
-												deque< deque<double> > &satMat,
-												deque< deque<double> > &lumMat, String name);
+									deque< deque<String> > &hslMat,String name);
 	void writeNormalizedIntensityMatrix(deque< deque<String> > &windowVec, String name);
 	void writeNormalizedIntensityMatrix(deque< deque<double> > &vec, String name);
 	void writeIntensityMatrix(deque< deque<double> > &intensityVec, String name);
 	void writeIntensityMatrix(deque< deque<String> > &windowVec, String name);
 	void writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-							deque< deque<double> > &hueMat,
-							deque< deque<double> > &satMat,
-							deque< deque<double> > &lumMat, String name);
+							deque< deque<String> > &hslMat,String name);
 	void writeContrastMatrix(deque< deque<double> > &vec, String name);
 	void writeCumConMatrix(deque< deque<double> > &vec, String name);
 	void writeSmoothIntensityMatrix(deque< deque<double> > &vec, String name);

@@ -16,7 +16,6 @@
 
 String init_specialRules(String pix, int r, int g, int b);
 bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, double &indexChange,
-					String &shade, String &shadePrev,
-					Point pt, deque<int> &ruleNo, deque< deque<double> > &hueMat,
-					deque< deque<double> > &satMat, deque< deque<double> > &lumMat);
+					String &shade, String &shadePrev, Point pt,
+					deque<int> &ruleNo, deque< deque<String> > &hslMat);
 #endif /* RULES_H_ */

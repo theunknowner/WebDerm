@@ -131,19 +131,14 @@ void runHysteresis()
 	Intensity in;
 	String filename;
 	String name;
-	String input;
-	Size size;
+	Size size(2,2);
 	cout << "Enter filename: ";
 	cin >> filename;
-	cout << "1) Size(1x1)" << endl << "2) Size(2x2)" << endl;
-	cin >> input;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	name = getImageName(filename);
-	if(input=="1") size = Size(1,1);
-	if(input=="2") size = Size(2,2);
 	int s = 3;
 	bool flag[s];
 	flag[0]=rgb.importThresholds();
@@ -155,12 +150,9 @@ void runHysteresis()
 			break;
 		}
 	}
-	if(flag[0]==true) {
-		if(size.height==1 && size.width==1)
-			hysteresis1x1(img2,name);
-		else
-			hysteresis(img2,size,name);
-	}
+	if(flag[0]==true)
+		hysteresis(img2,size,name);
+
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 	hsl.release_memory();
