@@ -7,13 +7,9 @@
 
 #include "hysteresis.h"
 
-
-
 //hysteresis moving 1 col/row at a time
 	void hysteresis(Mat img, Size size, String name)
 	{
-		//FILE * fp;
-		//fp = fopen("farColors.csv","w");
 		rgb rgb;
 		hsl hsl;
 		Color colorObj;
@@ -27,8 +23,8 @@
 		deque<double> hueWindow;
 		deque<double> satWindow;
 		deque<double> lumWindow;
-		//deque<String> hslVec;
-		//deque< deque<String> > hslMat;
+		deque<String> hslVec;
+		deque< deque<String> > hslMat;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -122,11 +118,11 @@
 						mainColorLevels[index.at(j)] = rgb.getColorLevel(pixelColorWindow.at(i),
 															mainColors.at(index.at(j)));
 						mainColorLevelAvg[index.at(j)] += mainColorLevels[index.at(j)];
-						//if(pixelColorWindow.at(i).find(mainColors.at(index.at(j)))!=string::npos) {
-							//windowFlags[i] = 1;
-						//}
+						if(pixelColorWindow.at(i).find(mainColors.at(index.at(j)))!=string::npos) {
+							windowFlags[i] = 1;
+						}
 					}
-				}/*
+				}
 				for(int i=0; i<dimension; i++) {
 					if(windowFlags[i]==true) {
 						grayLevel += rgb.getGrayLevel1(pixelColorWindow.at(i));
@@ -137,7 +133,7 @@
 						hslAvg[2] += lumWindow.at(i);
 						count++;
 					}
-				}*/
+				}
 				for(unsigned int i=0; i <index.size(); i++)
 				{
 					mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
@@ -161,11 +157,11 @@
 					hslAvg[2] = roundDecimal(hslAvg[2]/count,2);
 					hslAvg[0] -= 180;
 					if(hslAvg[0]<0) hslAvg[0] += 360;
-					//int h = hslAvg[0];
-					//int s = hslAvg[1]*100;
-					//int l = hslAvg[2]*100;
-					//String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
-					//hslVec.push_back(hslStr);
+					int h = hslAvg[0];
+					int s = hslAvg[1]*100;
+					int l = hslAvg[2]*100;
+					String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
+					hslVec.push_back(hslStr);
 					pix = toString(grayLevel) + pix;
 					colorWindow.push_back(pix);
 				}
@@ -178,7 +174,7 @@
 				hslAvg[1] = 0;
 				hslAvg[2] = 0;
 				count=0;
-				//fill_n(windowFlags,dimension,0);
+				fill_n(windowFlags,dimension,0);
 				fill_n(mainColorIndex,mainColors.size(),0);
 				fill_n(mainColorLevelAvg,mainColors.size(),0);
 				index.clear();
@@ -189,30 +185,28 @@
 				pixelColorWindow.clear();*/
 				col++;
 			}//end while col
-			//hslMat.push_back(hslVec);
+			hslMat.push_back(hslVec);
 			windowVec.push_back(colorWindow);
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			hueWindow.clear();
 			satWindow.clear();
 			lumWindow.clear();
-			//hslVec.clear();
+			hslVec.clear();
+
+			col=0; row++;
 		}//end while row
 		writeSeq2File(windowVec,name);
-		//writeSeq2File(hslMat,name+"_HSL");
-		//contrast con;
-		//con.writeMainColorMatrix(windowVec,name);
-		//con.calcContrastFromMatrix(windowVec,hueVec,filename);
+		writeSeq2File(hslMat,name+"_HSL");
 		Intensity in;
-		//in.writeMainColorMatrix(img, windowVec,hslMat,name);
+		in.writeMainColorMatrix(img, windowVec,hslMat,name);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);
 		deque<int>().swap(index);
-		//deque< deque<String> >().swap(hslMat);
-		//deque<String>().swap(hslVec);
+		deque< deque<String> >().swap(hslMat);
+		deque<String>().swap(hslVec);
 		deque<double>().swap(hueWindow);
 		deque<double>().swap(satWindow);
 		deque<double>().swap(lumWindow);
-		//fclose(fp);
 	}

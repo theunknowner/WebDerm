@@ -12,14 +12,18 @@ void writeSeq2File(deque< deque<String> > &vec, String name)
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
+	if(vec.size()==0)
+		cout << "Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++)
 		{
-			fprintf(fp,"[%s],", vec.at(i).at(j).c_str());
+			for(unsigned int j=0; j<vec.at(i).size(); j++)
+			{
+				fprintf(fp,"[%s],", vec.at(i).at(j).c_str());
+			}
+			fprintf(fp, "\n");
 		}
-		fprintf(fp, "\n");
-	}
 	fclose(fp);
 }
 
@@ -28,14 +32,18 @@ void writeSeq2File(deque< deque<String> > &vec, String pathname, String name)
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
+	if(vec.size()==0)
+		cout << "Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++)
 		{
-			fprintf(fp,"%s,", vec.at(i).at(j).c_str());
+			for(unsigned int j=0; j<vec.at(i).size(); j++)
+			{
+				fprintf(fp,"%s,", vec.at(i).at(j).c_str());
+			}
+			fprintf(fp, "\n");
 		}
-		fprintf(fp, "\n");
-	}
 	fclose(fp);
 }
 
@@ -44,14 +52,18 @@ void writeSeq2File(deque< deque<int> > &vec, String name)
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
+	if(vec.size()==0)
+		cout << "Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++)
 		{
-			fprintf(fp,"%d,", vec.at(i).at(j));
+			for(unsigned int j=0; j<vec.at(i).size(); j++)
+			{
+				fprintf(fp,"%d,", vec.at(i).at(j));
+			}
+			fprintf(fp, "\n");
 		}
-		fprintf(fp, "\n");
-	}
 	fclose(fp);
 }
 
@@ -60,14 +72,18 @@ void writeSeq2File(deque< deque<double> > &vec, String name)
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
+	if(vec.size()==0)
+		cout << "Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++)
 		{
-			fprintf(fp,"%f,", vec.at(i).at(j));
+			for(unsigned int j=0; j<vec.at(i).size(); j++)
+			{
+				fprintf(fp,"%f,", vec.at(i).at(j));
+			}
+			fprintf(fp, "\n");
 		}
-		fprintf(fp, "\n");
-	}
 	fclose(fp);
 }
 
@@ -75,9 +91,13 @@ void writeSeq2File(deque<double> &vec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++) {
-		fprintf(fp,"%f,",vec.at(i));
-	}
+	if(vec.size()==0)
+		cout << "Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++) {
+			fprintf(fp,"%f,",vec.at(i));
+		}
 	fclose(fp);
 }
 
@@ -86,14 +106,18 @@ void writeSeq2File(deque< deque<long double> > &vec, String name)
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<vec.size(); i++)
-	{
-		for(unsigned int j=0; j<vec.at(i).size(); j++)
+	if(vec.size()==0)
+		cout << "Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++)
 		{
-			fprintf(fp,"%Lf,", vec.at(i).at(j));
+			for(unsigned int j=0; j<vec.at(i).size(); j++)
+			{
+				fprintf(fp,"%Lf,", vec.at(i).at(j));
+			}
+			fprintf(fp, "\n");
 		}
-		fprintf(fp, "\n");
-	}
 	fclose(fp);
 }
 
@@ -101,9 +125,13 @@ void writeSeq2File(deque<Point> &ptVec, String name) {
 	String filename = name + ".txt";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<ptVec.size(); i++) {
-		fprintf(fp,"(%d,%d)\n",ptVec.at(i).x, ptVec.at(i).y);
-	}
+	if(ptVec.size()==0)
+		cout << "Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<ptVec.size(); i++) {
+			fprintf(fp,"(%d,%d)\n",ptVec.at(i).x, ptVec.at(i).y);
+		}
 	fclose(fp);
 }
 
