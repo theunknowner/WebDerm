@@ -277,3 +277,26 @@ String Color::shrinkColor(String pix, int number) {
 	}
 	return color;
 }
+
+double* Color::extractHSL(String inputString) {
+	int beginPos=0, endPos=0;
+	String substr;
+	for(unsigned int i=0; i<inputString.length(); i++) {
+		if(inputString[i]=='(')
+			beginPos=i;
+		if(inputString[i]==')') {
+			endPos=i;
+			break;
+		}
+	}
+	substr = inputString.substr(beginPos+1,endPos-1);
+	deque<double> vec;
+	getDelimitedValuesFromString(substr,';',vec);
+	static double result[3];
+	for(unsigned int i=0; i<vec.size(); i++) {
+		result[i] = vec.at(i);
+	}
+	vec.clear();
+	deque<double>().swap(vec);
+	return result;
+}

@@ -12,5 +12,4 @@ deque<String> hslColors;
 deque< deque<int> > hueThresh;
 deque< deque<double> > satThresh;
 deque< deque<double> > lumThresh;
-deque< deque<double> > satLevel;
-deque< deque<double> > lumLevel;
+deque<int> hueTableNum;

@@ -15,7 +15,6 @@ double getDelimitedValuesFromString(String inputString, char delimiter, int occu
 	int count=0;
 	for(unsigned int i=0; i<inputString.length(); i++) {
 		if((inputString[i]==delimiter) || (i==inputString.length()-1)) {
-			cout << i << endl;
 			substr = inputString.substr(pos,i+1);
 			pos = i+1;
 			count++;
@@ -24,6 +23,20 @@ double getDelimitedValuesFromString(String inputString, char delimiter, int occu
 		if(count==occurrence) break;
 	}
 	return result;
+}
+
+/* return all values separated by delimiter */
+void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec) {
+	String substr;
+	unsigned int pos=0;
+	int count=0;
+	for(unsigned int i=0; i<inputString.length(); i++) {
+		if((inputString[i]==delimiter) || (i==inputString.length()-1)) {
+			substr = inputString.substr(pos,i+1);
+			pos = i+1;
+			vec.push_back(atof(substr.c_str()));
+		}
+	}
 }
 
 String toString(int val)

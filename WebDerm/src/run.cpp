@@ -220,7 +220,7 @@ void runMouseHysteresis()
 {
 	rgb rgb;
 	hsl hsl;
-	hsl.importLsThreshold();
+	hsl.importHslThresholds();
 	rgb.importThresholds();
 	Mat img2, mask;
 	String filename;
@@ -244,7 +244,7 @@ void runMouseHysteresis2()
 {
 	rgb rgb;
 	hsl hsl;
-	hsl.importLsThreshold();
+	hsl.importHslThresholds();
 	rgb.importThresholds();
 	Mat img2, mask;
 	String filename;
@@ -306,7 +306,7 @@ void runOutputColorFreq()
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	rgb.importThresholds();
-	hsl.importLsThreshold();
+	hsl.importHslThresholds();
 	outputFreqColor(img2);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
@@ -330,7 +330,7 @@ void runOutputFarRGB() {
 	name = getImageName(filename);
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
-	hsl.importLsThreshold();
+	hsl.importHslThresholds();
 	//outputFarRGBScript(img2,name);
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory(); hsl.release_memory();

@@ -19,7 +19,6 @@ public:
 	bool isThreshImported();
 	void setThreshImported(bool flag);
 	bool importHslThresholds();
-	bool importLsThreshold();
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);
 	double *rgb2hsl(double red, double green, double blue);

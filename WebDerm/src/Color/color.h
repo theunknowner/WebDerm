@@ -29,5 +29,6 @@ public:
 	Mat changeImageBrightness(Mat &img, double amt);
 	void changeContrast(double r, double g, double b, double alpha=1, double beta=0);
 	String shrinkColor(String pix, int number);
+	double* extractHSL(String inputString);
 };
 #endif /* COLOR_H_ */

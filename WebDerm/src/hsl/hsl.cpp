@@ -37,6 +37,7 @@ bool hsl::importHslThresholds() {
 			if(i>=1 && i<=2) thresh.push_back(atoi(vec.at(i).c_str()));
 			if(i>=3 && i<=4) thresh2.push_back(atof(vec.at(i).c_str()));
 			if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
+			if(i==7) hueTableNum.push_back(atoi(vec.at(i).c_str()));
 		}
 		hueThresh.push_back(thresh);
 		satThresh.push_back(thresh2);
@@ -51,54 +52,6 @@ bool hsl::importHslThresholds() {
 	String().swap(temp);
 	setThreshImported(true);
 	return true;
-}
-
-bool hsl::importLsThreshold()
-{
-	String folderName = path+"Thresholds/";
-	String filename = folderName+"lum-thresholds.csv";
-	String filename2 = folderName+"sat-thresholds.csv";
-	fstream fsThresh(filename.c_str());
-	fstream fsThresh2(filename2.c_str());
-	if(fsThresh.is_open() && fsThresh2.is_open())
-	{
-		String temp;
-		deque<String> vec;
-		deque<double> thresh;
-		deque<double> thresh2;
-		getline(fsThresh,temp);
-		while(getline(fsThresh,temp))
-		{
-			getSubstr(temp,',',vec); //gets line to string
-			for(unsigned int i=0; i<vec.size(); i++)
-			{
-				thresh.push_back(atof(vec.at(i).c_str()));
-			}
-			lumLevel.push_back(thresh);
-			vec.clear(); thresh.clear();
-		}
-		getline(fsThresh2,temp);
-		while(getline(fsThresh2,temp))
-		{
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++)
-			{
-				thresh2.push_back(atof(vec.at(i).c_str()));
-			}
-			satLevel.push_back(thresh2);
-			vec.clear(); thresh2.clear();
-		}
-		fsThresh.close(); fsThresh2.close();
-		deque<String>().swap(vec);
-		deque<double>().swap(thresh);
-		deque<double>().swap(thresh2);
-		return true;
-	}
-	else
-	{
-		cout << "Importing ls-Thresholds Failed!" << endl;
-		return false;
-	}
 }
 
 //gets the minimum between the rgb value
@@ -253,8 +206,6 @@ void hsl::release_memory()
 	deque< deque<int> >().swap(hueThresh);
 	deque< deque<double> >().swap(satThresh);
 	deque< deque<double> >().swap(lumThresh);
-	deque< deque<double> >().swap(satLevel);
-	deque< deque<double> >().swap(lumLevel);
 }
 
 //customize calcuation of hue avg

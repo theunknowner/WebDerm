@@ -15,7 +15,6 @@ extern deque<String> hslColors;
 extern deque< deque<int> > hueThresh;
 extern deque< deque<double> > satThresh;
 extern deque< deque<double> > lumThresh;
-extern deque< deque<double> > satLevel;
-extern deque< deque<double> > lumLevel;
+extern deque<int> hueTableNum;
 
 #endif /* HSL_GLOBAL_H_ */

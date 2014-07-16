@@ -397,6 +397,7 @@ break_nested_loop:
 deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
 									deque< deque<String> > &hslMat,String name) {
 	rgb rgb;
+	hsl hsl;
 	Color c;
 	FILE *fp;
 	String filename = name + "_Rule_Table.csv";
@@ -493,7 +494,16 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				loc = j-(localIndexes.size()-index)+1;
 				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ruleNo,hslMat);
 				if(flag==true) pix2 = c.getMainColor(pix);
-				String str = "(" + hslMat.at(i).at(j) + ")";
+				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
+				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2)/100;
+				double l = getDelimitedValuesFromString(hslMat.at(i).at(j),';',3)/100;
+				int ind=0;
+				hsl.getHslColor(h,s,l,ind);
+				h = hueTableNum.at(ind);
+				s = roundDecimal(s,1);
+				l = roundDecimal(l,1);
+				String str = toString(h)+";"+toString(s)+";"+toString(l);
+				str = "("+str+")";
 				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc);
 			}
 			if(pix2!="Black") {

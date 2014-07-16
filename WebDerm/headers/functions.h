@@ -24,6 +24,7 @@ std::size_t length(const T (&)[N] )
 };
 
 double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence);
+void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec);
 String toString(int val);
 String toString(double val);
 double roundDecimal(double num, int places);
