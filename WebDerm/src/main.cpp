@@ -34,7 +34,6 @@ int main(int argc,char** argv)
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	in.importThresholds();
-	//hsl.importThresholds();
 	Mat img, img2,img3, mask,mask2;
 	img = runResizeImage(path+"Images/Psoriasis","Psoriasis1.jpg",Size(700,700),0);
 	getSkin(img, mask);
