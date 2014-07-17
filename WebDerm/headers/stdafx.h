@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstdarg>
 #include <cstdlib>
+#include <stdio.h>
 
 using namespace std;
 using namespace cv;

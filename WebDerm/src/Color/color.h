@@ -16,6 +16,7 @@
 class Color {
 public:
 	bool containsColor(String color1, String color2);
+	bool containsColor(String color1, ...);
 	int containsMainColor(String color, String mColor);
 	bool isSameColor(String color1, String color2);
 	void extractColorFromString(String color, deque<String> &vecColor);

@@ -16,6 +16,20 @@ bool Color::containsColor(String color1, String color2)
 		return false;
 }
 
+/** argNum as first input followed by color1 and colors to find  **/
+bool Color::containsColor(String argNum, ...) {
+	int arg = atoi(argNum.c_str());
+	va_list vl;
+	va_start(vl,argNum);
+	String color1 = va_arg(vl,char *);
+	for(int i=1; i<arg; i++) {
+		if(color1.find(va_arg(vl,char *))!=string::npos)
+		return true;
+	}
+	va_end(vl);
+	return false;
+}
+
 //returns the amount of time pixels contain main color
 int Color::containsMainColor(String color, String mColor)
 {
@@ -190,7 +204,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 					img.at<Vec3b>(i,j)[0] = 255;
 				}
 				else {
-					/*
+
 					for(unsigned int k=0; k<color.size(); k++) {
 						if(pix==color.at(k)) {
 							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
@@ -198,10 +212,10 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 							img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
 							break;
 						}
-					} */
-					img.at<Vec3b>(i,j)[2] = RGB[0];
-					img.at<Vec3b>(i,j)[1] = RGB[1];
-					img.at<Vec3b>(i,j)[0] = RGB[2];
+					}
+					//img.at<Vec3b>(i,j)[2] = RGB[0];
+					//img.at<Vec3b>(i,j)[1] = RGB[1];
+					//img.at<Vec3b>(i,j)[0] = RGB[2];
 				}
 			}
 		}

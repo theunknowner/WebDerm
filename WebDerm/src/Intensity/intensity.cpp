@@ -220,7 +220,7 @@ int Intensity::getShadeIndex(String shade) {
 	return index;
 }
 
-String Intensity::calcShade(double inten, int x, int y) {
+String Intensity::calcShade(double inten, bool eof) {
 	static int minIndex = getShadeIndex(oldMinShade);
 	static int maxIndex = getShadeIndex(oldMaxShade);
 	static int shadeAmt = (maxIndex-minIndex)+1;
@@ -279,7 +279,7 @@ String Intensity::calcShade(double inten, int x, int y) {
 			}
 		}
 	}
-	if(x==698 && y==698) {
+	if(eof==true) {
 		delete[] thresh;
 		delete[] shadeIndex;
 		thresh = NULL;
@@ -421,6 +421,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	deque<int> ruleNo;
 	deque<String> strVec1;
 	Point pt;
+	bool eof=false;
 	intensityVec = calcIntensityMatrix(windowVec);
 	smoothIntensityVec = calcSmoothedIntensityMatrix(intensityVec);
 	for(unsigned int i=0; i<smoothIntensityVec.size(); i++) {
@@ -428,15 +429,17 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			pix = windowVec.at(i).at(j);
 			pix2 = c.getMainColor(pix);
 			ccCurr = smoothIntensityVec.at(i).at(j);
+			if(i==(smoothIntensityVec.size()-1) && j==(smoothIntensityVec.at(i).size()-1))
+				eof = true;
 			if(flag==0) { //initial first pixel-area
 				if(pix!="Black") {
-					shade = calcShade(ccCurr, j,i);
+					shade = calcShade(ccCurr, eof);
 					flag=1;
 				}
 			}
 			else if(flag!=0) {
 				if(pix!="Black")
-					shade = calcShade(ccCurr,j,i);
+					shade = calcShade(ccCurr, eof);
 				else
 					shade = "";
 			}
@@ -484,6 +487,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 					index = minIndex;
 				}
 				else index--;
+				if(index<0) index=0;
 				shade = colorVec2.at(i).at(j);
 				indexChange = myRound((ccCurr-localCC)/(thresh));
 				shadeIndex = localIndex + (int)indexChange;
@@ -491,8 +495,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			}
 			if(pix2!="Black") {
 				pt.x = j; pt.y=i;
-				loc = j-(localIndexes.size()-index)+1;
-				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ruleNo,hslMat);
+				loc = j-(localIndexes.size()-index);
+				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,loc,ruleNo,hslMat,colorVec2);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
 				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2)/100;
@@ -504,7 +508,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				l = roundDecimal(l,1);
 				String str = toString(h)+";"+toString(s)+";"+toString(l);
 				str = "("+str+")";
-				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc);
+				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1);
 			}
 			if(pix2!="Black") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();

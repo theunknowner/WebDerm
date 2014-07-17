@@ -22,6 +22,7 @@ std::size_t length(const T (&)[N] )
 {
   return N;
 };
+#define stringify(name) #name
 
 double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence);
 void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec);

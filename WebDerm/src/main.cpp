@@ -14,6 +14,7 @@
 #include "scripts/scripts.h"
 #include "Math/maths.h"
 #include "Contrast/contrast.h"
+#include "FileData/filedata.h"
 
 int main(int argc,char** argv)
 {
@@ -30,21 +31,22 @@ int main(int argc,char** argv)
 	hsl hsl;
 	rgb rgb;
 	Color c;
+	FileData fd;
 	Intensity in;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	in.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Psoriasis","Psoriasis1.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Psoriasis","Psoriasis4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(232,227);
-	Point pt2(233,228);
+	Point pt1(287,187);
+	Point pt2(288,188);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
-	//checkColorsFromList(img2,pt1,pt2);
-	//generateColorRegionTable(img2, pt1,pt2);
+	checkColorsFromList(img2,pt1,pt2);
+	generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 	/*
 	int col = 361;
