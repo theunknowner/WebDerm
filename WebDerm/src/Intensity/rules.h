@@ -5,8 +5,8 @@
  *      Author: jason
  */
 
-#ifndef RULES_H_
-#define RULES_H_
+#ifndef RULES_H_INCLUDED
+#define RULES_H_INCLUDED
 
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
@@ -16,7 +16,7 @@
 
 String init_specialRules(String pix, int r, int g, int b);
 bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, double &indexChange,
-					String &shade, String &shadePrev, Point pt, int loc,
+					String &shade, String &shadePrev, Point pt, int loc, double relRatio,
 					deque<int> &ruleNo, deque< deque<String> > &hslMat,
 					deque< deque<String> > &colorVec);
 #endif /* RULES_H_ */

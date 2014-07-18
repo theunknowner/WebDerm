@@ -52,7 +52,7 @@ void getCoordinates(Mat &img, int red, int green, int blue)
 }
 
 //gets image filename from filepath
-String getImageName(String filename)
+String getFileName(String filename)
 {
 	char delimit1 = '/';
 	char delimit2 = '.';

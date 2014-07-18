@@ -17,8 +17,10 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/table.h"
+
 #include "rules.h"
 
+class FileData;
 class Intensity {
 public:
 	double getMinIntensity();
@@ -40,13 +42,13 @@ public:
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);
 	deque< deque<String> > calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-									deque< deque<String> > &hslMat,String name);
+									deque< deque<String> > &hslMat,String name, FileData &fd);
 	void writeNormalizedIntensityMatrix(deque< deque<String> > &windowVec, String name);
 	void writeNormalizedIntensityMatrix(deque< deque<double> > &vec, String name);
 	void writeIntensityMatrix(deque< deque<double> > &intensityVec, String name);
 	void writeIntensityMatrix(deque< deque<String> > &windowVec, String name);
 	void writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-							deque< deque<String> > &hslMat,String name);
+							deque< deque<String> > &hslMat,String name, FileData &fd);
 	void writeContrastMatrix(deque< deque<double> > &vec, String name);
 	void writeCumConMatrix(deque< deque<double> > &vec, String name);
 	void writeSmoothIntensityMatrix(deque< deque<double> > &vec, String name);

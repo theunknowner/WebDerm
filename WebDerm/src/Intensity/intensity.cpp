@@ -8,11 +8,12 @@
 #include "intensity.h"
 
 int global_flag=0;
-int shadeCount=0;
 String shadeArr[] = {"Dark","High","Low","Light","White"};
+int shadeCount=length(shadeArr);
 double minIntensity = 0;
 double maxIntensity = 255;
 double range=0;
+double outlierCorrection = 4;
 String status = "NA";
 String oldMinShade=status,oldMaxShade=status;
 String newMinShade=status,newMaxShade=status;
@@ -225,8 +226,8 @@ String Intensity::calcShade(double inten, bool eof) {
 	static int maxIndex = getShadeIndex(oldMaxShade);
 	static int shadeAmt = (maxIndex-minIndex)+1;
 	static double interval = range/shadeAmt;
-	static double minOutlier = minIntensity - 4;
-	static double maxOutlier = maxIntensity + 4;
+	static double minOutlier = minIntensity - outlierCorrection;
+	static double maxOutlier = maxIntensity + outlierCorrection;
 	static double *thresh;
 	static int *shadeIndex;
 	if(global_flag==0) {
@@ -234,8 +235,8 @@ String Intensity::calcShade(double inten, bool eof) {
 		maxIndex = getShadeIndex(oldMaxShade);
 		shadeAmt = (maxIndex-minIndex)+1;
 		interval = range/shadeAmt;
-		minOutlier = minIntensity - 4;
-		maxOutlier = maxIntensity + 4;
+		minOutlier = minIntensity - outlierCorrection;
+		maxOutlier = maxIntensity + outlierCorrection;
 		thresh = new double[shadeAmt];
 		shadeIndex = new int[shadeAmt];
 		//initialize thresholds to array
@@ -395,7 +396,7 @@ break_nested_loop:
 }
 
 deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-									deque< deque<String> > &hslMat,String name) {
+									deque< deque<String> > &hslMat,String name, FileData &fd) {
 	rgb rgb;
 	hsl hsl;
 	Color c;
@@ -455,6 +456,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	printf("%s;%s\n",newMinShade.c_str(),newMaxShade.c_str());
 	int shadeAmt = (maxShadeIndex-minShadeIndex)+1;
 	double thresh = range/shadeAmt;
+	double currGL=0, currCL=0, currRatio=0, prevRatio=0;
+	double localMinRatio=0, localMaxRatio=0, localRatio=0;
+	double minRatioIndex=0, maxRatioIndex=0, localRatioIndex=0, ratioLoc=0;
+	deque<double> localRatios;
+	double localRatioScanSize = 10;
+	double relativeRatio=0;
 	for(unsigned int i=0; i<smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -462,16 +469,36 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			ccCurr = smoothIntensityVec.at(i).at(j);
 			if(flag==0) { //initial first pixel-area
 				if(pix2!="Black") {
+					currGL = rgb.getGrayLevel1(pix);
+					currCL = rgb.getColorLevel(pix);
+					currRatio = currGL/currCL;
 					shade = colorVec2.at(i).at(j);
 					shadeIndex = getShadeIndex(shade);
 					localCC = ccCurr;
 					localIndex = shadeIndex;
 					localShade = shade;
 					ccPrev = ccCurr;
+					localRatio = currRatio;
+					prevRatio = currRatio;
 					flag=1;
 				}
 			}
 			else if(flag!=0 && pix2!="Black") {
+				currGL = rgb.getGrayLevel1(pix);
+				currCL = rgb.getColorLevel(pix);
+				currRatio = currGL/currCL;
+				if(currRatio-prevRatio>0) {
+					localRatio = localMinRatio;
+					localRatioIndex = minRatioIndex;
+				}
+				else if(currRatio-prevRatio<0) {
+					localRatio = localMaxRatio;
+					localRatioIndex = maxRatioIndex;
+				}
+				else localRatioIndex--;
+				if(localRatioIndex<0) localRatioIndex=0;
+				relativeRatio = currRatio/localRatio;
+
 				if(windowVec.at(i).at(j-1)!="Black")
 					ccPrev = smoothIntensityVec.at(i).at(j-1);
 				if((ccCurr-ccPrev)<0) {
@@ -492,11 +519,13 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				indexChange = myRound((ccCurr-localCC)/(thresh));
 				shadeIndex = localIndex + (int)indexChange;
 				ccPrev=ccCurr;
+				prevRatio = currRatio;
 			}
 			if(pix2!="Black") {
 				pt.x = j; pt.y=i;
 				loc = j-(localIndexes.size()-index);
-				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,loc,ruleNo,hslMat,colorVec2);
+				ratioLoc  = j-(localRatios.size()-localIndex);
+				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ratioLoc,relativeRatio,ruleNo,hslMat,colorVec2);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
 				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2)/100;
@@ -508,7 +537,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				l = roundDecimal(l,1);
 				String str = toString(h)+";"+toString(s)+";"+toString(l);
 				str = "("+str+")";
-				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1);
+				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(ratioLoc+1);
 			}
 			if(pix2!="Black") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
@@ -525,6 +554,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				localMinCC = localCCs.at(minIndex);
 				localMinIndex = localIndexes.at(minIndex);
 				localMinShade = localShades.at(minIndex);
+				if(localRatios.size()==localRatioScanSize) localRatios.pop_front();
+				localRatios.push_back(currRatio);
+				maxRatioIndex = distance(localRatios.begin(),max_element(localRatios.begin(),localRatios.end()));
+				localMaxRatio = localRatios.at(maxRatioIndex);
+				minRatioIndex = distance(localRatios.begin(),min_element(localRatios.begin(),localRatios.end()));
+				localMinRatio = localRatios.at(minRatioIndex);
 			}
 			/** generate rule table **/
 			if(ruleNo.size()>0) {
@@ -563,8 +598,21 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		localIndexes.clear();
 		localCCs.clear();
 		localShades.clear();
+		localRatioIndex=0;
+		localRatios.clear();
+
 	}
 	fclose(fp);
+	fd.minIntensity = minIntensity;
+	fd.maxIntensity = maxIntensity;
+	fd.minOutlier = minIntensity - outlierCorrection;
+	fd.maxOutlier = maxIntensity + outlierCorrection;
+	fd.oldMinShade = oldMinShade;
+	fd.oldMaxShade = oldMaxShade;
+	fd.newMinShade = newMinShade;
+	fd.newMaxShade = newMaxShade;
+	fd.shadeCount = shadeAmt;
+	fd.writeFileMetaData();
 	c.output2ImageColor(colorVec2,name);
 	writeIntensityMatrix(intensityVec,name);
 	writeSmoothIntensityMatrix(smoothIntensityVec,name);
@@ -641,9 +689,9 @@ void Intensity::writeIntensityMatrix(deque< deque<String> > &windowVec, String n
 }
 
 void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-									deque< deque<String> > &hslMat,String name) {
+									deque< deque<String> > &hslMat,String name, FileData &fd) {
 	deque< deque<String> > colorVec;
-	colorVec = calcMainColorMatrix(img, windowVec, hslMat, name);
+	colorVec = calcMainColorMatrix(img, windowVec, hslMat, name, fd);
 	String filename = name + "MainColors";
 	writeSeq2File(colorVec,filename);
 	deque< deque<String> >().swap(colorVec);

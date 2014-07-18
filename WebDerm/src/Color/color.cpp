@@ -80,7 +80,7 @@ String Color::extractShade(String pix) {
 	int shadeCount = in.getShadeCount();
 	String shade = "";
 	if(pix=="Black") return pix;
-	if(pix.find("Gray")!=string::npos) return "Gray";
+	//if(pix.find("Gray")!=string::npos) return "Gray";
 	for(int i=0; i<shadeCount; i++) {
 		shade = in.getShade(i);
 		if(pix.find(shade)!=string::npos)
@@ -120,7 +120,7 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 }
 
 String Color::getMainColor(String color) {
-	String pix;
+	String pix="";
 	int flag=0;
 	for(unsigned int i=0; i<mainColors.size(); i++) {
 		if(color.find(mainColors.at(i))!=string::npos && mainColors.at(i)!="Gray") {
@@ -128,10 +128,8 @@ String Color::getMainColor(String color) {
 			flag=1;
 		}
 	}
-	//return gray not grey!
-	if(flag==0) {
-		pix = "Gray";
-	}
+	if(flag==0 && color.find("Gray")!=string::npos)
+		return "Grey";
 	return pix;
 }
 
@@ -183,6 +181,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		String pix;
 		Size size(window.at(0).size(),window.size());
 		Mat img = img.zeros(size,16);
+		int flag=0;
 		double* HSL;
 		double* RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
@@ -191,7 +190,6 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 				pix = getMainColor(window.at(i).at(j));
 				HSL = c.extractHSL(window.at(i).at(j));
 				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
-				if(c.countColors(pix)>2) pix = shrinkColor(pix,2);
 				pix = shade+pix;
 				if(shade=="Black") {
 					img.at<Vec3b>(i,j)[2] = 0;
@@ -204,13 +202,25 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 					img.at<Vec3b>(i,j)[0] = 255;
 				}
 				else {
-
 					for(unsigned int k=0; k<color.size(); k++) {
 						if(pix==color.at(k)) {
 							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
 							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
 							img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
+							flag=1;
 							break;
+						}
+					}
+					if(flag==1) {
+						flag=0;
+						if(c.countColors(pix)>2) pix = shrinkColor(pix,2);
+						for(unsigned int k=0; k<color.size(); k++) {
+							if(pix==color.at(k)) {
+								img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
+								img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
+								img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
+								break;
+							}
 						}
 					}
 					//img.at<Vec3b>(i,j)[2] = RGB[0];

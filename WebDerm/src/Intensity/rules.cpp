@@ -324,53 +324,31 @@ int rule8(String &newPix, double &indexChange, Point pt,
 }
 
 /** rule 9 - GrayIndexChange - for non-grays that look gray **/
-int rule9(deque< deque<String> > &windowVec, String &newPix, Point pt, int loc, deque< deque<String> > &colorVec) {
+int rule9(deque< deque<String> > &windowVec, String &newPix, Point pt, int loc, double relRatio, deque< deque<String> > &colorVec) {
 	int ruleNum = 9;
 	bool flag = false;
 	rgb rgb;
 	Color c;
-	int locX = pt.x-10;
-	if(locX<0) locX = pt.x;
-	String prevPix = windowVec.at(pt.y).at(locX);
+	String prevPix = windowVec.at(pt.y).at(loc);
 	String color = c.getMainColor(newPix);
-	String prevColor = c.getMainColor(colorVec.at(pt.y).at(locX));
-	double grayLevel = rgb.getGrayLevel1(newPix);
-	double prevGL = rgb.getGrayLevel1(prevPix);
-	double colorLevel = rgb.getColorLevel(newPix);
-	double prevCL = rgb.getColorLevel(prevPix);
-	double ratio = grayLevel/colorLevel;
-	double prevRatio = prevGL/prevCL;
-	double relativeRatio = ratio/prevRatio;
-	double darkness = round(((100-colorLevel)/100) * 255);
-	double prevDarkness = round(((100-prevCL)/100) * 255);
-	double darknessRatio = darkness/prevDarkness;
-	if(pt.x==296 && pt.y==186) {
-		printf("(%d,%d) - %d\n",pt.x,pt.y,locX);
-		cout << newPix << endl;
-		cout << prevPix << endl;
-		cout << colorVec.at(pt.y).at(locX) << endl;
-		cout << grayLevel <<endl;
-		cout << prevGL << endl;
-		cout << ratio << endl;
-		cout << prevRatio << endl;
-		cout << relativeRatio << endl;
-		cout << darkness << endl;
-		cout << prevDarkness << endl;
-		cout << darknessRatio << endl;
+	String prevColor = c.getMainColor(colorVec.at(pt.y).at(loc));
+	if(prevColor=="" || prevColor=="Black") {
+		prevColor = color;
+		prevPix = newPix;
 	}
 	if(c.containsColor(toString(4),color.c_str(),"Brown","Pink","Blue")) {
-		if(relativeRatio>1.25 && darknessRatio>1.15 && ratio>1.35) {
+		if(relRatio>1.25) {
 			newPix = "Grey";
 			flag=true;
 		}
-		else if(relativeRatio<0.77 && darknessRatio<0.83) {
-			newPix = color;
-			//flag=true;
+		else if(prevColor=="Grey") {
+			if(relRatio>=0.80&&relRatio<=1.25) {
+				newPix = prevColor;
+				flag=true;
+			}
 		}
-		else if(relativeRatio>=0.77&&relativeRatio<=1.3 && darknessRatio>=0.83&&darknessRatio<=1.2 && ratio>1.35) {
-			newPix = prevColor;
-			flag=true;
-		}
+		else
+			newPix=color;
 	}
 
 	if(flag==true) return ruleNum;
@@ -379,8 +357,8 @@ int rule9(deque< deque<String> > &windowVec, String &newPix, Point pt, int loc, 
 }
 
 bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, double &indexChange,
-					String &shade, String &shadePrev,Point pt,
-					int loc, deque<int> &ruleNo, deque< deque<String> > &hslMat,
+					String &shade, String &shadePrev,Point pt,int loc,
+					double relRatio, deque<int> &ruleNo, deque< deque<String> > &hslMat,
 					deque< deque<String> > &colorVec) {
 	bool flag=false;
 	String newShade = shade;
@@ -391,7 +369,7 @@ bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, doub
 	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	//ruleNumVec.push_back(rule8(newPix,indexChange,pt,windowVec,hueMat,satMat,lumMat));
-	ruleNumVec.push_back(rule9(windowVec,newPix,pt,loc,colorVec));
+	ruleNumVec.push_back(rule9(windowVec,newPix,pt,loc,relRatio,colorVec));
 	ruleNumVec.push_back(rule7(pix,newPix));
 	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
 		if(ruleNumVec.at(i)!=0) {

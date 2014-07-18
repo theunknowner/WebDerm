@@ -13,7 +13,7 @@
 
 void getSubstr(String str, char delimiter, deque<String> &vec);
 void getCoordinates(Mat &img, int red, int green, int blue);
-String getImageName(String filename);
+String getFileName(String filename);
 void mouseEvent(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis2(int evt, int x, int y, int flags, void* param);

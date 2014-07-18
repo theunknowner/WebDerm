@@ -40,8 +40,12 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/Psoriasis","Psoriasis4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(287,187);
-	Point pt2(288,188);
+	Point pt1(313,400);
+	Point pt2(314,401);
+	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/Psoriasis4MainColors.csv");
+	//deque< deque<String> > vec;
+	//fd.getFileMatrix(vec);
+	//c.output2ImageColor(vec,fd.filename);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
