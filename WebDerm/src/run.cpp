@@ -129,6 +129,7 @@ void runHysteresis()
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
+	FileData fd;
 	String filename;
 	String name;
 	Size size(2,2);
@@ -138,7 +139,7 @@ void runHysteresis()
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	name = getImageName(filename);
+	name = getFileName(filename);
 	int s = 3;
 	bool flag[s];
 	flag[0]=rgb.importThresholds();
@@ -150,8 +151,12 @@ void runHysteresis()
 			break;
 		}
 	}
-	if(flag[0]==true)
-		hysteresis(img2,size,name);
+	if(flag[0]==true) {
+		fd.setFilePath(filename);
+		fd.matSize = size;
+		fd.matImage = img2;
+		hysteresis(fd);
+	}
 
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
@@ -163,6 +168,7 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
+	FileData fd;
 	String name;
 	String input;
 	Size size(2,2);
@@ -183,8 +189,11 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			img = runResizeImage(filenames[i],Size(700,700),0);
 			getSkin(img, mask);
 			img.copyTo(img2, mask);
-			name = getImageName(filenames[i]);
-			hysteresis(img2,size,name);
+			name = getFileName(filenames[i]);
+			fd.setFilePath(filenames[i]);
+			fd.matImage = img2;
+			fd.matSize = size;
+			hysteresis(fd);
 			img.release(); img2.release(); mask.release();
 		}
 	}
@@ -207,7 +216,7 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	img.copyTo(img2, mask);
 	if(input=="y")
 	{
-		String name = getImageName(filename);
+		String name = getFileName(filename);
 		imwrite(name+".png",img2);
 	}
 	imshow("Img", img2);
@@ -327,7 +336,7 @@ void runOutputFarRGB() {
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	name = getImageName(filename);
+	name = getFileName(filename);
 	if(input=="y") imwrite(name+".png",img2);
 	rgb.importThresholds();
 	hsl.importHslThresholds();

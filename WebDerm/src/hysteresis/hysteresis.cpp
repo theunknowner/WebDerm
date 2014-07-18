@@ -7,8 +7,12 @@
 
 #include "hysteresis.h"
 
+void hysteresis(FileData &fd) {
+	hysteresis(fd.matImage,fd.matSize,fd.filename,fd);
+}
+
 //hysteresis moving 1 col/row at a time
-	void hysteresis(Mat img, Size size, String name)
+	void hysteresis(Mat img, Size size, String name, FileData &fd)
 	{
 		rgb rgb;
 		hsl hsl;
@@ -199,7 +203,7 @@
 		writeSeq2File(windowVec,name);
 		writeSeq2File(hslMat,name+"_HSL");
 		Intensity in;
-		in.writeMainColorMatrix(img, windowVec,hslMat,name);
+		in.writeMainColorMatrix(img, windowVec,hslMat,name, fd);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque< deque<String> >().swap(windowVec);

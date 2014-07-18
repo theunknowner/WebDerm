@@ -14,7 +14,10 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Intensity/intensity.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
 
-void hysteresis(Mat img, Size size, String name);
+class FileData;
+void hysteresis(FileData &fd);
+void hysteresis(Mat img, Size size, String name, FileData &fd);
 
 #endif /* HYSTERESIS_H_ */
