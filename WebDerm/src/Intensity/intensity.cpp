@@ -462,11 +462,18 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	deque<double> localRatios;
 	double localRatioScanSize = 10;
 	double relativeRatio=0;
+	deque<double> ratioVec1;
+	deque< deque<double> > ratioVec2;
 	for(unsigned int i=0; i<smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
 			pix2 = c.getMainColor(pix);
 			ccCurr = smoothIntensityVec.at(i).at(j);
+			currGL = rgb.getGrayLevel1(pix);
+			currCL = rgb.getColorLevel(pix);
+			currRatio = currGL/currCL;
+			if(currCL==0) currRatio = -1;
+			ratioVec1.push_back(currRatio);
 			if(flag==0) { //initial first pixel-area
 				if(pix2!="Black") {
 					currGL = rgb.getGrayLevel1(pix);
@@ -498,7 +505,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				else localRatioIndex--;
 				if(localRatioIndex<0) localRatioIndex=0;
 				relativeRatio = currRatio/localRatio;
-
 				if(windowVec.at(i).at(j-1)!="Black")
 					ccPrev = smoothIntensityVec.at(i).at(j-1);
 				if((ccCurr-ccPrev)<0) {
@@ -524,7 +530,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			if(pix2!="Black") {
 				pt.x = j; pt.y=i;
 				loc = j-(localIndexes.size()-index);
-				ratioLoc  = j-(localRatios.size()-localIndex);
+				ratioLoc  = j-(localRatios.size()-localRatioIndex);
 				bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ratioLoc,relativeRatio,ruleNo,hslMat,colorVec2);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
@@ -592,6 +598,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			colorVec2.at(i).at(j) = pix2;
 			ruleNo.clear();
 		}
+		ratioVec2.push_back(ratioVec1);
+		ratioVec1.clear();
 		flag=0;
 		indexChange=0;
 		index=0;
@@ -614,6 +622,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.shadeCount = shadeAmt;
 	fd.writeFileMetaData();
 	c.output2ImageColor(colorVec2,name);
+	writeSeq2File(ratioVec2,name+"_Ratios");
 	writeIntensityMatrix(intensityVec,name);
 	writeSmoothIntensityMatrix(smoothIntensityVec,name);
 	reset_globals();
