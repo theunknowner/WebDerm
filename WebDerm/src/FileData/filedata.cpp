@@ -63,6 +63,9 @@ bool FileData::loadFileMatrix(String file_path) {
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
 			vec.pop_back(); //removes the weird empty space at the end of deque
+			for(unsigned int i=0; i<vec.size(); i++) {
+				vec.at(i) = vec.at(i).substr(1,vec.at(i).length()-2);
+			}
 			this->dataMatrix.push_back(vec);
 			vec.clear();
 		}
@@ -73,5 +76,9 @@ bool FileData::loadFileMatrix(String file_path) {
 	else
 		cout << "Failed to load File matrix!" << endl;
 	return false;
+}
+
+void FileData::printMatrixData(int x, int y, String data) {
+
 }
 

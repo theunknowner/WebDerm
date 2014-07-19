@@ -456,14 +456,16 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	printf("%s;%s\n",newMinShade.c_str(),newMaxShade.c_str());
 	int shadeAmt = (maxShadeIndex-minShadeIndex)+1;
 	double thresh = range/shadeAmt;
+
 	double currGL=0, currCL=0, currRatio=0, prevRatio=0;
 	double localMinRatio=0, localMaxRatio=0, localRatio=0;
 	double minRatioIndex=0, maxRatioIndex=0, localRatioIndex=0, ratioLoc=0;
 	deque<double> localRatios;
-	double localRatioScanSize = 10;
+	double localRatioScanSize = 20;
 	double relativeRatio=0;
 	deque<double> ratioVec1;
 	deque< deque<double> > ratioVec2;
+
 	for(unsigned int i=0; i<smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -472,8 +474,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			currGL = rgb.getGrayLevel1(pix);
 			currCL = rgb.getColorLevel(pix);
 			currRatio = currGL/currCL;
-			if(currCL==0) currRatio = -1;
-			ratioVec1.push_back(currRatio);
 			if(flag==0) { //initial first pixel-area
 				if(pix2!="Black") {
 					currGL = rgb.getGrayLevel1(pix);
@@ -504,7 +504,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				}
 				else localRatioIndex--;
 				if(localRatioIndex<0) localRatioIndex=0;
-				relativeRatio = currRatio/localRatio;
+
 				if(windowVec.at(i).at(j-1)!="Black")
 					ccPrev = smoothIntensityVec.at(i).at(j-1);
 				if((ccCurr-ccPrev)<0) {
@@ -526,7 +526,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				shadeIndex = localIndex + (int)indexChange;
 				ccPrev=ccCurr;
 				prevRatio = currRatio;
+				relativeRatio = currRatio/localRatio;
 			}
+			relativeRatio = currRatio/localRatio;
+			relativeRatio = roundDecimal(relativeRatio,2);
+			if(localRatio==0 || pix2=="Black") relativeRatio = -1;
+			ratioVec1.push_back(relativeRatio);
 			if(pix2!="Black") {
 				pt.x = j; pt.y=i;
 				loc = j-(localIndexes.size()-index);
@@ -608,7 +613,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		localShades.clear();
 		localRatioIndex=0;
 		localRatios.clear();
-
+		localRatio=0;
 	}
 	fclose(fp);
 	fd.minIntensity = minIntensity;

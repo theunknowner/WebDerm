@@ -332,20 +332,21 @@ int rule9(deque< deque<String> > &windowVec, String &newPix, Point pt, int loc, 
 	String prevPix = windowVec.at(pt.y).at(loc);
 	String color = c.getMainColor(newPix);
 	String prevColor = c.getMainColor(colorVec.at(pt.y).at(loc));
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
+	double ratio = roundDecimal(grayLevel/colorLevel,2);
 	if(prevColor=="" || prevColor=="Black") {
 		prevColor = color;
 		prevPix = newPix;
 	}
 	if(c.containsColor(toString(4),color.c_str(),"Brown","Pink","Blue")) {
-		if(relRatio>1.25) {
+		if(relRatio>1.25 && ratio>1.35) {
 			newPix = "Grey";
 			flag=true;
 		}
-		else if(prevColor=="Grey") {
-			if(relRatio>=0.80&&relRatio<=1.25) {
-				newPix = prevColor;
-				flag=true;
-			}
+		else if(relRatio>=0.85&&relRatio<=1.25 && prevColor=="Grey") {
+			newPix = prevColor;
+			flag=true;
 		}
 		else
 			newPix=color;
