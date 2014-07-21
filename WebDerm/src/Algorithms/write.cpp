@@ -13,7 +13,7 @@ void writeSeq2File(deque< deque<String> > &vec, String name)
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	if(vec.size()==0)
-		cout << "Write Sequence to File failed!" << endl;
+		cout << name << " Write Sequence to File failed!" << endl;
 
 	else
 		for(unsigned int i=0; i<vec.size(); i++)
@@ -27,33 +27,13 @@ void writeSeq2File(deque< deque<String> > &vec, String name)
 	fclose(fp);
 }
 
-void writeSeq2File(deque< deque<String> > &vec, String pathname, String name)
-{
-	String filename = name + ".csv";
-	FILE * fp;
-	fp = fopen(filename.c_str(),"w");
-	if(vec.size()==0)
-		cout << "Write Sequence to File failed!" << endl;
-
-	else
-		for(unsigned int i=0; i<vec.size(); i++)
-		{
-			for(unsigned int j=0; j<vec.at(i).size(); j++)
-			{
-				fprintf(fp,"%s,", vec.at(i).at(j).c_str());
-			}
-			fprintf(fp, "\n");
-		}
-	fclose(fp);
-}
-
 void writeSeq2File(deque< deque<int> > &vec, String name)
 {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	if(vec.size()==0)
-		cout << "Write Sequence to File failed!" << endl;
+		cout << name << " Write Sequence to File failed!" << endl;
 
 	else
 		for(unsigned int i=0; i<vec.size(); i++)
@@ -73,7 +53,7 @@ void writeSeq2File(deque< deque<double> > &vec, String name)
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	if(vec.size()==0)
-		cout << "Write Sequence to File failed!" << endl;
+		cout << name << " Write Sequence to File failed!" << endl;
 
 	else
 		for(unsigned int i=0; i<vec.size(); i++)
@@ -92,7 +72,7 @@ void writeSeq2File(deque<double> &vec, String name) {
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	if(vec.size()==0)
-		cout << "Write Sequence to File failed!" << endl;
+		cout << name << " Write Sequence to File failed!" << endl;
 
 	else
 		for(unsigned int i=0; i<vec.size(); i++) {
@@ -107,7 +87,7 @@ void writeSeq2File(deque< deque<long double> > &vec, String name)
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	if(vec.size()==0)
-		cout << "Write Sequence to File failed!" << endl;
+		cout << name << " Write Sequence to File failed!" << endl;
 
 	else
 		for(unsigned int i=0; i<vec.size(); i++)
@@ -126,7 +106,7 @@ void writeSeq2File(deque<Point> &ptVec, String name) {
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	if(ptVec.size()==0)
-		cout << "Write Sequence to File failed!" << endl;
+		cout << name << " Write Sequence to File failed!" << endl;
 
 	else
 		for(unsigned int i=0; i<ptVec.size(); i++) {

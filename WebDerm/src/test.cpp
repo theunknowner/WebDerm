@@ -200,39 +200,6 @@ void testMouseColor(Mat img)
 	waitKey(0);
 }
 
-void testSatLum(Mat &img)
-{
-	hsl hsl;
-	int r,g,b,hue;
-	double lum=0, sat=0;
-	char text[20];
-	deque<String> vec;
-	deque< deque<String> > windowVec;
-	for(int row=0; row<img.rows; row++)
-	{
-		for(int col=0; col<img.cols; col++)
-		{
-			r = img.at<Vec3b>(row,col)[2];
-			g = img.at<Vec3b>(row,col)[1];
-			b = img.at<Vec3b>(row,col)[0];
-			hsl.rgb2hsl(r,g,b);
-			hue = hsl.getHue();
-			lum = hsl.getLum();
-			sat = hsl.getSat();
-			lum = roundDecimal(lum,2) * 100;
-			sat = roundDecimal(sat,2) * 100;
-			sprintf(text,"(%d;%d;%d)", (int)hue,(int)sat,(int)lum);
-			vec.push_back(text);
-		}
-		windowVec.push_back(vec);
-		vec.clear();
-	}
-	writeSeq2File(windowVec,path,"satlum");
-	deque< deque<String> >().swap(windowVec);
-	deque<String>().swap(vec);
-	hsl.release_memory();
-}
-
 void testColorIndex(Mat &img, int index)
 {
 	rgb rgb;

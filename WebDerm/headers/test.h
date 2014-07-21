@@ -19,7 +19,6 @@
 String testHysteresis(Mat &img, int row, int col, Size size);
 String testMouseHysteresis(Mat &img, int row, int col, Size size, deque<Vec3b> &vec, deque<String> &colorVec);
 void testMouseColor(Mat img);
-void testSatLum(Mat &img);
 void testColorIndex(Mat &img, int index);
 String testColorAtLoc(Mat &img, Point pt, double &hue);
 

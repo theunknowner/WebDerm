@@ -15,6 +15,7 @@ private:
 	String file_path;
 	deque< deque<String> > dataMatrix;
 
+
 public:
 	String filename;
 	String oldMinShade;
@@ -28,8 +29,21 @@ public:
 	int shadeCount;
 	Size matSize;
 	Mat matImage;
+	Point pt; // current pt location of the filedata matrices
+	double localRatioScanSize;
+	deque< deque<String> > windowVec;
+	deque< deque<String> > hslMat;
+	deque<double> relRatioVec;
+	deque<double> absRatioVec;
+	deque< deque<double> > relRatioMat;
+	deque< deque<double> > absRatioMat;
+	deque< deque<String> > colorVec;
+	deque< deque<double> > intensityVec;
+	deque< deque<double> > smoothIntensityVec;
+	deque< deque<String> > shadeVec;
 
 	FileData(String file_path="");
+	~FileData();
 	void setFilePath(String file_path);
 	String getFilePath();
 	void getFileMatrix(deque< deque<String> > &vec);

@@ -324,32 +324,99 @@ int rule8(String &newPix, double &indexChange, Point pt,
 }
 
 /** rule 9 - GrayIndexChange - for non-grays that look gray **/
-int rule9(deque< deque<String> > &windowVec, String &newPix, Point pt, int loc, double relRatio, deque< deque<String> > &colorVec) {
+int rule9(FileData &fd, String &newPix, int ratioLoc) {
 	int ruleNum = 9;
 	bool flag = false;
 	rgb rgb;
 	Color c;
-	String prevPix = windowVec.at(pt.y).at(loc);
+	Point pt = fd.pt;
+	String prevPix_0deg =fd.windowVec.at(pt.y).at(ratioLoc);
 	String color = c.getMainColor(newPix);
-	String prevColor = c.getMainColor(colorVec.at(pt.y).at(loc));
+	String prevColor_0deg = c.getMainColor(fd.colorVec.at(pt.y).at(ratioLoc));
+	String prevColor_45deg, prevColor_90deg;
+	String pix0=newPix,pix45=newPix,pix90=newPix;
 	double grayLevel = rgb.getGrayLevel1(newPix);
 	double colorLevel = rgb.getColorLevel(newPix);
-	double ratio = roundDecimal(grayLevel/colorLevel,2);
-	if(prevColor=="" || prevColor=="Black") {
-		prevColor = color;
-		prevPix = newPix;
+
+	double absRatioThresh = 1.35;
+	double relRatioThreshUpper = 1.25;
+	double relRatioThreshLower = 0.85;
+	double absRatio = roundDecimal(grayLevel/colorLevel,2);
+	double relRatio_0deg = absRatio/fd.absRatioVec.at(ratioLoc);
+	double relRatio_45deg=0, relRatio_90deg=0;
+	bool relRatio_45deg_flag = false;
+	bool relRatio_90deg_flag = false;
+	double localRatioScanSize = fd.localRatioScanSize;
+
+	if(prevColor_0deg=="" || prevColor_0deg=="Black") {
+		prevColor_0deg = color;
+		prevPix_0deg = newPix;
 	}
+
 	if(c.containsColor(toString(4),color.c_str(),"Brown","Pink","Blue")) {
-		if(relRatio>1.25 && ratio>1.35) {
-			newPix = "Grey";
+		if(relRatio_0deg>relRatioThreshUpper && absRatio>absRatioThresh) {
+			pix0 = "Grey";
+		}
+		else if(relRatio_0deg>=relRatioThreshLower&&relRatio_0deg<=relRatioThreshUpper && prevColor_0deg=="Grey") {
+			pix0 = prevColor_0deg;
+		}
+		if(pt.y>0) {
+			int j=pt.x-1;
+			int endY=(pt.y-localRatioScanSize);
+			for(int i=(pt.y-1); i>=endY; i--) {
+				if(i<0 && j<0) break;
+
+				if(relRatio_45deg_flag==false && j>=0 && i>=0) {
+					relRatio_45deg = absRatio/fd.absRatioMat.at(i).at(j);
+					relRatio_45deg = roundDecimal(relRatio_45deg,2);
+					prevColor_45deg = fd.colorVec.at(i).at(j);
+					if(relRatio_45deg>relRatioThreshUpper && absRatio>absRatioThresh) {
+						pix45 = "Grey";
+						relRatio_45deg_flag = true;
+					}
+					else if(relRatio_45deg>=relRatioThreshLower&&relRatio_45deg<=relRatioThreshUpper && prevColor_45deg=="Grey") {
+						pix45 = prevColor_45deg;
+						relRatio_45deg_flag = true;
+					}
+				}
+				--j;
+				if(relRatio_90deg_flag==false && i>=0) {
+					relRatio_90deg = absRatio/fd.absRatioMat.at(i).at(pt.x);
+					relRatio_90deg = roundDecimal(relRatio_90deg,2);
+					prevColor_90deg = fd.colorVec.at(i).at(pt.x);
+					if(relRatio_90deg>relRatioThreshUpper && absRatio>absRatioThresh) {
+						pix90 = "Grey";
+						relRatio_90deg_flag = true;
+					}
+					else if(relRatio_90deg>=relRatioThreshLower&&relRatio_90deg<=relRatioThreshUpper && prevColor_90deg=="Grey") {
+						pix90 = prevColor_90deg;
+						relRatio_90deg_flag = true;
+					}
+				}
+				if(relRatio_45deg_flag==true && relRatio_90deg_flag==true)
+					break;
+			}
+		}
+		if(pix0==pix45||pix0==pix90) {
+			newPix=pix0;
 			flag=true;
 		}
-		else if(relRatio>=0.85&&relRatio<=1.25 && prevColor=="Grey") {
-			newPix = prevColor;
+		else if(pix45==pix90) {
+			newPix=pix45;
 			flag=true;
 		}
 		else
-			newPix=color;
+			newPix = color;
+		/*if(pt.x==57 && pt.y==441) {
+			cout << "NewPix: " << newPix << endl;
+			cout << "Color: " << color << endl;
+			cout << "Pix0: " << pix0 << endl;
+			cout << "Pix45: " << pix45 << endl;
+			cout << "Pix90: " << pix90 << endl;
+			cout << "PrevColor0: " << prevColor_0deg << endl;
+			cout << "PrevColor45: " << prevColor_45deg << endl;
+			cout << "PrevColor90: " << prevColor_90deg << endl;
+		}*/
 	}
 
 	if(flag==true) return ruleNum;
@@ -360,7 +427,7 @@ int rule9(deque< deque<String> > &windowVec, String &newPix, Point pt, int loc, 
 bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, double &indexChange,
 					String &shade, String &shadePrev,Point pt,int loc,
 					double relRatio, deque<int> &ruleNo, deque< deque<String> > &hslMat,
-					deque< deque<String> > &colorVec) {
+					deque< deque<String> > &colorVec, FileData &fd) {
 	bool flag=false;
 	String newShade = shade;
 	String newPix = pix;
@@ -370,7 +437,36 @@ bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, doub
 	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	//ruleNumVec.push_back(rule8(newPix,indexChange,pt,windowVec,hueMat,satMat,lumMat));
-	ruleNumVec.push_back(rule9(windowVec,newPix,pt,loc,relRatio,colorVec));
+	ruleNumVec.push_back(rule9(fd,newPix,loc));
+	ruleNumVec.push_back(rule7(pix,newPix));
+	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
+		if(ruleNumVec.at(i)!=0) {
+			ruleNo.push_back(ruleNumVec.at(i));
+			flag=true;
+		}
+	}
+	//rule2(pix, newPix, newShade, flag, ruleNo);
+	//rule3(pix,newPix, flag, ruleNo);
+	//rule4(pix, newPix, newShade, flag, ruleNo);
+
+	deque<int>().swap(ruleNumVec);
+	shade = newShade;
+	pix = newPix;
+	return flag;
+}
+
+bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade, int loc,
+					deque<int> &ruleNo) {
+	bool flag=false;
+	String newShade = shade;
+	String newPix = pix;
+	deque<int> ruleNumVec;
+
+	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
+	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
+	ruleNumVec.push_back(rule6(pix,newPix,newShade));
+	//ruleNumVec.push_back(rule8(newPix,indexChange,pt,windowVec,hueMat,satMat,lumMat));
+	ruleNumVec.push_back(rule9(fd,newPix,loc));
 	ruleNumVec.push_back(rule7(pix,newPix));
 	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
 		if(ruleNumVec.at(i)!=0) {

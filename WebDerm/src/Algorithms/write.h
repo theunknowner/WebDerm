@@ -14,7 +14,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 void writeSeq2File(deque< deque<String> > &vec, String name);
-void writeSeq2File(deque< deque<String> > &vec, String pathname,String name);
 void writeSeq2File(deque< deque<int> > &vec, String name);
 void writeSeq2File(deque< deque<double> > &vec, String name);
 void writeSeq2File(deque<double> &vec, String name);

@@ -22,13 +22,11 @@ void hysteresis(FileData &fd) {
 		int windowFlags[dimension];
 		deque<String> pixelColorWindow;
 		deque<String> colorWindow;
-		deque< deque<String> > windowVec;
 		deque<int> index;
 		deque<double> hueWindow;
 		deque<double> satWindow;
 		deque<double> lumWindow;
 		deque<String> hslVec;
-		deque< deque<String> > hslMat;
 		int mainColorIndex[mainColors.size()];
 		double mainColorLevels[mainColors.size()];
 		double mainColorLevelAvg[mainColors.size()];
@@ -189,8 +187,8 @@ void hysteresis(FileData &fd) {
 				pixelColorWindow.clear();*/
 				col++;
 			}//end while col
-			hslMat.push_back(hslVec);
-			windowVec.push_back(colorWindow);
+			fd.hslMat.push_back(hslVec);
+			fd.windowVec.push_back(colorWindow);
 			colorWindow.clear();
 			pixelColorWindow.clear();
 			hueWindow.clear();
@@ -200,15 +198,13 @@ void hysteresis(FileData &fd) {
 
 			col=0; row++;
 		}//end while row
-		writeSeq2File(windowVec,name);
-		writeSeq2File(hslMat,name+"_HSL");
+		writeSeq2File(fd.windowVec,name);
+		writeSeq2File(fd.hslMat,name+"_HSL");
 		Intensity in;
-		in.writeMainColorMatrix(img, windowVec,hslMat,name, fd);
+		in.writeMainColorMatrix(fd);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
-		deque< deque<String> >().swap(windowVec);
 		deque<int>().swap(index);
-		deque< deque<String> >().swap(hslMat);
 		deque<String>().swap(hslVec);
 		deque<double>().swap(hueWindow);
 		deque<double>().swap(satWindow);
