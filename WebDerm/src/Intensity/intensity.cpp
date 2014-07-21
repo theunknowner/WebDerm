@@ -421,6 +421,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	bool eof=false;
 	fd.intensityVec = calcIntensityMatrix(fd.windowVec);
 	fd.smoothIntensityVec = calcSmoothedIntensityMatrix(fd.intensityVec);
+	fd.range = range;
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -461,6 +462,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	double relativeRatio=0;
 	fd.shadeVec = fd.colorVec;
 	fd.localRatioScanSize = localRatioScanSize;
+	fd.localScanSize = localScanSize;
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -544,7 +546,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				int ind=0;
 				hsl.getHslColor(h,s,l,ind);
 				h = hueTableNum.at(ind);
-				s = roundDecimal(s,1);
+				s = roundDecimal(s,2);
 				l = roundDecimal(l,1);
 				String str = toString(h)+";"+toString(s)+";"+toString(l);
 				str = "("+str+")";

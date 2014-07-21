@@ -44,7 +44,7 @@ String init_specialRules(String pix, int r, int g, int b) {
 	return pix2;
 }
 
-/** provisional rule #1 - Contrast with IndexChange**/
+/** general rule #1 - Contrast with IndexChange**/
 int rule1(double &indexChange, String &shade, String &newShade) {
 	Intensity in;
 	bool flag=false;
@@ -129,7 +129,7 @@ int rule4(String &pix, String &newPix, String &newShade) {
 	return 0;
 }
 
-/** Rule #5 - Determining Dark Grey **/
+/** Special Rule #5 - Determining Dark Grey **/
 int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 	int ruleNum=5;
 	bool flag=false;
@@ -277,44 +277,28 @@ int rule7(String &pix, String &newPix) {
 }
 
 /** rule 8 - Using indexChange to promote colors on boundaries **/
-int rule8(String &newPix, double &indexChange, Point pt,
-			deque< deque<String> > &windowVec, deque< deque<String> > &hslMat) {
+int rule8(FileData &fd, String &newPix, double &indexChange) {
 	int ruleNum = 8;
 	bool flag=false;
 	hsl hsl;
 	Color c;
-	String color = c.getMainColor(newPix);
-	String prevColor = c.getMainColor(windowVec.at(pt.y).at(pt.x-1));
+	Point pt = fd.pt;
+	String color = c.getMainColor(fd.windowVec.at(pt.y).at(pt.x));
 	int ind=-1;
 	double indexChangeThresh = 1.0; //different than thresh for contrast of shades
 	double pThreshMove = 1.35;
 	double hue,sat,lum;
-	hue = getDelimitedValuesFromString(hslMat.at(pt.y).at(pt.x),';',1);
-	sat = getDelimitedValuesFromString(hslMat.at(pt.y).at(pt.x),';',2)/100;
-	lum = getDelimitedValuesFromString(hslMat.at(pt.y).at(pt.x),';',3)/100;
+	hue = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
+	sat = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2)/100;
+	lum = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3)/100;
 	double fSat=0;
+
 	if(indexChange>=indexChangeThresh) {
-		if(color=="Grey") {
-			hsl.getHslColor(hue,sat,lum,ind);
-			fSat = (sat-satThresh.at(ind).at(0));
-			fSat /= (satThresh.at(ind).at(1)-satThresh.at(ind).at(0));
-			fSat *= pThreshMove;
-			if(fSat>1) {
-				newPix = hslColors.at(ind+1);
-				flag = true;
-			}
-		}
-	}
-	else {
-		if(color=="Grey" && prevColor=="Grey") {
-			hsl.getHslColor(hue,sat,lum,ind);
-			fSat = (sat-satThresh.at(ind).at(0));
-			fSat /= (satThresh.at(ind).at(1)-satThresh.at(ind).at(0));
-			fSat *= pThreshMove;
-			if(fSat>1) {
-				newPix = hslColors.at(ind+1);
-				flag = true;
-			}
+		int j = pt.x-1;
+		int endY = (pt.y-fd.localScanSize);
+		for(int i=(pt.y-1); i>=endY; i--) {
+			if(j<0 && i<0) break;
+
 		}
 	}
 

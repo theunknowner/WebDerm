@@ -16,6 +16,7 @@ FileData::FileData(String file_path) {
 	maxOutlier = 0;
 	matSize = Size(0,0);
 	localRatioScanSize = 0;
+	localScanSize=0;
 	range=0;
 }
 

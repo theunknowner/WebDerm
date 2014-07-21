@@ -32,6 +32,7 @@ public:
 	Mat matImage;
 	Point pt; // current pt location of the filedata matrices
 	double localRatioScanSize;
+	double localScanSize;
 	deque< deque<String> > windowVec;
 	deque< deque<String> > hslMat;
 	deque<double> relRatioVec;
