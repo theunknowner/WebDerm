@@ -27,6 +27,7 @@ public:
 	double minOutlier;
 	double maxOutlier;
 	int shadeCount;
+	double range;
 	Size matSize;
 	Mat matImage;
 	Point pt; // current pt location of the filedata matrices
