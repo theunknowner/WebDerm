@@ -152,7 +152,6 @@ void hysteresis(FileData &fd) {
 						else
 							pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 					}
-					pix  = colorObj.fixColors(pix,r,g,b);
 					grayLevel = round(grayLevel/count);
 					hslAvg[0] = round(hslAvg[0]/count);
 					hslAvg[1] = roundDecimal(hslAvg[1]/count,2);

@@ -532,7 +532,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				loc = j-(localIndexes.size()-index);
 				ratioLoc  = j-(localRatios.size()-localRatioIndex);
 				//bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ratioLoc,relativeRatio,ruleNo,hslMat,colorVec2,fd);
-				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,ruleNo);
+				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
 				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2)/100;

@@ -37,11 +37,11 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	in.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/LPH","lph10.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(424,249);
-	Point pt2(425,250);
+	Point pt1(295,295);
+	Point pt2(296,296);
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/Psoriasis4.csv");
 	//deque< deque<String> > vec;
 	//fd.getFileMatrix(vec);

@@ -245,7 +245,7 @@ String Color::fixColors(String pix, double r, double g, double b) {
 	rgb rgb;
 	String color=pix;
 	double colorLevel = rgb.calcColorLevel2(r,g,b);
-	if(getMainColor(pix)=="Gray")
+	if(getMainColor(pix)=="Grey")
 		color = "Grey" + toString(colorLevel);
 	if(containsColor(pix,"Gray") && containsColor(pix,"Grey"))
 		color = "Grey" + toString(colorLevel);

@@ -219,7 +219,7 @@ int rule6(String& pix, String& newPix, String& newShade) {
 	double grayLevel = rgb.getGrayLevel1(newPix);
 
 	if(newShade=="Dark") {
-		if(grayLevel>=90) {
+		if(grayLevel>=85) {
 			newPix = "Grey";
 			flag=true;
 		}
@@ -343,8 +343,6 @@ int rule8(FileData &fd, String &newPix, int loc) {
 		}
 		flag=true;
 	}
-	else
-		newPix = color;
 
 	if(flag==true) return ruleNum;
 
@@ -433,8 +431,6 @@ int rule9(FileData &fd, String &newPix, int ratioLoc) {
 			newPix=pix45;
 			flag=true;
 		}
-		else
-			newPix = color;
 		/*if(pt.x==57 && pt.y==441) {
 			cout << "NewPix: " << newPix << endl;
 			cout << "Color: " << color << endl;
