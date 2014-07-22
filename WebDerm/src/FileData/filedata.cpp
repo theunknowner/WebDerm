@@ -30,6 +30,8 @@ FileData::~FileData() {
 	deque< deque<double> >().swap(intensityVec);
 	deque< deque<double> >().swap(smoothIntensityVec);
 	deque< deque<String> >().swap(shadeVec);
+	deque<double>().swap(relRatioVec);
+	deque<double>().swap(absRatioVec);
 }
 
 void FileData::setFilePath(String file_path) {

@@ -7,27 +7,26 @@
 
 #include "intensity.h"
 
-int global_flag=0;
 String shadeArr[] = {"Dark","High","Low","Light","White"};
-int shadeCount=length(shadeArr);
-double minIntensity = 0;
-double maxIntensity = 255;
-double range=0;
-const double outlierCorrection = 4;
-String status = "NA";
-String oldMinShade=status,oldMaxShade=status;
-String newMinShade=status,newMaxShade=status;
 deque<String> gShades;
 deque< deque<double> > gShadeThresh;
 
-void reset_globals() {
+Intensity::Intensity() {
 	global_flag=0;
-	shadeCount=0;
-	minIntensity=0;
-	maxIntensity=255;
+	shadeCount=length(shadeArr);
+	minIntensity = 0;
+	maxIntensity = 255;
 	range=0;
-	oldMinShade=status; oldMaxShade=status;
-	newMinShade=status; newMaxShade=status;
+	outlierCorrection = 4;
+	status = "NA";
+	oldMinShade=status,oldMaxShade=status;
+	newMinShade=status,newMaxShade=status;
+	minIndex=0;
+	maxIndex=0;
+	oldShadeAmt=0;
+	oldInterval=0;
+	minOutlier=0;
+	maxOutlier=0;
 }
 
 double Intensity::getMinIntensity() {
@@ -133,16 +132,8 @@ double Intensity::sigmoidFn(double intensity) {
 	return result;
 }
 
-inline void _setMinMax(double intensity) {
-	if(intensity>maxIntensity && intensity!=255)
-		maxIntensity = intensity;
-	if(intensity<minIntensity)
-		minIntensity = intensity;
-
-	range = maxIntensity-minIntensity;
-}
 //assigns min/max shades to an image. Only runs once per image.
-void setMinMaxShades() {
+void Intensity::setMinMaxShades() {
 	double min,max;
 	for(unsigned int i=0; i<gShadeThresh.size(); i++) {
 		min = gShadeThresh.at(i).at(0);
@@ -222,26 +213,20 @@ int Intensity::getShadeIndex(String shade) {
 }
 
 String Intensity::calcShade(double inten, bool eof) {
-	static int minIndex = getShadeIndex(oldMinShade);
-	static int maxIndex = getShadeIndex(oldMaxShade);
-	static int shadeAmt = (maxIndex-minIndex)+1;
-	static double interval = range/shadeAmt;
-	static double minOutlier = minIntensity - outlierCorrection;
-	static double maxOutlier = maxIntensity + outlierCorrection;
 	static double *thresh;
 	static int *shadeIndex;
 	if(global_flag==0) {
 		minIndex = getShadeIndex(oldMinShade);
 		maxIndex = getShadeIndex(oldMaxShade);
-		shadeAmt = (maxIndex-minIndex)+1;
-		interval = range/shadeAmt;
+		oldShadeAmt = (maxIndex-minIndex)+1;
+		oldInterval = range/oldShadeAmt;
 		minOutlier = minIntensity - outlierCorrection;
 		maxOutlier = maxIntensity + outlierCorrection;
-		thresh = new double[shadeAmt];
-		shadeIndex = new int[shadeAmt];
+		thresh = new double[oldShadeAmt];
+		shadeIndex = new int[oldShadeAmt];
 		//initialize thresholds to array
-		for(int i=0; i<shadeAmt; i++) {
-			thresh[i] = minIntensity + (i*interval);
+		for(int i=0; i<oldShadeAmt; i++) {
+			thresh[i] = minIntensity + (i*oldInterval);
 			if(i==0) thresh[i] = minOutlier;
 			shadeIndex[i] = getShadeIndex(oldMinShade) + i;
 			cout << thresh[i] << ";";
@@ -252,14 +237,14 @@ String Intensity::calcShade(double inten, bool eof) {
 	String shade;
 	double indexChange=0;
 	//calculate shade
-	for(int i=0; i<shadeAmt; i++) {
-		if(i<(shadeAmt-1)) {
+	for(int i=0; i<oldShadeAmt; i++) {
+		if(i<(oldShadeAmt-1)) {
 			if(inten>thresh[i] && inten<=thresh[i+1]) {
 				shade = getShade(shadeIndex[i]);
 				break;
 			}
 			if(inten<=minOutlier) {
-				indexChange = (inten-minOutlier)/interval;
+				indexChange = (inten-minOutlier)/oldInterval;
 				indexChange = floor(indexChange);
 				shade = getShade(minIndex+indexChange);
 				newMinShade = shade;
@@ -272,7 +257,7 @@ String Intensity::calcShade(double inten, bool eof) {
 				break;
 			}
 			if(inten>maxOutlier) {
-				indexChange = (inten-maxOutlier)/interval;
+				indexChange = (inten-maxOutlier)/oldInterval;
 				indexChange = ceil(indexChange);
 				shade = getShade(maxIndex+indexChange);
 				newMaxShade = shade;
@@ -451,8 +436,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	minShadeIndex = getShadeIndex(newMinShade);
 	printf("%s;%s\n",oldMinShade.c_str(),oldMaxShade.c_str());
 	printf("%s;%s\n",newMinShade.c_str(),newMaxShade.c_str());
-	int shadeAmt = (maxShadeIndex-minShadeIndex)+1;
-	double thresh = range/shadeAmt;
+	int newShadeAmt = (maxShadeIndex-minShadeIndex)+1;
+	double newInterval = range/newShadeAmt;
 
 	double currGL=0, currCL=0, currRatio=0, prevRatio=0;
 	double localMinRatio=0, localMaxRatio=0, localRatio=0;
@@ -463,6 +448,15 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.shadeVec = fd.colorVec;
 	fd.localRatioScanSize = localRatioScanSize;
 	fd.localScanSize = localScanSize;
+	fd.minIntensity = minIntensity;
+	fd.maxIntensity = maxIntensity;
+	fd.minOutlier = minIntensity - outlierCorrection;
+	fd.maxOutlier = maxIntensity + outlierCorrection;
+	fd.oldMinShade = oldMinShade;
+	fd.oldMaxShade = oldMaxShade;
+	fd.newMinShade = newMinShade;
+	fd.newMaxShade = newMaxShade;
+	fd.shadeCount = newShadeAmt;
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
@@ -519,7 +513,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				else index--;
 				if(index<0) index=0;
 				shade = fd.shadeVec.at(i).at(j);
-				indexChange = myRound((ccCurr-localCC)/(thresh));
+				indexChange = myRound((ccCurr-localCC)/(newInterval));
 				shadeIndex = localIndex + (int)indexChange;
 				ccPrev=ccCurr;
 				prevRatio = currRatio;
@@ -550,7 +544,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				l = roundDecimal(l,1);
 				String str = toString(h)+";"+toString(s)+";"+toString(l);
 				str = "("+str+")";
-				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(ratioLoc+1);
+				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1)+ ";" + toString(ratioLoc+1);
 			}
 			if(pix2!="Black") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
@@ -620,22 +614,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		localRatio=0;
 	} // end row
 	fclose(fp);
-	fd.minIntensity = minIntensity;
-	fd.maxIntensity = maxIntensity;
-	fd.minOutlier = minIntensity - outlierCorrection;
-	fd.maxOutlier = maxIntensity + outlierCorrection;
-	fd.oldMinShade = oldMinShade;
-	fd.oldMaxShade = oldMaxShade;
-	fd.newMinShade = newMinShade;
-	fd.newMaxShade = newMaxShade;
-	fd.shadeCount = shadeAmt;
 	fd.writeFileMetaData();
 	c.output2ImageColor(fd.colorVec,name);
 	writeSeq2File(fd.relRatioMat,name+"_RelativeRatios");
 	writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
 	writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 	writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
-	reset_globals();
 	//writeSeq2File(shadeVec2,"shadeVec");
 	return fd.colorVec;
 }

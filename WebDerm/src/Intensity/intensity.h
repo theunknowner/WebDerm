@@ -22,7 +22,25 @@
 
 class FileData;
 class Intensity {
+private:
+	int global_flag;
+	int shadeCount;
+	double minIntensity;
+	double maxIntensity;
+	double range;
+	double outlierCorrection;
+	String status;
+	String oldMinShade,oldMaxShade;
+	String newMinShade,newMaxShade;
+	int minIndex;
+	int maxIndex;
+	int oldShadeAmt;
+	double oldInterval;
+	double minOutlier;
+	double maxOutlier;
 public:
+	Intensity();
+	void reset_globals();
 	double getMinIntensity();
 	double getMaxIntensity();
 	String getOldMinShade();
@@ -34,6 +52,7 @@ public:
 	bool importThresholds();
 	double calcIntensity(String pix);
 	double sigmoidFn(double intensity);
+	void setMinMaxShades();
 	void setMinMax(deque< deque<double> > &input);
 	String getShade(int index);
 	int getShadeIndex(String shade);
