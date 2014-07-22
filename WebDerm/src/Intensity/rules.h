@@ -20,6 +20,6 @@ bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, doub
 					String &shade, String &shadePrev, Point pt, int loc, double relRatio,
 					deque<int> &ruleNo, deque< deque<String> > &hslMat,
 					deque< deque<String> > &colorVec, FileData &fd);
-bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade, int loc,
-					deque<int> &ruleNo);
+bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
+					int ratioLoc, int loc, deque<int> &ruleNo);
 #endif /* RULES_H_ */
