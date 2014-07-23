@@ -18,7 +18,7 @@
 
 int main(int argc,char** argv)
 {
-	//runHysteresis();
+	runHysteresis();
 	/*
 	String filename[]= {path+"Images/CLP/clp3.jpg",
 						path+"Images/LPH/lph4.jpg",
@@ -27,7 +27,7 @@ int main(int argc,char** argv)
 						path+"Images/Vesicles/vesicles18.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -42,14 +42,24 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(295,295);
 	Point pt2(296,296);
+	int ind=0;
+	String pix = hsl.getHslColor(10,0.2,0.52,ind);
+	cout << pix << endl;
+	cout << ind+2 << endl;
+	pix = hsl.getHslColor(10,0.2,0.47,ind);
+	cout << pix << endl;
+	cout << ind+2 << endl;
+	pix = hsl.getHslColor(10,0.2,0.42,ind);
+	cout << pix << endl;
+	cout << ind+2 << endl;
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/Psoriasis4.csv");
 	//deque< deque<String> > vec;
 	//fd.getFileMatrix(vec);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
-	checkColorsFromList(img2,pt1,pt2);
-	generateColorRegionTable(img2, pt1,pt2);
+	//checkColorsFromList(img2,pt1,pt2);
+	//generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 	/*
 	int col = 361;

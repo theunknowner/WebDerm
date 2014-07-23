@@ -95,7 +95,6 @@ double hsl::minRGB(double red, double green, double blue)
 		min = minRGB(r,g,b);
 		max = maxRGB(r,g,b);
 		L = (max+min)/2;
-		B = max;
 		delta = max-min;
 		if(delta==0)
 		{
@@ -146,11 +145,6 @@ double hsl::minRGB(double red, double green, double blue)
 		return L;
 	}
 
-	double hsl::getBrite()
-	{
-		return B;
-	}
-
 	double hsl::calcLum(double red, double green, double blue)
 	{
 		double r,g,b;
@@ -189,13 +183,15 @@ String hsl::getHslColor(double hue, double sat, double lum, int &ind)
 {
 	String color = "NONE";
 	for(unsigned int i=0; i<hslColors.size(); i++)
-		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1))
-			if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1))
-				if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
+		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+			if(sat>=satThresh.at(i).at(0) && sat<satThresh.at(i).at(1)) {
+				if(lum>=lumThresh.at(i).at(0) && lum<lumThresh.at(i).at(1)) {
 					color = hslColors.at(i);
 					ind = i;
 					return color;
 				}
+			}
+		}
 
 	return color;
 }

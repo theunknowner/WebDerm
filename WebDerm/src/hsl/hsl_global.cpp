@@ -7,7 +7,7 @@
 
 #include "hsl_global.h"
 
-double H, S, L, B;
+double H, S, L;
 deque<String> hslColors;
 deque< deque<int> > hueThresh;
 deque< deque<double> > satThresh;

@@ -535,8 +535,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
-				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2)/100;
-				double l = getDelimitedValuesFromString(hslMat.at(i).at(j),';',3)/100;
+				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
+				double l = getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
 				int ind=0;
 				hsl.getHslColor(h,s,l,ind);
 				h = hueTableNum.at(ind);

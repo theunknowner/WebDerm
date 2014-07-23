@@ -26,7 +26,6 @@ public:
 	double getHue();
 	double getSat();
 	double getLum();
-	double getBrite();
 	double calcLum(double red, double green, double blue);
 	double calcBrite(double red, double green, double blue);
 	double calcRelLum(double red, double green, double blue);

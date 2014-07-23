@@ -14,9 +14,14 @@ double getDelimitedValuesFromString(String inputString, char delimiter, int occu
 	unsigned int pos=0;
 	int count=0;
 	for(unsigned int i=0; i<inputString.length(); i++) {
-		if((inputString[i]==delimiter) || (i==inputString.length()-1)) {
-			substr = inputString.substr(pos,i+1);
+		if(inputString[i]==delimiter) {
+			substr = inputString.substr(pos,i-pos);
 			pos = i+1;
+			count++;
+			result = atof(substr.c_str());
+		}
+		if(i==inputString.length()-1) {
+			substr = inputString.substr(pos,(i-pos)+1);
 			count++;
 			result = atof(substr.c_str());
 		}
@@ -29,11 +34,14 @@ double getDelimitedValuesFromString(String inputString, char delimiter, int occu
 void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec) {
 	String substr;
 	unsigned int pos=0;
-	int count=0;
 	for(unsigned int i=0; i<inputString.length(); i++) {
-		if((inputString[i]==delimiter) || (i==inputString.length()-1)) {
-			substr = inputString.substr(pos,i+1);
+		if(inputString[i]==delimiter) {
+			substr = inputString.substr(pos,i-pos);
 			pos = i+1;
+			vec.push_back(atof(substr.c_str()));
+		}
+		if(i==inputString.length()-1) {
+			substr = inputString.substr(pos,(i-pos)+1);
 			vec.push_back(atof(substr.c_str()));
 		}
 	}

@@ -10,7 +10,7 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
-extern double H, S, L, B;
+extern double H, S, L;
 extern deque<String> hslColors;
 extern deque< deque<int> > hueThresh;
 extern deque< deque<double> > satThresh;

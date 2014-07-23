@@ -277,16 +277,18 @@ int rule8(FileData &fd, String &newPix, int loc) {
 	bool flag=false;
 	hsl hsl;
 	Color c;
+	Intensity in;
 	Point pt = fd.pt;
 	String color = c.getMainColor(fd.windowVec.at(pt.y).at(pt.x));
 	int index=-1, prevIndex=-1;
+	double localScanSize = 20;
 	double indexChangeThresh = 1.0; //different than thresh for contrast of shades
 	double pThreshMove = 1.35;
-	double hue,sat,lum;
-	hue = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
-	sat = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2)/100;
-	lum = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3)/100;
-	double fSat=0;
+	double hue = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
+	double sat = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
+	double lum = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
+	double fSat_promote=0;
+	double fSat_demote=0;
 	double thresh = fd.range/fd.shadeCount;
 	double currIntensity = fd.smoothIntensityVec.at(pt.y).at(pt.x);
 	double localIntensity = fd.smoothIntensityVec.at(pt.y).at(loc);
@@ -295,53 +297,103 @@ int rule8(FileData &fd, String &newPix, int loc) {
 	bool deg0_flag=false;
 	bool deg45_flag=false;
 	bool deg90_flag=false;
-	//String shade_0deg, shade_45deg, shade_90deg;
-
+	String shade_0deg, shade_45deg, shade_90deg;
 	hsl.getHslColor(hue,sat,lum,index);
-	fSat = (sat-satThresh.at(index).at(0));
-	fSat /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
-	fSat *= pThreshMove;
+	fSat_promote = (sat-satThresh.at(index).at(0));
+	fSat_promote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
+	fSat_promote *= pThreshMove;
+	fSat_demote = (sat-satThresh.at(index).at(1));
+	fSat_demote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
+	fSat_demote *= pThreshMove;
 	prevIndex=index;
-	if(fSat>1) {
+
+	if(fSat_promote>1) {
+		shade_0deg = fd.shadeVec.at(pt.y).at(pt.x);
 		indexChange_0deg = (currIntensity-localIntensity)/thresh;
-		indexChange_45deg = myRound(indexChange_45deg);
-		if(indexChange_0deg>indexChangeThresh)
+		indexChange_0deg = myRound(indexChange_0deg);
+		if(indexChange_0deg>=indexChangeThresh && shade_0deg=="Dark")
 			deg0_flag = true;
 		if(pt.y>0) {
 			int j = pt.x-1;
-			int endY = (pt.y-fd.localScanSize);
+			int endY = (pt.y-localScanSize);
 			for(int i=(pt.y-1); i>=endY; i--) {
 				if(j<0 && i<0) break;
 				if(deg45_flag==false && j>=0 && i>=0) {
+					shade_45deg = fd.shadeVec.at(i).at(j);
 					intensity_45deg = fd.smoothIntensityVec.at(i).at(j);
-						indexChange_45deg = (currIntensity-intensity_45deg)/thresh;
-						indexChange_45deg = myRound(indexChange_45deg);
-						if(indexChange_45deg>=indexChangeThresh) {
-							deg45_flag=true;
-						}
+					indexChange_45deg = (currIntensity-intensity_45deg)/thresh;
+					indexChange_45deg = myRound(indexChange_45deg);
+					if(indexChange_45deg>=indexChangeThresh && shade_45deg=="Dark") {
+						deg45_flag=true;
+					}
 				}
 				--j;
 				if(deg90_flag==false && i>=0) {
+					shade_90deg = fd.shadeVec.at(i).at(pt.x);
 					intensity_90deg = fd.smoothIntensityVec.at(i).at(pt.x);
-						indexChange_90deg = (currIntensity-intensity_90deg)/thresh;
-						indexChange_90deg = myRound(indexChange_90deg);
-						if(indexChange_90deg>=indexChangeThresh) {
-							deg90_flag=true;
-						}
+					indexChange_90deg = (currIntensity-intensity_90deg)/thresh;
+					indexChange_90deg = myRound(indexChange_90deg);
+					if(indexChange_90deg>=indexChangeThresh && shade_90deg=="Dark") {
+						deg90_flag=true;
+					}
 				}
 				if(deg45_flag==true && deg90_flag==true)
 					break;
 			}
 		}
-	}
-	if((deg0_flag+deg45_flag+deg90_flag)>=2) {
-		lum += 0.05;
-		newPix = hsl.getHslColor(hue,sat,lum,index);
-		if(index==prevIndex) {
+		if((deg0_flag+deg45_flag+deg90_flag)>=2) {
 			lum += 0.05;
 			newPix = hsl.getHslColor(hue,sat,lum,index);
+			if(index==prevIndex) {
+				lum += 0.05;
+				newPix = hsl.getHslColor(hue,sat,lum,index);
+			}
+			flag=true;
 		}
-		flag=true;
+	}
+	if(fSat_demote<(-1)) {
+		shade_0deg = fd.shadeVec.at(pt.y).at(pt.x);
+		indexChange_0deg = (currIntensity-localIntensity)/thresh;
+		indexChange_0deg = myRound(indexChange_0deg);
+		if(abs(indexChange_0deg)>=indexChangeThresh)
+			deg0_flag = true;
+		if(pt.y>0) {
+			int j = pt.x-1;
+			int endY = (pt.y-localScanSize);
+			for(int i=(pt.y-1); i>=endY; i--) {
+				if(j<0 && i<0) break;
+				if(deg45_flag==false && j>=0 && i>=0) {
+					shade_45deg = fd.shadeVec.at(i).at(j);
+					intensity_45deg = fd.smoothIntensityVec.at(i).at(j);
+					indexChange_45deg = (currIntensity-intensity_45deg)/thresh;
+					indexChange_45deg = myRound(indexChange_45deg);
+					if(abs(indexChange_45deg)>=indexChangeThresh) {
+						deg45_flag=true;
+					}
+				}
+				--j;
+				if(deg90_flag==false && i>=0) {
+					shade_90deg = fd.shadeVec.at(i).at(pt.x);
+					intensity_90deg = fd.smoothIntensityVec.at(i).at(pt.x);
+					indexChange_90deg = (currIntensity-intensity_90deg)/thresh;
+					indexChange_90deg = myRound(indexChange_90deg);
+					if(abs(indexChange_90deg)>=indexChangeThresh) {
+						deg90_flag=true;
+					}
+				}
+				if(deg45_flag==true && deg90_flag==true)
+					break;
+			}
+		}
+		if((deg0_flag+deg45_flag+deg90_flag)>=2) {
+			lum -= 0.05;
+			newPix = hsl.getHslColor(hue,sat,lum,index);
+			if(index==prevIndex) {
+				lum -= 0.05;
+				newPix = hsl.getHslColor(hue,sat,lum,index);
+			}
+			flag=true;
+		}
 	}
 
 	if(flag==true) return ruleNum;
@@ -431,52 +483,11 @@ int rule9(FileData &fd, String &newPix, int ratioLoc) {
 			newPix=pix45;
 			flag=true;
 		}
-		/*if(pt.x==57 && pt.y==441) {
-			cout << "NewPix: " << newPix << endl;
-			cout << "Color: " << color << endl;
-			cout << "Pix0: " << pix0 << endl;
-			cout << "Pix45: " << pix45 << endl;
-			cout << "Pix90: " << pix90 << endl;
-			cout << "PrevColor0: " << prevColor_0deg << endl;
-			cout << "PrevColor45: " << prevColor_45deg << endl;
-			cout << "PrevColor90: " << prevColor_90deg << endl;
-		}*/
 	}
 
 	if(flag==true) return ruleNum;
 
 	return 0;
-}
-
-bool specialRules(Mat &img, String &pix, deque< deque<String> > &windowVec, double &indexChange,
-					String &shade, String &shadePrev,Point pt,int loc,
-					double relRatio, deque<int> &ruleNo, deque< deque<String> > &hslMat,
-					deque< deque<String> > &colorVec, FileData &fd) {
-	bool flag=false;
-	String newShade = shade;
-	String newPix = pix;
-	deque<int> ruleNumVec;
-
-	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
-	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
-	ruleNumVec.push_back(rule6(pix,newPix,newShade));
-	//ruleNumVec.push_back(rule8(newPix,indexChange,pt,windowVec,hueMat,satMat,lumMat));
-	ruleNumVec.push_back(rule9(fd,newPix,loc));
-	ruleNumVec.push_back(rule7(pix,newPix));
-	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
-		if(ruleNumVec.at(i)!=0) {
-			ruleNo.push_back(ruleNumVec.at(i));
-			flag=true;
-		}
-	}
-	//rule2(pix, newPix, newShade, flag, ruleNo);
-	//rule3(pix,newPix, flag, ruleNo);
-	//rule4(pix, newPix, newShade, flag, ruleNo);
-
-	deque<int>().swap(ruleNumVec);
-	shade = newShade;
-	pix = newPix;
-	return flag;
 }
 
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,

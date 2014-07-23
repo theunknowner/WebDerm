@@ -158,11 +158,12 @@ void hysteresis(FileData &fd) {
 					hslAvg[2] = roundDecimal(hslAvg[2]/count,2);
 					hslAvg[0] -= 180;
 					if(hslAvg[0]<0) hslAvg[0] += 360;
-					int h = hslAvg[0];
-					int s = hslAvg[1]*100;
-					int l = hslAvg[2]*100;
+					double h = hslAvg[0];
+					double s = hslAvg[1];
+					double l = hslAvg[2];
 					String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
 					hslVec.push_back(hslStr);
+					pix = colorObj.fixColors(pix,r,g,b);
 					pix = toString(grayLevel) + pix;
 					colorWindow.push_back(pix);
 				}
