@@ -40,9 +40,11 @@ private:
 	double oldInterval;
 	double minOutlier;
 	double maxOutlier;
+	double *thresh;
+	int *shadeIndex;
 public:
 	Intensity();
-	void reset_globals();
+	~Intensity();
 	double getMinIntensity();
 	double getMaxIntensity();
 	String getOldMinShade();

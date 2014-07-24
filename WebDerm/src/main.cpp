@@ -19,12 +19,15 @@
 int main(int argc,char** argv)
 {
 	runHysteresis();
-	/*
+/*
 	String filename[]= {path+"Images/CLP/clp3.jpg",
 						path+"Images/LPH/lph4.jpg",
 						path+"Images/LPH/lph6.jpg",
+						path+"Images/LPH/lph8.jpg",
 						path+"Images/LPH/lph10.jpg",
-						path+"Images/Vesicles/vesicles18.jpg"};
+						path+"Images/Vesicles/vesicles18.jpg",
+						path+"Images/Psoriasis/Psoriasis1.jpg",
+						path+"Images/Psoriasis/Psoriasis4.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
 	/*
@@ -42,19 +45,20 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(295,295);
 	Point pt2(296,296);
-	int ind=0;
-	String pix = hsl.getHslColor(10,0.2,0.52,ind);
-	cout << pix << endl;
-	cout << ind+2 << endl;
-	pix = hsl.getHslColor(10,0.2,0.47,ind);
-	cout << pix << endl;
-	cout << ind+2 << endl;
-	pix = hsl.getHslColor(10,0.2,0.42,ind);
-	cout << pix << endl;
-	cout << ind+2 << endl;
-	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/Psoriasis4.csv");
-	//deque< deque<String> > vec;
-	//fd.getFileMatrix(vec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
+	deque< deque<String> > vec;
+	fd.getFileMatrix(vec);
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/vesicles18mainColor.csv","w");
+	String pix;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		for(unsigned int j=0; j<vec.at(i).size(); j++) {
+			pix = c.getMainColor(vec.at(i).at(j));
+			fprintf(fp,"%s,",pix.c_str());
+		}
+		fprintf(fp,"\n");
+	}
+	fclose(fp);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");

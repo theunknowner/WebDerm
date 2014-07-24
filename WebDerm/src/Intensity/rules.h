@@ -17,5 +17,5 @@
 class FileData;
 String init_specialRules(String pix, int r, int g, int b);
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
-					int ratioLoc, int loc, deque<int> &ruleNo);
+					int ratioLoc, int loc, deque<double> &ruleNo);
 #endif /* RULES_H_ */

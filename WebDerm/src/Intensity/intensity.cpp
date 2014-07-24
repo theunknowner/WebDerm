@@ -27,6 +27,15 @@ Intensity::Intensity() {
 	oldInterval=0;
 	minOutlier=0;
 	maxOutlier=0;
+	thresh=NULL;
+	shadeIndex=NULL;
+}
+
+Intensity::~Intensity() {
+	delete[] thresh;
+	delete[] shadeIndex;
+	thresh = NULL;
+	shadeIndex = NULL;
 }
 
 double Intensity::getMinIntensity() {
@@ -213,8 +222,6 @@ int Intensity::getShadeIndex(String shade) {
 }
 
 String Intensity::calcShade(double inten, bool eof) {
-	static double *thresh;
-	static int *shadeIndex;
 	if(global_flag==0) {
 		minIndex = getShadeIndex(oldMinShade);
 		maxIndex = getShadeIndex(oldMaxShade);
@@ -264,12 +271,6 @@ String Intensity::calcShade(double inten, bool eof) {
 				break;
 			}
 		}
-	}
-	if(eof==true) {
-		delete[] thresh;
-		delete[] shadeIndex;
-		thresh = NULL;
-		shadeIndex = NULL;
 	}
 	return shade;
 }
@@ -401,7 +402,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	deque<double> localIndexes;
 	deque<double> localCCs;
 	deque<String> localShades;
-	deque<int> ruleNo;
+	deque<double> ruleNo;
 	deque<String> strVec1;
 	bool eof=false;
 	fd.intensityVec = calcIntensityMatrix(fd.windowVec);
@@ -627,7 +628,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
 									deque< deque<String> > &hslMat,String name, FileData &fd) {
 	fd.colorVec = calcMainColorMatrix(img, windowVec, hslMat, name, fd);
-	writeSeq2File(fd.colorVec,name+"_MainColors");
+	writeSeq2File(fd.colorVec,name+"_ShadeColors");
 }
 
 void Intensity::writeMainColorMatrix(FileData &fd) {

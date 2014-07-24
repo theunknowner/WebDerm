@@ -32,6 +32,7 @@ FileData::~FileData() {
 	deque< deque<String> >().swap(shadeVec);
 	deque<double>().swap(relRatioVec);
 	deque<double>().swap(absRatioVec);
+	printf("Destructor executed for %s\n",filename.c_str());
 }
 
 void FileData::setFilePath(String file_path) {
@@ -93,9 +94,5 @@ bool FileData::loadFileMatrix(String file_path) {
 	else
 		cout << "Failed to load File matrix!" << endl;
 	return false;
-}
-
-void FileData::printMatrixData(int x, int y, String data) {
-
 }
 

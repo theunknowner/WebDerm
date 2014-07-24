@@ -15,6 +15,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/skin/Skin.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/scripts/scripts.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 
 void runCheckRGBColor();
 void runCheckList();

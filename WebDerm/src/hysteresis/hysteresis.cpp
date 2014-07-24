@@ -198,8 +198,6 @@ void hysteresis(FileData &fd) {
 
 			col=0; row++;
 		}//end while row
-		writeSeq2File(fd.windowVec,name);
-		writeSeq2File(fd.hslMat,name+"_HSL");
 		Intensity in;
 		in.writeMainColorMatrix(fd);
 		deque<String>().swap(pixelColorWindow);

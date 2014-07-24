@@ -45,10 +45,10 @@ String init_specialRules(String pix, int r, int g, int b) {
 }
 
 /** general rule #1 - Contrast with IndexChange**/
-int rule1(double &indexChange, String &shade, String &newShade) {
+double rule1(double &indexChange, String &shade, String &newShade) {
 	Intensity in;
 	bool flag=false;
-	int ruleNum=1;
+	double ruleNum=1;
 	double indexChangeThresh = 2.25; // different than thresh for contrast of colors
 	if(abs(indexChange)>=indexChangeThresh) {
 		int index = in.getShadeIndex(shade);
@@ -62,9 +62,9 @@ int rule1(double &indexChange, String &shade, String &newShade) {
 }
 
 /** provisional rule #2 - Determining Gray **/
-int rule2(String &pix, String &newPix, String &newShade) {
+double rule2(String &pix, String &newPix, String &newShade) {
 	bool flag=false;
-	int ruleNum=2;
+	double ruleNum=2;
 	rgb rgb;
 	Color c;
 	double grayLumLevel = rgb.getGrayLevel2(pix);
@@ -84,9 +84,9 @@ int rule2(String &pix, String &newPix, String &newShade) {
 }
 
 /** provisional rule #3 for Grayish Pink ONLY **/
-int rule3(String &pix, String &newPix) {
+double rule3(String &pix, String &newPix) {
 	bool flag=false;
-	int ruleNum=3;
+	double ruleNum=3;
 	rgb rgb;
 	Color c;
 	double grayLumLevel = rgb.getGrayLevel2(pix);
@@ -109,9 +109,9 @@ int rule3(String &pix, String &newPix) {
 }
 
 /** provisional rule #4 for DarkGrayPink ONLY **/
-int rule4(String &pix, String &newPix, String &newShade) {
+double rule4(String &pix, String &newPix, String &newShade) {
 	bool flag=false;
-	int ruleNum=4;
+	double ruleNum=4;
 	rgb rgb;
 	Color c;
 	double grayLumLevel = rgb.getGrayLevel2(pix);
@@ -130,8 +130,8 @@ int rule4(String &pix, String &newPix, String &newShade) {
 }
 
 /** Special Rule #5 - Determining Dark Grey **/
-int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
-	int ruleNum=5;
+double rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
+	double ruleNum=5;
 	bool flag=false;
 	double r,g,b;
 	int rgbFlag=0;
@@ -210,8 +210,8 @@ int rule5(Mat &img, String &pix, String &newPix, String &newShade, Point pt) {
 }
 
 /** rule 6 - Assign Dark Grey **/
-int rule6(String& pix, String& newPix, String& newShade) {
-	int ruleNum = 6;
+double rule6(String& pix, String& newPix, String& newShade) {
+	double ruleNum = 6;
 	bool flag = false;
 	rgb rgb;
 	Color c;
@@ -252,8 +252,8 @@ int rule6(String& pix, String& newPix, String& newShade) {
 }
 
 /** P0: General rule 7 - All violets are pinks, fixes other colors **/
-int rule7(String &pix, String &newPix) {
-	int ruleNum = 7;
+double rule7(String &pix, String &newPix) {
+	double ruleNum = 7;
 	bool flag=false;
 	Color c;
 	String color = c.getMainColor(newPix);
@@ -272,8 +272,8 @@ int rule7(String &pix, String &newPix) {
 }
 
 /** P1: Special rule 8- Using indexChange to promote colors on boundaries */
-int rule8(FileData &fd, String &newPix, int loc) {
-	int ruleNum = 8;
+double rule8(FileData &fd, String &newPix, int loc) {
+	double ruleNum = 8;
 	bool flag=false;
 	hsl hsl;
 	Color c;
@@ -299,14 +299,20 @@ int rule8(FileData &fd, String &newPix, int loc) {
 	bool deg90_flag=false;
 	String shade_0deg, shade_45deg, shade_90deg;
 	hsl.getHslColor(hue,sat,lum,index);
-	fSat_promote = (sat-satThresh.at(index).at(0));
-	fSat_promote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
-	fSat_promote *= pThreshMove;
-	fSat_demote = (sat-satThresh.at(index).at(1));
-	fSat_demote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
-	fSat_demote *= pThreshMove;
-	prevIndex=index;
-
+	try {
+		fSat_promote = (sat-satThresh.at(index).at(0));
+		fSat_promote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
+		fSat_promote *= pThreshMove;
+		fSat_demote = (sat-satThresh.at(index).at(1));
+		fSat_demote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
+		fSat_demote *= pThreshMove;
+		prevIndex=index;
+	} catch(const std::out_of_range& oor) {
+		printf("Rule8: Index Out of bounds!\n");
+		printf("Point(%d,%d)\n",pt.x,pt.y);
+		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
+		exit(0);
+	}
 	if(fSat_promote>1) {
 		shade_0deg = fd.shadeVec.at(pt.y).at(pt.x);
 		indexChange_0deg = (currIntensity-localIntensity)/thresh;
@@ -349,6 +355,7 @@ int rule8(FileData &fd, String &newPix, int loc) {
 				newPix = hsl.getHslColor(hue,sat,lum,index);
 			}
 			flag=true;
+			ruleNum = 8.1;
 		}
 	}
 	if(fSat_demote<(-1)) {
@@ -393,6 +400,7 @@ int rule8(FileData &fd, String &newPix, int loc) {
 				newPix = hsl.getHslColor(hue,sat,lum,index);
 			}
 			flag=true;
+			ruleNum=8.2;
 		}
 	}
 
@@ -402,8 +410,8 @@ int rule8(FileData &fd, String &newPix, int loc) {
 }
 
 /** P2: Special rule 9 - GrayIndexChange - for non-grays that look gray **/
-int rule9(FileData &fd, String &newPix, int ratioLoc) {
-	int ruleNum = 9;
+double rule9(FileData &fd, String &newPix, int ratioLoc) {
+	double ruleNum = 9;
 	bool flag = false;
 	rgb rgb;
 	Color c;
@@ -491,7 +499,7 @@ int rule9(FileData &fd, String &newPix, int ratioLoc) {
 }
 
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
-					int ratioLoc, int loc, deque<int> &ruleNo) {
+					int ratioLoc, int loc, deque<double> &ruleNo) {
 	bool flag=false;
 	String newShade = shade;
 	String newPix = pix;
@@ -509,7 +517,6 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 			flag=true;
 		}
 	}
-
 	deque<int>().swap(ruleNumVec);
 	shade = newShade;
 	pix = newPix;

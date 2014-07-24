@@ -129,7 +129,6 @@ void runHysteresis()
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
-	FileData fd;
 	String filename;
 	String name;
 	Size size(2,2);
@@ -152,10 +151,13 @@ void runHysteresis()
 		}
 	}
 	if(flag[0]==true) {
+		FileData fd;
 		fd.setFilePath(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
 		hysteresis(fd);
+		writeSeq2File(fd.windowVec,name);
+		writeSeq2File(fd.hslMat,name+"_HSL");
 	}
 
 	img.release(); img2.release(); mask.release();
@@ -168,7 +170,6 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
-	FileData fd;
 	String name;
 	String input;
 	Size size(2,2);
@@ -186,6 +187,7 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	}
 	if(flag[0]==true) {
 		for(int i=0; i<fileSize; i++) {
+			FileData fd;
 			img = runResizeImage(filenames[i],Size(700,700),0);
 			getSkin(img, mask);
 			img.copyTo(img2, mask);
@@ -193,7 +195,10 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			fd.setFilePath(filenames[i]);
 			fd.matImage = img2;
 			fd.matSize = size;
+			cout << fd.filename << endl;
 			hysteresis(fd);
+			writeSeq2File(fd.windowVec,name);
+			writeSeq2File(fd.hslMat,name+"_HSL");
 			img.release(); img2.release(); mask.release();
 		}
 	}

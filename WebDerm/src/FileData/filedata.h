@@ -15,7 +15,6 @@ private:
 	String file_path;
 	deque< deque<String> > dataMatrix;
 
-
 public:
 	String filename;
 	String oldMinShade;
@@ -53,7 +52,6 @@ public:
 	void writeFileMetaData();
 	void writeFileMetaData(int n_args, String* strArr, double *valArr);
 	bool loadFileMatrix(String file_path);
-	void printMatrixData(int x, int y, String data="");
 };
 
 
