@@ -291,9 +291,9 @@ double rule8(FileData &fd, String &newPix, int loc) {
 	double intensity_45deg=0, intensity_90deg=0;
 	double indexChange_0deg=0, indexChange_45deg=0, indexChange_90deg=0;
 
-	bool deg0_flag=0; // flag =  -1->demote; 1->promote
-	bool deg45_flag=0;
-	bool deg90_flag=0;
+	int deg0_flag=0; // flag =  -1->demote; 1->promote
+	int deg45_flag=0;
+	int deg90_flag=0;
 	String shade_0deg, shade_45deg, shade_90deg;
 	hsl.getHslColor(hue,sat,lum,index);
 	try {
@@ -310,6 +310,7 @@ double rule8(FileData &fd, String &newPix, int loc) {
 		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
 		exit(0);
 	}
+
 	shade_0deg = fd.shadeVec.at(pt.y).at(pt.x);
 	indexChange_0deg = (currIntensity-localIntensity)/thresh;
 	indexChange_0deg = myRound(indexChange_0deg);
