@@ -20,7 +20,7 @@
 
 #include "rules.h"
 
-enum SHADE {DARK,HIGH,LOW,LIGHT,WHITE};
+enum SHADE {BLACK,DARK,HIGH,LOW,LIGHT,WHITE};
 
 class FileData;
 class Intensity {
@@ -60,7 +60,7 @@ public:
 	void setMinMax(deque< deque<double> > &input);
 	String getShade(int index);
 	int getShadeIndex(String shade);
-	String calcShade(double inten, bool eof);
+	String calcShade(double inten);
 	deque< deque<double> > calcNormalizedIntensityMatrix(deque< deque<double> > &vec);
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);

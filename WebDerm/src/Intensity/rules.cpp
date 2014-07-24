@@ -251,7 +251,7 @@ double rule6(String& pix, String& newPix, String& newShade) {
 	return 0;
 }
 
-/** P0: General rule 7 - All violets are pinks, fixes other colors **/
+/** P0: General rule 7 - Fix non-existent double colors **/
 double rule7(String &pix, String &newPix) {
 	double ruleNum = 7;
 	bool flag=false;
@@ -259,10 +259,6 @@ double rule7(String &pix, String &newPix) {
 	String color = c.getMainColor(newPix);
 	if(color.find("Blue")!=string::npos && color.find("Purple")!=string::npos) {
 		newPix = "Purple";
-		flag=true;
-	}
-	if(color.find("Violet")!=string::npos) {
-		newPix = "Pink";
 		flag=true;
 	}
 
@@ -434,7 +430,7 @@ double rule9(FileData &fd, String &newPix, int ratioLoc) {
 	bool relRatio_90deg_flag = false;
 	double localRatioScanSize = fd.localRatioScanSize;
 
-	if(prevColor_0deg=="" || prevColor_0deg=="Black") {
+	if(prevColor_0deg=="" || prevColor_0deg=="Zero") {
 		prevColor_0deg = color;
 		prevPix_0deg = newPix;
 	}
@@ -503,7 +499,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	bool flag=false;
 	String newShade = shade;
 	String newPix = pix;
-	deque<int> ruleNumVec;
+	deque<double> ruleNumVec;
 
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	//ruleNumVec.push_back(rule5(img,pix,newPix,newShade, pt));
@@ -517,7 +513,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 			flag=true;
 		}
 	}
-	deque<int>().swap(ruleNumVec);
+	deque<double>().swap(ruleNumVec);
 	shade = newShade;
 	pix = newPix;
 	return flag;

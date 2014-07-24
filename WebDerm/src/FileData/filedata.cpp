@@ -8,7 +8,8 @@
 #include "filedata.h"
 
 FileData::FileData(String file_path) {
-	this->file_path = file_path;
+	setFilePath(file_path);
+	printf("Constructor executed for %s\n",filename.c_str());
 	shadeCount = 0;
 	minIntensity = 0;
 	maxIntensity = 0;

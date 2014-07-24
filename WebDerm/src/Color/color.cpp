@@ -79,7 +79,7 @@ String Color::extractShade(String pix) {
 	Intensity in;
 	int shadeCount = in.getShadeCount();
 	String shade = "";
-	if(pix=="Black") return pix;
+	if(pix=="Zero") return pix;
 	//if(pix.find("Gray")!=string::npos) return "Gray";
 	for(int i=0; i<shadeCount; i++) {
 		shade = in.getShade(i);
@@ -188,13 +188,19 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
 				pix = getMainColor(window.at(i).at(j));
+				if(pix.find("Violet")!=string::npos) pix="Pink";
 				HSL = c.extractHSL(window.at(i).at(j));
 				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 				pix = shade+pix;
-				if(shade=="Black") {
+				if(shade=="Zero") {
 					img.at<Vec3b>(i,j)[2] = 0;
 					img.at<Vec3b>(i,j)[1] = 0;
 					img.at<Vec3b>(i,j)[0] = 0;
+				}
+				else if(shade=="Black") {
+					img.at<Vec3b>(i,j)[2] = 35;
+					img.at<Vec3b>(i,j)[1] = 35;
+					img.at<Vec3b>(i,j)[0] = 35;
 				}
 				else if(shade=="White") {
 					img.at<Vec3b>(i,j)[2] = 255;

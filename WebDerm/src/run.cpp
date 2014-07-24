@@ -151,8 +151,7 @@ void runHysteresis()
 		}
 	}
 	if(flag[0]==true) {
-		FileData fd;
-		fd.setFilePath(filename);
+		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
 		hysteresis(fd);

@@ -189,9 +189,9 @@ bool rgb::checkAbsDist(double dist, double thresh)
 //checks if color is black
 String rgb::checkBlack(int r, int g, int b)
 	{
-		if(r<35 && g<35 && b<35)
+		if(r==0 && g==0 && b==0)
 		{
-			return "Black100";
+			return "Zero";
 		}
 		return "OTHER";
 	}
@@ -431,7 +431,7 @@ double rgb::getGrayLevel2(String color)
 		str = color.substr(pos+mainColor.size(),color.size()-(pos+mainColor.size()));
 		level = atof(str.c_str());
 	}
-	if(color.find("Grey")!=string::npos)
+	if(color.find("Grey")!=string::npos || color.find("Black")!=string::npos)
 		level = 100;
 
 	return level;
@@ -451,6 +451,13 @@ double rgb::getGrayLevel1(String color) {
 		if(pos!=string::npos) {
 			str = color.substr(0,pos);
 			level = atof(str.c_str());
+		}
+		else {
+			pos = color.find("Black");
+			if(pos!=string::npos) {
+				str = color.substr(0,pos);
+				level = atof(str.c_str());
+			}
 		}
 	}
 	return level;
@@ -550,23 +557,21 @@ String rgb::calcColor2(int red, int green, int blue) {
 	double grayLumLevel = calcGrayLumLevel(red,green,blue);
 	for(unsigned int i=0; i<hueThresh.size(); i++) {
 		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-			if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
-				if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
-					if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
-						pix = hslColors.at(i);
-						if(grayLevel==0) {
-							pix = hslColors.at(i) + toString(colorLevel);
-						}
-						else {
-							if(pix=="Black")
-								pix += toString(colorLevel);
-							else if(pix=="Grey")
-								pix += toString(colorLevel);
-							else
-								pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
-						}
-						return pix;
+			if(sat>=satThresh.at(i).at(0) && sat<satThresh.at(i).at(1)) {
+				if(lum>=lumThresh.at(i).at(0) && lum<lumThresh.at(i).at(1)) {
+					pix = hslColors.at(i);
+					if(grayLevel==0) {
+						pix = hslColors.at(i) + toString(colorLevel);
 					}
+					else {
+						if(pix=="Black" || pix=="White")
+							pix += toString(colorLevel);
+						else if(pix=="Grey")
+							pix += toString(colorLevel);
+						else
+							pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
+					}
+					return pix;
 				}
 			}
 		}

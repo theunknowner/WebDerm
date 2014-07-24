@@ -179,22 +179,3 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param)
     putText(img3, c, Point(5,45), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
     imshow("Info",img3);
 }
-
-void importMatrix2Double2D(String filename, deque< deque<double> > &matrix) {
-	fstream fs(filename.c_str());
-	if(fs.is_open()) {
-		String temp;
-		deque<String> vec;
-		deque<double> vec1;
-		while(getline(fs,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				vec1.push_back(atof(vec.at(i).c_str()));
-			}
-			matrix.push_back(vec1);
-			vec1.clear();
-			vec.clear();
-		}
-		fs.close();
-	}
-}

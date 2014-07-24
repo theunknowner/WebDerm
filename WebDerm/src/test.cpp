@@ -10,14 +10,11 @@
 String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
-	hsl hsl;
 	Intensity in;
 	Color colorObj;
 	int b,g,r;
 	int ind=0;
 	double dist=0;
-	double grayLevel=0;
-	double colorIntensity=0;
 	deque<int> index;
 	String pix;
 	deque<String> pixelColorWindow;
@@ -47,7 +44,6 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			{
 				pixelColorWindow.push_back(pix);
 			}
-			colorIntensity = in.calcIntensity(pix);
 			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << endl;
 		}
 	}

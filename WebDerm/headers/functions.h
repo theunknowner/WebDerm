@@ -29,17 +29,10 @@ void getDelimitedValuesFromString(String inputString, char delimiter, deque<doub
 String toString(int val);
 String toString(double val);
 double roundDecimal(double num, int places);
-double stdDevY(Mat img);
-double stdDevX(Mat img);
-double functionE(Point pixLoc, Point currLoc, double stdX, double stdY);
-double eTotal(double function);
-void kernel(Mat img, Size size, double stdX, double stdY);
 double calcSlope(Point pt, Point origin);
 Mat cropImage(Mat input);
 Mat rotateImage(const Mat& source, double angle);
-int checkTransitions(Mat img);
 Mat fillEdges2(Mat img);
 Mat fillEdges3(Mat img);
-void freqOfList(deque<double> &vec);
 Mat kMeansClustering(Mat &src);
 #endif

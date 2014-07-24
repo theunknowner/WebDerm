@@ -34,7 +34,6 @@ int main(int argc,char** argv)
 	hsl hsl;
 	rgb rgb;
 	Color c;
-	FileData fd;
 	Intensity in;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
@@ -45,20 +44,10 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(295,295);
 	Point pt2(296,296);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
-	deque< deque<String> > vec;
-	fd.getFileMatrix(vec);
-	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/vesicles18mainColor.csv","w");
-	String pix;
-	for(unsigned int i=0; i<vec.size(); i++) {
-		for(unsigned int j=0; j<vec.at(i).size(); j++) {
-			pix = c.getMainColor(vec.at(i).at(j));
-			fprintf(fp,"%s,",pix.c_str());
-		}
-		fprintf(fp,"\n");
-	}
-	fclose(fp);
+	//FileData fd;
+	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
+	//deque< deque<String> > vec;
+	//fd.getFileMatrix(vec);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");

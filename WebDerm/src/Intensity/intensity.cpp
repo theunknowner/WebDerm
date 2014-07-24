@@ -7,7 +7,7 @@
 
 #include "intensity.h"
 
-String shadeArr[] = {"Dark","High","Low","Light","White"};
+String shadeArr[] = {"Black","Dark","High","Low","Light","White"};
 deque<String> gShades;
 deque< deque<double> > gShadeThresh;
 
@@ -221,7 +221,7 @@ int Intensity::getShadeIndex(String shade) {
 	return index;
 }
 
-String Intensity::calcShade(double inten, bool eof) {
+String Intensity::calcShade(double inten) {
 	if(global_flag==0) {
 		minIndex = getShadeIndex(oldMinShade);
 		maxIndex = getShadeIndex(oldMaxShade);
@@ -314,7 +314,7 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 	for(unsigned int i=0; i<windowVec.size(); i++) {
 		for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);
-			if(pix.find("Black")!=string::npos)
+			if(pix.find("Zero")!=string::npos)
 				colorIntensity = 0;
 			else
 				colorIntensity = calcIntensity(pix);
@@ -404,7 +404,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	deque<String> localShades;
 	deque<double> ruleNo;
 	deque<String> strVec1;
-	bool eof=false;
 	fd.intensityVec = calcIntensityMatrix(fd.windowVec);
 	fd.smoothIntensityVec = calcSmoothedIntensityMatrix(fd.intensityVec);
 	fd.range = range;
@@ -413,17 +412,15 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			pix = windowVec.at(i).at(j);
 			pix2 = c.getMainColor(pix);
 			ccCurr = fd.smoothIntensityVec.at(i).at(j);
-			if(i==(fd.smoothIntensityVec.size()-1) && j==(fd.smoothIntensityVec.at(i).size()-1))
-				eof = true;
 			if(flag==0) { //initial first pixel-area
-				if(pix!="Black") {
-					shade = calcShade(ccCurr, eof);
+				if(pix!="Zero") {
+					shade = calcShade(ccCurr);
 					flag=1;
 				}
 			}
 			else if(flag!=0) {
-				if(pix!="Black")
-					shade = calcShade(ccCurr, eof);
+				if(pix!="Zero")
+					shade = calcShade(ccCurr);
 				else
 					shade = "";
 			}
@@ -467,7 +464,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			currCL = rgb.getColorLevel(pix);
 			currRatio = currGL/currCL;
 			if(flag==0) { //initial first pixel-area
-				if(pix2!="Black") {
+				if(pix2!="Zero") {
 					currGL = rgb.getGrayLevel1(pix);
 					currCL = rgb.getColorLevel(pix);
 					currRatio = currGL/currCL;
@@ -482,7 +479,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 					flag=1;
 				}
 			}
-			else if(flag!=0 && pix2!="Black") {
+			else if(flag!=0 && pix2!="Zero") {
 				currGL = rgb.getGrayLevel1(pix);
 				currCL = rgb.getColorLevel(pix);
 				currRatio = currGL/currCL;
@@ -497,7 +494,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				else localRatioIndex--;
 				if(localRatioIndex<0) localRatioIndex=0;
 
-				if(windowVec.at(i).at(j-1)!="Black")
+				if(windowVec.at(i).at(j-1)!="Zero")
 					ccPrev = fd.smoothIntensityVec.at(i).at(j-1);
 				if((ccCurr-ccPrev)<0) {
 					localCC = localMaxCC;
@@ -522,13 +519,13 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			}
 			relativeRatio = currRatio/localRatio;
 			relativeRatio = roundDecimal(relativeRatio,2);
-			if(localRatio==0 || pix2=="Black")  {
+			if(localRatio==0 || pix2=="Zero")  {
 				relativeRatio = -1;
 				currRatio = -1;
 			}
 			fd.relRatioVec.push_back(roundDecimal(relativeRatio,2));
 			fd.absRatioVec.push_back(roundDecimal(currRatio,2));
-			if(pix2!="Black") {
+			if(pix2!="Zero") {
 				fd.pt.x = j; fd.pt.y=i;
 				loc = j-(localIndexes.size()-index);
 				ratioLoc  = j-(localRatios.size()-localRatioIndex);
@@ -547,7 +544,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				str = "("+str+")";
 				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1)+ ";" + toString(ratioLoc+1);
 			}
-			if(pix2!="Black") {
+			if(pix2!="Zero") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
 				if(localCCs.size()==localScanSize) localCCs.pop_front();
 				if(localShades.size()==localScanSize) localShades.pop_front();

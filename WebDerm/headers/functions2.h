@@ -18,6 +18,5 @@ void mouseEvent(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis2(int evt, int x, int y, int flags, void* param);
 void onMouseCheckColor(int event, int x, int y, int flags, void* param);
-void importMatrix2Double2D(String filename, deque< deque<double> > &matrix);
 
 #endif /* FUNCTIONS2_H_ */
