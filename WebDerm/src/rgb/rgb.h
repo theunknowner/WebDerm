@@ -50,6 +50,7 @@ public:
 	double colorLevel2Brightness(double colorLevel);
 	bool importGrayLUT();
 	bool importGrayRGB();
+	double calcColorLumLevel(double red, double green, double blue);
 };
 
 

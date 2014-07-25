@@ -20,8 +20,7 @@ int main(int argc,char** argv)
 {
 	runHysteresis();
 /*
-	String filename[]= {path+"Images/CLP/clp3.jpg",
-						path+"Images/LPH/lph4.jpg",
+	String filename[]= {path+"Images/LPH/lph4.jpg",
 						path+"Images/LPH/lph6.jpg",
 						path+"Images/LPH/lph8.jpg",
 						path+"Images/LPH/lph10.jpg",
@@ -42,8 +41,8 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(295,295);
-	Point pt2(296,296);
+	Point pt1(357,423);
+	Point pt2(362,429);
 	//FileData fd;
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;
@@ -51,8 +50,8 @@ int main(int argc,char** argv)
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
-	//checkColorsFromList(img2,pt1,pt2);
-	//generateColorRegionTable(img2, pt1,pt2);
+	checkColorsFromList(img2,pt1,pt2);
+	generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 	/*
 	int col = 361;

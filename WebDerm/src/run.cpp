@@ -186,15 +186,13 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	}
 	if(flag[0]==true) {
 		for(int i=0; i<fileSize; i++) {
-			FileData fd;
 			img = runResizeImage(filenames[i],Size(700,700),0);
 			getSkin(img, mask);
 			img.copyTo(img2, mask);
 			name = getFileName(filenames[i]);
-			fd.setFilePath(filenames[i]);
+			FileData fd(filenames[i]);
 			fd.matImage = img2;
 			fd.matSize = size;
-			cout << fd.filename << endl;
 			hysteresis(fd);
 			writeSeq2File(fd.windowVec,name);
 			writeSeq2File(fd.hslMat,name+"_HSL");

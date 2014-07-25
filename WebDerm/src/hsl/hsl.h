@@ -29,7 +29,7 @@ public:
 	double calcLum(double red, double green, double blue);
 	double calcBrite(double red, double green, double blue);
 	double calcRelLum(double red, double green, double blue);
-	String getHslColor(double hue,double sat,double lum, int &ind);
+	String getHslColor(double hue,double sat,double lum, int &ind, Point pt=Point(0,0));
 	void release_memory();
 	double calcHueAvg(deque<int> &vec);
 };

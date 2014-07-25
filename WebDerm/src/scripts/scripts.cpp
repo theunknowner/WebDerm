@@ -542,18 +542,18 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 	int ptY = pt.y-1;
 	int ptX = pt.x-1;
 	int r,g,b;
-	double h;
+	double h,s,l;
 	String pix,pix2;
 	double dist = -1.0;
 	int ind=0;
-	double lum=0, grayLevel=0, colorLevel=0, grayLumLevel=0;
+	double lum=0, grayLevel=0, colorLevel=0, grayLumLevel=0, colorLumLevel=0;
 	double ratio=0, ratio2=0;
 	rgb rgb;
 	hsl hsl;
 	Color c;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
-	fprintf(fp,"Coord,Color,RGB,Hue,Dist Push,GrayLevel,GrayLumLevel,ColorLevel,Darkness,GL/CL,GLL/CL\n");
+	fprintf(fp,"Coord,Color,RGB,Hue,GrayLevel,ColorLevel,GrayLumLevel,ColorLumLevel,Darkness,GL/CL,GLL/CLL,CLL/CL\n");
 	for(int y=ptY; y<pt2.y; y++) {
 		for(int x=ptX; x<pt2.x; x++) {
 			r = img.at<Vec3b>(y,x)[2];
@@ -561,20 +561,23 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 			b = img.at<Vec3b>(y,x)[0];
 			hsl.rgb2hsl(r,g,b);
 			h = hsl.getHue();
+			s = roundDecimal(hsl.getSat(),2)*100;
+			l = roundDecimal(hsl.getLum(),2)*100;
 			pix = rgb.calcColor(r,g,b,dist,ind);
 			pix2 = c.getMainColor(pix);
-			dist = roundDecimal(dist,1);
 			lum = rgb.calcPerceivedBrightness(r,g,b);
 			lum = round(lum);
 			grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			//if(pix2=="Grey") grayLevel = 100;
 			colorLevel = rgb.calcColorLevel2(r,g,b);
-			ratio2 = grayLumLevel/colorLevel;
+			colorLumLevel = rgb.calcColorLumLevel(r,g,b);
+			ratio2 = grayLumLevel/colorLumLevel;
 			ratio = grayLevel/colorLevel;
-			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),%f,%f,%f,%f,%f,%f,%f,%f\n",x+1,y+1,pix.c_str(),r,g,b,h,
-					dist,grayLevel,grayLumLevel,colorLevel,lum,ratio,ratio2);
-			dist = -1.0;
+			double ratio3 = grayLumLevel/colorLevel;
+			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),%f,%f,%f,%f,%f,%f,%0.3f,%0.3f,",x+1,y+1,pix.c_str(),r,g,b,h,
+					grayLevel,colorLevel,grayLumLevel,colorLumLevel,lum,ratio,ratio2);
+			fprintf(fp,"%0.3f\n",ratio3);
 		}
 	}
 	fclose(fp);

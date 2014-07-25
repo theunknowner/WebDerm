@@ -529,15 +529,20 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				fd.pt.x = j; fd.pt.y=i;
 				loc = j-(localIndexes.size()-index);
 				ratioLoc  = j-(localRatios.size()-localRatioIndex);
-				//bool flag = specialRules(img,pix,windowVec,indexChange,shade,localShade,pt,ratioLoc,relativeRatio,ruleNo,hslMat,colorVec2,fd);
 				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
 				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
 				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
 				double l = getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
-				int ind=0;
-				hsl.getHslColor(h,s,l,ind);
-				h = hueTableNum.at(ind);
+				int ind=-1;
+				hsl.getHslColor(h,s,l,ind,fd.pt);
+				try { h = hueTableNum.at(ind); }
+				catch(const std::out_of_range& oor) {
+					printf("HueTableNum: Index out of bounds!\n");
+					printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
+					printf("HSL(%0.0f,%0.2f,%0.2f)\n",h,s,l);
+					exit(0);
+				}
 				s = roundDecimal(s,2);
 				l = roundDecimal(l,1);
 				String str = toString(h)+";"+toString(s)+";"+toString(l);

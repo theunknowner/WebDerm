@@ -219,7 +219,7 @@ double rule6(String& pix, String& newPix, String& newShade) {
 	double grayLevel = rgb.getGrayLevel1(newPix);
 
 	if(newShade=="Dark") {
-		if(grayLevel>=85) {
+		if(grayLevel>=90) {
 			newPix = "Grey";
 			flag=true;
 		}
@@ -272,103 +272,106 @@ double rule8(FileData &fd, String &newPix, int loc) {
 	double ruleNum = 8;
 	bool flag=false;
 	hsl hsl;
+	rgb rgb;
 	Color c;
 	Intensity in;
 	Point pt = fd.pt;
 	String color = c.getMainColor(fd.windowVec.at(pt.y).at(pt.x));
-	int index=-1, prevIndex=-1;
+	int index=-1;
 	double localScanSize = 20;
-	double indexChangeThresh = 1.0; //different than thresh for contrast of shades
-	double pThreshMove = 1.35;
+	//double indexChangeThresh = 1.0; //different than thresh for contrast of shades
+	//double pThreshMove = 1.35;
 	double hue = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
 	double sat = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
 	double lum = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
-	double fSat_promote=0;
-	double fSat_demote=0;
-	double thresh = fd.range/fd.shadeCount;
-	double currIntensity = fd.smoothIntensityVec.at(pt.y).at(pt.x);
-	double localIntensity = fd.smoothIntensityVec.at(pt.y).at(loc);
-	double intensity_45deg=0, intensity_90deg=0;
-	double indexChange_0deg=0, indexChange_45deg=0, indexChange_90deg=0;
+	//double fSat_promote=0;
+	//double fSat_demote=0;
+	double promoteThresh = 1.0/1.45;
+	double demoteThresh = 1.25;
+	//double currIntensity = fd.smoothIntensityVec.at(pt.y).at(pt.x);
+	//double localIntensity = fd.smoothIntensityVec.at(pt.y).at(loc);
+	double currCL = rgb.getColorLevel(fd.windowVec.at(pt.y).at(pt.x));
+	double localCL_0deg, localCL_45deg=0, localCL_90deg=0;
+	double relCL_0deg=0,relCL_45deg=0,relCL_90deg=0;
+	//double intensity_45deg=0, intensity_90deg=0;
+	//double indexChange_0deg=0, indexChange_45deg=0, indexChange_90deg=0;
 
 	int deg0_flag=0; // flag =  -1->demote; 1->promote
 	int deg45_flag=0;
 	int deg90_flag=0;
 	String shade_0deg, shade_45deg, shade_90deg;
 	hsl.getHslColor(hue,sat,lum,index);
-	try {
-		fSat_promote = (sat-satThresh.at(index).at(0));
-		fSat_promote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
-		fSat_promote *= pThreshMove;
-		fSat_demote = (sat-satThresh.at(index).at(1));
-		fSat_demote /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
-		fSat_demote *= pThreshMove;
-		prevIndex=index;
-	} catch(const std::out_of_range& oor) {
+	if(index<0) {
 		printf("Rule8: Index Out of bounds!\n");
 		printf("Point(%d,%d)\n",pt.x,pt.y);
 		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
 		exit(0);
 	}
 
-	shade_0deg = fd.shadeVec.at(pt.y).at(pt.x);
-	indexChange_0deg = (currIntensity-localIntensity)/thresh;
-	indexChange_0deg = myRound(indexChange_0deg);
-	if(indexChange_0deg>=indexChangeThresh && shade_0deg=="Dark")
-		deg0_flag = 1;
-	if(indexChange_0deg<=(-indexChangeThresh))
-		deg0_flag = -1;
 	if(pt.y>0) {
-		int j = pt.x-1;
+		int j = pt.x-1; //45deg
+		int x = j; //0deg
 		int endY = (pt.y-localScanSize);
 		for(int i=(pt.y-1); i>=endY; i--) {
-			if(j<0 && i<0) break;
-			if(deg45_flag==0 && j>=0 && i>=0) {
-				shade_45deg = fd.shadeVec.at(i).at(j);
-				intensity_45deg = fd.smoothIntensityVec.at(i).at(j);
-				indexChange_45deg = (currIntensity-intensity_45deg)/thresh;
-				indexChange_45deg = myRound(indexChange_45deg);
-				if(indexChange_45deg>=indexChangeThresh && shade_45deg=="Dark") {
-					deg45_flag = 1;
-				}
-				if(indexChange_45deg<=(-indexChangeThresh)) {
-					deg45_flag = -1;
-				}
+			if(x<0 && j<0 && i<0) break;
+			if(x>=0) {
+				localCL_0deg = rgb.getColorLevel(fd.windowVec.at(pt.y).at(x));
+				relCL_0deg = currCL/localCL_0deg;
+				if(relCL_0deg<=promoteThresh)
+					deg0_flag += 1;
+				if(relCL_0deg>=demoteThresh)
+					deg0_flag -= 1;
+			}
+			--x;
+			if(j>=0 && i>=0) {
+				localCL_45deg = rgb.getColorLevel(fd.windowVec.at(i).at(j));
+				relCL_45deg = currCL/localCL_45deg;
+				if(relCL_45deg<=promoteThresh)
+					deg45_flag += 1;
+				if(relCL_45deg>=demoteThresh)
+					deg45_flag -= 1;
 			}
 			--j;
-			if(deg90_flag==0 && i>=0) {
-				shade_90deg = fd.shadeVec.at(i).at(pt.x);
-				intensity_90deg = fd.smoothIntensityVec.at(i).at(pt.x);
-				indexChange_90deg = (currIntensity-intensity_90deg)/thresh;
-				indexChange_90deg = myRound(indexChange_90deg);
-				if(indexChange_90deg>=indexChangeThresh && shade_90deg=="Dark") {
-					deg90_flag = 1;
-				}
-				if(indexChange_90deg<=(-indexChangeThresh)) {
-					deg90_flag = -1;
-				}
+			if(i>=0) {
+				localCL_90deg = rgb.getColorLevel(fd.windowVec.at(i).at(pt.x));
+				relCL_90deg = currCL/localCL_90deg;
+				if(relCL_90deg<=promoteThresh)
+					deg90_flag += 1;
+				if(relCL_90deg>=demoteThresh)
+					deg90_flag -= 1;
 			}
-			if(deg45_flag!=0 && deg90_flag!=0)
+			if(pt.x==300 && pt.y==303) {
+				printf("%0.2f ; %0.2f ; %0.2f\n",relCL_0deg,relCL_45deg,relCL_90deg);
+				//printf("%.0f ; %.0f ; %.0f\n",localCL_0deg,localCL_45deg,localCL_90deg);
+				//printf("%d ; %d ; %d\n",deg0_flag,deg45_flag,deg90_flag);
+			}
+			if(abs(deg45_flag)>10 && abs(deg90_flag)>10)
+				break;
+			if(abs(deg0_flag)>10 && abs(deg90_flag)>10)
+				break;
+			if(abs(deg0_flag)>10 && abs(deg45_flag)>10)
 				break;
 		}
+		if(pt.x==300 && pt.y==303)
+			printf("%d ; %d ; %d\n",deg0_flag,deg45_flag,deg90_flag);
+
 	}
+
+	if(deg0_flag<0) deg0_flag = -1;
+	if(deg0_flag>0) deg0_flag = 1;
+	if(deg45_flag<0) deg45_flag = -1;
+	if(deg45_flag>0) deg45_flag = 1;
+	if(deg90_flag<0) deg90_flag = -1;
+	if(deg90_flag>0) deg90_flag = 1;
 	if((deg0_flag+deg45_flag)>=2||(deg0_flag+deg90_flag)>=2||(deg45_flag+deg90_flag)>=2) {
-		lum += 0.05;
+		lum += 0.10;
 		newPix = hsl.getHslColor(hue,sat,lum,index);
-		if(index==prevIndex) {
-			lum += 0.05;
-			newPix = hsl.getHslColor(hue,sat,lum,index);
-		}
 		flag=true;
 		ruleNum = 8.1;
 	}
 	if((deg0_flag+deg45_flag)<=-2||(deg0_flag+deg90_flag)<=-2||(deg45_flag+deg90_flag)<=-2) {
-		lum -= 0.05;
+		lum -= 0.10;
 		newPix = hsl.getHslColor(hue,sat,lum,index);
-		if(index==prevIndex) {
-			lum -= 0.05;
-			newPix = hsl.getHslColor(hue,sat,lum,index);
-		}
 		flag=true;
 		ruleNum = 8.2;
 	}

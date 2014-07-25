@@ -179,10 +179,10 @@ double hsl::minRGB(double red, double green, double blue)
 	}
 
 //return the color of the hsl values using hsl colorspace
-String hsl::getHslColor(double hue, double sat, double lum, int &ind)
+String hsl::getHslColor(double hue, double sat, double lum, int &ind, Point pt)
 {
 	String color = "NONE";
-	for(unsigned int i=0; i<hslColors.size(); i++)
+	for(unsigned int i=0; i<hslColors.size(); i++) {
 		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
 			if(sat>=satThresh.at(i).at(0) && sat<satThresh.at(i).at(1)) {
 				if(lum>=lumThresh.at(i).at(0) && lum<lumThresh.at(i).at(1)) {
@@ -192,7 +192,7 @@ String hsl::getHslColor(double hue, double sat, double lum, int &ind)
 				}
 			}
 		}
-
+	}
 	return color;
 }
 
