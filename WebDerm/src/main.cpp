@@ -38,11 +38,11 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	in.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/LPH","lph6.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(357,423);
-	Point pt2(362,429);
+	Point pt1(353,249);
+	Point pt2(356,251);
 	//FileData fd;
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;

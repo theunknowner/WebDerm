@@ -188,7 +188,6 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
 				pix = getMainColor(window.at(i).at(j));
-				if(pix.find("Violet")!=string::npos) pix="Pink";
 				HSL = c.extractHSL(window.at(i).at(j));
 				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 				pix = shade+pix;
