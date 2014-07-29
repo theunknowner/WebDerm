@@ -258,16 +258,14 @@ double rule8(FileData &fd, String &newPix, int loc) {
 }
 
 /** P2: Special rule 9 - GrayIndexChange - for non-grays that look gray **/
-double rule9(FileData &fd, String &newPix, int ratioLoc) {
+double rule9(FileData &fd, String &newPix) {
 	double ruleNum = 9;
 	bool flag = false;
 	rgb rgb;
 	Color c;
 	Point pt = fd.pt;
-	String prevPix_0deg =fd.windowVec.at(pt.y).at(ratioLoc);
 	String color = c.getMainColor(newPix);
-	String prevColor_0deg = c.getMainColor(fd.colorVec.at(pt.y).at(ratioLoc));
-	String prevColor_45deg, prevColor_90deg;
+	String prevColor_0deg, prevColor_45deg, prevColor_90deg;
 	String pix0=newPix,pix45=newPix,pix90=newPix;
 	double grayLevel = rgb.getGrayLevel1(newPix);
 	double colorLevel = rgb.getColorLevel(newPix);
@@ -276,30 +274,35 @@ double rule9(FileData &fd, String &newPix, int ratioLoc) {
 	double relRatioThreshUpper = 1.25;
 	double relRatioThreshLower = 0.85;
 	double absRatio = roundDecimal(grayLevel/colorLevel,2);
-	double relRatio_0deg = absRatio/fd.absRatioVec.at(ratioLoc);
+	double relRatio_0deg;
 	double relRatio_45deg=0, relRatio_90deg=0;
+	bool relRatio_0deg_flag = false;
 	bool relRatio_45deg_flag = false;
 	bool relRatio_90deg_flag = false;
 	double localRatioScanSize = fd.localRatioScanSize;
 
-	if(prevColor_0deg=="" || prevColor_0deg=="Zero") {
-		prevColor_0deg = color;
-		prevPix_0deg = newPix;
-	}
-
 	if(c.containsColor(toString(4),color.c_str(),"Brown","Pink","Blue")) {
-		if(relRatio_0deg>relRatioThreshUpper && absRatio>absRatioThresh) {
-			pix0 = "Grey";
-		}
-		else if(relRatio_0deg>=relRatioThreshLower&&relRatio_0deg<=relRatioThreshUpper && prevColor_0deg=="Grey") {
-			pix0 = prevColor_0deg;
-		}
 		if(pt.y>0) {
-			int j=pt.x-1;
+			int j=pt.x-1; //45deg
+			int x = j; //0deg
 			int endY=(pt.y-localRatioScanSize);
 			for(int i=(pt.y-1); i>=endY; i--) {
-				if(i<0 && j<0) break;
+				if(x<0 && j<0 && i<0) break;
 
+				if(relRatio_0deg_flag==false && x>=0) {
+					relRatio_0deg = absRatio/fd.absRatioVec.at(x);
+					relRatio_0deg = roundDecimal(relRatio_0deg,2);
+					prevColor_0deg = fd.colorVec.at(pt.y).at(x);
+					if(relRatio_0deg>relRatioThreshUpper && absRatio>absRatioThresh) {
+						pix0 = "Grey";
+						relRatio_0deg_flag = true;
+					}
+					else if(relRatio_0deg>=relRatioThreshLower&&relRatio_0deg<=relRatioThreshUpper && prevColor_0deg=="Grey") {
+						pix45 = prevColor_0deg;
+						relRatio_0deg_flag = true;
+					}
+				}
+				--x;
 				if(relRatio_45deg_flag==false && j>=0 && i>=0) {
 					relRatio_45deg = absRatio/fd.absRatioMat.at(i).at(j);
 					relRatio_45deg = roundDecimal(relRatio_45deg,2);
@@ -327,8 +330,12 @@ double rule9(FileData &fd, String &newPix, int ratioLoc) {
 						relRatio_90deg_flag = true;
 					}
 				}
-				if(relRatio_45deg_flag==true && relRatio_90deg_flag==true)
+				if(relRatio_0deg_flag==true && relRatio_45deg_flag==true && relRatio_90deg_flag==true)
 					break;
+
+			/*	if(pt.x==305 && pt.y==293) {
+					printf("%0.2f ; %0.2f ; %0.2f\n",relRatio_0deg,relRatio_45deg,relRatio_90deg);
+				}*/
 			}
 		}
 		if(pix0==pix45||pix0==pix90) {
@@ -356,7 +363,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
-	ruleNumVec.push_back(rule9(fd,newPix,ratioLoc));
+	ruleNumVec.push_back(rule9(fd,newPix));
 	//ruleNumVec.push_back(rule8(fd,newPix,loc));
 	ruleNumVec.push_back(rule7(pix,newPix));
 	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
