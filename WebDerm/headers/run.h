@@ -16,6 +16,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/scripts/scripts.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "test.h"
 
 void runCheckRGBColor();
 void runCheckList();
@@ -31,5 +32,6 @@ void runMouseHysteresis2();
 void outputFreqColor(Mat &img);
 void runOutputColorFreq();
 void runOutputFarRGB();
+void runMouseColor();
 
 #endif /* RUN_H_ */

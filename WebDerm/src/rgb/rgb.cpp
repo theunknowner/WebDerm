@@ -679,13 +679,17 @@ bool rgb::importGrayLUT() {
 
 double rgb::calcGrayLumLevel(double red, double green, double blue) {
 	hsl hsl;
-	double grayLevel=0;
+	double grayLumLevel=0;
 	double *HSL = hsl.rgb2hsl(red,green,blue);
-	double sat = roundDecimal(HSL[1],2) *100;
+	double sat = roundDecimal(HSL[1],2) * 100;
 	double lum = roundDecimal(HSL[2],2) * 100;
 	//grayLevel = grayLUT.at(sat).at(lum);
-	grayLevel = ((100-sat)*(100-lum))/100;
-	return round(grayLevel);
+	//grayLevel = ((100-sat)*(100-lum))/100;
+	double a=3;
+	grayLumLevel = ((100-lum)*a*(1.0-(sat/100)));///((100-lum)*a*(1.0-(sat/100))+(100-lum));
+	//cout << grayLumLevel << endl;
+	//cout << ((100-lum)*a*(1.0-(sat/100))+(100-lum)) << endl;
+	return round(grayLumLevel);
 }
 
 double rgb::colorLevel2Brightness(double colorLevel) {
@@ -698,10 +702,14 @@ double rgb::colorLevel2Brightness(double colorLevel) {
 
 double rgb::calcColorLumLevel(double red, double green, double blue) {
 	hsl hsl;
-	double result=0;
+	double colorLumLevel=0;
 	double* HSL = hsl.rgb2hsl(red,green,blue);
-	HSL[1] = roundDecimal(HSL[1],2)*100;
-	HSL[2] = roundDecimal(HSL[2],2)*100;
-	result = ((100-HSL[2])*HSL[1])/100;
-	return round(result);
+	double sat = roundDecimal(HSL[1],2) * 100;
+	double lum = roundDecimal(HSL[2],2) * 100;
+	//colorLumLevel = ((100-HSL[2])*HSL[1])/100;
+	double a=3;
+	colorLumLevel = ((100-lum)*1);///((100-lum)*a*(1.0-(sat/100))+(100-lum)*1);
+	return round(colorLumLevel);
 }
+
+

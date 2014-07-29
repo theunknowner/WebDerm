@@ -270,7 +270,7 @@ double rule9(FileData &fd, String &newPix) {
 	double grayLevel = rgb.getGrayLevel1(newPix);
 	double colorLevel = rgb.getColorLevel(newPix);
 
-	double absRatioThresh = 1.35;
+	double absRatioThresh = 1.5;
 	double relRatioThreshUpper = 1.25;
 	double relRatioThreshLower = 0.85;
 	double absRatio = roundDecimal(grayLevel/colorLevel,2);

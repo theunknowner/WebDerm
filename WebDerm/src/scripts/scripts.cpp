@@ -553,7 +553,7 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 	Color c;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
-	fprintf(fp,"Coord,Color,RGB,Hue,GrayLevel,ColorLevel,GrayLumLevel,ColorLumLevel,Darkness,GL/CL,GLL/CLL,CLL/CL\n");
+	fprintf(fp,"Coord,Color,RGB,Hue,GrayLevel,ColorLevel,GrayLumLevel,ColorLumLevel,Darkness,GL/CL,GLL/CLL,GLL/CL\n");
 	for(int y=ptY; y<pt2.y; y++) {
 		for(int x=ptX; x<pt2.x; x++) {
 			r = img.at<Vec3b>(y,x)[2];

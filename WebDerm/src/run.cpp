@@ -346,3 +346,36 @@ void runOutputFarRGB() {
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory(); hsl.release_memory();
 }
+
+void runMouseColor() {
+	rgb rgb;
+	hsl hsl;
+	Intensity in;
+	String filename;
+	String name;
+	Size size(2,2);
+	cout << "Enter filename: ";
+	cin >> filename;
+	Mat img, img2, mask;
+	img = runResizeImage(filename,Size(700,700),0);
+	getSkin(img, mask);
+	img.copyTo(img2, mask);
+	bool flag[3];
+	flag[0]=rgb.importThresholds();
+	flag[1]=hsl.importHslThresholds();
+	flag[2]=in.importThresholds();
+	for(int i=0; i<3; i++) {
+		if(flag[i]==false) {
+			flag[0] = false;
+			break;
+		}
+	}
+	if(flag[0]==true) {
+		testMouseColor(img2);
+	}
+
+	img.release(); img2.release(); mask.release();
+	rgb.release_memory();
+	hsl.release_memory();
+	in.release_memory();
+}
