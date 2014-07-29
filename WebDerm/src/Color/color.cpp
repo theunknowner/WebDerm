@@ -22,12 +22,31 @@ bool Color::containsColor(String argNum, ...) {
 	va_list vl;
 	va_start(vl,argNum);
 	String color1 = va_arg(vl,char *);
+	String color2;
 	for(int i=1; i<arg; i++) {
-		if(color1.find(va_arg(vl,char *))!=string::npos)
+		color2 = va_arg(vl,char *);
+		if(color1.find(color2)!=string::npos)
 		return true;
 	}
 	va_end(vl);
 	return false;
+}
+
+/** argNum as first input followed by color1 and colors to find  **/
+bool Color::containsAllColor(String argNum, ...) {
+	int arg = atoi(argNum.c_str());
+	va_list vl;
+	va_start(vl,argNum);
+	String color1 = va_arg(vl,char *);
+	String color2;
+	for(int i=1; i<arg; i++) {
+		color2 = va_arg(vl,char *);
+		if(color1.find(color2)==string::npos)
+			return false;
+	}
+
+	va_end(vl);
+	return true;
 }
 
 //returns the amount of time pixels contain main color
@@ -181,15 +200,13 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		String pix;
 		Size size(window.at(0).size(),window.size());
 		Mat img = img.zeros(size,16);
-		int flag=0;
 		double* HSL;
-		double* RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
 				pix = getMainColor(window.at(i).at(j));
 				HSL = c.extractHSL(window.at(i).at(j));
-				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+				pix = optimizeColor(pix);
 				pix = shade+pix;
 				if(shade=="Zero") {
 					img.at<Vec3b>(i,j)[2] = 0;
@@ -212,25 +229,9 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
 							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
 							img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
-							flag=1;
 							break;
 						}
 					}
-					if(flag==1) {
-						flag=0;
-						if(c.countColors(pix)>2) pix = shrinkColor(pix,2);
-						for(unsigned int k=0; k<color.size(); k++) {
-							if(pix==color.at(k)) {
-								img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
-								img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
-								img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
-								break;
-							}
-						}
-					}
-					//img.at<Vec3b>(i,j)[2] = RGB[0];
-					//img.at<Vec3b>(i,j)[1] = RGB[1];
-					//img.at<Vec3b>(i,j)[0] = RGB[2];
 				}
 			}
 		}
@@ -302,17 +303,33 @@ void Color::changeContrast(double r, double g, double b, double alpha, double be
 	waitKey(0);
 }
 
-String Color::shrinkColor(String pix, int number) {
+String Color::optimizeColor(String pix) {
+	String color = pix;
 	int count=0;
-	String color;
-	for(unsigned int i=0; i<mainColors.size(); i++) {
-		if(pix.find(mainColors.at(i))!=string::npos) {
-			color += mainColors.at(i);
-			count++;
-		}
-		if(count==number)
-			break;
+	if(containsAllColor(toString(3),color.c_str(),"Violet","Pink")) {
+		color = removeColor(color,"Violet");
 	}
+	if(color.find("Violet")!=string::npos) {
+		color = replaceColor(color,"Violet","Pink");
+	}
+	if(containsAllColor(toString(3),color.c_str(),"Pink","Purple")) {
+		color = removeColor(color,"Purple");
+	}
+	if(countColors(color)>2 && color.find("Grey")!=string::npos) {
+		color = removeColor(color,"Grey");
+	}
+	if(countColors(color)>2) {
+		color.clear();
+		for(unsigned int i=0; i<mainColors.size(); i++) {
+			if(pix.find(mainColors.at(i))!=string::npos) {
+				color += mainColors.at(i);
+				count++;
+			}
+			if(count==2)
+				break;
+		}
+	}
+
 	return color;
 }
 
@@ -337,4 +354,24 @@ double* Color::extractHSL(String inputString) {
 	vec.clear();
 	deque<double>().swap(vec);
 	return result;
+}
+
+String Color::removeColor(String color, String colorRemove) {
+	size_t pos = 0;
+	String str;
+	pos = color.find(colorRemove);
+	if(pos!=string::npos)
+		str = color.erase(pos,colorRemove.length());
+
+	return str;
+}
+
+String Color::replaceColor(String color, String colorTarget, String colorReplace) {
+	size_t pos=0;
+	String str;
+	pos = color.find(colorTarget);
+	if(pos!=string::npos)
+		str = color.replace(pos,colorTarget.length(),colorReplace);
+
+	return str;
 }

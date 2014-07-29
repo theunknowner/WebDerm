@@ -16,7 +16,8 @@
 class Color {
 public:
 	bool containsColor(String color1, String color2);
-	bool containsColor(String color1, ...);
+	bool containsColor(String argNum, ...);
+	bool containsAllColor(String argNum, ...);
 	int containsMainColor(String color, String mColor);
 	bool isSameColor(String color1, String color2);
 	void extractColorFromString(String color, deque<String> &vecColor);
@@ -29,7 +30,9 @@ public:
 	String fixColors(String pix, double r, double g, double b);
 	Mat changeImageBrightness(Mat &img, double amt);
 	void changeContrast(double r, double g, double b, double alpha=1, double beta=0);
-	String shrinkColor(String pix, int number);
+	String optimizeColor(String pix);
 	double* extractHSL(String inputString);
+	String removeColor(String color, String colorRemove);
+	String replaceColor(String color, String colorTarget, String colorReplace);
 };
 #endif /* COLOR_H_ */
