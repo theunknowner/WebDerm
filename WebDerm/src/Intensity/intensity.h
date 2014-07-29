@@ -20,7 +20,7 @@
 
 #include "rules.h"
 
-enum SHADE {BLACK,DARK,HIGH,LOW,LIGHT,WHITE};
+enum SHADE {DARK,HIGH,LOW,LIGHT,WHITE};
 
 class FileData;
 class Intensity {

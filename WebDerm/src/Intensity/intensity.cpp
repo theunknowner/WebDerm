@@ -7,7 +7,7 @@
 
 #include "intensity.h"
 
-String shadeArr[] = {"Black","Dark","High","Low","Light","White"};
+String shadeArr[] = {"Dark","High","Low","Light","White"};
 deque<String> gShades;
 deque< deque<double> > gShadeThresh;
 
