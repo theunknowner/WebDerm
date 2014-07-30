@@ -18,16 +18,17 @@
 
 int main(int argc,char** argv)
 {
-	runHysteresis();
-/*
-	String filename[]= {path+"Images/LPH/lph1.jpg",
-						path+"Images/LPH/lph4.jpg",
-						path+"Images/LPH/lph6.jpg",
-						path+"Images/LPH/lph8.jpg",
-						path+"Images/LPH/lph10.jpg",
+	//runHysteresis();
+
+	String filename[]= {//path+"Images/CLP/clp3.jpg",
+						//path+"Images/CLP/clp10.jpg",
+						//path+"Images/Herpes/herpes1.jpg",
+						//path+"Images/Herpes/herpes2.jpg",
+						path+"Images/Vesicles/vesicles9.jpg",
+						path+"Images/Vesicles/vesicles17.jpg",
 						path+"Images/Vesicles/vesicles18.jpg",
-						path+"Images/Psoriasis/Psoriasis1.jpg",
-						path+"Images/Psoriasis/Psoriasis4.jpg"};
+						path+"Images/Vitiligo/vitiligo3.jpg",
+						path+"Images/Herpes/herpes3.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
 	/*
@@ -39,11 +40,11 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	in.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/LPH","lph1.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Vesicles","vesicles9.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(333,265);
-	Point pt2(335,267);
+	Point pt1(475,35);
+	Point pt2(476,36);
 	//int r=220,g=86,b=86;
 	//cout << rgb.calcGrayLumLevel(r,g,b) << endl;
 	//cout << rgb.calcColorLumLevel(r,g,b);
@@ -57,9 +58,9 @@ int main(int argc,char** argv)
 	//checkColorsFromList(img2,pt1,pt2);
 	generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
-	/*
-	int col = 361;
-	int row = 253;
+/*
+	int col = 475;
+	int row = 35;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

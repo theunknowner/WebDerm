@@ -140,6 +140,7 @@ void hysteresis(FileData &fd) {
 				{
 					mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
 				}
+				double h = 0, s = 0, l = 0;
 				if(index.size()!=0)
 				{
 					pix.clear();
@@ -162,20 +163,19 @@ void hysteresis(FileData &fd) {
 					hslAvg[2] = roundDecimal(hslAvg[2]/count,2);
 					hslAvg[0] -= 180;
 					if(hslAvg[0]<0) hslAvg[0] += 360;
-					double h = hslAvg[0];
-					double s = hslAvg[1];
-					double l = hslAvg[2];
-					String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
-					hslVec.push_back(hslStr);
+					h = hslAvg[0];
+					s = hslAvg[1];
+					l = hslAvg[2];
 					pix = colorObj.fixColors(pix,r,g,b);
 					if(pix!="Zero")
 						pix = toString(grayLevel) + pix;
 					colorWindow.push_back(pix);
 				}
-				else
-				{
-					colorWindow.push_back("NZ");
+				else {
+					colorWindow.push_back("Zero");
 				}
+				String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
+				hslVec.push_back(hslStr);
 				grayLevel=0;
 				hslAvg[0] = 0;
 				hslAvg[1] = 0;

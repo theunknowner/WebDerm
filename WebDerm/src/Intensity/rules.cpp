@@ -44,7 +44,7 @@ double rule2(FileData &fd, String &newPix) {
 		fSat /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
 		fSat *= pThreshMove;
 	} catch(const std::out_of_range& oor) {
-		printf("Rule8: Index Out of bounds!\n");
+		printf("Rule2: Index Out of bounds!\n");
 		printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
 		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
 		exit(0);
@@ -52,8 +52,10 @@ double rule2(FileData &fd, String &newPix) {
 	try {
 		grey = hslColors.at(index-1);
 	} catch(const std::out_of_range& oor) {
-		printf("Rule8: Index Out of bounds!\n");
-		printf("Index-1 Out of bounds!\n");
+		printf("Rule2: Index Out of bounds!\n");
+		printf("Index{%d} out of bounds!\n",index-1);
+		printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
+		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
 		exit(0);
 	}
 	if(!c.containsColor(toString(4),color.c_str(),"Grey","White","Black")) {
@@ -144,8 +146,8 @@ double rule8(FileData &fd, String &newPix, int loc) {
 	double hue = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
 	double sat = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
 	double lum = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
-	double promoteThresh = 1.0/1.45;
-	double demoteThresh = 1.45;
+	double promoteThresh = 1.0/1.75;
+	double demoteThresh = 1.75;
 	double currCL = rgb.getColorLevel(fd.windowVec.at(pt.y).at(pt.x));
 	double localCL_0deg, localCL_45deg=0, localCL_90deg=0;
 	double relCL_0deg=0,relCL_45deg=0,relCL_90deg=0;
@@ -161,17 +163,6 @@ double rule8(FileData &fd, String &newPix, int loc) {
 		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
 		exit(0);
 	}
-/*
-	double HSL_0deg[3] = {0};
-	double HSL_45deg[3] = {0};
-	double HSL_90deg[3] = {0};
-	double HSL_err_0deg[3] = {0};
-	double HSL_err_45deg[3] = {0};
-	double HSL_err_90deg[3] = {0};
-	double err_0deg=0, err_45deg=0, err_90deg=0;
-	double eucErr_0deg=0, eucErr_45deg=0, eucErr_90deg=0;
-	double weight1 = 0.25, weight2 = 0.75;
-*/
 	if(pt.y>0) {
 		int j = pt.x-1; //45deg
 		int x = j; //0deg
@@ -185,18 +176,6 @@ double rule8(FileData &fd, String &newPix, int loc) {
 					deg0_flag += 1;
 				else if(relCL_0deg>=demoteThresh)
 					deg0_flag -= 1;
-			/*	else if(x>0) {
-					HSL_0deg[0] = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x-1),';',1);
-					HSL_0deg[1] = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x-1),';',2);
-					HSL_0deg[2] = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x-1),';',3);
-
-					eucErr_0deg = sqrt(pow(hue-HSL_0deg[0],2)+pow(sat-HSL_0deg[1],2)+pow(lum-HSL_0deg[2],2));
-					err_0deg = (weight1*err_0deg) + (weight2*eucErr_0deg);
-					HSL_err_0deg[0] = (weight1*HSL_err_0deg[0]) + (weight2*abs(hue-HSL_0deg[0]));
-					HSL_err_0deg[1] = (weight1*HSL_err_0deg[1]) + (weight2*abs(sat-HSL_0deg[1]));
-					HSL_err_0deg[2] = (weight1*HSL_err_0deg[2]) + (weight2*abs(lum-HSL_0deg[2]));
-
-				}*/
 			}
 			--x;
 			if(j>=0 && i>=0) {

@@ -10,11 +10,21 @@
 String testHysteresis(Mat &img, int row, int col, Size size)
 {
 	rgb rgb;
+	hsl hsl;
 	Intensity in;
 	Color colorObj;
 	int b,g,r;
 	int ind=0;
 	double dist=0;
+	double grayLevel=0;
+	double* HSL;
+	int hue=0;
+	double hslAvg[3]={0};
+	deque<double> hueWindow;
+	deque<double> satWindow;
+	deque<double> lumWindow;
+	String hslStr;
+	int count=0; //stores the amount of pixels hit
 	deque<int> index;
 	String pix;
 	deque<String> pixelColorWindow;
@@ -22,7 +32,10 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	int mainColorIndex[mainColors.size()];
 	double mainColorLevels[mainColors.size()];
 	double mainColorLevelAvg[mainColors.size()];
-	double matchingScans = (size.width*size.height)/2;
+	int dimension = size.width*size.height;
+	int matchingScans = dimension/2;
+	int windowFlags[dimension];
+	fill_n(windowFlags,dimension,0);
 	fill_n(colorIndex,rgbColors.size(),0);
 	fill_n(mainColorIndex,mainColors.size(),0);
 	fill_n(mainColorLevelAvg,mainColors.size(),0);
@@ -37,7 +50,12 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			if(pix=="OTHER")
 			{
 				pix = rgb.calcColor(r,g,b,dist,ind);
-				cout << "Dist: " << dist << endl;
+				HSL = hsl.rgb2hsl(r,g,b);
+				HSL[1] = roundDecimal(HSL[1],2);
+				HSL[2] = roundDecimal(HSL[2],2);
+				hueWindow.push_back(HSL[0]);
+				satWindow.push_back(HSL[1]);
+				lumWindow.push_back(HSL[2]);
 				pixelColorWindow.push_back(pix);
 			}
 			else
@@ -71,30 +89,62 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 		for(unsigned int j=0; j<index.size(); j++)
 		{
 			mainColorLevels[index.at(j)] = rgb.getColorLevel(pixelColorWindow.at(i),
-															mainColors.at(index.at(j)));
+					mainColors.at(index.at(j)));
 			mainColorLevelAvg[index.at(j)] += mainColorLevels[index.at(j)];
+			if(pixelColorWindow.at(i).find(mainColors.at(index.at(j)))!=string::npos) {
+				windowFlags[i] = 1;
+			}
+		}
+	}
+	for(int i=0; i<dimension; i++) {
+		if(windowFlags[i]==true) {
+			grayLevel += rgb.getGrayLevel1(pixelColorWindow.at(i));
+			hue =  hueWindow.at(i) + 180;
+			if(hue>=360) hue %= 360;
+			hslAvg[0] += hue;
+			hslAvg[1] += satWindow.at(i);
+			hslAvg[2] += lumWindow.at(i);
+			count++;
 		}
 	}
 	for(unsigned int i=0; i <index.size(); i++)
 	{
 		mainColorLevelAvg[index.at(i)] /= mainColorIndex[index.at(i)];
 	}
+	double h = 0, s = 0, l = 0;
 	if(index.size()!=0)
 	{
 		pix.clear();
 		for(unsigned int i=0; i<index.size(); i++)
 		{
-			if(mainColors.at(index[i])=="Black") {
+			if(mainColors.at(index[i])=="Zero") {
+				pix = mainColors.at(index[i]);
+				break;
+			}
+			else if(mainColors.at(index[i])=="Black" || mainColors.at(index[i])=="White") {
 				pix = mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 				break;
 			}
 			else
 				pix += mainColors.at(index[i]) + toString(round(mainColorLevelAvg[index.at(i)]));
 		}
+		grayLevel = round(grayLevel/count);
+		hslAvg[0] = round(hslAvg[0]/count);
+		hslAvg[1] = roundDecimal(hslAvg[1]/count,2);
+		hslAvg[2] = roundDecimal(hslAvg[2]/count,2);
+		hslAvg[0] -= 180;
+		if(hslAvg[0]<0) hslAvg[0] += 360;
+		h = hslAvg[0];
+		s = hslAvg[1];
+		l = hslAvg[2];
 		pix = colorObj.fixColors(pix,r,g,b);
+		if(pix!="Zero")
+			pix = toString(grayLevel) + pix;
 	}
 	else pix = "NOISE";
 
+	hslStr = toString(h)+";"+toString(s)+";"+toString(l);
+	cout << "HSL_Avg: " << hslStr << endl;
 	//cout << "COLORINT:" << in.calcIntensity(pix) << endl;
 	deque<int>().swap(index);
 	deque<String>().swap(pixelColorWindow);
