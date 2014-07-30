@@ -270,7 +270,7 @@ double rule9(FileData &fd, String &newPix) {
 	double grayLevel = rgb.getGrayLevel1(newPix);
 	double colorLevel = rgb.getColorLevel(newPix);
 
-	double absRatioThresh = 1.5;
+	double absRatioThresh = 1.35;
 	double relRatioThreshUpper = 1.25;
 	double relRatioThreshLower = 0.85;
 	double absRatio = roundDecimal(grayLevel/colorLevel,2);
@@ -293,11 +293,11 @@ double rule9(FileData &fd, String &newPix) {
 					relRatio_0deg = absRatio/fd.absRatioVec.at(x);
 					relRatio_0deg = roundDecimal(relRatio_0deg,2);
 					prevColor_0deg = fd.colorVec.at(pt.y).at(x);
-					if(relRatio_0deg>relRatioThreshUpper && absRatio>absRatioThresh) {
+					if(relRatio_0deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=70) {
 						pix0 = "Grey";
 						relRatio_0deg_flag = true;
 					}
-					else if(relRatio_0deg>=relRatioThreshLower&&relRatio_0deg<=relRatioThreshUpper && prevColor_0deg=="Grey") {
+					else if(relRatio_0deg>=relRatioThreshLower&&relRatio_0deg<=relRatioThreshUpper && prevColor_0deg=="Grey" && grayLevel>=70) {
 						pix45 = prevColor_0deg;
 						relRatio_0deg_flag = true;
 					}
@@ -307,11 +307,11 @@ double rule9(FileData &fd, String &newPix) {
 					relRatio_45deg = absRatio/fd.absRatioMat.at(i).at(j);
 					relRatio_45deg = roundDecimal(relRatio_45deg,2);
 					prevColor_45deg = fd.colorVec.at(i).at(j);
-					if(relRatio_45deg>relRatioThreshUpper && absRatio>absRatioThresh) {
+					if(relRatio_45deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=70) {
 						pix45 = "Grey";
 						relRatio_45deg_flag = true;
 					}
-					else if(relRatio_45deg>=relRatioThreshLower&&relRatio_45deg<=relRatioThreshUpper && prevColor_45deg=="Grey") {
+					else if(relRatio_45deg>=relRatioThreshLower&&relRatio_45deg<=relRatioThreshUpper && prevColor_45deg=="Grey" && grayLevel>=70) {
 						pix45 = prevColor_45deg;
 						relRatio_45deg_flag = true;
 					}
@@ -321,11 +321,11 @@ double rule9(FileData &fd, String &newPix) {
 					relRatio_90deg = absRatio/fd.absRatioMat.at(i).at(pt.x);
 					relRatio_90deg = roundDecimal(relRatio_90deg,2);
 					prevColor_90deg = fd.colorVec.at(i).at(pt.x);
-					if(relRatio_90deg>relRatioThreshUpper && absRatio>absRatioThresh) {
+					if(relRatio_90deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=70) {
 						pix90 = "Grey";
 						relRatio_90deg_flag = true;
 					}
-					else if(relRatio_90deg>=relRatioThreshLower&&relRatio_90deg<=relRatioThreshUpper && prevColor_90deg=="Grey") {
+					else if(relRatio_90deg>=relRatioThreshLower&&relRatio_90deg<=relRatioThreshUpper && prevColor_90deg=="Grey" && grayLevel>=70) {
 						pix90 = prevColor_90deg;
 						relRatio_90deg_flag = true;
 					}
@@ -333,8 +333,11 @@ double rule9(FileData &fd, String &newPix) {
 				if(relRatio_0deg_flag==true && relRatio_45deg_flag==true && relRatio_90deg_flag==true)
 					break;
 
-			/*	if(pt.x==305 && pt.y==293) {
+				/*if(pt.x==305 && pt.y==293) {
 					printf("%0.2f ; %0.2f ; %0.2f\n",relRatio_0deg,relRatio_45deg,relRatio_90deg);
+					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_0deg,glRatio_0deg,cl_0deg,clRatio_0deg);
+					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_45deg,glRatio_45deg,cl_45deg,clRatio_45deg);
+					//printf("(%.0f;%.3f;%.0f;%.3f)\n", gl_90deg,glRatio_90deg,cl_90deg,clRatio_90deg);
 				}*/
 			}
 		}
