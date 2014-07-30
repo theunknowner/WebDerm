@@ -523,7 +523,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				relativeRatio = -1;
 				currRatio = -1;
 			}
-			fd.relRatioVec.push_back(roundDecimal(relativeRatio,2));
 			fd.absRatioVec.push_back(roundDecimal(currRatio,2));
 			if(pix2!="Zero") {
 				fd.pt.x = j; fd.pt.y=i;
@@ -602,9 +601,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			fd.colorVec.at(i).at(j) = pix2;
 			ruleNo.clear();
 		} // end col
-		fd.relRatioMat.push_back(fd.relRatioVec);
 		fd.absRatioMat.push_back(fd.absRatioVec);
-		fd.relRatioVec.clear();
 		fd.absRatioVec.clear();
 		flag=0;
 		indexChange=0;
@@ -619,7 +616,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fclose(fp);
 	fd.writeFileMetaData();
 	c.output2ImageColor(fd.colorVec,name);
-	writeSeq2File(fd.relRatioMat,name+"_RelativeRatios");
 	writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
 	writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 	writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");

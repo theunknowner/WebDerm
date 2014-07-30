@@ -26,12 +26,10 @@ FileData::~FileData() {
 	deque< deque<String> >().swap(windowVec);
 	deque< deque<String> >().swap(hslMat);
 	deque< deque<double> >().swap(absRatioMat);
-	deque< deque<double> >().swap(relRatioMat);
 	deque< deque<String> >().swap(colorVec);
 	deque< deque<double> >().swap(intensityVec);
 	deque< deque<double> >().swap(smoothIntensityVec);
 	deque< deque<String> >().swap(shadeVec);
-	deque<double>().swap(relRatioVec);
 	deque<double>().swap(absRatioVec);
 	printf("Destructor executed for %s\n",filename.c_str());
 }

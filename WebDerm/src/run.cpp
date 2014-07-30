@@ -351,6 +351,7 @@ void runMouseColor() {
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
+	Mouse mouse;
 	String filename;
 	String name;
 	Size size(2,2);
@@ -371,7 +372,7 @@ void runMouseColor() {
 		}
 	}
 	if(flag[0]==true) {
-		testMouseColor(img2);
+		mouse.mouseColor(img2);
 	}
 
 	img.release(); img2.release(); mask.release();

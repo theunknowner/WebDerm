@@ -7,15 +7,6 @@
 
 #include "rgb.h"
 
-
-bool rgb::isThreshImported()	{
-	return THRESH_IMPORTED;
-}
-
-void rgb::setThreshImported(bool flag) {
-	THRESH_IMPORTED = true;
-}
-
 int rgb::getIndex(String color) {
 	for(unsigned int i=0; i<mainColors.size(); i++) {
 		if(color==mainColors.at(i))
@@ -86,7 +77,6 @@ bool rgb::importColorThresholds()
 		deque<double>().swap(thresh);
 		deque<double>().swap(thresh2);
 		String().swap(temp);
-		setThreshImported(true);
 		return true;
 	}
 	else
@@ -534,7 +524,7 @@ void rgb::release_memory()
 	deque< deque<double> >().swap(grayLUT);
 }
 
-double rgb::calcColorLevel2(double red, double green, double blue) {
+double rgb::calcColorLevel(double red, double green, double blue) {
 	double lum = calcPerceivedBrightness(red, green, blue);
 	lum /=255;
 	lum = roundDecimal(lum,2) * 100;
@@ -547,13 +537,12 @@ String rgb::calcColor2(int red, int green, int blue) {
 	String pix = "OTHER";
 	int hue;
 	double lum,sat;
-	double grayLevel=0, colorLevel=0;
 	hsl.rgb2hsl(red,green,blue);
 	hue = hsl.getHue();
 	lum = roundDecimal(hsl.getLum(),2);
 	sat = roundDecimal(hsl.getSat(),2);
-	grayLevel = calcGrayLevel(red,green,blue);
-	colorLevel = calcColorLevel2(red,green,blue);
+	double grayLevel = calcGrayLevel(red,green,blue);
+	double colorLevel = calcColorLevel(red,green,blue);
 	double grayLumLevel = calcGrayLumLevel(red,green,blue);
 	for(unsigned int i=0; i<hueThresh.size(); i++) {
 		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
@@ -579,47 +568,6 @@ String rgb::calcColor2(int red, int green, int blue) {
 	return pix;
 }
 
-String rgb::calcColor2(int red, int green, int blue, int &ind) {
-	hsl hsl;
-	String pix = "OTHER";
-	int hue;
-	double lum,sat;
-	double grayLevel=0, colorLevel=0;
-	hsl.rgb2hsl(red,green,blue);
-	hue = hsl.getHue();
-	lum = roundDecimal(hsl.getLum(),2);
-	sat = roundDecimal(hsl.getSat(),2);
-	grayLevel = calcGrayLevel(red,green,blue);
-	colorLevel = calcColorLevel2(red,green,blue);
-	double grayLumLevel = calcGrayLumLevel(red,green,blue);
-	for(unsigned int i=0; i<hueThresh.size(); i++) {
-		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-			if(sat>=satThresh.at(i).at(0) && sat<=satThresh.at(i).at(1)) {
-				if(lum>=lumThresh.at(i).at(0) && lum<=lumThresh.at(i).at(1)) {
-					if(hslColors.at(i)!="PinkEx") { //would be changed later with deeper implementations
-						pix = hslColors.at(i);
-						if(grayLevel==0) {
-							pix = hslColors.at(i) + toString(colorLevel);
-						}
-						else {
-							if(pix=="Black")
-								pix += toString(colorLevel);
-							else if(pix=="Grey")
-								pix += toString(colorLevel);
-							else
-								pix = toString(grayLevel) + "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
-						}
-						ind = i+2;
-						return pix;
-					}
-				}
-			}
-		}
-	}
-	ind=-1;
-	return pix;
-}
-
 String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	Color c;
 	String pix;
@@ -628,7 +576,6 @@ String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	if(pix=="OTHER")
 		pix = pushColor(red,green,blue,dist,ind);
 	pix = c.reassignLevels(pix,red,green,blue);
-	//pix = init_specialRules(pix,red,green,blue);
 	pix = toString(grayLevel) + pix;
 	return pix;
 }
@@ -643,7 +590,6 @@ String rgb::calcColor(int red, int green, int blue) {
 	if(pix=="OTHER")
 		pix = pushColor(red,green,blue,dist,ind);
 	pix = c.reassignLevels(pix,red,green,blue);
-	//pix = init_specialRules(pix,red,green,blue);
 	pix = toString(grayLevel) + pix;
 	return pix;
 }
@@ -685,19 +631,11 @@ double rgb::calcGrayLumLevel(double red, double green, double blue) {
 	double lum = roundDecimal(HSL[2],2) * 100;
 	//grayLevel = grayLUT.at(sat).at(lum);
 	//grayLevel = ((100-sat)*(100-lum))/100;
-	double a=3;
-	grayLumLevel = ((100-lum)*a*(1.0-(sat/100)));///((100-lum)*a*(1.0-(sat/100))+(100-lum));
-	//cout << grayLumLevel << endl;
-	//cout << ((100-lum)*a*(1.0-(sat/100))+(100-lum)) << endl;
-	return round(grayLumLevel);
-}
+	double a=4;
+	double temp = a*(1.0-(sat/100));
+	grayLumLevel = (100-lum) * temp/(temp+1);
 
-double rgb::colorLevel2Brightness(double colorLevel) {
-	double result=0;
-	result = 100 - colorLevel;
-	result /= 100;
-	result *= 255;
-	return round(result);
+	return round(grayLumLevel);
 }
 
 double rgb::calcColorLumLevel(double red, double green, double blue) {
@@ -706,9 +644,9 @@ double rgb::calcColorLumLevel(double red, double green, double blue) {
 	double* HSL = hsl.rgb2hsl(red,green,blue);
 	double sat = roundDecimal(HSL[1],2) * 100;
 	double lum = roundDecimal(HSL[2],2) * 100;
-	//colorLumLevel = ((100-HSL[2])*HSL[1])/100;
-	double a=3;
-	colorLumLevel = ((100-lum)*1);///((100-lum)*a*(1.0-(sat/100))+(100-lum)*1);
+	double a=4;
+	double temp = a * (1.0-(sat/100));
+	colorLumLevel = (100-lum) * 1/(temp+1);
 	return round(colorLumLevel);
 }
 

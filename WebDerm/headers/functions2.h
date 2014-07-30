@@ -17,6 +17,5 @@ String getFileName(String filename);
 void mouseEvent(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis(int evt, int x, int y, int flags, void* param);
 void onMouseHysteresis2(int evt, int x, int y, int flags, void* param);
-void onMouseCheckColor(int event, int x, int y, int flags, void* param);
 
 #endif /* FUNCTIONS2_H_ */

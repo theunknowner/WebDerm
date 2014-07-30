@@ -127,7 +127,7 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	double colorLevel=0;
 	extractColorFromString(pix, colorVec);
 	//grayLevel = rgb.calcGrayLevel(r,g,b);
-	colorLevel = rgb.calcColorLevel2(r,g,b);
+	colorLevel = rgb.calcColorLevel(r,g,b);
 	double grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
 		if(colorVec.at(i)=="Gray")
@@ -250,7 +250,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 String Color::fixColors(String pix, double r, double g, double b) {
 	rgb rgb;
 	String color=pix;
-	double colorLevel = rgb.calcColorLevel2(r,g,b);
+	double colorLevel = rgb.calcColorLevel(r,g,b);
 	if(getMainColor(pix)=="Grey")
 		color = "Grey" + toString(colorLevel);
 	if(containsColor(pix,"Gray") && containsColor(pix,"Grey"))

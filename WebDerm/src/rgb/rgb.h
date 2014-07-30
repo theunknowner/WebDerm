@@ -15,11 +15,7 @@
 
 class rgb
 {
-private:
-	bool THRESH_IMPORTED;
 public:
-	bool isThreshImported();
-	void setThreshImported(bool flag);
 	int getIndex(String color);
 	bool importColorThresholds();
 	bool importThresholds();
@@ -33,7 +29,7 @@ public:
 	String pushColor(int red, int green, int blue,double &dist, int &ind);
 	String pushColor(int red, int green, int blue, int &ind, double &dist);
 	double calcGrayLevel(int red, int green, int blue);
-	double calcColorLevel2(double red, double green, double blue);
+	double calcColorLevel(double red, double green, double blue);
 	double getGrayLevel1(String color);
 	double getGrayLevel2(String color);
 	double getColorLevel(String color, String mainColor);
@@ -42,12 +38,10 @@ public:
 	void showPixelColorAtLoc(Mat img, int row, int col, Size size);
 	void release_memory();
 	String calcColor2(int red, int green, int blue);
-	String calcColor2(int red, int gree, int blue, int &ind);
 	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	String calcColor(int red, int green, int blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
 	double calcGrayLumLevel(double red, double green, double blue);
-	double colorLevel2Brightness(double colorLevel);
 	bool importGrayLUT();
 	bool importGrayRGB();
 	double calcColorLumLevel(double red, double green, double blue);

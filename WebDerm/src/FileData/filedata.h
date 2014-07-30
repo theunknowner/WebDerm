@@ -34,9 +34,7 @@ public:
 	double localScanSize;
 	deque< deque<String> > windowVec;
 	deque< deque<String> > hslMat;
-	deque<double> relRatioVec;
 	deque<double> absRatioVec;
-	deque< deque<double> > relRatioMat;
 	deque< deque<double> > absRatioMat;
 	deque< deque<String> > colorVec;
 	deque< deque<double> > intensityVec;

@@ -30,7 +30,7 @@ void colorThreshNamingScript()
 		b = absMeanThresh.at(i).at(2);
 		hsl.rgb2hsl(r,g,b);
 		lum = roundDecimal(hsl.getLum(),2);
-		colorLevel = rgb.calcColorLevel2(r,g,b);
+		colorLevel = rgb.calcColorLevel(r,g,b);
 		//grayLevel = rgb.calcGrayLevel(r,g,b);
 		grayLevel = rgb.calcGrayLumLevel(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
@@ -84,7 +84,7 @@ void colorThreshRenamingScript()
 		b = absMeanThresh.at(i).at(2);
 		hsl.rgb2hsl(r,g,b);
 		hue = hsl.getHue();
-		colorLevel = rgb.calcColorLevel2(r,g,b);
+		colorLevel = rgb.calcColorLevel(r,g,b);
 		grayLevel = rgb.calcGrayLumLevel(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
@@ -212,7 +212,7 @@ void outputFarRGBScript(Mat &img, String name)
 		else
 			color.extractColorFromString(pix2,vecColor);
 
-		lumLevel = rgb.calcColorLevel2(r,g,b);
+		lumLevel = rgb.calcColorLevel(r,g,b);
 		pix.clear();
 		for(unsigned int j=0; j<vecColor.size(); j++) {
 			if(vecColor.size()==1 && vecColor.at(j)!="Gray") {
@@ -454,7 +454,7 @@ void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
 			lum = roundDecimal(hsl.getLum(),2);
 			sat = roundDecimal(hsl.getSat(),2);
 			grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
-			colorLevel = rgb.calcColorLevel2(r,g,b);
+			colorLevel = rgb.calcColorLevel(r,g,b);
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			for(unsigned int i=0; i<hueThresh.size(); i++) {
 				if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
@@ -526,7 +526,7 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 			grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			//if(pix2=="Grey") grayLevel = 100;
-			colorLevel = rgb.calcColorLevel2(r,g,b);
+			colorLevel = rgb.calcColorLevel(r,g,b);
 			ratio2 = grayLumLevel/colorLevel;
 			ratio = grayLevel/colorLevel;
 			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),%f,%f,%f,%f,%f,%f,%f,%f\n",x+1,y+1,pix.c_str(),r,g,b,h,
@@ -553,7 +553,7 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 	Color c;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
-	fprintf(fp,"Coord,Color,RGB,Hue,GrayLevel,ColorLevel,GrayLumLevel,ColorLumLevel,Darkness,GL/CL,GLL/CLL,GLL/CL\n");
+	fprintf(fp,"Coord,Color,RGB,HSL,GrayLevel,ColorLevel,GrayLumLevel,ColorLumLevel,Darkness,GL/CL,GLL/CLL,GLL/CL\n");
 	for(int y=ptY; y<pt2.y; y++) {
 		for(int x=ptX; x<pt2.x; x++) {
 			r = img.at<Vec3b>(y,x)[2];
@@ -570,12 +570,12 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 			grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 			grayLevel = rgb.calcGrayLevel(r,g,b);
 			//if(pix2=="Grey") grayLevel = 100;
-			colorLevel = rgb.calcColorLevel2(r,g,b);
+			colorLevel = rgb.calcColorLevel(r,g,b);
 			colorLumLevel = rgb.calcColorLumLevel(r,g,b);
 			ratio2 = grayLumLevel/colorLumLevel;
 			ratio = grayLevel/colorLevel;
 			double ratio3 = grayLumLevel/colorLevel;
-			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),%f,%f,%f,%f,%f,%f,%0.3f,%0.3f,",x+1,y+1,pix.c_str(),r,g,b,h,
+			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),(%.0f;%.0f;%.0f),%f,%f,%f,%f,%f,%0.3f,%0.3f,",x+1,y+1,pix.c_str(),r,g,b,h,s,l,
 					grayLevel,colorLevel,grayLumLevel,colorLumLevel,lum,ratio,ratio2);
 			fprintf(fp,"%0.3f\n",ratio3);
 		}
@@ -636,13 +636,13 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 	int ind=-1,ind2=-1;
 	FILE *fp;
 	fp = fopen("/home/jason/Desktop/workspace/checkColors.csv","w");
-	fprintf(fp,"R,G,B,H,S,L,CalcColorIndex,Color,Dist,Index,H Rounded,L Rounded\n");
+	fprintf(fp,"R,G,B,H,S,L,CalcColorIndex,Color,H Rounded,L Rounded\n");
 	for(int i=(pt1.y-1); i<pt2.y; i++) {
 		for(int j=(pt1.x-1); j<pt2.x; j++) {
 			r = img.at<Vec3b>(i,j)[2];
 			g = img.at<Vec3b>(i,j)[1];
 			b = img.at<Vec3b>(i,j)[0];
-			pix = rgb.calcColor2(r,g,b,ind2);
+			pix = rgb.calcColor2(r,g,b);
 			if(pix=="OTHER")
 				pix = rgb.pushColor(r,g,b,dist,ind);
 			pix = c.reassignLevels(pix,r,g,b);
@@ -653,7 +653,7 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
 			hRound = roundDecimal(HSL[0],-1);
 			lRound = roundDecimal(HSL[2],1);
 			fprintf(fp,"%d,%d,%d,%f,%f,%f,%d,%s,%f,%d,%f,%f\n",r,g,b,HSL[0],HSL[1],HSL[2],
-					ind2,pix.c_str(),dist,ind+2,hRound,lRound);
+					ind2,pix.c_str(),hRound,lRound);
 		}
 	}
 	fclose(fp);

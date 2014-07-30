@@ -187,15 +187,6 @@ String testMouseHysteresis(Mat &img, int row, int col, Size size,
 	return pix;
 }
 
-//get color of pixel at coordinate of mouse location on image
-void testMouseColor(Mat img)
-{
-	namedWindow("image");
-	cvSetMouseCallback("image", onMouseCheckColor, &img);
-	imshow("image", img);
-	waitKey(0);
-}
-
 void testColorIndex(Mat &img, int index)
 {
 	rgb rgb;
