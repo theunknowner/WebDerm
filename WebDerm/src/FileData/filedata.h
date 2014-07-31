@@ -50,6 +50,9 @@ public:
 	void writeFileMetaData();
 	void writeFileMetaData(int n_args, String* strArr, double *valArr);
 	bool loadFileMatrix(String file_path);
+
+	int listFiles(String directory);
+	bool getFilesFromDirectory(String directory, deque<String> &files);
 };
 
 

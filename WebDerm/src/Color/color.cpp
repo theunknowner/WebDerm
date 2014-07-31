@@ -181,13 +181,13 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 	if(fs.is_open()) {
 		String temp;
 		deque<String> vec;
-		deque<String> color;
+		deque<String> colorVec;
 		deque<int>	thresh1;
 		deque< deque<int> > values;
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0) color.push_back(vec.at(i));
+				if(i==0) colorVec.push_back(vec.at(i));
 				if(i>0) thresh1.push_back(atoi(vec.at(i).c_str()));
 			}
 			values.push_back(thresh1);
@@ -196,7 +196,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		}
 		hsl hsl;
 		Color c;
-		String shade;
+		String shade, color;
 		String pix;
 		Size size(window.at(0).size(),window.size());
 		Mat img = img.zeros(size,16);
@@ -204,28 +204,28 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
-				pix = getMainColor(window.at(i).at(j));
+				color = getMainColor(window.at(i).at(j));
 				HSL = c.extractHSL(window.at(i).at(j));
-				pix = optimizeColor(pix);
-				pix = shade+pix;
+				color = optimizeColor(color);
+				pix = shade+color;
 				if(shade=="Zero") {
 					img.at<Vec3b>(i,j)[2] = 0;
 					img.at<Vec3b>(i,j)[1] = 0;
 					img.at<Vec3b>(i,j)[0] = 0;
 				}
-				else if(shade=="Black") {
+				else if(shade=="Black" || color.find("Black")!=string::npos) {
 					img.at<Vec3b>(i,j)[2] = 35;
 					img.at<Vec3b>(i,j)[1] = 35;
 					img.at<Vec3b>(i,j)[0] = 35;
 				}
-				else if(shade=="White") {
+				else if(shade=="White" || color.find("White")!=string::npos) {
 					img.at<Vec3b>(i,j)[2] = 255;
 					img.at<Vec3b>(i,j)[1] = 255;
 					img.at<Vec3b>(i,j)[0] = 255;
 				}
 				else {
-					for(unsigned int k=0; k<color.size(); k++) {
-						if(pix==color.at(k)) {
+					for(unsigned int k=0; k<colorVec.size(); k++) {
+						if(pix==colorVec.at(k)) {
 							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
 							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
 							img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
@@ -241,7 +241,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		img.release();
 		fs.close();
 		deque<String>().swap(vec);
-		deque<String>().swap(color);
+		deque<String>().swap(colorVec);
 		deque<int>().swap(thresh1);
 		deque< deque<int> >().swap(values);
 	}
@@ -374,4 +374,26 @@ String Color::replaceColor(String color, String colorTarget, String colorReplace
 		str = color.replace(pos,colorTarget.length(),colorReplace);
 
 	return str;
+}
+
+Mat Color::changeImageContrast(Mat img, double alpha, double beta) {
+	Mat img2 = img.clone();
+	double r,g,b;
+	double contrast[3];
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			r = img.at<Vec3b>(i,j)[2];
+			g = img.at<Vec3b>(i,j)[1];
+			b = img.at<Vec3b>(i,j)[0];
+			contrast[2] = round((alpha * r) + beta);
+			contrast[1] = round((alpha * g) + beta);
+			contrast[0] = round((alpha * b) + beta);
+			for(int k=0; k<img.channels(); k++) {
+				if(contrast[k]>255) contrast[k] = 255;
+				if(contrast[k]<0) contrast[k] = 0;
+				img2.at<Vec3b>(i,j)[k] = contrast[k];
+			}
+		}
+	}
+	return img2;
 }

@@ -170,7 +170,6 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	hsl hsl;
 	Intensity in;
 	String name;
-	String input;
 	Size size(2,2);
 	Mat img, img2,img3, mask;
 	int s = 3;
@@ -191,6 +190,50 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			img.copyTo(img2, mask);
 			name = getFileName(filenames[i]);
 			FileData fd(filenames[i]);
+			fd.matImage = img2;
+			fd.matSize = size;
+			hysteresis(fd);
+			writeSeq2File(fd.windowVec,name);
+			writeSeq2File(fd.hslMat,name+"_HSL");
+			img.release(); img2.release(); mask.release();
+		}
+	}
+	rgb.release_memory();
+	hsl.release_memory();
+	in.release_memory();
+}
+
+void runAllHysteresis() {
+	rgb rgb;
+	hsl hsl;
+	Intensity in;
+	String folder;
+	cout << "Enter folder_name: ";
+	cin >> folder;
+	FileData fdFiles;
+	deque<String> files;
+	String name;
+	Size size(2,2);
+	Mat img, img2,img3, mask;
+	int s = 4;
+	bool flag[s];
+	flag[0]=rgb.importThresholds();
+	flag[1]=hsl.importHslThresholds();
+	flag[2]=in.importThresholds();
+	flag[3]=fdFiles.getFilesFromDirectory(folder, files);
+	for(int i=0; i<s; i++) {
+		if(flag[i]==false) {
+			flag[0] = false;
+			break;
+		}
+	}
+	if(flag[0]==true) {
+		for(unsigned int i=0; i<files.size(); i++) {
+			img = runResizeImage(files.at(i),Size(700,700),0);
+			getSkin(img, mask);
+			img.copyTo(img2, mask);
+			name = getFileName(files.at(i));
+			FileData fd(files.at(i));
 			fd.matImage = img2;
 			fd.matSize = size;
 			hysteresis(fd);

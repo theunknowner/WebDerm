@@ -25,6 +25,7 @@ Mat runResizeImage(String foldername, String filename, Size size,int write);
 Mat runResizeImage(String filename, Size size,int write);
 void runHysteresis();
 void runAllHysteresis(String *filenames, int fileSize);
+void runAllHysteresis();
 void runCheckSequence(Mat &img, int row, int col, Size size);
 void runGetSkin();
 void getMouseInfo(Mat &img);

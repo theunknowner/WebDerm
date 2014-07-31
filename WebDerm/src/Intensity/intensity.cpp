@@ -389,7 +389,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	FILE *fp;
 	String filename = name + "_Rule_Table.csv";
 	fp=fopen(filename.c_str(),"w");
-	fprintf(fp,"Color,NewColor,GL,GLL,CL,Shade,NewShade,IndexChange,Rules,Coord,Image\n");
+	fprintf(fp,"Color,NewColor,HSL,Shade,NewShade,IndexChange,Rules,Coord,Image\n");
 	int flag=0;
 	unsigned int localScanSize=10;
 	String pix, pix2, shade,localMinShade,localMaxShade,localShade;
@@ -524,15 +524,16 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				currRatio = -1;
 			}
 			fd.absRatioVec.push_back(roundDecimal(currRatio,2));
+			double h=0,s=0,l=0;
 			if(pix2!="Zero") {
 				fd.pt.x = j; fd.pt.y=i;
 				loc = j-(localIndexes.size()-index);
 				ratioLoc  = j-(localRatios.size()-localRatioIndex);
 				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
-				double h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
-				double s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
-				double l = getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
+				h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
+				s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
+				l = getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
 				int ind=-1;
 				hsl.getHslColor(h,s,l,ind,fd.pt);
 				try { h = hueTableNum.at(ind); }
@@ -578,14 +579,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				String ruleNum;
 				String oldPix = windowVec.at(i).at(j);
 				String oldShade = fd.colorVec.at(i).at(j);
-				double grayLevel = rgb.getGrayLevel1(oldPix);
-				double grayLumLevel = rgb.getGrayLevel2(oldPix);
-				double colorLevel = rgb.getColorLevel(oldPix);
+				char buffer2[50];
+				sprintf(buffer2,"(%.0f;%.2f;%.2f)",h,s,l);
+				String hslStr(buffer2);
 				strVec1.push_back(oldPix);
 				strVec1.push_back(pix);
-				strVec1.push_back(toString(grayLevel));
-				strVec1.push_back(toString(grayLumLevel));
-				strVec1.push_back(toString(colorLevel));
+				strVec1.push_back(hslStr);
 				strVec1.push_back(oldShade);
 				strVec1.push_back(shade);
 				strVec1.push_back(toString(indexChange));

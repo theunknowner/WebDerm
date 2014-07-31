@@ -15,20 +15,19 @@
 #include "Math/maths.h"
 #include "Contrast/contrast.h"
 #include "FileData/filedata.h"
+#include "Histogram/histogram.h"
 
 int main(int argc,char** argv)
 {
-	//runHysteresis();
-
-	String filename[]= {//path+"Images/CLP/clp3.jpg",
-						//path+"Images/CLP/clp10.jpg",
-						//path+"Images/Herpes/herpes1.jpg",
-						//path+"Images/Herpes/herpes2.jpg",
-						path+"Images/Vesicles/vesicles9.jpg",
-						path+"Images/Vesicles/vesicles17.jpg",
-						path+"Images/Vesicles/vesicles18.jpg",
-						path+"Images/Vitiligo/vitiligo3.jpg",
-						path+"Images/Herpes/herpes3.jpg"};
+	//runAllHysteresis();
+	runHysteresis();
+/*
+	String filename[]= {//path+"Images/Melanoma/melanoma1.jpg",
+						path+"Images/Melanoma/melanoma2.jpg",
+						path+"Images/Melanoma/melanoma3.jpg",
+						path+"Images/Melanoma/melanoma4.jpg",
+						path+"Images/Melanoma/melanoma5.jpg",
+						path+"Images/Melanoma/melanoma7.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
 	/*
@@ -40,14 +39,11 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	in.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Vesicles","vesicles9.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	Point pt1(475,35);
 	Point pt2(476,36);
-	//int r=220,g=86,b=86;
-	//cout << rgb.calcGrayLumLevel(r,g,b) << endl;
-	//cout << rgb.calcColorLumLevel(r,g,b);
 	//FileData fd;
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;
@@ -56,7 +52,7 @@ int main(int argc,char** argv)
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	//checkColorsFromList(img2,pt1,pt2);
-	generateColorRegionTable(img2, pt1,pt2);
+	//generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
 	int col = 475;
