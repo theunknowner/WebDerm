@@ -24,15 +24,20 @@ std::size_t length(const T (&)[N] )
 };
 #define stringify(name) #name
 
-double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence);
-void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec);
 String toString(int val);
 String toString(double val);
 double roundDecimal(double num, int places);
-double calcSlope(Point pt, Point origin);
-Mat cropImage(Mat input);
-Mat rotateImage(const Mat& source, double angle);
-Mat fillEdges2(Mat img);
-Mat fillEdges3(Mat img);
-Mat kMeansClustering(Mat &src);
+
+class Functions {
+public:
+	double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence);
+	void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec);
+	double calcSlope(Point pt, Point origin);
+	Mat cropImage(Mat input);
+	Mat rotateImage(const Mat& source, double angle);
+	Mat fillEdges2(Mat img);
+	Mat fillEdges3(Mat img);
+	Mat kMeansClustering(Mat &src);
+};
+
 #endif

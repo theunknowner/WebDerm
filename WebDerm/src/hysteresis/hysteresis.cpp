@@ -204,7 +204,8 @@ void hysteresis(FileData &fd) {
 			col=0; row++;
 		}//end while row
 		Intensity in;
-		in.writeMainColorMatrix(fd);
+		fd.colorVec = in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
+		//in.writeMainColorMatrix(fd);
 		deque<String>().swap(pixelColorWindow);
 		deque<String>().swap(colorWindow);
 		deque<int>().swap(index);

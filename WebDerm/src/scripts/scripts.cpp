@@ -726,39 +726,6 @@ void dataDeduplicationGrayRGB(double threshold) {
 	}
 }
 
-void testCases() {
-	fstream fs("/home/jason/Desktop/workspace/Thresholds/Test-Cases.csv");
-	if(fs.is_open()) {
-		rgb rgb;
-		String temp,color;
-		deque<String> vec;
-		deque<int> thresh;
-		double dist=0;
-		int ind=0;
-		getline(fs,temp);
-		while(getline(fs,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				thresh.push_back(atoi(vec.at(i).c_str()));
-			}
-			for(unsigned int k=0; k<grayRGB.size(); k++) {
-				dist = rgb.absEucDist(thresh.at(0),thresh.at(1),thresh.at(2),grayRGB.at(k));
-				if(dist<1.5) {
-					ind = k;
-					break;
-				}
-			}
-			printf("(%d,%d,%d)->",thresh.at(0),thresh.at(1),thresh.at(2));
-			printf("%s->%f->%d\n",color.c_str(),dist,ind+2);
-			vec.clear();
-			thresh.clear();
-		}
-		fs.close();
-	}
-	else
-		cout << "Test-Cases failed to load!" << endl;
-}
-
 void push500Colors(double r, double g, double b) {
 	fstream fsColors("/home/jason/Desktop/workspace/Thresholds/500Colors.csv");
 	if(fsColors.is_open()) {
@@ -795,4 +762,34 @@ void push500Colors(double r, double g, double b) {
 	}
 	else
 		cout << "Importing 500COlors.csv failed!" << endl;
+}
+
+void generateColorData(Mat &img, Point pt1, Point pt2) {
+	FILE *fp;
+	fp = fopen("/home/jason/Desktop/workspace/colordata.csv","w");
+	fprintf(fp,"Coord,RGB,HSL,Color,Brown,Pink\n");
+	hsl hsl;
+	double *HSL;
+	int r,g,b;
+	String color;
+	double satBrown=0, satPink=0;
+	int index=0;
+	for(int i=pt1.y-1; i<pt2.y; i++) {
+		for(int j=pt1.x-1; j<pt2.x; j++) {
+			r = img.at<Vec3b>(i,j)[2];
+			g = img.at<Vec3b>(i,j)[1];
+			b = img.at<Vec3b>(i,j)[0];
+			HSL = hsl.rgb2hsl(r,g,b);
+			HSL[1] = roundDecimal(HSL[1],2);
+			HSL[2] = roundDecimal(HSL[2],2);
+			color = hsl.getHslColor(HSL[0],HSL[1],HSL[2],index);
+			satBrown = satThresh.at(index).at(1)-HSL[1];
+			satBrown /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
+			satPink = HSL[1]-satThresh.at(index).at(0);
+			satPink /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
+			fprintf(fp,"(%d;%d),(%d;%d;%d),(%.0f;%.2f;%.2f),%s,%.3f,%.3f\n",
+					j+1,i+1,r,g,b,HSL[0],HSL[1],HSL[2],color.c_str(),satBrown,satPink);
+		}
+	}
+	fclose(fp);
 }

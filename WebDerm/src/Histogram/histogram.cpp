@@ -29,7 +29,7 @@ void Histogram::calcHistogram(Mat src) {
 	calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
 
 	// Draw the histograms for B, G and R
-	int hist_w = 512; int hist_h = 400;
+	int hist_w = 700; int hist_h = 512;
 	int bin_w = cvRound( (double) hist_w/histSize );
 
 	Mat histImage( hist_h, hist_w, CV_8UC3, Scalar( 0,0,0) );
@@ -64,14 +64,15 @@ void Histogram::equalizeHistogram(Mat src, Mat &dst) {
 	String source_window = "Source image";
 	String equalized_window = "Equalized Image";
 	vector<Mat> bgr_planes;
+	cvtColor(src,src,CV_BGR2HLS);
 	split( src, bgr_planes );
 
 	/// Apply Histogram Equalization
-	equalizeHist( bgr_planes.at(0), bgr_planes.at(0) );
 	equalizeHist( bgr_planes.at(1), bgr_planes.at(1) );
-	equalizeHist( bgr_planes.at(2), bgr_planes.at(2) );
 
-	merge(bgr_planes,dst);
+	merge(bgr_planes,src);
+
+	cvtColor(src,dst,CV_HLS2BGR);
 
 	/// Display results
 	namedWindow( source_window, CV_WINDOW_AUTOSIZE );

@@ -334,6 +334,7 @@ String Color::optimizeColor(String pix) {
 }
 
 double* Color::extractHSL(String inputString) {
+	Functions fn;
 	int beginPos=0, endPos=0;
 	String substr;
 	for(unsigned int i=0; i<inputString.length(); i++) {
@@ -346,7 +347,7 @@ double* Color::extractHSL(String inputString) {
 	}
 	substr = inputString.substr(beginPos+1,endPos-1);
 	deque<double> vec;
-	getDelimitedValuesFromString(substr,';',vec);
+	fn.getDelimitedValuesFromString(substr,';',vec);
 	static double result[3];
 	for(unsigned int i=0; i<vec.size(); i++) {
 		result[i] = vec.at(i);

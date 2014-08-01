@@ -129,6 +129,7 @@ void runHysteresis()
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
+	Color c;
 	String filename;
 	String name;
 	Size size(2,2);
@@ -157,6 +158,12 @@ void runHysteresis()
 		hysteresis(fd);
 		writeSeq2File(fd.windowVec,name);
 		writeSeq2File(fd.hslMat,name+"_HSL");
+		fd.writeFileMetaData();
+		c.output2ImageColor(fd.colorVec,name);
+		writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
+		writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
+		writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
+		writeSeq2File(fd.colorVec,name+"_ShadeColors");
 	}
 
 	img.release(); img2.release(); mask.release();
@@ -169,9 +176,10 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
+	Color c;
 	String name;
 	Size size(2,2);
-	Mat img, img2,img3, mask;
+	Mat img, img2, mask;
 	int s = 3;
 	bool flag[s];
 	flag[0]=rgb.importThresholds();
@@ -195,6 +203,12 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			hysteresis(fd);
 			writeSeq2File(fd.windowVec,name);
 			writeSeq2File(fd.hslMat,name+"_HSL");
+			fd.writeFileMetaData();
+			c.output2ImageColor(fd.colorVec,name);
+			writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
+			writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
+			writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
+			writeSeq2File(fd.colorVec,name+"_ShadeColors");
 			img.release(); img2.release(); mask.release();
 		}
 	}
@@ -207,6 +221,7 @@ void runAllHysteresis() {
 	rgb rgb;
 	hsl hsl;
 	Intensity in;
+	Color c;
 	String folder;
 	cout << "Enter folder_name: ";
 	cin >> folder;
@@ -239,6 +254,12 @@ void runAllHysteresis() {
 			hysteresis(fd);
 			writeSeq2File(fd.windowVec,name);
 			writeSeq2File(fd.hslMat,name+"_HSL");
+			fd.writeFileMetaData();
+			c.output2ImageColor(fd.colorVec,name);
+			writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
+			writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
+			writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
+			writeSeq2File(fd.colorVec,name+"_ShadeColors");
 			img.release(); img2.release(); mask.release();
 		}
 	}

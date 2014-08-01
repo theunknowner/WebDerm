@@ -386,6 +386,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	rgb rgb;
 	hsl hsl;
 	Color c;
+	Functions fn;
 	FILE *fp;
 	String filename = name + "_Rule_Table.csv";
 	fp=fopen(filename.c_str(),"w");
@@ -531,9 +532,9 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				ratioLoc  = j-(localRatios.size()-localRatioIndex);
 				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
-				h = getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
-				s = getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
-				l = getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
+				h = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
+				s = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
+				l = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
 				int ind=-1;
 				hsl.getHslColor(h,s,l,ind,fd.pt);
 				try { h = hueTableNum.at(ind); }
@@ -613,11 +614,11 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		localRatio=0;
 	} // end row
 	fclose(fp);
-	fd.writeFileMetaData();
-	c.output2ImageColor(fd.colorVec,name);
-	writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
-	writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
-	writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
+	//fd.writeFileMetaData();
+	//c.output2ImageColor(fd.colorVec,name);
+	//writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
+	//writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
+	//writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
 	//writeSeq2File(shadeVec2,"shadeVec");
 	return fd.colorVec;
 }

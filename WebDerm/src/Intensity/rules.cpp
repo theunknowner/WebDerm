@@ -30,11 +30,12 @@ double rule2(FileData &fd, String &newPix) {
 	bool flag=false;
 	hsl hsl;
 	Color c;
+	Functions fn;
 	double pThreshMove=1.15;
 	int index=-1;
-	double hue = getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',1);
-	double sat = getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',2);
-	double lum = getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',3);
+	double hue = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',1);
+	double sat = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',2);
+	double lum = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',3);
 	double fSat=0, fSat2 = 0;
 	String color = hsl.getHslColor(hue,sat,lum,index);
 	String grey;
@@ -65,6 +66,95 @@ double rule2(FileData &fd, String &newPix) {
 				newPix = "Grey" + color;
 				flag=true;
 			}
+		}
+	}
+
+	if(flag==true) return ruleNum;
+
+	return 0;
+}
+
+double rule3(FileData &fd, String &newPix) {
+	double ruleNum =3;
+	bool flag=false;
+	hsl hsl;
+	Color c;
+	Functions fn;
+	int localScanSize = 30;
+	double thresh = 1.04;
+	Point pt = fd.pt;
+	String color = c.getMainColor(newPix);
+	double HSL_0[3] = {0};
+	double HSL_45[3] = {0};
+	double HSL_90[3] = {0};
+	bool deg0_flag=false, deg45_flag=false, deg90_flag=false;
+	double result_0=0, result_45=0, result_90=0;
+	String color_0, color_45, color_90;
+	double s = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
+	double l = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
+	if(pt.x==623 && pt.y==308) {
+		cout << color << endl;
+	}
+	if(color=="BrownPink" && pt.y>0) {
+		int j=pt.x-1;
+		int x = j;
+		int endY = (pt.y-localScanSize);
+		for(int i=(pt.y-1); i>=endY; i--) {
+			if(x<0 && j<0 && i<0) break;
+			//deg0_flag==false &&
+			if(x>=0) {
+				HSL_0[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',1);
+				HSL_0[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',2);
+				HSL_0[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',3);
+				int index=-1;
+				color_0 = hsl.getHslColor(HSL_0[0],HSL_0[1],HSL_0[2],index);
+				result_0 = ((1-s)*l)/((1-HSL_0[1])*HSL_0[2]);
+				result_0 = roundDecimal(result_0,2);
+				if(color_0=="BrownPink" && result_0>thresh)
+					deg0_flag = true;
+			}
+			--x;
+			//deg45_flag==false &&
+			if(j>=0 && i>=0) {
+				HSL_45[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+				HSL_45[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+				HSL_45[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+				int index=-1;
+				color_45 = hsl.getHslColor(HSL_45[0],HSL_45[1],HSL_45[2],index);
+				result_45 = ((1-s)*l)/((1-HSL_45[1])*HSL_45[2]);
+				result_45 = roundDecimal(result_45,2);
+				if(color_45=="BrownPink" && result_45>thresh)
+					deg45_flag = true;
+			}
+			--j;
+			//deg90_flag==false &&
+			if(i>=0) {
+				HSL_90[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',1);
+				HSL_90[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',2);
+				HSL_90[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',3);
+				int index=-1;
+				color_90 = hsl.getHslColor(HSL_90[0],HSL_90[1],HSL_90[2],index);
+				result_90 = ((1-s)*l)/((1-HSL_90[1])*HSL_90[2]);
+				result_90 = roundDecimal(result_90,2);
+				if(color_90=="BrownPink" && result_90>thresh)
+					deg90_flag = true;
+			}
+			if(pt.x==623 && pt.y==308) {
+				printf("%s:%.2f ; %s:%.2f ; %s:%.2f\n",color_0.c_str(),result_0,
+						color_45.c_str(),result_45,
+						color_90.c_str(),result_90);
+			}
+			/*if(deg45_flag==true && deg90_flag==true)
+				break;
+			if(deg0_flag==true && deg90_flag==true)
+				break;
+			if(deg0_flag==true && deg45_flag==true)
+				break; */
+		}
+
+		if((deg0_flag+deg45_flag)>=2||(deg0_flag+deg90_flag)>=2||(deg45_flag+deg90_flag)>=2) {
+			newPix = "Brown";
+			flag=true;
 		}
 	}
 
@@ -139,13 +229,14 @@ double rule8(FileData &fd, String &newPix, int loc) {
 	rgb rgb;
 	Color c;
 	Intensity in;
+	Functions fn;
 	Point pt = fd.pt;
 	String color = c.getMainColor(fd.windowVec.at(pt.y).at(pt.x));
 	int index=-1;
 	double localScanSize = 20;
-	double hue = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
-	double sat = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
-	double lum = getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
+	double hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
+	double sat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
+	double lum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
 	double promoteThresh = 1.0/1.75;
 	double demoteThresh = 1.75;
 	double currCL = rgb.getColorLevel(fd.windowVec.at(pt.y).at(pt.x));
@@ -314,7 +405,7 @@ double rule9(FileData &fd, String &newPix) {
 				if(relRatio_0deg_flag==true && relRatio_45deg_flag==true && relRatio_90deg_flag==true)
 					break;
 
-				/*if(pt.x==305 && pt.y==293) {
+				/*if(pt.x==451 && pt.y==361) {
 					printf("%0.2f ; %0.2f ; %0.2f\n",relRatio_0deg,relRatio_45deg,relRatio_90deg);
 					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_0deg,glRatio_0deg,cl_0deg,clRatio_0deg);
 					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_45deg,glRatio_45deg,cl_45deg,clRatio_45deg);
@@ -346,6 +437,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
+	ruleNumVec.push_back(rule3(fd,newPix));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));

@@ -20,9 +20,9 @@
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	//runHysteresis();
+	runHysteresis();
 /*
-	String filename[]= {//path+"Images/Melanoma/melanoma1.jpg",
+	String filename[]= {path+"Images/Melanoma/melanoma1.jpg",
 						path+"Images/Melanoma/melanoma2.jpg",
 						path+"Images/Melanoma/melanoma3.jpg",
 						path+"Images/Melanoma/melanoma4.jpg",
@@ -30,7 +30,7 @@ int main(int argc,char** argv)
 						path+"Images/Melanoma/melanoma7.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -39,13 +39,12 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	in.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/LPH","lph4.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Urticaria","urticaria5.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(475,35);
-	Point pt2(476,36);
-	FileData fd;
-	fd.listFiles("/home/jason/Desktop/workspace/Images/LPH/");
+	Point pt1(613,274);
+	Point pt2(616,277);
+	//generateColorData(img2,pt1,pt2);
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;
 	//fd.getFileMatrix(vec);

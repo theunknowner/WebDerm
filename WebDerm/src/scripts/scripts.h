@@ -32,7 +32,7 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2);
 double checkEucDist(int r,int g, int b);
 void checkColorsFromList(Mat &img, Point pt1, Point pt2);
 void dataDeduplicationGrayRGB(double threshold);
-void testCases();
 void push500Colors(double r, double g, double b);
+void generateColorData(Mat &img, Point pt1, Point p2);
 
 #endif /* SCRIPTS_H_ */

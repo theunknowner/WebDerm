@@ -7,8 +7,35 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
+String toString(int val)
+{
+	ostringstream stringStream;
+	stringStream << val;
+	return stringStream.str();
+}
+
+String toString(double val)
+{
+	ostringstream stringStream;
+	stringStream << val;
+	return stringStream.str();
+}
+
+
+/** can also fix floating point precision that is not being shown on the
+ * binary level */
+double roundDecimal(double num, int places)
+{
+	double val=0;
+	val = num * pow(10,places);
+	val = round(val);
+	val /= pow(10,places);
+	return val;
+}
+
+
 /* return value up to Nth occurrence = first,second,third... of delimiter */
-double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
+double Functions::getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
 	double result=0;
 	String substr;
 	unsigned int pos=0;
@@ -31,7 +58,7 @@ double getDelimitedValuesFromString(String inputString, char delimiter, int occu
 }
 
 /* return all values separated by delimiter */
-void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec) {
+void Functions::getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec) {
 	String substr;
 	unsigned int pos=0;
 	for(unsigned int i=0; i<inputString.length(); i++) {
@@ -47,32 +74,7 @@ void getDelimitedValuesFromString(String inputString, char delimiter, deque<doub
 	}
 }
 
-String toString(int val)
-{
-	ostringstream stringStream;
-	stringStream << val;
-	return stringStream.str();
-}
-
-String toString(double val)
-{
-	ostringstream stringStream;
-	stringStream << val;
-	return stringStream.str();
-}
-
-/** can also fix floating point precision that is not being shown on the
- * binary level */
-double roundDecimal(double num, int places)
-{
-	double val=0;
-	val = num * pow(10,places);
-	val = round(val);
-	val /= pow(10,places);
-	return val;
-}
-
-double calcSlope(Point pt, Point origin)
+double Functions::calcSlope(Point pt, Point origin)
 {
 	double slopeY, slopeX;
 	slopeY = (pt.y - origin.y);
@@ -83,7 +85,7 @@ double calcSlope(Point pt, Point origin)
 		return slopeY/slopeX;
 }
 
-Mat cropImage(Mat input)
+Mat Functions::cropImage(Mat input)
 {
 	Mat img1, img2;
 	int ptX=0, ptY=0;
@@ -129,7 +131,7 @@ Mat cropImage(Mat input)
 	return img2;
 }
 
-Mat rotateImage(const Mat& source, double angle)
+Mat Functions::rotateImage(const Mat& source, double angle)
 {
 	Point2f src_center(source.cols/2.0F, source.rows/2.0F);
 	Mat rot_mat = getRotationMatrix2D(src_center, angle, 1.0);
@@ -138,7 +140,7 @@ Mat rotateImage(const Mat& source, double angle)
 	return dst;
 }
 
-Mat fillEdges2(Mat img)
+Mat Functions::fillEdges2(Mat img)
 {
 	Mat img2 = img.clone();
 	Mat kernel[3] = Mat::zeros(1, img.cols, CV_8U);
@@ -249,7 +251,7 @@ Mat fillEdges2(Mat img)
 	return img2;
 }
 
-Mat fillEdges3(Mat img)
+Mat Functions::fillEdges3(Mat img)
 {
 	Mat img2 = img.clone();
 	Mat kernel[5] = Mat::zeros(1, img.cols, CV_8U);
@@ -333,7 +335,7 @@ Mat fillEdges3(Mat img)
 	return img2;
 }
 
-Mat kMeansClustering(Mat &src) {
+Mat Functions::kMeansClustering(Mat &src) {
 	Mat samples(src.rows * src.cols, 3, CV_32F);
 	for( int y = 0; y < src.rows; y++ )
 		for( int x = 0; x < src.cols; x++ )
