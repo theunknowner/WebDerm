@@ -220,12 +220,14 @@ double rule8(FileData &fd, String &newPix, int loc) {
 	if(deg90_flag>0) deg90_flag = 1;
 	if((deg0_flag+deg45_flag)>=2||(deg0_flag+deg90_flag)>=2||(deg45_flag+deg90_flag)>=2) {
 		lum += 0.10;
+		if(lum>1) lum = 1;
 		newPix = hsl.getHslColor(hue,sat,lum,index);
 		flag=true;
 		ruleNum = 8.1;
 	}
 	if((deg0_flag+deg45_flag)<=-2||(deg0_flag+deg90_flag)<=-2||(deg45_flag+deg90_flag)<=-2) {
 		lum -= 0.10;
+		if(lum<0) lum=0;
 		newPix = hsl.getHslColor(hue,sat,lum,index);
 		flag=true;
 		ruleNum = 8.2;

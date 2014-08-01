@@ -98,8 +98,6 @@ bool FileData::loadFileMatrix(String file_path) {
 }
 
 int FileData::listFiles(String directory) {
-	boost::progress_timer t( std::clog );
-
 	fs::path full_path( fs::initial_path<fs::path>() );
 	full_path = fs::system_complete( fs::path( directory ) );
 	unsigned long file_count = 0;
@@ -109,13 +107,13 @@ int FileData::listFiles(String directory) {
 
 	if ( !fs::exists( full_path ) )
 	{
-		std::cout << "\nNot found: " << full_path.string() << std::endl;
+		cout << "Not found: " << full_path.string() << endl;
 		return 1;
 	}
 
 	if ( fs::is_directory( full_path ) )
 	{
-		std::cout << "\nIn directory: " << full_path.string() << "\n\n";
+		std::cout << "In directory: " << full_path.string() << "\n\n";
 		fs::directory_iterator end_iter;
 		for ( fs::directory_iterator dir_itr( full_path );
 				dir_itr != end_iter;

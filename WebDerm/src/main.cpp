@@ -20,7 +20,7 @@
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	runHysteresis();
+	//runHysteresis();
 /*
 	String filename[]= {//path+"Images/Melanoma/melanoma1.jpg",
 						path+"Images/Melanoma/melanoma2.jpg",
@@ -30,7 +30,7 @@ int main(int argc,char** argv)
 						path+"Images/Melanoma/melanoma7.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -44,7 +44,8 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(475,35);
 	Point pt2(476,36);
-	//FileData fd;
+	FileData fd;
+	fd.listFiles("/home/jason/Desktop/workspace/Images/LPH/");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;
 	//fd.getFileMatrix(vec);
