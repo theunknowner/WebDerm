@@ -84,3 +84,32 @@ void Histogram::equalizeHistogram(Mat src, Mat &dst) {
 	/// Wait until user exits the program
 	waitKey(0);
 }
+
+void Histogram::hist2SpreadSheet(Mat &src) {
+	FILE *fp;
+	fp = fopen("/home/jason/Desktop/workspace/hist.csv","w");
+	hsl hsl;
+	int r,g,b;
+	int hue,sat,lum;
+	int hueArr[360] = {0};
+	int satArr[100] = {0};
+	int lumArr[100] = {0};
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			r = src.at<Vec3b>(i,j)[2];
+			g = src.at<Vec3b>(i,j)[1];
+			b = src.at<Vec3b>(i,j)[0];
+			hsl.rgb2hsl(r,g,b);
+			hue = hsl.getHue();
+			sat = hsl.getSat()*100;
+			lum = hsl.getLum()*100;
+			if(hue==360) hue=0;
+			hueArr[hue]++;
+			satArr[sat]++;
+			lumArr[lum]++;
+		}
+	}
+	for(int i=0; i<360; i++) {
+		fprintf(fp,"%d,%d\n",i,hueArr[i]);
+	}
+}

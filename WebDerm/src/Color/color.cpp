@@ -263,7 +263,7 @@ Mat Color::changeImageBrightness(Mat &img, double amt) {
 	Mat img2 = img.clone();
 	int r,g,b;
 	double *HSL;
-	double *RGB;
+	int *RGB;
 	for(int i=0; i<img2.rows; i++) {
 		for(int j=0; j<img2.cols; j++) {
 			r = img2.at<Vec3b>(i,j)[2];
@@ -284,23 +284,18 @@ Mat Color::changeImageBrightness(Mat &img, double amt) {
 	return img2;
 }
 
-void Color::changeContrast(double r, double g, double b, double alpha, double beta) {
-	Mat img = img.zeros(400,400,CV_8UC3);
+void Color::changeContrast(double &r, double &g, double &b, double alpha, double beta) {
 	double contrast[3];
 	contrast[2] = round((alpha * r) + beta);
 	contrast[1] = round((alpha * g) + beta);
 	contrast[0] = round((alpha * b) + beta);
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			for(int k=0; k<img.channels(); k++) {
-				if(contrast[k]>255) contrast[k] = 255;
-				if(contrast[k]<0) contrast[k] = 0;
-				img.at<Vec3b>(i,j)[k] = contrast[k];
-			}
-		}
+	for(int k=0; k<3; k++) {
+		if(contrast[k]>255) contrast[k] = 255;
+		if(contrast[k]<0) contrast[k] = 0;
 	}
-	imshow("Color",img);
-	waitKey(0);
+	r = contrast[2];
+	g = contrast[1];
+	b = contrast[0];
 }
 
 String Color::optimizeColor(String pix) {
@@ -397,4 +392,66 @@ Mat Color::changeImageContrast(Mat img, double alpha, double beta) {
 		}
 	}
 	return img2;
+}
+
+void Color::avgImageLuminance(Mat &src) {
+	hsl hsl;
+	Mat dst = src.clone();
+	int satArr[101] = {0};
+	int lumArr[101] = {0};
+	int r,g,b;
+	int sat, lum;
+	double h,s,l;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			r = src.at<Vec3b>(i,j)[2];
+			g = src.at<Vec3b>(i,j)[1];
+			b = src.at<Vec3b>(i,j)[0];
+			hsl.rgb2hsl(r,g,b);
+			s = roundDecimal(hsl.getSat(),2);
+			l = roundDecimal(hsl.getLum(),2);
+			sat = s*100;
+			lum = l*100;
+			satArr[sat]++;
+			if(lum>0)
+			lumArr[lum]++;
+		}
+	}
+	double avgSat=0;
+	double avgLum=0;
+	double totalLum=0;
+	double countLum=0;
+	double totalSat=0;
+	double countSat=0;
+	for(int i=0; i<101; i++) {
+		if(lumArr[i]>0) {
+			totalLum += (i/100.) * lumArr[i];
+			countLum += lumArr[i];
+		}
+		totalSat += (i/100.) * satArr[i];
+		countSat += satArr[i];
+	}
+	avgLum = roundDecimal(totalLum/countLum,2);
+	avgSat = roundDecimal(totalSat/countSat,2);
+	int *RGB;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			r = src.at<Vec3b>(i,j)[2];
+			g = src.at<Vec3b>(i,j)[1];
+			b = src.at<Vec3b>(i,j)[0];
+			hsl.rgb2hsl(r,g,b);
+			h = hsl.getHue();
+			s = roundDecimal(hsl.getSat(),2);
+			l = roundDecimal(hsl.getLum(),2);
+			if(l>0) {
+				RGB = hsl.hsl2rgb(h,avgSat,avgLum);
+				dst.at<Vec3b>(i,j)[2] = RGB[0];
+				dst.at<Vec3b>(i,j)[1] = RGB[1];
+				dst.at<Vec3b>(i,j)[0] = RGB[2];
+			}
+		}
+	}
+	imshow("img",src);
+	imshow("DST",dst);
+	waitKey(0);
 }

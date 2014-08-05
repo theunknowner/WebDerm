@@ -233,8 +233,9 @@ inline double hue2rgb(double var1, double var2, double vH) {
 	return var1;
 }
 
-double *hsl::hsl2rgb(double hue, double sat, double lum) {
+int *hsl::hsl2rgb(double hue, double sat, double lum) {
 	static double RGB[3];
+	static int results[3];
 	if(sat==0) {
 		RGB[0] = round(lum * 255);
 		RGB[1] = round(lum * 255);
@@ -252,5 +253,8 @@ double *hsl::hsl2rgb(double hue, double sat, double lum) {
 		RGB[1] = round(255*hue2rgb(temp2,temp1,hue));
 		RGB[2] = round(255*hue2rgb(temp2,temp1,(hue-0.333)));
 	}
-	return RGB;
+	results[0] = (int)RGB[0];
+	results[1] = (int)RGB[1];
+	results[2] = (int)RGB[2];
+	return results;
 }

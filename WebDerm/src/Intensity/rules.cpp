@@ -74,6 +74,7 @@ double rule2(FileData &fd, String &newPix) {
 	return 0;
 }
 
+// contrast rule
 double rule3(FileData &fd, String &newPix) {
 	double ruleNum =3;
 	bool flag=false;
@@ -437,7 +438,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
-	ruleNumVec.push_back(rule3(fd,newPix));
+	//ruleNumVec.push_back(rule3(fd,newPix));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));

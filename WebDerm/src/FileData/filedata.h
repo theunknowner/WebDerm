@@ -53,6 +53,7 @@ public:
 
 	int listFiles(String directory);
 	bool getFilesFromDirectory(String directory, deque<String> &files);
+	void deleteContainingFilename(String directory, String filename);
 };
 
 

@@ -22,7 +22,7 @@ public:
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);
 	double *rgb2hsl(double red, double green, double blue);
-	double *hsl2rgb(double hue, double sat, double lum);
+	int *hsl2rgb(double hue, double sat, double lum);
 	double getHue();
 	double getSat();
 	double getLum();

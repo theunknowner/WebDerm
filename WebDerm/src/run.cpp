@@ -222,7 +222,7 @@ void runAllHysteresis() {
 	hsl hsl;
 	Intensity in;
 	Color c;
-	String folder;
+	String folder, full_path;
 	cout << "Enter folder_name: ";
 	cin >> folder;
 	FileData fdFiles;
@@ -245,10 +245,11 @@ void runAllHysteresis() {
 	if(flag[0]==true) {
 		for(unsigned int i=0; i<files.size(); i++) {
 			img = runResizeImage(files.at(i),Size(700,700),0);
+			full_path = folder+files.at(i);
 			getSkin(img, mask);
 			img.copyTo(img2, mask);
-			name = getFileName(files.at(i));
-			FileData fd(files.at(i));
+			name = getFileName(full_path);
+			FileData fd(full_path);
 			fd.matImage = img2;
 			fd.matSize = size;
 			hysteresis(fd);

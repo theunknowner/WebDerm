@@ -14,6 +14,7 @@ class Histogram {
 public:
 	void calcHistogram(Mat src);
 	void equalizeHistogram(Mat src, Mat &dst);
+	void hist2SpreadSheet(Mat &src);
 };
 
 #endif /* HISTOGRAM_H_ */

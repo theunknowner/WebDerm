@@ -175,7 +175,7 @@ bool FileData::getFilesFromDirectory(String directory, deque<String> &files) {
 				dir_itr != end_iter; ++dir_itr ) { //for loop continued
 			try {
 				if ( fs::is_regular_file( dir_itr->status() ) ) {
-					filepath = full_path.string()+dir_itr->path().filename().string();
+					filepath = dir_itr->path().filename().string();
 					files.push_back(filepath);
 				}
 			}
@@ -186,4 +186,21 @@ bool FileData::getFilesFromDirectory(String directory, deque<String> &files) {
 		}
 	}
 	return true;
+}
+
+/** deletes files containing filename,
+ * directory must end with a "/" **/
+void FileData::deleteContainingFilename(String directory, String filename) {
+	deque<String> files;
+	String full_path;
+	getFilesFromDirectory(directory,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		full_path = directory+files.at(i);
+		if(files.at(i).find(filename)!=string::npos) {
+			if(remove(full_path.c_str())==0)
+				printf("%s deleted!\n", files.at(i).c_str());
+			else
+				printf("Error deleting %s\n",files.at(i).c_str());
+		}
+	}
 }
