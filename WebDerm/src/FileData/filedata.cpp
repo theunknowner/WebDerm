@@ -190,7 +190,7 @@ bool FileData::getFilesFromDirectory(String directory, deque<String> &files) {
 
 /** deletes files containing filename,
  * directory must end with a "/" **/
-void FileData::deleteContainingFilename(String directory, String filename) {
+void FileData::deleteContainingName(String directory, String filename) {
 	deque<String> files;
 	String full_path;
 	getFilesFromDirectory(directory,files);
@@ -201,6 +201,28 @@ void FileData::deleteContainingFilename(String directory, String filename) {
 				printf("%s deleted!\n", files.at(i).c_str());
 			else
 				printf("Error deleting %s\n",files.at(i).c_str());
+		}
+	}
+}
+
+/** rename files containing oldname,
+ * directory must end with a "/" **/
+void FileData::renameFiles(String directory, String oldname, String newname) {
+	size_t pos=0;
+	String name;
+	deque<String> files;
+	String full_path_old, full_path_new;
+	getFilesFromDirectory(directory,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		full_path_old = directory+files.at(i);
+		pos = files.at(i).find(oldname);
+		if(pos!=string::npos) {
+			name = files.at(i).replace(pos,oldname.length(),newname);
+			full_path_new = directory+name;
+			if(rename(full_path_old.c_str(),full_path_new.c_str())==0)
+				printf("%s renamed!\n", files.at(i).c_str());
+			else
+				printf("Error renaming %s\n",files.at(i).c_str());
 		}
 	}
 }

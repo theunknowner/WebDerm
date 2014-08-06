@@ -22,5 +22,7 @@ double standardDevSort(deque<double> &vec);
 double standardDevNoSort(deque<double> &vec);
 int max(int argNum, ...);
 double max(double numArr[], int length);
+double average(deque<double> &vec);
+double forecast(double input, deque<double> &yArr, deque<double> &xArr);
 
 #endif /* MATHS_H_ */

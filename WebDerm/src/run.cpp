@@ -7,89 +7,6 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
-void runCheckRGBColor()
-{
-	rgb rgb;
-	rgb.importThresholds();
-	String str;
-	deque<String> strVec;
-	deque<int> rgbVec;
-	int ch=0;
-	for(;;)
-	{
-		cout << "Enter RGB: ";
-		cin >>	str;
-		getSubstr(str,',',strVec);
-		for(unsigned int i=0; i<strVec.size(); i++)
-		{
-			rgbVec.push_back(atoi(strVec.at(i).c_str()));
-		}
-		cout << "RESULTS: " << rgb.pushColor(rgbVec[0],rgbVec[1],rgbVec[2]) << endl;
-		cout << "Press any key to continue...";
-		getchar();
-		for(;;)
-		{
-			ch = getchar();
-			if(ch!=0)
-			{
-				cout << "\033[2J\033[1;1H";
-				break;
-			}
-		}
-		deque<String>().swap(strVec);
-		deque<int>().swap(rgbVec);
-	}
-}
-
-//function to check RGB list
-void runCheckList()
-{
-	rgb rgb;
-	fstream fs("RGB Check List.csv");
-	FILE * fp;
-	fp = fopen("RGB Output.csv", "w");
-	if(fs.is_open())
-	{
-		rgb.importThresholds();
-		String temp, str;
-		deque<int> rgbVec;
-		deque<String> strVec;
-		char delimit = ',';
-		bool flag;
-		getline(fs,temp);
-		while(getline(fs,temp))
-		{
-			getSubstr(temp,delimit,strVec);
-			for(unsigned int i=0; i<strVec.size(); i++)
-			{
-				if(i<3)
-				{
-					rgbVec.push_back(atoi(strVec.at(i).c_str()));
-				}
-			}
- 			str = rgb.pushColor(rgbVec[0],rgbVec[1],rgbVec[2]);
- 			if(str==strVec.at(3))
- 			{
- 				flag=true;
- 			}
- 			else
- 			{
- 				flag=false;
- 			}
-			fprintf(fp, "%d,%d,%d,%s,%s,%d\n",rgbVec[0],rgbVec[1],rgbVec[2],strVec.at(3).c_str(),str.c_str(),flag);
-			strVec.clear();
-			rgbVec.clear();
-		}
-		deque<int>().swap(rgbVec);
-		deque<String>().swap(strVec);
-		fs.close();
-	}
-	else
-	{
-		cout << "RGB Check List.csv not found!" << endl;
-	}
-}
-
 Mat runResizeImage(String foldername, String filename, Size size,int write)
 {
 	String file = foldername+"/"+filename;
@@ -291,6 +208,33 @@ void runAllHysteresis() {
 	img.release(); img2.release(); mask.release();
  }
 
+ void runAllGetSkin() {
+	 FileData fdFiles;
+	 deque<String> files;
+	 String input, folder, full_path;
+	 Mat img, img2, mask;
+	 cout << "Enter folder_name: ";
+	 cin >> folder;
+	 if(fdFiles.getFilesFromDirectory(folder, files)) {
+		 cout << "Do you want to write image? (y/n)";
+		 cin >> input;
+		 for(unsigned int i=0; i<files.size(); i++) {
+			 full_path = folder+files.at(i);
+			 img = runResizeImage(full_path,Size(700,700),0);
+			 getSkin(img, mask);
+			 img.copyTo(img2, mask);
+			 if(input=="y")
+			 {
+				 String name = getFileName(full_path);
+				 imwrite(name+".png",img2);
+			 }
+			 imshow("Img", img2);
+			 waitKey(0);
+			 img.release(); img2.release(); mask.release();
+		 }
+	 }
+ }
+
  //runs hysteresis with info output to terminal
 void runMouseHysteresis()
 {
@@ -366,50 +310,6 @@ void outputFreqColor(Mat &img)
 			fprintf(fp,"%d: %s(%d)\n", i+2, rgbColors.at(i).c_str(), arr[i]);
 		}
 	}
-}
-
-void runOutputColorFreq()
-{
-	rgb rgb;
-	hsl hsl;
-	String filename;
-	String name;
-	String input;
-	cout << "Enter filename: ";
-	cin >> filename;
-	Mat img, img2, mask;
-	img = runResizeImage(filename,Size(700,700),0);
-	getSkin(img, mask);
-	img.copyTo(img2, mask);
-	rgb.importThresholds();
-	hsl.importHslThresholds();
-	outputFreqColor(img2);
-	img.release(); img2.release(); mask.release();
-	rgb.release_memory();
-	hsl.release_memory();
-}
-
-void runOutputFarRGB() {
-	rgb rgb;
-	hsl hsl;
-	String filename;
-	String name;
-	String input;
-	cout << "Enter filename: ";
-	cin >> filename;
-	cout << "Do you want to write image? (y/n) ";
-	cin >> input;
-	Mat img, img2, mask;
-	img = runResizeImage(filename,Size(700,700),0);
-	getSkin(img, mask);
-	img.copyTo(img2, mask);
-	name = getFileName(filename);
-	if(input=="y") imwrite(name+".png",img2);
-	rgb.importThresholds();
-	hsl.importHslThresholds();
-	//outputFarRGBScript(img2,name);
-	img.release(); img2.release(); mask.release();
-	rgb.release_memory(); hsl.release_memory();
 }
 
 void runMouseColor() {

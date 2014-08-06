@@ -131,6 +131,12 @@ Mat Functions::cropImage(Mat input)
 	return img2;
 }
 
+Mat Functions::imageROI(Mat input, Point begin, Point end) {
+	Mat dst;
+	dst = input(Rect(begin,end));
+	return dst;
+}
+
 Mat Functions::rotateImage(const Mat& source, double angle)
 {
 	Point2f src_center(source.cols/2.0F, source.rows/2.0F);

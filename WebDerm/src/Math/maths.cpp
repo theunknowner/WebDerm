@@ -141,3 +141,29 @@ double max(double numArr[], int length) {
 	}
 	return largest;
 }
+
+double average(deque<double> &vec) {
+	double result=0;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		result += vec.at(i);
+	}
+	result /= vec.size();
+	return result;
+}
+
+/** yArr and xArr has to be same size **/
+double forecast(double input, deque<double> &yArr, deque<double> &xArr) {
+	double results=0;
+	double avgY=average(yArr);
+	double avgX=average(xArr);
+	double a=0,b=0;
+	double b_Top=0, b_Bottom=0;
+	for(unsigned int i=0; i<yArr.size(); i++) {
+		b_Top += (xArr.at(i)-avgX)*(yArr.at(i)-avgY);
+		b_Bottom += pow((xArr.at(i)-avgX),2);
+	}
+	b = b_Top/b_Bottom;
+	a = avgY - (b*avgX);
+	results = a + (b*input);
+	return results;
+}

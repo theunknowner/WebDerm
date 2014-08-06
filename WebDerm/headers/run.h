@@ -19,21 +19,16 @@
 #include "test.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
 
-void runCheckRGBColor();
-void runCheckList();
 Mat runResizeImage(String foldername, String filename, Size size,int write);
 Mat runResizeImage(String filename, Size size,int write);
 void runHysteresis();
 void runAllHysteresis(String *filenames, int fileSize);
 void runAllHysteresis();
-void runCheckSequence(Mat &img, int row, int col, Size size);
 void runGetSkin();
+void runAllGetSkin();
 void getMouseInfo(Mat &img);
 void runMouseHysteresis();
 void runMouseHysteresis2();
-void outputFreqColor(Mat &img);
-void runOutputColorFreq();
-void runOutputFarRGB();
 void runMouseColor();
 
 #endif /* RUN_H_ */

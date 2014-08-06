@@ -226,10 +226,36 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 				else {
 					for(unsigned int k=0; k<colorVec.size(); k++) {
 						if(pix==colorVec.at(k)) {
-							img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
-							img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
-							img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
-							break;
+							if(shade.find("1")!=string::npos) {
+								img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
+								img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
+								img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
+								break;
+							}
+							if(shade.find("2")!=string::npos) {
+								int val1 = values.at(k).at(0)+30;
+								int val2 = values.at(k).at(1)+30;
+								int val3 = values.at(k).at(2)+30;
+								if(val1>255) val1=255;
+								if(val2>255) val2=255;
+								if(val3>255) val3=255;
+								img.at<Vec3b>(i,j)[2] = val1;
+								img.at<Vec3b>(i,j)[1] = val2;
+								img.at<Vec3b>(i,j)[0] = val3;
+								break;
+							}
+							if(shade.find("3")!=string::npos) {
+								int val1 = values.at(k).at(0)+50;
+								int val2 = values.at(k).at(1)+50;
+								int val3 = values.at(k).at(2)+50;
+								if(val1>255) val1=255;
+								if(val2>255) val2=255;
+								if(val3>255) val3=255;
+								img.at<Vec3b>(i,j)[2] = val1;
+								img.at<Vec3b>(i,j)[1] = val2;
+								img.at<Vec3b>(i,j)[0] = val3;
+								break;
+							}
 						}
 					}
 				}

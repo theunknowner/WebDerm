@@ -34,6 +34,7 @@ public:
 	void getDelimitedValuesFromString(String inputString, char delimiter, deque<double> &vec);
 	double calcSlope(Point pt, Point origin);
 	Mat cropImage(Mat input);
+	Mat imageROI(Mat input, Point begin, Point end);
 	Mat rotateImage(const Mat& source, double angle);
 	Mat fillEdges2(Mat img);
 	Mat fillEdges3(Mat img);

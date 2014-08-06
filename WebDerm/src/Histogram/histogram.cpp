@@ -85,15 +85,18 @@ void Histogram::equalizeHistogram(Mat src, Mat &dst) {
 	waitKey(0);
 }
 
-void Histogram::hist2SpreadSheet(Mat &src) {
+/** HSL histogram info **/
+void Histogram::hist2SpreadSheet(Mat &src, String name) {
 	FILE *fp;
-	fp = fopen("/home/jason/Desktop/workspace/hist.csv","w");
+	String filename = path+name+"_hist.csv";
+	fp = fopen(filename.c_str(),"w");
+	fprintf(fp,"Hue,#,,Sat,#,,Lum,#\n");
 	hsl hsl;
 	int r,g,b;
 	int hue,sat,lum;
 	int hueArr[360] = {0};
-	int satArr[100] = {0};
-	int lumArr[100] = {0};
+	int satArr[101] = {0};
+	int lumArr[101] = {0};
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
 			r = src.at<Vec3b>(i,j)[2];
@@ -109,7 +112,39 @@ void Histogram::hist2SpreadSheet(Mat &src) {
 			lumArr[lum]++;
 		}
 	}
-	for(int i=0; i<360; i++) {
-		fprintf(fp,"%d,%d\n",i,hueArr[i]);
+	int i=0, j=0, k=0;
+	int count1=0, count2=0, count3=0;
+	while(i<360 || j<101 || k<101) {
+		for(;i<360;i++) {
+			if(hueArr[i]>0) {
+				fprintf(fp,"%d,%d,,",i,hueArr[i]);
+				count1++;
+				break;
+			}
+		}
+		i++;
+		for(;j<101;j++) {
+			if(satArr[j]>0) {
+				if(count2>=count1)
+					fprintf(fp,",,,");
+				fprintf(fp,"%d,%d,,",j,satArr[j]);
+				count2++;
+				break;
+			}
+		}
+		j++;
+		for(;k<101;k++) {
+			if(lumArr[k]>0) {
+				if(count3>=count2 && count3<count1)
+					fprintf(fp,",,,");
+				else if(count3>=count2 && count3>=count1)
+					fprintf(fp,",,,,,,");
+				fprintf(fp,"%d,%d",k,lumArr[k]);
+				count3++;
+				break;
+			}
+		}
+		k++;
+		fprintf(fp,"\n");
 	}
 }

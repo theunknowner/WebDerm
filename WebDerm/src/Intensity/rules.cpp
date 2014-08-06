@@ -173,7 +173,7 @@ double rule6(String& pix, String& newPix, String& newShade) {
 	String color = c.getMainColor(newPix);
 	double grayLevel = rgb.getGrayLevel1(newPix);
 
-	if(newShade=="Dark") {
+	if(newShade.find("Dark")!=string::npos) {
 		if(grayLevel>=90) {
 			newPix = "Grey";
 			flag=true;
