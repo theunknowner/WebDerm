@@ -233,6 +233,7 @@ inline double hue2rgb(double var1, double var2, double vH) {
 	return var1;
 }
 
+/** hue=0-360; sat=0-1; lum=0-1 **/
 int *hsl::hsl2rgb(double hue, double sat, double lum) {
 	static double RGB[3];
 	static int results[3];

@@ -16,11 +16,12 @@
 #include "Contrast/contrast.h"
 #include "FileData/filedata.h"
 #include "Histogram/histogram.h"
+#include "Shades/shades.h"
 
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	runHysteresis();
+	//runHysteresis();
 /*
 	String filename[]= {path+"Images/LPH/lph1.jpg",
 						path+"Images/LPH/lph4.jpg",
@@ -32,23 +33,21 @@ int main(int argc,char** argv)
 						path+"Images/Psoriasis/Psoriasis4.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	hsl hsl;
 	rgb rgb;
 	Color c;
-	Intensity in;
 	Functions fn;
+	Shades sh;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
-	in.importThresholds();
+	sh.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Urticaria","urticaria1.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Acne","acne2.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(58,400);
-	Point pt2(62,404);
-	Histogram hist;
-	hist.hist2SpreadSheet(img2,"urt1");
+	Point pt1(278,313);
+	Point pt2(281,316);
 	//FileData fd;
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;
@@ -57,7 +56,7 @@ int main(int argc,char** argv)
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	//checkColorsFromList(img2,pt1,pt2);
-	generateColorRegionTable(img2, pt1,pt2);
+	//generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
 	int col = 475;

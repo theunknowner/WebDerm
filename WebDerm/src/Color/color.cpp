@@ -95,13 +95,13 @@ void Color::extractColorFromString(String color, deque<String> &vecColor) {
 }
 
 String Color::extractShade(String pix) {
-	Intensity in;
-	int shadeCount = in.getShadeCount();
+	Shades sh;
+	int shadeCount = sh.getShadeCount();
 	String shade = "";
 	if(pix=="Zero") return pix;
 	//if(pix.find("Gray")!=string::npos) return "Gray";
 	for(int i=0; i<shadeCount; i++) {
-		shade = in.getShade(i);
+		shade = sh.getShade(i);
 		if(pix.find(shade)!=string::npos)
 			break;
 	}
@@ -182,13 +182,15 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		String temp;
 		deque<String> vec;
 		deque<String> colorVec;
+		deque<String> shadeVec;
 		deque<int>	thresh1;
 		deque< deque<int> > values;
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0) colorVec.push_back(vec.at(i));
-				if(i>0) thresh1.push_back(atoi(vec.at(i).c_str()));
+				if(i==0) shadeVec.push_back(vec.at(i));
+				if(i==1) colorVec.push_back(vec.at(i));
+				if(i>1) thresh1.push_back(atoi(vec.at(i).c_str()));
 			}
 			values.push_back(thresh1);
 			thresh1.clear();
@@ -196,24 +198,26 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		}
 		hsl hsl;
 		Color c;
+		Shades sh;
 		String shade, color;
-		String pix;
+		int shadeLevel;
+		double lumIncThresh = 0.05;
 		Size size(window.at(0).size(),window.size());
 		Mat img = img.zeros(size,16);
 		double* HSL;
+		int *RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
+				shadeLevel = sh.extractShadeLevel(shade);
 				color = getMainColor(window.at(i).at(j));
-				HSL = c.extractHSL(window.at(i).at(j));
 				color = optimizeColor(color);
-				pix = shade+color;
-				if(shade=="Zero") {
+				if(shade.find("Zero")!=string::npos) {
 					img.at<Vec3b>(i,j)[2] = 0;
 					img.at<Vec3b>(i,j)[1] = 0;
 					img.at<Vec3b>(i,j)[0] = 0;
 				}
-				else if(shade=="Black" || color.find("Black")!=string::npos) {
+				else if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos) {
 					img.at<Vec3b>(i,j)[2] = 35;
 					img.at<Vec3b>(i,j)[1] = 35;
 					img.at<Vec3b>(i,j)[0] = 35;
@@ -225,37 +229,18 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 				}
 				else {
 					for(unsigned int k=0; k<colorVec.size(); k++) {
-						if(pix==colorVec.at(k)) {
-							if(shade.find("1")!=string::npos) {
-								img.at<Vec3b>(i,j)[2] = values.at(k).at(0);
-								img.at<Vec3b>(i,j)[1] = values.at(k).at(1);
-								img.at<Vec3b>(i,j)[0] = values.at(k).at(2);
-								break;
-							}
-							if(shade.find("2")!=string::npos) {
-								int val1 = values.at(k).at(0)+30;
-								int val2 = values.at(k).at(1)+30;
-								int val3 = values.at(k).at(2)+30;
-								if(val1>255) val1=255;
-								if(val2>255) val2=255;
-								if(val3>255) val3=255;
-								img.at<Vec3b>(i,j)[2] = val1;
-								img.at<Vec3b>(i,j)[1] = val2;
-								img.at<Vec3b>(i,j)[0] = val3;
-								break;
-							}
-							if(shade.find("3")!=string::npos) {
-								int val1 = values.at(k).at(0)+50;
-								int val2 = values.at(k).at(1)+50;
-								int val3 = values.at(k).at(2)+50;
-								if(val1>255) val1=255;
-								if(val2>255) val2=255;
-								if(val3>255) val3=255;
-								img.at<Vec3b>(i,j)[2] = val1;
-								img.at<Vec3b>(i,j)[1] = val2;
-								img.at<Vec3b>(i,j)[0] = val3;
-								break;
-							}
+						if(shade.find(shadeVec.at(k))!=string::npos && color==colorVec.at(k)) {
+							int r = values.at(k).at(0);
+							int g = values.at(k).at(1);
+							int b = values.at(k).at(2);
+							HSL = hsl.rgb2hsl(r,g,b);
+							HSL[2] += (shadeLevel*lumIncThresh)-lumIncThresh;
+							if(HSL[2]>1) HSL[2]=1;
+							RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+							img.at<Vec3b>(i,j)[2] = RGB[0];
+							img.at<Vec3b>(i,j)[1] = RGB[1];
+							img.at<Vec3b>(i,j)[0] = RGB[2];
+							break;
 						}
 					}
 				}

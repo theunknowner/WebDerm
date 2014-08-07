@@ -17,6 +17,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/table.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
 #include "rules.h"
 
@@ -50,14 +51,10 @@ public:
 	String getNewMinShade();
 	String getNewMaxShade();
 	int getShadeCount();
-	void release_memory();
-	bool importThresholds();
 	double calcIntensity(String pix);
 	double sigmoidFn(double intensity);
 	void setMinMaxShades();
 	void setMinMax(deque< deque<double> > &input);
-	String getShade(int index);
-	int getShadeIndex(String shade);
 	String calcShade(double inten);
 	deque< deque<double> > calcNormalizedIntensityMatrix(deque< deque<double> > &vec);
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);

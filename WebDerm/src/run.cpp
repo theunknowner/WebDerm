@@ -45,7 +45,7 @@ void runHysteresis()
 {
 	rgb rgb;
 	hsl hsl;
-	Intensity in;
+	Shades shade;
 	Color c;
 	String filename;
 	String name;
@@ -61,7 +61,7 @@ void runHysteresis()
 	bool flag[s];
 	flag[0]=rgb.importThresholds();
 	flag[1]=hsl.importHslThresholds();
-	flag[2]=in.importThresholds();
+	flag[2]=shade.importThresholds();
 	for(int i=0; i<s; i++) {
 		if(flag[i]==false) {
 			flag[0] = false;
@@ -86,13 +86,13 @@ void runHysteresis()
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 	hsl.release_memory();
-	in.release_memory();
+	shade.release_memory();
 }
 
 void runAllHysteresis(String *filenames, int fileSize) {
 	rgb rgb;
 	hsl hsl;
-	Intensity in;
+	Shades shade;
 	Color c;
 	String name;
 	Size size(2,2);
@@ -101,7 +101,7 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	bool flag[s];
 	flag[0]=rgb.importThresholds();
 	flag[1]=hsl.importHslThresholds();
-	flag[2]=in.importThresholds();
+	flag[2]=shade.importThresholds();
 	for(int i=0; i<s; i++) {
 		if(flag[i]==false) {
 			flag[0] = false;
@@ -131,13 +131,13 @@ void runAllHysteresis(String *filenames, int fileSize) {
 	}
 	rgb.release_memory();
 	hsl.release_memory();
-	in.release_memory();
+	shade.release_memory();
 }
 
 void runAllHysteresis() {
 	rgb rgb;
 	hsl hsl;
-	Intensity in;
+	Shades shade;
 	Color c;
 	String folder, full_path;
 	cout << "Enter folder_name: ";
@@ -151,7 +151,7 @@ void runAllHysteresis() {
 	bool flag[s];
 	flag[0]=rgb.importThresholds();
 	flag[1]=hsl.importHslThresholds();
-	flag[2]=in.importThresholds();
+	flag[2]=shade.importThresholds();
 	flag[3]=fdFiles.getFilesFromDirectory(folder, files);
 	for(int i=0; i<s; i++) {
 		if(flag[i]==false) {
@@ -161,8 +161,8 @@ void runAllHysteresis() {
 	}
 	if(flag[0]==true) {
 		for(unsigned int i=0; i<files.size(); i++) {
-			img = runResizeImage(files.at(i),Size(700,700),0);
 			full_path = folder+files.at(i);
+			img = runResizeImage(full_path,Size(700,700),0);
 			getSkin(img, mask);
 			img.copyTo(img2, mask);
 			name = getFileName(full_path);
@@ -183,7 +183,7 @@ void runAllHysteresis() {
 	}
 	rgb.release_memory();
 	hsl.release_memory();
-	in.release_memory();
+	shade.release_memory();
 }
 
  void runGetSkin()
@@ -315,7 +315,7 @@ void outputFreqColor(Mat &img)
 void runMouseColor() {
 	rgb rgb;
 	hsl hsl;
-	Intensity in;
+	Shades shade;
 	Mouse mouse;
 	String filename;
 	String name;
@@ -329,7 +329,7 @@ void runMouseColor() {
 	bool flag[3];
 	flag[0]=rgb.importThresholds();
 	flag[1]=hsl.importHslThresholds();
-	flag[2]=in.importThresholds();
+	flag[2]=shade.importThresholds();
 	for(int i=0; i<3; i++) {
 		if(flag[i]==false) {
 			flag[0] = false;
@@ -343,5 +343,5 @@ void runMouseColor() {
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
 	hsl.release_memory();
-	in.release_memory();
+	shade.release_memory();
 }

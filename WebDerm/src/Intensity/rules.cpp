@@ -9,14 +9,14 @@
 
 /** general rule #1 - Contrast with IndexChange**/
 double rule1(double &indexChange, String &shade, String &newShade) {
-	Intensity in;
+	Shades sh;
 	bool flag=false;
 	double ruleNum=1;
 	double indexChangeThresh = 2.25; // different than thresh for contrast of colors
 	if(abs(indexChange)>=indexChangeThresh) {
-		int index = in.getShadeIndex(shade);
+		int index = sh.getShadeIndex(shade);
 		index += (indexChange/indexChangeThresh);
-		newShade = in.getShade(index);
+		newShade = sh.getShade(index);
 		flag=true;
 	}
 	if(flag==true) return ruleNum;

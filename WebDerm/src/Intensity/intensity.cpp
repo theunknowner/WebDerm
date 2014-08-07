@@ -7,13 +7,11 @@
 
 #include "intensity.h"
 
-String shadeArr[] = {"Dark1","Dark2","High1","High2","Low1","Low2","Low3","Light1","Light2","Light3","White"};
-deque<String> gShades;
-deque< deque<double> > gShadeThresh;
+//String shadeArr[] = {"Dark1","Dark2","High1","High2","Low1","Low2","Low3","Light1","Light2","Light3","White"};
 
 Intensity::Intensity() {
 	global_flag=0;
-	shadeCount=length(shadeArr);
+	shadeCount=g_Shades.size();
 	minIntensity = 0;
 	maxIntensity = 255;
 	range=0;
@@ -57,45 +55,6 @@ String Intensity::getNewMinShade() {
 }
 String Intensity::getNewMaxShade() {
 	return newMaxShade;
-}
-
-int Intensity::getShadeCount() {
-	return shadeCount;
-}
-
-void Intensity::release_memory() {
-	deque<String>().swap(gShades);
-	deque< deque<double> >().swap(gShadeThresh);
-}
-
-bool Intensity::importThresholds() {
-	String folderName = path+"Thresholds/";
-	String filename = folderName+"shade-thresholds.csv";
-	fstream fsThresh(filename.c_str());
-	if(fsThresh.is_open()) {
-		String temp;
-		deque<String> vec;
-		deque<double> thresh;
-		getline(fsThresh,temp);
-		while(getline(fsThresh,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0)
-					gShades.push_back(vec.at(i));
-				if(i>=1 && i<=2)
-					thresh.push_back(atof(vec.at(i).c_str()));
-			}
-			gShadeThresh.push_back(thresh);
-			thresh.clear(); vec.clear();
-		}
-		fsThresh.close();
-		deque<double>().swap(thresh);
-		return true;
-	}
-	else {
-		cout << "Importing Shade Thresholds Failed!" << endl;
-		return false;
-	}
 }
 
 double Intensity::calcIntensity(String pix) {
@@ -144,15 +103,15 @@ double Intensity::sigmoidFn(double intensity) {
 //assigns min/max shades to an image. Only runs once per image.
 void Intensity::setMinMaxShades() {
 	double min,max;
-	for(unsigned int i=0; i<gShadeThresh.size(); i++) {
-		min = gShadeThresh.at(i).at(0);
-		max = gShadeThresh.at(i).at(1);
+	for(unsigned int i=0; i<g_ShadeThresh.size(); i++) {
+		min = g_ShadeThresh.at(i).at(0);
+		max = g_ShadeThresh.at(i).at(1);
 		if(minIntensity>=min && minIntensity<max)
-			oldMinShade = gShades.at(i);
+			oldMinShade = g_Shades.at(i);
 		if(maxIntensity>=min && maxIntensity<max)
-			oldMaxShade = gShades.at(i);
-		if(maxIntensity>=gShadeThresh.at(gShadeThresh.size()-1).at(1))
-			oldMaxShade = gShades.at(gShades.size()-1);
+			oldMaxShade = g_Shades.at(i);
+		if(maxIntensity>=g_ShadeThresh.at(g_ShadeThresh.size()-1).at(1))
+			oldMaxShade = g_Shades.at(g_Shades.size()-1);
 		if(oldMinShade!=status && oldMaxShade!=status) break;
 	}
 }
@@ -198,33 +157,11 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double>().swap(vec);
 }
 
-String Intensity::getShade(int index) {
-	//String shadeArr[] = {"White","White","White","Light","Light","Light",
-	//		"","","","Dark","Dark","Dark","Black","Black","Black"};
-	//String shadeArr[] = {"White","Light","","Dark","Black"};
-	shadeCount = length(shadeArr);
-	int ind=index;
-	if(ind<0) ind=0;
-	if(ind>(shadeCount-1)) ind=(shadeCount-1);
-	return shadeArr[ind];
-}
-
-int Intensity::getShadeIndex(String shade) {
-	unsigned int index=0;
-	shadeCount = length(shadeArr);
-	for(int i=0; i<shadeCount; i++) {
-		if(shade==getShade(i)) {
-			index=i;
-			break;
-		}
-	}
-	return index;
-}
-
 String Intensity::calcShade(double inten) {
+	Shades sh;
 	if(global_flag==0) {
-		minIndex = getShadeIndex(oldMinShade);
-		maxIndex = getShadeIndex(oldMaxShade);
+		minIndex = sh.getShadeIndex(oldMinShade);
+		maxIndex = sh.getShadeIndex(oldMaxShade);
 		oldShadeAmt = (maxIndex-minIndex)+1;
 		oldInterval = range/oldShadeAmt;
 		minOutlier = minIntensity - outlierCorrection;
@@ -235,7 +172,7 @@ String Intensity::calcShade(double inten) {
 		for(int i=0; i<oldShadeAmt; i++) {
 			thresh[i] = minIntensity + (i*oldInterval);
 			if(i==0) thresh[i] = minOutlier;
-			shadeIndex[i] = getShadeIndex(oldMinShade) + i;
+			shadeIndex[i] = sh.getShadeIndex(oldMinShade) + i;
 			cout << thresh[i] << ";";
 		}
 		global_flag=1;
@@ -247,26 +184,26 @@ String Intensity::calcShade(double inten) {
 	for(int i=0; i<oldShadeAmt; i++) {
 		if(i<(oldShadeAmt-1)) {
 			if(inten>thresh[i] && inten<=thresh[i+1]) {
-				shade = getShade(shadeIndex[i]);
+				shade = sh.getShade(shadeIndex[i]);
 				break;
 			}
 			if(inten<=minOutlier) {
 				indexChange = (inten-minOutlier)/oldInterval;
 				indexChange = floor(indexChange);
-				shade = getShade(minIndex+indexChange);
+				shade = sh.getShade(minIndex+indexChange);
 				newMinShade = shade;
 				break;
 			}
 		}
 		else {
 			if(inten>thresh[i] && inten<=maxOutlier) {
-				shade = getShade(shadeIndex[i]);
+				shade = sh.getShade(shadeIndex[i]);
 				break;
 			}
 			if(inten>maxOutlier) {
 				indexChange = (inten-maxOutlier)/oldInterval;
 				indexChange = ceil(indexChange);
-				shade = getShade(maxIndex+indexChange);
+				shade = sh.getShade(maxIndex+indexChange);
 				newMaxShade = shade;
 				break;
 			}
@@ -386,6 +323,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	rgb rgb;
 	hsl hsl;
 	Color c;
+	Shades sh;
 	Functions fn;
 	FILE *fp;
 	String filename = name + "_Rule_Table.csv";
@@ -431,8 +369,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		fd.colorVec.push_back(colorVec1);
 		colorVec1.clear();
 	}
-	maxShadeIndex = getShadeIndex(newMaxShade);
-	minShadeIndex = getShadeIndex(newMinShade);
+	maxShadeIndex = sh.getShadeIndex(newMaxShade);
+	minShadeIndex = sh.getShadeIndex(newMinShade);
 	printf("%s;%s\n",oldMinShade.c_str(),oldMaxShade.c_str());
 	printf("%s;%s\n",newMinShade.c_str(),newMaxShade.c_str());
 	int newShadeAmt = (maxShadeIndex-minShadeIndex)+1;
@@ -470,7 +408,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 					currCL = rgb.getColorLevel(pix);
 					currRatio = currGL/currCL;
 					shade = fd.shadeVec.at(i).at(j);
-					shadeIndex = getShadeIndex(shade);
+					shadeIndex = sh.getShadeIndex(shade);
 					localCC = ccCurr;
 					localIndex = shadeIndex;
 					localShade = shade;

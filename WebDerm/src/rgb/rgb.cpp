@@ -16,11 +16,9 @@ int rgb::getIndex(String color) {
 }
 
 bool rgb::importThresholds() {
-	int size=3;
+	int size=1;
 	bool flag[size];
 	flag[0] = importColorThresholds();
-	flag[1] = importGrayLUT();
-	flag[2] = importGrayRGB();
 	for(int i=0; i<size; i++)
 		if(flag[i]!=true)
 			return false;
@@ -485,9 +483,8 @@ double rgb::getColorLevel(String pix) {
 
 double rgb::calcPerceivedBrightness(double red, double green, double blue) {
 	double lum;
-	lum = sqrt((0.299*red*red) + (0.587*green*green) + (0.114*blue*blue));
-	//lum /= 255;
-	return lum;
+	lum = (0.299*red) + (0.587*green) + (0.114*blue);
+	return round(lum);
 }
 //outputs image window with color of rgb value
 void rgb::showPixelColor(int r, int g, int b, Size size)
