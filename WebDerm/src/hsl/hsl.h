@@ -32,6 +32,7 @@ public:
 	String getHslColor(double hue,double sat,double lum, int &ind, Point pt=Point(0,0));
 	void release_memory();
 	double calcHueAvg(deque<int> &vec);
+	String printHS(double *HSL);
 };
 
 #endif /* HSL_H_ */

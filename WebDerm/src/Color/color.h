@@ -36,5 +36,7 @@ public:
 	String removeColor(String color, String colorRemove);
 	String replaceColor(String color, String colorTarget, String colorReplace);
 	void avgImageLuminance(Mat &src);
+	void imgRgb2Gray(Mat &src, Mat &dst);
+	int* changeRgbRelLum(double r, double g, double b, double amt);
 };
 #endif /* COLOR_H_ */

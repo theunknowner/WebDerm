@@ -259,3 +259,14 @@ int *hsl::hsl2rgb(double hue, double sat, double lum) {
 	results[2] = (int)RGB[2];
 	return results;
 }
+
+/** printf HSL/HSP values **/
+String hsl::printHS(double *HSL) {
+
+	HSL[1] = roundDecimal(HSL[1],2);
+	HSL[2] = roundDecimal(HSL[2],2);
+	char text[50];
+	sprintf(text,"(%.0f,%.2f,%.2f)",HSL[0],HSL[1],HSL[2]);
+	String str(text);
+	return str;
+}

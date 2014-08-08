@@ -234,6 +234,10 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 							int g = values.at(k).at(1);
 							int b = values.at(k).at(2);
 							HSL = hsl.rgb2hsl(r,g,b);
+							if(shade.find("Dark")!=string::npos) lumIncThresh = 0.08;
+							if(shade.find("High")!=string::npos) lumIncThresh = 0.06;
+							if(shade.find("Low")!=string::npos) lumIncThresh = 0.05;
+							if(shade.find("Light")!=string::npos) lumIncThresh = 0.04;
 							HSL[2] += (shadeLevel*lumIncThresh)-lumIncThresh;
 							if(HSL[2]>1) HSL[2]=1;
 							RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
@@ -465,4 +469,43 @@ void Color::avgImageLuminance(Mat &src) {
 	imshow("img",src);
 	imshow("DST",dst);
 	waitKey(0);
+}
+
+void Color::imgRgb2Gray(Mat &src, Mat &dst) {
+	rgb rgb;
+	int relLum=0;
+	int r,g,b;
+	dst = dst.zeros(src.size(), CV_8U);
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			r = src.at<Vec3b>(i,j)[2];
+			g = src.at<Vec3b>(i,j)[1];
+			b = src.at<Vec3b>(i,j)[0];
+			relLum = rgb.calcPerceivedBrightness(r,g,b);
+			dst.at<uchar>(i,j) = relLum;
+		}
+	}
+}
+
+int* Color::changeRgbRelLum(double r, double g, double b, double amt) {
+	hsl hsl;
+	static double RGB[3];
+	static int results[3];
+	double cR = 0.299, cG = 0.587, cB = 0.114;
+	double incR = cR*amt;
+	double incG = cG*amt;
+	double incB = cB*amt;
+	RGB[0]= cR*r; RGB[1] = cG*g; RGB[2] = cB*b;
+	RGB[0] += incR; RGB[1] += incG; RGB[2] += incB;
+	RGB[0] /= cR; RGB[1] /= cG; RGB[2] /= cB;
+
+	double *HSL = hsl.rgb2hsl(r,g,b);
+	double *HSL2 = hsl.rgb2hsl(RGB[0],RGB[1],RGB[2]);
+	int *RGB2 = hsl.hsl2rgb(HSL[0],HSL[1],HSL2[2]);
+
+	results[0] = RGB2[0];
+	results[1] = RGB2[1];
+	results[2] = RGB2[2];
+
+	return results;
 }

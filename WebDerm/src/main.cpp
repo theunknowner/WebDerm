@@ -21,7 +21,7 @@
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	//runHysteresis();
+	runHysteresis();
 /*
 	String filename[]= {path+"Images/LPH/lph1.jpg",
 						path+"Images/LPH/lph4.jpg",
@@ -33,7 +33,7 @@ int main(int argc,char** argv)
 						path+"Images/Psoriasis/Psoriasis4.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;

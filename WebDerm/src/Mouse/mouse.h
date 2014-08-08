@@ -12,7 +12,7 @@
 
 class Mouse {
 public:
-	void mouseColor(Mat img);
+	static void mouseColor(Mat img);
 };
 
 #endif /* MOUSE_H_ */
