@@ -9,7 +9,13 @@
 #define HSL_H
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
-#include "hsl_global.h"
+
+extern double H, S, L;
+extern deque<String> hslColors;
+extern deque< deque<int> > hueThresh;
+extern deque< deque<double> > satThresh;
+extern deque< deque<double> > lumThresh;
+extern deque<int> hueTableNum;
 
 class hsl
 {
@@ -27,8 +33,6 @@ public:
 	double getSat();
 	double getLum();
 	double calcLum(double red, double green, double blue);
-	double calcBrite(double red, double green, double blue);
-	double calcRelLum(double red, double green, double blue);
 	String getHslColor(double hue,double sat,double lum, int &ind, Point pt=Point(0,0));
 	void release_memory();
 	double calcHueAvg(deque<int> &vec);

@@ -7,6 +7,13 @@
 
 #include "rgb.h"
 
+deque< deque<double> > normMeanThresh;
+deque< deque<double> > absMeanThresh;
+deque< deque<double> > absThresh;
+deque< deque<double> > normThresh;
+deque<String> rgbColors;
+deque<String> mainColors;
+
 int rgb::getIndex(String color) {
 	for(unsigned int i=0; i<mainColors.size(); i++) {
 		if(color==mainColors.at(i))
@@ -82,35 +89,6 @@ bool rgb::importColorThresholds()
 		cout << "Importing Colors and Thresholds Failed!" << endl;
 		return false;
 	}
-}
-
-bool rgb::importGrayRGB() {
-	String folderName = path+"Thresholds/";
-	String filename = folderName+"gray-rgbs.csv";
-	fstream fsThresh(filename.c_str());
-	if(fsThresh.is_open()) {
-		String temp;
-		deque<String> vec;
-		deque<double> thresh1;
-		getline(fsThresh,temp);
-		while(getline(fsThresh,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i<3)
-					thresh1.push_back(atof(vec.at(i).c_str()));
-			}
-			grayRGB.push_back(thresh1);
-			thresh1.clear();
-			vec.clear();
-		}
-		deque<String>().swap(vec);
-		deque<double>().swap(thresh1);
-		fsThresh.close();
-		return true;
-	}
-	else
-		cout << "Importing GrayRGBs failed!" << endl;
-	return false;
 }
 
 //calculate the Euclidean Distance betweeen normalized rgb input and colors(vec).
@@ -518,7 +496,6 @@ void rgb::release_memory()
 	deque< deque<double> >().swap(absThresh);
 	deque<String>().swap(rgbColors);
 	deque<String>().swap(mainColors);
-	deque< deque<double> >().swap(grayLUT);
 }
 
 double rgb::calcColorLevel(double red, double green, double blue) {
@@ -589,35 +566,6 @@ String rgb::calcColor(int red, int green, int blue) {
 	pix = c.reassignLevels(pix,red,green,blue);
 	pix = toString(grayLevel) + pix;
 	return pix;
-}
-
-bool rgb::importGrayLUT() {
-	String foldername = path+"Thresholds/";
-	String filename = foldername+"GrayLevelLUT.csv";
-	fstream fsThresh(filename.c_str());
-	if(fsThresh.is_open()) {
-		String temp;
-		deque<String> vec;
-		deque<double> thresh1;
-		getline(fsThresh,temp);
-		while(getline(fsThresh,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i>0)
-					thresh1.push_back(atof(vec.at(i).c_str()));
-			}
-			grayLUT.push_back(thresh1);
-			thresh1.clear();
-			vec.clear();
-		}
-		fsThresh.close();
-		deque<String>().swap(vec);
-		deque<double>().swap(thresh1);
-		return true;
-	}
-	else
-		cout << "Importing grayLUTs failed!" << endl;
-	return false;
 }
 
 double rgb::calcGrayLumLevel(double red, double green, double blue) {

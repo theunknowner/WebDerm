@@ -7,6 +7,13 @@
 
 #include "hsl.h"
 
+double H, S, L;
+deque<String> hslColors;
+deque< deque<int> > hueThresh;
+deque< deque<double> > satThresh;
+deque< deque<double> > lumThresh;
+deque<int> hueTableNum;
+
 bool hsl::isThreshImported() {
 	return THRESH_IMPORTED;
 }
@@ -156,25 +163,6 @@ double hsl::minRGB(double red, double green, double blue)
 		min = minRGB(r,g,b);
 		max = maxRGB(r,g,b);
 		lum = (max+min)/2;
-		return lum;
-	}
-
-	double hsl::calcBrite(double red, double green, double blue)
-	{
-		double r,g,b;
-		double max;
-		r = red/255;
-		g = green/255;
-		b = blue/255;
-		max = maxRGB(r,g,b);
-		return max;
-	}
-
-	double hsl::calcRelLum(double red, double green, double blue)
-	{
-		double lum;
-		lum = (0.2126*red) + (0.7152*green) + (0.0722*blue);
-		lum/=255;
 		return lum;
 	}
 

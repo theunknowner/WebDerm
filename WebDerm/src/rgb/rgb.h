@@ -9,9 +9,16 @@
 #define RGB_H_INCLUDED
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "rgb_global.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Intensity/rules.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+
+extern deque< deque<double> > normMeanThresh;
+extern deque< deque<double> > absMeanThresh;
+extern deque< deque<double> > absThresh;
+extern deque< deque<double> > normThresh;
+extern deque<double> colorFactors;
+extern deque<String> rgbColors;
+extern deque<String> mainColors;
 
 class rgb
 {
@@ -42,8 +49,6 @@ public:
 	String calcColor(int red, int green, int blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
 	double calcGrayLumLevel(double red, double green, double blue);
-	bool importGrayLUT();
-	bool importGrayRGB();
 	double calcColorLumLevel(double red, double green, double blue);
 };
 
