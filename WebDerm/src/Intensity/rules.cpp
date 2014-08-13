@@ -75,86 +75,71 @@ double rule2(FileData &fd, String &newPix) {
 }
 
 // contrast rule
-double rule3(FileData &fd, String &newPix) {
+double rule3(FileData &fd, String &newPix, String &newShade) {
 	double ruleNum =3;
 	bool flag=false;
 	hsl hsl;
 	Color c;
 	Functions fn;
-	int localScanSize = 30;
-	double thresh = 1.04;
 	Point pt = fd.pt;
+	int localScanSize = 20;
 	String color = c.getMainColor(newPix);
+	double h = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
+	double s = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
+	double l = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
+	double currCumHSL = h + (s*100) + (l*100);
+	double cumHSL_0[2] = {currCumHSL};
+	double cumHSL_45[2] = {currCumHSL};
+	double cumHSL_90[2] = {currCumHSL};
 	double HSL_0[3] = {0};
 	double HSL_45[3] = {0};
 	double HSL_90[3] = {0};
 	bool deg0_flag=false, deg45_flag=false, deg90_flag=false;
 	double result_0=0, result_45=0, result_90=0;
 	String color_0, color_45, color_90;
-	double s = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
-	double l = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
-	if(pt.x==623 && pt.y==308) {
-		cout << color << endl;
-	}
 	if(color=="BrownPink" && pt.y>0) {
 		int j=pt.x-1;
 		int x = j;
 		int endY = (pt.y-localScanSize);
 		for(int i=(pt.y-1); i>=endY; i--) {
 			if(x<0 && j<0 && i<0) break;
-			//deg0_flag==false &&
+			double currHSL = 0;
 			if(x>=0) {
 				HSL_0[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',1);
 				HSL_0[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',2);
 				HSL_0[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',3);
-				int index=-1;
-				color_0 = hsl.getHslColor(HSL_0[0],HSL_0[1],HSL_0[2],index);
-				result_0 = ((1-s)*l)/((1-HSL_0[1])*HSL_0[2]);
-				result_0 = roundDecimal(result_0,2);
-				if(color_0=="BrownPink" && result_0>thresh)
-					deg0_flag = true;
+				currHSL = HSL_0[0] + (HSL_0[1]*100) + (HSL_0[2]*100);
+				if(currHSL<=cumHSL_0[0])
+					cumHSL_0[0] = currHSL;
+				else
+					cumHSL_0[1] = currHSL;
 			}
 			--x;
-			//deg45_flag==false &&
 			if(j>=0 && i>=0) {
 				HSL_45[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
 				HSL_45[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
 				HSL_45[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
-				int index=-1;
-				color_45 = hsl.getHslColor(HSL_45[0],HSL_45[1],HSL_45[2],index);
-				result_45 = ((1-s)*l)/((1-HSL_45[1])*HSL_45[2]);
-				result_45 = roundDecimal(result_45,2);
-				if(color_45=="BrownPink" && result_45>thresh)
-					deg45_flag = true;
+				currHSL = HSL_45[0] + (HSL_45[1]*100) + (HSL_45[2]*100);
+				if(currHSL<=cumHSL_45[0])
+					cumHSL_45[0] = currHSL;
+				else
+					cumHSL_45[1] = currHSL;
 			}
 			--j;
-			//deg90_flag==false &&
 			if(i>=0) {
 				HSL_90[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',1);
 				HSL_90[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',2);
 				HSL_90[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',3);
-				int index=-1;
-				color_90 = hsl.getHslColor(HSL_90[0],HSL_90[1],HSL_90[2],index);
-				result_90 = ((1-s)*l)/((1-HSL_90[1])*HSL_90[2]);
-				result_90 = roundDecimal(result_90,2);
-				if(color_90=="BrownPink" && result_90>thresh)
-					deg90_flag = true;
+				currHSL = HSL_90[0] + (HSL_90[1]*100) + (HSL_90[2]*100);
+				if(currHSL<=cumHSL_90[0])
+					cumHSL_90[0] = currHSL;
+				else
+					cumHSL_90[1] = currHSL;
 			}
-			if(pt.x==623 && pt.y==308) {
-				printf("%s:%.2f ; %s:%.2f ; %s:%.2f\n",color_0.c_str(),result_0,
-						color_45.c_str(),result_45,
-						color_90.c_str(),result_90);
-			}
-			/*if(deg45_flag==true && deg90_flag==true)
-				break;
-			if(deg0_flag==true && deg90_flag==true)
-				break;
-			if(deg0_flag==true && deg45_flag==true)
-				break; */
 		}
 
 		if((deg0_flag+deg45_flag)>=2||(deg0_flag+deg90_flag)>=2||(deg45_flag+deg90_flag)>=2) {
-			newPix = "Brown";
+			newPix = "Pink";
 			flag=true;
 		}
 	}

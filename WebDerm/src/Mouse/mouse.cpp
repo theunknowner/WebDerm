@@ -62,7 +62,7 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 }
 
 void Mouse::mouseColor(Mat img) {
-	namedWindow("image");
+	namedWindow("image", CV_WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
 	cvSetMouseCallback("image", onMouseCheckColor, &img);
 	imshow("image", img);
 	waitKey(0);
