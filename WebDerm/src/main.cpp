@@ -21,7 +21,7 @@
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	//runHysteresis();
+	runHysteresis();
 /*
 	String filename[]= {path+"Images/Vesicles/vesicles1.jpg",
 						path+"Images/Vesicles/vesicles2.jpg",
@@ -44,9 +44,6 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(222,370);
 	Point pt2(224,372);
-	namedWindow("img", CV_WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-	imshow("img",img2);
-	waitKey(0);
 	//FileData fd;
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;

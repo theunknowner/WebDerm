@@ -39,6 +39,8 @@ public:
 	Mat fillEdges2(Mat img);
 	Mat fillEdges3(Mat img);
 	Mat kMeansClustering(Mat &src);
+
+	int countContain(double argNum, ...);
 };
 
 #endif

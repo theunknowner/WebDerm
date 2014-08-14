@@ -238,9 +238,9 @@ int *hsl::hsl2rgb(double hue, double sat, double lum) {
 			temp1 = (lum+sat) - (lum*sat);
 		temp2 = (2*lum) - temp1;
 		hue /= 360;
-		RGB[0] = round(255*hue2rgb(temp2,temp1,(hue+0.333)));
+		RGB[0] = round(255*hue2rgb(temp2,temp1,(hue+(1./3.))));
 		RGB[1] = round(255*hue2rgb(temp2,temp1,hue));
-		RGB[2] = round(255*hue2rgb(temp2,temp1,(hue-0.333)));
+		RGB[2] = round(255*hue2rgb(temp2,temp1,(hue-(1./3.))));
 	}
 	results[0] = (int)RGB[0];
 	results[1] = (int)RGB[1];

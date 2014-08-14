@@ -16,7 +16,8 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 	String color;
 	double * HSL;
 	int h, s,l;
-    char text[100];
+    char coordText[50];
+    char rgbText[50];
     char hslText[100];
     char c[30];
     char gl[50];
@@ -26,9 +27,9 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
     int relLum=0;
     if(img2.type()==0) {
     	relLum = img2.at<uchar>(y,x);
-    	sprintf(text, "(%d,%d)", x, y);
+    	sprintf(coordText, "(%d,%d)", x, y);
     	sprintf(rl,"RelLum: %d",relLum);
-    	putText(img3, text, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+    	putText(img3, coordText, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
     	putText(img3, rl, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
     	imshow("Info",img3);
     }
@@ -45,18 +46,20 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 		colorlevel = rgb.calcColorLevel(rgbVec[2],rgbVec[1],rgbVec[0]);
 		relLum = rgb.calcPerceivedBrightness(rgbVec[2],rgbVec[1],rgbVec[0]);
 
-		sprintf(text, "(%d,%d) - [%d,%d,%d]", x, y,rgbVec[2],rgbVec[1],rgbVec[0]);
-		sprintf(hslText,"{%d,%d,%d}",h,s,l);
+		sprintf(coordText, "(%d,%d)", x, y);
+		sprintf(rgbText, "RGB(%d,%d,%d)",rgbVec[2],rgbVec[1],rgbVec[0]);
+		sprintf(hslText,"HSL(%d,%d,%d)",h,s,l);
 		sprintf(c, "%s", color.c_str());
 		sprintf(gl,"GL: %.0f",graylevel);
 		sprintf(cl,"CL: %0.0f",colorlevel);
 		sprintf(rl,"RelLum: %d",relLum);
-		putText(img3, text, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-		putText(img3, hslText, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-		putText(img3, c, Point(5,45), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-		putText(img3, gl, Point(5,60), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-		putText(img3, cl, Point(5,75), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-		putText(img3, rl, Point(5,90), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		putText(img3, coordText, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		putText(img3, rgbText, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		putText(img3, hslText, Point(5,45), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		putText(img3, c, Point(5,60), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		putText(img3, gl, Point(5,75), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		putText(img3, cl, Point(5,90), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		putText(img3, rl, Point(5,105), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
 		imshow("Info",img3);
     }
 }

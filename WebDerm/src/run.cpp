@@ -29,15 +29,17 @@ Mat runResizeImage(String filename, Size size,int write)
 	deque<String> vec;
 	Mat img = imread(filename);
 	Mat img2;
-	if(img.cols>=size.width || img.rows>=size.height)
-		{resize(img, img2, size,0,0,INTER_AREA);}
-	if(img.cols<size.width || img.rows<size.height)
-		{resize(img, img2, size,0,0, INTER_CUBIC);}
-	getSubstr(filename,'.',vec);
-	if(write==1) imwrite(vec[0]+".png",img2);
+	if(!img.empty()) {
+		if(img.cols>=size.width || img.rows>=size.height)
+			{resize(img, img2, size,0,0,INTER_AREA);}
+		if(img.cols<size.width || img.rows<size.height)
+			{resize(img, img2, size,0,0, INTER_CUBIC);}
+		getSubstr(filename,'.',vec);
+		if(write==1) imwrite(vec[0]+".png",img2);
 
-	img.release();
-	deque<String>().swap(vec);
+		img.release();
+		deque<String>().swap(vec);
+	}
 	return img2;
 }
 
@@ -313,35 +315,17 @@ void outputFreqColor(Mat &img)
 }
 
 void runMouseColor() {
-	rgb rgb;
-	hsl hsl;
-	Shades shade;
-	Mouse mouse;
-	String filename;
+	String filename,input;
 	String name;
 	Size size(2,2);
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
-	getSkin(img, mask);
+	cout << "Get skin? (y/n) ";
+	cin >> input;
+	if(input=="y") getSkin(img, mask);
 	img.copyTo(img2, mask);
-	bool flag[3];
-	flag[0]=rgb.importThresholds();
-	flag[1]=hsl.importHslThresholds();
-	flag[2]=shade.importThresholds();
-	for(int i=0; i<3; i++) {
-		if(flag[i]==false) {
-			flag[0] = false;
-			break;
-		}
-	}
-	if(flag[0]==true) {
-		mouse.mouseColor(img2);
-	}
-
+	Mouse::mouseColor(img2);
 	img.release(); img2.release(); mask.release();
-	rgb.release_memory();
-	hsl.release_memory();
-	shade.release_memory();
 }

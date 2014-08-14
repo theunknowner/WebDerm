@@ -21,7 +21,6 @@ String toString(double val)
 	return stringStream.str();
 }
 
-
 /** can also fix floating point precision that is not being shown on the
  * binary level */
 double roundDecimal(double num, int places)
@@ -364,4 +363,28 @@ Mat Functions::kMeansClustering(Mat &src) {
 			new_image.at<Vec3b>(y,x)[2] = centers.at<float>(cluster_idx, 2);
 		}
 	return new_image;
+}
+
+//! returns number of variables matching last input
+int Functions::countContain(double argNum, ...) {
+	int arg = (int)argNum;
+	double arr[arg-1];
+	double lastInput = 0;
+	va_list vl;
+	va_start(vl,argNum);
+	for(int i=0; i<arg; i++) {
+		if(i<(arg-1)) {
+			arr[i] = va_arg(vl,double);
+		}
+		else
+			lastInput = va_arg(vl,double);
+	}
+	va_end(vl);
+	int count=0;
+	for(int i=0; i<(arg-1); i++) {
+		if(arr[i]>=lastInput) {
+			++count;
+		}
+	}
+	return count;
 }
