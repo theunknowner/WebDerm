@@ -201,10 +201,8 @@ void hsl::release_memory()
 double hsl::calcHueAvg(deque<int> &vec) {
 	double hue=0;
 	double total=0;
-	int flag=0, change=0;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		hue = (vec.at(i)+180)%360;
-		//cout << hue << endl;
 		total += hue;
 	}
 	total /= vec.size();

@@ -20,6 +20,7 @@ FileData::FileData(String file_path) {
 	localRatioScanSize = 0;
 	localScanSize=0;
 	range=0;
+	inState = false;
 }
 
 FileData::~FileData() {

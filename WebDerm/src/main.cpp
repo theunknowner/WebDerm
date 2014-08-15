@@ -39,12 +39,14 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Acne","acne4.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Urticaria","urticaria5.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	Point pt1(222,370);
 	Point pt2(224,372);
+	deque<String> files;
 	//FileData fd;
+	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
 	//deque< deque<String> > vec;
 	//fd.getFileMatrix(vec);

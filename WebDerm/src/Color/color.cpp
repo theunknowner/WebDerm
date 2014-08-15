@@ -1,11 +1,4 @@
-/*
- * color.cpp
- *
- *  Created on: Mar 26, 2014
- *      Author: jason
- */
-
-#include "color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 //check if color1 contains color2
 bool Color::containsColor(String color1, String color2)
@@ -96,7 +89,8 @@ void Color::extractColorFromString(String color, deque<String> &vecColor) {
 
 String Color::extractShade(String pix) {
 	Shades sh;
-	int shadeCount = sh.getShadeCount();
+   int shadeCount = sh.getShadeCount();
+    //int shadeCount = sh.getShadeCount();
 	String shade = "";
 	if(pix=="Zero") return pix;
 	//if(pix.find("Gray")!=string::npos) return "Gray";
@@ -197,7 +191,6 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			vec.clear();
 		}
 		hsl hsl;
-		Color c;
 		Shades sh;
 		String shade, color;
 		int shadeLevel;

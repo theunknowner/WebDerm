@@ -343,6 +343,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	deque<String> localShades;
 	deque<double> ruleNo;
 	deque<String> strVec1;
+	deque<String> rulesRow;
 	fd.intensityVec = calcIntensityMatrix(fd.windowVec);
 	fd.smoothIntensityVec = calcSmoothedIntensityMatrix(fd.intensityVec);
 	fd.range = range;
@@ -535,12 +536,15 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				strVec1.push_back(name);
 				generateTable(fp,strVec1);
 				strVec1.clear();
+				rulesRow.push_back(ruleNum);
 			}
 			fd.colorVec.at(i).at(j) = pix2;
 			ruleNo.clear();
 		} // end col
 		fd.absRatioMat.push_back(fd.absRatioVec);
 		fd.absRatioVec.clear();
+		fd.rulesMat.push_back(rulesRow);
+		rulesRow.clear();
 		flag=0;
 		indexChange=0;
 		index=0;

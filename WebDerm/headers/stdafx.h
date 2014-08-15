@@ -7,10 +7,10 @@
 #ifndef STDAFX_H_INCLUDED
 #define STDAFX_H_INCLUDED
 
-#include <cv.h>
-#include <core/core.hpp>
-#include <imgproc/imgproc.hpp>
-#include <highgui/highgui.hpp>
+#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 #include <string>
 #include <math.h>

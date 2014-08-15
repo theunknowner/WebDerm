@@ -40,6 +40,8 @@ public:
 	deque< deque<double> > intensityVec;
 	deque< deque<double> > smoothIntensityVec;
 	deque< deque<String> > shadeVec;
+	deque< deque<String> > rulesMat;
+	bool inState;
 
 	FileData(String file_path="");
 	~FileData();

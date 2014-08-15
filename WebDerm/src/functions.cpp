@@ -32,6 +32,14 @@ double roundDecimal(double num, int places)
 	return val;
 }
 
+String decimal2hex(int num) {
+   stringstream ss;
+   ss << std::hex << num;
+   String str(ss.str());
+   if(str.length()==1) str = "0"+str;
+   return str;
+}
+
 
 /* return value up to Nth occurrence = first,second,third... of delimiter */
 double Functions::getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
@@ -365,7 +373,7 @@ Mat Functions::kMeansClustering(Mat &src) {
 	return new_image;
 }
 
-//! returns number of variables matching last input
+//! returns number of variables greater than last input
 int Functions::countContain(double argNum, ...) {
 	int arg = (int)argNum;
 	double arr[arg-1];
@@ -382,7 +390,7 @@ int Functions::countContain(double argNum, ...) {
 	va_end(vl);
 	int count=0;
 	for(int i=0; i<(arg-1); i++) {
-		if(arr[i]>=lastInput) {
+		if(arr[i]>lastInput) {
 			++count;
 		}
 	}

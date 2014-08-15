@@ -1,9 +1,3 @@
-/*
- * histogram.h
- *
- *  Created on: Jul 31, 2014
- *      Author: jason
- */
 
 #ifndef HISTOGRAM_H_
 #define HISTOGRAM_H_
@@ -12,7 +6,7 @@
 
 class Histogram {
 public:
-	void calcHistogram(Mat src);
+    Mat calcHistogram(Mat src);
 	void equalizeHistogram(Mat src, Mat &dst);
 	void hist2SpreadSheet(Mat &src, String name);
 };

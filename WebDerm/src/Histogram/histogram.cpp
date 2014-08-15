@@ -1,13 +1,7 @@
-/*
- * histogram.cpp
- *
- *  Created on: Jul 31, 2014
- *      Author: jason
- */
 
 #include "histogram.h"
 
-void Histogram::calcHistogram(Mat src) {
+Mat Histogram::calcHistogram(Mat src) {
 	/// Separate the image in 3 places ( B, G and R )
 	vector<Mat> bgr_planes;
 	split( src, bgr_planes );
@@ -53,11 +47,7 @@ void Histogram::calcHistogram(Mat src) {
 				Scalar( 0, 0, 255), 2, 8, 0  );
 	}
 
-	/// Display
-	namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE );
-	imshow("calcHist Demo", histImage );
-
-	waitKey(0);
+    return histImage;
 }
 
 void Histogram::equalizeHistogram(Mat src, Mat &dst) {

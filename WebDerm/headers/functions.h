@@ -27,6 +27,7 @@ std::size_t length(const T (&)[N] )
 String toString(int val);
 String toString(double val);
 double roundDecimal(double num, int places);
+String decimal2hex(int num);
 
 class Functions {
 public:
