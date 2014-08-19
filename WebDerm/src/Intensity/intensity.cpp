@@ -395,6 +395,9 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.newMinShade = newMinShade;
 	fd.newMaxShade = newMaxShade;
 	fd.shadeCount = newShadeAmt;
+	init_2D_Deque(fd.m_ContrastMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.hslMaxPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			pix = windowVec.at(i).at(j);

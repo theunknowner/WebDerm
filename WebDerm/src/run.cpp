@@ -84,6 +84,9 @@ void runHysteresis()
 		writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
 		writeSeq2File(fd.colorVec,name+"_ShadeColors");
 		writeSeq2File(fd.rulesMat,name+"_RulesMat");
+		writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
+		writeSeq2File(fd.d_HslMat,name+"_deltaHue");
+		writeSeq2File(fd.hslMaxPtMat,name+"_hslPts");
 	}
 
 	img.release(); img2.release(); mask.release();

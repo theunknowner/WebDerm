@@ -21,6 +21,11 @@ String toString(double val)
 	return stringStream.str();
 }
 
+String toString(bool val) {
+	if(val==true) return "true";
+	else return "false";
+}
+
 /** can also fix floating point precision that is not being shown on the
  * binary level */
 double roundDecimal(double num, int places)
@@ -38,6 +43,19 @@ String decimal2hex(int num) {
    String str(ss.str());
    if(str.length()==1) str = "0"+str;
    return str;
+}
+
+void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
+	deque<String> tempVec;
+	for(int i=0; i<rows; i++) {
+		for(int j=0; j<cols; j++) {
+			tempVec.push_back(val);
+		}
+		vec.push_back(tempVec);
+		tempVec.clear();
+	}
+	tempVec.clear();
+	deque<String>().swap(tempVec);
 }
 
 
@@ -373,8 +391,34 @@ Mat Functions::kMeansClustering(Mat &src) {
 	return new_image;
 }
 
+//! returns number of variables greater than or equal to last input
+//! every input has to be in double form
+int Functions::countGreaterEqual(double argNum, ...) {
+	int arg = (int)argNum;
+	double arr[arg-1];
+	double lastInput = 0;
+	va_list vl;
+	va_start(vl,argNum);
+	for(int i=0; i<arg; i++) {
+		if(i<(arg-1)) {
+			arr[i] = va_arg(vl,double);
+		}
+		else
+			lastInput = va_arg(vl,double);
+	}
+	va_end(vl);
+	int count=0;
+	for(int i=0; i<(arg-1); i++) {
+		if(arr[i]>=lastInput) {
+			++count;
+		}
+	}
+	return count;
+}
+
 //! returns number of variables greater than last input
-int Functions::countContain(double argNum, ...) {
+//! every input has to be in double form
+int Functions::countGreater(double argNum, ...) {
 	int arg = (int)argNum;
 	double arr[arg-1];
 	double lastInput = 0;

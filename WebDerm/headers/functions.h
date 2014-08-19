@@ -26,8 +26,10 @@ std::size_t length(const T (&)[N] )
 
 String toString(int val);
 String toString(double val);
+String toString(bool val);
 double roundDecimal(double num, int places);
 String decimal2hex(int num);
+void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val="0");
 
 class Functions {
 public:
@@ -41,7 +43,8 @@ public:
 	Mat fillEdges3(Mat img);
 	Mat kMeansClustering(Mat &src);
 
-	int countContain(double argNum, ...);
+	int countGreaterEqual(double argNum, ...);
+	int countGreater(double argNum, ...);
 };
 
 #endif

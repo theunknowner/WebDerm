@@ -159,26 +159,14 @@ double rule3(FileData &fd, String &newPix) {
 		double deltaHSL_0[3] = {0};
 		double deltaHSL_45[3] = {0};
 		double deltaHSL_90[3] = {0};
-		/*
-		if(pt.x==608 && pt.y==269) {
-			printf("HSL(%.0f,%.0f,%.0f)\n",HSL[0],HSL[1],HSL[2]);
-			printf("maxHSL0(%.0f,%.0f,%.0f\n",HSL_0[0],HSL_0[1],HSL_0[2]);
-			printf("maxHSL45(%.0f,%.0f,%.0f\n",HSL_45[0],HSL_45[1],HSL_45[2]);
-			printf("maxHSL45(%.0f,%.0f,%.0f\n",HSL_90[0],HSL_90[1],HSL_90[2]);
-			printf("d_HSL0(%.0f,%.0f,%.0f)\n",deltaHSL_0[0],deltaHSL_0[1],deltaHSL_0[2]);
-			printf("d_HSL45(%.0f,%.0f,%.0f)\n",deltaHSL_45[0],deltaHSL_45[1],deltaHSL_45[2]);
-			printf("d_HSL90(%.0f,%.0f,%.0f)\n",deltaHSL_90[0],deltaHSL_90[1],deltaHSL_90[2]);
-			printf("m_Con0(%.2f)\n",measuredContrast_0);
-			printf("m_Con45(%.2f)\n",measuredContrast_45);
-			printf("m_Con90(%.2f)\n",measuredContrast_90);
-		}*/
+		double measuredContrast_0 = 0;
+		double measuredContrast_45 = 0;
+		double measuredContrast_90 = 0;
 		if(fd.inState==false) { // beginning of pink
 			for(int i=0; i<3; i++) {
 				HSL_0[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(hslPt_0[1].y).at(hslPt_0[1].x),';',i+1);
 				HSL_45[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(hslPt_45[1].y).at(hslPt_45[1].x),';',i+1);
 				HSL_90[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(hslPt_90[1].y).at(hslPt_90[1].x),';',i+1);
-			}
-			for(int i=0; i<3; i++) {
 				if(i==0) {
 					HSL_0[i] = HSL_0[i] - floor(HSL_0[i]/180.) * 360;
 					HSL_45[i] = HSL_45[i] - floor(HSL_45[i]/180.) * 360;
@@ -197,24 +185,41 @@ double rule3(FileData &fd, String &newPix) {
 				deltaHSL_0[i] = HSL_0[i] - HSL[i];
 				deltaHSL_45[i] = HSL_45[i] - HSL[i];
 				deltaHSL_90[i] = HSL_90[i] - HSL[i];
-			}
-			double measuredContrast_0 = 0;
-			double measuredContrast_45 = 0;
-			double measuredContrast_90 = 0;
-			for(int i=0; i<3; i++) {
 				measuredContrast_0 += floor(deltaHSL_0[i]/5.);
 				measuredContrast_45 += floor(deltaHSL_45[i]/5.);
 				measuredContrast_90 += floor(deltaHSL_90[i]/5.);
 			}
-			if(fn.countContain(4,measuredContrast_0,measuredContrast_45,measuredContrast_90,2)>=2) {
-				if(fn.countContain(4,deltaHSL_0[0],deltaHSL_45[0],deltaHSL_90[0],0)>=2) {
+			if(fn.countGreaterEqual(4,measuredContrast_0,measuredContrast_45,measuredContrast_90,2.)>=2) {
+				if(fn.countGreater(4,deltaHSL_0[0],deltaHSL_45[0],deltaHSL_90[0],0.)>2) {
 					newPix = "Pink";
 					flag=true;
 					ruleNum = 3.1;
 				}
+				//else
+				//fd.inState = true;
 			}
-
+			/*
+			if(pt.x==227 && pt.y==210) {
+			printf("HSL(%.0f,%.0f,%.0f)\n",HSL[0],HSL[1],HSL[2]);
+			printf("maxPt0(%d,%d)\n",hslPt_0[1].x+1, hslPt_0[1].y+1);
+			printf("maxPt45(%d,%d)\n",hslPt_45[1].x+1, hslPt_45[1].y+1);
+			printf("maxPt90(%d,%d)\n",hslPt_90[1].x+1, hslPt_90[1].y+1);
+			printf("maxHSL0(%.0f,%.0f,%.0f)\n",HSL_0[0],HSL_0[1],HSL_0[2]);
+			printf("maxHSL45(%.0f,%.0f,%.0f)\n",HSL_45[0],HSL_45[1],HSL_45[2]);
+			printf("maxHSL45(%.0f,%.0f,%.0f)\n",HSL_90[0],HSL_90[1],HSL_90[2]);
+			printf("d_HSL0(%.0f,%.0f,%.0f)\n",deltaHSL_0[0],deltaHSL_0[1],deltaHSL_0[2]);
+			printf("d_HSL45(%.0f,%.0f,%.0f)\n",deltaHSL_45[0],deltaHSL_45[1],deltaHSL_45[2]);
+			printf("d_HSL90(%.0f,%.0f,%.0f)\n",deltaHSL_90[0],deltaHSL_90[1],deltaHSL_90[2]);
+			printf("m_Con0(%.2f)\n",measuredContrast_0);
+			printf("m_Con45(%.2f)\n",measuredContrast_45);
+			printf("m_Con90(%.2f)\n",measuredContrast_90);
+		}*/
+			String strCon = toString(fd.inState)+";"+toString(measuredContrast_0)+";"+toString(measuredContrast_45)+";"+toString(measuredContrast_90);
+			fd.m_ContrastMat.at(pt.y).at(pt.x) = strCon;
+			String strHsl = toString(deltaHSL_0[0])+";"+toString(deltaHSL_45[0])+";"+toString(deltaHSL_90[0]);
+			fd.d_HslMat.at(pt.y).at(pt.x) = strHsl;
 		}
+ 		/*
 		if(fd.inState==true) { // middle/end of pink
 			for(int i=0; i<3; i++) {
 				HSL_0[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(hslPt_0[0].y).at(hslPt_0[0].x),';',i+1);
@@ -250,7 +255,7 @@ double rule3(FileData &fd, String &newPix) {
 				measuredContrast_90 += floor(deltaHSL_90[i]/5.);
 			}
 			/*
-			if(pt.x==235 && pt.y==201) {
+			if(pt.x==216 && pt.y==217) {
 			printf("HSL(%.0f,%.0f,%.0f)\n",HSL[0],HSL[1],HSL[2]);
 			printf("minPt0(%d,%d)\n",hslPt_0[0].x, hslPt_0[0].y);
 			printf("minPt45(%d,%d)\n",hslPt_45[0].x, hslPt_45[0].y);
@@ -264,7 +269,7 @@ double rule3(FileData &fd, String &newPix) {
 			printf("m_Con0(%.2f)\n",measuredContrast_0);
 			printf("m_Con45(%.2f)\n",measuredContrast_45);
 			printf("m_Con90(%.2f)\n",measuredContrast_90);
-		}*/
+		}
 			if(fn.countContain(4,measuredContrast_0,measuredContrast_45,measuredContrast_90,1)>=2) {
 				if(fn.countContain(4,deltaHSL_0[0],deltaHSL_45[0],deltaHSL_90[0],0)>=2) {
 					newPix = "Brown";
@@ -274,18 +279,16 @@ double rule3(FileData &fd, String &newPix) {
 				}
 				else {
 					newPix="Pink";
-					fd.inState = true;
 					flag=true;
 					ruleNum = 3.31;
 				}
 			}
 			else {
 				newPix="Pink";
-				fd.inState = true;
 				flag=true;
 				ruleNum = 3.32;
 			}
-		}
+		}*/
 	}
 
 	if(flag==true) return ruleNum;

@@ -44,7 +44,9 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(222,370);
 	Point pt2(224,372);
-	deque<String> files;
+	int cge = fn.countGreaterEqual(4,1.,5.,4.,2);
+	cout << cge << endl;
+	//deque<String> files;
 	//FileData fd;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
