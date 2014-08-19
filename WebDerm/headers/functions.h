@@ -30,6 +30,7 @@ String toString(bool val);
 double roundDecimal(double num, int places);
 String decimal2hex(int num);
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val="0");
+void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val=0);
 
 class Functions {
 public:
@@ -45,6 +46,9 @@ public:
 
 	int countGreaterEqual(double argNum, ...);
 	int countGreater(double argNum, ...);
+	int countLesser(double argNum, ...);
+	int countLesserEqual(double argNum, ...);
+	int countEqual(double argNum, ...);
 };
 
 #endif

@@ -43,12 +43,10 @@ public:
 	deque< deque<String> > rulesMat;
 	bool inState;
 
-	deque<String> m_ContrastVec;
 	deque< deque<String> > m_ContrastMat;
-	deque<String> d_HslVec;
 	deque< deque<String> > d_HslMat;
-	deque<String> hslMaxPtVec;
 	deque< deque<String> > hslMaxPtMat;
+	deque< deque<double> > cumHslMat;
 
 	FileData(String file_path="");
 	~FileData();

@@ -58,6 +58,19 @@ void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) 
 	deque<String>().swap(tempVec);
 }
 
+void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val) {
+	deque<double> tempVec;
+	for(int i=0; i<rows; i++) {
+		for(int j=0; j<cols; j++) {
+			tempVec.push_back(val);
+		}
+		vec.push_back(tempVec);
+		tempVec.clear();
+	}
+	tempVec.clear();
+	deque<double>().swap(tempVec);
+}
+
 
 /* return value up to Nth occurrence = first,second,third... of delimiter */
 double Functions::getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
@@ -435,6 +448,81 @@ int Functions::countGreater(double argNum, ...) {
 	int count=0;
 	for(int i=0; i<(arg-1); i++) {
 		if(arr[i]>lastInput) {
+			++count;
+		}
+	}
+	return count;
+}
+
+//! returns number of variables greater than last input
+//! every input has to be in double form
+int Functions::countLesser(double argNum, ...) {
+	int arg = (int)argNum;
+	double arr[arg-1];
+	double lastInput = 0;
+	va_list vl;
+	va_start(vl,argNum);
+	for(int i=0; i<arg; i++) {
+		if(i<(arg-1)) {
+			arr[i] = va_arg(vl,double);
+		}
+		else
+			lastInput = va_arg(vl,double);
+	}
+	va_end(vl);
+	int count=0;
+	for(int i=0; i<(arg-1); i++) {
+		if(arr[i]<lastInput) {
+			++count;
+		}
+	}
+	return count;
+}
+
+//! returns number of variables greater than last input
+//! every input has to be in double form
+int Functions::countLesserEqual(double argNum, ...) {
+	int arg = (int)argNum;
+	double arr[arg-1];
+	double lastInput = 0;
+	va_list vl;
+	va_start(vl,argNum);
+	for(int i=0; i<arg; i++) {
+		if(i<(arg-1)) {
+			arr[i] = va_arg(vl,double);
+		}
+		else
+			lastInput = va_arg(vl,double);
+	}
+	va_end(vl);
+	int count=0;
+	for(int i=0; i<(arg-1); i++) {
+		if(arr[i]<=lastInput) {
+			++count;
+		}
+	}
+	return count;
+}
+
+//! returns number of variables greater than last input
+//! every input has to be in double form
+int Functions::countEqual(double argNum, ...) {
+	int arg = (int)argNum;
+	double arr[arg-1];
+	double lastInput = 0;
+	va_list vl;
+	va_start(vl,argNum);
+	for(int i=0; i<arg; i++) {
+		if(i<(arg-1)) {
+			arr[i] = va_arg(vl,double);
+		}
+		else
+			lastInput = va_arg(vl,double);
+	}
+	va_end(vl);
+	int count=0;
+	for(int i=0; i<(arg-1); i++) {
+		if(arr[i]==lastInput) {
 			++count;
 		}
 	}

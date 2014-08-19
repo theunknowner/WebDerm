@@ -87,6 +87,7 @@ void runHysteresis()
 		writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
 		writeSeq2File(fd.d_HslMat,name+"_deltaHue");
 		writeSeq2File(fd.hslMaxPtMat,name+"_hslPts");
+		writeSeq2File(fd.cumHslMat,name+"_cumHSL");
 	}
 
 	img.release(); img2.release(); mask.release();
