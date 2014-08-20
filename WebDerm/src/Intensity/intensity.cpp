@@ -397,7 +397,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.shadeCount = newShadeAmt;
 	init_2D_Deque(fd.m_ContrastMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	init_2D_Deque(fd.hslMaxPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
@@ -475,6 +475,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				ratioLoc  = j-(localRatios.size()-localRatioIndex);
 				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
 				if(flag==true) pix2 = c.getMainColor(pix);
+				else ruleNo.push_back(0);
 				h = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
 				s = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
 				l = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
@@ -493,6 +494,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				str = "("+str+")";
 				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1)+ ";" + toString(ratioLoc+1);
 			}
+			else
+				ruleNo.push_back(0);
 			if(pix2!="Zero") {
 				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
 				if(localCCs.size()==localScanSize) localCCs.pop_front();

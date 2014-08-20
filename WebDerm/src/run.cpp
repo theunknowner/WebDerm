@@ -52,8 +52,11 @@ void runHysteresis()
 	String filename;
 	String name;
 	Size size(2,2);
+	double rule3thresh=0;
 	cout << "Enter filename: ";
 	cin >> filename;
+	cout << "Enter rule#3 thresh: ";
+	cin >> rule3thresh;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
 	getSkin(img, mask);
@@ -71,10 +74,19 @@ void runHysteresis()
 		}
 	}
 	if(flag[0]==true) {
+		Intensity in;
 		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
+		fd.rule3thresh = rule3thresh;
 		hysteresis(fd);
+/*
+		fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv");
+		fd.getFileMatrix(fd.windowVec);
+		fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5_HSL.csv");
+		fd.getFileMatrix(fd.hslMat);
+		fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
+*/
 		writeSeq2File(fd.windowVec,name);
 		writeSeq2File(fd.hslMat,name+"_HSL");
 		fd.writeFileMetaData();
@@ -85,8 +97,8 @@ void runHysteresis()
 		writeSeq2File(fd.colorVec,name+"_ShadeColors");
 		writeSeq2File(fd.rulesMat,name+"_RulesMat");
 		writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
-		writeSeq2File(fd.d_HslMat,name+"_deltaHue");
-		writeSeq2File(fd.hslMaxPtMat,name+"_hslPts");
+		writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
+		writeSeq2File(fd.hslPtMat,name+"_hslPts");
 		writeSeq2File(fd.cumHslMat,name+"_cumHSL");
 	}
 

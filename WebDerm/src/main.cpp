@@ -42,21 +42,18 @@ int main(int argc,char** argv)
 	img = runResizeImage(path+"Images/Urticaria","urticaria5.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(222,370);
-	Point pt2(224,372);
-	int cge = fn.countGreaterEqual(4,1.,5.,4.,2);
-	cout << cge << endl;
-	//deque<String> files;
+	Point pt1(249,161);
+	Point pt2(251,163);
 	//FileData fd;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
-	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/vesicles18_MainColors.csv");
+	//fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5_HSL.csv");
 	//deque< deque<String> > vec;
 	//fd.getFileMatrix(vec);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	//checkColorsFromList(img2,pt1,pt2);
-	//generateColorRegionTable(img2, pt1,pt2);
+	generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
 	int col = 475;

@@ -42,10 +42,11 @@ public:
 	deque< deque<String> > shadeVec;
 	deque< deque<String> > rulesMat;
 	bool inState;
+	double rule3thresh;
 
 	deque< deque<String> > m_ContrastMat;
 	deque< deque<String> > d_HslMat;
-	deque< deque<String> > hslMaxPtMat;
+	deque< deque<String> > hslPtMat;
 	deque< deque<double> > cumHslMat;
 
 	FileData(String file_path="");

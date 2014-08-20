@@ -21,6 +21,8 @@ FileData::FileData(String file_path) {
 	localScanSize=0;
 	range=0;
 	inState = false;
+
+	rule3thresh=0;
 }
 
 FileData::~FileData() {
@@ -46,6 +48,8 @@ String FileData::getFilePath() { return file_path; }
 /** gets the imported data matrix by passing as reference **/
 void FileData::getFileMatrix(deque< deque<String> > &vec) {
 	vec = dataMatrix;
+	dataMatrix.clear();
+	deque< deque<String> >().swap(dataMatrix);
 }
 
 void FileData::writeFileMetaData() {
@@ -75,7 +79,6 @@ void FileData::writeFileMetaData(int n_args, String* strArr, double* valArr) {
 }
 /** imports the matrix/csv files **/
 bool FileData::loadFileMatrix(String file_path) {
-	filename = getFileName(file_path);
 	fstream fs(file_path.c_str());
 	if(fs.is_open()) {
 		String temp;
