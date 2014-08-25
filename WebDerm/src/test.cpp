@@ -50,18 +50,14 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			if(pix=="OTHER")
 			{
 				pix = rgb.calcColor(r,g,b,dist,ind);
-				HSL = hsl.rgb2hsl(r,g,b);
-				HSL[1] = roundDecimal(HSL[1],2);
-				HSL[2] = roundDecimal(HSL[2],2);
-				hueWindow.push_back(HSL[0]);
-				satWindow.push_back(HSL[1]);
-				lumWindow.push_back(HSL[2]);
-				pixelColorWindow.push_back(pix);
 			}
-			else
-			{
-				pixelColorWindow.push_back(pix);
-			}
+			HSL = hsl.rgb2hsl(r,g,b);
+			HSL[1] = roundDecimal(HSL[1],2);
+			HSL[2] = roundDecimal(HSL[2],2);
+			hueWindow.push_back(HSL[0]);
+			satWindow.push_back(HSL[1]);
+			lumWindow.push_back(HSL[2]);
+			pixelColorWindow.push_back(pix);
 			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << endl;
 		}
 	}

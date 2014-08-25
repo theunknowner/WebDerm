@@ -23,10 +23,11 @@ int main(int argc,char** argv)
 	//runAllHysteresis();
 	runHysteresis();
 /*
-	String filename[]= {path+"Images/Vesicles/vesicles1.jpg",
-						path+"Images/Vesicles/vesicles2.jpg",
-						path+"Images/Vesicles/vesicles3.jpg",
-						path+"Images/Vesicles/vesicles19.jpg"};
+	String filename[]= {path+"Images/Acne/acne1.jpg",
+						path+"Images/Acne/acne2.jpg",
+						path+"Images/Acne/acne3.jpg",
+						path+"Images/Acne/acne5.jpg",
+						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
 	/*
@@ -39,16 +40,15 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Urticaria","urticaria5.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Urticaria","urticaria3.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(249,161);
-	Point pt2(251,163);
+	Point pt1(201,382);
+	Point pt2(203,384);
 	//FileData fd;
-	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
-	//fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5_HSL.csv");
 	//deque< deque<String> > vec;
-	//fd.getFileMatrix(vec);
+	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
+	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/urticaria3.csv",vec);
 	//dataDeduplicationGrayRGB(0);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
@@ -56,8 +56,8 @@ int main(int argc,char** argv)
 	generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
-	int col = 475;
-	int row = 35;
+	int col = 202;
+	int row = 165;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

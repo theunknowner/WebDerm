@@ -52,14 +52,11 @@ void runHysteresis()
 	String filename;
 	String name;
 	Size size(2,2);
-	double rule3thresh=0;
 	cout << "Enter filename: ";
 	cin >> filename;
-	cout << "Enter rule#3 thresh: ";
-	cin >> rule3thresh;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
-	getSkin(img, mask);
+	//getSkin(img, mask);
 	img.copyTo(img2, mask);
 	name = getFileName(filename);
 	int s = 3;
@@ -74,11 +71,9 @@ void runHysteresis()
 		}
 	}
 	if(flag[0]==true) {
-		Intensity in;
 		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
-		fd.rule3thresh = rule3thresh;
 		hysteresis(fd);
 /*
 		fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv");
@@ -145,6 +140,13 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 			writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
 			writeSeq2File(fd.colorVec,name+"_ShadeColors");
+			writeSeq2File(fd.rulesMat,name+"_RulesMat");
+			writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
+			writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
+			writeSeq2File(fd.hslPtMat,name+"_hslPts");
+			writeSeq2File(fd.cumHslMat,name+"_cumHSL");
+
+			//release images for next use
 			img.release(); img2.release(); mask.release();
 		}
 	}
@@ -189,6 +191,16 @@ void runAllHysteresis() {
 			fd.matImage = img2;
 			fd.matSize = size;
 			hysteresis(fd);
+/*
+			String windowVecFile = "/home/jason/Desktop/Programs/Hysteresis/" + name + ".csv";
+			String hslVecFile = "/home/jason/Desktop/Programs/Hysteresis/" + name + "_HSL.csv";
+			Intensity in;
+			fd.loadFileMatrix(windowVecFile, fd.windowVec);
+			//fd.getFileMatrix(fd.windowVec);
+			fd.loadFileMatrix(hslVecFile, fd.hslMat);
+			//fd.getFileMatrix(fd.hslMat);
+			fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
+/**/
 			writeSeq2File(fd.windowVec,name);
 			writeSeq2File(fd.hslMat,name+"_HSL");
 			fd.writeFileMetaData();
@@ -197,6 +209,13 @@ void runAllHysteresis() {
 			writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 			writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
 			writeSeq2File(fd.colorVec,name+"_ShadeColors");
+			writeSeq2File(fd.rulesMat,name+"_RulesMat");
+			writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
+			writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
+			writeSeq2File(fd.hslPtMat,name+"_hslPts");
+			writeSeq2File(fd.cumHslMat,name+"_cumHSL");
+
+			//release images for next use
 			img.release(); img2.release(); mask.release();
 		}
 	}

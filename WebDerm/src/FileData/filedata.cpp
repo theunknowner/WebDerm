@@ -21,8 +21,6 @@ FileData::FileData(String file_path) {
 	localScanSize=0;
 	range=0;
 	inState = false;
-
-	rule3thresh=0;
 }
 
 FileData::~FileData() {
@@ -35,6 +33,11 @@ FileData::~FileData() {
 	deque< deque<double> >().swap(smoothIntensityVec);
 	deque< deque<String> >().swap(shadeVec);
 	deque<double>().swap(absRatioVec);
+
+	deque< deque<String> >().swap(m_ContrastMat);
+	deque< deque<String> >().swap(d_HslMat);
+	deque< deque<String> >().swap(hslPtMat);
+	deque< deque<double> >().swap(cumHslMat);
 	if(!filename.empty())
 		printf("Destructor executed for %s\n",filename.c_str());
 }
@@ -90,6 +93,29 @@ bool FileData::loadFileMatrix(String file_path) {
 				vec.at(i) = vec.at(i).substr(1,vec.at(i).length()-2);
 			}
 			dataMatrix.push_back(vec);
+			vec.clear();
+		}
+		deque<String>().swap(vec);
+		fs.close();
+		return true;
+	}
+	else
+		cout << "Failed to load File matrix!" << endl;
+	return false;
+}
+
+bool FileData::loadFileMatrix(String file_path, deque< deque<String> > &dataMat) {
+	fstream fs(file_path.c_str());
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			vec.pop_back(); //removes the weird empty space at the end of deque
+			for(unsigned int i=0; i<vec.size(); i++) {
+				vec.at(i) = vec.at(i).substr(1,vec.at(i).length()-2);
+			}
+			dataMat.push_back(vec);
 			vec.clear();
 		}
 		deque<String>().swap(vec);

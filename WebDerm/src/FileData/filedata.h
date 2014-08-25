@@ -42,7 +42,6 @@ public:
 	deque< deque<String> > shadeVec;
 	deque< deque<String> > rulesMat;
 	bool inState;
-	double rule3thresh;
 
 	deque< deque<String> > m_ContrastMat;
 	deque< deque<String> > d_HslMat;
@@ -58,6 +57,7 @@ public:
 	void writeFileMetaData();
 	void writeFileMetaData(int n_args, String* strArr, double *valArr);
 	bool loadFileMatrix(String file_path);
+	bool loadFileMatrix(String file_path, deque< deque<String> > &dataMat);
 
 	int listFiles(String directory);
 	bool getFilesFromDirectory(String directory, deque<String> &files);
