@@ -167,3 +167,35 @@ double forecast(double input, deque<double> &yArr, deque<double> &xArr) {
 	results = a + (b*input);
 	return results;
 }
+
+double max(deque<double> vec) {
+	double largest=0;
+	try {
+		largest = vec.at(0);
+		for(unsigned int i=0; i<vec.size(); i++) {
+			if(largest<vec.at(i))
+				largest = vec.at(i);
+		}
+	}
+	catch(const std::out_of_range &oor) {
+		printf("maths.cpp::max(deque<double> vec) out of range!\n");
+		exit(0);
+	}
+	return largest;
+}
+
+double min(deque<double> vec) {
+	double lowest=0;
+	try {
+		lowest = vec.at(0);
+		for(unsigned int i=0; i<vec.size(); i++) {
+			if(lowest<vec.at(i))
+				lowest = vec.at(i);
+		}
+	}
+	catch(const std::out_of_range &oor) {
+		printf("maths.cpp::min(deque<double> vec) out of range!\n");
+		exit(0);
+	}
+	return lowest;
+}

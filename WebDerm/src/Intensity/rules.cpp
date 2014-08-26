@@ -91,18 +91,28 @@ double rule3(FileData &fd, String &newPix) {
 	HSL[1] = 100-HSL[1];
 	double currCumHSL = HSL[0] + HSL[1] + HSL[2];
 	fd.cumHslMat.at(pt.y).at(pt.x) = currCumHSL;
-	double cumHSL_0[2] = {fd.cumHslMat.at(pt.y).at(pt.x-1)};
-	double cumHSL_45[2] = {fd.cumHslMat.at(pt.y-1).at(pt.x-1)};
-	double cumHSL_90[2] = {fd.cumHslMat.at(pt.y-1).at(pt.x)};
-	int HSL_0[3] = {0};
-	int HSL_45[3] = {0};
-	int HSL_90[3] = {0};
+	int HSL_0[2][3] = {0};
+	int HSL_45[2][3] = {0};
+	int HSL_90[2][3] = {0};
 	Point hslPt_0[2];
 	Point hslPt_45[2];
 	Point hslPt_90[2];
-	double unitThresh[3] = {6.0,5.0,5.0};
+	double unitThresh[3] = {5.0,5.0,5.0};
 	String color_0, color_45, color_90;
-	if(color=="BrownPink"&& pt.y>0) {
+	deque<double> minBucket0;
+	deque<Point> minBucketPts0;
+	deque<double> maxBucket0;
+	deque<Point> maxBucketPts0;
+	deque<double> minBucket45;
+	deque<Point> minBucketPts45;
+	deque<double> maxBucket45;
+	deque<Point> maxBucketPts45;
+	deque<double> minBucket90;
+	deque<Point> minBucketPts90;
+	deque<double> maxBucket90;
+	deque<Point> maxBucketPts90;
+
+	if((color=="BrownPink" || color=="BrownRed")&& pt.y>0) {
 		int j=pt.x-1;
 		int x = j;
 		int endY = (pt.y-localScanSize);
@@ -110,212 +120,170 @@ double rule3(FileData &fd, String &newPix) {
 			if(x<0 && j<0 && i<0) break;
 			double currHSL = 0;
 			if(x>=0) {
-				HSL_0[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',1);
-				HSL_0[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',2)*100;
-				HSL_0[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',3)*100;
-				HSL_0[0] = (int)(HSL_0[0] - floor(HSL_0[0]/180.) * 360);
-				HSL_0[1] = 100-HSL_0[1];
-				currHSL = HSL_0[0] + HSL_0[1] + HSL_0[2];
-				if(currHSL<=cumHSL_0[0]) {
-					cumHSL_0[0] = currHSL;
-					hslPt_0[0] = Point(x,pt.y);
+				HSL_0[0][0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',1);
+				HSL_0[0][1] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',2)*100;
+				HSL_0[0][2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',3)*100;
+				HSL_0[0][0] = (int)(HSL_0[0][0] - floor(HSL_0[0][0]/180.) * 360);
+				HSL_0[0][1] = 100-HSL_0[0][1];
+				currHSL = HSL_0[0][0] + HSL_0[0][1] + HSL_0[0][2];
+				color_0 = fd.colorVec.at(pt.y).at(x);
+				color_0 = c.getMainColor(color_0);
+				if(color_0=="Pink") {
+					minBucket0.push_back(currHSL);
+					minBucketPts0.push_back(Point(x,pt.y));
 				}
-				if(currHSL>cumHSL_0[1]) {
-					cumHSL_0[1] = currHSL;
-					hslPt_0[1] = Point(x,pt.y);
+				else if(color_0.find("Brown")!=string::npos) {
+					maxBucket0.push_back(currHSL);
+					maxBucketPts0.push_back(Point(x,pt.y));
 				}
 			}
 			--x;
 			if(j>=0 && i>=0) {
-				HSL_45[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
-				HSL_45[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2)*100;
-				HSL_45[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3)*100;
-				HSL_45[0] = (int)(HSL_45[0] - floor(HSL_45[0]/180.) * 360);
-				HSL_45[1] = 100-HSL_45[1];
-				currHSL = HSL_45[0] + HSL_45[1] + HSL_45[2];
-				if(currHSL<=cumHSL_45[0]) {
-					cumHSL_45[0] = currHSL;
-					hslPt_45[0] = Point(j,i);
+				HSL_45[0][0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+				HSL_45[0][1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2)*100;
+				HSL_45[0][2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3)*100;
+				HSL_45[0][0] = (int)(HSL_45[0][0] - floor(HSL_45[0][0]/180.) * 360);
+				HSL_45[0][1] = 100-HSL_45[0][1];
+				currHSL = HSL_45[0][0] + HSL_45[0][1] + HSL_45[0][2];
+				color_45 = fd.colorVec.at(i).at(j);
+				color_45 = c.getMainColor(color_45);
+				if(color_45=="Pink") {
+					minBucket45.push_back(currHSL);
+					minBucketPts45.push_back(Point(j,i));
 				}
-				if(currHSL>cumHSL_45[1]) {
-					cumHSL_45[1] = currHSL;
-					hslPt_45[1] = Point(j,i);
+				else if(color_45.find("Brown")!=string::npos) {
+					maxBucket45.push_back(currHSL);
+					maxBucketPts45.push_back(Point(j,i));
 				}
 			}
 			--j;
 			if(i>=0) {
-				HSL_90[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',1);
-				HSL_90[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',2)*100;
-				HSL_90[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',3)*100;
-				HSL_90[0] = (int)(HSL_90[0] - floor(HSL_90[0]/180.) * 360);
-				HSL_90[1] = 100-HSL_90[1];
-				currHSL = HSL_90[0] + HSL_90[1] + HSL_90[2];
-				if(currHSL<=cumHSL_90[0]) {
-					cumHSL_90[0] = currHSL;
-					hslPt_90[0] = Point(pt.x,i);
+				HSL_90[0][0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',1);
+				HSL_90[0][1] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',2)*100;
+				HSL_90[0][2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',3)*100;
+				HSL_90[0][0] = (int)(HSL_90[0][0] - floor(HSL_90[0][0]/180.) * 360);
+				HSL_90[0][1] = 100-HSL_90[0][1];
+				currHSL = HSL_90[0][0] + HSL_90[0][1] + HSL_90[0][2];
+				color_90 = fd.colorVec.at(i).at(pt.x);
+				color_90 = c.getMainColor(color_90);
+				if(color_90=="Pink") {
+					minBucket90.push_back(currHSL);
+					minBucketPts90.push_back(Point(pt.x,i));
 				}
-				if(currHSL>=cumHSL_90[1]) {
-					cumHSL_90[1] = currHSL;
-					hslPt_90[1] = Point(pt.x,i);
+				else if(color_90.find("Brown")!=string::npos) {
+					maxBucket90.push_back(currHSL);
+					maxBucketPts90.push_back(Point(pt.x,i));
 				}
 			}
 		}
-		double deltaHSL_0[3] = {0};
-		double deltaHSL_45[3] = {0};
-		double deltaHSL_90[3] = {0};
-		double measuredContrast_0 = 0;
-		double measuredContrast_45 = 0;
-		double measuredContrast_90 = 0;
-		double tempHSL_0[3] = {0};
-		double tempHSL_45[3] = {0};
-		double tempHSL_90[3] = {0};
-		String minMaxStr;
-		Point minMaxPt_0, minMaxPt_45, minMaxPt_90;
-		String strCon = toString(fd.inState);
-		if(fd.inState==false) { // beginning of pink
-			minMaxStr = "Max";
-			minMaxPt_0 = hslPt_0[1];
-			minMaxPt_45 = hslPt_45[1];
-			minMaxPt_90 = hslPt_90[1];
-			color_0 = fd.windowVec.at(minMaxPt_0.y).at(minMaxPt_0.x);
-			color_45 = fd.windowVec.at(minMaxPt_45.y).at(minMaxPt_45.x);
-			color_90 = fd.windowVec.at(minMaxPt_90.y).at(minMaxPt_90.x);
-			color_0 = c.getMainColor(color_0);
-			color_45 = c.getMainColor(color_45);
-			color_90 = c.getMainColor(color_90);
-			//if(color_0!="Brown" && color_45!="Brown" && color_90!="Brown") {
-				for(int i=0; i<3; i++) {
-					tempHSL_0[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(minMaxPt_0.y).at(minMaxPt_0.x),';',i+1);
-					tempHSL_45[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(minMaxPt_45.y).at(minMaxPt_45.x),';',i+1);
-					tempHSL_90[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(minMaxPt_90.y).at(minMaxPt_90.x),';',i+1);
-					if(i==0) {
-						HSL_0[i] = (int)(tempHSL_0[i] - floor(tempHSL_0[i]/180.) * 360);
-						HSL_45[i] = (int)(tempHSL_45[i] - floor(tempHSL_45[i]/180.) * 360);
-						HSL_90[i] = (int)(tempHSL_90[i] - floor(tempHSL_90[i]/180.) * 360);
-					}
-					if(i==1) {
-						HSL_0[i] = (int)(100-(tempHSL_0[i]*100));
-						HSL_45[i] = (int)(100-(tempHSL_45[i]*100));
-						HSL_90[i] = (int)(100-(tempHSL_90[i]*100));
-					}
-					if(i==2) {
-						HSL_0[i] = (int)(tempHSL_0[i]*100);
-						HSL_45[i] = (int)(tempHSL_45[i]*100);
-						HSL_90[i] = (int)(tempHSL_90[i]*100);
-					}
-					deltaHSL_0[i] = HSL_0[i] - HSL[i];
-					deltaHSL_45[i] = HSL_45[i] - HSL[i];
-					deltaHSL_90[i] = HSL_90[i] - HSL[i];
-					measuredContrast_0 += floor(deltaHSL_0[i]/unitThresh[i]);
-					measuredContrast_45 += floor(deltaHSL_45[i]/unitThresh[i]);
-					measuredContrast_90 += floor(deltaHSL_90[i]/unitThresh[i]);
+		int minIndex=0, maxIndex=0;
+		if(minBucket0.size()>0) {
+			fn.getMin(minBucket0,minIndex);
+			hslPt_0[0] = minBucketPts0.at(minIndex);
+		} else
+			hslPt_0[0] = Point(pt.x,pt.y);
+		if(maxBucket0.size()>0) {
+			fn.getMax(maxBucket0,maxIndex);
+			hslPt_0[1] = maxBucketPts0.at(maxIndex);
+		} else
+			hslPt_0[1] = Point(pt.x,pt.y);
+		if(minBucket45.size()>0) {
+			fn.getMin(minBucket45,minIndex);
+			hslPt_45[0] = minBucketPts45.at(minIndex);
+		} else
+			hslPt_45[0] = Point(pt.x,pt.y);
+		if(maxBucket45.size()>0) {
+			fn.getMax(maxBucket45,maxIndex);
+			hslPt_45[1] = maxBucketPts45.at(maxIndex);
+		} else
+			hslPt_45[1] = Point(pt.x,pt.y);
+		if(minBucket90.size()>0) {
+			fn.getMin(minBucket90,minIndex);
+			hslPt_90[0] = minBucketPts90.at(minIndex);
+		} else
+			hslPt_90[0] = Point(pt.x,pt.y);
+		if(maxBucket90.size()>0) {
+			fn.getMax(maxBucket90,maxIndex);
+			hslPt_90[1] = maxBucketPts90.at(maxIndex);
+		} else
+			hslPt_90[1] = Point(pt.x,pt.y);
+
+		double deltaHSL_0[2][3] = {0};
+		double deltaHSL_45[2][3] = {0};
+		double deltaHSL_90[2][3] = {0};
+		double measuredContrast_0[2] = {0};
+		double measuredContrast_45[2] = {0};
+		double measuredContrast_90[2] = {0};
+		double tempHSL_0[2][3] = {0};
+		double tempHSL_45[2][3] = {0};
+		double tempHSL_90[2][3] = {0};
+		for(int i=0; i<2; i++) {
+			for(int j=0; j<3; j++) {
+				tempHSL_0[i][j] = fn.getDelimitedValuesFromString(fd.hslMat.at(hslPt_0[i].y).at(hslPt_0[i].x),';',j+1);
+				tempHSL_45[i][j] = fn.getDelimitedValuesFromString(fd.hslMat.at(hslPt_45[i].y).at(hslPt_45[i].x),';',j+1);
+				tempHSL_90[i][j] = fn.getDelimitedValuesFromString(fd.hslMat.at(hslPt_90[i].y).at(hslPt_90[i].x),';',j+1);
+				if(j==0) {
+					HSL_0[i][j] = (int)(tempHSL_0[i][j] - floor(tempHSL_0[i][j]/180.) * 360);
+					HSL_45[i][j] = (int)(tempHSL_45[i][j] - floor(tempHSL_45[i][j]/180.) * 360);
+					HSL_90[i][j] = (int)(tempHSL_90[i][j] - floor(tempHSL_90[i][j]/180.) * 360);
 				}
-				if(fn.countGreaterEqual(4,measuredContrast_0,measuredContrast_45,measuredContrast_90,2.0)>=2) {
-					if(fn.countGreater(4,floor(deltaHSL_0[0]/unitThresh[0]),floor(deltaHSL_45[0]/unitThresh[0]),floor(deltaHSL_90[0]/unitThresh[0]),0.)>=2) {
-						newPix = "Pink";
-						fd.inState = true;
-						flag=true;
-						ruleNum = 3.1;
-					}
+				if(j==1) {
+					HSL_0[i][j] = (int)(100-(tempHSL_0[i][j]*100));
+					HSL_45[i][j] = (int)(100-(tempHSL_45[i][j]*100));
+					HSL_90[i][j] = (int)(100-(tempHSL_90[i][j]*100));
 				}
-				/*
-			if(pt.x==227 && pt.y==210) {
-			printf("HSL(%.0f,%.0f,%.0f)\n",HSL[0],HSL[1],HSL[2]);
-			printf("maxPt0(%d,%d)\n",hslPt_0[1].x+1, hslPt_0[1].y+1);
-			printf("maxPt45(%d,%d)\n",hslPt_45[1].x+1, hslPt_45[1].y+1);
-			printf("maxPt90(%d,%d)\n",hslPt_90[1].x+1, hslPt_90[1].y+1);
-			printf("maxHSL0(%.0f,%.0f,%.0f)\n",HSL_0[0],HSL_0[1],HSL_0[2]);
-			printf("maxHSL45(%.0f,%.0f,%.0f)\n",HSL_45[0],HSL_45[1],HSL_45[2]);
-			printf("maxHSL45(%.0f,%.0f,%.0f)\n",HSL_90[0],HSL_90[1],HSL_90[2]);
-			printf("d_HSL0(%.0f,%.0f,%.0f)\n",deltaHSL_0[0],deltaHSL_0[1],deltaHSL_0[2]);
-			printf("d_HSL45(%.0f,%.0f,%.0f)\n",deltaHSL_45[0],deltaHSL_45[1],deltaHSL_45[2]);
-			printf("d_HSL90(%.0f,%.0f,%.0f)\n",deltaHSL_90[0],deltaHSL_90[1],deltaHSL_90[2]);
-			printf("m_Con0(%.2f)\n",measuredContrast_0);
-			printf("m_Con45(%.2f)\n",measuredContrast_45);
-			printf("m_Con90(%.2f)\n",measuredContrast_90);
-			}*/
-			//}
+				if(j==2) {
+					HSL_0[i][j] = (int)(tempHSL_0[i][j]*100);
+					HSL_45[i][j] = (int)(tempHSL_45[i][j]*100);
+					HSL_90[i][j] = (int)(tempHSL_90[i][j]*100);
+				}
+				deltaHSL_0[i][j] = HSL_0[i][j] - HSL[j];
+				deltaHSL_45[i][j] = HSL_45[i][j] - HSL[j];
+				deltaHSL_90[i][j] = HSL_90[i][j] - HSL[j];
+				measuredContrast_0[i] += floor(deltaHSL_0[i][j]/unitThresh[j]);
+				measuredContrast_45[i] += floor(deltaHSL_45[i][j]/unitThresh[j]);
+				measuredContrast_90[i] += floor(deltaHSL_90[i][j]/unitThresh[j]);
+			}
 		}
-		else if(fd.inState==true) { // middle/end of pink
-			minMaxStr = "Min";
-			minMaxPt_0 = hslPt_0[0];
-			minMaxPt_45 = hslPt_45[0];
-			minMaxPt_90 = hslPt_90[0];
-			measuredContrast_0 = 0;
-			measuredContrast_45 = 0;
-			measuredContrast_90 = 0;
-			color_0 = fd.windowVec.at(minMaxPt_0.y).at(minMaxPt_0.x);
-			color_45 = fd.windowVec.at(minMaxPt_45.y).at(minMaxPt_45.x);
-			color_90 = fd.windowVec.at(minMaxPt_90.y).at(minMaxPt_90.x);
-			color_0 = c.getMainColor(color_0);
-			color_45 = c.getMainColor(color_45);
-			color_90 = c.getMainColor(color_90);
-			//if(color_0!="Brown" && color_45!="Brown" && color_90!="Brown") {
-				for(int i=0; i<3; i++) {
-					tempHSL_0[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(minMaxPt_0.y).at(minMaxPt_0.x),';',i+1);
-					tempHSL_45[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(minMaxPt_45.y).at(minMaxPt_45.x),';',i+1);
-					tempHSL_90[i] = fn.getDelimitedValuesFromString(fd.hslMat.at(minMaxPt_90.y).at(minMaxPt_90.x),';',i+1);
-					if(i==0) {
-						HSL_0[i] = (int)(tempHSL_0[i] - floor(tempHSL_0[i]/180.) * 360);
-						HSL_45[i] = (int)(tempHSL_45[i] - floor(tempHSL_45[i]/180.) * 360);
-						HSL_90[i] = (int)(tempHSL_90[i] - floor(tempHSL_90[i]/180.) * 360);
-					}
-					if(i==1) {
-						HSL_0[i] = (int)(100-(tempHSL_0[i]*100));
-						HSL_45[i] = (int)(100-(tempHSL_45[i]*100));
-						HSL_90[i] = (int)(100-(tempHSL_90[i]*100));
-					}
-					if(i==2) {
-						HSL_0[i] = (int)(tempHSL_0[i]*100);
-						HSL_45[i] = (int)(tempHSL_45[i]*100);
-						HSL_90[i] = (int)(tempHSL_90[i]*100);
-					}
-					deltaHSL_0[i] = HSL[i] - HSL_0[i];
-					deltaHSL_45[i] = HSL[i] - HSL_45[i];
-					deltaHSL_90[i] = HSL[i] - HSL_90[i];
-					measuredContrast_0 += floor(deltaHSL_0[i]/unitThresh[i]);
-					measuredContrast_45 += floor(deltaHSL_45[i]/unitThresh[i]);
-					measuredContrast_90 += floor(deltaHSL_90[i]/unitThresh[i]);
-				}
-				if(fn.countLesser(4,measuredContrast_0,measuredContrast_45,measuredContrast_90,2.0)>=2) {
-					if(fn.countLesserEqual(4,floor(deltaHSL_0[0]/unitThresh[0]),floor(deltaHSL_45[0]/unitThresh[0]),floor(deltaHSL_90[0]/unitThresh[0]),0.)>=2) {
-						newPix = "Pink";
-						flag=true;
-						ruleNum = 3.2;
-					}
-					else fd.inState = false;
-				}
-				else if(fn.countGreaterEqual(4,measuredContrast_0,measuredContrast_45,measuredContrast_90,2.0)>=2) {
-					if(fn.countGreater(4,floor(deltaHSL_0[0]/unitThresh[0]),deltaHSL_45[0],deltaHSL_90[0],0.)>=2) {
-						newPix = "Brown";
-						fd.inState = false;
-						flag=true;
-						ruleNum = 3.21;
-					}
-					else
-						fd.inState = false;
-				}
-				else
-					fd.inState = false;
-			//}
-		} // end if(state==true)
-		strCon += ";"+toString(measuredContrast_0)+";"+toString(measuredContrast_45)+";"+toString(measuredContrast_90);
+		if(minBucket0.size()<1) measuredContrast_0[0] = -0.1;
+		if(minBucket45.size()<1) measuredContrast_45[0] = -0.1;
+		if(minBucket90.size()<1) measuredContrast_90[0] = -0.1;
+		if(maxBucket0.size()<1) measuredContrast_0[1] = 2.1;
+		if(maxBucket45.size()<1) measuredContrast_45[1] = 2.1;
+		if(maxBucket90.size()<1) measuredContrast_90[1] = 2.1;
+		if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],2.0)>=2 &&
+				fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],2.0)>=2) {
+			if(fn.countEqual(4,floor(deltaHSL_0[0][0]/unitThresh[0]),floor(deltaHSL_45[0][0]/unitThresh[0]),floor(deltaHSL_90[0][0]/unitThresh[0]),0.)>=2 &&
+					fn.countGreater(4,floor(deltaHSL_0[1][0]/unitThresh[0]),floor(deltaHSL_45[1][0]/unitThresh[0]),floor(deltaHSL_90[1][0]/unitThresh[0]),0.)>=2) {
+				newPix = "Pink";
+				flag=true;
+				ruleNum = 3.1;
+			}
+		}
+
+		String strCon = "("+toString(measuredContrast_0[0])+";"+toString(measuredContrast_0[1])+")";
+		strCon += "("+toString(measuredContrast_45[0])+";"+toString(measuredContrast_45[1])+")";
+		strCon += "("+toString(measuredContrast_90[0])+";"+toString(measuredContrast_90[1])+")";
 		fd.m_ContrastMat.at(pt.y).at(pt.x) = strCon;
-		String strHsl = "("+toString(deltaHSL_0[0])+";"+toString(deltaHSL_0[1])+";"+toString(deltaHSL_0[2])+")";
-		strHsl += ";("+toString(deltaHSL_45[0])+";"+toString(deltaHSL_45[1])+";"+toString(deltaHSL_45[2])+")";
-		strHsl += ";("+toString(deltaHSL_90[0])+";"+toString(deltaHSL_90[1])+";"+toString(deltaHSL_90[2])+")";
+		String strHsl = "Min("+toString(deltaHSL_0[0][0])+";"+toString(deltaHSL_0[0][1])+";"+toString(deltaHSL_0[0][2])+")";
+		strHsl += ";("+toString(deltaHSL_45[0][0])+";"+toString(deltaHSL_45[0][1])+";"+toString(deltaHSL_45[0][2])+")";
+		strHsl += ";("+toString(deltaHSL_90[0][0])+";"+toString(deltaHSL_90[0][1])+";"+toString(deltaHSL_90[0][2])+")";
+		strHsl += "Max("+toString(deltaHSL_0[1][0])+";"+toString(deltaHSL_0[1][1])+";"+toString(deltaHSL_0[1][2])+")";
+		strHsl += ";("+toString(deltaHSL_45[1][0])+";"+toString(deltaHSL_45[1][1])+";"+toString(deltaHSL_45[1][2])+")";
+		strHsl += ";("+toString(deltaHSL_90[1][0])+";"+toString(deltaHSL_90[1][1])+";"+toString(deltaHSL_90[1][2])+")";
 		fd.d_HslMat.at(pt.y).at(pt.x) = strHsl;
 		char chArr[100];
-		sprintf(chArr,"(%d;%d);(%d;%d);(%d;%d)",minMaxPt_0.x+1,minMaxPt_0.y+1,minMaxPt_45.x+1,minMaxPt_45.y+1,minMaxPt_90.x+1,minMaxPt_90.y+1);
+		sprintf(chArr,"Min(%d;%d);(%d;%d);(%d;%d)",hslPt_0[0].x+1,hslPt_0[0].y+1,hslPt_45[0].x+1,hslPt_45[0].y+1,hslPt_90[0].x+1,hslPt_90[0].y+1);
 		String ptStr(chArr);
-		ptStr = minMaxStr + ptStr;
+		sprintf(chArr,"Max(%d;%d);(%d;%d);(%d;%d)",hslPt_0[1].x+1,hslPt_0[1].y+1,hslPt_45[1].x+1,hslPt_45[1].y+1,hslPt_90[1].x+1,hslPt_90[1].y+1);
+		String ptStr2(chArr);
+		ptStr += ptStr2;
 		fd.hslPtMat.at(pt.y).at(pt.x) = ptStr;
 	} // end if(brownpink)
 	else {
 		fd.m_ContrastMat.at(pt.y).at(pt.x) = color;
 		fd.d_HslMat.at(pt.y).at(pt.x) = color;
 		fd.hslPtMat.at(pt.y).at(pt.x) = color;
-		fd.inState = false;
 	}
 
 	if(flag==true) return ruleNum;

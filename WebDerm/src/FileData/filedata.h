@@ -41,7 +41,6 @@ public:
 	deque< deque<double> > smoothIntensityVec;
 	deque< deque<String> > shadeVec;
 	deque< deque<String> > rulesMat;
-	bool inState;
 
 	deque< deque<String> > m_ContrastMat;
 	deque< deque<String> > d_HslMat;

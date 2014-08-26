@@ -20,7 +20,7 @@ void writeSeq2File(deque< deque<String> > &vec, String name)
 		{
 			for(unsigned int j=0; j<vec.at(i).size(); j++)
 			{
-				fprintf(fp,"[%s],", vec.at(i).at(j).c_str());
+				fprintf(fp,"%s,", vec.at(i).at(j).c_str());
 			}
 			fprintf(fp, "\n");
 		}

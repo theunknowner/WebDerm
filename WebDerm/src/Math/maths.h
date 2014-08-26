@@ -24,5 +24,7 @@ int max(int argNum, ...);
 double max(double numArr[], int length);
 double average(deque<double> &vec);
 double forecast(double input, deque<double> &yArr, deque<double> &xArr);
+double max(deque<double> vec);
+double min(deque<double> vec);
 
 #endif /* MATHS_H_ */

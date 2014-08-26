@@ -528,3 +528,41 @@ int Functions::countEqual(double argNum, ...) {
 	}
 	return count;
 }
+
+double Functions::getMin(deque<double> &vec, int &minIndex) {
+	double lowest=-1;
+	try {
+		lowest = vec.at(0);
+		minIndex = 0;
+		for(unsigned int i=0; i<vec.size(); i++) {
+			if(lowest<vec.at(i)) {
+				lowest = vec.at(i);
+				minIndex = i;
+			}
+		}
+	}
+	catch(const std::out_of_range &oor) {
+		printf("Functions::getMin(deque<double> vec, minIndex) out of range!\n");
+		exit(0);
+	}
+	return lowest;
+}
+
+double Functions::getMax(deque<double> &vec, int &maxIndex) {
+	double largest=-1;
+	try {
+		largest = vec.at(0);
+		maxIndex = 0;
+		for(unsigned int i=0; i<vec.size(); i++) {
+			if(largest<vec.at(i)) {
+				largest = vec.at(i);
+				maxIndex = i;
+			}
+		}
+	}
+	catch(const std::out_of_range &oor) {
+		printf("Functions::getMax(deque<double> vec, maxIndex) out of range!\n");
+		exit(0);
+	}
+	return largest;
+}
