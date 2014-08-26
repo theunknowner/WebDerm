@@ -237,9 +237,16 @@ double rule3(FileData &fd, String &newPix) {
 					HSL_45[i][j] = (int)(tempHSL_45[i][j]*100);
 					HSL_90[i][j] = (int)(tempHSL_90[i][j]*100);
 				}
-				deltaHSL_0[i][j] = HSL_0[i][j] - HSL[j];
-				deltaHSL_45[i][j] = HSL_45[i][j] - HSL[j];
-				deltaHSL_90[i][j] = HSL_90[i][j] - HSL[j];
+				if(i==0) {
+					deltaHSL_0[i][j] = HSL[j] - HSL_0[i][j];
+					deltaHSL_45[i][j] = HSL[j]- HSL_45[i][j];
+					deltaHSL_90[i][j] = HSL[j] - HSL_90[i][j];
+				}
+				if(i==1) {
+					deltaHSL_0[i][j] = HSL_0[i][j] - HSL[j];
+					deltaHSL_45[i][j] = HSL_45[i][j] - HSL[j];
+					deltaHSL_90[i][j] = HSL_90[i][j] - HSL[j];
+				}
 				measuredContrast_0[i] += floor(deltaHSL_0[i][j]/unitThresh[j]);
 				measuredContrast_45[i] += floor(deltaHSL_45[i][j]/unitThresh[j]);
 				measuredContrast_90[i] += floor(deltaHSL_90[i][j]/unitThresh[j]);
@@ -253,8 +260,8 @@ double rule3(FileData &fd, String &newPix) {
 		if(maxBucket90.size()<1) measuredContrast_90[1] = 2.1;
 		if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],2.0)>=2 &&
 				fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],2.0)>=2) {
-			if(fn.countEqual(4,floor(deltaHSL_0[0][0]/unitThresh[0]),floor(deltaHSL_45[0][0]/unitThresh[0]),floor(deltaHSL_90[0][0]/unitThresh[0]),0.)>=2 &&
-					fn.countGreater(4,floor(deltaHSL_0[1][0]/unitThresh[0]),floor(deltaHSL_45[1][0]/unitThresh[0]),floor(deltaHSL_90[1][0]/unitThresh[0]),0.)>=2) {
+			if(fn.countEqual(4,floor(abs(deltaHSL_0[0][0]/unitThresh[0])),floor(abs(deltaHSL_45[0][0]/unitThresh[0])),floor(abs(deltaHSL_90[0][0]/unitThresh[0])),0.)>=2 &&
+					fn.countGreater(4,floor(abs(deltaHSL_0[1][0]/unitThresh[0])),floor(abs(deltaHSL_45[1][0]/unitThresh[0])),floor(abs(deltaHSL_90[1][0]/unitThresh[0])),0.)>=2) {
 				newPix = "Pink";
 				flag=true;
 				ruleNum = 3.1;
