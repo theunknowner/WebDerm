@@ -45,7 +45,14 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(201,382);
 	Point pt2(203,384);
-	//FileData fd;
+	FileData fd;
+	String name = "urticaria5";
+	String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
+	String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
+	fd.loadFileMatrix(windowVecFile, fd.windowVec);
+	fd.loadFileMatrix(hslVecFile, fd.hslMat);
+	cout << fd.windowVec.at(0).size() << endl;
+	cout << fd.hslMat.at(0).size() << endl;
 	//deque< deque<String> > vec;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/Hysteresis/urticaria3.csv",vec);

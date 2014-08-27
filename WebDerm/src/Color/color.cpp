@@ -135,14 +135,20 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 String Color::getMainColor(String color) {
 	String pix="";
 	int flag=0;
-	for(unsigned int i=0; i<mainColors.size(); i++) {
-		if(color.find(mainColors.at(i))!=string::npos && mainColors.at(i)!="Gray") {
-			pix += mainColors.at(i);
-			flag=1;
+	try {
+		for(unsigned int i=0; i<mainColors.size(); i++) {
+			if(color.find(mainColors.at(i))!=string::npos && mainColors.at(i)!="Gray") {
+				pix += mainColors.at(i);
+				flag=1;
+			}
 		}
+		if(flag==0 && color.find("Gray")!=string::npos)
+			return "Grey";
 	}
-	if(flag==0 && color.find("Gray")!=string::npos)
-		return "Grey";
+	catch(const std::out_of_range &oor) {
+		printf("Color::getMainColor() out of range!\n");
+		exit(0);
+	}
 	return pix;
 }
 

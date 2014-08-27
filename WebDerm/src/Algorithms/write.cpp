@@ -20,9 +20,11 @@ void writeSeq2File(deque< deque<String> > &vec, String name)
 		{
 			for(unsigned int j=0; j<vec.at(i).size(); j++)
 			{
-				fprintf(fp,"%s,", vec.at(i).at(j).c_str());
+				if(j<vec.at(i).size()-1)
+					fprintf(fp,"%s,", vec.at(i).at(j).c_str());
+				else
+					fprintf(fp,"%s\n", vec.at(i).at(j).c_str());
 			}
-			fprintf(fp, "\n");
 		}
 	fclose(fp);
 }
@@ -40,9 +42,11 @@ void writeSeq2File(deque< deque<int> > &vec, String name)
 		{
 			for(unsigned int j=0; j<vec.at(i).size(); j++)
 			{
-				fprintf(fp,"%d,", vec.at(i).at(j));
+				if(j<vec.at(i).size()-1)
+					fprintf(fp,"%d,", vec.at(i).at(j));
+				else
+					fprintf(fp,"%d\n", vec.at(i).at(j));
 			}
-			fprintf(fp, "\n");
 		}
 	fclose(fp);
 }
@@ -60,9 +64,11 @@ void writeSeq2File(deque< deque<double> > &vec, String name)
 		{
 			for(unsigned int j=0; j<vec.at(i).size(); j++)
 			{
-				fprintf(fp,"%f,", vec.at(i).at(j));
+				if(j<vec.at(i).size()-1)
+					fprintf(fp,"%f,", vec.at(i).at(j));
+				else
+					fprintf(fp,"%f\n", vec.at(i).at(j));
 			}
-			fprintf(fp, "\n");
 		}
 	fclose(fp);
 }
@@ -94,9 +100,11 @@ void writeSeq2File(deque< deque<long double> > &vec, String name)
 		{
 			for(unsigned int j=0; j<vec.at(i).size(); j++)
 			{
-				fprintf(fp,"%Lf,", vec.at(i).at(j));
+				if(j<vec.at(i).size()-1)
+					fprintf(fp,"%Lf,", vec.at(i).at(j));
+				else
+					fprintf(fp,"%Lf\n", vec.at(i).at(j));
 			}
-			fprintf(fp, "\n");
 		}
 	fclose(fp);
 }

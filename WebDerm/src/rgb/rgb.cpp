@@ -448,14 +448,20 @@ double rgb::getColorLevel(String pix) {
 	double level=0;
 	size_t pos=0;
 	String str;
-	for(unsigned int i=0; i<mainColors.size(); i++) {
-		if(mainColors.at(i)!="Gray") {
-			pos = pix.find(mainColors.at(i));
-			if(pos!=string::npos)
-				str = pix.substr(pos+mainColors.at(i).size(),pix.size()-(pos+mainColors.at(i).size()));
+	try {
+		for(unsigned int i=0; i<mainColors.size(); i++) {
+			if(mainColors.at(i)!="Gray") {
+				pos = pix.find(mainColors.at(i));
+				if(pos!=string::npos)
+					str = pix.substr(pos+mainColors.at(i).size(),pix.size()-(pos+mainColors.at(i).size()));
+			}
 		}
+		level = atof(str.c_str());
 	}
-	level = atof(str.c_str());
+	catch(const std::out_of_range &oor) {
+		printf("rgb::getColorLevel() out of range1\n");
+		exit(0);
+	}
 	return level;
 }
 

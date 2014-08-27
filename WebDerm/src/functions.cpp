@@ -535,7 +535,7 @@ double Functions::getMin(deque<double> &vec, int &minIndex) {
 		lowest = vec.at(0);
 		minIndex = 0;
 		for(unsigned int i=0; i<vec.size(); i++) {
-			if(lowest<vec.at(i)) {
+			if(lowest>vec.at(i)) {
 				lowest = vec.at(i);
 				minIndex = i;
 			}

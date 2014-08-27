@@ -87,7 +87,7 @@ bool FileData::loadFileMatrix(String file_path) {
 		deque<String> vec;
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
-			vec.pop_back(); //removes the weird empty space at the end of deque
+			//vec.pop_back(); //removes the weird empty space at the end of deque
 			for(unsigned int i=0; i<vec.size(); i++) {
 				vec.at(i) = vec.at(i).substr(1,vec.at(i).length()-2);
 			}
@@ -110,9 +110,9 @@ bool FileData::loadFileMatrix(String file_path, deque< deque<String> > &dataMat)
 		deque<String> vec;
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
-			vec.pop_back(); //removes the weird empty space at the end of deque
+			//vec.pop_back(); //removes the weird empty space at the end of deque
 			for(unsigned int i=0; i<vec.size(); i++) {
-				vec.at(i) = vec.at(i).substr(1,vec.at(i).length()-2);
+				vec.at(i) = vec.at(i).substr(0,vec.at(i).length());
 			}
 			dataMat.push_back(vec);
 			vec.clear();

@@ -248,20 +248,30 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 	String pix;
 	deque<double> vec;
 	deque< deque<double> > vec2;
-	for(unsigned int i=0; i<windowVec.size(); i++) {
-		for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
-			pix = windowVec.at(i).at(j);
-			if(pix.find("Zero")!=string::npos)
-				colorIntensity = 0;
-			else
-				colorIntensity = calcIntensity(pix);
-			colorIntensity = round(colorIntensity);
-			vec.push_back(colorIntensity);
+	unsigned int x=0,y=0;
+	try {
+		for(unsigned int i=0; i<windowVec.size(); i++) {
+			y=i;
+			for(unsigned int j=0; j<windowVec.at(i).size(); j++) {
+				x=j;
+				pix = windowVec.at(i).at(j);
+				if(pix.find("Zero")!=string::npos)
+					colorIntensity = 0;
+				else
+					colorIntensity = calcIntensity(pix);
+				colorIntensity = round(colorIntensity);
+				vec.push_back(colorIntensity);
+			}
+			vec2.push_back(vec);
+			vec.clear();
 		}
-		vec2.push_back(vec);
-		vec.clear();
+		setMinMax(vec2);
 	}
-	setMinMax(vec2);
+	catch(const std::out_of_range &oor) {
+		printf("Intensity::calcIntensityMatrix() out of range!\n");
+		printf("Point(%d,%d)\n",x,y);
+		exit(0);
+	}
 	return vec2;
 }
 
@@ -275,45 +285,50 @@ deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<doubl
 	deque< deque<double> > vec2;
 	unsigned int x=0,y=0;
 	unsigned int tempX=scanSize, tempY=scanSize; //scan size
-	while(y<intensityVec.size()) {
-		while(x<intensityVec.at(y).size()) {
-			if(x>intensityVec.size()-tempX) tempX--;
-			if(y>intensityVec.size()-tempY) tempY--;
-			for(unsigned int i=y; i<y+tempY; i++) {
-				for(unsigned int j=x; j<x+tempX; j++) {
-					intensity = intensityVec.at(i).at(j);
-					//intensity = (intensity*range)+minIntensity;
-					if(i==y && j==x) {
-						if(intensity<=0)
-							flag=1;
-					}
-					if(flag==0) {
-						if(intensity>0) {
-							totalIntensity+=intensityVec.at(i).at(j);
-							counter++;
+	try {
+		while(y<intensityVec.size()) {
+			while(x<intensityVec.at(y).size()) {
+				if(x>intensityVec.size()-tempX) tempX--;
+				if(y>intensityVec.size()-tempY) tempY--;
+				for(unsigned int i=y; i<y+tempY; i++) {
+					for(unsigned int j=x; j<x+tempX; j++) {
+						intensity = intensityVec.at(i).at(j);
+						if(i==y && j==x) {
+							if(intensity<=0)
+								flag=1;
+						}
+						if(flag==0) {
+							if(intensity>0) {
+								totalIntensity+=intensityVec.at(i).at(j);
+								counter++;
+							}
+						}
+						else {
+							totalIntensity=intensityVec.at(i).at(j);
+							goto break_nested_loop;
 						}
 					}
-					else {
-						totalIntensity=intensityVec.at(i).at(j);
-						goto break_nested_loop;
-					}
 				}
-			}
 break_nested_loop:
-			if(flag==0) totalIntensity /= counter;
-			//totalIntensity = roundDecimal(totalIntensity,2);
-			totalIntensity = round(totalIntensity);
-			vec1.push_back(totalIntensity);
-			totalIntensity=0;
-			flag=0;
-			counter=0;
-			x++;
+				if(flag==0) totalIntensity /= counter;
+				totalIntensity = round(totalIntensity);
+				vec1.push_back(totalIntensity);
+				totalIntensity=0;
+				flag=0;
+				counter=0;
+				x++;
+			}
+			vec2.push_back(vec1);
+			vec1.clear();
+			y++;
+			x=0;
+			tempX=scanSize;
 		}
-		vec2.push_back(vec1);
-		vec1.clear();
-		y++;
-		x=0;
-		tempX=scanSize;
+	}
+	catch(const std::out_of_range &oor) {
+		printf("Intensity::calcSmoothedIntensityMatrix() out of range!\n");
+		printf("Point(%d,%d)\n",x,y);
+		exit(0);
 	}
 	return vec2;
 }
@@ -347,29 +362,36 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.intensityVec = calcIntensityMatrix(fd.windowVec);
 	fd.smoothIntensityVec = calcSmoothedIntensityMatrix(fd.intensityVec);
 	fd.range = range;
-	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
-		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
-			pix = windowVec.at(i).at(j);
-			pix2 = c.getMainColor(pix);
-			ccCurr = fd.smoothIntensityVec.at(i).at(j);
-			if(flag==0) { //initial first pixel-area
-				if(pix!="Zero") {
-					shade = calcShade(ccCurr);
-					flag=1;
+	try {
+		for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
+			for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
+				pix = windowVec.at(i).at(j);
+				pix2 = c.getMainColor(pix);
+				ccCurr = fd.smoothIntensityVec.at(i).at(j);
+				if(flag==0) { //initial first pixel-area
+					if(pix!="Zero") {
+						shade = calcShade(ccCurr);
+						flag=1;
+					}
 				}
+				else if(flag!=0) {
+					if(pix!="Zero")
+						shade = calcShade(ccCurr);
+					else
+						shade = "";
+				}
+				colorVec1.push_back(shade);
 			}
-			else if(flag!=0) {
-				if(pix!="Zero")
-					shade = calcShade(ccCurr);
-				else
-					shade = "";
-			}
-			colorVec1.push_back(shade);
+			flag=0;
+			fd.colorVec.push_back(colorVec1);
+			colorVec1.clear();
 		}
-		flag=0;
-		fd.colorVec.push_back(colorVec1);
-		colorVec1.clear();
 	}
+	catch(const std::out_of_range &oor) {
+		printf("Intensity::calcMainColorMatrix()-1stHalf out of range!\n");
+		exit(0);
+	}
+
 	maxShadeIndex = sh.getShadeIndex(newMaxShade);
 	minShadeIndex = sh.getShadeIndex(newMinShade);
 	printf("%s;%s\n",oldMinShade.c_str(),oldMaxShade.c_str());
@@ -399,176 +421,183 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
-		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
-			pix = windowVec.at(i).at(j);
-			pix2 = c.getMainColor(pix);
-			ccCurr = fd.smoothIntensityVec.at(i).at(j);
-			currGL = rgb.getGrayLevel1(pix);
-			currCL = rgb.getColorLevel(pix);
-			currRatio = currGL/currCL;
-			if(flag==0) { //initial first pixel-area
-				if(pix2!="Zero") {
-					currGL = rgb.getGrayLevel1(pix);
-					currCL = rgb.getColorLevel(pix);
-					currRatio = currGL/currCL;
-					shade = fd.shadeVec.at(i).at(j);
-					shadeIndex = sh.getShadeIndex(shade);
-					localCC = ccCurr;
-					localIndex = shadeIndex;
-					localShade = shade;
-					ccPrev = ccCurr;
-					localRatio = currRatio;
-					prevRatio = currRatio;
-					flag=1;
-				}
-			}
-			else if(flag!=0 && pix2!="Zero") {
+	try {
+		for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
+			for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
+				pix = windowVec.at(i).at(j);
+				pix2 = c.getMainColor(pix);
+				ccCurr = fd.smoothIntensityVec.at(i).at(j);
 				currGL = rgb.getGrayLevel1(pix);
 				currCL = rgb.getColorLevel(pix);
 				currRatio = currGL/currCL;
-				if(currRatio-prevRatio>0) {
-					localRatio = localMinRatio;
-					localRatioIndex = minRatioIndex;
+				if(flag==0) { //initial first pixel-area
+					if(pix2!="Zero") {
+						currGL = rgb.getGrayLevel1(pix);
+						currCL = rgb.getColorLevel(pix);
+						currRatio = currGL/currCL;
+						shade = fd.shadeVec.at(i).at(j);
+						shadeIndex = sh.getShadeIndex(shade);
+						localCC = ccCurr;
+						localIndex = shadeIndex;
+						localShade = shade;
+						ccPrev = ccCurr;
+						localRatio = currRatio;
+						prevRatio = currRatio;
+						flag=1;
+					}
 				}
-				else if(currRatio-prevRatio<0) {
-					localRatio = localMaxRatio;
-					localRatioIndex = maxRatioIndex;
-				}
-				else localRatioIndex--;
-				if(localRatioIndex<0) localRatioIndex=0;
+				else if(flag!=0 && pix2!="Zero") {
+					currGL = rgb.getGrayLevel1(pix);
+					currCL = rgb.getColorLevel(pix);
+					currRatio = currGL/currCL;
+					if(currRatio-prevRatio>0) {
+						localRatio = localMinRatio;
+						localRatioIndex = minRatioIndex;
+					}
+					else if(currRatio-prevRatio<0) {
+						localRatio = localMaxRatio;
+						localRatioIndex = maxRatioIndex;
+					}
+					else localRatioIndex--;
+					if(localRatioIndex<0) localRatioIndex=0;
 
-				if(windowVec.at(i).at(j-1)!="Zero")
-					ccPrev = fd.smoothIntensityVec.at(i).at(j-1);
-				if((ccCurr-ccPrev)<0) {
-					localCC = localMaxCC;
-					localIndex = localMaxIndex;
-					localShade = localMaxShade;
-					index = maxIndex;
+					if(windowVec.at(i).at(j-1)!="Zero")
+						ccPrev = fd.smoothIntensityVec.at(i).at(j-1);
+					if((ccCurr-ccPrev)<0) {
+						localCC = localMaxCC;
+						localIndex = localMaxIndex;
+						localShade = localMaxShade;
+						index = maxIndex;
+					}
+					else if((ccCurr-ccPrev)>0) {
+						localCC = localMinCC;
+						localIndex = localMinIndex;
+						localShade = localMinShade;
+						index = minIndex;
+					}
+					else index--;
+					if(index<0) index=0;
+					shade = fd.shadeVec.at(i).at(j);
+					indexChange = myRound((ccCurr-localCC)/(newInterval));
+					shadeIndex = localIndex + (int)indexChange;
+					ccPrev=ccCurr;
+					prevRatio = currRatio;
+					relativeRatio = currRatio/localRatio;
 				}
-				else if((ccCurr-ccPrev)>0) {
-					localCC = localMinCC;
-					localIndex = localMinIndex;
-					localShade = localMinShade;
-					index = minIndex;
-				}
-				else index--;
-				if(index<0) index=0;
-				shade = fd.shadeVec.at(i).at(j);
-				indexChange = myRound((ccCurr-localCC)/(newInterval));
-				shadeIndex = localIndex + (int)indexChange;
-				ccPrev=ccCurr;
-				prevRatio = currRatio;
 				relativeRatio = currRatio/localRatio;
-			}
-			relativeRatio = currRatio/localRatio;
-			relativeRatio = roundDecimal(relativeRatio,2);
-			if(localRatio==0 || pix2=="Zero")  {
-				relativeRatio = -1;
-				currRatio = -1;
-			}
-			fd.absRatioVec.push_back(roundDecimal(currRatio,2));
-			double h=0,s=0,l=0;
-			if(pix2!="Zero") {
-				fd.pt.x = j; fd.pt.y=i;
-				loc = j-(localIndexes.size()-index);
-				ratioLoc  = j-(localRatios.size()-localRatioIndex);
-				bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
-				if(flag==true) pix2 = c.getMainColor(pix);
-				else ruleNo.push_back(0);
-				h = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
-				s = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
-				l = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
-				int ind=-1;
-				hsl.getHslColor(h,s,l,ind,fd.pt);
-				try { h = hueTableNum.at(ind); }
-				catch(const std::out_of_range& oor) {
-					printf("HueTableNum: Index out of bounds!\n");
-					printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
-					printf("HSL(%0.0f,%0.2f,%0.2f)\n",h,s,l);
-					exit(0);
+				relativeRatio = roundDecimal(relativeRatio,2);
+				if(localRatio==0 || pix2=="Zero")  {
+					relativeRatio = -1;
+					currRatio = -1;
 				}
-				s = roundDecimal(s,2);
-				l = roundDecimal(l,1);
-				String str = toString(h)+";"+toString(s)+";"+toString(l);
-				str = "("+str+")";
-				pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1)+ ";" + toString(ratioLoc+1);
-			}
-			else
-				ruleNo.push_back(0);
-			if(pix2!="Zero") {
-				if(localIndexes.size()==localScanSize) localIndexes.pop_front();
-				if(localCCs.size()==localScanSize) localCCs.pop_front();
-				if(localShades.size()==localScanSize) localShades.pop_front();
-				localIndexes.push_back(shadeIndex);
-				localCCs.push_back(ccCurr);
-				localShades.push_back(shade);
-				maxIndex = distance(localCCs.begin(),max_element(localCCs.begin(),localCCs.end()));
-				localMaxCC = localCCs.at(maxIndex);
-				localMaxIndex = localIndexes.at(maxIndex);
-				localMaxShade = localShades.at(maxIndex);
-				minIndex = distance(localCCs.begin(),min_element(localCCs.begin(),localCCs.end()));
-				localMinCC = localCCs.at(minIndex);
-				localMinIndex = localIndexes.at(minIndex);
-				localMinShade = localShades.at(minIndex);
-				if(localRatios.size()==localRatioScanSize) localRatios.pop_front();
-				localRatios.push_back(currRatio);
-				maxRatioIndex = distance(localRatios.begin(),max_element(localRatios.begin(),localRatios.end()));
-				localMaxRatio = localRatios.at(maxRatioIndex);
-				minRatioIndex = distance(localRatios.begin(),min_element(localRatios.begin(),localRatios.end()));
-				localMinRatio = localRatios.at(minRatioIndex);
-			}
-			/** generate rule table **/
-			if(ruleNo.size()>0) {
-				char buffer[40];
-				sprintf(buffer,"(%d;%d)",j+1,i+1);
-				String coord(buffer);
-				String ruleNum;
-				String oldPix = windowVec.at(i).at(j);
-				String oldShade = fd.colorVec.at(i).at(j);
-				char buffer2[50];
-				sprintf(buffer2,"(%.0f;%.2f;%.2f)",h,s,l);
-				String hslStr(buffer2);
-				strVec1.push_back(oldPix);
-				strVec1.push_back(pix);
-				strVec1.push_back(hslStr);
-				strVec1.push_back(oldShade);
-				strVec1.push_back(shade);
-				strVec1.push_back(toString(indexChange));
-				for(unsigned int n=0; n<ruleNo.size(); n++) {
-					ruleNum += toString(ruleNo.at(n)) + ";";
+				fd.absRatioVec.push_back(roundDecimal(currRatio,2));
+				double h=0,s=0,l=0;
+				if(pix2!="Zero") {
+					fd.pt.x = j; fd.pt.y=i;
+					loc = j-(localIndexes.size()-index);
+					ratioLoc  = j-(localRatios.size()-localRatioIndex);
+					bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
+					if(flag==true) pix2 = c.getMainColor(pix);
+					else ruleNo.push_back(0);
+					h = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
+					s = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
+					l = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
+					int ind=-1;
+					hsl.getHslColor(h,s,l,ind,fd.pt);
+					try { h = hueTableNum.at(ind); }
+					catch(const std::out_of_range& oor) {
+						printf("HueTableNum: Index out of bounds!\n");
+						printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
+						printf("HSL(%0.0f,%0.2f,%0.2f)\n",h,s,l);
+						exit(0);
+					}
+					s = roundDecimal(s,2);
+					l = roundDecimal(l,1);
+					String str = toString(h)+";"+toString(s)+";"+toString(l);
+					str = "("+str+")";
+					pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1)+ ";" + toString(ratioLoc+1);
 				}
-				strVec1.push_back(ruleNum);
-				strVec1.push_back(coord);
-				strVec1.push_back(name);
-				generateTable(fp,strVec1);
-				strVec1.clear();
-				rulesRow.push_back(ruleNum);
-			}
-			fd.colorVec.at(i).at(j) = pix2;
-			ruleNo.clear();
-		} // end col
-		fd.absRatioMat.push_back(fd.absRatioVec);
-		fd.absRatioVec.clear();
-		fd.rulesMat.push_back(rulesRow);
-		rulesRow.clear();
-		flag=0;
-		indexChange=0;
-		index=0;
-		localIndexes.clear();
-		localCCs.clear();
-		localShades.clear();
-		localRatioIndex=0;
-		localRatios.clear();
-		localRatio=0;
-	} // end row
-	fclose(fp);
-	//fd.writeFileMetaData();
-	//c.output2ImageColor(fd.colorVec,name);
-	//writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
-	//writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
-	//writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
-	//writeSeq2File(shadeVec2,"shadeVec");
+				else
+					ruleNo.push_back(0);
+				if(pix2!="Zero") {
+					if(localIndexes.size()==localScanSize) localIndexes.pop_front();
+					if(localCCs.size()==localScanSize) localCCs.pop_front();
+					if(localShades.size()==localScanSize) localShades.pop_front();
+					localIndexes.push_back(shadeIndex);
+					localCCs.push_back(ccCurr);
+					localShades.push_back(shade);
+					maxIndex = distance(localCCs.begin(),max_element(localCCs.begin(),localCCs.end()));
+					localMaxCC = localCCs.at(maxIndex);
+					localMaxIndex = localIndexes.at(maxIndex);
+					localMaxShade = localShades.at(maxIndex);
+					minIndex = distance(localCCs.begin(),min_element(localCCs.begin(),localCCs.end()));
+					localMinCC = localCCs.at(minIndex);
+					localMinIndex = localIndexes.at(minIndex);
+					localMinShade = localShades.at(minIndex);
+					if(localRatios.size()==localRatioScanSize) localRatios.pop_front();
+					localRatios.push_back(currRatio);
+					maxRatioIndex = distance(localRatios.begin(),max_element(localRatios.begin(),localRatios.end()));
+					localMaxRatio = localRatios.at(maxRatioIndex);
+					minRatioIndex = distance(localRatios.begin(),min_element(localRatios.begin(),localRatios.end()));
+					localMinRatio = localRatios.at(minRatioIndex);
+				}
+				/** generate rule table **/
+				if(ruleNo.size()>0) {
+					char buffer[40];
+					sprintf(buffer,"(%d;%d)",j+1,i+1);
+					String coord(buffer);
+					String ruleNum;
+					String oldPix = windowVec.at(i).at(j);
+					String oldShade = fd.colorVec.at(i).at(j);
+					char buffer2[50];
+					sprintf(buffer2,"(%.0f;%.2f;%.2f)",h,s,l);
+					String hslStr(buffer2);
+					strVec1.push_back(oldPix);
+					strVec1.push_back(pix);
+					strVec1.push_back(hslStr);
+					strVec1.push_back(oldShade);
+					strVec1.push_back(shade);
+					strVec1.push_back(toString(indexChange));
+					for(unsigned int n=0; n<ruleNo.size(); n++) {
+						ruleNum += toString(ruleNo.at(n)) + ";";
+					}
+					strVec1.push_back(ruleNum);
+					strVec1.push_back(coord);
+					strVec1.push_back(name);
+					generateTable(fp,strVec1);
+					strVec1.clear();
+					rulesRow.push_back(ruleNum);
+				}
+				fd.colorVec.at(i).at(j) = pix2;
+				ruleNo.clear();
+			} // end col
+			fd.absRatioMat.push_back(fd.absRatioVec);
+			fd.absRatioVec.clear();
+			fd.rulesMat.push_back(rulesRow);
+			rulesRow.clear();
+			flag=0;
+			indexChange=0;
+			index=0;
+			localIndexes.clear();
+			localCCs.clear();
+			localShades.clear();
+			localRatioIndex=0;
+			localRatios.clear();
+			localRatio=0;
+		} // end row
+		fclose(fp);
+		//fd.writeFileMetaData();
+		//c.output2ImageColor(fd.colorVec,name);
+		//writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
+		//writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
+		//writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
+		//writeSeq2File(shadeVec2,"shadeVec");
+	}
+	catch(const std::out_of_range &oor) {
+		printf("Intensity::calcMainColorMatrix()-1stHalf out of range!\n");
+		exit(0);
+	}
+
 	return fd.colorVec;
 }
 

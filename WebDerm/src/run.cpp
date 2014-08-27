@@ -74,14 +74,15 @@ void runHysteresis()
 		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
-		hysteresis(fd);
-/*
-		fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv");
-		fd.getFileMatrix(fd.windowVec);
-		fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5_HSL.csv");
-		fd.getFileMatrix(fd.hslMat);
+		//hysteresis(fd);
+
+		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
+		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
+		Intensity in;
+		fd.loadFileMatrix(windowVecFile, fd.windowVec);
+		fd.loadFileMatrix(hslVecFile, fd.hslMat);
 		fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
-*/
+/**/
 		writeSeq2File(fd.windowVec,name);
 		writeSeq2File(fd.hslMat,name+"_HSL");
 		fd.writeFileMetaData();
