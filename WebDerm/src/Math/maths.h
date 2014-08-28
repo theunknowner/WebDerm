@@ -26,5 +26,8 @@ double average(deque<double> &vec);
 double forecast(double input, deque<double> &yArr, deque<double> &xArr);
 double max(deque<double> vec);
 double min(deque<double> vec);
+double euclideanDist(deque<double> &vec1, deque<double> &vec2);
+double euclideanDist(double *vec1, double *vec2);
+double euclideanDist(int *vec1, int *vec2);
 
 #endif /* MATHS_H_ */

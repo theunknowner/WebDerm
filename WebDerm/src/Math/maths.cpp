@@ -199,3 +199,42 @@ double min(deque<double> vec) {
 	}
 	return lowest;
 }
+
+double euclideanDist(double *vec1, double *vec2) {
+	double result=0;
+	double val[3] = {0};
+	for(int i=0; i<3; i++)
+	{
+		val[i] = vec1[i]-vec2[i];
+		val[i] *= val[i];
+		result += val[i];
+	}
+	result = sqrt(result);
+	return result;
+}
+
+double euclideanDist(int *vec1, int *vec2) {
+	double result=0;
+	int val[3] = {0};
+	for(int i=0; i<3; i++)
+	{
+		val[i] = vec1[i]-vec2[i];
+		val[i] *= val[i];
+		result += val[i];
+	}
+	result = sqrt(result);
+	return result;
+}
+
+double euclideanDist(deque<double> &vec1, deque<double> &vec2) {
+	double result=0;
+	double val[3] = {0};
+	for(unsigned int i=0; i<3; i++)
+	{
+		val[i] = vec1.at(i)-vec2.at(i);
+		val[i] *= val[i];
+		result += val[i];
+	}
+	result = sqrt(result);
+	return result;
+}

@@ -92,13 +92,11 @@ bool rgb::importColorThresholds()
 }
 
 //calculate the Euclidean Distance betweeen normalized rgb input and colors(vec).
-double rgb::normEucDist(double red, double green, double blue, deque<double> &vec)
-	{
+double rgb::normEucDist(double red, double green, double blue, deque<double> &vec) {
 		double result=0;
 		double color[3] = {red,green,blue};
 		double normVals[3];
-		for(int i=0; i<3; i++)
-		{
+		for(int i=0; i<3; i++) {
 			normVals[i] = color[i]/(color[0]+color[1]+color[2]);
 			normVals[i] -= vec.at(i);
 			normVals[i] *= normVals[i];

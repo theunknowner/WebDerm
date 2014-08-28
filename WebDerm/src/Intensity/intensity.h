@@ -18,7 +18,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/table.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
-
 #include "rules.h"
 
 class FileData;
@@ -64,6 +63,8 @@ public:
 	void writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
 							deque< deque<String> > &hslMat,String name, FileData &fd);
 	void writeMainColorMatrix(FileData &fd);
+
+	void test_cases();
 };
 
 #endif /* INTENSITY_H_ */

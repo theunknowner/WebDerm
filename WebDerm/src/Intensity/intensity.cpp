@@ -389,6 +389,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	}
 	catch(const std::out_of_range &oor) {
 		printf("Intensity::calcMainColorMatrix()-1stHalf out of range!\n");
+		cout << "Cols: " << fd.smoothIntensityVec.at(0).size() << endl;
+		cout << "Rows: " << fd.smoothIntensityVec.size() << endl;
 		exit(0);
 	}
 
@@ -594,7 +596,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		//writeSeq2File(shadeVec2,"shadeVec");
 	}
 	catch(const std::out_of_range &oor) {
-		printf("Intensity::calcMainColorMatrix()-1stHalf out of range!\n");
+		printf("Intensity::calcMainColorMatrix()-2ndHalf out of range!\n");
 		exit(0);
 	}
 
