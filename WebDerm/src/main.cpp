@@ -45,7 +45,7 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(304,437);
 	Point pt2(306,439);
-	FileData fd;
+	//FileData fd;
 	//deque< deque<String> > vec;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv",fd.windowVec);

@@ -529,6 +529,29 @@ int Functions::countEqual(double argNum, ...) {
 	return count;
 }
 
+int Functions::countEqual(String argNum, ...) {
+	int arg = atoi(argNum.c_str());
+	String arr[arg-1];
+	String lastInput = "";
+	va_list vl;
+	va_start(vl,argNum);
+	for(int i=0; i<arg; i++) {
+		if(i<(arg-1)) {
+			arr[i] = va_arg(vl,char *);
+		}
+		else
+			lastInput = va_arg(vl,char *);
+	}
+	va_end(vl);
+	int count=0;
+	for(int i=0; i<(arg-1); i++) {
+		if(arr[i]==lastInput) {
+			++count;
+		}
+	}
+	return count;
+}
+
 double Functions::getMin(deque<double> &vec, int &minIndex) {
 	double lowest=-1;
 	try {

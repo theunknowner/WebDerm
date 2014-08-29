@@ -101,19 +101,13 @@ double rule3(FileData &fd, String &newPix) {
 	Point hslPt_45[2];
 	Point hslPt_90[2];
 	double unitThresh[3] = {6.0,5.0,4.0};
-	String color_0, color_45, color_90;
-	deque<double> minBucket0;
-	deque<Point> minBucketPts0;
-	deque<double> maxBucket0;
-	deque<Point> maxBucketPts0;
-	deque<double> minBucket45;
-	deque<Point> minBucketPts45;
-	deque<double> maxBucket45;
-	deque<Point> maxBucketPts45;
-	deque<double> minBucket90;
-	deque<Point> minBucketPts90;
-	deque<double> maxBucket90;
-	deque<Point> maxBucketPts90;
+	deque<double> minMaxBucket0;
+	deque<double> minMaxBucket45;
+	deque<double> minMaxBucket90;
+	deque<Point> minMaxBucketPts0;
+	deque<Point> minMaxBucketPts45;
+	deque<Point> minMaxBucketPts90;
+	String prevColor_0, prevColor_45, prevColor_90;
 
 	if((color=="BrownPink" || color=="Brown") && pt.y>0) {
 		int j=pt.x-1;
@@ -129,16 +123,8 @@ double rule3(FileData &fd, String &newPix) {
 				HSL_0[0][0] = (int)(HSL_0[0][0] - floor(HSL_0[0][0]/180.) * 360);
 				HSL_0[0][1] = 100-HSL_0[0][1];
 				currHSL = HSL_0[0][0] + HSL_0[0][1] + HSL_0[0][2];
-				color_0 = fd.colorVec.at(pt.y).at(x);
-				color_0 = c.getMainColor(color_0);
-				if(color_0=="Pink") {
-					minBucket0.push_back(currHSL);
-					minBucketPts0.push_back(Point(x,pt.y));
-				}
-				if(color_0.find("Brown")!=string::npos) {
-					maxBucket0.push_back(currHSL);
-					maxBucketPts0.push_back(Point(x,pt.y));
-				}
+				minMaxBucket0.push_back(currHSL);
+				minMaxBucketPts0.push_back(Point(x,pt.y));
 			}
 			--x;
 			if(j>=0 && i>=0) {
@@ -148,16 +134,8 @@ double rule3(FileData &fd, String &newPix) {
 				HSL_45[0][0] = (int)(HSL_45[0][0] - floor(HSL_45[0][0]/180.) * 360);
 				HSL_45[0][1] = 100-HSL_45[0][1];
 				currHSL = HSL_45[0][0] + HSL_45[0][1] + HSL_45[0][2];
-				color_45 = fd.colorVec.at(i).at(j);
-				color_45 = c.getMainColor(color_45);
-				if(color_45=="Pink") {
-					minBucket45.push_back(currHSL);
-					minBucketPts45.push_back(Point(j,i));
-				}
-				if(color_45.find("Brown")!=string::npos) {
-					maxBucket45.push_back(currHSL);
-					maxBucketPts45.push_back(Point(j,i));
-				}
+				minMaxBucket45.push_back(currHSL);
+				minMaxBucketPts45.push_back(Point(j,i));
 			}
 			--j;
 			if(i>=0) {
@@ -167,55 +145,30 @@ double rule3(FileData &fd, String &newPix) {
 				HSL_90[0][0] = (int)(HSL_90[0][0] - floor(HSL_90[0][0]/180.) * 360);
 				HSL_90[0][1] = 100-HSL_90[0][1];
 				currHSL = HSL_90[0][0] + HSL_90[0][1] + HSL_90[0][2];
-				color_90 = fd.colorVec.at(i).at(pt.x);
-				color_90 = c.getMainColor(color_90);
-				if(color_90=="Pink") {
-					minBucket90.push_back(currHSL);
-					minBucketPts90.push_back(Point(pt.x,i));
-				}
-				if(color_90.find("Brown")!=string::npos) {
-					maxBucket90.push_back(currHSL);
-					maxBucketPts90.push_back(Point(pt.x,i));
-				}
+				minMaxBucket90.push_back(currHSL);
+				minMaxBucketPts90.push_back(Point(pt.x,i));
 			}
 		}
 		int minIndex=0, maxIndex=0;
-		if(minBucket0.size()>0) {
-			fn.getMin(minBucket0,minIndex);
-			hslPt_0[0] = minBucketPts0.at(minIndex);
-		} else
-			hslPt_0[0] = Point(pt.x,pt.y);
-		if(maxBucket0.size()>0) {
-			fn.getMax(maxBucket0,maxIndex);
-			hslPt_0[1] = maxBucketPts0.at(maxIndex);
-		} else
-			hslPt_0[1] = Point(pt.x,pt.y);
-		if(minBucket45.size()>0) {
-			fn.getMin(minBucket45,minIndex);
-			hslPt_45[0] = minBucketPts45.at(minIndex);
-		} else
-			hslPt_45[0] = Point(pt.x,pt.y);
-		if(maxBucket45.size()>0) {
-			fn.getMax(maxBucket45,maxIndex);
-			hslPt_45[1] = maxBucketPts45.at(maxIndex);
-		} else
-			hslPt_45[1] = Point(pt.x,pt.y);
-		if(minBucket90.size()>0) {
-			fn.getMin(minBucket90,minIndex);
-			hslPt_90[0] = minBucketPts90.at(minIndex);
-		} else
-			hslPt_90[0] = Point(pt.x,pt.y);
-		if(maxBucket90.size()>0) {
-			fn.getMax(maxBucket90,maxIndex);
-			hslPt_90[1] = maxBucketPts90.at(maxIndex);
-		} else
-			hslPt_90[1] = Point(pt.x,pt.y);
+		fn.getMin(minMaxBucket0,minIndex);
+		hslPt_0[0] = minMaxBucketPts0.at(minIndex);
+		fn.getMin(minMaxBucket45,minIndex);
+		hslPt_45[0] = minMaxBucketPts45.at(minIndex);
+		fn.getMin(minMaxBucket90,minIndex);
+		hslPt_90[0] = minMaxBucketPts90.at(minIndex);
+
+		fn.getMax(minMaxBucket0,maxIndex);
+		hslPt_0[1] = minMaxBucketPts0.at(maxIndex);
+		fn.getMax(minMaxBucket45,maxIndex);
+		hslPt_45[1] = minMaxBucketPts45.at(maxIndex);
+		fn.getMax(minMaxBucket90,maxIndex);
+		hslPt_90[1] = minMaxBucketPts90.at(maxIndex);
 
 		double deltaHSL_0[2][3] = {0};
 		double deltaHSL_45[2][3] = {0};
 		double deltaHSL_90[2][3] = {0};
 		double measuredContrast_0[2] = {0};
-		double measuredContrast_45[2] = {0};
+		double measuredContrast_45[2] ={0};
 		double measuredContrast_90[2] = {0};
 		double tempHSL_0[2][3] = {0};
 		double tempHSL_45[2][3] = {0};
@@ -240,6 +193,7 @@ double rule3(FileData &fd, String &newPix) {
 					HSL_45[i][j] = (int)(tempHSL_45[i][j]*100);
 					HSL_90[i][j] = (int)(tempHSL_90[i][j]*100);
 				}
+				/*
 				if(i==0) {
 					deltaHSL_0[i][j] = HSL[j] - HSL_0[i][j];
 					deltaHSL_45[i][j] = HSL[j]- HSL_45[i][j];
@@ -249,25 +203,53 @@ double rule3(FileData &fd, String &newPix) {
 					deltaHSL_0[i][j] = HSL_0[i][j] - HSL[j];
 					deltaHSL_45[i][j] = HSL_45[i][j] - HSL[j];
 					deltaHSL_90[i][j] = HSL_90[i][j] - HSL[j];
-				}
+				}*/
+				deltaHSL_0[i][j] = HSL[j] - HSL_0[i][j];
+				deltaHSL_45[i][j] = HSL[j]- HSL_45[i][j];
+				deltaHSL_90[i][j] = HSL[j] - HSL_90[i][j];
 				measuredContrast_0[i] += (deltaHSL_0[i][j]/unitThresh[j]);
 				measuredContrast_45[i] += (deltaHSL_45[i][j]/unitThresh[j]);
 				measuredContrast_90[i] += (deltaHSL_90[i][j]/unitThresh[j]);
 			}
 		}
-		if(minBucket0.size()<1) measuredContrast_0[0] = -0.1;
-		if(minBucket45.size()<1) measuredContrast_45[0] = -0.1;
-		if(minBucket90.size()<1) measuredContrast_90[0] = -0.1;
-		if(maxBucket0.size()<1) measuredContrast_0[1] = 2.1;
-		if(maxBucket45.size()<1) measuredContrast_45[1] = 2.1;
-		if(maxBucket90.size()<1) measuredContrast_90[1] = 2.1;
-		if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],2.0)>=2 &&
-				fn.countGreaterEqual(4,round(measuredContrast_0[1]),round(measuredContrast_45[1]),round(measuredContrast_90[1]),2.0)>=2) {
-			if(fn.countGreater(4,round(abs(deltaHSL_0[0][0]/unitThresh[0])),round(abs(deltaHSL_45[0][0]/unitThresh[0])),round(abs(deltaHSL_90[0][0]/unitThresh[0])),0.)>=2 &&
-					fn.countGreater(4,round(abs(deltaHSL_0[1][0]/unitThresh[0])),round(abs(deltaHSL_45[1][0]/unitThresh[0])),round(abs(deltaHSL_90[1][0]/unitThresh[0])),0.)>=2) {
-				newPix = "Pink";
-				flag=true;
-				ruleNum = 3.1;
+
+		/*
+		if(pt.x==190 && pt.y==219) {
+			cout << "MinBucket0: " << minBucket0.size() << endl;
+			cout << "MaxBucket0: " << maxBucket0.size() << endl;
+			cout << "MinBucket45: " << minBucket45.size() << endl;
+			cout << "MaxBucket45: " << maxBucket45.size() << endl;
+			cout << "MinBucket90: " << minBucket90.size() << endl;
+			cout << "MaxBucket90: " << maxBucket90.size() << endl;
+		}
+		*/
+		//entering pink
+		if(fn.countLesser(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2) {
+			if(HSL[1]<=70) {
+				if(fn.countGreater(4,round(abs(deltaHSL_0[1][0]/unitThresh[0])),round(abs(deltaHSL_45[1][0]/unitThresh[0])),round(abs(deltaHSL_90[1][0]/unitThresh[0])),0.)>=2) {
+					newPix = "Pink";
+					flag=true;
+					ruleNum = 3.1;
+				}
+				else if(fn.countGreater(4,round(abs(deltaHSL_0[1][2]/unitThresh[2])),round(abs(deltaHSL_45[1][2]/unitThresh[2])),round(abs(deltaHSL_90[1][2]/unitThresh[2])),3.)>=2) {
+					newPix = "Pink";
+					flag=true;
+					ruleNum = 3.12;
+				}
+			}
+		}
+		//in pink
+		if(fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2 &&
+				fn.countLesserEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],2.0)>=2) {
+			if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],2.0)>=2){
+				prevColor_0 = fd.colorVec.at(hslPt_0[1].y).at(hslPt_0[1].x);
+				prevColor_45 = fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x);
+				prevColor_90 = fd.colorVec.at(hslPt_90[1].y).at(hslPt_90[1].x);
+				if(fn.countEqual("4",prevColor_0.c_str(),prevColor_45.c_str(),prevColor_90.c_str(),"Pink")>=2) {
+					newPix = "Pink";
+					flag=true;
+					ruleNum = 3.2;
+				}
 			}
 		}
 
@@ -289,6 +271,7 @@ double rule3(FileData &fd, String &newPix) {
 		String ptStr2(chArr);
 		ptStr += ptStr2;
 		fd.hslPtMat.at(pt.y).at(pt.x) = ptStr;
+		/**/
 	} // end if(brownpink)
 	else {
 		fd.m_ContrastMat.at(pt.y).at(pt.x) = color;

@@ -49,6 +49,7 @@ public:
 	int countLesser(double argNum, ...);
 	int countLesserEqual(double argNum, ...);
 	int countEqual(double argNum, ...);
+	int countEqual(String argNum, ...);
 
 	double getMin(deque<double> &vec, int &minIndex);
 	double getMax(deque<double> &vec, int &maxIndex);
