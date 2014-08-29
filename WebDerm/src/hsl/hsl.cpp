@@ -189,6 +189,9 @@ String hsl::getHslColor(double hue, double sat, double lum, int &ind, Point pt)
 	return color;
 }
 
+String hsl::getHslColor(int index) {
+	return hslColors.at(index);
+}
 void hsl::release_memory()
 {
 	deque<String>().swap(hslColors);

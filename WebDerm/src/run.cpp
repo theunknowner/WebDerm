@@ -74,8 +74,8 @@ void runHysteresis()
 		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
-		hysteresis(fd);
-/*
+		//hysteresis(fd);
+
 		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
 		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
 		Intensity in;
