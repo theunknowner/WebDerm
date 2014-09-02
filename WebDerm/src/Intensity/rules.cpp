@@ -199,7 +199,7 @@ double rule3(FileData &fd, String &newPix) {
 				if(i==1) {
 					deltaHSL_0[i][j] = HSL_0[i][j] - HSL[j];
 					deltaHSL_45[i][j] = HSL_45[i][j] - HSL[j];
-					deltaHSL_90[i][j] = HSL_90[i][j] - HSL[j];
+					deltaHSL_90[i][j] = HSL_90[i][j] - HSL[j];9
 				}*/
 				deltaHSL_0[i][j] = HSL[j] - HSL_0[i][j];
 				deltaHSL_45[i][j] = HSL[j]- HSL_45[i][j];
