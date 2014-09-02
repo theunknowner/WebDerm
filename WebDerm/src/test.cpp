@@ -58,7 +58,8 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 			satWindow.push_back(HSL[1]);
 			lumWindow.push_back(HSL[2]);
 			pixelColorWindow.push_back(pix);
-			cout << pix << img.at<Vec3b>(y,x) << ";" << ind+2 << ";" << endl;
+			cout << pix << img.at<Vec3b>(y,x) << ";";
+			printf("HSL(%.0f,%.2f,%.2f)\n",HSL[0],HSL[1],HSL[2]);
 		}
 	}
 	for(unsigned int i=0; i<pixelColorWindow.size(); i++)
@@ -136,6 +137,9 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 		pix = colorObj.fixColors(pix,r,g,b);
 		if(pix!="Zero")
 			pix = toString(grayLevel) + pix;
+		else {
+			h=0; s=0; l=0;
+		}
 	}
 	else pix = "NOISE";
 

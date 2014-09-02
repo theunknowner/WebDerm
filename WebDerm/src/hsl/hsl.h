@@ -33,6 +33,7 @@ public:
 	double getSat();
 	double getLum();
 	double calcLum(double red, double green, double blue);
+	String getHslColor(double hue,double sat,double lum);
 	String getHslColor(double hue,double sat,double lum, int &ind, Point pt=Point(0,0));
 	String getHslColor(int index);
 	void release_memory();

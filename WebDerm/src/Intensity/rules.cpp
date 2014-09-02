@@ -36,9 +36,6 @@ double rule2(FileData &fd, String &newPix) {
 	double hue = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',1);
 	double sat = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',2);
 	double lum = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',3);
-	//if(fd.pt.x==699 && fd.pt.y==0) {
-	//	cout << hue << endl << sat << endl << lum << endl;
-	//}
 	double fSat=0, fSat2 = 0;
 	String color = hsl.getHslColor(hue,sat,lum,index);
 	String grey;
@@ -109,7 +106,7 @@ double rule3(FileData &fd, String &newPix) {
 	deque<Point> minMaxBucketPts90;
 	String prevColor_0, prevColor_45, prevColor_90;
 
-	if((color=="BrownPink" || color=="Brown") && pt.y>0) {
+	if((color=="BrownPink" || color=="Brown") && HSL[0]<30 && pt.y>0) {
 		int j=pt.x-1;
 		int x = j;
 		int endY = (pt.y-localScanSize);
@@ -149,7 +146,7 @@ double rule3(FileData &fd, String &newPix) {
 				minMaxBucketPts90.push_back(Point(pt.x,i));
 			}
 		}
-		int minIndex=0, maxIndex=0;
+		int minIndex=-1, maxIndex=-1;
 		fn.getMin(minMaxBucket0,minIndex);
 		hslPt_0[0] = minMaxBucketPts0.at(minIndex);
 		fn.getMin(minMaxBucket45,minIndex);
@@ -216,71 +213,105 @@ double rule3(FileData &fd, String &newPix) {
 		//entering pink
 		if(fn.countLesser(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2) {
 			if(HSL[1]<=70) {
-				hsl hsl;
-				double hue,sat,lum;
-				double currHue, currSat, currLum;
-				currHue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
-				currSat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
-				currLum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
-				int index=-1, currIndex=-1;
-				hsl.getHslColor(hue,sat,lum,currIndex);
-				double xCurr = satThresh.at(currIndex).at(1) - currSat;
-				double x0=0, x45=0, x90=0;
-				double xMax0=0, xMax45=0, xMax90=0;
-				int countColor0=0,countColor45=0,countColor90=0;
-				for(unsigned int i=0; i<minMaxBucket0.size(); i++) {
-					Point pt0((pt.x-i+1),pt.y);
-					Point pt45((pt.x-i+1),(pt.y-i+1));
-					Point pt90(pt.x,(pt.y-i+1));
-					if(color==fd.colorVec.at(pt0.y).at(pt0.x)) {
-						countColor0++;
-						hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt0.y).at(pt0.x),';',1);
-						sat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt0.y).at(pt0.x),';',2);
-						lum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt0.y).at(pt0.x),';',3);
-						hsl.getHslColor(hue,sat,lum,index);
-						x0 = satThresh.at(index).at(1) - sat;
-						if(x0>xMax0) xMax0 = x0;
-					}
-					if(color==fd.colorVec.at(pt45.y).at(pt45.x)) {
-						countColor45++;
-						hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt45.y).at(pt45.x),';',1);
-						sat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt45.y).at(pt45.x),';',2);
-						lum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt45.y).at(pt45.x),';',3);
-						hsl.getHslColor(hue,sat,lum,index);
-						x45 = satThresh.at(index).at(1) - sat;
-						if(x45>xMax45) xMax45 = x45;
-					}
-					if(color==fd.colorVec.at(pt90.y).at(pt90.x)) {
-						countColor90++;
-						hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt90.y).at(pt90.x),';',1);
-						sat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt90.y).at(pt90.x),';',2);
-						lum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt90.y).at(pt90.x),';',3);
-						hsl.getHslColor(hue,sat,lum,index);
-						x90 = satThresh.at(index).at(1) - sat;
-						if(x90>xMax90) xMax90 = x90;
-					}
-				}
-				if(countColor0<10) xMax0=0;
-				if(countColor45<10) xMax45=0;
-				if(countColor90<10) xMax90=0;
-				if(fn.countGreater(4,xMax0/xCurr,xMax45/xCurr,xMax90/xCurr,5)>=2) {
-					newPix = hsl.getHslColor(currIndex+1);
+				if(fn.countGreater(4,round(abs(deltaHSL_0[1][0]/unitThresh[0])),round(abs(deltaHSL_45[1][0]/unitThresh[0])),round(abs(deltaHSL_90[1][0]/unitThresh[0])),0.)>=2) {
+					newPix = "Pink";
 					flag=true;
 					ruleNum = 3.1;
 				}
+				/*
+				else {
+					hsl hsl;
+					double hue,sat,lum;
+					double currHue, currSat, currLum;
+					currHue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
+					currSat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2);
+					currLum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3);
+					int index=-1, currIndex=-1;
+					hsl.getHslColor(currHue,currSat,currLum,currIndex);
+					double xCurr = satThresh.at(currIndex).at(1) - currSat;
+					double x0=0, x45=0, x90=0;
+					double xMax0=0, xMax45=0, xMax90=0;
+					int countColor0=0,countColor45=0,countColor90=0;
+					for(int i=0; i<localScanSize; i++) {
+						Point pt0((pt.x-i+1),pt.y);
+						Point pt45((pt.x-i+1),(pt.y-i+1));
+						Point pt90(pt.x,(pt.y-i+1));
+						if(pt0.x>=0) {
+							try {
+								if(color==c.getMainColor(fd.windowVec.at(pt0.y).at(pt0.x))) {
+									countColor0++;
+									hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt0.y).at(pt0.x),';',1);
+									sat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt0.y).at(pt0.x),';',2);
+									lum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt0.y).at(pt0.x),';',3);
+									hsl.getHslColor(hue,sat,lum,index);
+									x0 = satThresh.at(index).at(1) - sat;
+									if(x0>xMax0) xMax0 = x0;
+								}
+							}
+							catch(const std::out_of_range &oor) {
+								printf("x0 out of range!\n");
+								exit(0);
+							}
+						}
+						if(pt45.x>=0 && pt45.y>=0) {
+							try {
+								if(color==c.getMainColor(fd.windowVec.at(pt45.y).at(pt45.x))) {
+									countColor45++;
+									hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt45.y).at(pt45.x),';',1);
+									sat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt45.y).at(pt45.x),';',2);
+									lum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt45.y).at(pt45.x),';',3);
+									hsl.getHslColor(hue,sat,lum,index);
+									x45 = satThresh.at(index).at(1) - sat;
+									if(x45>xMax45) xMax45 = x45;
+								}
+							}
+							catch(const std::out_of_range &oor) {
+								printf("x45 out of range!\n");
+								exit(0);
+							}
+						}
+						if(pt90.y>=0) {
+							try{
+								if(color==c.getMainColor(fd.windowVec.at(pt90.y).at(pt90.x))) {
+									countColor90++;
+									hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt90.y).at(pt90.x),';',1);
+									sat = fn.getDelimitedValuesFromString(fd.hslMat.at(pt90.y).at(pt90.x),';',2);
+									lum = fn.getDelimitedValuesFromString(fd.hslMat.at(pt90.y).at(pt90.x),';',3);
+									hsl.getHslColor(hue,sat,lum,index);
+									x90 = satThresh.at(index).at(1) - sat;
+									if(x90>xMax90) xMax90 = x90;
+								}
+							}
+							catch(const std::out_of_range &oor) {
+								printf("x90 out of range!\n");
+								exit(0);
+							}
+						}
+					}
+					if(countColor0<3) xMax0=0;
+					if(countColor45<3) xMax45=0;
+					if(countColor90<3) xMax90=0;
+					if(fn.countGreater(4,xMax0/xCurr,xMax45/xCurr,xMax90/xCurr,1)>=2) {
+						newPix = hsl.getHslColor(currIndex+1);
+						flag=true;
+						ruleNum = 3.1;
+					}
+				}*/
 			}
 		}
 		//in pink
 		if(fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2 &&
 				fn.countLesserEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],2.0)>=2) {
 			if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],2.0)>=2){
-				prevColor_0 = fd.colorVec.at(hslPt_0[1].y).at(hslPt_0[1].x);
-				prevColor_45 = fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x);
-				prevColor_90 = fd.colorVec.at(hslPt_90[1].y).at(hslPt_90[1].x);
-				if(fn.countEqual("4",prevColor_0.c_str(),prevColor_45.c_str(),prevColor_90.c_str(),"Pink")>=2) {
-					newPix = "Pink";
-					flag=true;
-					ruleNum = 3.2;
+				if(HSL[1]<=70) {
+					prevColor_0 = c.getMainColor(fd.colorVec.at(hslPt_0[1].y).at(hslPt_0[1].x));
+					prevColor_45 = c.getMainColor(fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x));
+					prevColor_90 = c.getMainColor(fd.colorVec.at(hslPt_90[1].y).at(hslPt_90[1].x));
+					if(fn.countEqual("4",prevColor_0.c_str(),prevColor_45.c_str(),prevColor_90.c_str(),"Pink")>=2) {
+						newPix = "Pink";
+						flag=true;
+						ruleNum = 3.2;
+					}
 				}
 			}
 		}

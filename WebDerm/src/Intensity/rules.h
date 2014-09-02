@@ -17,7 +17,8 @@
 class FileData;
 double rule3(FileData &fd, String &newPix);
 
-String init_specialRules(String pix, int r, int g, int b);
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 					int ratioLoc, int loc, deque<double> &ruleNo);
+
+void testRule(Point pt);
 #endif /* RULES_H_ */

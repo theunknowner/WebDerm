@@ -167,6 +167,28 @@ double hsl::minRGB(double red, double green, double blue)
 	}
 
 //return the color of the hsl values using hsl colorspace
+String hsl::getHslColor(double hue, double sat, double lum)
+{
+	String color = "NONE";
+	try {
+		for(unsigned int i=0; i<hslColors.size(); i++) {
+			if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+				if(sat>=satThresh.at(i).at(0) && sat<satThresh.at(i).at(1)) {
+					if(lum>=lumThresh.at(i).at(0) && lum<lumThresh.at(i).at(1)) {
+						color = hslColors.at(i);
+						return color;
+					}
+				}
+			}
+		}
+	} catch(const std::out_of_range& oor) {
+		printf("hsl::getHslColor(); HSL does not exist!\n");
+		printf("HSL(%.0f,%.2f,%.2f)\n",hue,sat,lum);
+	}
+	return color;
+}
+
+//return the color of the hsl values using hsl colorspace
 String hsl::getHslColor(double hue, double sat, double lum, int &ind, Point pt)
 {
 	String color = "NONE";

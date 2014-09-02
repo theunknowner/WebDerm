@@ -40,10 +40,10 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Urticaria","urticaria5.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Acne","acne2.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Point pt1(304,437);
+	Point pt1(171,191);
 	Point pt2(306,439);
 	//FileData fd;
 	//deque< deque<String> > vec;
@@ -56,8 +56,8 @@ int main(int argc,char** argv)
 	//generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
-	int col = 202;
-	int row = 165;
+	int col = 271;
+	int row = 291;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;

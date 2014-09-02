@@ -169,6 +169,9 @@ void hysteresis(FileData &fd) {
 					pix = colorObj.fixColors(pix,r,g,b);
 					if(pix!="Zero")
 						pix = toString(grayLevel) + pix;
+					else {
+						h=0;s=0;l=0;
+					}
 					colorWindow.push_back(pix);
 				}
 				else {
