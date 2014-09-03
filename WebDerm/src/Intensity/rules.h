@@ -15,7 +15,7 @@
 #include "intensity.h"
 
 class FileData;
-double rule3(FileData &fd, String &newPix);
+double rule3(FileData &fd, String &newPix, String &newShade);
 
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 					int ratioLoc, int loc, deque<double> &ruleNo);

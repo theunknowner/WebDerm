@@ -255,3 +255,94 @@ void FileData::renameFiles(String directory, String oldname, String newname) {
 		}
 	}
 }
+
+void FileData::getMinMaxPts(String input, deque< deque<Point> > &pt) {
+	size_t posMins=0;
+	size_t posMaxs=0;
+	posMins = input.find("Min");
+	posMaxs = input.find("Max");
+	String minStr = input.substr(posMins,posMaxs-posMins);
+	String maxStr = input.substr(posMaxs,input.length()-posMaxs);
+	size_t posBeginPar=0;
+	size_t posEndPar=0;
+	size_t posDelimiter=0;
+	Point tempPt;
+	deque<Point> tempPtVec;
+	while(minStr.length()>0) {
+		posBeginPar = minStr.find("(");
+		posEndPar = minStr.find(")");
+		posDelimiter = minStr.find(";");
+		tempPt.x = atoi(minStr.substr(posBeginPar+1,posDelimiter-posBeginPar+1).c_str());
+		tempPt.y = atoi(minStr.substr(posDelimiter+1,posEndPar-posDelimiter+1).c_str());
+		tempPtVec.push_back(tempPt);
+		if(posEndPar==(minStr.length()-1))
+			minStr = minStr.substr(posEndPar+1,minStr.length()-posEndPar+1);
+		else
+			minStr = minStr.substr(posEndPar+2,minStr.length()-posEndPar+2);
+	}
+	pt.push_back(tempPtVec);
+	tempPtVec.clear();
+	while(maxStr.length()>0) {
+		posBeginPar = maxStr.find("(");
+		posEndPar = maxStr.find(")");
+		posDelimiter = maxStr.find(";");
+		tempPt.x = atoi(maxStr.substr(posBeginPar+1,posDelimiter-posBeginPar+1).c_str());
+		tempPt.y = atoi(maxStr.substr(posDelimiter+1,posEndPar-posDelimiter+1).c_str());
+		tempPtVec.push_back(tempPt);
+		if(posEndPar==(maxStr.length()-1))
+			maxStr = maxStr.substr(posEndPar+1,maxStr.length()-posEndPar+1);
+		else
+			maxStr = maxStr.substr(posEndPar+2,maxStr.length()-posEndPar+2);
+	}
+	pt.push_back(tempPtVec);
+}
+
+void FileData::extractRuleData(String filename, Point loc) {
+	deque< deque<String> > hslPtsVec;
+	deque< deque<String> > mConVec;
+	deque< deque<String> > deltaHslVec;
+	deque< deque<String> > hslVec;
+	deque< deque<String> > colorVec;
+	loc = Point(loc.x-1,loc.y-1);
+	String location  = "/home/jason/Desktop/Programs/";
+	String hslPtsFile = location + filename + "_hslPts.csv";
+	String mConFile = location + filename + "_measuredContrast.csv";
+	String deltaHslFile = location + filename + "_deltaHSL.csv";
+	String hslFile = location + filename + "_HSL.csv";
+	String colorFile = location + filename + "_ShadeColors.csv";
+	loadFileMatrix(hslPtsFile,hslPtsVec);
+	loadFileMatrix(mConFile,mConVec);
+	loadFileMatrix(deltaHslFile,deltaHslVec);
+	loadFileMatrix(hslFile,hslVec);
+	loadFileMatrix(colorFile,colorVec);
+	String outputFilename = "/home/jason/Desktop/workspace/" + filename + "_Rule3Data.csv";
+	FILE * fp;
+	fp = fopen(outputFilename.c_str(),"w");
+	String minMaxPts = hslPtsVec.at(loc.y).at(loc.x);
+	String mCon = mConVec.at(loc.y).at(loc.x);
+	String deltaHSL = deltaHslVec.at(loc.y).at(loc.x);
+	String hsl = hslVec.at(loc.y).at(loc.x);
+	String color = colorVec.at(loc.y).at(loc.x);
+	deque< deque<Point> > pt;
+	getMinMaxPts(minMaxPts, pt);
+	String hslMin = "";
+	String hslMax = "";
+	String colorsMin = "";
+	String colorsMax = "";
+	Color c;
+	for(unsigned int i=0; i<pt.at(0).size(); i++) {
+		hslMin += "("+ hslVec.at(pt.at(0).at(i).y-1).at(pt.at(0).at(i).x-1)+")";
+		hslMax += "("+ hslVec.at(pt.at(1).at(i).y-1).at(pt.at(1).at(i).x-1)+")";
+		colorsMin += "("+c.getMainColor(colorVec.at(pt.at(0).at(i).y-1).at(pt.at(0).at(i).x-1))+")";
+		colorsMax += "("+c.getMainColor(colorVec.at(pt.at(1).at(i).y-1).at(pt.at(1).at(i).x-1))+")";
+	}
+	fprintf(fp,"%s,(%d;%d) - HSL(%s)\n",filename.c_str(),loc.x+1,loc.y+1,hsl.c_str());
+	fprintf(fp,"Points,%s\n",minMaxPts.c_str());
+	fprintf(fp,"mCon,%s\n",mCon.c_str());
+	fprintf(fp,"dHSL,%s\n",deltaHSL.c_str());
+	fprintf(fp,"HslMin,%s\n",hslMin.c_str());
+	fprintf(fp,"HslMax,%s\n",hslMax.c_str());
+	fprintf(fp,"ColorsMin,%s\n", colorsMin.c_str());
+	fprintf(fp,"ColorsMax,%s\n", colorsMax.c_str());
+	fclose(fp);
+}

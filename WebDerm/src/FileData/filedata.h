@@ -63,6 +63,9 @@ public:
 	void deleteContainingName(String directory, String filename);
 	void renameFiles(String directory, String oldname, String newname);
 
+	void getMinMaxPts(String input, deque< deque<Point> > &pt);
+	void extractRuleData(String filename, Point loc);
+
 };
 
 

@@ -75,7 +75,7 @@ double rule2(FileData &fd, String &newPix) {
 }
 
 // contrast rule
-double rule3(FileData &fd, String &newPix) {
+double rule3(FileData &fd, String &newPix, String &newShade) {
 	double ruleNum =3;
 	bool flag=false;
 	Color c;
@@ -190,17 +190,6 @@ double rule3(FileData &fd, String &newPix) {
 					HSL_45[i][j] = (int)(tempHSL_45[i][j]*100);
 					HSL_90[i][j] = (int)(tempHSL_90[i][j]*100);
 				}
-				/*
-				if(i==0) {
-					deltaHSL_0[i][j] = HSL[j] - HSL_0[i][j];
-					deltaHSL_45[i][j] = HSL[j]- HSL_45[i][j];
-					deltaHSL_90[i][j] = HSL[j] - HSL_90[i][j];
-				}
-				if(i==1) {
-					deltaHSL_0[i][j] = HSL_0[i][j] - HSL[j];
-					deltaHSL_45[i][j] = HSL_45[i][j] - HSL[j];
-					deltaHSL_90[i][j] = HSL_90[i][j] - HSL[j];9
-				}*/
 				deltaHSL_0[i][j] = HSL[j] - HSL_0[i][j];
 				deltaHSL_45[i][j] = HSL[j]- HSL_45[i][j];
 				deltaHSL_90[i][j] = HSL[j] - HSL_90[i][j];
@@ -209,7 +198,9 @@ double rule3(FileData &fd, String &newPix) {
 				measuredContrast_90[i] += (deltaHSL_90[i][j]/unitThresh[j]);
 			}
 		}
-
+		String color0 =  fd.windowVec.at(hslPt_0[1].y).at(hslPt_0[1].x);
+		String color45 =  fd.windowVec.at(hslPt_45[1].y).at(hslPt_45[1].x);
+		String color90 =  fd.windowVec.at(hslPt_90[1].y).at(hslPt_90[1].x);
 		//entering pink
 		if(fn.countLesser(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2) {
 			if(HSL[1]<=70) {
@@ -302,7 +293,7 @@ double rule3(FileData &fd, String &newPix) {
 		//in pink
 		if(fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2 &&
 				fn.countLesserEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],2.0)>=2) {
-			if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],2.0)>=2){
+			if(fn.countLesser(4,round(measuredContrast_0[0]),round(measuredContrast_45[0]),round(measuredContrast_90[0]),1.0)>=2){
 				if(HSL[1]<=70) {
 					prevColor_0 = c.getMainColor(fd.colorVec.at(hslPt_0[1].y).at(hslPt_0[1].x));
 					prevColor_45 = c.getMainColor(fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x));
@@ -621,7 +612,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
-	ruleNumVec.push_back(rule3(fd,newPix));
+	ruleNumVec.push_back(rule3(fd,newPix,newShade));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));
