@@ -147,19 +147,30 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 			}
 		}
 		int minIndex=-1, maxIndex=-1;
+
 		fn.getMin(minMaxBucket0,minIndex);
-		hslPt_0[0] = minMaxBucketPts0.at(minIndex);
+		if(minIndex<0) hslPt_0[0] = Point(pt.x,pt.y);
+		else hslPt_0[0] = minMaxBucketPts0.at(minIndex);
+
 		fn.getMin(minMaxBucket45,minIndex);
-		hslPt_45[0] = minMaxBucketPts45.at(minIndex);
+		if(minIndex<0) hslPt_45[0] = Point(pt.x,pt.y);
+		else hslPt_45[0] = minMaxBucketPts45.at(minIndex);
+
 		fn.getMin(minMaxBucket90,minIndex);
-		hslPt_90[0] = minMaxBucketPts90.at(minIndex);
+		if(minIndex<0) hslPt_90[0] = Point(pt.x,pt.y);
+		else hslPt_90[0] = minMaxBucketPts90.at(minIndex);
 
 		fn.getMax(minMaxBucket0,maxIndex);
-		hslPt_0[1] = minMaxBucketPts0.at(maxIndex);
+		if(maxIndex<0) hslPt_0[1] = Point(pt.x,pt.y);
+		else hslPt_0[1] = minMaxBucketPts0.at(maxIndex);
+
 		fn.getMax(minMaxBucket45,maxIndex);
-		hslPt_45[1] = minMaxBucketPts45.at(maxIndex);
+		if(maxIndex<0) hslPt_45[1] = Point(pt.x,pt.y);
+		else hslPt_45[1] = minMaxBucketPts45.at(maxIndex);
+
 		fn.getMax(minMaxBucket90,maxIndex);
-		hslPt_90[1] = minMaxBucketPts90.at(maxIndex);
+		if(maxIndex<0) hslPt_90[1] = Point(pt.x,pt.y);
+		else hslPt_90[1] = minMaxBucketPts90.at(maxIndex);
 
 		double deltaHSL_0[2][3] = {0};
 		double deltaHSL_45[2][3] = {0};

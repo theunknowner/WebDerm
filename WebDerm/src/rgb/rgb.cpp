@@ -9,8 +9,6 @@
 
 deque< deque<double> > normMeanThresh;
 deque< deque<double> > absMeanThresh;
-deque< deque<double> > absThresh;
-deque< deque<double> > normThresh;
 deque<String> rgbColors;
 deque<String> mainColors;
 
@@ -457,7 +455,7 @@ double rgb::getColorLevel(String pix) {
 		level = atof(str.c_str());
 	}
 	catch(const std::out_of_range &oor) {
-		printf("rgb::getColorLevel() out of range1\n");
+		printf("rgb::getColorLevel() out of range!\n");
 		exit(0);
 	}
 	return level;
@@ -496,8 +494,6 @@ void rgb::release_memory()
 {
 	deque< deque<double> >().swap(normMeanThresh);
 	deque< deque<double> >().swap(absMeanThresh);
-	deque< deque<double> >().swap(normThresh);
-	deque< deque<double> >().swap(absThresh);
 	deque<String>().swap(rgbColors);
 	deque<String>().swap(mainColors);
 }

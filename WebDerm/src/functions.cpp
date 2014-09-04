@@ -554,6 +554,7 @@ int Functions::countEqual(String argNum, ...) {
 
 double Functions::getMin(deque<double> &vec, int &minIndex) {
 	double lowest=-1;
+	minIndex=-1;
 	try {
 		lowest = vec.at(0);
 		minIndex = 0;
@@ -565,14 +566,15 @@ double Functions::getMin(deque<double> &vec, int &minIndex) {
 		}
 	}
 	catch(const std::out_of_range &oor) {
-		printf("Functions::getMin(deque<double> vec, minIndex) out of range!\n");
-		exit(0);
+		//printf("Functions::getMin(deque<double> vec, minIndex) out of range!\n");
+		return -1;
 	}
 	return lowest;
 }
 
 double Functions::getMax(deque<double> &vec, int &maxIndex) {
 	double largest=-1;
+	maxIndex=-1;
 	try {
 		largest = vec.at(0);
 		maxIndex = 0;
@@ -584,8 +586,8 @@ double Functions::getMax(deque<double> &vec, int &maxIndex) {
 		}
 	}
 	catch(const std::out_of_range &oor) {
-		printf("Functions::getMax(deque<double> vec, maxIndex) out of range!\n");
-		exit(0);
+		//printf("Functions::getMax(deque<double> vec, maxIndex) out of range!\n");
+		return -1;
 	}
 	return largest;
 }
