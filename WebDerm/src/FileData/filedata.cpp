@@ -322,7 +322,6 @@ void FileData::extractRuleData(String filename, Point loc) {
 	String mCon = mConVec.at(loc.y).at(loc.x);
 	String deltaHSL = deltaHslVec.at(loc.y).at(loc.x);
 	String hsl = hslVec.at(loc.y).at(loc.x);
-	String color = colorVec.at(loc.y).at(loc.x);
 	deque< deque<Point> > pt;
 	getMinMaxPts(minMaxPts, pt);
 	String hslMin = "";
@@ -330,13 +329,17 @@ void FileData::extractRuleData(String filename, Point loc) {
 	String colorsMin = "";
 	String colorsMax = "";
 	Color c;
+	String color = c.extractShade(colorVec.at(loc.y).at(loc.x))+
+			c.getMainColor(colorVec.at(loc.y).at(loc.x));
 	for(unsigned int i=0; i<pt.at(0).size(); i++) {
 		hslMin += "("+ hslVec.at(pt.at(0).at(i).y-1).at(pt.at(0).at(i).x-1)+")";
 		hslMax += "("+ hslVec.at(pt.at(1).at(i).y-1).at(pt.at(1).at(i).x-1)+")";
-		colorsMin += "("+c.getMainColor(colorVec.at(pt.at(0).at(i).y-1).at(pt.at(0).at(i).x-1))+")";
-		colorsMax += "("+c.getMainColor(colorVec.at(pt.at(1).at(i).y-1).at(pt.at(1).at(i).x-1))+")";
+		colorsMin += "("+c.extractShade(colorVec.at(pt.at(0).at(i).y-1).at(pt.at(0).at(i).x-1))+
+				c.getMainColor(colorVec.at(pt.at(0).at(i).y-1).at(pt.at(0).at(i).x-1))+")";
+		colorsMax += "("+c.extractShade(colorVec.at(pt.at(1).at(i).y-1).at(pt.at(1).at(i).x-1))+
+				c.getMainColor(colorVec.at(pt.at(1).at(i).y-1).at(pt.at(1).at(i).x-1))+")";
 	}
-	fprintf(fp,"%s,(%d;%d) - HSL(%s)\n",filename.c_str(),loc.x+1,loc.y+1,hsl.c_str());
+	fprintf(fp,"%s,(%d;%d) - HSL(%s) - %s\n",filename.c_str(),loc.x+1,loc.y+1,hsl.c_str(),color.c_str());
 	fprintf(fp,"Points,%s\n",minMaxPts.c_str());
 	fprintf(fp,"mCon,%s\n",mCon.c_str());
 	fprintf(fp,"dHSL,%s\n",deltaHSL.c_str());

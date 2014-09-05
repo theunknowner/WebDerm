@@ -22,7 +22,6 @@ int main(int argc,char** argv)
 {
 	//runAllHysteresis();
 	//runHysteresis();
-	runMouseColor();
 /*
 	String filename[]= {path+"Images/Acne/acne1.jpg",
 						path+"Images/Acne/acne2.jpg",
@@ -31,7 +30,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -41,12 +40,13 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Melanoma","melanoma1.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Acne/","acne9.jpg",Size(700,700),0);
 	getSkin(img, mask);
 	img.copyTo(img2, mask);
 	Point pt1(171,191);
 	Point pt2(306,439);
-	//FileData fd;
+	FileData fd;
+	fd.extractRuleData("acne9",Point(427,586));
 	//deque< deque<String> > vec;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv",fd.windowVec);
@@ -57,8 +57,8 @@ int main(int argc,char** argv)
 	//generateColorRegionTable(img2, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
-	int col = 163;
-	int row = 316;
+	int col = 278;
+	int row = 395;
 	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
 	//cout << in.calcIntensity("Gray39Brown30");
 	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
