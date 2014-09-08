@@ -21,7 +21,7 @@
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	//runHysteresis();
+	runHysteresis();
 /*
 	String filename[]= {path+"Images/Acne/acne1.jpg",
 						path+"Images/Acne/acne2.jpg",
@@ -30,7 +30,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	hsl hsl;
 	rgb rgb;
 	Color c;
@@ -46,7 +46,8 @@ int main(int argc,char** argv)
 	Point pt1(171,191);
 	Point pt2(306,439);
 	FileData fd;
-	fd.extractRuleData("acne9",Point(427,586));
+	fd.deleteContainingName("/home/jason/Desktop/Programs/","lph13");
+	//fd.extractRuleData("acne9",Point(427,586));
 	//deque< deque<String> > vec;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv",fd.windowVec);

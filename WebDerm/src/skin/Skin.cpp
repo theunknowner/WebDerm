@@ -50,17 +50,14 @@ void getSkinUsingCorrelation(Mat &img, Mat &mask)
 	double vec2[3] = {221,183,160}; //skin values for correlation
 	int r,g,b;
 	double dist=0;
-	for(int row=0; row<img.rows; row++)
-	{
-		for(int col=0; col<img.cols; col++)
-		{
+	for(int row=0; row<img.rows; row++) {
+		for(int col=0; col<img.cols; col++) {
 			b = img.at<Vec3b>(row,col)[0];
 			g = img.at<Vec3b>(row,col)[1];
 			r = img.at<Vec3b>(row,col)[2];
 			double vec1[3] = {(double)r,(double)g,(double)b};
 			dist = correlationDist(vec1,vec2);
-			if(dist<thresh)
-			{
+			if(dist<thresh) {
 				mask.at<uchar>(row,col) = 255;
 			}
 		}
