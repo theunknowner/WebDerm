@@ -113,6 +113,11 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 	double measuredContrast_45[2] ={0};
 	double measuredContrast_90[2] = {0};
 
+	String shade0="",shade45="",shade90="";
+	int currShadeIndex=-1,shadeIndex0=-1,shadeIndex45=-1,shadeIndex90=-1;
+	currShadeIndex = sh.getShadeIndex(newShade);
+	int flag0=0, flag45=0, flag90=0;
+
 	if((color=="BrownPink" || color=="Brown") && HSL[0]<30 && pt.y>0) {
 		int j=pt.x-1;
 		int x = j;
@@ -226,7 +231,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		//in pink
 		if(fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2 &&
 				fn.countLesserEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],2.0)>=2) {
-			if(fn.countLesser(4,round(measuredContrast_0[0]),round(measuredContrast_45[0]),round(measuredContrast_90[0]),1.0)>=2){
+			if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],1.0)>=2){
 				if(HSL[1]<=70) {
 					prevColor_0 = c.getMainColor(fd.colorVec.at(hslPt_0[1].y).at(hslPt_0[1].x));
 					prevColor_45 = c.getMainColor(fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x));
@@ -235,6 +240,37 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 						newPix = "Pink";
 						flag=true;
 						ruleNum = 3.2;
+					}
+					else if(fn.countEqual("4",prevColor_0.c_str(),prevColor_45.c_str(),prevColor_90.c_str(),"BrownPink")>=2) {
+						shade0 = c.extractShade(fd.colorVec.at(hslPt_0[1].y).at(hslPt_0[1].x));
+						shade45 = c.extractShade(fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x));
+						shade90 = c.extractShade(fd.colorVec.at(hslPt_90[1].y).at(hslPt_90[1].x));
+						shadeIndex0 = sh.getShadeIndex(shade0);
+						shadeIndex45 = sh.getShadeIndex(shade45);
+						shadeIndex90 = sh.getShadeIndex(shade90);
+						if((shadeIndex0-currShadeIndex)>=1 && (shadeIndex0-currShadeIndex)<=2) flag0=1;
+						if((shadeIndex45-currShadeIndex)>=1 && (shadeIndex45-currShadeIndex)<=2) flag45=1;
+						if((shadeIndex90-currShadeIndex)>=1 && (shadeIndex90-currShadeIndex)<=2) flag90=1;
+						if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
+							if(pt.x==432 && pt.y==249) {
+								printf("currShade: %s\n", newShade.c_str());
+								printf("shade0: %s\n",shade0.c_str());
+								printf("shade45: %s\n",shade45.c_str());
+								printf("shade90: %s\n",shade90.c_str());
+								printf("currShadeIndex: %d\n", currShadeIndex);
+								printf("shadeIndex0: %d\n",shadeIndex0);
+								printf("shadeIndex45: %d\n",shadeIndex45);
+								printf("shadeIndex90: %d\n",shadeIndex90);
+								printf("deltaHSL0: %.0f\n",deltaHSL_0[1][0]);
+								printf("deltaHSL45: %.0f\n",deltaHSL_45[1][0]);
+								printf("deltaHSL90: %.0f\n",deltaHSL_90[1][0]);
+							}
+							if(fn.countLesserEqual(4,deltaHSL_0[1][0],deltaHSL_45[1][0],deltaHSL_90[1][0],-3.0)>=2) {
+								newPix = "Pink";
+								flag=true;
+								ruleNum = 3.21;
+							}
+						}
 					}
 				}
 			}
@@ -341,10 +377,6 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		prevColor_45 = c.getMainColor(fd.windowVec.at(hslPt_45[1].y).at(hslPt_45[1].x));
 		prevColor_90 = c.getMainColor(fd.windowVec.at(hslPt_90[1].y).at(hslPt_90[1].x));
 
-		String shade0="",shade45="",shade90="";
-		int currShadeIndex=-1,shadeIndex0=-1,shadeIndex45=-1,shadeIndex90=-1;
-		currShadeIndex = sh.getShadeIndex(newShade);
-		int flag0=0, flag45=0, flag90=0;
 		int thresh = 20;
 
 		if(prevColor_0=="Pink") {

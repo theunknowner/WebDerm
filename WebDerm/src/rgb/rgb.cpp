@@ -7,6 +7,7 @@
 
 #include "rgb.h"
 
+
 deque< deque<double> > normMeanThresh;
 deque< deque<double> > absMeanThresh;
 deque<String> rgbColors;

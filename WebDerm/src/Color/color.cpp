@@ -249,7 +249,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 				}
 			}
 		}
-		String file = "outputShades2x2" + name + ".png";
+		String file = name + "_outputShades2x2.png";
 		//resize(img,img,Size(700,700),INTER_CUBIC);
 		imwrite(file,img);
 		img.release();
