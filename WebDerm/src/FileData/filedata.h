@@ -9,6 +9,8 @@
 #define FILEDATA_H_INCLUDED
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
 class FileData {
 private:
@@ -25,7 +27,7 @@ public:
 	double maxIntensity;
 	double minOutlier;
 	double maxOutlier;
-	int shadeCount;
+	int totalShades;
 	double range;
 	Size matSize;
 	Mat matImage;
@@ -46,6 +48,8 @@ public:
 	deque< deque<String> > d_HslMat;
 	deque< deque<String> > hslPtMat;
 	deque< deque<double> > cumHslMat;
+
+	deque< deque<int> > shadeColorCount;
 
 	FileData(String file_path="");
 	~FileData();

@@ -216,6 +216,10 @@ String hsl::getHslColor(int index) {
 }
 void hsl::release_memory()
 {
+	hslColors.clear();
+	hueThresh.clear();
+	satThresh.clear();
+	lumThresh.clear();
 	deque<String>().swap(hslColors);
 	deque< deque<int> >().swap(hueThresh);
 	deque< deque<double> >().swap(satThresh);

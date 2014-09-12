@@ -7,6 +7,24 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
+void runResizeImage() {
+	String filename;
+	String input;
+	cout << "Enter filename: ";
+	cin >> filename;
+	cout << "Do you want to write image? (y/n)";
+	cin >> input;
+	Mat img = runResizeImage(filename,Size(700,700),0);
+	if(input=="y")
+	{
+		String name = getFileName(filename);
+		imwrite(name+".png",img);
+	}
+	imshow("Img", img);
+	waitKey(0);
+	img.release();
+}
+
 Mat runResizeImage(String foldername, String filename, Size size,int write)
 {
 	String file = foldername+"/"+filename;
@@ -56,7 +74,7 @@ void runHysteresis()
 	cin >> filename;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
-	getSkin(img, mask);
+	//getSkin(img, mask);
 	img.copyTo(img2, mask);
 	name = getFileName(filename);
 	int s = 3;
@@ -74,8 +92,8 @@ void runHysteresis()
 		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
-		//hysteresis(fd);
-
+		hysteresis(fd);
+/*
 		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
 		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
 		Intensity in;
@@ -85,17 +103,19 @@ void runHysteresis()
 /**/
 		writeSeq2File(fd.windowVec,name);
 		writeSeq2File(fd.hslMat,name+"_HSL");
-		fd.writeFileMetaData();
+		//fd.writeFileMetaData();
 		c.output2ImageColor(fd.colorVec,name);
+		writeSeq2File(fd.colorVec,name+"_ShadeColors");
+		/*
 		writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
 		writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 		writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
-		writeSeq2File(fd.colorVec,name+"_ShadeColors");
 		writeSeq2File(fd.rulesMat,name+"_RulesMat");
 		writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
 		writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
 		writeSeq2File(fd.hslPtMat,name+"_hslPts");
 		writeSeq2File(fd.cumHslMat,name+"_cumHSL");
+		*/
 	}
 
 	img.release(); img2.release(); mask.release();
@@ -185,7 +205,7 @@ void runAllHysteresis() {
 		for(unsigned int i=0; i<files.size(); i++) {
 			full_path = folder+files.at(i);
 			img = runResizeImage(full_path,Size(700,700),0);
-			getSkin(img, mask);
+			//getSkin(img, mask);
 			img.copyTo(img2, mask);
 			name = getFileName(full_path);
 			FileData fd(full_path);
@@ -203,19 +223,20 @@ void runAllHysteresis() {
 			fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
 /**/
 			writeSeq2File(fd.windowVec,name);
-			writeSeq2File(fd.hslMat,name+"_HSL");
-			fd.writeFileMetaData();
+			//writeSeq2File(fd.hslMat,name+"_HSL");
+			//fd.writeFileMetaData();
 			c.output2ImageColor(fd.colorVec,name);
+			writeSeq2File(fd.colorVec,name+"_ShadeColors");
+			/*
 			writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
 			writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 			writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
-			writeSeq2File(fd.colorVec,name+"_ShadeColors");
 			writeSeq2File(fd.rulesMat,name+"_RulesMat");
 			writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
 			writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
 			writeSeq2File(fd.hslPtMat,name+"_hslPts");
 			writeSeq2File(fd.cumHslMat,name+"_cumHSL");
-
+*/
 			//release images for next use
 			img.release(); img2.release(); mask.release();
 		}

@@ -47,7 +47,7 @@ Mat Histogram::calcHistogram(Mat src) {
 				Scalar( 0, 0, 255), 2, 8, 0  );
 	}
 
-    return histImage;
+	return histImage;
 }
 
 void Histogram::equalizeHistogram(Mat src, Mat &dst) {
@@ -137,4 +137,101 @@ void Histogram::hist2SpreadSheet(Mat &src, String name) {
 		k++;
 		fprintf(fp,"\n");
 	}
+}
+
+void Histogram::outputHistogram(Mat &src, String name) {
+	hsl hsl;
+	int r,g,b;
+	double *HSL;
+	deque<int> lumVec(256,0);
+	int lum=0;
+	double lum2=0;
+	Mat grayImg = src.zeros(src.size(),CV_8U);
+	Mat dst;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			r = src.at<Vec3b>(i,j)[2];
+			g = src.at<Vec3b>(i,j)[1];
+			b = src.at<Vec3b>(i,j)[0];
+			HSL = hsl.rgb2hsl(r,g,b);
+			HSL[2] = roundDecimal(HSL[2],2);
+			lum2 = round(HSL[2]*255);
+			lum = lum2;
+			grayImg.at<uchar>(i,j) = lum;
+			++lumVec.at(lum);
+		}
+	}
+	String filename = path+name+"_hist.csv";
+	FILE *fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<lumVec.size(); i++) {
+		if(lumVec.at(i)>0)
+			fprintf(fp,"%d,%d\n",i,lumVec.at(i));
+	}
+}
+
+void Histogram::lightEqualizer(Mat src, Mat &dst) {
+	dst = src.clone();
+	hsl hsl;
+	double idealLum = 65; //percentage integer
+	int r,g,b;
+	deque<int> lumVec(101,0);
+	double *HSL;
+	int *RGB;
+	int lum=0;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			r = src.at<Vec3b>(i,j)[2];
+			g = src.at<Vec3b>(i,j)[1];
+			b = src.at<Vec3b>(i,j)[0];
+			HSL = hsl.rgb2hsl(r,g,b);
+			HSL[2] -= .10;
+			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+			dst.at<Vec3b>(i,j)[2] = RGB[0];
+			dst.at<Vec3b>(i,j)[1] = RGB[1];
+			dst.at<Vec3b>(i,j)[0] = RGB[2];
+			HSL[2] = roundDecimal(HSL[2],2)*100;
+			lum = HSL[2];
+			++lumVec.at(lum);
+		}
+	}
+	/*
+	int total = src.rows*src.cols;
+	double avg=0,sum=0;
+	for(unsigned int i=0; i<lumVec.size(); i++) {
+		if(lumVec.at(i)>0) {
+			sum += (i*lumVec.at(i));
+		}
+	}
+	avg = sum/total;
+	sum=0;
+	for(unsigned int i=0; i<lumVec.size(); i++) {
+		if(lumVec.at(i)>0) {
+			sum += pow((i-avg),2)*lumVec.at(i);
+		}
+	}
+	double variance = sum/total;
+	double stdev = sqrt(variance);
+	double stdevMultiplier = (avg-idealLum)/stdev;
+	int *RGB;
+	for(int i=0; i<dst.rows; i++) {
+		for(int j=0; j<dst.cols; j++) {
+			r = dst.at<Vec3b>(i,j)[2];
+			g = dst.at<Vec3b>(i,j)[1];
+			b = dst.at<Vec3b>(i,j)[0];
+			HSL = hsl.rgb2hsl(r,g,b);
+			HSL[2] = roundDecimal(HSL[2],2)*100;
+			if(HSL[2]>=round(avg)) {
+				HSL[2] -= (stdev*stdevMultiplier);
+			}
+			else if(HSL[2]<idealLum) {
+				HSL[2] += (stdev*stdevMultiplier);
+			}
+			HSL[2] /= 100.;
+			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+			dst.at<Vec3b>(i,j)[2] = RGB[0];
+			dst.at<Vec3b>(i,j)[1] = RGB[1];
+			dst.at<Vec3b>(i,j)[0] = RGB[2];
+		}
+	}*/
 }

@@ -11,7 +11,7 @@ FileData::FileData(String file_path) {
 	setFilePath(file_path);
 	if(!filename.empty())
 		printf("Constructor executed for %s\n",filename.c_str());
-	shadeCount = 0;
+	totalShades = 0;
 	minIntensity = 0;
 	maxIntensity = 0;
 	minOutlier = 0;
@@ -20,7 +20,9 @@ FileData::FileData(String file_path) {
 	localRatioScanSize = 0;
 	localScanSize=0;
 	range=0;
-	}
+
+	init_2D_Deque(this->shadeColorCount,g_Shades.size(), allColors.size(),0);
+}
 
 FileData::~FileData() {
 	matImage.release();
@@ -37,6 +39,7 @@ FileData::~FileData() {
 	deque< deque<String> >().swap(d_HslMat);
 	deque< deque<String> >().swap(hslPtMat);
 	deque< deque<double> >().swap(cumHslMat);
+
 	if(!filename.empty())
 		printf("Destructor executed for %s\n",filename.c_str());
 }
@@ -66,7 +69,7 @@ void FileData::writeFileMetaData() {
 	fprintf(fp,"%s,%s\n",stringify(newMaxShade), newMaxShade.c_str());
 	fprintf(fp,"%s,%0.2f\n",stringify(minIntensity), minIntensity);
 	fprintf(fp,"%s,%0.2f\n",stringify(maxIntensity), maxIntensity);
-	fprintf(fp,"%s,%d\n",stringify(shadeCount), shadeCount);
+	fprintf(fp,"%s,%d\n",stringify(totalShades), totalShades);
 	fclose(fp);
 }
 

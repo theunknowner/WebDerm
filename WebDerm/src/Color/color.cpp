@@ -147,7 +147,7 @@ String Color::getMainColor(String color) {
 	}
 	catch(const std::out_of_range &oor) {
 		printf("Color::getMainColor() out of range!\n");
-		exit(0);
+		exit(1);
 	}
 	return pix;
 }
@@ -327,6 +327,8 @@ String Color::optimizeColor(String pix) {
 	if(countColors(color)>2 && color.find("Grey")!=string::npos) {
 		color = removeColor(color,"Grey");
 	}
+	if(color=="RedPink")
+		color = "PinkRed";
 	if(countColors(color)>2) {
 		color.clear();
 		for(unsigned int i=0; i<mainColors.size(); i++) {

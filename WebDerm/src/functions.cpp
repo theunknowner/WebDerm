@@ -58,6 +58,7 @@ void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) 
 	deque<String>().swap(tempVec);
 }
 
+
 void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val) {
 	deque<double> tempVec;
 	for(int i=0; i<rows; i++) {
@@ -69,6 +70,19 @@ void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val) 
 	}
 	tempVec.clear();
 	deque<double>().swap(tempVec);
+}
+
+void init_2D_Deque(deque< deque<int> > &vec, int cols, int rows, int val) {
+	deque<int> tempVec;
+	for(int i=0; i<rows; i++) {
+		for(int j=0; j<cols; j++) {
+			tempVec.push_back(val);
+		}
+		vec.push_back(tempVec);
+		tempVec.clear();
+	}
+	tempVec.clear();
+	deque<int>().swap(tempVec);
 }
 
 

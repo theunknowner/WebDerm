@@ -309,7 +309,7 @@ deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<doubl
 						}
 					}
 				}
-break_nested_loop:
+				break_nested_loop:
 				if(flag==0) totalIntensity /= counter;
 				totalIntensity = round(totalIntensity);
 				vec1.push_back(totalIntensity);
@@ -334,7 +334,7 @@ break_nested_loop:
 }
 
 deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-									deque< deque<String> > &hslMat,String name, FileData &fd) {
+		deque< deque<String> > &hslMat,String name, FileData &fd) {
 	rgb rgb;
 	hsl hsl;
 	Color c;
@@ -362,9 +362,9 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.intensityVec = calcIntensityMatrix(fd.windowVec);
 	fd.smoothIntensityVec = calcSmoothedIntensityMatrix(fd.intensityVec);
 	fd.range = range;
-	try {
-		for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
-			for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
+	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
+		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
+			try {
 				pix = windowVec.at(i).at(j);
 				pix2 = c.getMainColor(pix);
 				ccCurr = fd.smoothIntensityVec.at(i).at(j);
@@ -382,16 +382,17 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				}
 				colorVec1.push_back(shade);
 			}
-			flag=0;
-			fd.colorVec.push_back(colorVec1);
-			colorVec1.clear();
+			catch(const std::out_of_range &oor) {
+				printf("Intensity::calcMainColorMatrix()-1stHalf out of range!\n");
+				cout << "Col Size: " << fd.smoothIntensityVec.at(0).size() << endl;
+				cout << "Row Size: " << fd.smoothIntensityVec.size() << endl;
+				printf("Point(%d,%d)\n", j,i );
+				exit(1);
+			}
 		}
-	}
-	catch(const std::out_of_range &oor) {
-		printf("Intensity::calcMainColorMatrix()-1stHalf out of range!\n");
-		cout << "Cols: " << fd.smoothIntensityVec.at(0).size() << endl;
-		cout << "Rows: " << fd.smoothIntensityVec.size() << endl;
-		exit(0);
+		flag=0;
+		fd.colorVec.push_back(colorVec1);
+		colorVec1.clear();
 	}
 
 	maxShadeIndex = sh.getShadeIndex(newMaxShade);
@@ -418,7 +419,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.oldMaxShade = oldMaxShade;
 	fd.newMinShade = newMinShade;
 	fd.newMaxShade = newMaxShade;
-	fd.shadeCount = newShadeAmt;
+	fd.totalShades = newShadeAmt;
 	init_2D_Deque(fd.m_ContrastMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
@@ -597,14 +598,14 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	}
 	catch(const std::out_of_range &oor) {
 		printf("Intensity::calcMainColorMatrix()-2ndHalf out of range!\n");
-		exit(0);
+		exit(1);
 	}
 
 	return fd.colorVec;
 }
 
 void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
-									deque< deque<String> > &hslMat,String name, FileData &fd) {
+		deque< deque<String> > &hslMat,String name, FileData &fd) {
 	fd.colorVec = calcMainColorMatrix(img, windowVec, hslMat, name, fd);
 	writeSeq2File(fd.colorVec,name+"_ShadeColors");
 }

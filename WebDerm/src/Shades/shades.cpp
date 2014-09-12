@@ -72,7 +72,23 @@ int Shades::getShadeIndex(String shade) {
 	return index;
 }
 
+String Shades::extractShade(String pix) {
+   int shadeCount = getShadeCount();
+    //int shadeCount = sh.getShadeCount();
+	String shade = "";
+	if(pix=="Zero") return pix;
+	//if(pix.find("Gray")!=string::npos) return "Gray";
+	for(int i=0; i<shadeCount; i++) {
+		shade = getShade(i);
+		if(pix.find(shade)!=string::npos)
+			break;
+	}
+	return shade;
+}
+
 void Shades::release_memory() {
+	g_Shades.clear();
+	g_ShadeThresh.clear();
 	deque<String>().swap(g_Shades);
 	deque< deque<double> >().swap(g_ShadeThresh);
 }

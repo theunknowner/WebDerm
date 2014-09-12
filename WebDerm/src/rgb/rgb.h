@@ -14,16 +14,15 @@
 
 extern deque< deque<double> > normMeanThresh;
 extern deque< deque<double> > absMeanThresh;
-extern deque< deque<double> > absThresh;
-extern deque< deque<double> > normThresh;
-extern deque<double> colorFactors;
 extern deque<String> rgbColors;
 extern deque<String> mainColors;
+extern deque<String> allColors;
 
 class rgb
 {
 public:
-	int getIndex(String color);
+	int getMainColorIndex(String color);
+	int getColorIndex(String color);
 	bool importColorThresholds();
 	bool importThresholds();
 	double normEucDist(double red, double green, double blue, deque<double> &vec);

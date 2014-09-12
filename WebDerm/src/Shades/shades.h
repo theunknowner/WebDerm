@@ -23,6 +23,7 @@ public:
 	String getShade(int index);
 	int getShadeIndex(String shade);
 	int extractShadeLevel(String shade);
+	String extractShade(String pix);
 	void release_memory();
 };
 

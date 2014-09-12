@@ -12,10 +12,19 @@ deque< deque<double> > normMeanThresh;
 deque< deque<double> > absMeanThresh;
 deque<String> rgbColors;
 deque<String> mainColors;
+deque<String> allColors;
 
-int rgb::getIndex(String color) {
+int rgb::getMainColorIndex(String color) {
 	for(unsigned int i=0; i<mainColors.size(); i++) {
 		if(color==mainColors.at(i))
+			return i;
+	}
+	return 0;
+}
+
+int rgb::getColorIndex(String color) {
+	for(unsigned int i=0; i<allColors.size(); i++) {
+		if(color==allColors.at(i))
 			return i;
 	}
 	return -1;
@@ -36,20 +45,28 @@ bool rgb::importColorThresholds()
 {
 	String folderName = path+"Thresholds/";
 	String filename = folderName+"color-thresholds.csv";
-	String filename2 = folderName+"colors.csv";
+	String filename2 = folderName+"main_colors.csv";
+	String filename3 = folderName+"colors.csv";
 	fstream fsThresh(filename.c_str());
 	fstream fsColors(filename2.c_str());
+	fstream fsColors2(filename3.c_str());
 	if(fsThresh.is_open() && fsColors.is_open())
 	{
 		String temp;
 		deque<String> vec;
 		deque<double> thresh;
 		deque<double> thresh2;
-		while(getline(fsColors,temp))
-		{
+		while(getline(fsColors,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
 				if(i==0) mainColors.push_back(vec.at(i));
+			}
+			vec.clear();
+		}
+		while(getline(fsColors2,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0) allColors.push_back(vec.at(i));
 			}
 			vec.clear();
 		}
@@ -491,8 +508,11 @@ void rgb::showPixelColorAtLoc(Mat img, int row, int col, Size size)
 		showPixelColor(r,g,b,size);
 	}
 
-void rgb::release_memory()
-{
+void rgb::release_memory() {
+	normMeanThresh.clear();
+	absMeanThresh.clear();
+	rgbColors.clear();
+	mainColors.clear();
 	deque< deque<double> >().swap(normMeanThresh);
 	deque< deque<double> >().swap(absMeanThresh);
 	deque<String>().swap(rgbColors);

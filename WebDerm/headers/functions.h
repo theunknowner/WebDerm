@@ -31,6 +31,7 @@ double roundDecimal(double num, int places);
 String decimal2hex(int num);
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val="0");
 void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val=0);
+void init_2D_Deque(deque< deque<int> > &vec, int cols, int rows, int val=0);
 
 class Functions {
 public:

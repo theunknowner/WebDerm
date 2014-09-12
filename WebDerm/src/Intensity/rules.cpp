@@ -252,19 +252,6 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 						if((shadeIndex45-currShadeIndex)>=1 && (shadeIndex45-currShadeIndex)<=2) flag45=1;
 						if((shadeIndex90-currShadeIndex)>=1 && (shadeIndex90-currShadeIndex)<=2) flag90=1;
 						if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
-							if(pt.x==432 && pt.y==249) {
-								printf("currShade: %s\n", newShade.c_str());
-								printf("shade0: %s\n",shade0.c_str());
-								printf("shade45: %s\n",shade45.c_str());
-								printf("shade90: %s\n",shade90.c_str());
-								printf("currShadeIndex: %d\n", currShadeIndex);
-								printf("shadeIndex0: %d\n",shadeIndex0);
-								printf("shadeIndex45: %d\n",shadeIndex45);
-								printf("shadeIndex90: %d\n",shadeIndex90);
-								printf("deltaHSL0: %.0f\n",deltaHSL_0[1][0]);
-								printf("deltaHSL45: %.0f\n",deltaHSL_45[1][0]);
-								printf("deltaHSL90: %.0f\n",deltaHSL_90[1][0]);
-							}
 							if(fn.countLesserEqual(4,deltaHSL_0[1][0],deltaHSL_45[1][0],deltaHSL_90[1][0],-3.0)>=2) {
 								newPix = "Pink";
 								flag=true;
