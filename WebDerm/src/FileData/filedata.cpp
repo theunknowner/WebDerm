@@ -352,3 +352,16 @@ void FileData::extractRuleData(String filename, Point loc) {
 	fprintf(fp,"ColorsMax,%s\n", colorsMax.c_str());
 	fclose(fp);
 }
+
+deque< deque<double> > FileData::stringVec2Double(deque< deque<String> > &vec) {
+	deque< deque<double> > doubleVec;
+	deque<double> tempVec;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		for(unsigned int j=0; j<vec.at(i).size(); j++) {
+			tempVec.push_back(atof(vec.at(i).at(j).c_str()));
+		}
+		doubleVec.push_back(tempVec);
+		tempVec.clear();
+	}
+	return doubleVec;
+}

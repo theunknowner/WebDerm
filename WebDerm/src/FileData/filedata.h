@@ -70,6 +70,8 @@ public:
 	void getMinMaxPts(String input, deque< deque<Point> > &pt);
 	void extractRuleData(String filename, Point loc);
 
+	deque< deque<double> > stringVec2Double(deque< deque<String> > &vec);
+
 };
 
 

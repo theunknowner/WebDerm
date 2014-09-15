@@ -344,6 +344,29 @@ String Color::optimizeColor(String pix) {
 	return color;
 }
 
+String Color::optimizeColor2(String pix) {
+	String color = pix;
+	int count=0;
+	if(countColors(color)>2 && color.find("Grey")!=string::npos) {
+		color = removeColor(color,"Grey");
+	}
+	if(color=="RedPink")
+		color = "PinkRed";
+	if(countColors(color)>2) {
+		color.clear();
+		for(unsigned int i=0; i<mainColors.size(); i++) {
+			if(pix.find(mainColors.at(i))!=string::npos) {
+				color += mainColors.at(i);
+				count++;
+			}
+			if(count==2)
+				break;
+		}
+	}
+
+	return color;
+}
+
 double* Color::extractHSL(String inputString) {
 	Functions fn;
 	int beginPos=0, endPos=0;

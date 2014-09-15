@@ -46,11 +46,15 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(430,244);
 	Point pt2(306,439);
-	FileData fd;
-	fd.filename = "acne3";
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/acne3_ShadeColors.csv",fd.colorVec);
+
+	String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
+	String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
+	//FileData fd;
+	//fd.filename = "melanoma6";
+	//fd.loadFileMatrix("/home/jason/Desktop/Programs/melanoma6_ShadeColors.csv",fd.colorVec);
 	Entropy en;
-	en.outputEntropy(fd,Size(25,25));
+	//en.outputEntropy(fd,Size(25,25));
+	en.importEntropyFiles(file1,file2,"lph4psor1");
 	//deque< deque<String> > vec;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv",fd.windowVec);
