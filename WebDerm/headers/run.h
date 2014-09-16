@@ -20,6 +20,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
 
 void runResizeImage();
+void runResizeAllImages();
 Mat runResizeImage(String foldername, String filename, Size size,int write);
 Mat runResizeImage(String filename, Size size,int write);
 void runHysteresis();

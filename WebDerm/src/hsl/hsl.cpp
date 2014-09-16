@@ -41,7 +41,7 @@ bool hsl::importHslThresholds() {
 		getSubstr(temp,',',vec);
 		for(unsigned int i=0; i<vec.size(); i++) {
 			if(i==0) hslColors.push_back(vec.at(i));
-			if(i>=1 && i<=2) thresh.push_back(atoi(vec.at(i).c_str()));
+			if(i>=1 && i<=2) thresh.push_back(atof(vec.at(i).c_str()));
 			if(i>=3 && i<=4) thresh2.push_back(atof(vec.at(i).c_str()));
 			if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
 			if(i==7) hueTableNum.push_back(atoi(vec.at(i).c_str()));

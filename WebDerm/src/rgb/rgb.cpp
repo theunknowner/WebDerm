@@ -540,24 +540,30 @@ String rgb::calcColor2(int red, int green, int blue) {
 	double colorLevel = calcColorLevel(red,green,blue);
 	double grayLumLevel = calcGrayLumLevel(red,green,blue);
 	for(unsigned int i=0; i<hueThresh.size(); i++) {
-		if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-			if(sat>=satThresh.at(i).at(0) && sat<satThresh.at(i).at(1)) {
-				if(lum>=lumThresh.at(i).at(0) && lum<lumThresh.at(i).at(1)) {
-					pix = hslColors.at(i);
-					if(grayLevel==0) {
-						pix = hslColors.at(i) + toString(colorLevel);
+		try {
+			if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
+				if(sat>=satThresh.at(i).at(0) && sat<satThresh.at(i).at(1)) {
+					if(lum>=lumThresh.at(i).at(0) && lum<lumThresh.at(i).at(1)) {
+						pix = hslColors.at(i);
+						if(grayLevel==0) {
+							pix = hslColors.at(i) + toString(colorLevel);
+						}
+						else {
+							if(pix=="Black" || pix=="White")
+								pix += toString(colorLevel);
+							else if(pix=="Grey")
+								pix += toString(colorLevel);
+							else
+								pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
+						}
+						return pix;
 					}
-					else {
-						if(pix=="Black" || pix=="White")
-							pix += toString(colorLevel);
-						else if(pix=="Grey")
-							pix += toString(colorLevel);
-						else
-							pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
-					}
-					return pix;
 				}
 			}
+		} catch (const std::out_of_range &oor) {
+			printf("rgb::calcColor2() out of range!\n");
+			printf("hueThresh.Size: %lu", hueThresh.size());
+			exit(1);
 		}
 	}
 	return pix;
@@ -577,13 +583,13 @@ String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 
 String rgb::calcColor(int red, int green, int blue) {
 	Color c;
-	String pix;
+    String pix;
 	double dist=0;
 	int ind=0;
 	pix = calcColor2(red,green,blue);
 	double grayLevel = calcGrayLevel(red,green,blue);
-	if(pix=="OTHER")
-		pix = pushColor(red,green,blue,dist,ind);
+    if(pix=="OTHER")
+        pix = pushColor(red,green,blue,dist,ind);
 	pix = c.reassignLevels(pix,red,green,blue);
 	pix = toString(grayLevel) + pix;
 	return pix;

@@ -158,10 +158,10 @@ void Entropy::importEntropyFiles(String path1, String path2,String name) {
 		tempVec.clear();
 		tempVec2.clear();
 	}
-	outputEntropyDistance(doubleVec1,doubleVec2,name);
+	compareEntropy(doubleVec1,doubleVec2,name);
 }
 
-void Entropy::outputEntropyDistance(deque< deque<double> > &vec1, deque< deque<double> > &vec2,String name) {
+void Entropy::compareEntropy(deque< deque<double> > &vec1, deque< deque<double> > &vec2,String name) {
 	deque< deque<double> > distVec(vec1.size(), deque<double>(vec1.at(0).size(),0));
 	int cumDist[20] = {0};
 	int dist=0;

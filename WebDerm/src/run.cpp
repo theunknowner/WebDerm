@@ -25,6 +25,22 @@ void runResizeImage() {
 	img.release();
 }
 
+void runResizeAllImages() {
+	String folder,filename,name;
+	cout << "Enter folder_name: ";
+	cin >> folder;
+	deque<String> files;
+	FileData fd;
+	if(fd.getFilesFromDirectory(folder,files)) {
+		for(unsigned int i=0; i<files.size(); i++) {
+			filename = folder + files.at(i);
+			Mat img = runResizeImage(filename,Size(700,700),0);
+			String name = getFileName(filename);
+			imwrite(name+".png",img);
+		}
+	}
+}
+
 Mat runResizeImage(String foldername, String filename, Size size,int write)
 {
 	String file = foldername+"/"+filename;
@@ -373,9 +389,13 @@ void outputFreqColor(Mat &img)
 }
 
 void runMouseColor() {
+	rgb rgb;
+	hsl hsl;
+	Shades sh;
+	hsl.importHslThresholds();
+	rgb.importThresholds();
+	sh.importThresholds();
 	String filename,input;
-	String name;
-	Size size(2,2);
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img, img2, mask;

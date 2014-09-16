@@ -16,13 +16,13 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 	String color;
 	double * HSL;
 	int h, s,l;
-    char coordText[50];
-    char rgbText[50];
-    char hslText[100];
-    char c[30];
-    char gl[50];
-    char cl[50];
-    char rl[50];
+    char coordText[25];
+    char rgbText[25];
+    char hslText[25];
+    char c[25];
+    char gl[25];
+    char cl[25];
+    char rl[25];
     double graylevel=0, colorlevel=0;
     int relLum=0;
     if(img2.type()==0) {
@@ -41,7 +41,7 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 		l = roundDecimal(HSL[2],2) * 100;
 		color = rgb.checkBlack(rgbVec[2],rgbVec[1],rgbVec[0]);
 		if(color=="OTHER")
-			color = rgb.calcColor(rgbVec[2],rgbVec[1],rgbVec[0]);
+            color = rgb.calcColor(rgbVec[2],rgbVec[1],rgbVec[0]);
 		graylevel = rgb.calcGrayLevel(rgbVec[2],rgbVec[1],rgbVec[0]);
 		colorlevel = rgb.calcColorLevel(rgbVec[2],rgbVec[1],rgbVec[0]);
 		relLum = rgb.calcPerceivedBrightness(rgbVec[2],rgbVec[1],rgbVec[0]);
@@ -60,13 +60,14 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 		putText(img3, gl, Point(5,75), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
 		putText(img3, cl, Point(5,90), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
 		putText(img3, rl, Point(5,105), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+
 		imshow("Info",img3);
     }
 }
 
 void Mouse::mouseColor(Mat img) {
-	namedWindow("image", CV_WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-	cvSetMouseCallback("image", onMouseCheckColor, &img);
-	imshow("image", img);
-	waitKey(0);
+		namedWindow("image", CV_WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+        cvSetMouseCallback("image", onMouseCheckColor, &img);
+		imshow("image", img);
+		waitKey(0);
 }

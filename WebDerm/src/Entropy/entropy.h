@@ -20,7 +20,7 @@ class Entropy {
 public:
 	void outputEntropy(FileData &fd, Size ksize);
 	void importEntropyFiles(String path1, String path2,String name);
-	void outputEntropyDistance(deque< deque<double> > &vec1, deque< deque<double> > &vec2,String name);
+	void compareEntropy(deque< deque<double> > &vec1, deque< deque<double> > &vec2,String name);
 };
 
 #endif /* ENTROPY_H_ */
