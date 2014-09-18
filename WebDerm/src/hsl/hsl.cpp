@@ -1,5 +1,5 @@
 /*
- * hsl.cpp
+ * Hsl.cpp
  *
  *  Created on: Jan 30, 2014
  *      Author: jason
@@ -14,16 +14,16 @@ deque< deque<double> > satThresh;
 deque< deque<double> > lumThresh;
 deque<int> hueTableNum;
 
-bool hsl::isThreshImported() {
+bool Hsl::isThreshImported() {
 	return THRESH_IMPORTED;
 }
 
-void hsl::setThreshImported(bool flag) {
+void Hsl::setThreshImported(bool flag) {
 	THRESH_IMPORTED = flag;
 }
 
 //import main HSL thresholds
-bool hsl::importHslThresholds() {
+bool Hsl::importHslThresholds() {
 	String foldername = path+"Thresholds/";
 	String filename = foldername+"hslcolor-thresholds2.csv";
 	fstream fsThresh(filename.c_str());
@@ -62,7 +62,7 @@ bool hsl::importHslThresholds() {
 }
 
 //gets the minimum between the rgb value
-double hsl::minRGB(double red, double green, double blue)
+double Hsl::minRGB(double red, double green, double blue)
 	{
 		if(red<=green && red<=blue)
 		{
@@ -76,7 +76,7 @@ double hsl::minRGB(double red, double green, double blue)
 	}
 
 //get the max between tbe rgb value
-	double hsl::maxRGB(double red, double green, double blue)
+	double Hsl::maxRGB(double red, double green, double blue)
 	{
 		if(red>=green && red>=blue)
 		{
@@ -89,8 +89,8 @@ double hsl::minRGB(double red, double green, double blue)
 		return blue;
 	}
 
-//converts rgb values to hsl values
-	double *hsl::rgb2hsl(double red, double green, double blue)
+//converts rgb values to Hsl values
+	double *Hsl::rgb2hsl(double red, double green, double blue)
 	{
 		double r,g,b;
 		double min, max;
@@ -136,23 +136,23 @@ double hsl::minRGB(double red, double green, double blue)
 		return HSL;
 	}
 
-	double hsl::getHue()
+	double Hsl::getHue()
 	{
 		H = round(H);
 		return H;
 	}
 
-	double hsl::getSat()
+	double Hsl::getSat()
 	{
 		return S;
 	}
 
-	double hsl::getLum()
+	double Hsl::getLum()
 	{
 		return L;
 	}
 
-	double hsl::calcLum(double red, double green, double blue)
+	double Hsl::calcLum(double red, double green, double blue)
 	{
 		double r,g,b;
 		double min, max;
@@ -166,8 +166,8 @@ double hsl::minRGB(double red, double green, double blue)
 		return lum;
 	}
 
-//return the color of the hsl values using hsl colorspace
-String hsl::getHslColor(double hue, double sat, double lum)
+//return the color of the Hsl values using Hsl colorspace
+String Hsl::getHslColor(double hue, double sat, double lum)
 {
 	String color = "NONE";
 	try {
@@ -188,8 +188,8 @@ String hsl::getHslColor(double hue, double sat, double lum)
 	return color;
 }
 
-//return the color of the hsl values using hsl colorspace
-String hsl::getHslColor(double hue, double sat, double lum, int &ind, Point pt)
+//return the color of the Hsl values using Hsl colorspace
+String Hsl::getHslColor(double hue, double sat, double lum, int &ind, Point pt)
 {
 	String color = "NONE";
 	try {
@@ -211,10 +211,10 @@ String hsl::getHslColor(double hue, double sat, double lum, int &ind, Point pt)
 	return color;
 }
 
-String hsl::getHslColor(int index) {
+String Hsl::getHslColor(int index) {
 	return hslColors.at(index);
 }
-void hsl::release_memory()
+void Hsl::release_memory()
 {
 	hslColors.clear();
 	hueThresh.clear();
@@ -227,7 +227,7 @@ void hsl::release_memory()
 }
 
 //customize calcuation of hue avg
-double hsl::calcHueAvg(deque<int> &vec) {
+double Hsl::calcHueAvg(deque<int> &vec) {
 	double hue=0;
 	double total=0;
 	for(unsigned int i=0; i<vec.size(); i++) {
@@ -249,7 +249,7 @@ inline double hue2rgb(double var1, double var2, double vH) {
 }
 
 /** hue=0-360; sat=0-1; lum=0-1 **/
-int *hsl::hsl2rgb(double hue, double sat, double lum) {
+int *Hsl::hsl2rgb(double hue, double sat, double lum) {
 	static double RGB[3];
 	static int results[3];
 	if(sat==0) {
@@ -276,7 +276,7 @@ int *hsl::hsl2rgb(double hue, double sat, double lum) {
 }
 
 /** printf HSL/HSP values **/
-String hsl::printHS(double *HSL) {
+String Hsl::printHS(double *HSL) {
 
 	HSL[1] = roundDecimal(HSL[1],2);
 	HSL[2] = roundDecimal(HSL[2],2);

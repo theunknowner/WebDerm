@@ -1,5 +1,5 @@
 /*
- * rgb.h
+ * Rgb.h
  *
  *  Created on: Feb 14, 2014
  *      Author: jason
@@ -18,7 +18,7 @@ extern deque<String> rgbColors;
 extern deque<String> mainColors;
 extern deque<String> allColors;
 
-class rgb
+class Rgb
 {
 public:
 	int getMainColorIndex(String color);

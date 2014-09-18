@@ -22,8 +22,9 @@
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	//runHysteresis();
-	runMouseColor();
+	runHysteresis();
+	//runMouseColor();
+	//runResizeAllImages();
 /*
 	String filename[]= {path+"Images/Acne/acne1.jpg",
 						path+"Images/Acne/acne2.jpg",
@@ -33,8 +34,8 @@ int main(int argc,char** argv)
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
 	/*
-	hsl hsl;
-	rgb rgb;
+	Hsl hsl;
+	Rgb rgb;
 	Color c;
 	Functions fn;
 	Shades sh;
@@ -47,9 +48,9 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(430,244);
 	Point pt2(306,439);
-
 	//String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
 	//String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
+	/*
 	FileData fd;
 	fd.filename = "clp4";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors.csv",fd.colorVec);

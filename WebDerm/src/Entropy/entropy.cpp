@@ -11,7 +11,7 @@ void Entropy::outputEntropy(FileData &fd, Size ksize) {
 	String shade, color, pix;
 	int shadeIndex=0, colorIndex=0;
 	Shades sh;
-	rgb rgb;
+	Rgb rgb;
 	Color c;
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {

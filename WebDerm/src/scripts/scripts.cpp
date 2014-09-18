@@ -11,8 +11,8 @@ void colorThreshNamingScript()
 {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/colorThresh.csv","w");
-	hsl hsl;
-	rgb rgb;
+	Hsl hsl;
+	Rgb rgb;
 	Color color;
 	double r,g,b;
 	double lum=0;
@@ -31,7 +31,7 @@ void colorThreshNamingScript()
 		hsl.rgb2hsl(r,g,b);
 		lum = roundDecimal(hsl.getLum(),2);
 		colorLevel = rgb.calcColorLevel(r,g,b);
-		//grayLevel = rgb.calcGrayLevel(r,g,b);
+		//grayLevel = Rgb.calcGrayLevel(r,g,b);
 		grayLevel = rgb.calcGrayLumLevel(r,g,b);
 		color.extractColorFromString(rgbColors.at(i),vecColor);
 		for(unsigned int j=0; j<vecColor.size(); j++)
@@ -65,8 +65,8 @@ void colorThreshRenamingScript()
 {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/colorThresh.csv","w");
-	hsl hsl;
-	rgb rgb;
+	Hsl hsl;
+	Rgb rgb;
 	Color color;
 	double r,g,b;
 	double hue=0;
@@ -117,7 +117,7 @@ void sortColorThreshold(String color1, String color2) {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/sortColor.csv","w");
 	fprintf(fp,"Color,Hue,Sat,Lum,R,G,B,Index\n");
-	hsl hsl;
+	Hsl hsl;
 	String pix;
 	int arr[10] = {0,6,7,13,339,345,346,352,353,359};
 	int r,g,b;
@@ -152,7 +152,7 @@ void outputFarRGBScript(Mat &img, String name)
 	FILE * fs;
 	fp = fopen(filename.c_str(),"w");
 	fs = fopen("/home/jason/Desktop/workspace/colorThresh.csv","w");
-	rgb rgb;
+	Rgb rgb;
 	int r,g,b;
 	int ind=0;
 	double dist=0;
@@ -337,12 +337,12 @@ void spreadsheetCompareScript()
 	}
 }
 
-//prints out rgb vals and location of matching index
+//prints out Rgb vals and location of matching index
 void outputPixLoc(Mat img,int index)
 {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/pixLoc.txt", "w");
-	rgb rgb;
+	Rgb rgb;
 	int r,g,b;
 	String pix;
 	int ind=0;
@@ -364,7 +364,7 @@ void outputPixLoc(Mat img,int index)
 }
 
 void showPushColorOnImage(Mat &img, int index) {
-	rgb rgb;
+	Rgb rgb;
 	int r,g,b;
 	int ind=0;
 	int count=0;
@@ -392,8 +392,8 @@ void showPushColorOnImage(Mat &img, int index) {
 
 //needs manual changes for the name of color
 void addNewColors(Mat &img, Point pt1, Point pt2,String color1, String color2) {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/newColors.csv","w");
 	String pix;
@@ -505,8 +505,8 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 	int ind=0;
 	double lum=0, grayLevel=0, colorLevel=0, grayLumLevel=0;
 	double ratio=0, ratio2=0;
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Color c;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
@@ -548,8 +548,8 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 	int ind=0;
 	double lum=0, grayLevel=0, colorLevel=0, grayLumLevel=0, colorLumLevel=0;
 	double ratio=0, ratio2=0;
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Color c;
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
@@ -589,7 +589,7 @@ double checkEucDist(int r,int g, int b) {
 	fstream fsThresh(filename.c_str());
 	double dist=-1;
 	if(fsThresh.is_open()) {
-		rgb rgb;
+		Rgb rgb;
 		String temp;
 		deque<String> vec;
 		deque<double> thresh;
@@ -625,8 +625,8 @@ double checkEucDist(int r,int g, int b) {
 }
 
 void checkColorsFromList(Mat &img, Point pt1, Point pt2) {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Color c;
 	int r,g,b;
 	double *HSL;
@@ -687,7 +687,7 @@ void dataDeduplicationGrayRGB(double threshold) {
 			thresh.clear();
 			vec.clear();
 		}
-		rgb rgb;
+		Rgb rgb;
 		deque< deque<double> > rgbVec;
 		int i=0,j=0, size=thresh2.size();
 		int counter=0;
@@ -729,7 +729,7 @@ void dataDeduplicationGrayRGB(double threshold) {
 void push500Colors(double r, double g, double b) {
 	fstream fsColors("/home/jason/Desktop/workspace/Thresholds/500Colors.csv");
 	if(fsColors.is_open()) {
-		rgb rgb;
+		Rgb rgb;
 		String temp;
 		deque<String> vec;
 		deque<String> color;
@@ -768,7 +768,7 @@ void generateColorData(Mat &img, Point pt1, Point pt2) {
 	FILE *fp;
 	fp = fopen("/home/jason/Desktop/workspace/colordata.csv","w");
 	fprintf(fp,"Coord,RGB,HSL,Color,Brown,Pink\n");
-	hsl hsl;
+	Hsl hsl;
 	double *HSL;
 	int r,g,b;
 	String color;

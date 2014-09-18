@@ -75,7 +75,7 @@ String getFileName(String filename)
 }
 ///////////////MOUSE EVENTS///////////////////////////
 void mouseEvent(int evt, int x, int y, int flags, void* param) {
-	rgb rgb;
+	Rgb rgb;
     Mat* RGB = (Mat*) param;
     String color;
     int r,g,b;

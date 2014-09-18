@@ -114,13 +114,13 @@ int Color::countColors(String color) {
 
 //gets color and recalculates gray and color levels
 String Color::reassignLevels(String pix, int r, int g, int b) {
-	rgb rgb;
+	Rgb rgb;
 	deque<String> colorVec;
 	String pix2;
 	//double grayLevel=0;
 	double colorLevel=0;
 	extractColorFromString(pix, colorVec);
-	//grayLevel = rgb.calcGrayLevel(r,g,b);
+	//grayLevel = Rgb.calcGrayLevel(r,g,b);
 	colorLevel = rgb.calcColorLevel(r,g,b);
 	double grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
@@ -196,7 +196,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 			thresh1.clear();
 			vec.clear();
 		}
-		hsl hsl;
+		Hsl hsl;
 		Shades sh;
 		String shade, color;
 		int shadeLevel;
@@ -262,7 +262,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 }
 
 String Color::fixColors(String pix, double r, double g, double b) {
-	rgb rgb;
+	Rgb rgb;
 	String color=pix;
 	double colorLevel = rgb.calcColorLevel(r,g,b);
 	if(getMainColor(pix)=="Grey")
@@ -273,7 +273,7 @@ String Color::fixColors(String pix, double r, double g, double b) {
 }
 
 Mat Color::changeImageBrightness(Mat &img, double amt) {
-	hsl hsl;
+	Hsl hsl;
 	Mat img2 = img.clone();
 	int r,g,b;
 	double *HSL;
@@ -315,14 +315,11 @@ void Color::changeContrast(double &r, double &g, double &b, double alpha, double
 String Color::optimizeColor(String pix) {
 	String color = pix;
 	int count=0;
-	if(containsAllColor(toString(3),color.c_str(),"Violet","Pink")) {
-		color = removeColor(color,"Violet");
-	}
-	if(color.find("Violet")!=string::npos) {
-		color = replaceColor(color,"Violet","Pink");
-	}
 	if(containsAllColor(toString(3),color.c_str(),"Pink","Purple")) {
-		color = removeColor(color,"Purple");
+		color = "Violet";
+	}
+	if(containsAllColor(toString(3),color.c_str(),"Purple","Violet")) {
+		color = "Purple";
 	}
 	if(countColors(color)>2 && color.find("Grey")!=string::npos) {
 		color = removeColor(color,"Grey");
@@ -434,7 +431,7 @@ Mat Color::changeImageContrast(Mat img, double alpha, double beta) {
 }
 
 void Color::avgImageLuminance(Mat &src) {
-	hsl hsl;
+	Hsl hsl;
 	Mat dst = src.clone();
 	int satArr[101] = {0};
 	int lumArr[101] = {0};
@@ -496,7 +493,7 @@ void Color::avgImageLuminance(Mat &src) {
 }
 
 void Color::imgRgb2Gray(Mat &src, Mat &dst) {
-	rgb rgb;
+	Rgb rgb;
 	int relLum=0;
 	int r,g,b;
 	dst = dst.zeros(src.size(), CV_8U);
@@ -512,7 +509,7 @@ void Color::imgRgb2Gray(Mat &src, Mat &dst) {
 }
 
 int* Color::changeRgbRelLum(double r, double g, double b, double amt) {
-	hsl hsl;
+	Hsl hsl;
 	static double RGB[3];
 	static int results[3];
 	double cR = 0.299, cG = 0.587, cB = 0.114;

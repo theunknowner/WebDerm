@@ -37,6 +37,7 @@ void runResizeAllImages() {
 			Mat img = runResizeImage(filename,Size(700,700),0);
 			String name = getFileName(filename);
 			imwrite(name+".png",img);
+			cout << name+" resized!" << endl;
 		}
 	}
 }
@@ -79,8 +80,8 @@ Mat runResizeImage(String filename, Size size,int write)
 
 void runHysteresis()
 {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Shades shade;
 	Color c;
 	String filename;
@@ -108,8 +109,8 @@ void runHysteresis()
 		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
-		hysteresis(fd);
-/*
+		//hysteresis(fd);
+
 		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
 		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
 		Intensity in;
@@ -141,8 +142,8 @@ void runHysteresis()
 }
 
 void runAllHysteresis(String *filenames, int fileSize) {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Shades shade;
 	Color c;
 	String name;
@@ -193,8 +194,8 @@ void runAllHysteresis(String *filenames, int fileSize) {
 }
 
 void runAllHysteresis() {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Shades shade;
 	Color c;
 	String folder, full_path;
@@ -314,8 +315,8 @@ void runAllHysteresis() {
  //runs hysteresis with info output to terminal
 void runMouseHysteresis()
 {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	hsl.importHslThresholds();
 	rgb.importThresholds();
 	Mat img2, mask;
@@ -338,8 +339,8 @@ void runMouseHysteresis()
 //runs hysteresis with info output to image window
 void runMouseHysteresis2()
 {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	hsl.importHslThresholds();
 	rgb.importThresholds();
 	Mat img2, mask;
@@ -360,7 +361,7 @@ void runMouseHysteresis2()
 
 void outputFreqColor(Mat &img)
 {
-	rgb rgb;
+	Rgb rgb;
 	int arr[rgbColors.size()];
 	fill_n(arr, rgbColors.size(), 0);
 	int ind=0;
@@ -389,21 +390,45 @@ void outputFreqColor(Mat &img)
 }
 
 void runMouseColor() {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Shades sh;
 	hsl.importHslThresholds();
 	rgb.importThresholds();
 	sh.importThresholds();
-	String filename,input;
+	String filename,input,name;
 	cout << "Enter filename: ";
 	cin >> filename;
+	name = getFileName(filename);
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
 	cout << "Get skin? (y/n) ";
 	cin >> input;
 	if(input=="y") getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Mouse::mouseColor(img2);
+	Mouse::mouseColor(img2, name);
 	img.release(); img2.release(); mask.release();
+}
+
+void runMouseOutputColor() {
+	FileData fd;
+	String filename,filepath;
+	cout << "Enter filename: ";
+	cin >> filename;
+	Mat img;
+	img = runResizeImage(filename,Size(700,700),0);
+	size_t pos1=0, pos2=0;
+	pos2 = filename.find("_outputShades");
+	for(int i=pos2; i>=0; i--) {
+		if(filename[i]=='/') {
+			pos1=i+1;
+			break;
+		}
+	}
+	fd.filename = filename.substr(pos1,pos2-pos1);
+	filepath = filename.substr(0,pos1);
+	filepath = filepath+fd.filename+"_ShadeColors.csv";
+	fd.loadFileMatrix(filepath,fd.colorVec);
+	Mouse::mouseOutputColor(img,fd);
+	img.release();
 }

@@ -1,5 +1,5 @@
 /*
- * hsl.h
+ * Hsl.h
  *
  *  Created on: Jan 30, 2014
  *      Author: jason
@@ -17,7 +17,7 @@ extern deque< deque<double> > satThresh;
 extern deque< deque<double> > lumThresh;
 extern deque<int> hueTableNum;
 
-class hsl
+class Hsl
 {
 private:
 	bool THRESH_IMPORTED;

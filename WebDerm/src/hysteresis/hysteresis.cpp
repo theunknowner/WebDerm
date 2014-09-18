@@ -14,8 +14,8 @@ void hysteresis(FileData &fd) {
 //hysteresis moving 1 col/row at a time
 	void hysteresis(Mat img, Size size, String name, FileData &fd)
 	{
-		rgb rgb;
-		hsl hsl;
+		Rgb rgb;
+		Hsl hsl;
 		Color colorObj;
 		int dimension = size.width*size.height;
 		int matchingScans = dimension/2;

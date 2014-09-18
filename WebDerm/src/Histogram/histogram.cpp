@@ -81,7 +81,7 @@ void Histogram::hist2SpreadSheet(Mat &src, String name) {
 	String filename = path+name+"_hist.csv";
 	fp = fopen(filename.c_str(),"w");
 	fprintf(fp,"Hue,#,,Sat,#,,Lum,#\n");
-	hsl hsl;
+	Hsl hsl;
 	int r,g,b;
 	int hue,sat,lum;
 	int hueArr[360] = {0};
@@ -140,7 +140,7 @@ void Histogram::hist2SpreadSheet(Mat &src, String name) {
 }
 
 void Histogram::outputHistogram(Mat &src, String name) {
-	hsl hsl;
+	Hsl hsl;
 	int r,g,b;
 	double *HSL;
 	deque<int> lumVec(256,0);
@@ -172,7 +172,7 @@ void Histogram::outputHistogram(Mat &src, String name) {
 
 void Histogram::lightEqualizer(Mat src, Mat &dst) {
 	dst = src.clone();
-	hsl hsl;
+	Hsl hsl;
 	double idealLum = 65; //percentage integer
 	int r,g,b;
 	deque<int> lumVec(101,0);
@@ -219,7 +219,7 @@ void Histogram::lightEqualizer(Mat src, Mat &dst) {
 			r = dst.at<Vec3b>(i,j)[2];
 			g = dst.at<Vec3b>(i,j)[1];
 			b = dst.at<Vec3b>(i,j)[0];
-			HSL = hsl.rgb2hsl(r,g,b);
+			HSL = Hsl.rgb2hsl(r,g,b);
 			HSL[2] = roundDecimal(HSL[2],2)*100;
 			if(HSL[2]>=round(avg)) {
 				HSL[2] -= (stdev*stdevMultiplier);
@@ -228,7 +228,7 @@ void Histogram::lightEqualizer(Mat src, Mat &dst) {
 				HSL[2] += (stdev*stdevMultiplier);
 			}
 			HSL[2] /= 100.;
-			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+			RGB = Hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 			dst.at<Vec3b>(i,j)[2] = RGB[0];
 			dst.at<Vec3b>(i,j)[1] = RGB[1];
 			dst.at<Vec3b>(i,j)[0] = RGB[2];

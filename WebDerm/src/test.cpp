@@ -9,8 +9,8 @@
 
 String testHysteresis(Mat &img, int row, int col, Size size)
 {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	Intensity in;
 	Color colorObj;
 	int b,g,r;
@@ -156,7 +156,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 String testMouseHysteresis(Mat &img, int row, int col, Size size,
 						   deque<Vec3b> &vec, deque<String> &colorVec)
 {
-	rgb rgb;
+	Rgb rgb;
 	Color colorObj;
 	int b,g,r;
 	deque<int> index;
@@ -239,7 +239,7 @@ String testMouseHysteresis(Mat &img, int row, int col, Size size,
 
 void testColorIndex(Mat &img, int index)
 {
-	rgb rgb;
+	Rgb rgb;
 	int r,g,b;
 	int ind=0;
 	double dist=0;
@@ -270,8 +270,8 @@ void testColorIndex(Mat &img, int index)
 }
 
 String testColorAtLoc(Mat &img, Point pt, double &h) {
-	rgb rgb;
-	hsl hsl;
+	Rgb rgb;
+	Hsl hsl;
 	int r,g,b;
 	int ind= -3;
 	double dist=0;

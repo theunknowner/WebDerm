@@ -169,7 +169,7 @@ bool getData(String filename)
 
 	void getNormAbsDist(int red, int green, int blue, double * normDistVals, double * absDistVals)
 	{
-		rgb rgb;
+		Rgb rgb;
 		for(unsigned int i=0; i<normMeanThresh.size(); i++)
 		{
 			normDistVals[i] = rgb.normEucDist(red,green,blue, normMeanThresh.at(i));
@@ -221,7 +221,7 @@ bool getData(String filename)
 
 	void createDataFile(String inFileRGB, String outFileData)
 	{
-		rgb rgb;
+		Rgb rgb;
 		//fstream outFile(outputFileData.c_str());
 		FILE * fp;
 		fp = fopen(outFileData.c_str(), "a");
@@ -246,7 +246,7 @@ bool getData(String filename)
 		{
 			for(int j=0; j<3; j++)
 			{
-				//cout << rgb.at(i).at(j) << endl;
+				//cout << Rgb.at(i).at(j) << endl;
 				rgbVal[j] = RGB.at(i).at(j);
 			}
 			temp = rgb.pushColor(rgbVal[0],rgbVal[1],rgbVal[2]);

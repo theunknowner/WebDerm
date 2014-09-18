@@ -1,5 +1,5 @@
 /*
- * rgb.cpp
+ * Rgb.cpp
  *
  *  Created on: Feb 14, 2014
  *      Author: jason
@@ -14,7 +14,7 @@ deque<String> rgbColors;
 deque<String> mainColors;
 deque<String> allColors;
 
-int rgb::getMainColorIndex(String color) {
+int Rgb::getMainColorIndex(String color) {
 	for(unsigned int i=0; i<mainColors.size(); i++) {
 		if(color==mainColors.at(i))
 			return i;
@@ -22,7 +22,7 @@ int rgb::getMainColorIndex(String color) {
 	return 0;
 }
 
-int rgb::getColorIndex(String color) {
+int Rgb::getColorIndex(String color) {
 	for(unsigned int i=0; i<allColors.size(); i++) {
 		if(color==allColors.at(i))
 			return i;
@@ -30,7 +30,7 @@ int rgb::getColorIndex(String color) {
 	return -1;
 }
 
-bool rgb::importThresholds() {
+bool Rgb::importThresholds() {
 	int size=1;
 	bool flag[size];
 	flag[0] = importColorThresholds();
@@ -41,7 +41,7 @@ bool rgb::importThresholds() {
 	return true;
 }
 //imports RGB colorspace thresholds
-bool rgb::importColorThresholds()
+bool Rgb::importColorThresholds()
 {
 	String folderName = path+"Thresholds/";
 	String filename = folderName+"color-thresholds.csv";
@@ -107,8 +107,8 @@ bool rgb::importColorThresholds()
 	}
 }
 
-//calculate the Euclidean Distance betweeen normalized rgb input and colors(vec).
-double rgb::normEucDist(double red, double green, double blue, deque<double> &vec) {
+//calculate the Euclidean Distance betweeen normalized Rgb input and colors(vec).
+double Rgb::normEucDist(double red, double green, double blue, deque<double> &vec) {
 		double result=0;
 		double color[3] = {red,green,blue};
 		double normVals[3];
@@ -122,8 +122,8 @@ double rgb::normEucDist(double red, double green, double blue, deque<double> &ve
 		return result;
 	}
 
-//calculates the Euclidean Distance between absolute rgb input and colors(vec).
-double rgb::absEucDist(double red, double green, double blue, deque<double> &vec)
+//calculates the Euclidean Distance between absolute Rgb input and colors(vec).
+double Rgb::absEucDist(double red, double green, double blue, deque<double> &vec)
 	{
 		double result=0;
 		double color[3] = {red,green,blue};
@@ -137,7 +137,7 @@ double rgb::absEucDist(double red, double green, double blue, deque<double> &vec
 		return result;
 	}
 
-double rgb::absEucDist(double red, double green, double blue, deque<int> &vec)
+double Rgb::absEucDist(double red, double green, double blue, deque<int> &vec)
 	{
 		double result=0;
 		double color[3] = {red,green,blue};
@@ -151,13 +151,13 @@ double rgb::absEucDist(double red, double green, double blue, deque<int> &vec)
 		return result;
 	}
 
-void rgb::outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind)
+void Rgb::outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind)
 {
 	fprintf(fp,"%d,%d,%d - (%d,%d) - %f - %s - %d\n", red,green,blue,coord.x,coord.y,dist, color.c_str(), ind+2);
 }
 
 //check if dist is greater than thresh
-bool rgb::checkAbsDist(double dist, double thresh)
+bool Rgb::checkAbsDist(double dist, double thresh)
 {
 	if(dist>thresh)
 	{
@@ -167,7 +167,7 @@ bool rgb::checkAbsDist(double dist, double thresh)
 }
 
 //checks if color is black
-String rgb::checkBlack(int r, int g, int b)
+String Rgb::checkBlack(int r, int g, int b)
 	{
 		if(r==0 && g==0 && b==0)
 		{
@@ -177,7 +177,7 @@ String rgb::checkBlack(int r, int g, int b)
 	}
 
 //pushes color using Euclidean Distance with 7 different schemes
-String rgb::pushColor(int red, int green, int blue)
+String Rgb::pushColor(int red, int green, int blue)
 	{
 		const int length=7;
 		double smallest[length]={0};
@@ -244,7 +244,7 @@ String rgb::pushColor(int red, int green, int blue)
 		return rgbColors[index[0]];
 	}
 
-String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
+String Rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 	{
 		const int length=7;
 		double smallest[length]={0};
@@ -317,7 +317,7 @@ String rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
 		return rgbColors[index2];
 	}
 
-String rgb::pushColor(int red, int green, int blue, int &ind, double &dist)
+String Rgb::pushColor(int red, int green, int blue, int &ind, double &dist)
 	{
 		const int length=7;
 		double smallest[length]={0};
@@ -390,9 +390,9 @@ String rgb::pushColor(int red, int green, int blue, int &ind, double &dist)
 		return rgbColors[index2];
 	}
 
-double rgb::calcGrayLevel(int red, int green, int blue)
+double Rgb::calcGrayLevel(int red, int green, int blue)
 {
-	hsl hsl;
+	Hsl hsl;
 	double sat=0;
 	hsl.rgb2hsl(red,green,blue);
 	sat = hsl.getSat();
@@ -401,7 +401,7 @@ double rgb::calcGrayLevel(int red, int green, int blue)
 	return sat;
 }
 
-double rgb::getGrayLevel2(String color)
+double Rgb::getGrayLevel2(String color)
 {
 	double level=0;
 	size_t pos=0;
@@ -417,7 +417,7 @@ double rgb::getGrayLevel2(String color)
 	return level;
 }
 
-double rgb::getGrayLevel1(String color) {
+double Rgb::getGrayLevel1(String color) {
 	double level=0;
 	size_t pos=0;
 	String str, mainColor="Gray";
@@ -444,7 +444,7 @@ double rgb::getGrayLevel1(String color) {
 }
 
 
-double rgb::getColorLevel(String color, String mainColor)
+double Rgb::getColorLevel(String color, String mainColor)
 {
 	double level=0;
 	size_t pos=0;
@@ -458,7 +458,7 @@ double rgb::getColorLevel(String color, String mainColor)
 	return level;
 }
 
-double rgb::getColorLevel(String pix) {
+double Rgb::getColorLevel(String pix) {
 	double level=0;
 	size_t pos=0;
 	String str;
@@ -479,13 +479,13 @@ double rgb::getColorLevel(String pix) {
 	return level;
 }
 
-double rgb::calcPerceivedBrightness(double red, double green, double blue) {
+double Rgb::calcPerceivedBrightness(double red, double green, double blue) {
 	double lum;
 	lum = (0.299*red) + (0.587*green) + (0.114*blue);
 	return round(lum);
 }
-//outputs image window with color of rgb value
-void rgb::showPixelColor(int r, int g, int b, Size size)
+//outputs image window with color of Rgb value
+void Rgb::showPixelColor(int r, int g, int b, Size size)
 	{
 		Mat img = img.zeros(Size(1,1),16);
 		img.at<Vec3b>(0,0)[0] = b;
@@ -498,7 +498,7 @@ void rgb::showPixelColor(int r, int g, int b, Size size)
 	}
 
 //outputs image window of color at Location x,y
-void rgb::showPixelColorAtLoc(Mat img, int row, int col, Size size)
+void Rgb::showPixelColorAtLoc(Mat img, int row, int col, Size size)
 	{
 		Mat img2;
 		int r,g,b;
@@ -508,7 +508,7 @@ void rgb::showPixelColorAtLoc(Mat img, int row, int col, Size size)
 		showPixelColor(r,g,b,size);
 	}
 
-void rgb::release_memory() {
+void Rgb::release_memory() {
 	normMeanThresh.clear();
 	absMeanThresh.clear();
 	rgbColors.clear();
@@ -519,7 +519,7 @@ void rgb::release_memory() {
 	deque<String>().swap(mainColors);
 }
 
-double rgb::calcColorLevel(double red, double green, double blue) {
+double Rgb::calcColorLevel(double red, double green, double blue) {
 	double lum = calcPerceivedBrightness(red, green, blue);
 	lum /=255;
 	lum = roundDecimal(lum,2) * 100;
@@ -527,8 +527,8 @@ double rgb::calcColorLevel(double red, double green, double blue) {
 	return lum;
 }
 
-String rgb::calcColor2(int red, int green, int blue) {
-	hsl hsl;
+String Rgb::calcColor2(int red, int green, int blue) {
+	Hsl hsl;
 	String pix = "OTHER";
 	int hue;
 	double lum,sat;
@@ -569,7 +569,7 @@ String rgb::calcColor2(int red, int green, int blue) {
 	return pix;
 }
 
-String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
+String Rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	Color c;
 	String pix;
 	pix = calcColor2(red,green,blue);
@@ -581,7 +581,7 @@ String rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	return pix;
 }
 
-String rgb::calcColor(int red, int green, int blue) {
+String Rgb::calcColor(int red, int green, int blue) {
 	Color c;
     String pix;
 	double dist=0;
@@ -595,8 +595,8 @@ String rgb::calcColor(int red, int green, int blue) {
 	return pix;
 }
 
-double rgb::calcGrayLumLevel(double red, double green, double blue) {
-	hsl hsl;
+double Rgb::calcGrayLumLevel(double red, double green, double blue) {
+	Hsl hsl;
 	double grayLumLevel=0;
 	double *HSL = hsl.rgb2hsl(red,green,blue);
 	double sat = roundDecimal(HSL[1],2) * 100;
@@ -610,8 +610,8 @@ double rgb::calcGrayLumLevel(double red, double green, double blue) {
 	return round(grayLumLevel);
 }
 
-double rgb::calcColorLumLevel(double red, double green, double blue) {
-	hsl hsl;
+double Rgb::calcColorLumLevel(double red, double green, double blue) {
+	Hsl hsl;
 	double colorLumLevel=0;
 	double* HSL = hsl.rgb2hsl(red,green,blue);
 	double sat = roundDecimal(HSL[1],2) * 100;

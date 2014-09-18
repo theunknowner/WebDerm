@@ -28,7 +28,7 @@ double rule1(double &indexChange, String &shade, String &newShade) {
 double rule2(FileData &fd, String &newPix) {
 	double ruleNum = 2;
 	bool flag=false;
-	hsl hsl;
+	Hsl hsl;
 	Color c;
 	Functions fn;
 	double pThreshMove=1.15;
@@ -408,6 +408,46 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		fd.hslPtMat.at(pt.y).at(pt.x) = ptStr;
 
 	}/**/
+	else if(color.find("Violet")==string::npos && color!="Grey" && HSL[1]>=75 && pt.y>0) {
+		int colorCount0=0, colorCount45=0, colorCount90=0;
+		flag0=0;flag45=0;flag90=0;
+		int j=pt.x-1;
+		int x = j;
+		int endY = (pt.y-localScanSize);
+		for(int i=(pt.y-1); i>=endY; i--) {
+			if(x<0 && j<0 && i<0) break;
+			if(x>=0) {
+				prevColor_0 = c.getMainColor(fd.colorVec.at(pt.y).at(x));
+				if(prevColor_0.find("Violet")!=string::npos || prevColor_0.find("Purple")!=string::npos) {
+					++colorCount0;
+				}
+			}
+			--x;
+			if(j>=0 && i>=0) {
+				prevColor_45 = c.getMainColor(fd.colorVec.at(i).at(j));
+				if(prevColor_45.find("Violet")!=string::npos || prevColor_45.find("Purple")!=string::npos) {
+					++colorCount45;
+				}
+			}
+			--j;
+			if(i>=0) {
+				prevColor_90 = c.getMainColor(fd.colorVec.at(i).at(pt.x));
+				if(prevColor_90.find("Violet")!=string::npos || prevColor_90.find("Purple")!=string::npos) {
+					++colorCount90;
+				}
+			}
+		}
+
+		if(colorCount0>=10) flag0=1;
+		if(colorCount45>=10) flag45=1;
+		if(colorCount90>=10) flag90=1;
+
+		if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
+			newPix = "Purple";
+			flag=true;
+			ruleNum = 3.4;
+		}
+	}/**/
 	else {
 		fd.m_ContrastMat.at(pt.y).at(pt.x) = color;
 		fd.d_HslMat.at(pt.y).at(pt.x) = color;
@@ -419,11 +459,70 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 	return 0;
 }
 
+/** contrast rule 2 **/
+double rule4(FileData &fd, String &newPix, String newShade) {
+	double ruleNum=4;
+	double flag=false;
+	Color c;
+	Functions fn;
+	Point pt = fd.pt;
+	int localScanSize = 20;
+	String color = c.getMainColor(newPix);
+	String prevColor_0, prevColor_45, prevColor_90;
+	int colorCount0=0, colorCount45=0, colorCount90=0;
+	int flag0=0, flag45=0, flag90=0;
+	int HSL[3] = {0};
+	HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
+	HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2)*100;
+	HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3)*100;
+	if((color.find("Grey")!=string::npos || newShade.find("Dark")!=string::npos) && HSL[1]<=25 && pt.y>0) {
+		int j=pt.x-1;
+		int x = j;
+		int endY = (pt.y-localScanSize);
+		for(int i=(pt.y-1); i>=endY; i--) {
+			if(x<0 && j<0 && i<0) break;
+			if(x>=0) {
+				prevColor_0 = c.getMainColor(fd.colorVec.at(pt.y).at(x));
+				if(prevColor_0.find("Violet")!=string::npos) {
+					++colorCount0;
+				}
+			}
+			--x;
+			if(j>=0 && i>=0) {
+				prevColor_45 = c.getMainColor(fd.colorVec.at(i).at(j));
+				if(prevColor_45.find("Violet")!=string::npos) {
+					++colorCount45;
+				}
+			}
+			--j;
+			if(i>=0) {
+				prevColor_90 = c.getMainColor(fd.colorVec.at(i).at(pt.x));
+				if(prevColor_90.find("Violet")!=string::npos) {
+					++colorCount90;
+				}
+
+			}
+		}
+
+		if(colorCount0>=10) flag0=1;
+		if(colorCount45>=10) flag45=1;
+		if(colorCount90>=10) flag90=1;
+
+		if(fn.countGreaterEqual(4,flag0,flag45,flag90,1)>=2) {
+			newPix = "Purple";
+			flag=true;
+		}
+	}
+	if(flag==true) return ruleNum;
+
+	return 0;
+}
+
 /** rule 6 - Assign Dark Grey **/
 double rule6(String& pix, String& newPix, String& newShade) {
 	double ruleNum = 6;
 	bool flag = false;
-	rgb rgb;
+	Rgb rgb;
 	Color c;
 	String color = c.getMainColor(newPix);
 	double grayLevel = rgb.getGrayLevel1(newPix);
@@ -481,8 +580,8 @@ double rule7(String &pix, String &newPix) {
 double rule8(FileData &fd, String &newPix, int loc) {
 	double ruleNum = 8;
 	bool flag=false;
-	hsl hsl;
-	rgb rgb;
+	Hsl hsl;
+	Rgb rgb;
 	Color c;
 	Intensity in;
 	Functions fn;
@@ -589,7 +688,7 @@ double rule8(FileData &fd, String &newPix, int loc) {
 double rule9(FileData &fd, String &newPix) {
 	double ruleNum = 9;
 	bool flag = false;
-	rgb rgb;
+	Rgb rgb;
 	Color c;
 	Point pt = fd.pt;
 	String color = c.getMainColor(newPix);
