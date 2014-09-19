@@ -48,6 +48,7 @@ int main(int argc,char** argv)
 	img.copyTo(img2, mask);
 	Point pt1(430,244);
 	Point pt2(306,439);
+	outputHueTableColorImage(355);
 	//String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
 	//String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
 	/*

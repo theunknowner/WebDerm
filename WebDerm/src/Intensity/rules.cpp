@@ -408,9 +408,13 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		fd.hslPtMat.at(pt.y).at(pt.x) = ptStr;
 
 	}/**/
-	else if(color.find("Violet")==string::npos && color!="Grey" && HSL[1]>=75 && pt.y>0) {
+	/*
+	else if(color.find("Purple")==string::npos && color.find("Violet")==string::npos && HSL[1]>=75 && pt.y>0) {
 		int colorCount0=0, colorCount45=0, colorCount90=0;
 		flag0=0;flag45=0;flag90=0;
+		int currHSL0[3]={0},currHSL45[3]={0},currHSL90[3]={0};
+		int deltaHSL0[3]={0},deltaHSL45[3]={0},deltaHSL90[3]={0};
+		String origColor0,origColor45,origColor90;
 		int j=pt.x-1;
 		int x = j;
 		int endY = (pt.y-localScanSize);
@@ -418,24 +422,38 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 			if(x<0 && j<0 && i<0) break;
 			if(x>=0) {
 				prevColor_0 = c.getMainColor(fd.colorVec.at(pt.y).at(x));
-				if(prevColor_0.find("Violet")!=string::npos || prevColor_0.find("Purple")!=string::npos) {
+				currHSL0[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',1);
+				currHSL0[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(x),';',3)*100;
+				currHSL0[0] = (int)(currHSL0[0] - floor(currHSL0[0]/180.) * 360);
+				deltaHSL0[0] = abs(HSL[0]-currHSL0[0]);
+				deltaHSL0[2] = abs(HSL[2]-currHSL0[2]);
+				if(deltaHSL0[0]<10 && deltaHSL0[2]<=8 && (prevColor_0.find("Violet")!=string::npos || prevColor_0.find("Purple")!=string::npos)) {
 					++colorCount0;
 				}
 			}
-			--x;
 			if(j>=0 && i>=0) {
 				prevColor_45 = c.getMainColor(fd.colorVec.at(i).at(j));
-				if(prevColor_45.find("Violet")!=string::npos || prevColor_45.find("Purple")!=string::npos) {
+				currHSL45[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+				currHSL45[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3)*100;
+				currHSL45[0] = (int)(currHSL45[0] - floor(currHSL45[0]/180.) * 360);
+				deltaHSL45[0] = abs(HSL[0]-currHSL45[0]);
+				deltaHSL45[2] = abs(HSL[2]-currHSL45[2]);
+				if(deltaHSL45[0]<10 && deltaHSL45[2]<=8 && (prevColor_45.find("Violet")!=string::npos || prevColor_45.find("Purple")!=string::npos)) {
 					++colorCount45;
 				}
 			}
-			--j;
 			if(i>=0) {
 				prevColor_90 = c.getMainColor(fd.colorVec.at(i).at(pt.x));
-				if(prevColor_90.find("Violet")!=string::npos || prevColor_90.find("Purple")!=string::npos) {
+				currHSL90[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',1);
+				currHSL90[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(pt.x),';',3)*100;
+				currHSL90[0] = (int)(currHSL90[0] - floor(currHSL90[0]/180.) * 360);
+				deltaHSL90[0] = abs(HSL[0]-currHSL90[0]);
+				deltaHSL90[2] = abs(HSL[2]-currHSL90[2]);
+				if(deltaHSL90[0]<10 && deltaHSL90[2]<=8 && (prevColor_90.find("Violet")!=string::npos || prevColor_90.find("Purple")!=string::npos)) {
 					++colorCount90;
 				}
 			}
+			--x; --j;
 		}
 
 		if(colorCount0>=10) flag0=1;
@@ -443,7 +461,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		if(colorCount90>=10) flag90=1;
 
 		if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
-			newPix = "Purple";
+			newPix = "GreyPurple";
 			flag=true;
 			ruleNum = 3.4;
 		}

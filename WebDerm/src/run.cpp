@@ -86,7 +86,7 @@ void runHysteresis()
 	Color c;
 	String filename;
 	String name;
-	Size size(2,2);
+	Size size(20,20);
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img, img2, mask;
@@ -109,8 +109,8 @@ void runHysteresis()
 		FileData fd(filename);
 		fd.matSize = size;
 		fd.matImage = img2;
-		//hysteresis(fd);
-
+		hysteresis(fd);
+/*
 		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
 		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
 		Intensity in;

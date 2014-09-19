@@ -793,3 +793,25 @@ void generateColorData(Mat &img, Point pt1, Point pt2) {
 	}
 	fclose(fp);
 }
+
+void outputHueTableColorImage(double hue) {
+	Hsl hsl;
+	Mat img = img.zeros(Size(71,71),CV_8UC3);
+	int *RGB;
+	double sat,lum;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			sat = j/100.;
+			lum = i/100.;
+			sat += .20;
+			lum += .20;
+			RGB = hsl.hsl2rgb(hue,sat,lum);
+			img.at<Vec3b>(i,j)[2] = RGB[0];
+			img.at<Vec3b>(i,j)[1] = RGB[1];
+			img.at<Vec3b>(i,j)[0] = RGB[2];
+		}
+	}
+	namedWindow("Image",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	imshow("Image", img);
+	waitKey(0);
+}

@@ -34,5 +34,6 @@ void checkColorsFromList(Mat &img, Point pt1, Point pt2);
 void dataDeduplicationGrayRGB(double threshold);
 void push500Colors(double r, double g, double b);
 void generateColorData(Mat &img, Point pt1, Point p2);
+void outputHueTableColorImage(double hue);
 
 #endif /* SCRIPTS_H_ */

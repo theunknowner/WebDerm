@@ -515,7 +515,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 						exit(1);
 					}
 					s = roundDecimal(s,2);
-					l = roundDecimal(l,1);
+					l = roundDecimal(l,2);
 					String str = toString(h)+";"+toString(s)+";"+toString(l);
 					str = "("+str+")";
 					pix2 = str + shade + pix2 + toString(indexChange) + ";" + toString(loc+1)+ ";" + toString(ratioLoc+1);

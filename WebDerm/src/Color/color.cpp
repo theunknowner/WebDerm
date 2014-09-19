@@ -321,9 +321,6 @@ String Color::optimizeColor(String pix) {
 	if(containsAllColor(toString(3),color.c_str(),"Purple","Violet")) {
 		color = "Purple";
 	}
-	if(countColors(color)>2 && color.find("Grey")!=string::npos) {
-		color = removeColor(color,"Grey");
-	}
 	if(color=="RedPink")
 		color = "PinkRed";
 	if(countColors(color)>2) {
@@ -344,9 +341,6 @@ String Color::optimizeColor(String pix) {
 String Color::optimizeColor2(String pix) {
 	String color = pix;
 	int count=0;
-	if(countColors(color)>2 && color.find("Grey")!=string::npos) {
-		color = removeColor(color,"Grey");
-	}
 	if(color=="RedPink")
 		color = "PinkRed";
 	if(countColors(color)>2) {
