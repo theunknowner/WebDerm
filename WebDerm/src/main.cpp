@@ -18,11 +18,12 @@
 #include "Histogram/histogram.h"
 #include "Shades/shades.h"
 #include "Entropy/entropy.h"
+#include "Algorithms/quicksort.h"
 
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	runHysteresis();
+	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 /*
@@ -33,7 +34,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	Hsl hsl;
 	Rgb rgb;
 	Color c;
@@ -43,18 +44,17 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, mask,mask2;
-	img = runResizeImage(path+"Images/Acne/","acne9.jpg",Size(700,700),0);
+	img = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
-	img.copyTo(img2, mask);
+	//img.copyTo(img2, mask);
 	Point pt1(430,244);
 	Point pt2(306,439);
-	outputHueTableColorImage(355);
-	//String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
-	//String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
-	/*
+	String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
+	String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
+
 	FileData fd;
-	fd.filename = "clp4";
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors.csv",fd.colorVec);
+	fd.filename = "Psoriasis2";
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors2x2.csv",fd.colorVec);
 	Entropy en;
 	en.outputEntropy(fd,Size(25,25));
 	//en.importEntropyFiles(file1,file2,"lph4psor1");

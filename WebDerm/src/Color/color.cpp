@@ -175,7 +175,7 @@ void Color::output2ImageGray(deque< deque<String> > &input, String name) {
 	img.release();
 }
 
-void Color::output2ImageColor(deque< deque<String> > &window, String name) {
+void Color::output2ImageColor(deque< deque<String> > &window, Size size, String name) {
 	String filename = path+"Thresholds/output-shades.csv";
 	fstream fs(filename.c_str());
 	if(fs.is_open()) {
@@ -201,8 +201,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 		String shade, color;
 		int shadeLevel;
 		double lumIncThresh = 0.05;
-		Size size(window.at(0).size(),window.size());
-		Mat img = img.zeros(size,16);
+		Mat img = img.zeros(Size(window.at(0).size(),window.size()),16);
 		double* HSL;
 		int *RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
@@ -249,8 +248,8 @@ void Color::output2ImageColor(deque< deque<String> > &window, String name) {
 				}
 			}
 		}
-		String file = name + "_outputShades2x2.png";
-		//resize(img,img,Size(700,700),INTER_CUBIC);
+		String str = toString(size.width)+"x"+toString(size.height);
+		String file = name + "_outputShades"+str+".png";
 		imwrite(file,img);
 		img.release();
 		fs.close();

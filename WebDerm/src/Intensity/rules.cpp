@@ -51,7 +51,8 @@ double rule2(FileData &fd, String &newPix) {
 		exit(0);
 	}
 	try {
-		grey = hslColors.at(index-1);
+		if((index-1)>=0)
+			grey = hslColors.at(index-1);
 	} catch(const std::out_of_range& oor) {
 		printf("Rule2: Index Out of bounds!\n");
 		printf("Index{%d} out of bounds!\n",index-1);
@@ -59,7 +60,7 @@ double rule2(FileData &fd, String &newPix) {
 		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
 		exit(0);
 	}
-	if(!c.containsColor(toString(4),color.c_str(),"Grey","White","Black")) {
+	if(!c.containsColor(toString(5),color.c_str(),"Grey","White","Black","Zero")) {
 		if(grey=="Grey") {
 			fSat2 = sat - satThresh.at(index-1).at(1);
 			if(fSat<(-1) || fSat2<=0.02) {

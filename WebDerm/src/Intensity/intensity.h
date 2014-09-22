@@ -49,7 +49,6 @@ public:
 	String getOldMaxShade();
 	String getNewMinShade();
 	String getNewMaxShade();
-	int getShadeCount();
 	double calcIntensity(String pix);
 	double sigmoidFn(double intensity);
 	void setMinMaxShades();

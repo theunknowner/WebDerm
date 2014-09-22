@@ -21,7 +21,7 @@ public:
 	String getMainColor(String color);
 	String extractShade(String pix);
 	void output2ImageGray(deque< deque<String> > &input, String name);
-	void output2ImageColor(deque< deque<String> > &window, String name);
+	void output2ImageColor(deque< deque<String> > &window, Size size, String name);
 	String fixColors(String pix, double r, double g, double b);
 	Mat changeImageBrightness(Mat &img, double amt);
 	Mat changeImageContrast(Mat img, double alpha=1, double beta=0);

@@ -17,8 +17,8 @@ Intensity::Intensity() {
 	range=0;
 	outlierCorrection = 4;
 	status = "NA";
-	oldMinShade=status,oldMaxShade=status;
-	newMinShade=status,newMaxShade=status;
+	oldMinShade=status;oldMaxShade=status;
+	newMinShade=status;newMaxShade=status;
 	minIndex=0;
 	maxIndex=0;
 	oldShadeAmt=0;
@@ -507,13 +507,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 					l = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',3);
 					int ind=-1;
 					hsl.getHslColor(h,s,l,ind,fd.pt);
-					try { h = hueTableNum.at(ind); }
-					catch(const std::out_of_range& oor) {
-						printf("HueTableNum: Index out of bounds!\n");
-						printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
-						printf("HSL(%0.0f,%0.2f,%0.2f)\n",h,s,l);
-						exit(1);
-					}
 					s = roundDecimal(s,2);
 					l = roundDecimal(l,2);
 					String str = toString(h)+";"+toString(s)+";"+toString(l);
