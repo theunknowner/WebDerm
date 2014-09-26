@@ -13,16 +13,25 @@ void Entropy::outputEntropy(FileData &fd, Size ksize) {
 	Shades sh;
 	Rgb rgb;
 	Color c;
+	init_2D_Deque(fd.shadeColorCount,g_Shades.size(), allColors.size(),0);
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
 			try {
 				pix = fd.colorVec.at(i).at(j);
 				shade = sh.extractShade(pix);
+				/**temporary testing**/
+				if(shade.find("Dark")!=string::npos) shade = "Dark";
+				if(shade.find("High")!=string::npos) shade = "High";
+				if(shade.find("Low")!=string::npos) shade = "Low";
+				if(shade.find("Light")!=string::npos) shade = "Light";
+				/************************************/
 				shadeIndex = sh.getShadeIndex(shade);
 				color = c.getMainColor(pix);
 				color = c.optimizeColor2(color);
-				if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
+				if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)  {
 					color = "Black";
+					//shade = "Dark1";
+				}
 				else if(shade=="White" || color.find("White")!=string::npos)
 					color = "White";
 				colorIndex = rgb.getColorIndex(color);
@@ -61,6 +70,12 @@ void Entropy::outputEntropy(FileData &fd, Size ksize) {
 						try {
 							pix = fd.colorVec.at(i).at(j);
 							shade = sh.extractShade(pix);
+			/**temporary testing**/
+							if(shade.find("Dark")!=string::npos) shade = "Dark";
+							if(shade.find("High")!=string::npos) shade = "High";
+							if(shade.find("Low")!=string::npos) shade = "Low";
+							if(shade.find("Light")!=string::npos) shade = "Light";
+		/************************************/
 							shadeIndex = sh.getShadeIndex(shade);
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
@@ -116,8 +131,8 @@ void Entropy::outputEntropy(FileData &fd, Size ksize) {
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
-
-	String filename = path+fd.filename + "_Entropy.csv";
+	String strSize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename + "_Entropy_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades.size(); i++) {
@@ -161,40 +176,27 @@ void Entropy::importEntropyFiles(String path1, String path2,String name) {
 	compareEntropy(doubleVec1,doubleVec2,name);
 }
 
+/** shifts the vector elements left n_times **/
+void shiftLeft(deque<double> &vec, int n_times) {
+	for(int i=0; i<n_times; i++) {
+		vec.pop_front();
+		vec.push_back(0);
+	}
+}
+
 void Entropy::compareEntropy(deque< deque<double> > &vec1, deque< deque<double> > &vec2,String name) {
 	deque< deque<double> > distVec(vec1.size(), deque<double>(vec1.at(0).size(),0));
-	int cumDist[20] = {0};
-	int dist=0;
+	int flag=0;
+	int vec1Begin=-1, vec2Begin=-1;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		for(unsigned int j=0; j<vec1.at(i).size(); j++) {
-			distVec.at(i).at(j) = abs(vec1.at(i).at(j)-vec2.at(i).at(j));
-			dist = floor(distVec.at(i).at(j));
-			++cumDist[dist];
+			if(vec1.at(i).at(j)!=0 && vec1Begin==-1) vec1Begin = j;
+			if(vec2.at(i).at(j)!=0 && vec2Begin==-1) vec2Begin = j;
+			if(vec1Begin!=-1 && vec2Begin!=-1)  {
+				flag=1;
+				break;
+			}
 		}
-	}
 
-	String filename = path+name + "_EntropyDistance.csv";
-	FILE * fp;
-	fp = fopen(filename.c_str(),"w");
-	for(unsigned int i=0; i<g_Shades.size(); i++) {
-		fprintf(fp,",%s",g_Shades.at(i).c_str());
 	}
-	fprintf(fp,"\n");
-	for(unsigned int i=0; i<distVec.size(); i++)
-	{
-		fprintf(fp,"%s,",allColors.at(i).c_str());
-		for(unsigned int j=0; j<distVec.at(i).size(); j++)
-		{
-			if(j<distVec.at(i).size()-1)
-				fprintf(fp,"%f,", distVec.at(i).at(j));
-			else
-				fprintf(fp,"%f\n", distVec.at(i).at(j));
-		}
-	}
-	for(int i=0; i<20; i++) {
-		if(cumDist[i]!=0) {
-			fprintf(fp,"%d,%d\n",i,cumDist[i]);
-		}
-	}
-	fclose(fp);
 }

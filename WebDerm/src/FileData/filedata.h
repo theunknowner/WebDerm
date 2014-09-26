@@ -29,7 +29,7 @@ public:
 	double maxOutlier;
 	int totalShades;
 	double range;
-	Size matSize;
+	Size ksize;
 	Mat matImage;
 	Point pt; // current pt location of the filedata matrices
 	double localRatioScanSize;

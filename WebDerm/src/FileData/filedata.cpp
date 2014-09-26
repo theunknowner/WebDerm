@@ -16,12 +16,12 @@ FileData::FileData(String file_path) {
 	maxIntensity = 0;
 	minOutlier = 0;
 	maxOutlier = 0;
-	matSize = Size(0,0);
+	ksize = Size(0,0);
 	localRatioScanSize = 0;
 	localScanSize=0;
 	range=0;
 
-	init_2D_Deque(this->shadeColorCount,g_Shades.size(), allColors.size(),0);
+	ksize = Size(2,2);
 }
 
 FileData::~FileData() {

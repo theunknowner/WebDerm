@@ -107,7 +107,7 @@ void runHysteresis()
 	}
 	if(flag[0]==true) {
 		FileData fd(filename);
-		fd.matSize = size;
+		fd.ksize = size;
 		fd.matImage = img;
 		hysteresis(fd);
 /*
@@ -118,12 +118,12 @@ void runHysteresis()
 		if(!fd.loadFileMatrix(hslVecFile, fd.hslMat)) exit(0);
 		fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
 /**/
-		String str = toString(size.width)+"x"+toString(size.height);
-		writeSeq2File(fd.windowVec,name+str);
-		writeSeq2File(fd.hslMat,name+"_HSL"+str);
+		String strSize = toString(size.width)+"x"+toString(size.height);
+		writeSeq2File(fd.windowVec,name+"_"+strSize);
+		writeSeq2File(fd.hslMat,name+"_HSL_"+strSize);
 		//fd.writeFileMetaData();
 		c.output2ImageColor(fd.colorVec,size,name);
-		writeSeq2File(fd.colorVec,name+"_ShadeColors"+str);
+		writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
 		/*
 		writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
 		writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
@@ -169,7 +169,7 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			name = getFileName(filenames[i]);
 			FileData fd(filenames[i]);
 			fd.matImage = img2;
-			fd.matSize = size;
+			fd.ksize = size;
 			hysteresis(fd);
 			writeSeq2File(fd.windowVec,name);
 			writeSeq2File(fd.hslMat,name+"_HSL");
@@ -226,7 +226,7 @@ void runAllHysteresis() {
 			name = getFileName(full_path);
 			FileData fd(full_path);
 			fd.matImage = img;
-			fd.matSize = size;
+			fd.ksize = size;
 			hysteresis(fd);
 /*
 			String windowVecFile = "/home/jason/Desktop/Programs/Hysteresis/" + name + ".csv";

@@ -53,8 +53,9 @@ int main(int argc,char** argv)
 	String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
 
 	FileData fd;
-	fd.filename = "Psoriasis2";
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors2x2.csv",fd.colorVec);
+	fd.filename = "lph4";
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
+	fd.ksize = Size(10,10);
 	Entropy en;
 	en.outputEntropy(fd,Size(25,25));
 	//en.importEntropyFiles(file1,file2,"lph4psor1");

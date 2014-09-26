@@ -12,7 +12,7 @@ deque< deque<double> > g_ShadeThresh;
 
 bool Shades::importThresholds() {
 	String folderName = path+"Thresholds/";
-	String filename = folderName+"shade-thresholds.csv";
+	String filename = folderName+"shade-thresholds2.csv";
 	fstream fsThresh(filename.c_str());
 	if(fsThresh.is_open()) {
 		String temp;

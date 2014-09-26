@@ -328,7 +328,7 @@ deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<doubl
 	catch(const std::out_of_range &oor) {
 		printf("Intensity::calcSmoothedIntensityMatrix() out of range!\n");
 		printf("Point(%d,%d)\n",x,y);
-		exit(0);
+		exit(1);
 	}
 	return vec2;
 }
@@ -353,7 +353,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	double localMinCC=0, localMaxCC=0;
 	deque<String> colorVec1;
 	deque< deque<String> > colorVec3;
-	deque<double> localIndexes;
+	deque<int> localIndexes;
 	deque<double> localCCs;
 	deque<String> localShades;
 	deque<double> ruleNo;
@@ -499,8 +499,8 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 					fd.pt.x = j; fd.pt.y=i;
 					loc = j-(localIndexes.size()-index);
 					ratioLoc  = j-(localRatios.size()-localRatioIndex);
-					bool flag = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
-					if(flag==true) pix2 = c.getMainColor(pix);
+					bool flag2 = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
+					if(flag2==true) pix2 = c.getMainColor(pix);
 					else ruleNo.push_back(0);
 					h = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',1);
 					s = fn.getDelimitedValuesFromString(hslMat.at(i).at(j),';',2);
