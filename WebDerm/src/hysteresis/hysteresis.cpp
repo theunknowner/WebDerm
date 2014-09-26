@@ -8,7 +8,7 @@
 #include "hysteresis.h"
 
 void hysteresis(FileData &fd) {
-	hysteresis(fd.matImage,fd.matSize,fd.filename,fd);
+	hysteresis(fd.matImage,fd.ksize,fd.filename,fd);
 }
 
 //hysteresis moving 1 col/row at a time
@@ -20,6 +20,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 	int dimension = size.width*size.height;
 	int matchingScans = dimension/2;
 	int windowFlags[dimension];
+	deque< deque<String> > windowColors(img.rows, deque<String>(img.cols,""));
 	deque<String> pixelColorWindow;
 	deque<String> colorWindow;
 	deque<int> index;
@@ -43,12 +44,18 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 	fill_n(windowFlags,dimension,0);
 	fill_n(mainColorIndex,mainColors.size(),0);
 	fill_n(mainColorLevelAvg,mainColors.size(),0);
+	int rowDiff=0;
 	while(row<img.rows)  {
 		while(col<img.cols)  {
-			if((row+size.height+1)>img.rows)  maxRow = img.rows;
-			else  maxRow = row+size.height;
+			rowDiff = (row+size.height) - img.rows;
+			if(rowDiff>0) {
+				size.height -= rowDiff;
+				dimension = size.height * size.width;
+				matchingScans = round(dimension/2.);
+			}
+			maxRow = row+size.height;
 
-			if((col+size.width+1)>img.cols)  maxCol= img.cols;
+			if((col+size.width)>img.cols)  maxCol= img.cols;
 			else  maxCol = col+size.width;
 
 			if(pixelColorWindow.size()==0)  {
@@ -57,11 +64,22 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 						b = img.at<Vec3b>(y,x)[0];
 						g = img.at<Vec3b>(y,x)[1];
 						r = img.at<Vec3b>(y,x)[2];
-						pix = rgb.checkBlack(r,g,b);
-						if(pix=="OTHER") {
-							pix = rgb.calcColor(r,g,b,dist,ind);
-							//if(dist>10)
-							//fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
+						try {
+							if(windowColors.at(y).at(x)=="") {
+								pix = rgb.checkBlack(r,g,b);
+								if(pix=="OTHER") {
+									pix = rgb.calcColor(r,g,b,dist,ind);
+									//if(dist>10)
+									//fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
+								}
+								windowColors.at(y).at(x) = pix;
+							}
+						} catch (const std::out_of_range &oor) {
+							printf("1\n");
+							printf("windowColors.Size: %lu\n", windowColors.size());
+							printf("ColRow(%d,%d)\n",col,row);
+							printf("Point(%d,%d)\n",x,y);
+							exit(1);
 						}
 						HSL = hsl.rgb2hsl(r,g,b);
 						HSL[1] = roundDecimal(HSL[1],2);
@@ -69,20 +87,36 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 						hueWindow.push_back(HSL[0]);
 						satWindow.push_back(HSL[1]);
 						lumWindow.push_back(HSL[2]);
-						pixelColorWindow.push_back(pix);
+						pixelColorWindow.push_back(windowColors.at(y).at(x));
 					}
 				}
 			}
 			else  {
+				int x = 0;
+				if((col+size.width-1)>=img.cols)
+					x = col;
+				else
+					x = maxCol-1;
 				for(int y=row; y<(maxRow); y++)  {
-					b = img.at<Vec3b>(y,col+(size.width-1))[0];
-					g = img.at<Vec3b>(y,col+(size.width-1))[1];
-					r = img.at<Vec3b>(y,col+(size.width-1))[2];
-					pix = rgb.checkBlack(r,g,b);
-					if(pix=="OTHER") {
-						pix = rgb.calcColor(r,g,b,dist,ind);
-						//if(dist>10)
-						//fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
+					b = img.at<Vec3b>(y,x)[0];
+					g = img.at<Vec3b>(y,x)[1];
+					r = img.at<Vec3b>(y,x)[2];
+					try {
+						if(windowColors.at(y).at(x)=="")  {
+							pix = rgb.checkBlack(r,g,b);
+							if(pix=="OTHER") {
+								pix = rgb.calcColor(r,g,b,dist,ind);
+								//if(dist>10)
+								//fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
+							}
+							windowColors.at(y).at(x) = pix;
+						}
+					} catch (const std::out_of_range &oor) {
+						printf("2\n");
+						printf("windowColors.Size: %lu\n", windowColors.size());
+						printf("ColRow(%d,%d)\n",col,row);
+						printf("Point(%d,%d)\n",x,y);
+						exit(1);
 					}
 					HSL = hsl.rgb2hsl(r,g,b);
 					HSL[1] = roundDecimal(HSL[1],2);
@@ -94,7 +128,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 					satWindow.push_back(HSL[1]);
 					lumWindow.push_back(HSL[2]);
 					pixelColorWindow.pop_front();
-					pixelColorWindow.push_back(pix);
+					pixelColorWindow.push_back(windowColors.at(y).at(x));
 				}
 			}
 			for(unsigned int i=0; i<pixelColorWindow.size(); i++)  {
@@ -104,7 +138,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 				}
 			}
 			for(unsigned int j=0; j<mainColors.size(); j++)  {
-				if(mainColorIndex[j]>=round(matchingScans))  {
+				if(mainColorIndex[j]>=matchingScans)  {
 					index.push_back(j);
 				}
 			}
