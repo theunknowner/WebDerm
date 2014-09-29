@@ -16,6 +16,9 @@
 extern deque<String> g_Shades;
 extern deque< deque<double> > g_ShadeThresh;
 
+extern deque<String> g_Shades2;
+extern deque< deque<double> > g_ShadeThresh2;
+
 class Shades {
 public:
 	bool importThresholds();
@@ -25,6 +28,9 @@ public:
 	int extractShadeLevel(String shade);
 	String extractShade(String pix);
 	void release_memory();
+
+	int getShadeIndex2(String shade);
+	String getShade2(int index);
 };
 
 #endif /* SHADES_H_ */

@@ -342,6 +342,10 @@ String Color::optimizeColor2(String pix) {
 	int count=0;
 	if(color=="RedPink")
 		color = "PinkRed";
+	if(pix.find("White")!=string::npos)
+		color = "White";
+	if(pix.find("Black")!=string::npos)
+		color = "Black";
 	if(countColors(color)>2) {
 		color.clear();
 		for(unsigned int i=0; i<mainColors.size(); i++) {

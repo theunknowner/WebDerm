@@ -86,7 +86,7 @@ void runHysteresis()
 	Color c;
 	String filename;
 	String name;
-	Size size(2,2);
+	Size size(10,10);
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img;

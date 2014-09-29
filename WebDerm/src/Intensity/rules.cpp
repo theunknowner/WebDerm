@@ -809,17 +809,19 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	String newPix = pix;
 	deque<double> ruleNumVec;
 
-	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
-	ruleNumVec.push_back(rule2(fd,newPix));
-	ruleNumVec.push_back(rule3(fd,newPix,newShade));
-	ruleNumVec.push_back(rule6(pix,newPix,newShade));
-	ruleNumVec.push_back(rule9(fd,newPix));
-	ruleNumVec.push_back(rule8(fd,newPix,loc));
-	ruleNumVec.push_back(rule7(pix,newPix));
-	for(unsigned int i=0; i<ruleNumVec.size(); i++) {
-		if(ruleNumVec.at(i)!=0) {
-			ruleNo.push_back(ruleNumVec.at(i));
-			flag=true;
+	//ruleNumVec.push_back(rule1(indexChange, shade, newShade));
+	//ruleNumVec.push_back(rule2(fd,newPix));
+	//ruleNumVec.push_back(rule3(fd,newPix,newShade));
+	//ruleNumVec.push_back(rule6(pix,newPix,newShade));
+	//ruleNumVec.push_back(rule9(fd,newPix));
+	//ruleNumVec.push_back(rule8(fd,newPix,loc));
+	//ruleNumVec.push_back(rule7(pix,newPix));
+	if(ruleNumVec.size()>0) {
+		for(unsigned int i=0; i<ruleNumVec.size(); i++) {
+			if(ruleNumVec.at(i)!=0) {
+				ruleNo.push_back(ruleNumVec.at(i));
+				flag=true;
+			}
 		}
 	}
 	deque<double>().swap(ruleNumVec);

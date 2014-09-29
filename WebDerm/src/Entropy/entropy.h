@@ -18,9 +18,10 @@ class FileData;
 class Entropy {
 
 public:
-	void outputEntropy(FileData &fd, Size ksize);
+	deque< deque<double> > outputEntropy(FileData &fd, Size ksize);
 	void importEntropyFiles(String path1, String path2,String name);
-	void compareEntropy(deque< deque<double> > &vec1, deque< deque<double> > &vec2,String name);
+	deque<int> calcShadeShift(deque< deque<double> > &vec1, deque< deque<double> > &vec2);
+	void outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deque<int> &colorShiftAmt);
 };
 
 #endif /* ENTROPY_H_ */

@@ -51,14 +51,24 @@ int main(int argc,char** argv)
 	Point pt2(306,439);
 	String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
 	String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
+	deque< deque<double> > pEnt1;
+	deque< deque<double> > pEnt2;
+	deque<int> colorShadeShift;
+	Entropy en;
 
 	FileData fd;
-	fd.filename = "lph4";
+	fd.filename = "acne1";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.ksize = Size(10,10);
-	Entropy en;
-	en.outputEntropy(fd,Size(25,25));
-	//en.importEntropyFiles(file1,file2,"lph4psor1");
+	pEnt1 = en.outputEntropy(fd,Size(25,25));
+
+	FileData fd2;
+	fd2.filename = "acne3";
+	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
+	fd2.ksize = Size(10,10);
+	pEnt2 = en.outputEntropy(fd2,Size(25,25));
+	colorShadeShift = en.calcShadeShift(pEnt1, pEnt2);
+	en.outputShiftedEntropy(fd,fd2,Size(25,25),colorShadeShift);
 	//deque< deque<String> > vec;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
 	//fd.loadFileMatrix("/home/jason/Desktop/Programs/urticaria5.csv",fd.windowVec);
