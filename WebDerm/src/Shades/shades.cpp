@@ -97,6 +97,7 @@ String Shades::extractShade(String pix) {
 	String shade = "";
 	if(pix=="Zero") return pix;
 	if(pix.find("White")!=string::npos) return "White";
+	if(pix.find("Black")!=string::npos) return getShade(0);
 	//if(pix.find("Gray")!=string::npos) return "Gray";
 	for(int i=0; i<shadeCount; i++) {
 		shade = getShade(i);

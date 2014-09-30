@@ -527,3 +527,95 @@ int* Color::changeRgbRelLum(double r, double g, double b, double amt) {
 
 	return results;
 }
+
+void Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget) {
+	String filename = path+"Thresholds/output-shades.csv";
+	fstream fs(filename.c_str());
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<String> colorVec;
+		deque<String> shadeVec;
+		deque<int>	thresh1;
+		deque< deque<int> > values;
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0) shadeVec.push_back(vec.at(i));
+				if(i==1) colorVec.push_back(vec.at(i));
+				if(i>1) thresh1.push_back(atoi(vec.at(i).c_str()));
+			}
+			values.push_back(thresh1);
+			thresh1.clear();
+			vec.clear();
+		}
+		Hsl hsl;
+		Shades sh;
+		String shade, color;
+		int shadeLevel;
+		double lumIncThresh = 0.05;
+		Mat img = img.zeros(Size(window.at(0).size(),window.size()),16);
+		double* HSL;
+		int *RGB;
+		for(unsigned int i=0; i<window.size(); i++) {
+			for(unsigned int j=0; j<window.at(i).size(); j++) {
+				shade = extractShade(window.at(i).at(j));
+				shadeLevel = sh.extractShadeLevel(shade);
+				color = getMainColor(window.at(i).at(j));
+				color = optimizeColor(color);
+				if (color==colorTarget) {
+					if(shade.find("Zero")!=string::npos) {
+						img.at<Vec3b>(i,j)[2] = 0;
+						img.at<Vec3b>(i,j)[1] = 0;
+						img.at<Vec3b>(i,j)[0] = 0;
+					}
+					else if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos) {
+						img.at<Vec3b>(i,j)[2] = 35;
+						img.at<Vec3b>(i,j)[1] = 35;
+						img.at<Vec3b>(i,j)[0] = 35;
+					}
+					else if(shade=="White" || color.find("White")!=string::npos) {
+						img.at<Vec3b>(i,j)[2] = 255;
+						img.at<Vec3b>(i,j)[1] = 255;
+						img.at<Vec3b>(i,j)[0] = 255;
+					}
+					else {
+						for(unsigned int k=0; k<colorVec.size(); k++) {
+							if(shade.find(shadeVec.at(k))!=string::npos && color==colorVec.at(k)) {
+								int r = values.at(k).at(0);
+								int g = values.at(k).at(1);
+								int b = values.at(k).at(2);
+								HSL = hsl.rgb2hsl(r,g,b);
+								if(shade.find("Dark")!=string::npos) lumIncThresh = 0.08;
+								if(shade.find("High")!=string::npos) lumIncThresh = 0.06;
+								if(shade.find("Low")!=string::npos) lumIncThresh = 0.05;
+								if(shade.find("Light")!=string::npos) lumIncThresh = 0.04;
+								HSL[2] += (shadeLevel*lumIncThresh)-lumIncThresh;
+								if(HSL[2]>1) HSL[2]=1;
+								RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+								img.at<Vec3b>(i,j)[2] = RGB[0];
+								img.at<Vec3b>(i,j)[1] = RGB[1];
+								img.at<Vec3b>(i,j)[0] = RGB[2];
+								break;
+							}
+						}
+					}
+				}//end if color==colorTarget
+				else {
+					img.at<Vec3b>(i,j)[2] = 0;
+					img.at<Vec3b>(i,j)[1] = 0;
+					img.at<Vec3b>(i,j)[0] = 0;
+				}
+			}
+		}
+		namedWindow("TargetColorOutput", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+		imshow("TargetColorOutput",img);
+		waitKey(0);
+		img.release();
+		fs.close();
+		deque<String>().swap(vec);
+		deque<String>().swap(colorVec);
+		deque<int>().swap(thresh1);
+		deque< deque<int> >().swap(values);
+	}
+}

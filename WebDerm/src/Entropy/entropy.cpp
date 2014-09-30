@@ -30,7 +30,6 @@ deque< deque<double> > Entropy::outputEntropy(FileData &fd, Size ksize) {
 				color = c.optimizeColor2(color);
 				if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)  {
 					color = "Black";
-					//shade = "Dark1";
 				}
 				else if(shade=="White" || color.find("White")!=string::npos)
 					color = "White";
@@ -105,7 +104,7 @@ deque< deque<double> > Entropy::outputEntropy(FileData &fd, Size ksize) {
 						try {
 							if(pShadeColor.at(colorRow).at(shadeCol)!=0) {
 								pTotal = pShadeColor.at(colorRow).at(shadeCol)/fd.shadeColorCount.at(colorRow).at(shadeCol);
-								pEntropy.at(colorRow).at(shadeCol) += (pTotal * pow(log2(pTotal),2));
+								pEntropy.at(colorRow).at(shadeCol) += (-pTotal * log2(pTotal));
 							}
 						}
 						catch (const std::out_of_range &oor) {
@@ -230,7 +229,7 @@ void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deq
 				shadeIndex2 = sh.getShadeIndex2(shade2);
 				if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)  {
 					color = "Black";
-					//shade = "Dark1";
+					shade = "Dark";
 				}
 				else if(shade=="White" || color.find("White")!=string::npos)
 					color = "White";
@@ -241,7 +240,7 @@ void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deq
 
 				if(shade2.find("Black")!=string::npos || color2.find("Black")!=string::npos)  {
 					color2 = "Black";
-					//shade = "Dark1";
+					shade = "Dark";
 				}
 				else if(shade2=="White" || color2.find("White")!=string::npos)
 					color2 = "White";
@@ -321,8 +320,9 @@ void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deq
 							/************************************/
 							shadeIndex = sh.getShadeIndex2(shade);
 							shadeIndex2 = sh.getShadeIndex2(shade2);
-							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
+							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)  {
 								color = "Black";
+							}
 							else if(shade=="White" || color.find("White")!=string::npos)
 								color = "White";
 							colorIndex = rgb.getColorIndex(color);
@@ -357,11 +357,11 @@ void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deq
 						try {
 							if(pShadeColor.at(colorRow).at(shadeCol)!=0 && fd1.shadeColorCount.at(colorRow).at(shadeCol)!=0) {
 								pTotal = pShadeColor.at(colorRow).at(shadeCol)/fd1.shadeColorCount.at(colorRow).at(shadeCol);
-								pEntropy.at(colorRow).at(shadeCol) += (pTotal * pow(log2(pTotal),2));
+								pEntropy.at(colorRow).at(shadeCol) += (-pTotal * log2(pTotal));
 							}
 							if(pShadeColor2.at(colorRow).at(shadeCol)!=0 && fd2.shadeColorCount.at(colorRow).at(shadeCol)!=0) {
 								pTotal2 = pShadeColor2.at(colorRow).at(shadeCol)/fd2.shadeColorCount.at(colorRow).at(shadeCol);
-								pEntropy2.at(colorRow).at(shadeCol) += (pTotal2 * pow(log2(pTotal2),2));
+								pEntropy2.at(colorRow).at(shadeCol) += (-pTotal2 * log2(pTotal2));
 								//if(colorRow==6 && shadeCol==0) {
 								//	printf("%.0f/%d=%f\n",pShadeColor2.at(colorRow).at(shadeCol),fd2.shadeColorCount.at(colorRow).at(shadeCol),pTotal2);
 								//}
@@ -395,9 +395,13 @@ void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deq
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
+	double total=0;
+	double total2=0;
 	String strSize = toString(fd1.ksize.width)+"x"+toString(fd1.ksize.height);
-	String filename = path+fd1.filename + "_EntropyShifted_"+strSize+".csv";
-	String filename2 = path+fd2.filename + "_EntropyShifted_"+strSize+".csv";
+	String filename = path+fd1.filename;
+	String filename2 = path+fd2.filename;
+	filename += "_" + fd2.filename + "_EntropyShifted_"+strSize+".csv";
+	filename2 += "_" + fd1.filename + "_EntropyShifted_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	FILE * fp2;
@@ -414,16 +418,20 @@ void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deq
 		fprintf(fp2,"%s,",allColors.at(i).c_str());
 		for(unsigned int j=0; j<pEntropy.at(i).size(); j++)
 		{
+			total += pEntropy.at(i).at(j);
+			total2 += pEntropy2.at(i).at(j);
 			if(j<pEntropy.at(i).size()-1)
 				fprintf(fp,"%f,", pEntropy.at(i).at(j));
 			else
-				fprintf(fp,"%f\n", pEntropy.at(i).at(j));
+				fprintf(fp,"%f,%f\n", pEntropy.at(i).at(j),total);
 
 			if(j<pEntropy2.at(i).size()-1)
 				fprintf(fp2,"%f,", pEntropy2.at(i).at(j));
 			else
-				fprintf(fp2,"%f\n", pEntropy2.at(i).at(j));
+				fprintf(fp2,"%f,%f\n", pEntropy2.at(i).at(j),total2);
 		}
+		total=0;
+		total2=0;
 	}
 	fclose(fp);
 	fclose(fp2);
