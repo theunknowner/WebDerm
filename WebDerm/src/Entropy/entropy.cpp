@@ -400,8 +400,8 @@ void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deq
 	String strSize = toString(fd1.ksize.width)+"x"+toString(fd1.ksize.height);
 	String filename = path+fd1.filename;
 	String filename2 = path+fd2.filename;
-	filename += "_" + fd2.filename + "_EntropyShifted_"+strSize+".csv";
-	filename2 += "_" + fd1.filename + "_EntropyShifted_"+strSize+".csv";
+	filename += "_" + fd2.filename + "_Entropy_"+strSize+".csv";
+	filename2 += "_" + fd1.filename + "_Entropy_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	FILE * fp2;
@@ -461,4 +461,275 @@ deque<int> Entropy::calcShadeShift(deque< deque<double> > &vec1, deque< deque<do
 		vec2Begin = -1;
 	}
 	return colorShiftAmt;
+}
+
+deque< deque<double> > Entropy::outputEntropy2(FileData &fd, Size ksize)  {
+	String shade, color, pix;
+	int shadeIndex=0, colorIndex=0;
+	Shades sh;
+	Rgb rgb;
+	Color c;
+	init_2D_Deque(fd.shadeColorCount,g_Shades.size(), allColors.size(),0);
+	deque< deque<double> > pShadeColor(allColors.size(),deque<double>(g_Shades.size(),0));
+	deque< deque<double> > pEntropy(allColors.size(),deque<double>(g_Shades.size(),0));
+	double pTotal=0;
+	unsigned int row=0, col=0;
+	int i=0,j=0, maxRow=0, maxCol=0;
+	try {
+		while(row<=(fd.colorVec.size()-ksize.height)) {
+			while(col<=(fd.colorVec.at(row).size()-ksize.width)) {
+				if((row+ksize.height+1)>fd.colorVec.size())
+					maxRow = fd.colorVec.size();
+				else
+					maxRow = row+ksize.height;
+				if((col+ksize.width+1)>fd.colorVec.at(row).size())
+					maxCol = fd.colorVec.at(row).size();
+				else
+					maxCol = col+ksize.width;
+
+				for(i=row; i<maxRow; i++) {
+					for(j=col; j<maxCol; j++) {
+						try {
+							pix = fd.colorVec.at(i).at(j);
+							shade = sh.extractShade(pix);
+							shadeIndex = sh.getShadeIndex(shade);
+							color = c.getMainColor(pix);
+							color = c.optimizeColor2(color);
+							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
+								color = "Black";
+							else if(shade=="White" || color.find("White")!=string::npos)
+								color = "White";
+							colorIndex = rgb.getColorIndex(color);
+							if(color!="Zero" || colorIndex>=0)
+								++fd.shadeColorCount.at(colorIndex).at(shadeIndex);
+						}
+						catch(const std::out_of_range& oor) {
+							printf("ColorVec.Size: %lux%lu\n",fd.colorVec.size(),fd.colorVec.at(i).size());
+							printf("Point(%d,%d)\n",j,i);
+							printf("Shade: %s\n",shade.c_str());
+							printf("ShadeIndex: %d\n",shadeIndex);
+							printf("Color: %s\n",color.c_str());
+							printf("ColorIndex: %d\n",colorIndex);
+							printf("fd.shadeColorCount.Size: %lu\n",fd.shadeColorCount.size());
+							printf("fd.shadeColorCount(%d,%d)\n",i,j);
+							exit(1);
+						}
+					}
+				}
+				int max=0;
+				deque<int> indexes;
+				deque< deque<int> > shadeColorIndexes;
+				for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++)  {
+					for(unsigned int shadeCol=0; shadeCol<g_Shades.size(); shadeCol++)  {
+						if(fd.shadeColorCount.at(colorRow).at(shadeCol)>0 && fd.shadeColorCount.at(colorRow).at(shadeCol)>=max) {
+							max = fd.shadeColorCount.at(colorRow).at(shadeCol);
+							indexes.push_back(colorRow);
+							indexes.push_back(shadeCol);
+							shadeColorIndexes.push_back(indexes);
+							indexes.clear();
+						}
+					}
+				}
+				//loop to get & store majority shadeColor
+				for(unsigned int y=0; y<shadeColorIndexes.size(); y++)  {
+					colorIndex = shadeColorIndexes.at(y).at(0);
+					shadeIndex = shadeColorIndexes.at(y).at(1);
+					if(fd.shadeColorCount.at(colorIndex).at(shadeIndex)>=max)
+						++pShadeColor.at(colorIndex).at(shadeIndex);
+				}
+				col+=ksize.width;
+				fd.shadeColorCount.clear();
+				fd.shadeColorCount.resize(allColors.size(),deque<int>(g_Shades.size(),0));
+			}
+			row += ksize.height;
+			col=0;
+		}
+		double height = fd.colorVec.size()/ksize.height;
+		double width = fd.colorVec.at(0).size()/ksize.width;
+		double a=50.0, b=9.0;
+		for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++) {
+			for(unsigned int shadeCol=0; shadeCol<g_Shades.size(); shadeCol++) {
+				try {
+					if(pShadeColor.at(colorRow).at(shadeCol)!=0) {
+						pTotal = pShadeColor.at(colorRow).at(shadeCol)/(height*width);
+						pEntropy.at(colorRow).at(shadeCol) = 1.0/(1.0+a*exp(-b*pTotal));
+					}
+				}
+				catch (const std::out_of_range &oor) {
+					printf("pShadeColor.Rows: %lu\n", pShadeColor.size());
+					printf("pShadeColor.Cols: %lu\n", pShadeColor.at(colorRow).size());
+					printf("pShadeColor(%d,%d)\n",colorRow,shadeCol);
+					printf("pEntropy(%d,%d)\n",colorRow,shadeCol);
+					exit(1);
+				}
+			}
+		}
+	}
+	catch (const std::out_of_range &oor) {
+		printf("colorVec.Rows: %lu\n",fd.colorVec.size());
+		printf("colorVec.Cols: %lu\n",fd.colorVec.at(row).size());
+		printf("colorVec(%d,%d)\n",col,row);
+		exit(1);
+	}
+	String strSize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename + "_Entropy2_"+strSize+".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<g_Shades.size(); i++) {
+		fprintf(fp,",%s",g_Shades.at(i).c_str());
+	}
+	fprintf(fp,"\n");
+	for(unsigned int i=0; i<pEntropy.size(); i++)
+	{
+		fprintf(fp,"%s,",allColors.at(i).c_str());
+		for(unsigned int j=0; j<pEntropy.at(i).size(); j++)
+		{
+			if(j<pEntropy.at(i).size()-1)
+				fprintf(fp,"%f,", pEntropy.at(i).at(j));
+			else
+				fprintf(fp,"%f\n", pEntropy.at(i).at(j));
+		}
+	}
+	fclose(fp);
+	return pEntropy;
+}
+
+deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize)  {
+	String shade, color, pix;
+	int shadeIndex=0, colorIndex=0;
+	Shades sh;
+	Rgb rgb;
+	Color c;
+	init_2D_Deque(fd.shadeColorCount,g_Shades2.size(), allColors.size(),0);
+	deque< deque<double> > pShadeColor(allColors.size(),deque<double>(g_Shades2.size(),0));
+	deque< deque<double> > pEntropy(allColors.size(),deque<double>(g_Shades2.size(),0));
+	double pTotal=0;
+	unsigned int row=0, col=0;
+	int i=0,j=0, maxRow=0, maxCol=0;
+	try {
+		while(row<=(fd.colorVec.size()-ksize.height)) {
+			while(col<=(fd.colorVec.at(row).size()-ksize.width)) {
+				if((row+ksize.height+1)>fd.colorVec.size())
+					maxRow = fd.colorVec.size();
+				else
+					maxRow = row+ksize.height;
+				if((col+ksize.width+1)>fd.colorVec.at(row).size())
+					maxCol = fd.colorVec.at(row).size();
+				else
+					maxCol = col+ksize.width;
+
+				for(i=row; i<maxRow; i++) {
+					for(j=col; j<maxCol; j++) {
+						try {
+							pix = fd.colorVec.at(i).at(j);
+							shade = sh.extractShade(pix);
+							/**temporary testing**/
+							if(shade.find("Dark")!=string::npos) shade = "Dark";
+							if(shade.find("High")!=string::npos) shade = "High";
+							if(shade.find("Low")!=string::npos) shade = "Low";
+							if(shade.find("Light")!=string::npos) shade = "Light";
+							/************************************/
+							shadeIndex = sh.getShadeIndex2(shade);
+							color = c.getMainColor(pix);
+							color = c.optimizeColor2(color);
+							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
+								color = "Black";
+							else if(shade=="White" || color.find("White")!=string::npos)
+								color = "White";
+							colorIndex = rgb.getColorIndex(color);
+							if(color!="Zero" || colorIndex>=0)
+								++fd.shadeColorCount.at(colorIndex).at(shadeIndex);
+						}
+						catch(const std::out_of_range& oor) {
+							printf("ColorVec.Size: %lux%lu\n",fd.colorVec.size(),fd.colorVec.at(i).size());
+							printf("Point(%d,%d)\n",j,i);
+							printf("Shade: %s\n",shade.c_str());
+							printf("ShadeIndex: %d\n",shadeIndex);
+							printf("Color: %s\n",color.c_str());
+							printf("ColorIndex: %d\n",colorIndex);
+							printf("fd.shadeColorCount.Size: %lu\n",fd.shadeColorCount.size());
+							printf("fd.shadeColorCount(%d,%d)\n",i,j);
+							exit(1);
+						}
+					}
+				}
+				int max=0;
+				deque<int> indexes;
+				deque< deque<int> > shadeColorIndexes;
+				for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++)  {
+					for(unsigned int shadeCol=0; shadeCol<g_Shades2.size(); shadeCol++)  {
+						if(fd.shadeColorCount.at(colorRow).at(shadeCol)>0 && fd.shadeColorCount.at(colorRow).at(shadeCol)>=max) {
+							max = fd.shadeColorCount.at(colorRow).at(shadeCol);
+							indexes.push_back(colorRow);
+							indexes.push_back(shadeCol);
+							shadeColorIndexes.push_back(indexes);
+							indexes.clear();
+						}
+					}
+				}
+				//loop to get & store majority shadeColor
+				for(unsigned int y=0; y<shadeColorIndexes.size(); y++)  {
+					colorIndex = shadeColorIndexes.at(y).at(0);
+					shadeIndex = shadeColorIndexes.at(y).at(1);
+					if(fd.shadeColorCount.at(colorIndex).at(shadeIndex)>=max)
+						++pShadeColor.at(colorIndex).at(shadeIndex);
+				}
+				col+=ksize.width;
+				fd.shadeColorCount.clear();
+				fd.shadeColorCount.resize(allColors.size(),deque<int>(g_Shades2.size(),0));
+			}
+			row += ksize.height;
+			col=0;
+		}
+		double height = fd.colorVec.size()/ksize.height;
+		double width = fd.colorVec.at(0).size()/ksize.width;
+		double a=50.0, b=9.0;
+		for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++) {
+			for(unsigned int shadeCol=0; shadeCol<g_Shades2.size(); shadeCol++) {
+				try {
+					if(pShadeColor.at(colorRow).at(shadeCol)!=0) {
+						pTotal = pShadeColor.at(colorRow).at(shadeCol)/(height*width);
+						pEntropy.at(colorRow).at(shadeCol) = 1.0/(1.0+a*exp(-b*pTotal));
+					}
+				}
+				catch (const std::out_of_range &oor) {
+					printf("pShadeColor.Rows: %lu\n", pShadeColor.size());
+					printf("pShadeColor.Cols: %lu\n", pShadeColor.at(colorRow).size());
+					printf("pShadeColor(%d,%d)\n",colorRow,shadeCol);
+					printf("pEntropy(%d,%d)\n",colorRow,shadeCol);
+					exit(1);
+				}
+			}
+		}
+	}
+	catch (const std::out_of_range &oor) {
+		printf("colorVec.Rows: %lu\n",fd.colorVec.size());
+		printf("colorVec.Cols: %lu\n",fd.colorVec.at(row).size());
+		printf("colorVec(%d,%d)\n",col,row);
+		exit(1);
+	}
+	double total=0;
+	String strSize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename + "_EntropyCombined_"+strSize+".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<g_Shades2.size(); i++) {
+		fprintf(fp,",%s",g_Shades2.at(i).c_str());
+	}
+	fprintf(fp,"\n");
+	for(unsigned int i=0; i<pEntropy.size(); i++)
+	{
+		fprintf(fp,"%s,",allColors.at(i).c_str());
+		for(unsigned int j=0; j<pEntropy.at(i).size(); j++)
+		{
+			total += pEntropy.at(i).at(j);
+			if(j<pEntropy.at(i).size()-1)
+				fprintf(fp,"%f,", pEntropy.at(i).at(j));
+			else
+				fprintf(fp,"%f,%f\n", pEntropy.at(i).at(j),total);
+		}
+		total=0;
+	}
+	fclose(fp);
+	return pEntropy;
 }

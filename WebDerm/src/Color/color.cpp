@@ -19,7 +19,7 @@ bool Color::containsColor(String argNum, ...) {
 	for(int i=1; i<arg; i++) {
 		color2 = va_arg(vl,char *);
 		if(color1.find(color2)!=string::npos)
-		return true;
+			return true;
 	}
 	va_end(vl);
 	return false;
@@ -89,8 +89,8 @@ void Color::extractColorFromString(String color, deque<String> &vecColor) {
 
 String Color::extractShade(String pix) {
 	Shades sh;
-   int shadeCount = sh.getShadeCount();
-    //int shadeCount = sh.getShadeCount();
+	int shadeCount = sh.getShadeCount();
+	//int shadeCount = sh.getShadeCount();
 	String shade = "";
 	if(pix=="Zero") return pix;
 	//if(pix.find("Gray")!=string::npos) return "Gray";
@@ -447,7 +447,7 @@ void Color::avgImageLuminance(Mat &src) {
 			lum = l*100;
 			satArr[sat]++;
 			if(lum>0)
-			lumArr[lum]++;
+				lumArr[lum]++;
 		}
 	}
 	double avgSat=0;
@@ -563,48 +563,49 @@ void Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, S
 				shadeLevel = sh.extractShadeLevel(shade);
 				color = getMainColor(window.at(i).at(j));
 				color = optimizeColor(color);
-				if (color==colorTarget) {
-					if(shade.find("Zero")!=string::npos) {
-						img.at<Vec3b>(i,j)[2] = 0;
-						img.at<Vec3b>(i,j)[1] = 0;
-						img.at<Vec3b>(i,j)[0] = 0;
-					}
-					else if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos) {
-						img.at<Vec3b>(i,j)[2] = 35;
-						img.at<Vec3b>(i,j)[1] = 35;
-						img.at<Vec3b>(i,j)[0] = 35;
-					}
-					else if(shade=="White" || color.find("White")!=string::npos) {
-						img.at<Vec3b>(i,j)[2] = 255;
-						img.at<Vec3b>(i,j)[1] = 255;
-						img.at<Vec3b>(i,j)[0] = 255;
-					}
-					else {
-						for(unsigned int k=0; k<colorVec.size(); k++) {
-							if(shade.find(shadeVec.at(k))!=string::npos && color==colorVec.at(k)) {
-								int r = values.at(k).at(0);
-								int g = values.at(k).at(1);
-								int b = values.at(k).at(2);
-								HSL = hsl.rgb2hsl(r,g,b);
-								if(shade.find("Dark")!=string::npos) lumIncThresh = 0.08;
-								if(shade.find("High")!=string::npos) lumIncThresh = 0.06;
-								if(shade.find("Low")!=string::npos) lumIncThresh = 0.05;
-								if(shade.find("Light")!=string::npos) lumIncThresh = 0.04;
-								HSL[2] += (shadeLevel*lumIncThresh)-lumIncThresh;
-								if(HSL[2]>1) HSL[2]=1;
+				if(shade.find("Zero")!=string::npos) {
+					img.at<Vec3b>(i,j)[2] = 0;
+					img.at<Vec3b>(i,j)[1] = 0;
+					img.at<Vec3b>(i,j)[0] = 0;
+				}
+				else if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos) {
+					img.at<Vec3b>(i,j)[2] = 35;
+					img.at<Vec3b>(i,j)[1] = 35;
+					img.at<Vec3b>(i,j)[0] = 35;
+				}
+				else if(shade=="White" || color.find("White")!=string::npos) {
+					img.at<Vec3b>(i,j)[2] = 255;
+					img.at<Vec3b>(i,j)[1] = 255;
+					img.at<Vec3b>(i,j)[0] = 255;
+				}
+				else {
+					for(unsigned int k=0; k<colorVec.size(); k++) {
+						if(shade.find(shadeVec.at(k))!=string::npos && color==colorVec.at(k)) {
+							int r = values.at(k).at(0);
+							int g = values.at(k).at(1);
+							int b = values.at(k).at(2);
+							HSL = hsl.rgb2hsl(r,g,b);
+							if(shade.find("Dark")!=string::npos) lumIncThresh = 0.08;
+							if(shade.find("High")!=string::npos) lumIncThresh = 0.06;
+							if(shade.find("Low")!=string::npos) lumIncThresh = 0.05;
+							if(shade.find("Light")!=string::npos) lumIncThresh = 0.04;
+							HSL[2] += (shadeLevel*lumIncThresh)-lumIncThresh;
+							if(HSL[2]>1) HSL[2]=1;
+							if(color==colorTarget) {
 								RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 								img.at<Vec3b>(i,j)[2] = RGB[0];
 								img.at<Vec3b>(i,j)[1] = RGB[1];
 								img.at<Vec3b>(i,j)[0] = RGB[2];
-								break;
 							}
+							else {
+								RGB = hsl.hsl2rgb(HSL[0],0.35,0.7);
+								img.at<Vec3b>(i,j)[2] = RGB[0];
+								img.at<Vec3b>(i,j)[1] = RGB[1];
+								img.at<Vec3b>(i,j)[0] = RGB[2];
+							}
+							break;
 						}
 					}
-				}//end if color==colorTarget
-				else {
-					img.at<Vec3b>(i,j)[2] = 0;
-					img.at<Vec3b>(i,j)[1] = 0;
-					img.at<Vec3b>(i,j)[0] = 0;
 				}
 			}
 		}

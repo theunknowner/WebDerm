@@ -22,6 +22,9 @@ public:
 	void importEntropyFiles(String path1, String path2,String name);
 	deque<int> calcShadeShift(deque< deque<double> > &vec1, deque< deque<double> > &vec2);
 	void outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deque<int> &colorShiftAmt);
+
+	deque< deque<double> > outputEntropy2(FileData &fd, Size ksize);
+	deque< deque<double> > outputCombinedEntropy(FileData &fd, Size ksize);
 };
 
 #endif /* ENTROPY_H_ */
