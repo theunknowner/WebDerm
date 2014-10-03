@@ -9,6 +9,7 @@
 
 void Graph::graph(deque< deque<double> > matrix, deque<String> xLabel, deque<String> yLabel, String filename)  {
 	FILE * fp;
+	filename += ".csv";
 	fp = fopen(filename.c_str(),"w");
 	if(xLabel.size()!=0)  {
 		for(unsigned int i=0; i<xLabel.size(); i++)  {

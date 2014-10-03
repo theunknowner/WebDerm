@@ -816,7 +816,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));
 	ruleNumVec.push_back(rule7(pix,newPix));
-	*/
+*/
 	if(ruleNumVec.size()>0) {
 		for(unsigned int i=0; i<ruleNumVec.size(); i++) {
 			if(ruleNumVec.at(i)!=0) {

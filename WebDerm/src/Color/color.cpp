@@ -323,14 +323,16 @@ String Color::optimizeColor(String pix) {
 	if(color=="RedPink")
 		color = "PinkRed";
 	if(countColors(color)>2) {
-		color.clear();
-		for(unsigned int i=0; i<mainColors.size(); i++) {
-			if(pix.find(mainColors.at(i))!=string::npos) {
-				color += mainColors.at(i);
-				count++;
+		if(color!="GreyBrownPink" && color!="GreyPinkViolet")  {
+			color.clear();
+			for(unsigned int i=0; i<mainColors.size(); i++) {
+				if(pix.find(mainColors.at(i))!=string::npos) {
+					color += mainColors.at(i);
+					count++;
+				}
+				if(count==2)
+					break;
 			}
-			if(count==2)
-				break;
 		}
 	}
 
@@ -347,14 +349,16 @@ String Color::optimizeColor2(String pix) {
 	if(pix.find("Black")!=string::npos)
 		color = "Black";
 	if(countColors(color)>2) {
-		color.clear();
-		for(unsigned int i=0; i<mainColors.size(); i++) {
-			if(pix.find(mainColors.at(i))!=string::npos) {
-				color += mainColors.at(i);
-				count++;
+		if(color!="GreyBrownPink" && color!="GreyPinkViolet")  {
+			color.clear();
+			for(unsigned int i=0; i<mainColors.size(); i++) {
+				if(pix.find(mainColors.at(i))!=string::npos) {
+					color += mainColors.at(i);
+					count++;
+				}
+				if(count==2)
+					break;
 			}
-			if(count==2)
-				break;
 		}
 	}
 
@@ -598,10 +602,10 @@ void Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, S
 								img.at<Vec3b>(i,j)[0] = RGB[2];
 							}
 							else {
-								RGB = hsl.hsl2rgb(HSL[0],0.35,0.7);
-								img.at<Vec3b>(i,j)[2] = RGB[0];
-								img.at<Vec3b>(i,j)[1] = RGB[1];
-								img.at<Vec3b>(i,j)[0] = RGB[2];
+								//RGB = hsl.hsl2rgb(HSL[0],0.35,0.7);
+								img.at<Vec3b>(i,j)[2] = 0;
+								img.at<Vec3b>(i,j)[1] = 0;
+								img.at<Vec3b>(i,j)[0] = 0;
 							}
 							break;
 						}

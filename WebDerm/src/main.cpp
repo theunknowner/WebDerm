@@ -56,26 +56,29 @@ int main(int argc,char** argv)
 	deque<int> colorShadeShift(allColors.size(),0);
 	Entropy en;
 
+	double a=50.0, b=10;
 	FileData fd;
-	fd.filename = "lph4";
+	fd.filename = "pic1a";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.ksize = Size(10,10);
-	pEnt1 = en.outputCombinedEntropy(fd,Size(10,10));
-
+	pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b);
+	pEnt1 = en.outputCombinedEntropy(fd,fd.ksize);
+/*
 	FileData fd2;
-	fd2.filename = "lph7";
+	fd2.filename = "clp4";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.ksize = Size(10,10);
-	pEnt2 = en.outputCombinedEntropy(fd2,Size(10,10));
+	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b);
+	pEnt2 = en.outputCombinedEntropy(fd2,fd2.ksize);
 	//colorShadeShift = en.calcShadeShift(pEnt1, pEnt2);
 	//en.outputShiftedEntropy(fd,fd2,Size(10,10),colorShadeShift);
 /*
 	//deque< deque<String> > vec;
 	FileData fd;
 	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
-	fd.filename = "Psoriasis1";
+	fd.filename = "melanoma6";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
-	c.output2ImageTargetColor(fd.colorVec,Size(10,10),fd.filename,"PinkRed");
+	c.output2ImageTargetColor(fd.colorVec,Size(10,10),fd.filename,"GreyPink");
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	//checkColorsFromList(img2,pt1,pt2);

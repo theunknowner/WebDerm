@@ -269,6 +269,7 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 	}
 	catch(const std::out_of_range &oor) {
 		printf("Intensity::calcIntensityMatrix() out of range!\n");
+		printf("WindowVec.Size: %lu\n",windowVec.size());
 		printf("Point(%d,%d)\n",x,y);
 		exit(0);
 	}

@@ -529,6 +529,7 @@ double Rgb::calcColorLevel(double red, double green, double blue) {
 
 String Rgb::calcColor2(int red, int green, int blue) {
 	Hsl hsl;
+	Color c;
 	String pix = "OTHER";
 	int hue;
 	double lum,sat;
@@ -556,7 +557,9 @@ String Rgb::calcColor2(int red, int green, int blue) {
 							else
 								pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
 						}
-						return pix;
+						if(c.countColors(hslColors.at(i))>=2)
+							pix = c.reassignLevels(pix,red,green,blue);
+						return toString(grayLevel) + pix;
 					}
 				}
 			}
@@ -573,11 +576,6 @@ String Rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 	Color c;
 	String pix;
 	pix = calcColor2(red,green,blue);
-	double grayLevel = calcGrayLevel(red,green,blue);
-	if(pix=="OTHER")
-		pix = pushColor(red,green,blue,dist,ind);
-	pix = c.reassignLevels(pix,red,green,blue);
-	pix = toString(grayLevel) + pix;
 	return pix;
 }
 
@@ -587,11 +585,6 @@ String Rgb::calcColor(int red, int green, int blue) {
 	double dist=0;
 	int ind=0;
 	pix = calcColor2(red,green,blue);
-	double grayLevel = calcGrayLevel(red,green,blue);
-    if(pix=="OTHER")
-        pix = pushColor(red,green,blue,dist,ind);
-	pix = c.reassignLevels(pix,red,green,blue);
-	pix = toString(grayLevel) + pix;
 	return pix;
 }
 

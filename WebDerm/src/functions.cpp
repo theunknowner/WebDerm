@@ -47,6 +47,8 @@ String decimal2hex(int num) {
 
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
 	deque<String> tempVec;
+	vec.clear();
+	deque< deque<String> >().swap(vec);
 	for(int i=0; i<rows; i++) {
 		for(int j=0; j<cols; j++) {
 			tempVec.push_back(val);
@@ -61,6 +63,8 @@ void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) 
 
 void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val) {
 	deque<double> tempVec;
+	vec.clear();
+	deque< deque<double> >().swap(vec);
 	for(int i=0; i<rows; i++) {
 		for(int j=0; j<cols; j++) {
 			tempVec.push_back(val);
@@ -74,6 +78,8 @@ void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val) 
 
 void init_2D_Deque(deque< deque<int> > &vec, int cols, int rows, int val) {
 	deque<int> tempVec;
+	vec.clear();
+	deque< deque<int> >().swap(vec);
 	for(int i=0; i<rows; i++) {
 		for(int j=0; j<cols; j++) {
 			tempVec.push_back(val);

@@ -11,6 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 class Graph {
+public:
 	void graph(deque< deque<double> > matrix, deque<String> xLabel, deque<String> yLabel, String filename);
 };
 
