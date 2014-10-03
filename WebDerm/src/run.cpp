@@ -91,6 +91,7 @@ void runHysteresis()
 	cin >> filename;
 	Mat img;
 	img = runResizeImage(filename,Size(700,700),0);
+	//blur(img,img,Size(25,25));
 	//getSkin(img, mask);
 	//img.copyTo(img2, mask);
 	name = getFileName(filename);

@@ -130,8 +130,9 @@ deque< deque<double> > Entropy::outputEntropy(FileData &fd, Size ksize) {
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
-	String strSize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
-	String filename = path+fd.filename + "_Entropy_"+strSize+".csv";
+	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
+	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename+ "_"+ file_ksize+"_Entropy_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades.size(); i++) {
@@ -279,8 +280,9 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 	double total=0;
 	//Graph gr;
 	//gr.graph(pShadeColor,g_Shades2,allColors,fd.filename+"pShadeColors");
-	String strSize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
-	String filename = path+fd.filename + "_EntropyCombined_"+strSize+".csv";
+	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
+	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename+ "_"+ file_ksize+"_EntropyCombined_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades2.size(); i++) {
@@ -614,7 +616,13 @@ deque<int> Entropy::calcShadeShift(deque< deque<double> > &vec1, deque< deque<do
 	return colorShiftAmt;
 }
 
-deque< deque<double> > Entropy::outputSigmoid(FileData &fd, Size ksize, double a, double b)  {
+inline double f(double t, double a, double b, double p)  {
+	double result = 0;
+	result = 1.0/(1.0+a*exp(-pow((b*t),p)));
+	return result;
+}
+
+deque< deque<double> > Entropy::outputSigmoid(FileData &fd, Size ksize, double a, double b, double p)  {
 	String shade, color, pix;
 	int shadeIndex=0, colorIndex=0;
 	Shades sh;
@@ -623,7 +631,7 @@ deque< deque<double> > Entropy::outputSigmoid(FileData &fd, Size ksize, double a
 	init_2D_Deque(fd.shadeColorCount,g_Shades.size(), allColors.size(),0);
 	deque< deque<double> > pShadeColor(allColors.size(),deque<double>(g_Shades.size(),0));
 	deque< deque<double> > pEntropy(allColors.size(),deque<double>(g_Shades.size(),0));
-	double pTotal=0;
+	deque< deque<double> > pRatio(allColors.size(),deque<double>(g_Shades2.size(),0));
 	unsigned int row=0, col=0;
 	int i=0,j=0, maxRow=0, maxCol=0;
 	try {
@@ -697,12 +705,14 @@ deque< deque<double> > Entropy::outputSigmoid(FileData &fd, Size ksize, double a
 		}
 		double height = fd.colorVec.size()/ksize.height;
 		double width = fd.colorVec.at(0).size()/ksize.width;
+		double t=0;
 		for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++) {
 			for(unsigned int shadeCol=0; shadeCol<g_Shades.size(); shadeCol++) {
 				try {
 					if(pShadeColor.at(colorRow).at(shadeCol)!=0) {
-						pTotal = pShadeColor.at(colorRow).at(shadeCol)/(height*width);
-						pEntropy.at(colorRow).at(shadeCol) = 1.0/(1.0+a*exp(-b*pTotal));
+						pRatio.at(colorRow).at(shadeCol) = pShadeColor.at(colorRow).at(shadeCol)/(height*width);
+						t = pRatio.at(colorRow).at(shadeCol);
+						pEntropy.at(colorRow).at(shadeCol) = (2.0*(f(t,a,b,p)-f(0,a,b,p)))/(2.0*(f(1,a,b,p)-f(0,a,b,p)));
 					}
 				}
 				catch (const std::out_of_range &oor) {
@@ -721,8 +731,9 @@ deque< deque<double> > Entropy::outputSigmoid(FileData &fd, Size ksize, double a
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
-	String strSize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
-	String filename = path+fd.filename + "Sigmoid"+strSize+".csv";
+	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
+	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename+ "_"+ file_ksize+"_Sigmoid_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades.size(); i++) {
@@ -744,7 +755,7 @@ deque< deque<double> > Entropy::outputSigmoid(FileData &fd, Size ksize, double a
 	return pEntropy;
 }
 
-deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, double a, double b)  {
+deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, double a, double b, double p)  {
 	String shade, color, pix;
 	int shadeIndex=0, colorIndex=0;
 	Shades sh;
@@ -833,12 +844,14 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 		}
 		double height = fd.colorVec.size()/ksize.height;
 		double width = fd.colorVec.at(0).size()/ksize.width;
+		double t=0;
 		for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++) {
 			for(unsigned int shadeCol=0; shadeCol<g_Shades2.size(); shadeCol++) {
 				try {
 					if(pShadeColor.at(colorRow).at(shadeCol)!=0) {
 						pRatio.at(colorRow).at(shadeCol) = pShadeColor.at(colorRow).at(shadeCol)/(height*width);
-						pEntropy.at(colorRow).at(shadeCol) = 1.0/(1.0+a*exp(-b*pRatio.at(colorRow).at(shadeCol)));
+						t = pRatio.at(colorRow).at(shadeCol);
+						pEntropy.at(colorRow).at(shadeCol) = (2.0*(f(t,a,b,p)-f(0,a,b,p)))/(2.0*(f(1,a,b,p)-f(0,a,b,p)));
 					}
 				}
 				catch (const std::out_of_range &oor) {
@@ -860,8 +873,9 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 	Graph gr;
 	gr.graph(pShadeColor,g_Shades2,allColors,fd.filename+"pShadeColor");
 	double total=0;
-	String strSize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
-	String filename = path+fd.filename + "_SigmoidCombined_"+strSize+".csv";
+	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
+	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename+ "_"+ file_ksize+"_SigmoidCombined_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades2.size(); i++) {
@@ -873,11 +887,13 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 		fprintf(fp,"%s,",allColors.at(i).c_str());
 		for(unsigned int j=0; j<pEntropy.at(i).size(); j++)
 		{
-			total += pEntropy.at(i).at(j);
+			total += pRatio.at(i).at(j);
 			if(j<pEntropy.at(i).size()-1)
 				fprintf(fp,"%f,", pEntropy.at(i).at(j));
-			else
+			else {
+				total = (2.0*(f(total,a,b,p)-f(0,a,b,p)))/(2.0*(f(1,a,b,p)-f(0,a,b,p)));
 				fprintf(fp,"%f,%f\n", pEntropy.at(i).at(j),total);
+			}
 		}
 		total=0;
 	}

@@ -20,5 +20,6 @@ class FileData;
 void hysteresis(FileData &fd);
 void hysteresis(Mat img, Size size, String name, FileData &fd);
 void hysteresis2(Mat img, Size size, String name, FileData &fd);
+void hysteresis3(Mat img, Size size, String name, FileData &fd);
 
 #endif /* HYSTERESIS_H_ */

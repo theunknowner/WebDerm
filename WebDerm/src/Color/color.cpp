@@ -602,10 +602,10 @@ void Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, S
 								img.at<Vec3b>(i,j)[0] = RGB[2];
 							}
 							else {
-								//RGB = hsl.hsl2rgb(HSL[0],0.35,0.7);
-								img.at<Vec3b>(i,j)[2] = 0;
-								img.at<Vec3b>(i,j)[1] = 0;
-								img.at<Vec3b>(i,j)[0] = 0;
+								RGB = hsl.hsl2rgb(HSL[0],0.35,0.75);
+								img.at<Vec3b>(i,j)[2] = RGB[0];
+								img.at<Vec3b>(i,j)[1] = RGB[1];
+								img.at<Vec3b>(i,j)[0] = RGB[2];
 							}
 							break;
 						}
@@ -613,9 +613,8 @@ void Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, S
 				}
 			}
 		}
-		namedWindow("TargetColorOutput", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-		imshow("TargetColorOutput",img);
-		waitKey(0);
+		namedWindow(name+"TargetColorOutput", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+		imshow(name+"TargetColorOutput",img);
 		img.release();
 		fs.close();
 		deque<String>().swap(vec);

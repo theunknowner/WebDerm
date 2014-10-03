@@ -17,7 +17,6 @@
 
 class FileData;
 class Entropy {
-
 public:
 	deque< deque<double> > outputEntropy(FileData &fd, Size ksize);
 	deque< deque<double> > outputCombinedEntropy(FileData &fd, Size ksize);
@@ -25,8 +24,8 @@ public:
 	deque<int> calcShadeShift(deque< deque<double> > &vec1, deque< deque<double> > &vec2);
 	void outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deque<int> &colorShiftAmt);
 
-	deque< deque<double> > outputSigmoid(FileData &fd, Size ksize, double a, double b);
-	deque< deque<double> > outputCombinedSigmoid(FileData &fd, Size ksize, double a, double b);
+	deque< deque<double> > outputSigmoid(FileData &fd, Size ksize, double a, double b, double p);
+	deque< deque<double> > outputCombinedSigmoid(FileData &fd, Size ksize, double a, double b, double p);
 };
 
 #endif /* ENTROPY_H_ */
