@@ -23,7 +23,7 @@
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
-	runHysteresis();
+	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 /*
@@ -34,7 +34,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	Hsl hsl;
 	Rgb rgb;
 	Color c;
@@ -57,21 +57,20 @@ int main(int argc,char** argv)
 	deque< deque<double> > pEnt2;
 	//deque<int> colorShadeShift(allColors.size(),0);
 	Entropy en;
-
-	double a=1.0, b=0.001, p=0.33;
+	//double a=1.0, b=0.001, p=0.33;
 	FileData fd;
-	fd.filename = "clp3";
+	fd.filename = "melanoma2";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.ksize = Size(10,10);
-	pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
-	pEnt1 = en.outputCombinedEntropy(fd,Size(25,25));
+	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
+	pEnt1 = en.outputCombinedEntropy(fd,Size(50,50));
 
 	FileData fd2;
-	fd2.filename = "clp4";
+	fd2.filename = "melanoma6";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.ksize = Size(10,10);
-	pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
-	pEnt2 = en.outputCombinedEntropy(fd2,Size(25,25));
+	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
+	pEnt2 = en.outputCombinedEntropy(fd2,Size(50,50));
 	//colorShadeShift = en.calcShadeShift(pEnt1, pEnt2);
 	//en.outputShiftedEntropy(fd,fd2,Size(10,10),colorShadeShift);
 /*

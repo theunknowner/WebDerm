@@ -8,7 +8,7 @@
 #include "hysteresis.h"
 
 void hysteresis(FileData &fd) {
-	hysteresis3(fd.matImage,fd.ksize,fd.filename,fd);
+	hysteresis2(fd.matImage,fd.ksize,fd.filename,fd);
 }
 
 //hysteresis moving 1 col/row at a time
@@ -74,7 +74,8 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 								}
 								windowColors.at(y).at(x) = pix;
 							}
-						} catch (const std::out_of_range &oor) {
+						}
+						catch (const std::out_of_range &oor) {
 							printf("1\n");
 							printf("windowColors.Size: %lu\n", windowColors.size());
 							printf("ColRow(%d,%d)\n",col,row);
@@ -111,7 +112,8 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 							}
 							windowColors.at(y).at(x) = pix;
 						}
-					} catch (const std::out_of_range &oor) {
+					}
+					catch (const std::out_of_range &oor) {
 						printf("2\n");
 						printf("windowColors.Size: %lu\n", windowColors.size());
 						printf("ColRow(%d,%d)\n",col,row);
@@ -242,8 +244,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 }
 
 void hysteresis2(Mat img, Size size, String name, FileData &fd) {
-	Mat img2;
-	blur(img,img2,size);
+	blur(img,img,size);
 	Rgb rgb;
 	Hsl hsl;
 	int r,g,b;
@@ -290,7 +291,6 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 	deque<double> hueWindow;
 	deque<double> satWindow;
 	deque<double> lumWindow;
-	deque<String> hslVec;
 	int mainColorIndex[mainColors.size()];
 	double mainColorLevels[mainColors.size()];
 	double mainColorLevelAvg[mainColors.size()];
@@ -308,6 +308,7 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 	fill_n(mainColorIndex,mainColors.size(),0);
 	fill_n(mainColorLevelAvg,mainColors.size(),0);
 	init_2D_Deque(fd.windowVec,img.cols,img.rows,"");
+	init_2D_Deque(fd.hslMat,img.cols,img.rows,"");
 	int rowDiff=0, colDiff=0;
 	while(row<img.rows)  {
 		while(col<img.cols)  {
@@ -327,26 +328,25 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 			}
 			maxCol = col+size.width;
 
-			for(int x=col; x<(maxCol); x++)  {
-				for(int y=row; y<(maxRow); y++)  {
+			for(int x=col; x<maxCol; x++)  {
+				for(int y=row; y<maxRow; y++)  {
 					b = img.at<Vec3b>(y,x)[0];
 					g = img.at<Vec3b>(y,x)[1];
 					r = img.at<Vec3b>(y,x)[2];
-
 					pix = rgb.checkBlack(r,g,b);
 					if(pix=="OTHER") {
 						pix = rgb.calcColor(r,g,b,dist,ind);
 						//if(dist>10)
 						//fprintf(fp,"%s,%f,%d,%d,%d\n",pix.c_str(),dist,r,g,b);
 					}
+					HSL = hsl.rgb2hsl(r,g,b);
+					HSL[1] = roundDecimal(HSL[1],2);
+					HSL[2] = roundDecimal(HSL[2],2);
+					hueWindow.push_back(HSL[0]);
+					satWindow.push_back(HSL[1]);
+					lumWindow.push_back(HSL[2]);
+					pixelColorWindow.push_back(pix);
 				}
-				HSL = hsl.rgb2hsl(r,g,b);
-				HSL[1] = roundDecimal(HSL[1],2);
-				HSL[2] = roundDecimal(HSL[2],2);
-				hueWindow.push_back(HSL[0]);
-				satWindow.push_back(HSL[1]);
-				lumWindow.push_back(HSL[2]);
-				pixelColorWindow.push_back(pix);
 			}
 			for(unsigned int i=0; i<pixelColorWindow.size(); i++)  {
 				for(unsigned int j=0; j<mainColors.size(); j++)  {
@@ -413,21 +413,23 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 				else {
 					h=0;s=0;l=0;
 				}
+				String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
 				for(int x=col; x<(maxCol); x++)  {
 					for(int y=row; y<(maxRow); y++)  {
 						fd.windowVec.at(y).at(x) = pix;
+						fd.hslMat.at(y).at(x) = hslStr;
 					}
 				}
 			}
 			else {
+				String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
 				for(int x=col; x<(maxCol); x++)  {
 					for(int y=row; y<(maxRow); y++)  {
 						fd.windowVec.at(y).at(x) = "Zero";
+						fd.hslMat.at(y).at(x) = hslStr;
 					}
 				}
 			}
-			String hslStr = toString(h)+";"+toString(s)+";"+toString(l);
-			hslVec.push_back(hslStr);
 			grayLevel=0;
 			hslAvg[0] = 0;
 			hslAvg[1] = 0;
@@ -437,6 +439,9 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 			fill_n(mainColorIndex,mainColors.size(),0);
 			fill_n(mainColorLevelAvg,mainColors.size(),0);
 			index.clear();
+			hueWindow.clear();
+			satWindow.clear();
+			lumWindow.clear();
 			pixelColorWindow.clear();
 			/* remove window clears when using FIFO
 				hueWindow.clear();
@@ -445,12 +450,10 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 				pixelColorWindow.clear();*/
 			col+=size.width;
 		}//end while col
-		fd.hslMat.push_back(hslVec);
 		pixelColorWindow.clear();
 		hueWindow.clear();
 		satWindow.clear();
 		lumWindow.clear();
-		hslVec.clear();
 
 		col=0; row+=size.height;
 	}//end while row
@@ -458,7 +461,6 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 	fd.colorVec = in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
 	deque<String>().swap(pixelColorWindow);
 	deque<int>().swap(index);
-	deque<String>().swap(hslVec);
 	deque<double>().swap(hueWindow);
 	deque<double>().swap(satWindow);
 	deque<double>().swap(lumWindow);

@@ -154,6 +154,25 @@ deque< deque<double> > Entropy::outputEntropy(FileData &fd, Size ksize) {
 	return pEntropy;
 }
 
+String combineShades(String shade) {
+	if(shade.find("Dark")!=string::npos) return "Dark";
+	if(shade.find("High")!=string::npos) return "High";
+	if(shade.find("Low")!=string::npos) return "Low";
+	if(shade.find("Light")!=string::npos) return "Light";
+	return shade;
+}
+
+String combineColors(String color)  {
+	if(color.find("Purple")!=string::npos)
+		return "Purple";
+	if(color.find("Violet")!=string::npos)
+		return "Violet";
+	if(color.find("Pink")!=string::npos)
+		if(color.find("Brown")==string::npos && color.find("Red")==string::npos)
+			return "Pink";
+	return color;
+}
+
 deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) {
 	String shade, color, pix;
 	int shadeIndex=0, colorIndex=0;
@@ -166,15 +185,13 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 			try {
 				pix = fd.colorVec.at(i).at(j);
 				shade = sh.extractShade(pix);
-				/**temporary testing**/
-				if(shade.find("Dark")!=string::npos) shade = "Dark";
-				if(shade.find("High")!=string::npos) shade = "High";
-				if(shade.find("Low")!=string::npos) shade = "Low";
-				if(shade.find("Light")!=string::npos) shade = "Light";
-				/************************************/
-				shadeIndex = sh.getShadeIndex2(shade);
 				color = c.getMainColor(pix);
 				color = c.optimizeColor2(color);
+				/**temporary testing**/
+				shade = combineShades(shade);
+				color = combineColors(color);
+				/************************************/
+				shadeIndex = sh.getShadeIndex2(shade);
 				if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)  {
 					color = "Black";
 				}
@@ -216,15 +233,15 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 						try {
 							pix = fd.colorVec.at(i).at(j);
 							shade = sh.extractShade(pix);
-							/**temporary testing**/
-							if(shade.find("Dark")!=string::npos) shade = "Dark";
-							if(shade.find("High")!=string::npos) shade = "High";
-							if(shade.find("Low")!=string::npos) shade = "Low";
-							if(shade.find("Light")!=string::npos) shade = "Light";
-		/************************************/
-							shadeIndex = sh.getShadeIndex2(shade);
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
+							/**temporary testing**/
+							shade = combineShades(shade);
+							color = combineColors(color);
+							if(shade.find("Light")!=string::npos) shade = "Light";
+							/************************************/
+							shadeIndex = sh.getShadeIndex2(shade);
+
 							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
 								color = "Black";
 							else if(shade=="White" || color.find("White")!=string::npos)

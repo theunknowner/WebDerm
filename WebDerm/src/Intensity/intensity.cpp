@@ -104,15 +104,22 @@ double Intensity::sigmoidFn(double intensity) {
 void Intensity::setMinMaxShades() {
 	double min,max;
 	for(unsigned int i=0; i<g_ShadeThresh.size(); i++) {
-		min = g_ShadeThresh.at(i).at(0);
-		max = g_ShadeThresh.at(i).at(1);
-		if(minIntensity>=min && minIntensity<max)
-			oldMinShade = g_Shades.at(i);
-		if(maxIntensity>=min && maxIntensity<max)
-			oldMaxShade = g_Shades.at(i);
-		if(maxIntensity>=g_ShadeThresh.at(g_ShadeThresh.size()-1).at(1))
-			oldMaxShade = g_Shades.at(g_Shades.size()-1);
-		if(oldMinShade!=status && oldMaxShade!=status) break;
+		try {
+			min = g_ShadeThresh.at(i).at(0);
+			max = g_ShadeThresh.at(i).at(1);
+			if(minIntensity>=min && minIntensity<max)
+				oldMinShade = g_Shades.at(i);
+			if(maxIntensity>=min && maxIntensity<max)
+				oldMaxShade = g_Shades.at(i);
+			if(maxIntensity>=g_ShadeThresh.at(g_ShadeThresh.size()-1).at(1))
+				oldMaxShade = g_Shades.at(g_Shades.size()-1);
+			if(oldMinShade!=status && oldMaxShade!=status) break;
+		}
+		catch (const std::out_of_range &oor) {
+			printf("Intensity::setMinMaxShades() out of range!\n");
+			printf("g_ShadeThresh.Size: %lu\n",g_ShadeThresh.size());
+			exit(1);
+		}
 	}
 }
 
@@ -122,12 +129,24 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double> vec;
 	double intensity=0;
 	double thresh = 0.05; //percentage of outlier removal
-	for(unsigned int i=0; i<input.size(); i++) {
-		for(unsigned int j=0; j<input.at(i).size(); j++) {
-			intensity = input.at(i).at(j);
-			if(intensity!=0)
-				vec.push_back(intensity);
+	unsigned int x=0, y=0;
+	try {
+		for(unsigned int i=0; i<input.size(); i++) {
+			y=i;
+			for(unsigned int j=0; j<input.at(i).size(); j++) {
+				x=j;
+				intensity = input.at(i).at(j);
+				if(intensity!=0)
+					vec.push_back(intensity);
+			}
 		}
+	}
+	catch (const std::out_of_range &oor) {
+		printf("setMinMax() out of range!\n");
+		printf("input.Rows: %lu\n",input.size());
+		printf("input.Cols: %lu\n",input.at(0).size());
+		printf("Point(%d,%d)\n",x,y);
+		exit(1);
 	}
 	quicksort(vec,0,vec.size()-1);
 	//freqOfList(vec);
@@ -248,7 +267,7 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 	String pix;
 	deque<double> vec;
 	deque< deque<double> > vec2;
-	unsigned int x=0,y=0;
+	unsigned int x=0, y=0;
 	try {
 		for(unsigned int i=0; i<windowVec.size(); i++) {
 			y=i;
@@ -265,14 +284,15 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 			vec2.push_back(vec);
 			vec.clear();
 		}
-		setMinMax(vec2);
 	}
 	catch(const std::out_of_range &oor) {
 		printf("Intensity::calcIntensityMatrix() out of range!\n");
-		printf("WindowVec.Size: %lu\n",windowVec.size());
+		printf("WindowVec.Rows: %lu\n",windowVec.size());
+		printf("WindowVec.Cols: %lu\n", windowVec.at(0).size());
 		printf("Point(%d,%d)\n",x,y);
-		exit(0);
+		exit(1);
 	}
+	setMinMax(vec2);
 	return vec2;
 }
 
