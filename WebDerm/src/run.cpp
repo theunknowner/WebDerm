@@ -406,7 +406,8 @@ void runMouseColor() {
 	cin >> input;
 	if(input=="y") getSkin(img, mask);
 	img.copyTo(img2, mask);
-	Mouse::mouseColor(img2, name);
+	Mouse m;
+	m.mouseColor(img2, name);
 	img.release(); img2.release(); mask.release();
 }
 
@@ -429,6 +430,7 @@ void runMouseOutputColor() {
 	filepath = filename.substr(0,pos1);
 	filepath = filepath+fd.filename+"_ShadeColors.csv";
 	fd.loadFileMatrix(filepath,fd.colorVec);
-	Mouse::mouseOutputColor(img,fd);
+	Mouse m;
+	m.mouseOutputColor(img,fd);
 	img.release();
 }

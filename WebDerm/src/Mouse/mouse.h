@@ -13,9 +13,10 @@
 
 class FileData;
 class Mouse {
+
 public:
-	static void mouseColor(Mat img, String name);
-	static void mouseOutputColor(Mat img, FileData &fd);
+	void mouseColor(Mat img, String name);
+	void mouseOutputColor(Mat img, FileData &fd);
 };
 
 #endif /* MOUSE_H_ */

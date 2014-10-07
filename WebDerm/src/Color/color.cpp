@@ -532,7 +532,7 @@ int* Color::changeRgbRelLum(double r, double g, double b, double amt) {
 	return results;
 }
 
-void Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget) {
+Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget) {
 	String filename = path+"Thresholds/output-shades.csv";
 	fstream fs(filename.c_str());
 	if(fs.is_open()) {
@@ -613,13 +613,13 @@ void Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, S
 				}
 			}
 		}
-		namedWindow(name+"TargetColorOutput", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-		imshow(name+"TargetColorOutput",img);
-		img.release();
+		//namedWindow(name+"TargetColorOutput", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+		//imshow(name+"TargetColorOutput",img);
 		fs.close();
 		deque<String>().swap(vec);
 		deque<String>().swap(colorVec);
 		deque<int>().swap(thresh1);
 		deque< deque<int> >().swap(values);
+		return img;
 	}
 }

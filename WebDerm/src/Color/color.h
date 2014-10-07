@@ -35,6 +35,6 @@ public:
 	void imgRgb2Gray(Mat &src, Mat &dst);
 	int* changeRgbRelLum(double r, double g, double b, double amt);
 
-	void output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget);
+	Mat output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget);
 };
 #endif /* COLOR_H_ */

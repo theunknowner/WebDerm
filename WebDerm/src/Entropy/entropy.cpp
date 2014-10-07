@@ -173,6 +173,9 @@ String combineColors(String color)  {
 	return color;
 }
 
+double vec[14][14][5] = {0};
+double vecTotal[5] = {0};
+
 deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) {
 	String shade, color, pix;
 	int shadeIndex=0, colorIndex=0;
@@ -182,7 +185,7 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 	init_2D_Deque(fd.shadeColorCount,g_Shades2.size(), allColors.size(),0);
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
-			try {
+			try  {
 				pix = fd.colorVec.at(i).at(j);
 				shade = sh.extractShade(pix);
 				color = c.getMainColor(pix);
@@ -241,7 +244,6 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 							if(shade.find("Light")!=string::npos) shade = "Light";
 							/************************************/
 							shadeIndex = sh.getShadeIndex2(shade);
-
 							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
 								color = "Black";
 							else if(shade=="White" || color.find("White")!=string::npos)
@@ -266,9 +268,14 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 				for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++) {
 					for(unsigned int shadeCol=0; shadeCol<g_Shades2.size(); shadeCol++) {
 						try {
-							if(pShadeColor.at(colorRow).at(shadeCol)!=0) {
+							if(pShadeColor.at(colorRow).at(shadeCol)>5 && fd.shadeColorCount.at(colorRow).at(shadeCol)>100) {
 								pTotal = pShadeColor.at(colorRow).at(shadeCol)/fd.shadeColorCount.at(colorRow).at(shadeCol);
-								pEntropy.at(colorRow).at(shadeCol) += (-pTotal * log2(pTotal));
+								pTotal = -pTotal * log2(pTotal);
+								if(allColors.at(colorRow)=="Violet") {
+									vec[row/ksize.height][col/ksize.width][shadeCol] = pShadeColor.at(colorRow).at(shadeCol);
+									vecTotal[shadeCol] = fd.shadeColorCount.at(colorRow).at(shadeCol);
+								}
+								pEntropy.at(colorRow).at(shadeCol) += pTotal;
 							}
 						}
 						catch (const std::out_of_range &oor) {
@@ -306,11 +313,9 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 		fprintf(fp,",%s",g_Shades2.at(i).c_str());
 	}
 	fprintf(fp,"\n");
-	for(unsigned int i=0; i<pEntropy.size(); i++)
-	{
+	for(unsigned int i=0; i<pEntropy.size(); i++)  {
 		fprintf(fp,"%s,",allColors.at(i).c_str());
-		for(unsigned int j=0; j<pEntropy.at(i).size(); j++)
-		{
+		for(unsigned int j=0; j<pEntropy.at(i).size(); j++)  {
 			total += pEntropy.at(i).at(j);
 			if(j<pEntropy.at(i).size()-1)
 				fprintf(fp,"%f,", pEntropy.at(i).at(j));
@@ -916,4 +921,35 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 	}
 	fclose(fp);
 	return pEntropy;
+}
+
+Mat Entropy::showEntropySquares(Mat img, Size ksize)  {
+	Mat dst = img.clone();
+	Point end;
+	String dark,high,low,light,white;
+	cout << vecTotal[0] << endl;
+	cout << vecTotal[1] << endl;
+	cout << vecTotal[2] << endl;
+	cout << vecTotal[3] << endl;
+	for(int i=0; i<img.rows; i+=ksize.height)  {
+		for(int j=0; j<img.cols; j+=ksize.width)  {
+			if((i+ksize.width)>img.cols) end = Point(img.cols-1,img.rows-1);
+			else end = Point(j+ksize.width,i+ksize.height);
+
+			dark = toString(vec[i/ksize.height][j/ksize.width][0]);
+			high = toString(vec[i/ksize.height][j/ksize.width][1]);
+			low = toString(vec[i/ksize.height][j/ksize.width][2]);
+			light = toString(vec[i/ksize.height][j/ksize.width][3]);
+			white = toString(vec[i/ksize.height][j/ksize.width][4]);
+			putText(dst,dark,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			putText(dst,low,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			putText(dst,light,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			rectangle(dst,Point(j,i),Point(end.x,end.y),Scalar(0,0,255));
+		}
+	}
+	//namedWindow("output",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//imshow("output",dst);
+	//waitKey(0);
+	return dst;
 }

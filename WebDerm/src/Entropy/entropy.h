@@ -26,6 +26,8 @@ public:
 
 	deque< deque<double> > outputSigmoid(FileData &fd, Size ksize, double a, double b, double p);
 	deque< deque<double> > outputCombinedSigmoid(FileData &fd, Size ksize, double a, double b, double p);
+
+	Mat showEntropySquares(Mat img, Size ksize);
 };
 
 #endif /* ENTROPY_H_ */
