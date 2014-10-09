@@ -193,6 +193,18 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 				/**temporary testing**/
 				shade = combineShades(shade);
 				color = combineColors(color);
+				if(fd.filename.find("acne")!=string::npos)  {
+					if(color=="Violet")
+						color = "BrownRed";
+				}
+				if(fd.filename.find("Psoriasis")!=string::npos)  {
+					if(color=="Violet")
+						color = "BrownRed";
+				}
+				if(fd.filename.find("herpes")!=string::npos)  {
+					if(color=="Violet")
+						color = "BrownRed";
+				}
 				/************************************/
 				shadeIndex = sh.getShadeIndex2(shade);
 				if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)  {
@@ -241,7 +253,18 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 							/**temporary testing**/
 							shade = combineShades(shade);
 							color = combineColors(color);
-							if(shade.find("Light")!=string::npos) shade = "Light";
+							if(fd.filename.find("acne")!=string::npos)  {
+								if(color=="Violet")
+									color = "BrownRed";
+							}
+							if(fd.filename.find("Psoriasis")!=string::npos)  {
+								if(color=="Violet")
+									color = "BrownRed";
+							}
+							if(fd.filename.find("herpes")!=string::npos)  {
+								if(color=="Violet")
+									color = "BrownRed";
+							}
 							/************************************/
 							shadeIndex = sh.getShadeIndex2(shade);
 							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
@@ -806,15 +829,25 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 						try {
 							pix = fd.colorVec.at(i).at(j);
 							shade = sh.extractShade(pix);
-							/**temporary testing**/
-							if(shade.find("Dark")!=string::npos) shade = "Dark";
-							if(shade.find("High")!=string::npos) shade = "High";
-							if(shade.find("Low")!=string::npos) shade = "Low";
-							if(shade.find("Light")!=string::npos) shade = "Light";
-							/************************************/
-							shadeIndex = sh.getShadeIndex2(shade);
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
+							/**temporary testing**/
+							shade = combineShades(shade);
+							color = combineColors(color);
+							if(fd.filename.find("acne")!=string::npos)  {
+								if(color=="Violet")
+									color = "BrownRed";
+							}
+							if(fd.filename.find("Psoriasis")!=string::npos)  {
+								if(color=="Violet")
+									color = "BrownRed";
+							}
+							if(fd.filename.find("herpes")!=string::npos)  {
+								if(color=="Violet")
+									color = "BrownRed";
+							}
+							/************************************/
+							shadeIndex = sh.getShadeIndex2(shade);
 							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
 								color = "Black";
 							else if(shade=="White" || color.find("White")!=string::npos)
@@ -892,8 +925,8 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
-	Graph gr;
-	gr.graph(pShadeColor,g_Shades2,allColors,fd.filename+"pShadeColor");
+	//Graph gr;
+	//gr.graph(pShadeColor,g_Shades2,allColors,fd.filename+"pShadeColor");
 	double total=0;
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
