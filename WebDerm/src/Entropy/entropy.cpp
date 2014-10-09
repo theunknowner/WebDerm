@@ -182,6 +182,9 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 	Shades sh;
 	Rgb rgb;
 	Color c;
+	Hsl hsl;
+	Functions fn;
+	double h,s,l;
 	init_2D_Deque(fd.shadeColorCount,g_Shades2.size(), allColors.size(),0);
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
@@ -194,16 +197,37 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 				shade = combineShades(shade);
 				color = combineColors(color);
 				if(fd.filename.find("acne")!=string::npos)  {
-					if(color=="Violet")
-						color = "BrownRed";
+					if(color=="Violet")  {
+						int index=-1;
+						h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+						s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+						l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+						color = hsl.getHslColor(h,s,l,index);
+						color = hsl.getHslColor(index+1);
+						//color = "BrownRed";
+					}
 				}
 				if(fd.filename.find("Psoriasis")!=string::npos)  {
-					if(color=="Violet")
-						color = "BrownRed";
+					if(color=="Violet")  {
+						int index=-1;
+						h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+						s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+						l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+						color = hsl.getHslColor(h,s,l,index);
+						color = hsl.getHslColor(index+1);
+						//color = "BrownRed";
+					}
 				}
 				if(fd.filename.find("herpes")!=string::npos)  {
-					if(color=="Violet")
-						color = "BrownRed";
+					if(color=="Violet")  {
+						int index=-1;
+						h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+						s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+						l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+						hsl.getHslColor(h,s,l,index);
+						color = hsl.getHslColor(index+1);
+						//color = "BrownRed";
+					}
 				}
 				/************************************/
 				shadeIndex = sh.getShadeIndex2(shade);
@@ -254,16 +278,37 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 							shade = combineShades(shade);
 							color = combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
-								if(color=="Violet")
-									color = "BrownRed";
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
 							}
 							if(fd.filename.find("Psoriasis")!=string::npos)  {
-								if(color=="Violet")
-									color = "BrownRed";
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
 							}
 							if(fd.filename.find("herpes")!=string::npos)  {
-								if(color=="Violet")
-									color = "BrownRed";
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
 							}
 							/************************************/
 							shadeIndex = sh.getShadeIndex2(shade);
@@ -806,6 +851,9 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 	Shades sh;
 	Rgb rgb;
 	Color c;
+	Hsl hsl;
+	Functions fn;
+	double h,s,l;
 	init_2D_Deque(fd.shadeColorCount,g_Shades2.size(), allColors.size(),0);
 	deque< deque<double> > pShadeColor(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque< deque<double> > pEntropy(allColors.size(),deque<double>(g_Shades2.size(),0));
@@ -835,16 +883,37 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 							shade = combineShades(shade);
 							color = combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
-								if(color=="Violet")
-									color = "BrownRed";
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									color = hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
 							}
 							if(fd.filename.find("Psoriasis")!=string::npos)  {
-								if(color=="Violet")
-									color = "BrownRed";
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									color = hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
 							}
 							if(fd.filename.find("herpes")!=string::npos)  {
-								if(color=="Violet")
-									color = "BrownRed";
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
 							}
 							/************************************/
 							shadeIndex = sh.getShadeIndex2(shade);

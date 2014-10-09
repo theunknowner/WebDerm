@@ -38,6 +38,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 	int b=0,g=0,r=0;
 	double* HSL;
 	int hue=0;
+	double h = 0, s = 0, l = 0;
 	double hslAvg[3]={0};
 	int row=0, col=0, maxRow=0, maxCol=0;
 	int count=0; //stores the amount of pixels hit
@@ -83,11 +84,12 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 							exit(1);
 						}
 						HSL = hsl.rgb2hsl(r,g,b);
-						HSL[1] = roundDecimal(HSL[1],2);
-						HSL[2] = roundDecimal(HSL[2],2);
-						hueWindow.push_back(HSL[0]);
-						satWindow.push_back(HSL[1]);
-						lumWindow.push_back(HSL[2]);
+						h = HSL[0];
+						s = roundDecimal(HSL[1],2);
+						l = roundDecimal(HSL[2],2);
+						hueWindow.push_back(h);
+						satWindow.push_back(s);
+						lumWindow.push_back(l);
 						pixelColorWindow.push_back(windowColors.at(y).at(x));
 					}
 				}
@@ -121,14 +123,15 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 						exit(1);
 					}
 					HSL = hsl.rgb2hsl(r,g,b);
-					HSL[1] = roundDecimal(HSL[1],2);
-					HSL[2] = roundDecimal(HSL[2],2);
+					h = HSL[0];
+					s = roundDecimal(HSL[1],2);
+					l = roundDecimal(HSL[2],2);
 					hueWindow.pop_front();
 					satWindow.pop_front();
 					lumWindow.pop_front();
-					hueWindow.push_back(HSL[0]);
-					satWindow.push_back(HSL[1]);
-					lumWindow.push_back(HSL[2]);
+					hueWindow.push_back(h);
+					satWindow.push_back(s);
+					lumWindow.push_back(l);
 					pixelColorWindow.pop_front();
 					pixelColorWindow.push_back(windowColors.at(y).at(x));
 				}
@@ -144,7 +147,6 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 					index.push_back(j);
 				}
 			}
-			double h = 0, s = 0, l = 0;
 			if(index.size()!=0) {
 				for(unsigned int i=0; i<pixelColorWindow.size(); i++)  {
 					for(unsigned int j=0; j<index.size(); j++)  {
@@ -248,8 +250,9 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 	Rgb rgb;
 	Hsl hsl;
 	int r,g,b;
-	double *HSL;
+	double *HSL,h,s,l;
 	String pix;
+	String hslStr;
 	deque<String> colorWindow;
 	deque<String> hslVec;
 	for(int i=0; i<img.rows; i++)  {
@@ -258,14 +261,15 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 			g = img.at<Vec3b>(i,j)[1];
 			b = img.at<Vec3b>(i,j)[0];
 			HSL = hsl.rgb2hsl(r,g,b);
-			HSL[1] = roundDecimal(HSL[1],2);
-			HSL[2] = roundDecimal(HSL[2],2);
+			h = HSL[0];
+			s = roundDecimal(HSL[1],2);
+			l = roundDecimal(HSL[2],2);
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER") {
 				pix = rgb.calcColor(r,g,b);
 			}
 			colorWindow.push_back(pix);
-			String hslStr = toString(HSL[0])+";"+toString(HSL[1])+";"+toString(HSL[2]);
+			hslStr = toString(h)+";"+toString(s)+";"+toString(l);
 			hslVec.push_back(hslStr);
 		}
 		fd.windowVec.push_back(colorWindow);
