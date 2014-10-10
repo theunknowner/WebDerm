@@ -194,6 +194,10 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 				color = c.getMainColor(pix);
 				color = c.optimizeColor2(color);
 				/**temporary testing**/
+				if(fd.filename.find("herpes6")!=string::npos) {
+					if(color=="BrownPink" && (shade=="Low1" || shade=="Low2"))
+						color = "Pink";
+				}
 				shade = combineShades(shade);
 				color = combineColors(color);
 				if(fd.filename.find("acne")!=string::npos)  {
@@ -228,6 +232,10 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 						color = hsl.getHslColor(index+1);
 						//color = "BrownRed";
 					}
+				}
+				if(fd.filename.find("herpes5")!=string::npos) {
+					if(color=="BrownOrange")
+						color = "BrownPink";
 				}
 				/************************************/
 				shadeIndex = sh.getShadeIndex2(shade);
@@ -275,6 +283,10 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
+							if(fd.filename.find("herpes6")!=string::npos) {
+								if(color=="BrownPink" && (shade=="Low1" || shade=="Low2"))
+									color = "Pink";
+							}
 							shade = combineShades(shade);
 							color = combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
@@ -309,6 +321,10 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 									color = hsl.getHslColor(index+1);
 									//color = "BrownRed";
 								}
+							}
+							if(fd.filename.find("herpes5")!=string::npos) {
+								if(color=="BrownOrange")
+									color = "BrownPink";
 							}
 							/************************************/
 							shadeIndex = sh.getShadeIndex2(shade);
@@ -880,7 +896,12 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
+							if(fd.filename.find("herpes6")!=string::npos) {
+								if(color=="BrownPink" && (shade=="Low1" || shade=="Low2"))
+									color = "Pink";
+							}
 							shade = combineShades(shade);
+							shade = "Low";
 							color = combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
 								if(color=="Violet")  {
@@ -914,6 +935,10 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 									color = hsl.getHslColor(index+1);
 									//color = "BrownRed";
 								}
+							}
+							if(fd.filename.find("herpes5")!=string::npos) {
+								if(color=="BrownOrange")
+									color = "BrownPink";
 							}
 							/************************************/
 							shadeIndex = sh.getShadeIndex2(shade);
