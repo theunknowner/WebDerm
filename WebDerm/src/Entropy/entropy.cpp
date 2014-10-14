@@ -173,7 +173,8 @@ String combineColors(String color)  {
 	return color;
 }
 
-double vec[14][14][5] = {0};
+deque< deque< deque<double> > > vec;
+deque< deque< deque<double> > > vec2;
 double vecTotal[5] = {0};
 
 deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) {
@@ -185,6 +186,8 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 	Hsl hsl;
 	Functions fn;
 	double h,s,l;
+	init_3D_Deque(vec,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
+	init_3D_Deque(vec2,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
 	init_2D_Deque(fd.shadeColorCount,g_Shades2.size(), allColors.size(),0);
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
@@ -194,10 +197,6 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 				color = c.getMainColor(pix);
 				color = c.optimizeColor2(color);
 				/**temporary testing**/
-				if(fd.filename.find("herpes6")!=string::npos) {
-					if(color=="BrownPink" && (shade=="Low1" || shade=="Low2"))
-						color = "Pink";
-				}
 				shade = combineShades(shade);
 				color = combineColors(color);
 				if(fd.filename.find("acne")!=string::npos)  {
@@ -283,10 +282,6 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
-							if(fd.filename.find("herpes6")!=string::npos) {
-								if(color=="BrownPink" && (shade=="Low1" || shade=="Low2"))
-									color = "Pink";
-							}
 							shade = combineShades(shade);
 							color = combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
@@ -355,10 +350,13 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 							if(pShadeColor.at(colorRow).at(shadeCol)>5 && fd.shadeColorCount.at(colorRow).at(shadeCol)>100) {
 								pTotal = pShadeColor.at(colorRow).at(shadeCol)/fd.shadeColorCount.at(colorRow).at(shadeCol);
 								pTotal = -pTotal * log2(pTotal);
-								if(allColors.at(colorRow)=="Violet") {
+								/***Test Code***/
+								if(allColors.at(colorRow)=="BrownPink") {
 									vec[row/ksize.height][col/ksize.width][shadeCol] = pShadeColor.at(colorRow).at(shadeCol);
+									vec2[row/ksize.height][col/ksize.width][shadeCol] = pTotal;
 									vecTotal[shadeCol] = fd.shadeColorCount.at(colorRow).at(shadeCol);
 								}
+								/*************/
 								pEntropy.at(colorRow).at(shadeCol) += pTotal;
 							}
 						}
@@ -896,10 +894,6 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
-							if(fd.filename.find("herpes6")!=string::npos) {
-								if(color=="BrownPink" && (shade=="Low1" || shade=="Low2"))
-									color = "Pink";
-							}
 							shade = combineShades(shade);
 							shade = "Low";
 							color = combineColors(color);
@@ -1067,7 +1061,11 @@ Mat Entropy::showEntropySquares(Mat img, Size ksize)  {
 			high = toString(vec[i/ksize.height][j/ksize.width][1]);
 			low = toString(vec[i/ksize.height][j/ksize.width][2]);
 			light = toString(vec[i/ksize.height][j/ksize.width][3]);
-			white = toString(vec[i/ksize.height][j/ksize.width][4]);
+			//white = toString(vec[i/ksize.height][j/ksize.width][4]);
+			//dark += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][0],3))+" )";
+			//high += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][1],3))+" )";
+			//low += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][2],3))+" )";
+			//light += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][3],3))+" )";
 			putText(dst,dark,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,low,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));

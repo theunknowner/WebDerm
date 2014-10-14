@@ -91,6 +91,71 @@ void init_2D_Deque(deque< deque<int> > &vec, int cols, int rows, int val) {
 	deque<int>().swap(tempVec);
 }
 
+void init_3D_Deque(deque< deque< deque<String> > > &vec, int cols, int rows, int dep, String val) {
+	deque<String> tempVec;
+	deque< deque<String> > tempVec2;
+	vec.clear();
+	deque< deque< deque<String> > >().swap(vec);
+	for(int i=0; i<rows; i++) {
+		for(int j=0; j<cols; j++) {
+			for(int k=0; k<dep; k++)  {
+				tempVec.push_back(val);
+			}
+			tempVec2.push_back(tempVec);
+			tempVec.clear();
+		}
+		vec.push_back(tempVec2);
+		tempVec2.clear();
+	}
+	tempVec.clear();
+	tempVec2.clear();
+	deque<String>().swap(tempVec);
+	deque< deque<String> >().swap(tempVec2);
+}
+
+void init_3D_Deque(deque< deque< deque<double> > > &vec, int cols, int rows, int dep, double val) {
+	deque<double> tempVec;
+	deque< deque<double> > tempVec2;
+	vec.clear();
+	deque< deque< deque<double> > >().swap(vec);
+	for(int i=0; i<rows; i++) {
+		for(int j=0; j<cols; j++) {
+			for(int k=0; k<dep; k++)  {
+				tempVec.push_back(val);
+			}
+			tempVec2.push_back(tempVec);
+			tempVec.clear();
+		}
+		vec.push_back(tempVec2);
+		tempVec2.clear();
+	}
+	tempVec.clear();
+	tempVec2.clear();
+	deque<double>().swap(tempVec);
+	deque< deque<double> >().swap(tempVec2);
+}
+
+void init_3D_Deque(deque< deque< deque<int> > > &vec, int cols, int rows, int dep, int val) {
+	deque<int> tempVec;
+	deque< deque<int> > tempVec2;
+	vec.clear();
+	deque< deque< deque<int> > >().swap(vec);
+	for(int i=0; i<rows; i++) {
+		for(int j=0; j<cols; j++) {
+			for(int k=0; k<dep; k++)  {
+				tempVec.push_back(val);
+			}
+			tempVec2.push_back(tempVec);
+			tempVec.clear();
+		}
+		vec.push_back(tempVec2);
+		tempVec2.clear();
+	}
+	tempVec.clear();
+	tempVec2.clear();
+	deque<int>().swap(tempVec);
+	deque< deque<int> >().swap(tempVec2);
+}
 
 /* return value up to Nth occurrence = first,second,third... of delimiter */
 double Functions::getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
