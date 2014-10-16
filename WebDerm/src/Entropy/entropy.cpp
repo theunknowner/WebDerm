@@ -1244,7 +1244,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
-	const double H=0.5,A=100,B=20,P=3.5, MAX=1,MIN=0.9;
+	deque<deque<int> > pt(height,deque<int>(width,0));
+	const double H=0.1,A=100,B=20,P=3.5, MAX=1,MIN=1;
 	double D=0;
 	int x1=0,y1=0,minRow,minCol;
 	double count=0;
@@ -1267,16 +1268,25 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 					++count;
 				}
 			}
+			//int index = rgb.getColorIndex(targetColor);
 			for(int c=0; c<innerHeight; c++) {
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatio[y1][x1][c][d] /=count;
 					if(ratio[y1][x1][c][d]>0) {
 						fEye.at(c).at(d) = ((1-H)*fEye.at(c).at(d)) + (H*smoothRatio[y1][x1][c][d]);
+						if(targetColor!="") {
+							int index = rgb.getColorIndex(targetColor);
+							if(c==index) {
+								pt.at(y1).at(x1) = 1;
+							}
+						}
+						//if(x1==11 && y1==8)
+							//fEye.at(c).at(d) = 0.287;
 					}
-					else {
+					/*else {
 						D = MIN + (MAX-MIN) * eyeF_fn1(fEye.at(c).at(d),A,B,P);
 						fEye.at(c).at(d) *= D;
-					}
+					}*/
 
 					if(targetColor!="") {
 						int index = rgb.getColorIndex(targetColor);
@@ -1291,6 +1301,15 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		x1=0;
 		++y1;
 	}
+	/*for(int a=0; a<height; a++) {
+		for(int b=0; b<width; b++) {
+			if(pt.at(a).at(b)==0) {
+				D = MIN + (MAX-MIN) * eyeF_fn1(fEye.at(29).at(2),A,B,P);
+				fEye.at(29).at(2) *= D;
+				vec[a][b][2] = fEye.at(29).at(2);
+			}
+		}
+	}*/
 
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
@@ -1321,6 +1340,7 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
 	Mat dst = img.clone();
 	Point end;
 	String dark,high,low,light,white;
+	String low2;
 	String data;
 	Rgb rgb;
 	int indexColor = rgb.getColorIndex(targetColor);
@@ -1332,12 +1352,14 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
 			data = toString(roundDecimal(vec[i/ksize.height][j/ksize.width][2],3));
 			//dark = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][0],3));
 			//high = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][1],3));
+			low2 = toString(roundDecimal(gRatio[i/ksize.height][j/ksize.width][indexColor][2],3));
 			low = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][2],3));
 			//light = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][3],3));
 			//white = toString(vec[i/ksize.height][j/ksize.width][4]);
 			//putText(dst,dark,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			//putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,data,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			putText(dst,low2,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,low,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			//putText(dst,light,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			rectangle(dst,Point(j,i),Point(end.x,end.y),Scalar(0,0,255));

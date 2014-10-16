@@ -60,20 +60,20 @@ int main(int argc,char** argv)
 
 	//double a=1.0, b=0.001, p=0.33;
 	FileData fd;
-	fd.filename = "acne1";
+	fd.filename = "pic1d";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	String targetColor = "Pink";
+	String targetColor = "Red";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
 	img3 = c.output2ImageTargetColor(fd.colorVec,Size(10,10),fd.filename,targetColor);
 	//img3 = en.showEntropySquares(img3,entSize);
 	img3 = en.showEyeFnSquares(img3,entSize,targetColor);
-	//Mouse::mouseOutputColor(img3,fd);
-
+	Mouse::mouseOutputColor(img3,fd);
+/*
 	FileData fd2;
 	fd2.filename = "acne1";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
@@ -88,7 +88,7 @@ int main(int argc,char** argv)
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-
+/*
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);
