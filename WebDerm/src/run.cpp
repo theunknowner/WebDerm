@@ -7,6 +7,27 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
+void runBlurImage() {
+	String filename;
+	String input;
+	Size size(10,10);
+	cout << "Enter filename: ";
+	cin >> filename;
+	cout << "Do you want to write image? (y/n)";
+	cin >> input;
+	Mat img = runResizeImage(filename,Size(700,700),0);
+	blur(img,img,size);
+	if(input=="y")
+	{
+		String name = getFileName(filename);
+		name += "_Blur_" + toString(size.width) + "x" + toString(size.height);
+		imwrite(name+".png",img);
+	}
+	imshow("Img", img);
+	waitKey(0);
+	img.release();
+}
+
 void runResizeImage() {
 	String filename;
 	String input;
@@ -86,7 +107,7 @@ void runHysteresis()
 	Color c;
 	String filename;
 	String name;
-	Size size(11,11);
+	Size size(10,10);
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img;

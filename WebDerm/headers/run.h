@@ -19,6 +19,7 @@
 #include "test.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
 
+void runBlurImage();
 void runResizeImage();
 void runResizeAllImages();
 Mat runResizeImage(String foldername, String filename, Size size,int write);

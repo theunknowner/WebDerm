@@ -58,17 +58,20 @@ int main(int argc,char** argv)
 	//deque<int> colorShadeShift(allColors.size(),0);
 	Entropy en;
 
-	double a=1.0, b=0.001, p=0.33;
+	//double a=1.0, b=0.001, p=0.33;
 	FileData fd;
 	fd.filename = "acne1";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
-	pEnt1 = en.outputCombinedEntropy(fd,entSize);
-	img3 = c.output2ImageTargetColor(fd.colorVec,Size(10,10),fd.filename,"BrownPink");
-	img3 = en.showEntropySquares(img3,entSize);
+	String targetColor = "Pink";
+	en.eyeFn(fd,entSize,targetColor);
+	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
+	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
+	img3 = c.output2ImageTargetColor(fd.colorVec,Size(10,10),fd.filename,targetColor);
+	//img3 = en.showEntropySquares(img3,entSize);
+	img3 = en.showEyeFnSquares(img3,entSize,targetColor);
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
@@ -76,17 +79,20 @@ int main(int argc,char** argv)
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
-	pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
-	pEnt2 = en.outputCombinedEntropy(fd2,entSize);
-	img4 = c.output2ImageTargetColor(fd2.colorVec,Size(10,10),fd2.filename,"Pink");
-	img4 = en.showEntropySquares(img4,entSize);
+	String targetColor2 = "Brown";
+	en.eyeFn(fd2,entSize,targetColor2);
+	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
+	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
+	img4 = c.output2ImageTargetColor(fd2.colorVec,Size(10,10),fd2.filename,targetColor2);
+	//img4 = en.showEntropySquares(img4,entSize);
+	img4 = en.showEyeFnSquares(img4,entSize,targetColor2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
 
-	namedWindow(fd.filename+"_EntropySquares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	namedWindow(fd2.filename+"_EntropySquares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	imshow(fd.filename+"_EntropySquares",img3);
-	imshow(fd2.filename+"_EntropySquares2",img4);
+	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	imshow(fd.filename+"_Squares",img3);
+	imshow(fd2.filename+"_Squares2",img4);
 	waitKey(0);
 	//colorShadeShift = en.calcShadeShift(pEnt1, pEnt2);
 	//en.outputShiftedEntropy(fd,fd2,Size(10,10),colorShadeShift);

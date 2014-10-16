@@ -7,6 +7,15 @@
 
 #include "entropy.h"
 
+Entropy::Entropy() {
+	dim1=0;
+	dim2=0;
+	dim3=0;
+	dim4=0;
+}
+Entropy::~Entropy()  {
+
+}
 deque< deque<double> > Entropy::outputEntropy(FileData &fd, Size ksize) {
 	String shade, color, pix;
 	int shadeIndex=0, colorIndex=0;
@@ -176,6 +185,9 @@ String combineColors(String color)  {
 deque< deque< deque<double> > > vec;
 deque< deque< deque<double> > > vec2;
 double vecTotal[5] = {0};
+
+deque<deque<deque<deque<double> > > > gRatio;
+deque<deque<deque< deque<double> > > > gSmoothRatio;
 
 deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) {
 	String shade, color, pix;
@@ -351,7 +363,7 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 								pTotal = pShadeColor.at(colorRow).at(shadeCol)/fd.shadeColorCount.at(colorRow).at(shadeCol);
 								pTotal = -pTotal * log2(pTotal);
 								/***Test Code***/
-								if(allColors.at(colorRow)=="BrownPink") {
+								if(allColors.at(colorRow)=="Pink") {
 									vec[row/ksize.height][col/ksize.width][shadeCol] = pShadeColor.at(colorRow).at(shadeCol);
 									vec2[row/ksize.height][col/ksize.width][shadeCol] = pTotal;
 									vecTotal[shadeCol] = fd.shadeColorCount.at(colorRow).at(shadeCol);
@@ -1070,6 +1082,264 @@ Mat Entropy::showEntropySquares(Mat img, Size ksize)  {
 			putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,low,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,light,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			rectangle(dst,Point(j,i),Point(end.x,end.y),Scalar(0,0,255));
+		}
+	}
+	//namedWindow("output",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//imshow("output",dst);
+	//waitKey(0);
+	return dst;
+}
+
+inline double eyeF_fn1(double Y, double a, double b, double p)  {
+	double result=0;
+	result = 1.0/(1+a*exp(-b*pow(Y,p)));
+	return result;
+}
+
+void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
+	int height = fd.colorVec.size()/ksize.height;
+	int width = fd.colorVec.at(0).size()/ksize.width;
+	int innerHeight = allColors.size();
+	int innerWidth = g_Shades2.size();
+	init_3D_Deque(vec,height,width,innerWidth);
+	deque<deque<deque<deque<double> > > > ratio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
+	deque<deque<deque<deque<double> > > > smoothRatio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
+	//double ratio[height][width][innerHeight][innerWidth];
+	//double smoothRatio[height][width][innerHeight][innerWidth];
+	//4-D Array initialization
+	/*for(int a=0; a<height; a++) {
+		for(int b=0; b<width; b++) {
+			for(int c=0; c<innerHeight; c++) {
+				for(int d=0; d<innerWidth; d++) {
+					ratio[a][b][c][d]=0;
+					smoothRatio[a][b][c][d]=0;
+				}
+			}
+		}
+	}*/
+	Rgb rgb;
+	Hsl hsl;
+	Color c;
+	Shades sh;
+	Functions fn;
+	String color,shade,pix;
+	double h,s,l;
+	int shadeIndex,colorIndex;
+	int cellSize = ksize.height*ksize.width;
+	deque< deque<double> > pShadeColor(allColors.size(),deque<double>(g_Shades2.size(),0));
+	deque< deque<double> > fEye(allColors.size(),deque<double>(g_Shades2.size(),0));
+	double pTotal=0;
+	unsigned int row=0, col=0;
+	int i=0,j=0, maxRow=0, maxCol=0;
+	try {
+		while(row<=(fd.colorVec.size()-ksize.height)) {
+			while(col<=(fd.colorVec.at(row).size()-ksize.width)) {
+				if((row+ksize.height+1)>fd.colorVec.size())
+					maxRow = fd.colorVec.size();
+				else
+					maxRow = row+ksize.height;
+				if((col+ksize.width+1)>fd.colorVec.at(row).size())
+					maxCol = fd.colorVec.at(row).size();
+				else
+					maxCol = col+ksize.width;
+
+				for(i=row; i<maxRow; i++) {
+					for(j=col; j<maxCol; j++) {
+						try {
+							pix = fd.colorVec.at(i).at(j);
+							shade = sh.extractShade(pix);
+							color = c.getMainColor(pix);
+							color = c.optimizeColor2(color);
+							/**temporary testing**/
+							shade = combineShades(shade);
+							shade = "Low";
+							color = combineColors(color);
+							if(fd.filename.find("acne")!=string::npos)  {
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
+							}
+							if(fd.filename.find("Psoriasis")!=string::npos)  {
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
+							}
+							if(fd.filename.find("herpes")!=string::npos)  {
+								if(color=="Violet")  {
+									int index=-1;
+									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+									hsl.getHslColor(h,s,l,index);
+									color = hsl.getHslColor(index+1);
+									//color = "BrownRed";
+								}
+							}
+							if(fd.filename.find("herpes5")!=string::npos) {
+								if(color=="BrownOrange")
+									color = "BrownPink";
+							}
+							/************************************/
+							shadeIndex = sh.getShadeIndex2(shade);
+							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
+								color = "Black";
+							else if(shade=="White" || color.find("White")!=string::npos)
+								color = "White";
+							colorIndex = rgb.getColorIndex(color);
+							if(color!="Zero" || colorIndex>=0)
+								++pShadeColor.at(colorIndex).at(shadeIndex);
+						}
+						catch(const std::out_of_range& oor) {
+							printf("ColorVec.Size: %lux%lu\n",fd.colorVec.size(),fd.colorVec.at(i).size());
+							printf("Point(%d,%d)\n",j,i);
+							printf("Shade: %s\n",shade.c_str());
+							printf("ShadeIndex: %d\n",shadeIndex);
+							printf("Color: %s\n",color.c_str());
+							printf("ColorIndex: %d\n",colorIndex);
+							printf("pShadeColor.Size: %lu\n",pShadeColor.size());
+							printf("pShadeColor(%d,%d)\n",i,j);
+							exit(1);
+						}
+					}
+				}
+				for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++) {
+					for(unsigned int shadeCol=0; shadeCol<g_Shades2.size(); shadeCol++) {
+						try {
+							pTotal = pShadeColor.at(colorRow).at(shadeCol)/cellSize;
+							ratio[row/ksize.height][col/ksize.width][colorRow][shadeCol] = pTotal;
+						}
+						catch (const std::out_of_range &oor) {
+							printf("pShadeColor.Rows: %lu\n", pShadeColor.size());
+							printf("pShadeColor.Cols: %lu\n", pShadeColor.at(colorRow).size());
+							printf("pShadeColor(%d,%d)\n",colorRow,shadeCol);
+							printf("pEntropy(%d,%d)\n",colorRow,shadeCol);
+							exit(1);
+						}
+					}
+				}
+				col+=ksize.width;
+				pShadeColor.clear();
+				pShadeColor.resize(allColors.size(),deque<double>(g_Shades2.size(),0));
+			}
+			row += ksize.height;
+			col=0;
+		}
+	}
+	catch (const std::out_of_range &oor) {
+		printf("colorVec.Rows: %lu\n",fd.colorVec.size());
+		printf("colorVec.Cols: %lu\n",fd.colorVec.at(row).size());
+		printf("colorVec(%d,%d)\n",col,row);
+		exit(1);
+	}
+	const double H=0.5,A=100,B=20,P=3.5, MAX=1,MIN=0.9;
+	double D=0;
+	int x1=0,y1=0,minRow,minCol;
+	double count=0;
+	while(y1<height) {
+		minRow=maxRow=y1;
+		if((minRow-1)>=0) minRow-=1;
+		if((maxRow+1)<height) maxRow+=1;
+		while(x1<width) {
+			minCol=maxCol=x1;
+			if((minCol-1)>=0) minCol-=1;
+			if((maxCol+1)<width) maxCol+=1;
+			for(int a=minRow; a<=maxRow; a++)  {
+				for(int b=minCol; b<=maxCol; b++)	 {
+					for(int c=0; c<innerHeight; c++) {
+						for(int d=0; d<innerWidth; d++) {
+							if(ratio[y1][x1][c][d]>0)
+								smoothRatio[y1][x1][c][d] += ratio[a][b][c][d];
+						}
+					}
+					++count;
+				}
+			}
+			for(int c=0; c<innerHeight; c++) {
+				for(int d=0; d<innerWidth; d++) {
+					smoothRatio[y1][x1][c][d] /=count;
+					if(ratio[y1][x1][c][d]>0) {
+						fEye.at(c).at(d) = ((1-H)*fEye.at(c).at(d)) + (H*smoothRatio[y1][x1][c][d]);
+					}
+					else {
+						D = MIN + (MAX-MIN) * eyeF_fn1(fEye.at(c).at(d),A,B,P);
+						fEye.at(c).at(d) *= D;
+					}
+
+					if(targetColor!="") {
+						int index = rgb.getColorIndex(targetColor);
+						if(c==index)
+							vec[y1][x1][d] = fEye.at(c).at(d);
+					}
+				}
+			}
+			count=0;
+			++x1;
+		}
+		x1=0;
+		++y1;
+	}
+
+	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
+	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	String filename = path+fd.filename+ "_"+ file_ksize+"_EyeFnCombined_"+strSize+".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<g_Shades2.size(); i++) {
+		fprintf(fp,",%s",g_Shades2.at(i).c_str());
+	}
+	fprintf(fp,"\n");
+	for(unsigned int i=0; i<fEye.size(); i++)  {
+		fprintf(fp,"%s,",allColors.at(i).c_str());
+		for(unsigned int j=0; j<fEye.at(i).size(); j++)  {
+
+			if(j<fEye.at(i).size()-1)
+				fprintf(fp,"%f,", fEye.at(i).at(j));
+			else
+				fprintf(fp,"%f\n", fEye.at(i).at(j));
+		}
+
+	}
+	fclose(fp);
+	gRatio = ratio;
+	gSmoothRatio = smoothRatio;
+}
+
+Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
+	Mat dst = img.clone();
+	Point end;
+	String dark,high,low,light,white;
+	String data;
+	Rgb rgb;
+	int indexColor = rgb.getColorIndex(targetColor);
+
+	for(int i=0; i<img.rows; i+=ksize.height)  {
+		for(int j=0; j<img.cols; j+=ksize.width)  {
+			if((i+ksize.width)>img.cols) end = Point(img.cols-1,img.rows-1);
+			else end = Point(j+ksize.width,i+ksize.height);
+			data = toString(roundDecimal(vec[i/ksize.height][j/ksize.width][2],3));
+			//dark = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][0],3));
+			//high = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][1],3));
+			low = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][2],3));
+			//light = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][3],3));
+			//white = toString(vec[i/ksize.height][j/ksize.width][4]);
+			//putText(dst,dark,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			//putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			putText(dst,data,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			putText(dst,low,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			//putText(dst,light,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			rectangle(dst,Point(j,i),Point(end.x,end.y),Scalar(0,0,255));
 		}
 	}
