@@ -1245,7 +1245,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		exit(1);
 	}
 	deque<deque<int> > pt(height,deque<int>(width,0));
-	const double H=0.1,A=100,B=20,P=3.5, MAX=1,MIN=1;
+	const double H=0.08,A=100,B=20,P=3.5, MAX=1,MIN=1;
 	double D=0;
 	int x1=0,y1=0,minRow,minCol;
 	double count=0;
@@ -1273,7 +1273,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatio[y1][x1][c][d] /=count;
 					if(ratio[y1][x1][c][d]>0) {
-						fEye.at(c).at(d) = ((1-H)*fEye.at(c).at(d)) + (H*smoothRatio[y1][x1][c][d]);
+						//fEye.at(c).at(d) = ((1-H)*fEye.at(c).at(d)) + (H*smoothRatio[y1][x1][c][d]);
+						fEye.at(c).at(d) += eyeF_fn1(smoothRatio[y1][x1][c][d],A,B,P);
 						if(targetColor!="") {
 							int index = rgb.getColorIndex(targetColor);
 							if(c==index) {
