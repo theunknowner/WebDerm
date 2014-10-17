@@ -1128,7 +1128,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	int shadeIndex,colorIndex;
 	int cellSize = ksize.height*ksize.width;
 	deque< deque<double> > pShadeColor(allColors.size(),deque<double>(g_Shades2.size(),0));
-	deque< deque<double> > fEye(allColors.size(),deque<double>(g_Shades2.size(),0));
+	deque< deque<double> > fnEye(allColors.size(),deque<double>(g_Shades2.size(),0));
+	deque< deque<double> > dnEye(allColors.size(),deque<double>(g_Shades2.size(),0));
 	double pTotal=0;
 	unsigned int row=0, col=0;
 	int i=0,j=0, maxRow=0, maxCol=0;
@@ -1244,6 +1245,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
+	deque< deque<double> > cellCount(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque<deque<int> > pt(height,deque<int>(width,0));
 	const double H=0.08,A=100,B=20,P=3.5, MAX=1,MIN=1;
 	double D=0;
@@ -1261,8 +1263,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 				for(int b=minCol; b<=maxCol; b++)	 {
 					for(int c=0; c<innerHeight; c++) {
 						for(int d=0; d<innerWidth; d++) {
-							if(ratio[y1][x1][c][d]>0)
-								smoothRatio[y1][x1][c][d] += ratio[a][b][c][d];
+							//if(ratio[y1][x1][c][d]>0)
+							smoothRatio[y1][x1][c][d] += ratio[a][b][c][d];
 						}
 					}
 					++count;
@@ -1273,26 +1275,20 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatio[y1][x1][c][d] /=count;
 					if(ratio[y1][x1][c][d]>0) {
-						//fEye.at(c).at(d) = ((1-H)*fEye.at(c).at(d)) + (H*smoothRatio[y1][x1][c][d]);
-						fEye.at(c).at(d) += eyeF_fn1(smoothRatio[y1][x1][c][d],A,B,P);
+						cellCount.at(c).at(d)++;
 						if(targetColor!="") {
 							int index = rgb.getColorIndex(targetColor);
 							if(c==index) {
 								pt.at(y1).at(x1) = 1;
 							}
 						}
-						//if(x1==11 && y1==8)
-							//fEye.at(c).at(d) = 0.287;
+						fnEye.at(c).at(d) += smoothRatio[y1][x1][c][d];
+						dnEye.at(c).at(d) = ((cellCount.at(c).at(d)-1)*dnEye.at(c).at(d)+smoothRatio[y1][x1][c][d])/cellCount.at(c).at(d);
 					}
-					/*else {
-						D = MIN + (MAX-MIN) * eyeF_fn1(fEye.at(c).at(d),A,B,P);
-						fEye.at(c).at(d) *= D;
-					}*/
-
 					if(targetColor!="") {
 						int index = rgb.getColorIndex(targetColor);
 						if(c==index)
-							vec[y1][x1][d] = fEye.at(c).at(d);
+							vec[y1][x1][d] = dnEye.at(c).at(d);
 					}
 				}
 			}
@@ -1302,37 +1298,38 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		x1=0;
 		++y1;
 	}
-	/*for(int a=0; a<height; a++) {
-		for(int b=0; b<width; b++) {
-			if(pt.at(a).at(b)==0) {
-				D = MIN + (MAX-MIN) * eyeF_fn1(fEye.at(29).at(2),A,B,P);
-				fEye.at(29).at(2) *= D;
-				vec[a][b][2] = fEye.at(29).at(2);
-			}
-		}
-	}*/
-
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
 	String filename = path+fd.filename+ "_"+ file_ksize+"_EyeFnCombined_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
+	String filename2 = path+fd.filename+ "_"+ file_ksize+"_EyeDnCombined_"+strSize+".csv";
+	FILE * fp2;
+	fp2 = fopen(filename2.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades2.size(); i++) {
 		fprintf(fp,",%s",g_Shades2.at(i).c_str());
+		fprintf(fp2,",%s",g_Shades2.at(i).c_str());
 	}
 	fprintf(fp,"\n");
-	for(unsigned int i=0; i<fEye.size(); i++)  {
+	fprintf(fp2,"\n");
+	for(unsigned int i=0; i<fnEye.size(); i++)  {
 		fprintf(fp,"%s,",allColors.at(i).c_str());
-		for(unsigned int j=0; j<fEye.at(i).size(); j++)  {
+		fprintf(fp2,"%s,",allColors.at(i).c_str());
+		for(unsigned int j=0; j<fnEye.at(i).size(); j++)  {
 
-			if(j<fEye.at(i).size()-1)
-				fprintf(fp,"%f,", fEye.at(i).at(j));
-			else
-				fprintf(fp,"%f\n", fEye.at(i).at(j));
+			if(j<fnEye.at(i).size()-1) {
+				fprintf(fp,"%f,", fnEye.at(i).at(j));
+				fprintf(fp2,"%f,", dnEye.at(i).at(j));
+			}
+			else {
+				fprintf(fp,"%f\n", fnEye.at(i).at(j));
+				fprintf(fp2,"%f\n", dnEye.at(i).at(j));
+			}
 		}
 
 	}
 	fclose(fp);
+	fclose(fp2);
 	gRatio = ratio;
 	gSmoothRatio = smoothRatio;
 }

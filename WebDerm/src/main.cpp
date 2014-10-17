@@ -20,13 +20,51 @@
 #include "Entropy/entropy.h"
 #include "Algorithms/quicksort.h"
 
+/*
+deque<double> pic1h {0.121,0.233,0.159,0.159,0.18,0.254,0.18,0.14};
+deque<double> pic1j {0.121,0.233,0.159,0.159,0.18,0.254,0.18,0.14,
+	0.037,0.037,0.062,0.041,0.051,0.04,0.037,0.037,0.037,0.037};
+deque<double> dot1 {0.037,0.037};
+deque<double> dot2 {0.037,0.037,0.037,0.037};
+deque<double> dot3 {0.037,0.037,0.037,0.037,0.037,0.037};
+deque<double> dot4 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037};
+deque<double> dot5 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.06};
+deque<double> dot6 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.06,0.064,0.037};
+deque<double> dot7 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,
+					0.037,0.037,0.06,0.064,0.037,0.037,0.056,0.056,0.037};
+
+void func()  {
+	deque<deque<double> > vec;
+	vec.push_back(dot1);
+	vec.push_back(dot2);
+	vec.push_back(dot3);
+	vec.push_back(dot4);
+	vec.push_back(dot5);
+	vec.push_back(dot6);
+	vec.push_back(dot7);
+
+	double y=0,H=0.025,A=100,B=20,P=3.5;
+	/*
+	for(int i=0; i<size; i++) {
+		y += 1.0/(1+A*exp(-B*pow(M[i],P)));
+		cout << y << endl;
+	}
+	for(unsigned int a=0; a<vec.size(); a++) {
+		for(unsigned int i=0; i<vec.at(a).size(); i++)  {
+			y = (1-H)*y+(H*vec.at(a).at(i));
+		}
+		cout << y << endl;
+		y=0;
+	}
+}
+*/
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-/*
+	/*
 	String filename[]= {path+"Images/Acne/acne1.jpg",
 						path+"Images/Acne/acne2.jpg",
 						path+"Images/Acne/acne3.jpg",
@@ -60,12 +98,12 @@ int main(int argc,char** argv)
 
 	//double a=1.0, b=0.001, p=0.33;
 	FileData fd;
-	fd.filename = "pic1d";
+	fd.filename = "pic1h";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	String targetColor = "Red";
+	String targetColor = "Pink";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
@@ -73,7 +111,7 @@ int main(int argc,char** argv)
 	//img3 = en.showEntropySquares(img3,entSize);
 	img3 = en.showEyeFnSquares(img3,entSize,targetColor);
 	Mouse::mouseOutputColor(img3,fd);
-/*
+	/*
 	FileData fd2;
 	fd2.filename = "acne1";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
@@ -88,7 +126,7 @@ int main(int argc,char** argv)
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-/*
+	/*
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);
