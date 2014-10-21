@@ -17,14 +17,8 @@
 
 class FileData;
 class Entropy {
-private:
-	int dim1;
-	int dim2;
-	int dim3;
-	int dim4;
+
 public:
-	Entropy();
-	~Entropy();
 	deque< deque<double> > outputEntropy(FileData &fd, Size ksize);
 	deque< deque<double> > outputCombinedEntropy(FileData &fd, Size ksize);
 	void importEntropyFiles(String path1, String path2,String name);
