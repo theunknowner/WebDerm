@@ -1271,7 +1271,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 						fnEye.at(c).at(d) += smoothRatio[y1][x1][c][d];
 						dnEye.at(c).at(d) = ((cellCount.at(c).at(d)-1)*dnEye.at(c).at(d)+smoothRatio[y1][x1][c][d])/cellCount.at(c).at(d);
 						/**to calc entropy of density**/
-						binNum = floor((dnEye.at(c).at(d)*100)/5); //should I round it?
+						binNum = floor((smoothRatio[y1][x1][c][d]*100)/5); //should I round it?
 						++densityBin.at(c).at(d).at(binNum);
 						++totalBins.at(c).at(d);
 						/*****************************/
