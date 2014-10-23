@@ -1238,12 +1238,13 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	deque< deque<double> > entropyDensity(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque< deque<double> > totalBins(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque<deque<deque<double> > > densityBin(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(binSize,0)));
+	deque< deque<double> > variance(allColors.size(),deque<double>(g_Shades2.size(),0));
+	deque< deque<double> > variance2(allColors.size(),deque<double>(g_Shades2.size(),0));
 	int binNum = 0;
 	//deque<deque<int> > pt(height,deque<int>(width,0));
 	const double H=0.08,A=100,B=20,P=3.5, MAX=1,MIN=1;
-	double D=0;
 	int x1=0,y1=0,minRow,minCol;
-	double count=0, min=0;
+	double count=0, min=0.01;
 	while(y1<height) {
 		minRow=maxRow=y1;
 		if((minRow-1)>=0) minRow-=1;
@@ -1256,8 +1257,9 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 				for(int b=minCol; b<=maxCol; b++)	 {
 					for(int c=0; c<innerHeight; c++) {
 						for(int d=0; d<innerWidth; d++) {
-							if(ratio[y1][x1][c][d]>0)
+							if(ratio[y1][x1][c][d]>min) {
 								smoothRatio[y1][x1][c][d] += ratio[a][b][c][d];
+							}
 						}
 					}
 					++count;
@@ -1266,14 +1268,16 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 			for(int c=0; c<innerHeight; c++) {
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatio[y1][x1][c][d] /=count;
-					if(ratio[y1][x1][c][d]>0) {
+					if(ratio[y1][x1][c][d]>min) {
 						cellCount.at(c).at(d)++;
 						fnEye.at(c).at(d) += smoothRatio[y1][x1][c][d];
 						dnEye.at(c).at(d) = ((cellCount.at(c).at(d)-1)*dnEye.at(c).at(d)+smoothRatio[y1][x1][c][d])/cellCount.at(c).at(d);
 						/**to calc entropy of density**/
-						binNum = floor((smoothRatio[y1][x1][c][d]*100)/5); //should I round it?
+						binNum = floor((dnEye.at(c).at(d)*100)/5); //should I round it?
 						++densityBin.at(c).at(d).at(binNum);
 						++totalBins.at(c).at(d);
+						variance.at(c).at(d) += pow(ratio[y1][x1][c][d],2);
+						variance2.at(c).at(d) += ratio[y1][x1][c][d];
 						/*****************************/
 						if(targetColor!="") {
 							int index = rgb.getColorIndex(targetColor);
@@ -1303,8 +1307,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 					if(targetColor!="") {
 						int index = rgb.getColorIndex(targetColor);
 						if(c==index) {
-							vec[y1][x1][d] = fnEye.at(c).at(d);
-							vec2[y1][x1][d] = dnEye.at(c).at(d);
+							vec[y1][x1][d] = variance.at(c).at(d);
+							vec2[y1][x1][d] = variance2.at(c).at(d);
 							gTargetCellCount[y1][x1][d] = targetCellCount.at(c).at(d);
 						}
 					}
@@ -1316,7 +1320,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		x1=0;
 		++y1;
 	}
-
 	for(int i=0; i<innerHeight; i++) {
 		for(int j=0; j<innerWidth; j++) {
 			for(int k=0; k<binSize; k++) {
@@ -1326,9 +1329,23 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 					entropyDensity.at(i).at(j) += pTotal;
 				}
 			}
+			if(i==24 && j==2) {
+				//printf("%d-%d: %.0f - %f\n",k*5,k*5+5,densityBin.at(i).at(j).at(k),pTotal);
+				cout << variance.at(i).at(j) << endl;
+				cout << cellCount.at(i).at(j) << endl;
+			}
+			if(variance.at(i).at(j)>0 && cellCount.at(i).at(j)>0) {
+				variance.at(i).at(j) /= cellCount.at(i).at(j);
+				variance2.at(i).at(j) /= cellCount.at(i).at(j);
+				if(i==24 && j==2) {
+				//printf("%d-%d: %.0f - %f\n",k*5,k*5+5,densityBin.at(i).at(j).at(k),pTotal);
+					cout << variance2.at(i).at(j) << endl;
+				}
+				variance.at(i).at(j) -= pow(variance2.at(i).at(j),2);
+				variance.at(i).at(j) = sqrt(variance.at(i).at(j));
+			}
 		}
 	}
-
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
 	String filename = path+fd.filename+ "_"+ file_ksize+"_EyeFnCombined_"+strSize+".csv";
@@ -1340,28 +1357,36 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	String filename3 = path+fd.filename+ "_"+ file_ksize+"_DensityEntropyCombined_"+strSize+".csv";
 	FILE * fp3;
 	fp3 = fopen(filename3.c_str(),"w");
+	String filename4 = path+fd.filename+ "_"+ file_ksize+"_VarianceCombined_"+strSize+".csv";
+	FILE * fp4;
+	fp4 = fopen(filename4.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades2.size(); i++) {
 		fprintf(fp,",%s",g_Shades2.at(i).c_str());
 		fprintf(fp2,",%s",g_Shades2.at(i).c_str());
 		fprintf(fp3,",%s",g_Shades2.at(i).c_str());
+		fprintf(fp4,",%s",g_Shades2.at(i).c_str());
 	}
 	fprintf(fp,"\n");
 	fprintf(fp2,"\n");
 	fprintf(fp3,"\n");
+	fprintf(fp4,"\n");
 	for(unsigned int i=0; i<fnEye.size(); i++)  {
 		fprintf(fp,"%s,",allColors.at(i).c_str());
 		fprintf(fp2,"%s,",allColors.at(i).c_str());
 		fprintf(fp3,"%s,",allColors.at(i).c_str());
+		fprintf(fp4,"%s,",allColors.at(i).c_str());
 		for(unsigned int j=0; j<fnEye.at(i).size(); j++)  {
 			if(j<fnEye.at(i).size()-1) {
 				fprintf(fp,"%f,", fnEye.at(i).at(j));
 				fprintf(fp2,"%f,", dnEye.at(i).at(j));
 				fprintf(fp3,"%f,", entropyDensity.at(i).at(j));
+				fprintf(fp4,"%f,", variance.at(i).at(j));
 			}
 			else {
 				fprintf(fp,"%f\n", fnEye.at(i).at(j));
 				fprintf(fp2,"%f\n", dnEye.at(i).at(j));
 				fprintf(fp3,"%f\n", entropyDensity.at(i).at(j));
+				fprintf(fp4,"%f\n", variance.at(i).at(j));
 			}
 		}
 
@@ -1369,6 +1394,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	fclose(fp);
 	fclose(fp2);
 	fclose(fp3);
+	fclose(fp4);
 	gRatio = ratio;
 	gSmoothRatio = smoothRatio;
 }
@@ -1378,7 +1404,7 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
 	Point end;
 	String dark,high,low,light,white;
 	String low2;
-	String data,data2;
+	String data,data2,data3;
 	Rgb rgb;
 	int indexColor = rgb.getColorIndex(targetColor);
 
@@ -1386,8 +1412,8 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
 		for(int j=0; j<img.cols; j+=ksize.width)  {
 			if((i+ksize.width)>img.cols) end = Point(img.cols-1,img.rows-1);
 			else end = Point(j+ksize.width,i+ksize.height);
-			//data = toString(roundDecimal(vec[i/ksize.height][j/ksize.width][2],3));
-			data = toString(roundDecimal(gTargetCellCount[i/ksize.height][j/ksize.width][2],3));
+			data = toString(roundDecimal(vec[i/ksize.height][j/ksize.width][2],3));
+			//data3 = toString(roundDecimal(gTargetCellCount[i/ksize.height][j/ksize.width][2],3));
 			data2 = toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][2],3));
 			//dark = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][0],3));
 			//high = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][1],3));
