@@ -1234,7 +1234,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	deque< deque<double> > dnMax(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque< deque<int> > cellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	deque< deque<int> > targetCellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
-	int binSize = 101;
+	int binSize = 21;
 	deque< deque<double> > entropyDensity(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque< deque<double> > totalBins(allColors.size(),deque<double>(g_Shades2.size(),0));
 	//deque<deque<deque<double> > > densityBin(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(binSize,0)));
@@ -1272,7 +1272,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 						fnEye.at(c).at(d) += smoothRatio[y1][x1][c][d];
 						dnEye.at(c).at(d) = ((cellCount.at(c).at(d)-1)*dnEye.at(c).at(d)+smoothRatio[y1][x1][c][d])/cellCount.at(c).at(d);
 						/**to calc entropy of density**/
-						binNum = floor((smoothRatio[y1][x1][c][d]*100)); //should I round it?
+						binNum = floor((smoothRatio[y1][x1][c][d]*100)/5); //should I round it?
 						if(densityBin.at(c).at(d).at(binNum).size()==1) {
 							if(densityBin.at(c).at(d).at(binNum).at(0)==-1) {
 								deque<double>().swap(densityBin.at(c).at(d).at(binNum));
@@ -1280,6 +1280,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 						}
 						densityBin.at(c).at(d).at(binNum).push_back(smoothRatio[y1][x1][c][d]);
 						++totalBins.at(c).at(d);
+						//entropyDensity.at(c).at(d) += log2(smoothRatio[y1][x1][c][d]+0.902)+0.15;
 						/*****************************/
 						if(targetColor!="") {
 							int index = rgb.getColorIndex(targetColor);
@@ -1333,15 +1334,21 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 					binAvg /= densityBin.at(i).at(j).at(k).size();
 					pTotal = densityBin.at(i).at(j).at(k).size()/totalBins.at(i).at(j);
 					eResult = -pTotal * log2(binAvg);
-					//eResult = pTotal * (exp(binAvg-0.5)-0.606);
-					//eResult = pTotal * log2(0.5*binAvg+1);
 					entropyDensity.at(i).at(j) += eResult;
 				}
 				binAvg=0;
 			}
 		}
 	}
-	//writeSeq2File(densityBin.at(26).at(2), fd.filename+"_BinOutput");
+	/*
+	for(int i=0; i<innerHeight; i++) {
+		for(int j=0; j<innerWidth; j++) {
+			if(entropyDensity.at(i).at(j)>0 && cellCount.at(i).at(j)>0) {
+				entropyDensity.at(i).at(j) /= cellCount.at(i).at(j);
+			}
+		}
+	}*/
+	writeSeq2File(densityBin.at(8).at(2), fd.filename+"_BinOutput");
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
 	String filename = path+fd.filename+ "_"+ file_ksize+"_EyeFnCombined_"+strSize+".csv";

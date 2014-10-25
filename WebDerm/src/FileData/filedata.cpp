@@ -125,7 +125,7 @@ bool FileData::loadFileMatrix(String file_path, deque< deque<String> > &dataMat)
 		return true;
 	}
 	else
-		cout << "Failed to load File matrix!" << endl;
+		printf("%s: Failed to load File matrix!\n",this->filename.c_str());
 	return false;
 }
 
