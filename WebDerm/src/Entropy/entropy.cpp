@@ -1235,15 +1235,17 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	deque< deque<int> > cellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	deque< deque<int> > targetCellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	int binSize = 21;
-	deque< deque<double> > entropyDensity(allColors.size(),deque<double>(g_Shades2.size(),0));
+	deque< deque<double> > stdevRatio(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque< deque<double> > totalBins(allColors.size(),deque<double>(g_Shades2.size(),0));
 	//deque<deque<deque<double> > > densityBin(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(binSize,0)));
 	deque<deque<deque<deque<double> > > > densityBin(allColors.size(),deque<deque<deque<double> > >(g_Shades2.size(),deque<deque<double> >(binSize,deque<double>(1,-1))));
 	int binNum = 0;
 	//deque<deque<int> > pt(height,deque<int>(width,0));
-	const double H=0.08,A=100,B=20,P=3.5, MAX=1,MIN=1;
+	deque<deque<Point> > ratioPtsList(allColors.size(), deque<Point>(1),Point(-1,-1));
+	deque<deque<double> > smoothRatioSingleList(allColors.size(),deque<double>(1,-1));
 	int x1=0,y1=0,minRow,minCol;
 	double count=0, min=0.01;
+	double outlierThresh = 0.05;
 	while(y1<height) {
 		minRow=maxRow=y1;
 		if((minRow-1)>=0) minRow-=1;
@@ -1268,6 +1270,15 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatio[y1][x1][c][d] /=count;
 					if(ratio[y1][x1][c][d]>min) {
+						if(smoothRatioSingleList.at(c).size()>0) {
+							if(smoothRatioSingleList.at(c).at(0)==-1) {
+								smoothRatioSingleList.at(c).pop_front();
+								ratioPtsList.at(c).pop_front();
+							}
+						}
+						smoothRatioSingleList.at(c).push_back(smoothRatio[y1][x1][c][d]);
+						ratioPtsList.at(c).push_back(Point(x1,y1));
+
 						cellCount.at(c).at(d)++;
 						fnEye.at(c).at(d) += smoothRatio[y1][x1][c][d];
 						dnEye.at(c).at(d) = ((cellCount.at(c).at(d)-1)*dnEye.at(c).at(d)+smoothRatio[y1][x1][c][d])/cellCount.at(c).at(d);
@@ -1280,7 +1291,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 						}
 						densityBin.at(c).at(d).at(binNum).push_back(smoothRatio[y1][x1][c][d]);
 						++totalBins.at(c).at(d);
-						//entropyDensity.at(c).at(d) += log2(smoothRatio[y1][x1][c][d]+0.902)+0.15;
+						//stdevRatio.at(c).at(d) += log2(smoothRatio[y1][x1][c][d]+0.902)+0.15;
 						/*****************************/
 						if(targetColor!="") {
 							int index = rgb.getColorIndex(targetColor);
@@ -1322,42 +1333,29 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		x1=0;
 		++y1;
 	}
-	double eResult=0;
-	double binAvg=0;
-	for(int i=0; i<innerHeight; i++) {
-		for(int j=0; j<innerWidth; j++) {
-			for(int k=0; k<binSize; k++) {
-				if(densityBin.at(i).at(j).at(k).at(0)!=-1 && densityBin.at(i).at(j).at(k).size()>0 && totalBins.at(i).at(j)>0) {
-					for(unsigned int n=0; n<densityBin.at(i).at(j).at(k).size(); n++) {
-						binAvg += densityBin.at(i).at(j).at(k).at(n);
-					}
-					binAvg /= densityBin.at(i).at(j).at(k).size();
-					pTotal = densityBin.at(i).at(j).at(k).size()/totalBins.at(i).at(j);
-					eResult = -pTotal * log2(binAvg);
-					entropyDensity.at(i).at(j) += eResult;
-				}
-				binAvg=0;
+	for(int c=0; c<innerHeight; c++) {
+		if(smoothRatioSingleList.at(c).size()>0) {
+			if(smoothRatioSingleList.at(c).at(0)!=1) {
+				quicksort(smoothRatioSingleList.at(c),0,smoothRatioSingleList.at(c).size()-1);
+				double t = smoothRatioSingleList.at(c).size()*outlierThresh;
+				t = round(t);
+				smoothRatioSingleList.at(c).erase(smoothRatioSingleList.at(c).begin(),smoothRatioSingleList.at(c).begin()+t);
+				smoothRatioSingleList.at(c).erase(smoothRatioSingleList.at(c).end()-t,smoothRatioSingleList.at(c).end());
+				stdevRatio.at(c).at(2) = standardDev(smoothRatioSingleList.at(c));
 			}
 		}
 	}
-	/*
-	for(int i=0; i<innerHeight; i++) {
-		for(int j=0; j<innerWidth; j++) {
-			if(entropyDensity.at(i).at(j)>0 && cellCount.at(i).at(j)>0) {
-				entropyDensity.at(i).at(j) /= cellCount.at(i).at(j);
-			}
-		}
-	}*/
-	//writeSeq2File(densityBin.at(8).at(2), fd.filename+"_BinOutput");
+
+	writeSeq2File(smoothRatioSingleList, fd.filename+"_BinOutput");
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
 	String filename = path+fd.filename+ "_"+ file_ksize+"_EyeFnCombined_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
-	String filename2 = path+fd.filename+ "_"+ file_ksize+"_EyeDnCombined_"+strSize+".csv";
+	String filename2 = path+fd.filename+ "_"+ file_ksize+"_EyeDensityCombined_"+strSize+".csv";
 	FILE * fp2;
 	fp2 = fopen(filename2.c_str(),"w");
-	String filename3 = path+fd.filename+ "_"+ file_ksize+"_DensityEntropyCombined_"+strSize+".csv";
+	String filename3 = path+fd.filename+ "_"+ file_ksize+"_StdevCombined_"+strSize+".csv";
 	FILE * fp3;
 	fp3 = fopen(filename3.c_str(),"w");
 	for(unsigned int i=0; i<g_Shades2.size(); i++) {
@@ -1376,16 +1374,23 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 			if(j<fnEye.at(i).size()-1) {
 				fprintf(fp,"%f,", fnEye.at(i).at(j));
 				fprintf(fp2,"%f,", dnEye.at(i).at(j));
-				fprintf(fp3,"%f,", entropyDensity.at(i).at(j));
+				fprintf(fp3,"%f,", stdevRatio.at(i).at(j));
 			}
 			else {
 				fprintf(fp,"%f\n", fnEye.at(i).at(j));
 				fprintf(fp2,"%f\n", dnEye.at(i).at(j));
-				fprintf(fp3,"%f\n", entropyDensity.at(i).at(j));
+				fprintf(fp3,"%f\n", stdevRatio.at(i).at(j));
 			}
 		}
-
 	}
+	/*
+	String filename4 = path+fd.filename+ "_"+ file_ksize+"_YSV_Combined"+strSize+".csv";
+	FILE * fp4;
+	fp4 = fopen(filename4.c_str(),"w");
+	fprintf(fp4,",Y,S,V\n");
+	for(int i=0; i<allColors.size(); i++) {
+
+	}*/
 	fclose(fp);
 	fclose(fp2);
 	fclose(fp3);

@@ -21,6 +21,5 @@ double standardDev(deque<double> &input) {
 	}
 	var /= input.size();
 	result = sqrt(var);
-	result = round(result);
 	return result;
 }
