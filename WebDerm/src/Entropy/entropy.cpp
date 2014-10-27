@@ -1348,7 +1348,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 			}
 		}
 	}*/
-	writeSeq2File(densityBin.at(8).at(2), fd.filename+"_BinOutput");
+	//writeSeq2File(densityBin.at(8).at(2), fd.filename+"_BinOutput");
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
 	String filename = path+fd.filename+ "_"+ file_ksize+"_EyeFnCombined_"+strSize+".csv";
