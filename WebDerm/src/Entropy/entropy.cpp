@@ -1243,7 +1243,9 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	//deque<deque<int> > pt(height,deque<int>(width,0));
 	deque<deque<Point> > ratioPtsList(allColors.size(), deque<Point>(1),Point(-1,-1));
 	deque<deque<double> > smoothRatioSingleList(allColors.size(),deque<double>(1,-1));
-	int x1=0,y1=0,minRow,minCol;
+	deque<deque<deque<deque<double> > > > smoothRatioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
+	deque<deque<deque<deque<double> > > > ratioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
+	int x1=0,y1=0,minRow=0,minCol=0;
 	double count=0, min=0.01;
 	double outlierThresh = 0.05;
 	while(y1<height) {
@@ -1333,19 +1335,60 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		x1=0;
 		++y1;
 	}
+	deque<deque<Point> > outlierPts(allColors.size(),deque<Point>(1,Point(-1,-1)));
 	for(int c=0; c<innerHeight; c++) {
 		if(smoothRatioSingleList.at(c).size()>0) {
 			if(smoothRatioSingleList.at(c).at(0)!=1) {
 				quicksort(smoothRatioSingleList.at(c),0,smoothRatioSingleList.at(c).size()-1);
 				double t = smoothRatioSingleList.at(c).size()*outlierThresh;
 				t = round(t);
-				smoothRatioSingleList.at(c).erase(smoothRatioSingleList.at(c).begin(),smoothRatioSingleList.at(c).begin()+t);
-				smoothRatioSingleList.at(c).erase(smoothRatioSingleList.at(c).end()-t,smoothRatioSingleList.at(c).end());
-				stdevRatio.at(c).at(2) = standardDev(smoothRatioSingleList.at(c));
+				for(int i=0; i<t; i++) {
+					if(outlierPts.at(c).size()>0) {
+						if(outlierPts.at(c).at(0)==Point(-1,-1))
+							outlierPts.at(c).pop_front();
+					}
+					outlierPts.at(c).push_back(ratioPtsList.at(c).front());
+					outlierPts.at(c).push_back(ratioPtsList.at(c).back());
+					ratioPtsList.at(c).pop_back();
+					ratioPtsList.at(c).pop_front();
+					smoothRatioSingleList.pop_back();
+					smoothRatioSingleList.pop_front();
+				}
 			}
 		}
 	}
-
+	x1=0,y1=0,minRow=0,minCol=0,maxRow=0,maxCol=0;
+	while(y1<height) {
+		minRow=maxRow=y1;
+		if((minRow-1)>=0) minRow-=1;
+		if((maxRow+1)<height) maxRow+=1;
+		while(x1<width) {
+			minCol=maxCol=x1;
+			if((minCol-1)>=0) minCol-=1;
+			if((maxCol+1)<width) maxCol+=1;
+			for(int a=minRow; a<=maxRow; a++)  {
+				for(int b=minCol; b<=maxCol; b++)	 {
+					for(int c=0; c<innerHeight; c++) {
+						for(int d=0; d<innerWidth; d++) {
+							if(ratio[y1][x1][c][d]>min) {
+								smoothRatioOutlierRm[y1][x1][c][d] += ratio[a][b][c][d];
+							}
+						}
+					}
+					++count;
+				}
+			}
+			for(int c=0; c<innerHeight; c++) {
+				for(int d=0; d<innerWidth; d++) {
+					smoothRatioOutlierRm[y1][x1][c][d] /=count;
+				}
+			}
+			count=0;
+			++x1;
+		}
+		x1=0;
+		++y1;
+	}
 	writeSeq2File(smoothRatioSingleList, fd.filename+"_BinOutput");
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
