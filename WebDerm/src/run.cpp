@@ -136,8 +136,8 @@ void runHysteresis()
 		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
 		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
 		Intensity in;
-		if(!fd.loadFileMatrix(windowVecFile, fd.windowVec)) exit(0);
-		if(!fd.loadFileMatrix(hslVecFile, fd.hslMat)) exit(0);
+		if(!fd.loadFileMatrix(windowVecFile, fd.windowVec)) exit(1);
+		if(!fd.loadFileMatrix(hslVecFile, fd.hslMat)) exit(1);
 		fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
 /**/
 		String strSize = toString(size.width)+"x"+toString(size.height);

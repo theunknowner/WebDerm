@@ -20,44 +20,7 @@
 #include "Entropy/entropy.h"
 #include "Algorithms/quicksort.h"
 
-/*
-deque<double> pic1h {0.121,0.233,0.159,0.159,0.18,0.254,0.18,0.14};
-deque<double> pic1j {0.121,0.233,0.159,0.159,0.18,0.254,0.18,0.14,
-	0.037,0.037,0.062,0.041,0.051,0.04,0.037,0.037,0.037,0.037};
-deque<double> dot1 {0.037,0.037};
-deque<double> dot2 {0.037,0.037,0.037,0.037};
-deque<double> dot3 {0.037,0.037,0.037,0.037,0.037,0.037};
-deque<double> dot4 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037};
-deque<double> dot5 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.06};
-deque<double> dot6 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.06,0.064,0.037};
-deque<double> dot7 {0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,0.037,
-					0.037,0.037,0.06,0.064,0.037,0.037,0.056,0.056,0.037};
 
-void func()  {
-	deque<deque<double> > vec;
-	vec.push_back(dot1);
-	vec.push_back(dot2);
-	vec.push_back(dot3);
-	vec.push_back(dot4);
-	vec.push_back(dot5);
-	vec.push_back(dot6);
-	vec.push_back(dot7);
-
-	double y=0,H=0.025,A=100,B=20,P=3.5;
-	/*
-	for(int i=0; i<size; i++) {
-		y += 1.0/(1+A*exp(-B*pow(M[i],P)));
-		cout << y << endl;
-	}
-	for(unsigned int a=0; a<vec.size(); a++) {
-		for(unsigned int i=0; i<vec.at(a).size(); i++)  {
-			y = (1-H)*y+(H*vec.at(a).at(i));
-		}
-		cout << y << endl;
-		y=0;
-	}
-}
-*/
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
@@ -82,8 +45,9 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp3.jpg",Size(700,700),0);
-	//img = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp3.jpg",Size(700,700),0);
+	img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4.jpg",Size(700,700),0);
+	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
 	//img.copyTo(img2, mask);
 
@@ -98,26 +62,26 @@ int main(int argc,char** argv)
 
 	//double a=1.0, b=0.001, p=0.33;
 	FileData fd;
-	fd.filename = "pic1h";
+	fd.filename = "clp3";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	String targetColor = "Pink";
+	String targetColor = "Violet";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
 	img3 = c.output2ImageTargetColor(fd.colorVec,Size(10,10),fd.filename,targetColor);
 	//img3 = en.showEntropySquares(img3,entSize);
 	img3 = en.showEyeFnSquares(img3,entSize,targetColor);
-	Mouse::mouseOutputColor(img3,fd);
-	/*
+	//Mouse::mouseOutputColor(img3,fd);
+
 	FileData fd2;
-	fd2.filename = "acne1";
+	fd2.filename = "clp4";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
-	String targetColor2 = "Brown";
+	String targetColor2 = "Violet";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
@@ -126,7 +90,7 @@ int main(int argc,char** argv)
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-	/*
+
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);

@@ -602,7 +602,7 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 								img.at<Vec3b>(i,j)[0] = RGB[2];
 							}
 							else {
-								RGB = hsl.hsl2rgb(HSL[0],0.35,0.75);
+								RGB = hsl.hsl2rgb(HSL[0],0.20,0.75);
 								img.at<Vec3b>(i,j)[2] = RGB[0];
 								img.at<Vec3b>(i,j)[1] = RGB[1];
 								img.at<Vec3b>(i,j)[0] = RGB[2];
@@ -623,3 +623,18 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 		return img;
 	}
 }
+
+Mat correctGamma( Mat& img, double gamma ) {
+ double inverse_gamma = 1.0 / gamma;
+
+ Mat lut_matrix(1, 256, CV_8UC1 );
+ uchar * ptr = lut_matrix.ptr();
+ for( int i = 0; i < 256; i++ )
+   ptr[i] = (int)( pow( (double) i / 255.0, inverse_gamma ) * 255.0 );
+
+ Mat result;
+ LUT( img, lut_matrix, result );
+
+ return result;
+}
+

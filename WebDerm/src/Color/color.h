@@ -36,5 +36,7 @@ public:
 	int* changeRgbRelLum(double r, double g, double b, double amt);
 
 	Mat output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget);
+
+	Mat correctGamma(Mat& img, double gamma);
 };
 #endif /* COLOR_H_ */
