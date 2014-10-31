@@ -43,7 +43,6 @@ void runResizeImage() {
 	}
 	imshow("Img", img);
 	waitKey(0);
-	img.release();
 }
 
 void runResizeAllImages() {
