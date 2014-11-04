@@ -1337,12 +1337,13 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 		x1=0;
 		++y1;
 	}
+	//start of standard dev (V)
 	ratioOutlierRm = ratio;
 	deque<double> sortedList;
 	deque<Point> sortedPtsList;
 	for(int c=0; c<innerHeight; c++) {
 		if(smoothRatioSingleList.at(c).size()>0) {
-			if(smoothRatioSingleList.at(c).at(0)!=1) {
+			if(smoothRatioSingleList.at(c).at(0)!=-1) {
 				if(sortedList.size()==0) {
 					sortedList.push_back(smoothRatioSingleList.at(c).at(0));
 					sortedPtsList.push_back(ratioPtsList.at(c).at(0));
@@ -1437,7 +1438,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	}
 	for(int c=0; c<innerHeight; c++) {
 		if(smoothRatioSingleList.at(c).size()>0) {
-			if(smoothRatioSingleList.at(c).at(0)!=1) {
+			if(smoothRatioSingleList.at(c).at(0)!=-1) {
 				stdevRatio.at(c).at(2) = standardDev(smoothRatioSingleList.at(c));
 			}
 		}

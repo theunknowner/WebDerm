@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/herpes3.jpg",Size(700,700),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/herpes12.jpg",Size(700,700),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4.jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
@@ -110,7 +110,7 @@ int main(int argc,char** argv)
 	for(int k=0; k<6; k++) {
 		cout << v[k] << ";";
 	}/**/
-
+/*
 	img2 = img.clone();
 	Hsv hsv;
 	int r,g,b;
@@ -119,15 +119,15 @@ int main(int argc,char** argv)
 	double z=0;
 	double mul[6] = {1};
 
-	double p[6] = {0.824388692200190,-0.000584800073449605,0.000127670789000708,
-				8.50818976015699e-07, 4.12684390316410e-07, -6.40042067865217e-07};
+	double p[6] = {0.758019453031709,-0.000621651989553701,0.000460246306941858,
+				5.73563907853262e-07, 4.92067568344679e-07, -4.92186141659142e-07};
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
 			r = img.at<Vec3b>(i,j)[2];
 			g = img.at<Vec3b>(i,j)[1];
 			b = img.at<Vec3b>(i,j)[0];
 			HSV = hsv.rgb2hsv(r,g,b);
-			if(j==497 && i==366)
+			if(j==97 && i==180)
 				printf("RGB(%d,%d,%d)\n",r,g,b);
 			mul[1] = j+1;
 			mul[2] = i+1;
@@ -137,11 +137,10 @@ int main(int argc,char** argv)
 			for(int k=0; k<6; k++) {
 				z += p[k] * mul[k];
 			}
-
 			HSV[2] /= z;
 			if(HSV[2]>1) HSV[2] = 1;
 			RGB = hsv.hsv2rgb(HSV[0],HSV[1],HSV[2]);
-			if(j==497 && i==366)
+			if(j==97 && i==180)
 				printf("RGB(%d,%d,%d)\n",RGB[0],RGB[1],RGB[2]);
 			img2.at<Vec3b>(i,j)[2] = RGB[0];
 			img2.at<Vec3b>(i,j)[1] = RGB[1];
@@ -154,10 +153,11 @@ int main(int argc,char** argv)
 	imshow("img",img);
 	imshow("img2",img2);
 	waitKey(0);
-	/*
+	imwrite("herpes12lum.png",img2);/**/
+
 	//double a=1.0, b=0.001, p=0.33;
 	FileData fd;
-	fd.filename = "photo2a";
+	fd.filename = "herpes3";
 	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
@@ -172,7 +172,7 @@ int main(int argc,char** argv)
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
-	fd2.filename = "photo2b";
+	fd2.filename = "herpes12";
 	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
