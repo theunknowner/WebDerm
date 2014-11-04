@@ -638,3 +638,69 @@ Mat correctGamma( Mat& img, double gamma ) {
 	return result;
 }
 
+Mat Color::shadeCorrection(Mat &img) {
+	Hsv hsv;
+	double * HSV;
+	Mat coef = Mat::zeros(6,6,CV_64F);
+	double mul[6] = {1};
+	Mat totalV = Mat::zeros(6,1,CV_64F);
+	int r,g,b;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			r = img.at<Vec3b>(i,j)[2];
+			g = img.at<Vec3b>(i,j)[1];
+			b = img.at<Vec3b>(i,j)[0];
+			if(r>20 && g>20 && b>20) {
+				HSV = hsv.rgb2hsv(r,g,b);
+				HSV[2] = roundDecimal(HSV[2],2);
+				totalV.at<double>(0,0) += HSV[2];
+				totalV.at<double>(1,0) += j * HSV[2];
+				totalV.at<double>(2,0) += i * HSV[2];
+				totalV.at<double>(3,0) += j * i * HSV[2];
+				totalV.at<double>(4,0) += pow(j,2) * HSV[2];
+				totalV.at<double>(5,0) += pow(i,2) * HSV[2];
+				mul[1] = j+1;
+				mul[2] = i+1;
+				mul[3] = (i+1)*(j+1);
+				mul[4] = pow(j+1,2);
+				mul[5] = pow(i+1,2);
+				for(int m=0; m<6; m++) {
+					for(int k=0; k<6; k++) {
+						coef.at<double>(m,k) += mul[k] * mul[m];
+					}
+				}
+			}
+		}
+	}
+	Mat img2 = img.clone();
+	int * RGB;
+	double z=0;
+	invert(coef,coef);
+	Mat product = coef * totalV;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			r = img.at<Vec3b>(i,j)[2];
+			g = img.at<Vec3b>(i,j)[1];
+			b = img.at<Vec3b>(i,j)[0];
+			if(r>20 && g>20 && b>20) {
+				HSV = hsv.rgb2hsv(r,g,b);
+				mul[1] = j+1;
+				mul[2] = i+1;
+				mul[3] = (i+1)*(j+1);
+				mul[4] = pow(j+1,2);
+				mul[5] = pow(i+1,2);
+				for(int k=0; k<6; k++) {
+					z += product.at<double>(k,0) * mul[k];
+				}
+				HSV[2] /= z;
+				if(HSV[2]>1) HSV[2] = 1;
+				RGB = hsv.hsv2rgb(HSV[0],HSV[1],HSV[2]);
+				img2.at<Vec3b>(i,j)[2] = RGB[0];
+				img2.at<Vec3b>(i,j)[1] = RGB[1];
+				img2.at<Vec3b>(i,j)[0] = RGB[2];
+				z=0;
+			}
+		}
+	}
+	return img2;
+}
