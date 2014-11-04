@@ -271,6 +271,7 @@ String Color::fixColors(String pix, double r, double g, double b) {
 	return color;
 }
 
+// amt is between 0.0-1.0 in HSL form
 Mat Color::changeImageBrightness(Mat &img, double amt) {
 	Hsl hsl;
 	Mat img2 = img.clone();
@@ -553,6 +554,7 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 			thresh1.clear();
 			vec.clear();
 		}
+		int flag=0;
 		Hsl hsl;
 		Shades sh;
 		String shade, color;
@@ -571,16 +573,19 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 					img.at<Vec3b>(i,j)[2] = 0;
 					img.at<Vec3b>(i,j)[1] = 0;
 					img.at<Vec3b>(i,j)[0] = 0;
+					HSL = hsl.rgb2hsl(0,0,0);
 				}
 				else if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos) {
 					img.at<Vec3b>(i,j)[2] = 35;
 					img.at<Vec3b>(i,j)[1] = 35;
 					img.at<Vec3b>(i,j)[0] = 35;
+					HSL = hsl.rgb2hsl(35,35,35);
 				}
 				else if(shade=="White" || color.find("White")!=string::npos) {
 					img.at<Vec3b>(i,j)[2] = 255;
 					img.at<Vec3b>(i,j)[1] = 255;
 					img.at<Vec3b>(i,j)[0] = 255;
+					HSL = hsl.rgb2hsl(255,255,255);
 				}
 				else {
 					for(unsigned int k=0; k<colorVec.size(); k++) {
@@ -611,6 +616,7 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 					img.at<Vec3b>(i,j)[1] = RGB[1];
 					img.at<Vec3b>(i,j)[0] = RGB[2];
 				}
+
 			}
 		}
 		//namedWindow(name+"TargetColorOutput", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -684,6 +690,10 @@ Mat Color::shadeCorrection(Mat &img) {
 			b = img.at<Vec3b>(i,j)[0];
 			if(r>20 && g>20 && b>20) {
 				HSV = hsv.rgb2hsv(r,g,b);
+				if(j==535 && i==558) {
+					printf("RGB(%d,%d,%d)\n",r,g,b);
+					printf("HSV(%.f,%.2f,%.2f)\n",HSV[0],HSV[1],HSV[2]);
+				}
 				mul[1] = j+1;
 				mul[2] = i+1;
 				mul[3] = (i+1)*(j+1);
@@ -695,6 +705,10 @@ Mat Color::shadeCorrection(Mat &img) {
 				HSV[2] /= z;
 				if(HSV[2]>1) HSV[2] = 1;
 				RGB = hsv.hsv2rgb(HSV[0],HSV[1],HSV[2]);
+				if(j==535 && i==558) {
+					printf("RGB(%d,%d,%d)\n",RGB[0],RGB[1],RGB[2]);
+					printf("HSV(%.f,%.2f,%.2f)\n",HSV[0],HSV[1],HSV[2]);
+				}
 				img2.at<Vec3b>(i,j)[2] = RGB[0];
 				img2.at<Vec3b>(i,j)[1] = RGB[1];
 				img2.at<Vec3b>(i,j)[0] = RGB[2];

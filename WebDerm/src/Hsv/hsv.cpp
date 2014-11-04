@@ -38,6 +38,7 @@ double * Hsv::rgb2hsv(double red, double green, double blue) {
 		}
 		HSV[0] *= 60;
 		if(HSV[0]<0) HSV[0]+=360;
+		if(HSV[0]>=360) HSV[0]-=360;
 	}
 	HSV[0] = round(HSV[0]);
 	return HSV;
@@ -55,6 +56,7 @@ int * Hsv::hsv2rgb(double hue, double sat, double val) {
 		RGB[2] = round(val * 255);
 	}
 	else {
+		if(hue>=360) hue-=360;
 		hue /= 60;
 		i = floor(hue);
 		v1 = val * (1 - sat);
