@@ -454,3 +454,44 @@ void runMouseOutputColor() {
 	m.mouseOutputColor(img,fd);
 	img.release();
 }
+
+void runRenameFiles() {
+	String old_input, new_input;
+	cout << "Enter old name: ";
+	cin >> old_input;
+	cout << "Enter new name: ";
+	cin >> new_input;
+	String new_name,old_name;
+	size_t pos=0;
+	deque<String> files;
+	String filepath;
+	fs::path full_path( fs::current_path() );
+	if ( fs::is_directory( full_path ) )
+	{
+		fs::directory_iterator end_iter;
+		for ( fs::directory_iterator dir_itr( full_path );
+				dir_itr != end_iter; ++dir_itr ) { //for loop continued
+			try {
+				if ( fs::is_regular_file( dir_itr->status() ) ) {
+					filepath = dir_itr->path().filename().string();
+					files.push_back(filepath);
+				}
+			}
+			catch ( const std::exception & ex ) {
+				std::cout << dir_itr->path().filename() << " " << ex.what() << std::endl;
+				exit(0);
+			}
+		}
+	}
+	for(unsigned int i=0; i<files.size(); i++) {
+		pos = files.at(i).find(old_input);
+		if(pos!=string::npos) {
+			old_name = files.at(i);
+			new_name = files.at(i).replace(pos,old_input.length(),new_input);
+			if(rename(old_name.c_str(),new_name.c_str())==0)
+				printf("%s -> %s!\n", old_name.c_str(), new_name.c_str());
+			else
+				printf("Cannot rename %s\n",files.at(i).c_str());
+		}
+	}
+}

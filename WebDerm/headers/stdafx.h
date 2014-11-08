@@ -29,6 +29,7 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "boost/progress.hpp"
+
 namespace fs = boost::filesystem;
 
 using namespace std;

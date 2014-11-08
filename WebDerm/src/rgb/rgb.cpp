@@ -43,7 +43,7 @@ bool Rgb::importThresholds() {
 //imports RGB colorspace thresholds
 bool Rgb::importColorThresholds()
 {
-	String folderName = path+"Thresholds/";
+	String folderName = "Thresholds/";
 	String filename = folderName+"color-thresholds.csv";
 	String filename2 = folderName+"main_colors.csv";
 	String filename3 = folderName+"colors.csv";

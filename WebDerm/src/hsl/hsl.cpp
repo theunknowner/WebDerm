@@ -24,7 +24,7 @@ void Hsl::setThreshImported(bool flag) {
 
 //import main HSL thresholds
 bool Hsl::importHslThresholds() {
-	String foldername = path+"Thresholds/";
+	String foldername = "Thresholds/";
 	String filename = foldername+"hslcolor-thresholds2.csv";
 	fstream fsThresh(filename.c_str());
 	if(!fsThresh.is_open()) {

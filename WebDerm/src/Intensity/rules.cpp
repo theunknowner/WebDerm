@@ -478,7 +478,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 	return 0;
 }
 
-/** contrast rule 2 **/
+/** contrast rule 2 for Grey that looks Violet/Purple**/
 double rule4(FileData &fd, String &newPix, String newShade) {
 	double ruleNum=4;
 	double flag=false;

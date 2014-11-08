@@ -162,17 +162,6 @@ String combineShades(String shade) {
 	return shade;
 }
 
-String combineColors(String color)  {
-	if(color.find("Purple")!=string::npos)
-		return "Purple";
-	if(color.find("Violet")!=string::npos)
-		return "Violet";
-	if(color.find("Pink")!=string::npos)
-		if(color.find("Brown")==string::npos && color.find("Red")==string::npos)
-			return "Pink";
-	return color;
-}
-
 deque< deque< deque<double> > > vec;
 deque< deque< deque<double> > > vec2;
 deque< deque< deque<int> > > gTargetCellCount;
@@ -204,7 +193,7 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 				color = c.optimizeColor2(color);
 				/**temporary testing**/
 				shade = combineShades(shade);
-				color = combineColors(color);
+				color = c.combineColors(color);
 				if(fd.filename.find("acne")!=string::npos)  {
 					if(color=="Violet")  {
 						int index=-1;
@@ -289,7 +278,7 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
 							shade = combineShades(shade);
-							color = combineColors(color);
+							color = c.combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
 								if(color=="Violet")  {
 									int index=-1;
@@ -902,7 +891,7 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 							/**temporary testing**/
 							shade = combineShades(shade);
 							shade = "Low";
-							color = combineColors(color);
+							color = c.combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
 								if(color=="Violet")  {
 									int index=-1;
@@ -1138,7 +1127,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 							/**temporary testing**/
 							shade = combineShades(shade);
 							shade = "Low";
-							color = combineColors(color);
+							color = c.combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
 								if(color=="Violet")  {
 									int index=-1;

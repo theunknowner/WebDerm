@@ -23,7 +23,7 @@ public:
 	void output2ImageGray(deque< deque<String> > &input, String name);
 	void output2ImageColor(deque< deque<String> > &window, Size size, String name);
 	String fixColors(String pix, double r, double g, double b);
-	Mat changeImageBrightness(Mat &img, double amt);
+	Mat changeImageBrightness(Mat &img, double amt, int type=0);
 	Mat changeImageContrast(Mat img, double alpha=1, double beta=0);
 	void changeContrast(double &r, double &g, double &b, double alpha=1, double beta=0);
 	String optimizeColor(String pix);
@@ -35,6 +35,7 @@ public:
 	void imgRgb2Gray(Mat &src, Mat &dst);
 	int* changeRgbRelLum(double r, double g, double b, double amt);
 
+	String combineColors(String color);
 	Mat output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget);
 
 	Mat correctGamma(Mat& img, double gamma);

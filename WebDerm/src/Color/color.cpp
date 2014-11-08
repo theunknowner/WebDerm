@@ -176,7 +176,7 @@ void Color::output2ImageGray(deque< deque<String> > &input, String name) {
 }
 
 void Color::output2ImageColor(deque< deque<String> > &window, Size size, String name) {
-	String filename = path+"Thresholds/output-shades.csv";
+	String filename = "Thresholds/output-shades.csv";
 	fstream fs(filename.c_str());
 	if(fs.is_open()) {
 		String temp;
@@ -258,6 +258,9 @@ void Color::output2ImageColor(deque< deque<String> > &window, Size size, String 
 		deque<int>().swap(thresh1);
 		deque< deque<int> >().swap(values);
 	}
+	else {
+		printf("Error opening %s\n",filename.c_str());
+	}
 }
 
 String Color::fixColors(String pix, double r, double g, double b) {
@@ -271,8 +274,8 @@ String Color::fixColors(String pix, double r, double g, double b) {
 	return color;
 }
 
-// amt is between 0.0-1.0 in HSL form
-Mat Color::changeImageBrightness(Mat &img, double amt) {
+// amt is between 0.0-1.0 in 0=HSL / 1=RGB form
+Mat Color::changeImageBrightness(Mat &img, double amt, int type) {
 	Hsl hsl;
 	Mat img2 = img.clone();
 	int r,g,b;
@@ -284,10 +287,17 @@ Mat Color::changeImageBrightness(Mat &img, double amt) {
 			g = img2.at<Vec3b>(i,j)[1];
 			b = img2.at<Vec3b>(i,j)[0];
 			if(r!=0 && g!=0 && b!=0) {
+				if(type==1) {
+					r = (int)round(r*amt);
+					g = (int)round(g*amt);
+					b = (int)round(b*amt);
+				}
 				HSL = hsl.rgb2hsl(r,g,b);
-				HSL[2] += amt;
-				if(HSL[2]>1.0) HSL[2] = 1.0;
-				if(HSL[2]<0) HSL[2] = 0;
+				if(type==0) {
+					HSL[2] += amt;
+					if(HSL[2]>1.0) HSL[2] = 1.0;
+					if(HSL[2]<0) HSL[2] = 0;
+				}
 				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 				img2.at<Vec3b>(i,j)[2] = RGB[0];
 				img2.at<Vec3b>(i,j)[1] = RGB[1];
@@ -533,6 +543,25 @@ int* Color::changeRgbRelLum(double r, double g, double b, double amt) {
 	return results;
 }
 
+String Color::combineColors(String color)  {
+	if(color.find("Grey")!=string::npos && color.find("Yellow")!=string::npos)
+		return "Yellow";
+	if(color.find("Grey")!=string::npos && color.find("Brown")!=string::npos)
+		return "Brown";
+	if(color.find("Grey")!=string::npos && color.find("Green")!=string::npos)
+		return "Green";
+	if(color.find("Grey")!=string::npos && color.find("Blue")!=string::npos)
+		return "Blue";
+	if(color.find("Purple")!=string::npos)
+		return "Purple";
+	if(color.find("Violet")!=string::npos)
+		return "Violet";
+	if(color.find("Pink")!=string::npos)
+		if(color.find("Brown")==string::npos && color.find("Red")==string::npos)
+			return "Pink";
+	return color;
+}
+
 Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget) {
 	String filename = path+"Thresholds/output-shades.csv";
 	fstream fs(filename.c_str());
@@ -554,7 +583,6 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 			thresh1.clear();
 			vec.clear();
 		}
-		int flag=0;
 		Hsl hsl;
 		Shades sh;
 		String shade, color;
@@ -569,6 +597,8 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 				shadeLevel = sh.extractShadeLevel(shade);
 				color = getMainColor(window.at(i).at(j));
 				color = optimizeColor(color);
+				color = combineColors(color);
+
 				if(shade.find("Zero")!=string::npos) {
 					img.at<Vec3b>(i,j)[2] = 0;
 					img.at<Vec3b>(i,j)[1] = 0;
@@ -630,7 +660,7 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 	}
 }
 
-Mat correctGamma( Mat& img, double gamma ) {
+Mat Color::correctGamma( Mat& img, double gamma ) {
 	double inverse_gamma = 1.0 / gamma;
 
 	Mat lut_matrix(1, 256, CV_8UC1 );
@@ -690,10 +720,6 @@ Mat Color::shadeCorrection(Mat &img) {
 			b = img.at<Vec3b>(i,j)[0];
 			if(r>20 && g>20 && b>20) {
 				HSV = hsv.rgb2hsv(r,g,b);
-				if(j==535 && i==558) {
-					printf("RGB(%d,%d,%d)\n",r,g,b);
-					printf("HSV(%.f,%.2f,%.2f)\n",HSV[0],HSV[1],HSV[2]);
-				}
 				mul[1] = j+1;
 				mul[2] = i+1;
 				mul[3] = (i+1)*(j+1);
@@ -705,10 +731,6 @@ Mat Color::shadeCorrection(Mat &img) {
 				HSV[2] /= z;
 				if(HSV[2]>1) HSV[2] = 1;
 				RGB = hsv.hsv2rgb(HSV[0],HSV[1],HSV[2]);
-				if(j==535 && i==558) {
-					printf("RGB(%d,%d,%d)\n",RGB[0],RGB[1],RGB[2]);
-					printf("HSV(%.f,%.2f,%.2f)\n",HSV[0],HSV[1],HSV[2]);
-				}
 				img2.at<Vec3b>(i,j)[2] = RGB[0];
 				img2.at<Vec3b>(i,j)[1] = RGB[1];
 				img2.at<Vec3b>(i,j)[0] = RGB[2];

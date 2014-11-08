@@ -34,5 +34,6 @@ void runMouseHysteresis();
 void runMouseHysteresis2();
 void runMouseColor();
 void runMouseOutputColor();
+void runRenameFiles();
 
 #endif /* RUN_H_ */

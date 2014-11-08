@@ -21,7 +21,6 @@
 #include "Entropy/entropy.h"
 #include "Algorithms/quicksort.h"
 
-
 int main(int argc,char** argv)
 {
 	//runAllHysteresis();
@@ -46,7 +45,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph7.jpg",Size(700,700),0);
+	img = runResizeImage("/home/jason/Desktop/Pics1/photo7b.jpg",Size(700,700),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4.jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
@@ -62,22 +61,26 @@ int main(int argc,char** argv)
 	Entropy en;
 /*
 	img2 = c.shadeCorrection(img);
-	//img2 = c.changeImageBrightness(img2,-0.1);
-	namedWindow("img",CV_WINDOW_FREERATIO);
-	namedWindow("img2",CV_WINDOW_FREERATIO);
-	imshow("img",img);
-	imshow("img2",img2);
+	//img3 = c.changeImageBrightness(img2,-0.20,0);
+	img4 = c.changeImageBrightness(img2,0.8,1);
+	//img4 = c.correctGamma(img2,2.2);
+	//namedWindow("img",CV_WINDOW_FREERATIO);
+	//namedWindow("img3",CV_WINDOW_FREERATIO);
+	namedWindow("img4",CV_WINDOW_FREERATIO);
+	//imshow("img",img);
+	//imshow("img3",img3);
+	imshow("img4",img4);
 	waitKey(0);
-	imwrite("lph7lum.png",img2);/**/
-
+	imwrite("photo7blum3.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
+
 	FileData fd;
-	fd.filename = "lph4lum";
+	fd.filename = "photo5alum3";
 	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	String targetColor = "BrownPink";
+	String targetColor = "Blue";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
@@ -87,11 +90,11 @@ int main(int argc,char** argv)
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
-	fd2.filename = "lph7lum";
+	fd2.filename = "photo5blum3";
 	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
-	String targetColor2 = "BrownPink";
+	String targetColor2 = "Blue";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
