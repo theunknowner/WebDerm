@@ -45,7 +45,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph8.jpg",Size(700,700),0);
+	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph8.jpg",Size(700,700),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
@@ -74,13 +74,45 @@ int main(int argc,char** argv)
 	imwrite("test1.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
 
+	deque<deque<double> > vec1;
+	deque<deque<double> > vec2;
+	deque<deque<double> > corrVec;
+	deque<deque<double> > matchVec;
+	en.loadEntropyFiles("/home/jason/Desktop/workspace/acne1-lum3_10x10_YSV_Combined50x50.csv",vec1);
+	en.loadEntropyFiles("/home/jason/Desktop/workspace/acne3-lum3_10x10_YSV_Combined50x50.csv",vec2);
+	en.compareEntropy(vec1,vec2,corrVec,matchVec);
+
+	String filename = "acne1-acne3_Corr.csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	String filename2 = "acne1-acne3_Match.csv";
+	FILE * fp2;
+	fp2 = fopen(filename2.c_str(),"w");
+	fprintf(fp,",Y,S,V\n");
+	fprintf(fp2,",Y,S,V\n");
+	for(unsigned int i=0; i<matchVec.size(); i++) {
+		fprintf(fp,"%s,",allColors.at(i).c_str());
+		fprintf(fp2,"%s,",allColors.at(i).c_str());
+		for(unsigned int j=0; j<matchVec.at(i).size(); j++) {
+			if(j<matchVec.at(i).size()-1) {
+				fprintf(fp,"%f,",corrVec.at(i).at(j));
+				fprintf(fp2,"%f,",matchVec.at(i).at(j));
+			}
+			else {
+				fprintf(fp,"%f\n",corrVec.at(i).at(j));
+				fprintf(fp2,"%f\n",matchVec.at(i).at(j));
+			}
+		}
+	}
+
+/*
 	FileData fd;
-	fd.filename = "clp3lum3";
+	fd.filename = "Psoriasis10-lum3";
 	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	String targetColor = "BrownOrange";
+	String targetColor = "PinkRed";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
@@ -90,11 +122,11 @@ int main(int argc,char** argv)
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
-	fd2.filename = "clp4lum3";
+	fd2.filename = "Psoriasis16-lum3";
 	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
-	String targetColor2 = "BrownOrange";
+	String targetColor2 = "PinkRed";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
@@ -103,7 +135,7 @@ int main(int argc,char** argv)
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-
+/*
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);

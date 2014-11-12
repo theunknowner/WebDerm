@@ -405,28 +405,6 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 	return pEntropy;
 }
 
-void Entropy::importEntropyFiles(String path1, String path2,String name) {
-	deque< deque<String> > vec;
-	deque< deque<String> > vec2;
-	deque< deque<double> > doubleVec1;
-	deque< deque<double> > doubleVec2;
-	deque<double> tempVec;
-	deque<double> tempVec2;
-	FileData fd;
-	fd.loadFileMatrix(path1,vec);
-	fd.loadFileMatrix(path2,vec2);
-	for(unsigned int i=1; i<vec.size(); i++) {
-		for(unsigned int j=1; j<vec.at(i).size(); j++) {
-			tempVec.push_back(atof(vec.at(i).at(j).c_str()));
-			tempVec2.push_back(atof(vec2.at(i).at(j).c_str()));
-		}
-		doubleVec1.push_back(tempVec);
-		doubleVec2.push_back(tempVec2);
-		tempVec.clear();
-		tempVec2.clear();
-	}
-}
-
 void Entropy::outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deque<int> &colorShiftAmt)  {
 	String shade, shade2, color,color2, pix,pix2;
 	int shadeIndex=0, colorIndex=0;
@@ -1525,4 +1503,179 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
 	//imshow("output",dst);
 	//waitKey(0);
 	return dst;
+}
+
+bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat) {
+	fstream fs(filepath.c_str());
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<double> thresh;
+		getline(fs,temp);
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			//vec.pop_back(); //removes the weird empty space at the end of deque
+			for(unsigned int i=0; i<vec.size(); i++) {
+				vec.at(i) = vec.at(i).substr(0,vec.at(i).length());
+				if(i>0)
+					thresh.push_back(atof(vec.at(i).c_str()));
+			}
+			dataMat.push_back(thresh);
+			thresh.clear();
+			vec.clear();
+		}
+		deque<String>().swap(vec);
+		deque<double>().swap(thresh);
+		fs.close();
+		return true;
+	}
+	else
+		printf("Failed to load Entropy file!\n");
+	return false;
+}
+
+void Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &corrVec, deque<deque<double> > &matchVec) {
+	matchVec.resize(vec1.size(),deque<double>(vec1.at(0).size(),0));
+	corrVec.resize(vec1.size(),deque<double>(vec1.at(0).size(),0));
+	double Y_HIGH = 49.0;
+	double Y_LOW = 15.0;
+	double S_HIGH = 0.30;
+	double S_LOW = 0.10;
+	double V_HIGH = 0.10;
+	double V_LOW = 0.04;
+	double Y_THRESH = 0.50;
+	double S_THRESH = 0.25;
+	double V_THRESH = 0.20;
+	double Y_DIST = 7;
+	double S_DIST = 0.05;
+	double V_DIST = 0.05;
+	double Y_PERCEPTION = 5.0;
+	double S_PERCEPTION = 0.045;
+	double ysv1[3];
+	double ysv2[3];
+	double val=0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		for(unsigned int j=0; j<vec1.at(i).size(); j++) {
+			ysv1[j] = vec1.at(i).at(j);
+			ysv2[j] = vec2.at(i).at(j);
+		}
+		if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {
+			if((ysv1[0]>=Y_LOW && ysv1[0]<=Y_HIGH) && (ysv2[0]>=Y_LOW && ysv2[0]<=Y_HIGH)) {
+				val = (max(ysv1[0],ysv2[0])-min(ysv1[0],ysv2[0]))/min(ysv1[0],ysv2[0]);
+				corrVec.at(i).at(0) = val;
+				if(val<=Y_THRESH)
+					matchVec.at(i).at(0) = 1.1;
+				else
+					matchVec.at(i).at(0) = 0.1;
+			}
+			else if((ysv1[0]>Y_HIGH && ysv2[0]>Y_HIGH)) {
+				val = (max(ysv1[0],ysv2[0])-min(ysv1[0],ysv2[0]))/min(ysv1[0],ysv2[0]);
+				corrVec.at(i).at(0) = val;
+				matchVec.at(i).at(0) = 1.1;
+			}
+			else if((ysv1[0]>Y_HIGH && ysv2[0]<=Y_HIGH) || (ysv1[0]<=Y_HIGH && ysv2[0]>Y_HIGH)) {
+				val = (max(ysv1[0],ysv2[0])-min(ysv1[0],ysv2[0]))/min(ysv1[0],ysv2[0]);
+				corrVec.at(i).at(0) = val;
+				if(val<=Y_THRESH)
+					matchVec.at(i).at(0) = 1.1;
+				else
+					matchVec.at(i).at(0) = 0.1;
+			}
+			else if((ysv1[0]<=Y_LOW && ysv2[0]<=Y_LOW)) {
+				val = max(ysv1[0],ysv2[0])-min(ysv1[0],ysv2[0]);
+				corrVec.at(i).at(0) = val;
+				if(val<=Y_DIST)
+					matchVec.at(i).at(0) = 1.2;
+				else
+					matchVec.at(i).at(0) = 0.2;
+			}
+			else if((ysv1[0]<=Y_LOW && ysv2[0]>Y_LOW) || (ysv1[0]>Y_LOW && ysv2[0]<=Y_LOW)) {
+				val = (max(ysv1[0],ysv2[0])-min(ysv1[0],ysv2[0]))/min(ysv1[0],ysv2[0]);
+				corrVec.at(i).at(0) = val;
+				if(val<=Y_THRESH)
+					matchVec.at(i).at(0) = 1.1;
+				else
+					matchVec.at(i).at(0) = 0.1;
+			}
+			if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION) {
+				if((ysv1[1]>=S_LOW && ysv1[1]<=S_HIGH) && (ysv2[1]>=S_LOW && ysv2[1]<=S_HIGH)) {
+					val = (max(ysv1[1],ysv2[1])-min(ysv1[1],ysv2[1]))/min(ysv1[1],ysv2[1]);
+					corrVec.at(i).at(1) = val;
+					if(val<=S_THRESH)
+						matchVec.at(i).at(1) = 1.1;
+					else
+						matchVec.at(i).at(1) = 0.1;
+				}
+				else if((ysv1[1]>S_HIGH && ysv2[1]>S_HIGH)) {
+					val = (max(ysv1[1],ysv2[1])-min(ysv1[1],ysv2[1]))/min(ysv1[1],ysv2[1]);
+					corrVec.at(i).at(1) = val;
+					matchVec.at(i).at(1) = 1.1;
+				}
+				else if((ysv1[1]>S_HIGH && ysv2[1]<=S_HIGH) || (ysv1[1]<=S_HIGH && ysv2[1]>S_HIGH)) {
+					val = (max(ysv1[1],ysv2[1])-min(ysv1[1],ysv2[1]))/min(ysv1[1],ysv2[1]);
+					corrVec.at(i).at(1) = val;
+					if(val<=S_THRESH)
+						matchVec.at(i).at(1) = 1.1;
+					else
+						matchVec.at(i).at(1) = 0.1;
+				}
+				else if((ysv1[1]<=S_LOW && ysv2[1]<=S_LOW)) {
+					val = max(ysv1[1],ysv2[1])-min(ysv1[1],ysv2[1]);
+					corrVec.at(i).at(1) = val;
+					if(val<=S_DIST)
+						matchVec.at(i).at(1) = 1.2;
+					else
+						matchVec.at(i).at(1) = 0.2;
+				}
+				else if((ysv1[1]<=S_LOW && ysv2[1]>S_LOW) || (ysv1[1]>S_LOW && ysv2[1]<=S_LOW)) {
+					val = (max(ysv1[1],ysv2[1])-min(ysv1[1],ysv2[1]))/min(ysv1[1],ysv2[1]);
+					corrVec.at(i).at(1) = val;
+					if(val<=S_THRESH)
+						matchVec.at(i).at(1) = 1.1;
+					else
+						matchVec.at(i).at(1) = 0.1;
+				}
+			}
+			if((ysv1[2]>=V_LOW && ysv1[2]<=V_HIGH) && (ysv2[2]>=V_LOW && ysv2[2]<=V_HIGH)) {
+				val = max(ysv1[2],ysv2[2])-min(ysv1[2],ysv2[2]);
+				corrVec.at(i).at(2) = val;
+				if(val<=V_DIST)
+					matchVec.at(i).at(2) = 1.2;
+				else
+					matchVec.at(i).at(2) = 0.2;
+			}
+			else if((ysv1[2]>V_HIGH && ysv2[2]>V_HIGH)) {
+				val = (max(ysv1[2],ysv2[2])-min(ysv1[2],ysv2[2]))/min(ysv1[2],ysv2[2]);
+				corrVec.at(i).at(2) = val;
+				if(val<=V_THRESH)
+					matchVec.at(i).at(2) = 1.1;
+				else
+					matchVec.at(i).at(2) = 0.1;
+			}
+			else if((ysv1[2]>V_HIGH && ysv2[2]<=V_HIGH) || (ysv1[2]<=V_HIGH && ysv2[2]>V_HIGH)) {
+				val = (max(ysv1[2],ysv2[2])-min(ysv1[2],ysv2[2]))/min(ysv1[2],ysv2[2]);
+				corrVec.at(i).at(2) = val;
+				if(val<=V_THRESH)
+					matchVec.at(i).at(2) = 1.1;
+				else
+					matchVec.at(i).at(2) = 0.1;
+			}
+			else if((ysv1[2]<=V_LOW && ysv2[2]<=V_LOW)) {
+				val = max(ysv1[2],ysv2[2])-min(ysv1[2],ysv2[2]);
+				corrVec.at(i).at(2) = val;
+				if(val<=V_DIST)
+					matchVec.at(i).at(2) = 1.2;
+				else
+					matchVec.at(i).at(2) = 0.2;
+			}
+			else if((ysv1[2]<=V_LOW && ysv2[2]>V_LOW) || (ysv1[2]>V_LOW && ysv2[2]<=V_LOW)) {
+				val = (max(ysv1[2],ysv2[2])-min(ysv1[2],ysv2[2]))/min(ysv1[2],ysv2[2]);
+				corrVec.at(i).at(2) = val;
+				if(val<=V_THRESH)
+					matchVec.at(i).at(2) = 1.1;
+				else
+					matchVec.at(i).at(2) = 0.1;
+			}
+		}
+	}
 }

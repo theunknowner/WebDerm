@@ -127,8 +127,6 @@ void runHysteresis()
 	if(img.data) {
 		img = runColorNormalization(img);
 		name = getFileName(filename);
-		fs::path full_path( fs::current_path() );
-		String new_fullpath = full_path.string() + "/Output/";
 		int s = 3;
 		bool flag[s];
 		flag[0]=rgb.importThresholds();
@@ -155,11 +153,11 @@ void runHysteresis()
 /**/
 			cout << "Writing Files..." << flush;
 			String strSize = toString(size.width)+"x"+toString(size.height);
-			writeSeq2File(fd.windowVec,new_fullpath+name+"_"+strSize);
-			writeSeq2File(fd.hslMat,new_fullpath+name+"_HSL_"+strSize);
+			writeSeq2File(fd.windowVec,name+"_"+strSize);
+			writeSeq2File(fd.hslMat,name+"_HSL_"+strSize);
 			//fd.writeFileMetaData();
-			c.output2ImageColor(fd.colorVec,size,new_fullpath+name);
-			writeSeq2File(fd.colorVec,new_fullpath+name+"_ShadeColors_"+strSize);
+			c.output2ImageColor(fd.colorVec,size,name);
+			writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
 			cout << "Done!" << endl;
 			/*
 		writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
@@ -242,8 +240,6 @@ void runAllHysteresis() {
 	FileData fdFiles;
 	deque<String> files;
 	String name;
-	fs::path full_filepath( fs::current_path() );
-	String new_fullpath = full_filepath.string() + "/Output/";
 	Size size(10,10);
 	Mat img;
 	int s = 4;
@@ -272,11 +268,11 @@ void runAllHysteresis() {
 
 				cout << "Writing Files..." << flush;
 				String strSize = toString(size.width)+"x"+toString(size.height);
-				writeSeq2File(fd.windowVec,new_fullpath+name+"_"+strSize);
-				writeSeq2File(fd.hslMat,new_fullpath+name+"_HSL_"+strSize);
+				writeSeq2File(fd.windowVec,name+"_"+strSize);
+				writeSeq2File(fd.hslMat,name+"_HSL_"+strSize);
 				//fd.writeFileMetaData();
-				c.output2ImageColor(fd.colorVec,size,new_fullpath+name);
-				writeSeq2File(fd.colorVec,new_fullpath+name+"_ShadeColors_"+strSize);
+				c.output2ImageColor(fd.colorVec,size,name);
+				writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
 				cout << "Done!" << endl;
 
 				//release images for next use
