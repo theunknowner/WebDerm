@@ -40,6 +40,6 @@ public:
 
 	Mat correctGamma(Mat& img, double gamma);
 
-	Mat shadeCorrection(Mat &img);
+	Mat shadeCorrection(Mat img);
 };
 #endif /* COLOR_H_ */

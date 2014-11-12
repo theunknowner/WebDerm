@@ -674,7 +674,7 @@ Mat Color::correctGamma( Mat& img, double gamma ) {
 	return result;
 }
 
-Mat Color::shadeCorrection(Mat &img) {
+Mat Color::shadeCorrection(Mat img) {
 	Hsv hsv;
 	double * HSV;
 	Mat coef = Mat::zeros(6,6,CV_64F);

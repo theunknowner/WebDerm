@@ -144,7 +144,6 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	catch (const std::out_of_range &oor) {
 		printf("setMinMax() out of range!\n");
 		printf("input.Rows: %lu\n",input.size());
-		printf("input.Cols: %lu\n",input.at(0).size());
 		printf("Point(%d,%d)\n",x,y);
 		exit(1);
 	}
@@ -284,15 +283,14 @@ deque< deque<double> > Intensity::calcIntensityMatrix(deque <deque<String> > &wi
 			vec2.push_back(vec);
 			vec.clear();
 		}
+		setMinMax(vec2);
 	}
 	catch(const std::out_of_range &oor) {
 		printf("Intensity::calcIntensityMatrix() out of range!\n");
 		printf("WindowVec.Rows: %lu\n",windowVec.size());
-		printf("WindowVec.Cols: %lu\n", windowVec.at(0).size());
 		printf("Point(%d,%d)\n",x,y);
 		exit(1);
 	}
-	setMinMax(vec2);
 	return vec2;
 }
 
@@ -405,7 +403,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			}
 			catch(const std::out_of_range &oor) {
 				printf("Intensity::calcMainColorMatrix()-1st Half out of range!\n");
-				cout << "Col Size: " << fd.smoothIntensityVec.at(0).size() << endl;
 				cout << "Row Size: " << fd.smoothIntensityVec.size() << endl;
 				printf("Point(%d,%d)\n", j,i );
 				exit(1);
@@ -445,6 +442,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	cout << "Calculating Contrast..." << flush;
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			try {
@@ -609,6 +607,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		localRatios.clear();
 		localRatio=0;
 	} // end row
+	cout << "Done!" << endl;
 	fclose(fp);
 	//fd.writeFileMetaData();
 	//c.output2ImageColor(fd.colorVec,name);
@@ -616,8 +615,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	//writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 	//writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
 	//writeSeq2File(shadeVec2,"shadeVec");
-
-
 
 	return fd.colorVec;
 }
