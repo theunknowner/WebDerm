@@ -24,6 +24,7 @@ void runResizeImage();
 void runResizeAllImages();
 Mat runResizeImage(String foldername, String filename, Size size,int write);
 Mat runResizeImage(String filename, Size size,int write);
+Mat runResizeImage(Mat img, Size size);
 void runHysteresis();
 void runAllHysteresis(String *filenames, int fileSize);
 void runAllHysteresis();
@@ -35,5 +36,7 @@ void runMouseHysteresis2();
 void runMouseColor();
 void runMouseOutputColor();
 void runRenameFiles();
+Mat runColorNormalization(Mat &img);
+void runEntropy();
 
 #endif /* RUN_H_ */

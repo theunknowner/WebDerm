@@ -69,9 +69,9 @@ Mat runResizeImage(String foldername, String filename, Size size,int write)
 	Mat img = imread(file);
 	Mat img2;
 	if(img.cols>=size.width || img.rows>=size.height)
-		{resize(img, img2, size,0,0,INTER_AREA);}
+	{resize(img, img2, size,0,0,INTER_AREA);}
 	if(img.cols<size.width || img.rows<size.height)
-		{resize(img, img2, size,0,0, INTER_CUBIC);}
+	{resize(img, img2, size,0,0, INTER_CUBIC);}
 	getSubstr(filename,'.',vec);
 	if(write==1) imwrite(vec[0]+".png",img2);
 
@@ -86,14 +86,27 @@ Mat runResizeImage(String filename, Size size,int write)
 	Mat img2;
 	if(!img.empty()) {
 		if(img.cols>=size.width || img.rows>=size.height)
-			{resize(img, img2, size,0,0,INTER_AREA);}
+		{resize(img, img2, size,0,0,INTER_AREA);}
 		if(img.cols<size.width || img.rows<size.height)
-			{resize(img, img2, size,0,0, INTER_CUBIC);}
+		{resize(img, img2, size,0,0, INTER_CUBIC);}
 		getSubstr(filename,'.',vec);
 		if(write==1) imwrite(vec[0]+".png",img2);
 
 		img.release();
 		deque<String>().swap(vec);
+	}
+	return img2;
+}
+
+Mat runResizeImage(Mat img, Size size)
+{
+	Mat img2;
+	if(!img.empty()) {
+		if(img.cols>=size.width || img.rows>=size.height)
+		{resize(img, img2, size,0,0,INTER_AREA);}
+		if(img.cols<size.width || img.rows<size.height)
+		{resize(img, img2, size,0,0, INTER_CUBIC);}
+		img.release();
 	}
 	return img2;
 }
@@ -110,28 +123,29 @@ void runHysteresis()
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img;
-	img = runResizeImage(filename,Size(700,700),0);
-	//blur(img,img,Size(25,25));
-	//getSkin(img, mask);
-	//img.copyTo(img2, mask);
-	name = getFileName(filename);
-	int s = 3;
-	bool flag[s];
-	flag[0]=rgb.importThresholds();
-	flag[1]=hsl.importHslThresholds();
-	flag[2]=shade.importThresholds();
-	for(int i=0; i<s; i++) {
-		if(flag[i]==false) {
-			flag[0] = false;
-			break;
+	img = runResizeImage(img,Size(700,700));
+	if(img.data) {
+		img = runColorNormalization(img);
+		name = getFileName(filename);
+		fs::path full_path( fs::current_path() );
+		String new_fullpath = full_path.string() + "/Output/";
+		int s = 3;
+		bool flag[s];
+		flag[0]=rgb.importThresholds();
+		flag[1]=hsl.importHslThresholds();
+		flag[2]=shade.importThresholds();
+		for(int i=0; i<s; i++) {
+			if(flag[i]==false) {
+				flag[0] = false;
+				break;
+			}
 		}
-	}
-	if(flag[0]==true) {
-		FileData fd(filename);
-		fd.ksize = size;
-		fd.matImage = img;
-		hysteresis(fd);
-/*
+		if(flag[0]==true) {
+			FileData fd(filename);
+			fd.ksize = size;
+			fd.matImage = img;
+			hysteresis(fd);
+			/*
 		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
 		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
 		Intensity in;
@@ -139,13 +153,15 @@ void runHysteresis()
 		if(!fd.loadFileMatrix(hslVecFile, fd.hslMat)) exit(1);
 		fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
 /**/
-		String strSize = toString(size.width)+"x"+toString(size.height);
-		writeSeq2File(fd.windowVec,name+"_"+strSize);
-		writeSeq2File(fd.hslMat,name+"_HSL_"+strSize);
-		//fd.writeFileMetaData();
-		c.output2ImageColor(fd.colorVec,size,name);
-		writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
-		/*
+			cout << "Writing Files..." << flush;
+			String strSize = toString(size.width)+"x"+toString(size.height);
+			writeSeq2File(fd.windowVec,new_fullpath+name+"_"+strSize);
+			writeSeq2File(fd.hslMat,new_fullpath+name+"_HSL_"+strSize);
+			//fd.writeFileMetaData();
+			c.output2ImageColor(fd.colorVec,size,new_fullpath+name);
+			writeSeq2File(fd.colorVec,new_fullpath+name+"_ShadeColors_"+strSize);
+			cout << "Done!" << endl;
+			/*
 		writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
 		writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
 		writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
@@ -154,13 +170,13 @@ void runHysteresis()
 		writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
 		writeSeq2File(fd.hslPtMat,name+"_hslPts");
 		writeSeq2File(fd.cumHslMat,name+"_cumHSL");
-		*/
+			 */
+		}
+		img.release();
+		rgb.release_memory();
+		hsl.release_memory();
+		shade.release_memory();
 	}
-
-	img.release();
-	rgb.release_memory();
-	hsl.release_memory();
-	shade.release_memory();
 }
 
 void runAllHysteresis(String *filenames, int fileSize) {
@@ -226,6 +242,8 @@ void runAllHysteresis() {
 	FileData fdFiles;
 	deque<String> files;
 	String name;
+	fs::path full_filepath( fs::current_path() );
+	String new_fullpath = full_filepath.string() + "/Output/";
 	Size size(10,10);
 	Mat img;
 	int s = 4;
@@ -244,38 +262,26 @@ void runAllHysteresis() {
 		for(unsigned int i=0; i<files.size(); i++) {
 			full_path = folder+files.at(i);
 			img = runResizeImage(full_path,Size(700,700),0);
-			name = getFileName(full_path);
-			FileData fd(full_path);
-			fd.matImage = img;
-			fd.ksize = size;
-			hysteresis(fd);
-/*
-			String windowVecFile = "/home/jason/Desktop/Programs/Hysteresis/" + name + ".csv";
-			String hslVecFile = "/home/jason/Desktop/Programs/Hysteresis/" + name + "_HSL.csv";
-			Intensity in;
-			fd.loadFileMatrix(windowVecFile, fd.windowVec);
-			//fd.getFileMatrix(fd.windowVec);
-			fd.loadFileMatrix(hslVecFile, fd.hslMat);
-			//fd.getFileMatrix(fd.hslMat);
-			fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
-/**/
-			writeSeq2File(fd.windowVec,name);
-			writeSeq2File(fd.hslMat,name+"_HSL");
-			//fd.writeFileMetaData();
-			c.output2ImageColor(fd.colorVec,size,name);
-			writeSeq2File(fd.colorVec,name+"_ShadeColors");
-			/*
-			writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
-			writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
-			writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
-			writeSeq2File(fd.rulesMat,name+"_RulesMat");
-			writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
-			writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
-			writeSeq2File(fd.hslPtMat,name+"_hslPts");
-			writeSeq2File(fd.cumHslMat,name+"_cumHSL");
-*/
-			//release images for next use
-			img.release();
+			if(img.data) {
+				img = runColorNormalization(img);
+				name = getFileName(full_path);
+				FileData fd(full_path);
+				fd.matImage = img;
+				fd.ksize = size;
+				hysteresis(fd);
+
+				cout << "Writing Files..." << flush;
+				String strSize = toString(size.width)+"x"+toString(size.height);
+				writeSeq2File(fd.windowVec,new_fullpath+name+"_"+strSize);
+				writeSeq2File(fd.hslMat,new_fullpath+name+"_HSL_"+strSize);
+				//fd.writeFileMetaData();
+				c.output2ImageColor(fd.colorVec,size,new_fullpath+name);
+				writeSeq2File(fd.colorVec,new_fullpath+name+"_ShadeColors_"+strSize);
+				cout << "Done!" << endl;
+
+				//release images for next use
+				img.release();
+			}
 		}
 	}
 	rgb.release_memory();
@@ -283,8 +289,8 @@ void runAllHysteresis() {
 	shade.release_memory();
 }
 
- void runGetSkin()
- {
+void runGetSkin()
+{
 	String filename;
 	String input;
 	cout << "Enter filename: ";
@@ -303,36 +309,36 @@ void runAllHysteresis() {
 	imshow("Img", img2);
 	waitKey(0);
 	img.release(); img2.release(); mask.release();
- }
+}
 
- void runAllGetSkin() {
-	 FileData fdFiles;
-	 deque<String> files;
-	 String input, folder, full_path;
-	 Mat img, img2, mask;
-	 cout << "Enter folder_name: ";
-	 cin >> folder;
-	 if(fdFiles.getFilesFromDirectory(folder, files)) {
-		 cout << "Do you want to write image? (y/n)";
-		 cin >> input;
-		 for(unsigned int i=0; i<files.size(); i++) {
-			 full_path = folder+files.at(i);
-			 img = runResizeImage(full_path,Size(700,700),0);
-			 getSkin(img, mask);
-			 img.copyTo(img2, mask);
-			 if(input=="y")
-			 {
-				 String name = getFileName(full_path);
-				 imwrite(name+".png",img2);
-			 }
-			 imshow("Img", img2);
-			 waitKey(0);
-			 img.release(); img2.release(); mask.release();
-		 }
-	 }
- }
+void runAllGetSkin() {
+	FileData fdFiles;
+	deque<String> files;
+	String input, folder, full_path;
+	Mat img, img2, mask;
+	cout << "Enter folder_name: ";
+	cin >> folder;
+	if(fdFiles.getFilesFromDirectory(folder, files)) {
+		cout << "Do you want to write image? (y/n)";
+		cin >> input;
+		for(unsigned int i=0; i<files.size(); i++) {
+			full_path = folder+files.at(i);
+			img = runResizeImage(full_path,Size(700,700),0);
+			getSkin(img, mask);
+			img.copyTo(img2, mask);
+			if(input=="y")
+			{
+				String name = getFileName(full_path);
+				imwrite(name+".png",img2);
+			}
+			imshow("Img", img2);
+			waitKey(0);
+			img.release(); img2.release(); mask.release();
+		}
+	}
+}
 
- //runs hysteresis with info output to terminal
+//runs hysteresis with info output to terminal
 void runMouseHysteresis()
 {
 	Rgb rgb;
@@ -350,7 +356,7 @@ void runMouseHysteresis()
 	cvSetMouseCallback("Hysteresis", onMouseHysteresis, &img2);
 	while (waitKey(1)<0)
 	{
-	imshow("Hysteresis", img2);
+		imshow("Hysteresis", img2);
 	}
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
@@ -494,4 +500,35 @@ void runRenameFiles() {
 				printf("Cannot rename %s\n",files.at(i).c_str());
 		}
 	}
+}
+
+Mat runColorNormalization(Mat &img) {
+	Color c;
+	Mat img2 = c.shadeCorrection(img);
+	img2 = c.changeImageBrightness(img2,0.80,1);
+	return img2;
+}
+
+void runAllEntropy() {
+	String filepath;
+	deque<String> files;
+	fs::path full_path( fs::current_path() );
+	if ( fs::is_directory( full_path ) )
+	{
+		fs::directory_iterator end_iter;
+		for ( fs::directory_iterator dir_itr( full_path );
+				dir_itr != end_iter; ++dir_itr ) { //for loop continued
+			try {
+				if ( fs::is_regular_file( dir_itr->status() ) ) {
+					filepath = dir_itr->path().filename().string();
+					files.push_back(filepath);
+				}
+			}
+			catch ( const std::exception & ex ) {
+				std::cout << dir_itr->path().filename() << " " << ex.what() << std::endl;
+				exit(0);
+			}
+		}
+	}
+	//for(unsigned int )
 }
