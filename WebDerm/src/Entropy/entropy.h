@@ -33,7 +33,7 @@ public:
 	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor);
 
 	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat);
-	void compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &corrVec, deque<deque<double> > &matchVec);
+	deque<int> compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec);
 };
 
 #endif /* ENTROPY_H_ */
