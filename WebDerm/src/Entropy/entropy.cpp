@@ -1154,7 +1154,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 								++pShadeColor.at(colorIndex).at(shadeIndex);
 						}
 						catch(const std::out_of_range& oor) {
-							printf("ColorVec.Size: %lux%lu\n",fd.colorVec.size(),fd.colorVec.at(i).size());
+							printf("ColorVec.Size: %lu\n",fd.colorVec.size());
 							printf("Point(%d,%d)\n",j,i);
 							printf("Shade: %s\n",shade.c_str());
 							printf("ShadeIndex: %d\n",shadeIndex);
@@ -1174,7 +1174,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 						}
 						catch (const std::out_of_range &oor) {
 							printf("pShadeColor.Rows: %lu\n", pShadeColor.size());
-							printf("pShadeColor.Cols: %lu\n", pShadeColor.at(colorRow).size());
 							printf("pShadeColor(%d,%d)\n",colorRow,shadeCol);
 							printf("pEntropy(%d,%d)\n",colorRow,shadeCol);
 							exit(1);
@@ -1191,7 +1190,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	}
 	catch (const std::out_of_range &oor) {
 		printf("colorVec.Rows: %lu\n",fd.colorVec.size());
-		printf("colorVec.Cols: %lu\n",fd.colorVec.at(row).size());
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
@@ -1410,9 +1408,10 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 			}
 		}
 	}
-	//writeSeq2File(smoothRatioSingleList, fd.filename+"_BinOutput");
+
 	String strSize = toString(ksize.width)+"x"+toString(ksize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
+	/*
 	String filename = path+fd.filename+ "_"+ file_ksize+"_EyeFnCombined_"+strSize+".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -1447,22 +1446,24 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 			}
 		}
 	}
-
-	String filename4 = path+fd.filename+ "_"+ file_ksize+"_YSV_Combined"+strSize+".csv";
+*/
+	cout << fd.filename  << ": Writing YSV files..." << flush;
+	String filename4 = fd.filename+ "_"+ file_ksize+"_YSV_Combined"+strSize+".csv";
 	FILE * fp4;
 	fp4 = fopen(filename4.c_str(),"w");
 	fprintf(fp4,",Y,S,V\n");
 	for(unsigned int i=0; i<allColors.size(); i++) {
 		fprintf(fp4,"%s,%f,%f,%f\n",allColors.at(i).c_str(),fnEye.at(i).at(2),dnEye.at(i).at(2),stdevRatio.at(i).at(2));
 	}
-	fclose(fp);
-	fclose(fp2);
-	fclose(fp3);
+	cout << "Done!" << endl;
+	//fclose(fp);
+	//fclose(fp2);
+	//fclose(fp3);
 	fclose(fp4);
-	gRatio = ratio;
-	gSmoothRatio = smoothRatio;
-	gSmoothRatioRm = smoothRatioOutlierRm;
-	gRatioRm = ratioOutlierRm;
+	//gRatio = ratio;
+	//gSmoothRatio = smoothRatio;
+	//gSmoothRatioRm = smoothRatioOutlierRm;
+	//gRatioRm = ratioOutlierRm;
 }
 
 Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {

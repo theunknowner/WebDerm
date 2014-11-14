@@ -37,6 +37,5 @@ void runMouseColor();
 void runMouseOutputColor();
 void runRenameFiles();
 Mat runColorNormalization(Mat &img);
-void runEntropy();
 
 #endif /* RUN_H_ */

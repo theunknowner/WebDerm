@@ -504,27 +504,3 @@ Mat runColorNormalization(Mat &img) {
 	img2 = c.changeImageBrightness(img2,0.80,1);
 	return img2;
 }
-
-void runAllEntropy() {
-	String filepath;
-	deque<String> files;
-	fs::path full_path( fs::current_path() );
-	if ( fs::is_directory( full_path ) )
-	{
-		fs::directory_iterator end_iter;
-		for ( fs::directory_iterator dir_itr( full_path );
-				dir_itr != end_iter; ++dir_itr ) { //for loop continued
-			try {
-				if ( fs::is_regular_file( dir_itr->status() ) ) {
-					filepath = dir_itr->path().filename().string();
-					files.push_back(filepath);
-				}
-			}
-			catch ( const std::exception & ex ) {
-				std::cout << dir_itr->path().filename() << " " << ex.what() << std::endl;
-				exit(0);
-			}
-		}
-	}
-	//for(unsigned int )
-}

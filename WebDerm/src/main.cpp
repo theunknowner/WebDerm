@@ -23,6 +23,9 @@
 
 int main(int argc,char** argv)
 {
+	Entropy en;
+	en.runAllEntropy();
+	//runRenameFiles();
 	//runAllHysteresis();
 	//runHysteresis();
 	//runMouseColor();
@@ -35,7 +38,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	Hsl hsl;
 	Rgb rgb;
 	Color c;
@@ -73,7 +76,7 @@ int main(int argc,char** argv)
 	waitKey(0);
 	imwrite("test1.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
-
+/*
 	deque<deque<double> > vec1;
 	deque<deque<double> > vec2;
 	deque<deque<double> > matchVec;
