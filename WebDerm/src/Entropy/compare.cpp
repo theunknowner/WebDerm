@@ -115,6 +115,35 @@ double compareV(double v1, double v2) {
 	}
 }
 
+bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat) {
+	fstream fs(filepath.c_str());
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		deque<double> thresh;
+		getline(fs,temp);
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			//vec.pop_back(); //removes the weird empty space at the end of deque
+			for(unsigned int i=0; i<vec.size(); i++) {
+				vec.at(i) = vec.at(i).substr(0,vec.at(i).length());
+				if(i>0)
+					thresh.push_back(atof(vec.at(i).c_str()));
+			}
+			dataMat.push_back(thresh);
+			thresh.clear();
+			vec.clear();
+		}
+		deque<String>().swap(vec);
+		deque<double>().swap(thresh);
+		fs.close();
+		return true;
+	}
+	else
+		printf("Failed to load Entropy file!\n");
+	return false;
+}
+
 deque<int> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec) {
 	matchVec.resize(vec1.size(),deque<double>(vec1.at(0).size(),0));
 	deque<int> resultVec(vec1.size(),0);
@@ -160,31 +189,37 @@ deque<int> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<doubl
 	return resultVec;
 }
 
-bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat) {
-	fstream fs(filepath.c_str());
-	if(fs.is_open()) {
-		String temp;
-		deque<String> vec;
-		deque<double> thresh;
-		getline(fs,temp);
-		while(getline(fs,temp)) {
-			getSubstr(temp,',',vec);
-			//vec.pop_back(); //removes the weird empty space at the end of deque
-			for(unsigned int i=0; i<vec.size(); i++) {
-				vec.at(i) = vec.at(i).substr(0,vec.at(i).length());
-				if(i>0)
-					thresh.push_back(atof(vec.at(i).c_str()));
+void Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2) {
+	double dist[vec1.size()];
+	fill_n(dist,vec1.size(),-1);
+	double sum=0, total=0, totalYSV[3];
+	double ysv1[3], ysv2[3];
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		for(unsigned int j=0; j<vec1.at(i).size(); j++) {
+			ysv1[j] = vec1.at(i).at(j);
+			ysv2[j] = vec2.at(i).at(j);
+			if(ysv1[j]>0 || ysv2[j]>0) {
+				totalYSV[j] = (pow(ysv1[j]-ysv2[j],2)/(pow(ysv1[j],2)+pow(ysv2[j],2)));
+				sum += totalYSV[j];
+				if(i==1)
+					cout << totalYSV[j] << endl;
 			}
-			dataMat.push_back(thresh);
-			thresh.clear();
-			vec.clear();
 		}
-		deque<String>().swap(vec);
-		deque<double>().swap(thresh);
-		fs.close();
-		return true;
+		total += max(ysv1[0],ysv2[0]);
+		if(ysv1[0]>0 || ysv2[0]>0)
+			dist[i] = sqrt(sum) * (1/sqrt(3));
+
+		sum=0;
 	}
-	else
-		printf("Failed to load Entropy file!\n");
-	return false;
+	double avgDist=0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		ysv1[0] = vec1.at(i).at(0);
+		ysv2[0] = vec2.at(i).at(0);
+		//cout << dist[i] << endl;
+		if(ysv1[0]>0 || ysv2[0]>0) {
+			sum = (max(ysv1[0],ysv2[0])/total) * dist[i];
+			avgDist +=sum;
+		}
+	}
+	cout << avgDist << endl;
 }

@@ -34,6 +34,7 @@ public:
 
 	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat);
 	deque<int> compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec);
+	void compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2);
 
 	void runAllEntropy();
 };

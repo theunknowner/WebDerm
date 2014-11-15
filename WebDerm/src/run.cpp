@@ -124,7 +124,7 @@ void runHysteresis()
 	cin >> filename;
 	Mat img;
 	img = runResizeImage(img,Size(700,700));
-	if(img.data) {
+	if(!img.empty()) {
 		img = runColorNormalization(img);
 		name = getFileName(filename);
 		int s = 3;

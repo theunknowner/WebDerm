@@ -23,8 +23,6 @@
 
 int main(int argc,char** argv)
 {
-	Entropy en;
-	en.runAllEntropy();
 	//runRenameFiles();
 	//runAllHysteresis();
 	//runHysteresis();
@@ -38,7 +36,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	Hsl hsl;
 	Rgb rgb;
 	Color c;
@@ -76,17 +74,18 @@ int main(int argc,char** argv)
 	waitKey(0);
 	imwrite("test1.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
-/*
+
 	deque<deque<double> > vec1;
 	deque<deque<double> > vec2;
 	deque<deque<double> > matchVec;
 	deque<int> resultVec;
-	String name1 = "Psoriasis10";
-	String name2 = "Psoriasis16";
-	en.loadEntropyFiles("/home/jason/Desktop/workspace/"+name1+"-lum3_10x10_YSV_Combined50x50.csv",vec1);
-	en.loadEntropyFiles("/home/jason/Desktop/workspace/"+name2+"-lum3_10x10_YSV_Combined50x50.csv",vec2);
-	resultVec = en.compareEntropy(vec1,vec2,matchVec);
-
+	String name1 = "lph4";
+	String name2 = "lph7";
+	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name1+"_10x10_YSV_Combined50x50.csv",vec1);
+	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name2+"_10x10_YSV_Combined50x50.csv",vec2);
+	//resultVec = en.compareEntropy(vec1,vec2,matchVec);
+	en.compareEntropy2(vec1,vec2);
+/*
 	String filename2 = name1+"-"+name2+".csv";
 	FILE * fp;
 	fp = fopen(filename2.c_str(),"w");
