@@ -78,14 +78,15 @@ int main(int argc,char** argv)
 	deque<deque<double> > vec1;
 	deque<deque<double> > vec2;
 	deque<deque<double> > matchVec;
-	deque<int> resultVec;
-	String name1 = "lph4";
-	String name2 = "lph7";
+	deque<double> resultVec;
+	String name1 = "psoriasis10";
+	String name2 = "psoriasis16";
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name1+"_10x10_YSV_Combined50x50.csv",vec1);
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name2+"_10x10_YSV_Combined50x50.csv",vec2);
-	//resultVec = en.compareEntropy(vec1,vec2,matchVec);
+	resultVec = en.compareEntropy(vec1,vec2,matchVec);
 	en.compareEntropy2(vec1,vec2);
-/*
+
+	double result=0;
 	String filename2 = name1+"-"+name2+".csv";
 	FILE * fp;
 	fp = fopen(filename2.c_str(),"w");
@@ -95,14 +96,20 @@ int main(int argc,char** argv)
 		for(unsigned int j=0; j<matchVec.at(i).size(); j++) {
 			fprintf(fp,"%f,",matchVec.at(i).at(j));
 		}
-		fprintf(fp,"%d\n",resultVec.at(i));
+		fprintf(fp,"%f\n",resultVec.at(i));
+		if(resultVec.at(i)>0) {
+			result+=resultVec.at(i);
+		}
 	}
+	fprintf(fp,",,,,%f\n",result);
+	fclose(fp);
+	cout << "Mine: " << result << endl;
 /**/
 /*
 	FileData fd;
-	fd.filename = "herpes3-lum3";
-	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
+	fd.filename = "psoriasis19a";
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
 	String targetColor = "Pink";
@@ -115,9 +122,9 @@ int main(int argc,char** argv)
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
-	fd2.filename = "herpes12-lum3";
-	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
-	fd2.loadFileMatrix("/home/jason/Desktop/Pics1/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
+	fd2.filename = "psoriasis19b";
+	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
+	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
 	String targetColor2 = "Pink";
 	en.eyeFn(fd2,entSize,targetColor2);

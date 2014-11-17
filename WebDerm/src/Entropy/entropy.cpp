@@ -1117,7 +1117,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 									//color = "BrownRed";
 								}
 							}
-							if(fd.filename.find("Psoriasis")!=string::npos)  {
+							if(fd.filename.find("psoriasis")!=string::npos)  {
 								if(color=="Violet")  {
 									int index=-1;
 									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
@@ -1155,6 +1155,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 						}
 						catch(const std::out_of_range& oor) {
 							printf("ColorVec.Size: %lu\n",fd.colorVec.size());
+							printf("HslMat.Size: %lu\n",fd.hslMat.size());
 							printf("Point(%d,%d)\n",j,i);
 							printf("Shade: %s\n",shade.c_str());
 							printf("ShadeIndex: %d\n",shadeIndex);
@@ -1351,7 +1352,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 					sortedList.pop_back();
 					sortedList.pop_front();
 				}
-				//smoothRatioSingleList.at(c) = sortedList;
 				sortedList.clear();
 				sortedPtsList.clear();
 				deque<double>().swap(sortedList);
@@ -1460,10 +1460,10 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	//fclose(fp2);
 	//fclose(fp3);
 	fclose(fp4);
-	//gRatio = ratio;
-	//gSmoothRatio = smoothRatio;
-	//gSmoothRatioRm = smoothRatioOutlierRm;
-	//gRatioRm = ratioOutlierRm;
+	gRatio = ratio;
+	gSmoothRatio = smoothRatio;
+	gSmoothRatioRm = smoothRatioOutlierRm;
+	gRatioRm = ratioOutlierRm;
 }
 
 Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {

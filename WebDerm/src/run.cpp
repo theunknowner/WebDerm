@@ -123,8 +123,8 @@ void runHysteresis()
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img;
-	img = runResizeImage(img,Size(700,700));
-	if(!img.empty()) {
+	img = runResizeImage(filename,Size(700,700),0);
+	if(img.data) {
 		img = runColorNormalization(img);
 		name = getFileName(filename);
 		int s = 3;
@@ -174,6 +174,11 @@ void runHysteresis()
 		rgb.release_memory();
 		hsl.release_memory();
 		shade.release_memory();
+	}
+	else {
+		printf("Image input incorrect!\n");
+		printf("Filename: %s\n", filename.c_str());
+		printf("Image Dimensions: %dx%d\n",img.rows,img.cols);
 	}
 }
 

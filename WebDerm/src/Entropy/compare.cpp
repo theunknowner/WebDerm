@@ -21,6 +21,7 @@ double S_DIST;
 double V_DIST;
 double Y_PERCEPTION;
 double S_PERCEPTION;
+double AVG_THRESH;
 double Y_LARGE_THRESH;
 double threshPass, threshFail;
 double distPass, distFail;
@@ -32,68 +33,54 @@ void resetThreshVals() {
 	S_LOW = 0.10;
 	V_HIGH = 0.10;
 	V_LOW = 0.04;
-	Y_THRESH = 0.50;
-	S_THRESH = 0.35;
-	V_THRESH = 0.25;
+	Y_THRESH = 0.70;
+	S_THRESH = 0.70;
+	V_THRESH = 0.70;
 	Y_DIST = 7;
 	S_DIST = 0.05;
 	V_DIST = 0.03;
 	Y_PERCEPTION = 5.0;
 	S_PERCEPTION = 0.045;
+	AVG_THRESH = 0.70;
 	Y_LARGE_THRESH = 85.0;
-	threshPass = 1, threshFail = -1;
-	distPass = 2, distFail = -2;
+	distPass = 1;
 }
 
 double compareY(double y1, double y2) {
 	double val;
-	double yThresh = Y_THRESH*1.3;
 	if((y1>Y_HIGH && y2>Y_HIGH)) {
-		val = (max(y1,y2)-min(y1,y2))/min(y1,y2);
-		if(val<=yThresh)
-			return threshPass;
-		else
-			return threshFail;
+		val = min(y1,y2)/max(y1,y2);
+		return val;
 	}
 	else if((y1<=Y_LOW && y2<=Y_LOW)) {
 		val = max(y1,y2)-min(y1,y2);
 		if(val<=Y_DIST)
 			return distPass;
 		else
-			return distFail;
+			return min(y1,y2)/max(y1,y2);
 	}
 	else {
-		val = (max(y1,y2)-min(y1,y2))/min(y1,y2);
-		if(val<=Y_THRESH)
-			return threshPass;
-		else
-			return threshFail;
+		val = min(y1,y2)/max(y1,y2);
+		return val;
 	}
 }
 
 double compareS(double s1, double s2) {
 	double val;
-	double sThresh = S_THRESH*1.3;
 	if((s1>S_HIGH && s2>S_HIGH)) {
-		val = (max(s1,s2)-min(s1,s2))/min(s1,s2);
-		if(val<=sThresh)
-			return threshPass;
-		else
-			return threshFail;
+		val = min(s1,s2)/max(s1,s2);
+		return val;
 	}
 	else if((s1<=S_LOW && s2<=S_LOW)) {
 		val = max(s1,s2)-min(s1,s2);
 		if(val<=S_DIST)
 			return distPass;
 		else
-			return distFail;
+			return min(s1,s2)/max(s1,s2);
 	}
 	else {
-		val = (max(s1,s2)-min(s1,s2))/min(s1,s2);
-		if(val<=S_THRESH)
-			return threshPass;
-		else
-			return threshFail;
+		val = min(s1,s2)/max(s1,s2);
+		return val;
 	}
 }
 
@@ -104,14 +91,11 @@ double compareV(double v1, double v2) {
 		if(val<=V_DIST)
 			return distPass;
 		else
-			return distFail;
+			return min(v1,v2)/max(v1,v2);
 	}
 	else {
-		val = (max(v1,v2)-min(v1,v2))/min(v1,v2);
-		if(val<=V_THRESH)
-			return threshPass;
-		else
-			return threshFail;
+		val = min(v1,v2)/max(v1,v2);
+		return val;
 	}
 }
 
@@ -144,18 +128,20 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat) 
 	return false;
 }
 
-deque<int> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec) {
+deque<double> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec) {
 	matchVec.resize(vec1.size(),deque<double>(vec1.at(0).size(),0));
-	deque<int> resultVec(vec1.size(),0);
+	deque<double> resultVec(vec1.size(),0);
 	double ysv1[3];
 	double ysv2[3];
 	double valY=0, valS=0, valV=0;
+	double avg=0, total=0;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		resetThreshVals();
 		for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 			ysv1[j] = vec1.at(i).at(j);
 			ysv2[j] = vec2.at(i).at(j);
 		}
+		total += max(ysv1[0],ysv2[0]);
 		if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION)
 			Y_PERCEPTION = 2.0;
 
@@ -172,19 +158,37 @@ deque<int> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<doubl
 			valV = compareV(ysv1[2],ysv2[2]);
 			matchVec.at(i).at(2) = valV;
 
-			//Recompute Y if S & V are same
-			if(valS>0 && valV>0 && valY<0) {
-				Y_THRESH = 0.65;
+			//Reassign Y_THRESH if S & V are the same
+			if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH) {
+				Y_THRESH *= 0.8;
 				Y_DIST = 10;
-				valY = compareY(ysv1[0],ysv2[0]);
-				matchVec.at(i).at(0) = valY;
+			}
+			//Reassign Y if S & V are the same
+			if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH)
+				valY *= 1.3;
+			//Reassign V if Y & S are different
+			if(valY<Y_THRESH && valS<S_THRESH) {
+				double diff = valY/Y_THRESH;
+				valV *= diff;
 			}
 
-			if(valY>0 && valS>0 && valV>0)
-				resultVec.at(i) = 1;
+			//Average value of YSV matching
+			avg = valY + valS + valV;
+			avg /= 3.0;
+			resultVec.at(i) = avg;
+			/*
+			if(avg>=Y_THRESH)
+				resultVec.at(i) = avg;
 			else if(ysv1[0]>Y_LARGE_THRESH && ysv2[0]>Y_LARGE_THRESH)
-				resultVec.at(i) = 1;
+				resultVec.at(i) = 1;*/
 		}
+	}
+	double sum=0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		ysv1[0] = vec1.at(i).at(0);
+		ysv2[0] = vec2.at(i).at(0);
+		sum = max(ysv1[0],ysv2[0])/total;
+		resultVec.at(i) *= sum;
 	}
 	return resultVec;
 }
@@ -201,8 +205,6 @@ void Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > 
 			if(ysv1[j]>0 || ysv2[j]>0) {
 				totalYSV[j] = (pow(ysv1[j]-ysv2[j],2)/(pow(ysv1[j],2)+pow(ysv2[j],2)));
 				sum += totalYSV[j];
-				if(i==1)
-					cout << totalYSV[j] << endl;
 			}
 		}
 		total += max(ysv1[0],ysv2[0]);
@@ -215,11 +217,11 @@ void Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > 
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		ysv1[0] = vec1.at(i).at(0);
 		ysv2[0] = vec2.at(i).at(0);
-		//cout << dist[i] << endl;
+		//cout << allColors.at(i) << ": " << dist[i] << endl;
 		if(ysv1[0]>0 || ysv2[0]>0) {
 			sum = (max(ysv1[0],ysv2[0])/total) * dist[i];
 			avgDist +=sum;
 		}
 	}
-	cout << avgDist << endl;
+	cout << "Dr.Dube: " << avgDist << endl;
 }

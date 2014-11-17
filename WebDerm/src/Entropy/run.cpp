@@ -35,17 +35,47 @@ void Entropy::runAllEntropy() {
 	rgb.importThresholds();
 	sh.importThresholds();
 	Size entSize(50,50);
-	String name;
+	bool flag[2] = {false};
 	for(unsigned int i=0; i<files.size(); i++) {
 		Mat img = imread(files.at(i));
 		if(img.data) {
 			FileData fd;
 			fd.filename = getFileName(files.at(i),"_");
-			fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
-			fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
-			fd.ksize = Size(10,10);
-			eyeFn(fd,entSize,"");
+			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
+			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
+			if(flag[0]==true && flag[1]==true) {
+				fd.ksize = Size(10,10);
+				eyeFn(fd,entSize,"");
+			}
 		}
 		img.release();
+	}
+	rgb.release_memory();
+	hsl.release_memory();
+	sh.release_memory();
+}
+
+void Entropy::runEntropy() {
+	String input;
+	cout << "Enter image name: ";
+	cin >> input;
+	bool flag[2] = {false};
+	Size entSize(50,50);
+	FileData fd;
+	fd.filename = input;
+	flag[0]=fd.loadFileMatrix(fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
+	flag[1]=fd.loadFileMatrix(fd.filename+"_HSL_10x10.csv",fd.hslMat);
+	if(flag[0]==true && flag[1]==true) {
+		Rgb rgb;
+		Hsl hsl;
+		Shades sh;
+		hsl.importHslThresholds();
+		rgb.importThresholds();
+		sh.importThresholds();
+		fd.ksize=Size(10,10);
+		eyeFn(fd,entSize,"");
+		rgb.release_memory();
+		hsl.release_memory();
+		sh.release_memory();
 	}
 }
