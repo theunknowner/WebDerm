@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph8.jpg",Size(700,700),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria1.jpg",Size(700,700),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
@@ -60,10 +60,11 @@ int main(int argc,char** argv)
 	//deque< deque<double> > pEnt2;
 	//deque<int> colorShadeShift(allColors.size(),0);
 	Entropy en;
-/*
+	/*
 	img2 = c.shadeCorrection(img);
 	//img3 = c.changeImageBrightness(img2,-0.20,0);
 	img4 = c.changeImageBrightness(img2,0.8,1);
+	blur(img4,img4,Size(10,10));
 	//img4 = c.correctGamma(img2,2.2);
 	//namedWindow("img",CV_WINDOW_FREERATIO);
 	//namedWindow("img3",CV_WINDOW_FREERATIO);
@@ -79,14 +80,14 @@ int main(int argc,char** argv)
 	deque<deque<double> > vec2;
 	deque<deque<double> > matchVec;
 	deque<double> resultVec;
-	String name1 = "psoriasis10";
-	String name2 = "psoriasis16";
+	String name1 = "clp3";
+	String name2 = "lph4";
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name1+"_10x10_YSV_Combined50x50.csv",vec1);
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name2+"_10x10_YSV_Combined50x50.csv",vec2);
 	resultVec = en.compareEntropy(vec1,vec2,matchVec);
+	en.importEntropyThresholds();
 	en.compareEntropy2(vec1,vec2);
 
-	double result=0;
 	String filename2 = name1+"-"+name2+".csv";
 	FILE * fp;
 	fp = fopen(filename2.c_str(),"w");
@@ -97,22 +98,18 @@ int main(int argc,char** argv)
 			fprintf(fp,"%f,",matchVec.at(i).at(j));
 		}
 		fprintf(fp,"%f\n",resultVec.at(i));
-		if(resultVec.at(i)>0) {
-			result+=resultVec.at(i);
-		}
 	}
-	fprintf(fp,",,,,%f\n",result);
 	fclose(fp);
-	cout << "Mine: " << result << endl;
+	en.releaseMemory();
 /**/
 /*
 	FileData fd;
-	fd.filename = "psoriasis19a";
+	fd.filename = "clp3";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	String targetColor = "Pink";
+	String targetColor = "Grey";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
@@ -122,11 +119,11 @@ int main(int argc,char** argv)
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
-	fd2.filename = "psoriasis19b";
+	fd2.filename = "lph7";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
-	String targetColor2 = "Pink";
+	String targetColor2 = "Grey";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);

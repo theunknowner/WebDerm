@@ -32,6 +32,8 @@ public:
 	void eyeFn(FileData &fd, Size ksize, String targetColor="");
 	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor);
 
+	bool importEntropyThresholds();
+	void releaseMemory();
 	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat);
 	deque<double> compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec);
 	void compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2);
