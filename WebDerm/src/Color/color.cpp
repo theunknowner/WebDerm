@@ -129,6 +129,8 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 		else
 			pix2 += colorVec.at(i) + toString(colorLevel);
 	}
+	colorVec.clear();
+	colorVec.shrink_to_fit();
 	return pix2;
 }
 
@@ -253,10 +255,14 @@ void Color::output2ImageColor(deque< deque<String> > &window, Size size, String 
 		imwrite(file,img);
 		img.release();
 		fs.close();
-		deque<String>().swap(vec);
-		deque<String>().swap(colorVec);
-		deque<int>().swap(thresh1);
-		deque< deque<int> >().swap(values);
+		vec.clear();
+		vec.shrink_to_fit();
+		colorVec.clear();
+		colorVec.shrink_to_fit();
+		thresh1.clear();
+		thresh1.shrink_to_fit();
+		values.clear();
+		values.shrink_to_fit();
 	}
 	else {
 		printf("Error opening %s\n",filename.c_str());
@@ -738,5 +744,8 @@ Mat Color::shadeCorrection(Mat img) {
 			}
 		}
 	}
+	coef.release();
+	totalV.release();
+	product.release();
 	return img2;
 }

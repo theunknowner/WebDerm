@@ -19,7 +19,7 @@
 #include "Histogram/histogram.h"
 #include "Shades/shades.h"
 #include "Entropy/entropy.h"
-#include "Algorithms/quicksort.h"
+#include "Algorithms/jaysort.h"
 
 int main(int argc,char** argv)
 {
@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria1.jpg",Size(700,700),0);
+	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis21a.jpg",Size(700,700),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
@@ -60,7 +60,9 @@ int main(int argc,char** argv)
 	//deque< deque<double> > pEnt2;
 	//deque<int> colorShadeShift(allColors.size(),0);
 	Entropy en;
-	/*
+	en.runCompareEntropy();
+	en.runCompareEntropy2();
+/*
 	img2 = c.shadeCorrection(img);
 	//img3 = c.changeImageBrightness(img2,-0.20,0);
 	img4 = c.changeImageBrightness(img2,0.8,1);
@@ -73,21 +75,21 @@ int main(int argc,char** argv)
 	//imshow("img3",img3);
 	imshow("img4",img4);
 	waitKey(0);
-	imwrite("test1.png",img4);/**/
+	imwrite("psoriasis21a.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
-
+/*
 	deque<deque<double> > vec1;
 	deque<deque<double> > vec2;
 	deque<deque<double> > matchVec;
 	deque<double> resultVec;
-	String name1 = "clp3";
-	String name2 = "lph4";
+	String name1 = "psoriasis21a";
+	String name2 = "acne-vulgaris4";
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name1+"_10x10_YSV_Combined50x50.csv",vec1);
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name2+"_10x10_YSV_Combined50x50.csv",vec2);
-	resultVec = en.compareEntropy(vec1,vec2,matchVec);
+	//resultVec = en.compareEntropy(vec1,vec2,matchVec);
 	en.importEntropyThresholds();
 	en.compareEntropy2(vec1,vec2);
-
+/*
 	String filename2 = name1+"-"+name2+".csv";
 	FILE * fp;
 	fp = fopen(filename2.c_str(),"w");

@@ -44,7 +44,6 @@ bool Hsl::importHslThresholds() {
 			if(i>=1 && i<=2) thresh.push_back(atof(vec.at(i).c_str()));
 			if(i>=3 && i<=4) thresh2.push_back(atof(vec.at(i).c_str()));
 			if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
-			if(i==7) hueTableNum.push_back(atoi(vec.at(i).c_str()));
 		}
 		hueThresh.push_back(thresh);
 		satThresh.push_back(thresh2);
@@ -220,10 +219,11 @@ void Hsl::release_memory()
 	hueThresh.clear();
 	satThresh.clear();
 	lumThresh.clear();
-	deque<String>().swap(hslColors);
-	deque< deque<int> >().swap(hueThresh);
-	deque< deque<double> >().swap(satThresh);
-	deque< deque<double> >().swap(lumThresh);
+	hslColors.shrink_to_fit();
+	hueThresh.shrink_to_fit();
+	satThresh.shrink_to_fit();
+	lumThresh.shrink_to_fit();
+
 }
 
 //customize calcuation of hue avg

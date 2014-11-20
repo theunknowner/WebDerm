@@ -14,6 +14,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Graph/graph.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 
 class FileData;
 class Entropy {
@@ -35,11 +36,14 @@ public:
 	bool importEntropyThresholds();
 	void releaseMemory();
 	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat);
-	deque<double> compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec);
-	void compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2);
+	double compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec);
+	double compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2);
 
 	void runAllEntropy();
 	void runEntropy();
+	void runCompareEntropy();
+	void runCompareEntropyAll();
+	void runCompareEntropy2();
 };
 
 #endif /* ENTROPY_H_ */

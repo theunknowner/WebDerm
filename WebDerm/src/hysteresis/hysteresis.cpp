@@ -250,7 +250,8 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 	Rgb rgb;
 	Hsl hsl;
 	int r,g,b;
-	double *HSL,h,s,l;
+	double *HSL;
+	double h,s,l;
 	String pix;
 	String hslStr;
 	deque<String> colorWindow;
@@ -279,8 +280,10 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 	}
 	Intensity in;
 	fd.colorVec = in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
-	deque<String>().swap(colorWindow);
-	deque<String>().swap(hslVec);
+	colorWindow.clear();
+	colorWindow.shrink_to_fit();
+	hslVec.clear();
+	hslVec.shrink_to_fit();
 }
 
 void hysteresis3(Mat img, Size size, String name, FileData &fd) {

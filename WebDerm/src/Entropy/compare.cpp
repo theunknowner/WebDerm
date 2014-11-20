@@ -24,6 +24,7 @@ double S_PERCEPTION;
 double Y_LARGE_THRESH;
 double distPass;
 deque<double> colorWeights; //holds the weights for color impact
+double Y1, Y2;
 
 void resetThreshVals() {
 	Y_HIGH = 49.0;
@@ -82,8 +83,12 @@ double compareY(double y1, double y2) {
 	}
 	else if((y1<=Y_LOW && y2<=Y_LOW)) {
 		val = max(y1,y2)-min(y1,y2);
-		if(val<=Y_DIST)
-			return distPass;
+		if(val<=Y_DIST) {
+			if(y1>=Y_PERCEPTION && y2>=Y_PERCEPTION)
+				return distPass;
+			else
+				return min(y1,y2)/max(y1,y2);
+		}
 		else
 			return min(y1,y2)/max(y1,y2);
 	}
@@ -101,8 +106,12 @@ double compareS(double s1, double s2) {
 	}
 	else if((s1<=S_LOW && s2<=S_LOW)) {
 		val = max(s1,s2)-min(s1,s2);
-		if(val<=S_DIST)
-			return distPass;
+		if(val<=S_DIST) {
+			if(Y1>=Y_PERCEPTION && Y2>=Y_PERCEPTION)
+				return distPass;
+			else
+				return min(s1,s2)/max(s1,s2);
+		}
 		else
 			return min(s1,s2)/max(s1,s2);
 	}
@@ -116,8 +125,12 @@ double compareV(double v1, double v2) {
 	double val=0;
 	if((v1<=V_HIGH && v2<=V_HIGH)) {
 		val = max(v1,v2)-min(v1,v2);
-		if(val<=V_DIST)
-			return distPass;
+		if(val<=V_DIST) {
+			if(Y1>=Y_PERCEPTION && Y2>=Y_PERCEPTION)
+				return distPass;
+			else
+				return min(v1,v2)/max(v1,v2);
+		}
 		else
 			return min(v1,v2)/max(v1,v2);
 	}
@@ -156,7 +169,7 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat) 
 	return false;
 }
 
-deque<double> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec) {
+double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec) {
 	matchVec.resize(vec1.size(),deque<double>(vec1.at(0).size(),0));
 	deque<double> resultVec(vec1.size(),0);
 	double ysv1[3];
@@ -173,6 +186,8 @@ deque<double> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<do
 				ysv1[j] = vec1.at(i).at(j);
 				ysv2[j] = vec2.at(i).at(j);
 			}
+			Y1 = ysv1[0];
+			Y2 = ysv2[0];
 			if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION)
 				Y_PERCEPTION = 2.0;
 
@@ -226,11 +241,11 @@ deque<double> Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<do
 			results += resultVec.at(i);
 		}
 	}
-	cout << "Mine: " << results << endl;
-	return resultVec;
+	//cout << "Mine: " << results << endl;
+	return results;
 }
 
-void Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2) {
+double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2) {
 	double dist[vec1.size()];
 	fill_n(dist,vec1.size(),-1);
 	double sum=0, total=0, totalYSV[3];
@@ -261,13 +276,14 @@ void Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > 
 		if(colorsHit[i]==1) {
 			ysv1[0] = vec1.at(i).at(0);
 			ysv2[0] = vec2.at(i).at(0);
-			//cout << allColors.at(i) << ": " << dist[i] << endl;
 			if(ysv1[0]>0 || ysv2[0]>0) {
 				sum = (max(ysv1[0],ysv2[0])/total) * dist[i];
+				//printf("%s: %f\n",allColors.at(i).c_str(),dist[i]);
 				avgDist +=sum;
 			}
 		}
 	}
 	avgDist = 1 - min(avgDist,1.0);
-	printf("Dr.Dube: %f\n",avgDist);
+	return avgDist;
+	//printf("Dr.Dube: %f\n",avgDist);
 }

@@ -26,19 +26,31 @@ FileData::FileData(String file_path) {
 
 FileData::~FileData() {
 	matImage.release();
-	deque< deque<String> >().swap(windowVec);
-	deque< deque<String> >().swap(hslMat);
-	deque< deque<double> >().swap(absRatioMat);
-	deque< deque<String> >().swap(colorVec);
-	deque< deque<double> >().swap(intensityVec);
-	deque< deque<double> >().swap(smoothIntensityVec);
-	deque< deque<String> >().swap(shadeVec);
-	deque<double>().swap(absRatioVec);
+	windowVec.clear();
+	windowVec.shrink_to_fit();
+	hslMat.clear();
+	hslMat.shrink_to_fit();
+	absRatioMat.clear();
+	absRatioMat.shrink_to_fit();
+	colorVec.clear();
+	colorVec.shrink_to_fit();
+	intensityVec.clear();
+	intensityVec.shrink_to_fit();
+	smoothIntensityVec.clear();
+	smoothIntensityVec.shrink_to_fit();
+	shadeVec.clear();
+	shadeVec.shrink_to_fit();
+	absRatioVec.clear();
+	absRatioVec.shrink_to_fit();
 
-	deque< deque<String> >().swap(m_ContrastMat);
-	deque< deque<String> >().swap(d_HslMat);
-	deque< deque<String> >().swap(hslPtMat);
-	deque< deque<double> >().swap(cumHslMat);
+	m_ContrastMat.clear();
+	m_ContrastMat.shrink_to_fit();
+	d_HslMat.clear();
+	d_HslMat.shrink_to_fit();
+	hslPtMat.clear();
+	hslPtMat.shrink_to_fit();
+	cumHslMat.clear();
+	cumHslMat.shrink_to_fit();
 
 	if(!filename.empty())
 		printf("Destructor executed for %s\n",filename.c_str());
@@ -97,7 +109,8 @@ bool FileData::loadFileMatrix(String file_path) {
 			dataMatrix.push_back(vec);
 			vec.clear();
 		}
-		deque<String>().swap(vec);
+		vec.clear();
+		vec.shrink_to_fit();
 		fs.close();
 		return true;
 	}
@@ -120,7 +133,8 @@ bool FileData::loadFileMatrix(String file_path, deque< deque<String> > &dataMat)
 			dataMat.push_back(vec);
 			vec.clear();
 		}
-		deque<String>().swap(vec);
+		vec.clear();
+		vec.shrink_to_fit();
 		fs.close();
 		return true;
 	}
@@ -213,7 +227,7 @@ bool FileData::getFilesFromDirectory(String directory, deque<String> &files) {
 			}
 			catch ( const std::exception & ex ) {
 				std::cout << dir_itr->path().filename() << " " << ex.what() << std::endl;
-				exit(0);
+				exit(1);
 			}
 		}
 	}
@@ -235,6 +249,8 @@ void FileData::deleteContainingName(String directory, String filename) {
 				printf("Error deleting %s\n",files.at(i).c_str());
 		}
 	}
+	files.clear();
+	files.shrink_to_fit();
 }
 
 /** rename files containing oldname,
@@ -257,6 +273,8 @@ void FileData::renameFiles(String directory, String oldname, String newname) {
 				printf("Error renaming %s\n",files.at(i).c_str());
 		}
 	}
+	files.clear();
+	files.shrink_to_fit();
 }
 
 void FileData::getMinMaxPts(String input, deque< deque<Point> > &pt) {
@@ -298,6 +316,8 @@ void FileData::getMinMaxPts(String input, deque< deque<Point> > &pt) {
 			maxStr = maxStr.substr(posEndPar+2,maxStr.length()-posEndPar+2);
 	}
 	pt.push_back(tempPtVec);
+	tempPtVec.clear();
+	tempPtVec.shrink_to_fit();
 }
 
 void FileData::extractRuleData(String filename, Point loc) {

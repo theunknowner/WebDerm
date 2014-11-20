@@ -60,6 +60,8 @@ void runResizeAllImages() {
 			cout << name+" resized!" << endl;
 		}
 	}
+	files.clear();
+	files.shrink_to_fit();
 }
 
 Mat runResizeImage(String foldername, String filename, Size size,int write)
@@ -75,7 +77,8 @@ Mat runResizeImage(String foldername, String filename, Size size,int write)
 	getSubstr(filename,'.',vec);
 	if(write==1) imwrite(vec[0]+".png",img2);
 
-	deque<String>().swap(vec);
+	vec.clear();
+	vec.shrink_to_fit();
 	return img2;
 }
 
@@ -93,7 +96,8 @@ Mat runResizeImage(String filename, Size size,int write)
 		if(write==1) imwrite(vec[0]+".png",img2);
 
 		img.release();
-		deque<String>().swap(vec);
+		vec.clear();
+		vec.shrink_to_fit();
 	}
 	return img2;
 }
@@ -260,6 +264,7 @@ void runAllHysteresis() {
 		}
 	}
 	if(flag[0]==true) {
+		boost::timer time;
 		for(unsigned int i=0; i<files.size(); i++) {
 			full_path = folder+files.at(i);
 			img = runResizeImage(full_path,Size(700,700),0);
@@ -284,6 +289,7 @@ void runAllHysteresis() {
 				img.release();
 			}
 		}
+		cout <<"Time Elapsed: " << time.elapsed() << endl;
 	}
 	rgb.release_memory();
 	hsl.release_memory();
@@ -337,6 +343,8 @@ void runAllGetSkin() {
 			img.release(); img2.release(); mask.release();
 		}
 	}
+	files.clear();
+	files.shrink_to_fit();
 }
 
 //runs hysteresis with info output to terminal
@@ -361,6 +369,7 @@ void runMouseHysteresis()
 	}
 	img.release(); img2.release(); mask.release();
 	rgb.release_memory();
+	hsl.release_memory();
 }
 
 //runs hysteresis with info output to image window

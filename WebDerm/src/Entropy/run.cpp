@@ -79,3 +79,77 @@ void Entropy::runEntropy() {
 		sh.release_memory();
 	}
 }
+
+void Entropy::runCompareEntropy() {
+	String input;
+	deque<deque<double> > vec1;
+	cout << "Enter filename: ";
+	cin >> input;
+	Entropy en;
+	if(en.loadEntropyFiles(input,vec1)) {
+		deque<String> files;
+		deque<deque<double> > vec2;
+		deque<deque<double> > matchVec;
+		FileData fd;
+		String folder = "/home/jason/Desktop/Programs/Test/";
+		String filepath, name;
+		double results;
+		deque<double> resultVec;
+		deque<String> nameVec;
+		deque<int> origPos;
+		fd.getFilesFromDirectory(folder,files);
+		for(unsigned int i=0; i<files.size(); i++) {
+			filepath = folder+files.at(i);
+			name = getFileName(files.at(i),"_");
+			en.loadEntropyFiles(filepath,vec2);
+			results = en.compareEntropy(vec1,vec2,matchVec);
+			resultVec.push_back(results);
+			nameVec.push_back(name);
+			vec2.clear();
+			vec2.shrink_to_fit();
+			matchVec.clear();
+			matchVec.shrink_to_fit();
+		}
+		jaysort(resultVec,origPos);
+		for(unsigned int i=0; i<resultVec.size(); i++) {
+			printf("%s: %f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i));
+		}
+	}
+}
+
+void Entropy::runCompareEntropy2() {
+	String input;
+	deque<deque<double> > vec1;
+	cout << "Enter filename: ";
+	cin >> input;
+	Entropy en;
+	if(en.loadEntropyFiles(input,vec1)) {
+		deque<String> files;
+		deque<deque<double> > vec2;
+		deque<deque<double> > matchVec;
+		FileData fd;
+		String folder = "/home/jason/Desktop/Programs/Test/";
+		String filepath, name;
+		double results;
+		deque<double> resultVec;
+		deque<String> nameVec;
+		deque<int> origPos;
+		fd.getFilesFromDirectory(folder,files);
+		for(unsigned int i=0; i<files.size(); i++) {
+			filepath = folder+files.at(i);
+			name = getFileName(files.at(i),"_");
+			en.loadEntropyFiles(filepath,vec2);
+			results = en.compareEntropy2(vec1,vec2);
+			resultVec.push_back(results);
+			nameVec.push_back(name);
+			vec2.clear();
+			vec2.shrink_to_fit();
+			matchVec.clear();
+			matchVec.shrink_to_fit();
+		}
+		jaysort(resultVec,origPos);
+		for(unsigned int i=0; i<resultVec.size(); i++) {
+			printf("%s: %f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i));
+		}
+	}
+}

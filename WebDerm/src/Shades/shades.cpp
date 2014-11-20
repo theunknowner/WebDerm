@@ -110,8 +110,12 @@ String Shades::extractShade(String pix) {
 void Shades::release_memory() {
 	g_Shades.clear();
 	g_ShadeThresh.clear();
-	deque<String>().swap(g_Shades);
-	deque< deque<double> >().swap(g_ShadeThresh);
+	g_Shades2.clear();
+	g_ShadeThresh2.clear();
+	g_Shades.shrink_to_fit();
+	g_ShadeThresh.shrink_to_fit();
+	g_Shades2.shrink_to_fit();
+	g_ShadeThresh2.shrink_to_fit();
 }
 
 int Shades::getShadeIndex2(String shade) {

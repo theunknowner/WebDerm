@@ -609,6 +609,15 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	} // end row
 	cout << "Done!" << endl;
 	fclose(fp);
+	colorVec1.clear(); colorVec1.shrink_to_fit();
+	colorVec3.clear(); colorVec3.shrink_to_fit();
+	localIndexes.clear(); localIndexes.shrink_to_fit();
+	localCCs.clear(); localCCs.shrink_to_fit();
+	localShades.clear(); localShades.shrink_to_fit();
+	ruleNo.clear(); ruleNo.shrink_to_fit();
+	strVec1.clear(); strVec1.shrink_to_fit();
+	rulesRow.clear(); rulesRow.shrink_to_fit();
+
 	//fd.writeFileMetaData();
 	//c.output2ImageColor(fd.colorVec,name);
 	//writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");

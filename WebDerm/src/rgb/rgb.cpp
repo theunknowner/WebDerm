@@ -513,10 +513,12 @@ void Rgb::release_memory() {
 	absMeanThresh.clear();
 	rgbColors.clear();
 	mainColors.clear();
-	deque< deque<double> >().swap(normMeanThresh);
-	deque< deque<double> >().swap(absMeanThresh);
-	deque<String>().swap(rgbColors);
-	deque<String>().swap(mainColors);
+	allColors.clear();
+	normMeanThresh.shrink_to_fit();
+	absMeanThresh.shrink_to_fit();
+	rgbColors.shrink_to_fit();
+	mainColors.shrink_to_fit();
+	allColors.shrink_to_fit();
 }
 
 double Rgb::calcColorLevel(double red, double green, double blue) {
