@@ -14,7 +14,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/SpreadSheet/ssheet.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/MD5/md5.h"
 
 void colorThreshNamingScript();

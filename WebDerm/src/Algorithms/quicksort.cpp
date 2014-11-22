@@ -7,48 +7,91 @@
 
 #include "quicksort.h"
 
-deque<double> numbers;
+deque<double> numbersDouble;
+deque<int> numbersInt;
 
-inline void exchange(int i, int j) {
-	double temp = numbers.at(i);
-	numbers.at(i) = numbers.at(j);
-	numbers.at(j) = temp;
+inline void exchangeDouble(int i, int j) {
+	double temp = numbersDouble.at(i);
+	numbersDouble.at(i) = numbersDouble.at(j);
+	numbersDouble.at(j) = temp;
 }
 
-inline void sort(int low, int high) {
+inline void exchangeInt(int i, int j) {
+	int temp = numbersInt.at(i);
+	numbersInt.at(i) = numbersInt.at(j);
+	numbersInt.at(j) = temp;
+}
+
+inline void sortDouble(int low, int high) {
 	int i = low, j = high;
 	// Get the pivot element from the middle of the list
-	double pivot = numbers.at(low + (high-low)/2);
+	double pivot = numbersDouble.at(low + (high-low)/2);
 
 	// Divide into two lists
 	while (i <= j) {
 		// If the current value from the left list is smaller then the pivot
 		// element then get the next element from the left list
-		while (numbers.at(i) < pivot) {
+		while (numbersDouble.at(i) < pivot) {
 			i++;
 		}
 		// If the current value from the right list is larger then the pivot
 		// element then get the next element from the right list
-		while (numbers.at(j) > pivot) {
+		while (numbersDouble.at(j) > pivot) {
 			j--;
 		}
 
 		// If we have found a values in the left list which is larger then
 		// the pivot element and if we have found a value in the right list
-		// which is smaller then the pivot element then we exchange the
+		// which is smaller then the pivot element then we exchangeDouble the
 		// values.
 		// As we are done we can increase i and j
 		if (i <= j) {
-			exchange(i, j);
+			exchangeDouble(i, j);
 			i++;
 			j--;
 		}
 	}
 	// Recursion
 	if (low < j)
-		sort(low, j);
+		sortDouble(low, j);
 	if (i < high)
-		sort(i, high);
+		sortDouble(i, high);
+}
+
+inline void sortInt(int low, int high) {
+	int i = low, j = high;
+	// Get the pivot element from the middle of the list
+	int pivot = numbersInt.at(low + (high-low)/2);
+
+	// Divide into two lists
+	while (i <= j) {
+		// If the current value from the left list is smaller then the pivot
+		// element then get the next element from the left list
+		while (numbersInt.at(i) < pivot) {
+			i++;
+		}
+		// If the current value from the right list is larger then the pivot
+		// element then get the next element from the right list
+		while (numbersInt.at(j) > pivot) {
+			j--;
+		}
+
+		// If we have found a values in the left list which is larger then
+		// the pivot element and if we have found a value in the right list
+		// which is smaller then the pivot element then we exchangeDouble the
+		// values.
+		// As we are done we can increase i and j
+		if (i <= j) {
+			exchangeInt(i, j);
+			i++;
+			j--;
+		}
+	}
+	// Recursion
+	if (low < j)
+		sortInt(low, j);
+	if (i < high)
+		sortInt(i, high);
 }
 
 void quicksort(deque<double> &values, int p, int r) {
@@ -56,14 +99,26 @@ void quicksort(deque<double> &values, int p, int r) {
 	if (values.size()==0){
 		return;
 	}
-	numbers = values;
-	sort(p, r);
+	numbersDouble = values;
+	sortDouble(p, r);
 
-	values = numbers;
+	values = numbersDouble;
+}
+
+//p = start pos, r = end pos
+void quicksort(deque<int> &values, int p, int r) {
+	// check for empty or null array
+	if (values.size()==0){
+		return;
+	}
+	numbersInt = values;
+	sortInt(p, r);
+
+	values = numbersInt;
 }
 
 void printResult() {
-	for(unsigned int i=0; i<numbers.size(); i++) {
-		printf("%.0f\n",numbers.at(i));
+	for(unsigned int i=0; i<numbersDouble.size(); i++) {
+		printf("%.0f\n",numbersDouble.at(i));
 	}
 }

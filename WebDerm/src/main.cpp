@@ -37,8 +37,8 @@ int main(int argc,char** argv)
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
 	/**/
-	Hsl hsl;
 	Rgb rgb;
+	Hsl hsl;
 	Color c;
 	Functions fn;
 	Shades sh;
@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis21a.jpg",Size(700,700),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/herpes5.jpg",Size(700,700),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
@@ -60,9 +60,9 @@ int main(int argc,char** argv)
 	//deque< deque<double> > pEnt2;
 	//deque<int> colorShadeShift(allColors.size(),0);
 	Entropy en;
-	en.runCompareEntropy();
-	en.runCompareEntropy2();
-/*
+	//en.runCompareEntropy();
+	//en.runCompareEntropy2();
+
 	img2 = c.shadeCorrection(img);
 	//img3 = c.changeImageBrightness(img2,-0.20,0);
 	img4 = c.changeImageBrightness(img2,0.8,1);
@@ -75,20 +75,20 @@ int main(int argc,char** argv)
 	//imshow("img3",img3);
 	imshow("img4",img4);
 	waitKey(0);
-	imwrite("psoriasis21a.png",img4);/**/
+	imwrite("herpes5.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
 /*
 	deque<deque<double> > vec1;
 	deque<deque<double> > vec2;
 	deque<deque<double> > matchVec;
 	deque<double> resultVec;
-	String name1 = "psoriasis21a";
-	String name2 = "acne-vulgaris4";
+	String name1 = "acne1";
+	String name2 = "vesicles25";
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name1+"_10x10_YSV_Combined50x50.csv",vec1);
 	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name2+"_10x10_YSV_Combined50x50.csv",vec2);
 	//resultVec = en.compareEntropy(vec1,vec2,matchVec);
-	en.importEntropyThresholds();
-	en.compareEntropy2(vec1,vec2);
+	//en.importEntropyThresholds();
+	en.compareEntropy(vec1,vec2,matchVec);
 /*
 	String filename2 = name1+"-"+name2+".csv";
 	FILE * fp;
@@ -106,12 +106,12 @@ int main(int argc,char** argv)
 /**/
 /*
 	FileData fd;
-	fd.filename = "clp3";
+	fd.filename = "acne1";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
 	fd.ksize = Size(10,10);
 	Size entSize(50,50);
-	String targetColor = "Grey";
+	String targetColor = "Pink";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
@@ -121,11 +121,11 @@ int main(int argc,char** argv)
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
-	fd2.filename = "lph7";
+	fd2.filename = "vesicles25";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
-	String targetColor2 = "Grey";
+	String targetColor2 = "Pink";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
@@ -142,17 +142,13 @@ int main(int argc,char** argv)
 	waitKey(0);
 	//colorShadeShift = en.calcShadeShift(pEnt1, pEnt2);
 	//en.outputShiftedEntropy(fd,fd2,Size(10,10),colorShadeShift);
-/*
-	//deque< deque<String> > vec;
-	//FileData fd;
-	//fd.renameFiles("/home/jason/Desktop/workspace/Qt/WebDermGui/test/","Link to ","");
-	//fd.filename = "acne1";
-	//waitKey(0);
-/*
+
+	Point pt1(265,196);
+	Point pt2(267,198);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	//checkColorsFromList(img2,pt1,pt2);
-	//generateColorRegionTable(img2, pt1,pt2);
+	generateColorRegionTable(img4, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
 	int col = 477;

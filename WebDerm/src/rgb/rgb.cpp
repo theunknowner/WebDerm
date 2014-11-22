@@ -109,47 +109,47 @@ bool Rgb::importColorThresholds()
 
 //calculate the Euclidean Distance betweeen normalized Rgb input and colors(vec).
 double Rgb::normEucDist(double red, double green, double blue, deque<double> &vec) {
-		double result=0;
-		double color[3] = {red,green,blue};
-		double normVals[3];
-		for(int i=0; i<3; i++) {
-			normVals[i] = color[i]/(color[0]+color[1]+color[2]);
-			normVals[i] -= vec.at(i);
-			normVals[i] *= normVals[i];
-			result += normVals[i];
-		}
-		result = sqrt(result);
-		return result;
+	double result=0;
+	double color[3] = {red,green,blue};
+	double normVals[3];
+	for(int i=0; i<3; i++) {
+		normVals[i] = color[i]/(color[0]+color[1]+color[2]);
+		normVals[i] -= vec.at(i);
+		normVals[i] *= normVals[i];
+		result += normVals[i];
 	}
+	result = sqrt(result);
+	return result;
+}
 
 //calculates the Euclidean Distance between absolute Rgb input and colors(vec).
 double Rgb::absEucDist(double red, double green, double blue, deque<double> &vec)
+{
+	double result=0;
+	double color[3] = {red,green,blue};
+	for(int i=0; i<3; i++)
 	{
-		double result=0;
-		double color[3] = {red,green,blue};
-		for(int i=0; i<3; i++)
-		{
-			color[i] -= vec.at(i);
-			color[i] *= color[i];
-			result += color[i];
-		}
-		result = sqrt(result);
-		return result;
+		color[i] -= vec.at(i);
+		color[i] *= color[i];
+		result += color[i];
 	}
+	result = sqrt(result);
+	return result;
+}
 
 double Rgb::absEucDist(double red, double green, double blue, deque<int> &vec)
+{
+	double result=0;
+	double color[3] = {red,green,blue};
+	for(int i=0; i<3; i++)
 	{
-		double result=0;
-		double color[3] = {red,green,blue};
-		for(int i=0; i<3; i++)
-		{
-			color[i] -= vec.at(i);
-			color[i] *= color[i];
-			result += color[i];
-		}
-		result = sqrt(result);
-		return result;
+		color[i] -= vec.at(i);
+		color[i] *= color[i];
+		result += color[i];
 	}
+	result = sqrt(result);
+	return result;
+}
 
 void Rgb::outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind)
 {
@@ -168,227 +168,227 @@ bool Rgb::checkAbsDist(double dist, double thresh)
 
 //checks if color is black
 String Rgb::checkBlack(int r, int g, int b)
+{
+	if(r==0 && g==0 && b==0)
 	{
-		if(r==0 && g==0 && b==0)
-		{
-			return "Zero";
-		}
-		return "OTHER";
+		return "Zero";
 	}
+	return "OTHER";
+}
 
 //pushes color using Euclidean Distance with 7 different schemes
 String Rgb::pushColor(int red, int green, int blue)
+{
+	const int length=7;
+	double smallest[length]={0};
+	double val[length]={0};
+	unsigned int index[length]={0};
+	int colorIndex[rgbColors.size()];
+	fill_n(colorIndex,rgbColors.size(),0);
+	double normDistVals[normMeanThresh.size()];
+	double absDistVals[absMeanThresh.size()];
+	for(unsigned int i=0; i<normMeanThresh.size(); i++)
 	{
-		const int length=7;
-		double smallest[length]={0};
-		double val[length]={0};
-		unsigned int index[length]={0};
-		int colorIndex[rgbColors.size()];
-		fill_n(colorIndex,rgbColors.size(),0);
-		double normDistVals[normMeanThresh.size()];
-		double absDistVals[absMeanThresh.size()];
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
-			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i],e) << endl;
-		}
-		smallest[0] = normDistVals[0];
-		smallest[1] = absDistVals[0];
-		smallest[2] = absDistVals[0] * pow(normDistVals[0],2);
-		smallest[3] = absDistVals[0] * normDistVals[0];
-		smallest[4] = absDistVals[0] * pow(normDistVals[0],0.25);
-		smallest[5] = absDistVals[0] * pow(normDistVals[0],0.45);
-		smallest[6] = absDistVals[0] * pow(normDistVals[0],0.65);
-		fill_n(index,length,0);
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			val[0] = normDistVals[i];
-			val[1] = absDistVals[i];
-			val[2] = absDistVals[i] * pow(normDistVals[i],2);
-			val[3] = absDistVals[i] * normDistVals[i];
-			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
-			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
-			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
-			if(val[1]<=2) {
-				return rgbColors[i];
-			}
-			for(int j=0; j<length; j++)
-			{
-				if(val[j]<smallest[j])
-				{
-					smallest[j] = val[j];
-					index[j] = i;
-				}
-			}
-		}
-		for(int i=0; i<length; i++)
-		{
-			for(unsigned int j=0; j<rgbColors.size(); j++)
-			{
-				if(rgbColors.at(index[i])==rgbColors.at(j))
-				{
-					++colorIndex[j];
-				}
-			}
-		}
-		int greatest=0;
-		for(unsigned int i=0; i<rgbColors.size(); i++)
-		{
-			if(colorIndex[i]>=greatest)
-			{
-				greatest = colorIndex[i];
-				index[0] = i;
-			}
-		}
-		return rgbColors[index[0]];
+		normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
+		absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
+		//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*pow(normDistVals[i],e) << endl;
 	}
+	smallest[0] = normDistVals[0];
+	smallest[1] = absDistVals[0];
+	smallest[2] = absDistVals[0] * pow(normDistVals[0],2);
+	smallest[3] = absDistVals[0] * normDistVals[0];
+	smallest[4] = absDistVals[0] * pow(normDistVals[0],0.25);
+	smallest[5] = absDistVals[0] * pow(normDistVals[0],0.45);
+	smallest[6] = absDistVals[0] * pow(normDistVals[0],0.65);
+	fill_n(index,length,0);
+	for(unsigned int i=0; i<normMeanThresh.size(); i++)
+	{
+		val[0] = normDistVals[i];
+		val[1] = absDistVals[i];
+		val[2] = absDistVals[i] * pow(normDistVals[i],2);
+		val[3] = absDistVals[i] * normDistVals[i];
+		val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
+		val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
+		val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+		if(val[1]<=2) {
+			return rgbColors[i];
+		}
+		for(int j=0; j<length; j++)
+		{
+			if(val[j]<smallest[j])
+			{
+				smallest[j] = val[j];
+				index[j] = i;
+			}
+		}
+	}
+	for(int i=0; i<length; i++)
+	{
+		for(unsigned int j=0; j<rgbColors.size(); j++)
+		{
+			if(rgbColors.at(index[i])==rgbColors.at(j))
+			{
+				++colorIndex[j];
+			}
+		}
+	}
+	int greatest=0;
+	for(unsigned int i=0; i<rgbColors.size(); i++)
+	{
+		if(colorIndex[i]>=greatest)
+		{
+			greatest = colorIndex[i];
+			index[0] = i;
+		}
+	}
+	return rgbColors[index[0]];
+}
 
 String Rgb::pushColor(int red, int green, int blue, double &dist, int &ind)
+{
+	const int length=7;
+	double smallest[length]={0};
+	double val[length]={0};
+	unsigned int index[length]={0};
+	int index2=0;
+	int colorIndex[rgbColors.size()];
+	fill_n(colorIndex,rgbColors.size(),0);
+	double normDistVals[normMeanThresh.size()];
+	double absDistVals[absMeanThresh.size()];
+	for(unsigned int i=0; i<normMeanThresh.size(); i++)
 	{
-		const int length=7;
-		double smallest[length]={0};
-		double val[length]={0};
-		unsigned int index[length]={0};
-		int index2=0;
-		int colorIndex[rgbColors.size()];
-		fill_n(colorIndex,rgbColors.size(),0);
-		double normDistVals[normMeanThresh.size()];
-		double absDistVals[absMeanThresh.size()];
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
-			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*(normDistVals[i]) << endl;
-		}
-		smallest[0] = normDistVals[0];
-		smallest[1] = absDistVals[0];
-		smallest[2] = absDistVals[0] * pow(normDistVals[0],2);
-		smallest[3] = absDistVals[0] * normDistVals[0];
-		smallest[4] = absDistVals[0] * pow(normDistVals[0],0.25);
-		smallest[5] = absDistVals[0] * pow(normDistVals[0],0.45);
-		smallest[6] = absDistVals[0] * pow(normDistVals[0],0.65);
-		fill_n(index,length,0);
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			val[0] = normDistVals[i];
-			val[1] = absDistVals[i];
-			val[2] = absDistVals[i] * pow(normDistVals[i],2);
-			val[3] = absDistVals[i] * normDistVals[i];
-			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
-			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
-			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
-
-			if(val[1]<=2) {
-				dist = val[1];
-				ind = i;
-				return rgbColors[i];
-			}
-			for(int j=0; j<length; j++)
-			{
-				if(val[j]<smallest[j])
-				{
-					smallest[j] = val[j];
-					index[j] = i;
-				}
-			}
-		}
-		for(int i=0; i<length; i++)
-		{
-			for(unsigned int j=0; j<rgbColors.size(); j++)
-			{
-				if(index[i]==j)
-				{
-					++colorIndex[j];
-				}
-			}
-		}
-		int greatest=0;
-		for(unsigned int i=0; i<rgbColors.size(); i++)
-		{
-			if(colorIndex[i]>greatest)
-			{
-				greatest = colorIndex[i];
-				index2 = i;
-			}
-		}
-		dist = absDistVals[index2];
-		ind = index2;
-		return rgbColors[index2];
+		normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
+		absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
+		//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*(normDistVals[i]) << endl;
 	}
+	smallest[0] = normDistVals[0];
+	smallest[1] = absDistVals[0];
+	smallest[2] = absDistVals[0] * pow(normDistVals[0],2);
+	smallest[3] = absDistVals[0] * normDistVals[0];
+	smallest[4] = absDistVals[0] * pow(normDistVals[0],0.25);
+	smallest[5] = absDistVals[0] * pow(normDistVals[0],0.45);
+	smallest[6] = absDistVals[0] * pow(normDistVals[0],0.65);
+	fill_n(index,length,0);
+	for(unsigned int i=0; i<normMeanThresh.size(); i++)
+	{
+		val[0] = normDistVals[i];
+		val[1] = absDistVals[i];
+		val[2] = absDistVals[i] * pow(normDistVals[i],2);
+		val[3] = absDistVals[i] * normDistVals[i];
+		val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
+		val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
+		val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+
+		if(val[1]<=2) {
+			dist = val[1];
+			ind = i;
+			return rgbColors[i];
+		}
+		for(int j=0; j<length; j++)
+		{
+			if(val[j]<smallest[j])
+			{
+				smallest[j] = val[j];
+				index[j] = i;
+			}
+		}
+	}
+	for(int i=0; i<length; i++)
+	{
+		for(unsigned int j=0; j<rgbColors.size(); j++)
+		{
+			if(index[i]==j)
+			{
+				++colorIndex[j];
+			}
+		}
+	}
+	int greatest=0;
+	for(unsigned int i=0; i<rgbColors.size(); i++)
+	{
+		if(colorIndex[i]>greatest)
+		{
+			greatest = colorIndex[i];
+			index2 = i;
+		}
+	}
+	dist = absDistVals[index2];
+	ind = index2;
+	return rgbColors[index2];
+}
 
 String Rgb::pushColor(int red, int green, int blue, int &ind, double &dist)
+{
+	const int length=7;
+	double smallest[length]={0};
+	double val[length]={0};
+	unsigned int index[length]={0};
+	int index2=0;
+	int colorIndex[rgbColors.size()];
+	fill_n(colorIndex,rgbColors.size(),0);
+	double normDistVals[normMeanThresh.size()];
+	double absDistVals[absMeanThresh.size()];
+	for(unsigned int i=0; i<normMeanThresh.size(); i++)
 	{
-		const int length=7;
-		double smallest[length]={0};
-		double val[length]={0};
-		unsigned int index[length]={0};
-		int index2=0;
-		int colorIndex[rgbColors.size()];
-		fill_n(colorIndex,rgbColors.size(),0);
-		double normDistVals[normMeanThresh.size()];
-		double absDistVals[absMeanThresh.size()];
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
-			absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
-			//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*(normDistVals[i]) << endl;
-		}
-		smallest[0] = normDistVals[0];
-		smallest[1] = absDistVals[0];
-		smallest[2] = absDistVals[0] * pow(normDistVals[0],2);
-		smallest[3] = absDistVals[0] * normDistVals[0];
-		smallest[4] = absDistVals[0] * pow(normDistVals[0],0.25);
-		smallest[5] = absDistVals[0] * pow(normDistVals[0],0.45);
-		smallest[6] = absDistVals[0] * pow(normDistVals[0],0.65);
-		fill_n(index,length,0);
-		for(unsigned int i=0; i<normMeanThresh.size(); i++)
-		{
-			val[0] = normDistVals[i];
-			val[1] = absDistVals[i];
-			val[2] = absDistVals[i] * pow(normDistVals[i],2);
-			val[3] = absDistVals[i] * normDistVals[i];
-			val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
-			val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
-			val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
-			if(val[1]<=2) {
-				ind = i;
-				cout << absDistVals[ind] << endl;
-				return rgbColors[i];
-			}
-			for(int j=0; j<length; j++)
-			{
-				if(val[j]<smallest[j])
-				{
-					smallest[j] = val[j];
-					index[j] = i;
-				}
-			}
-		}
-		for(int i=0; i<length; i++)
-		{
-			for(unsigned int j=0; j<rgbColors.size(); j++)
-			{
-				if(index[i]==j)
-				{
-					++colorIndex[j];
-				}
-			}
-		}
-		int greatest=0;
-		for(unsigned int i=0; i<rgbColors.size(); i++)
-		{
-			if(colorIndex[i]>greatest)
-			{
-				greatest = colorIndex[i];
-				index2 = i;
-			}
-		}
-		ind = index2;
-		dist = absDistVals[ind];
-		cout << absDistVals[ind] << endl;
-		return rgbColors[index2];
+		normDistVals[i] = normEucDist(red,green,blue, normMeanThresh.at(i));
+		absDistVals[i] = absEucDist(red,green,blue, absMeanThresh.at(i));
+		//cout << rgbColors[i] << ": " << setw(10) << "\t" << normDistVals[i] << " | " << absDistVals[i] << " | " << absDistVals[i]*(normDistVals[i]) << endl;
 	}
+	smallest[0] = normDistVals[0];
+	smallest[1] = absDistVals[0];
+	smallest[2] = absDistVals[0] * pow(normDistVals[0],2);
+	smallest[3] = absDistVals[0] * normDistVals[0];
+	smallest[4] = absDistVals[0] * pow(normDistVals[0],0.25);
+	smallest[5] = absDistVals[0] * pow(normDistVals[0],0.45);
+	smallest[6] = absDistVals[0] * pow(normDistVals[0],0.65);
+	fill_n(index,length,0);
+	for(unsigned int i=0; i<normMeanThresh.size(); i++)
+	{
+		val[0] = normDistVals[i];
+		val[1] = absDistVals[i];
+		val[2] = absDistVals[i] * pow(normDistVals[i],2);
+		val[3] = absDistVals[i] * normDistVals[i];
+		val[4] = absDistVals[i] * pow(normDistVals[i],0.25);
+		val[5] = absDistVals[i] * pow(normDistVals[i],0.45);
+		val[6] = absDistVals[i] * pow(normDistVals[i],0.65);
+		if(val[1]<=2) {
+			ind = i;
+			cout << absDistVals[ind] << endl;
+			return rgbColors[i];
+		}
+		for(int j=0; j<length; j++)
+		{
+			if(val[j]<smallest[j])
+			{
+				smallest[j] = val[j];
+				index[j] = i;
+			}
+		}
+	}
+	for(int i=0; i<length; i++)
+	{
+		for(unsigned int j=0; j<rgbColors.size(); j++)
+		{
+			if(index[i]==j)
+			{
+				++colorIndex[j];
+			}
+		}
+	}
+	int greatest=0;
+	for(unsigned int i=0; i<rgbColors.size(); i++)
+	{
+		if(colorIndex[i]>greatest)
+		{
+			greatest = colorIndex[i];
+			index2 = i;
+		}
+	}
+	ind = index2;
+	dist = absDistVals[ind];
+	cout << absDistVals[ind] << endl;
+	return rgbColors[index2];
+}
 
 double Rgb::calcGrayLevel(int red, int green, int blue)
 {
@@ -486,27 +486,27 @@ double Rgb::calcPerceivedBrightness(double red, double green, double blue) {
 }
 //outputs image window with color of Rgb value
 void Rgb::showPixelColor(int r, int g, int b, Size size)
-	{
-		Mat img = img.zeros(Size(1,1),16);
-		img.at<Vec3b>(0,0)[0] = b;
-		img.at<Vec3b>(0,0)[1] = g;
-		img.at<Vec3b>(0,0)[2] = r;
-		cout << r << "," << g << "," << b << endl;
-		resize(img,img,size,0,0,INTER_CUBIC);
-		imshow("Pixel", img);
-		waitKey(0);
-	}
+{
+	Mat img = img.zeros(Size(1,1),16);
+	img.at<Vec3b>(0,0)[0] = b;
+	img.at<Vec3b>(0,0)[1] = g;
+	img.at<Vec3b>(0,0)[2] = r;
+	cout << r << "," << g << "," << b << endl;
+	resize(img,img,size,0,0,INTER_CUBIC);
+	imshow("Pixel", img);
+	waitKey(0);
+}
 
 //outputs image window of color at Location x,y
 void Rgb::showPixelColorAtLoc(Mat img, int row, int col, Size size)
-	{
-		Mat img2;
-		int r,g,b;
-		b = img.at<Vec3b>(row-1,col-1)[0];
-		g = img.at<Vec3b>(row-1,col-1)[1];
-		r = img.at<Vec3b>(row-1,col-1)[2];
-		showPixelColor(r,g,b,size);
-	}
+{
+	Mat img2;
+	int r,g,b;
+	b = img.at<Vec3b>(row-1,col-1)[0];
+	g = img.at<Vec3b>(row-1,col-1)[1];
+	r = img.at<Vec3b>(row-1,col-1)[2];
+	showPixelColor(r,g,b,size);
+}
 
 void Rgb::release_memory() {
 	normMeanThresh.clear();
@@ -561,7 +561,7 @@ String Rgb::calcColor2(int red, int green, int blue) {
 						}
 						if(c.countColors(hslColors.at(i))>=2)
 							pix = c.reassignLevels(pix,red,green,blue);
-						return toString(grayLevel) + pix;
+						return pix;
 					}
 				}
 			}
@@ -583,7 +583,7 @@ String Rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
 
 String Rgb::calcColor(int red, int green, int blue) {
 	Color c;
-    String pix;
+	String pix;
 	double dist=0;
 	int ind=0;
 	pix = calcColor2(red,green,blue);

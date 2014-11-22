@@ -129,7 +129,7 @@ void runHysteresis()
 	Mat img;
 	img = runResizeImage(filename,Size(700,700),0);
 	if(img.data) {
-		img = runColorNormalization(img);
+		//img = runColorNormalization(img);
 		name = getFileName(filename);
 		int s = 3;
 		bool flag[s];
@@ -143,6 +143,7 @@ void runHysteresis()
 			}
 		}
 		if(flag[0]==true) {
+			boost::timer time;
 			FileData fd(filename);
 			fd.ksize = size;
 			fd.matImage = img;
@@ -163,16 +164,18 @@ void runHysteresis()
 			c.output2ImageColor(fd.colorVec,size,name);
 			writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
 			cout << "Done!" << endl;
-			/*
-		writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
-		writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
-		writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
-		writeSeq2File(fd.rulesMat,name+"_RulesMat");
-		writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
-		writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
-		writeSeq2File(fd.hslPtMat,name+"_hslPts");
-		writeSeq2File(fd.cumHslMat,name+"_cumHSL");
-			 */
+
+			int hours=0, minutes=0, seconds=0;
+			seconds = round(time.elapsed());
+			if(seconds>=60) {
+				minutes = floor(seconds/60);
+				seconds %= 60;
+				if(minutes>=60) {
+					hours = floor(minutes/60);
+					minutes = minutes%60;
+				}
+			}
+			printf("Time Elapsed: %dh:%dm:%ds\n",hours,minutes,seconds);
 		}
 		img.release();
 		rgb.release_memory();
@@ -289,7 +292,17 @@ void runAllHysteresis() {
 				img.release();
 			}
 		}
-		cout <<"Time Elapsed: " << time.elapsed() << endl;
+		int hours=0, minutes=0, seconds=0;
+		seconds = round(time.elapsed());
+		if(seconds>=60) {
+			minutes = floor(seconds/60);
+			seconds %= 60;
+			if(minutes>=60) {
+				hours = floor(minutes/60);
+				minutes = minutes%60;
+			}
+		}
+		printf("Time Elapsed: %dh:%dm:%ds\n",hours,minutes,seconds);
 	}
 	rgb.release_memory();
 	hsl.release_memory();

@@ -77,6 +77,7 @@ Mat labelData ( Mat points , int equation ) {
 	return labels ;
 }
 
+//Support Vector Machine
 void svm ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat &
 		testClasses ) {
 	CvSVMParams param = CvSVMParams () ;
@@ -97,8 +98,6 @@ void svm ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat &
 	Mat predicted ( testClasses.rows , 1 , CV_32F ) ;
 	for ( int i = 0; i < testData.rows ; i ++) {
 		Mat sample = testData.row ( i ) ;
-		float x = sample.at<float>(0 ,0) ;
-		float y = sample.at<float>(0 ,1) ;
 		predicted.at<float>( i , 0) = svm.predict ( sample ) ;
 	}
 	cout << " Accuracy_ { SVM } = " << evaluate ( predicted , testClasses ) << endl ;
@@ -116,6 +115,7 @@ void svm ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat &
 	}
 }
 
+//Neural Network - Multi-Layer Perceptrons
 void mlp ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat &
 		testClasses ) {
 	Mat layers = Mat (4 , 1 , CV_32SC1 ) ;
@@ -146,9 +146,10 @@ void mlp ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat &
 		predicted.at < float >( i ,0) = response.at < float >(0 ,0) ;
 	}
 	cout << " Accuracy_ { MLP } = " << evaluate ( predicted , testClasses ) << endl ;
-	plot_binary ( testData , predicted , " Predictions B ac kp ro p ag at io n " ) ;
+	plot_binary ( testData , predicted , "Predictions Backpropagation" ) ;
 }
 
+//K-nearest neighbor
 void knn ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat &
 		testClasses , int K ) {
 	CvKNearest knn ( trainingData , trainingClasses , Mat () , false , K ) ;
@@ -161,6 +162,7 @@ void knn ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat &
 	plot_binary ( testData , predicted , " Predictions KNN " ) ;
 }
 
+//Bayesian Classifier
 void bayes ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat
 		& testClasses ) {
 	CvNormalBayesClassifier bayes ( trainingData , trainingClasses ) ;
@@ -173,6 +175,7 @@ void bayes ( Mat & trainingData , Mat & trainingClasses , Mat & testData , Mat
 	plot_binary ( testData , predicted , " Predictions Bayes " ) ;
 }
 
+//Decision Tree
 void decisiontree ( Mat & trainingData , Mat & trainingClasses , Mat & testData ,
 		Mat & testClasses ) {
 	CvDTree dtree ;

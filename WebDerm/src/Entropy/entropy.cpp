@@ -1214,7 +1214,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
 	deque<deque<deque<deque<double> > > > smoothRatioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	deque<deque<deque<deque<double> > > > ratioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	int x1=0,y1=0,minRow=0,minCol=0;
-	double count=0, min=0.01;
+	double count=0, min=0.03;
 	double outlierThresh = 0.05;
 	while(y1<height) {
 		minRow=maxRow=y1;
@@ -1480,19 +1480,19 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
 			if((i+ksize.width)>img.cols) end = Point(img.cols-1,img.rows-1);
 			else end = Point(j+ksize.width,i+ksize.height);
 			//data = toString(roundDecimal(vec[i/ksize.height][j/ksize.width][2],3));
-			//data3 = toString(roundDecimal(gTargetCellCount[i/ksize.height][j/ksize.width][2],3));
-			//data2 = toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][2],3));
+			data3 = toString(roundDecimal(gTargetCellCount[i/ksize.height][j/ksize.width][2],3));
+			data2 = toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][2],3));
 			//dark = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][0],3));
 			//high = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][1],3));
 			low2 = toString(roundDecimal(gRatio[i/ksize.height][j/ksize.width][indexColor][2],3));
 			low = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][2],3));
-			data = toString(roundDecimal(gRatioRm[i/ksize.height][j/ksize.width][indexColor][2],3));
-			data2 = toString(roundDecimal(gSmoothRatioRm[i/ksize.height][j/ksize.width][indexColor][2],3));
+			//data = toString(roundDecimal(gRatioRm[i/ksize.height][j/ksize.width][indexColor][2],3));
+			//data2 = toString(roundDecimal(gSmoothRatioRm[i/ksize.height][j/ksize.width][indexColor][2],3));
 			//light = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][3],3));
 			//white = toString(vec[i/ksize.height][j/ksize.width][4]);
 			//putText(dst,dark,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			//putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
-			putText(dst,data,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			putText(dst,data3,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,data2,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,low2,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,low,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));

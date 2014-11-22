@@ -223,6 +223,8 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 				avg /= 3.0;
 				resultVec.at(i) = avg;
 
+				//printf("%s : %f,%f,%f\n",allColors.at(i).c_str(),valY,valS,valV);
+
 				//Total of all the Y that are noticeable
 				total += max(ysv1[0],ysv2[0]);
 				colorsHit[i] = 1;
@@ -238,6 +240,7 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 		if(colorsHit[i]==1) {
 			sum = max(ysv1[0],ysv2[0])/total;
 			resultVec.at(i) *= sum;
+			cout << allColors.at(i) << ": " << resultVec.at(i) << endl;
 			results += resultVec.at(i);
 		}
 	}

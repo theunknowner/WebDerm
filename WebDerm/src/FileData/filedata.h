@@ -50,6 +50,7 @@ public:
 	deque< deque<double> > cumHslMat;
 
 	deque< deque<int> > shadeColorCount;
+	deque<deque<double> > maxHslValues; //max HSL values of each color
 
 	FileData(String file_path="");
 	~FileData();

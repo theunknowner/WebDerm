@@ -38,6 +38,8 @@ public:
 	void release_memory();
 	double calcHueAvg(deque<int> &vec);
 	String printHS(double *HSL);
+	int getHueDirection(double hue1, double hue2);
+	int calcHueDifference(double hue1, double hue2);
 };
 
 #endif /* HSL_H_ */

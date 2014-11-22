@@ -117,11 +117,9 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	Rgb rgb;
 	deque<String> colorVec;
 	String pix2;
-	//double grayLevel=0;
-	double colorLevel=0;
 	extractColorFromString(pix, colorVec);
-	//grayLevel = Rgb.calcGrayLevel(r,g,b);
-	colorLevel = rgb.calcColorLevel(r,g,b);
+	double grayLevel = rgb.calcGrayLevel(r,g,b);
+	double colorLevel = rgb.calcColorLevel(r,g,b);
 	double grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
 		if(colorVec.at(i)=="Gray")
@@ -131,7 +129,29 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	}
 	colorVec.clear();
 	colorVec.shrink_to_fit();
-	return pix2;
+	return toString(grayLevel) + pix2;
+}
+
+//gets color and recalculates gray and color levels
+String Color::reassignLevels(String color, double h, double s, double l) {
+	Rgb rgb;
+	Hsl hsl;
+	deque<String> colorVec;
+	String pix2;
+	extractColorFromString(color, colorVec);
+	int *RGB = hsl.hsl2rgb(h,s,l);
+	double grayLevel = rgb.calcGrayLevel(RGB[0],RGB[1],RGB[2]);
+	double colorLevel = rgb.calcColorLevel(RGB[0],RGB[1],RGB[2]);
+	double grayLumLevel = rgb.calcGrayLumLevel(RGB[0],RGB[1],RGB[2]);
+	for(unsigned int i=0; i<colorVec.size(); i++) {
+		if(colorVec.at(i)=="Gray")
+			pix2 += colorVec.at(i) + toString(grayLumLevel);
+		else
+			pix2 += colorVec.at(i) + toString(colorLevel);
+	}
+	colorVec.clear();
+	colorVec.shrink_to_fit();
+	return toString(grayLevel) + pix2;
 }
 
 String Color::getMainColor(String color) {

@@ -705,3 +705,23 @@ double Functions::getMax(deque<double> &vec, int &maxIndex) {
 	}
 	return largest;
 }
+
+void Functions::removeOutliersFromVec(deque<int> &vec, double thresh) {
+	quicksort(vec,0,vec.size()-1);
+	double amt = vec.size() * thresh;
+	amt = round(amt);
+	for(unsigned int i=0; i<amt; i++) {
+		vec.pop_back();
+		vec.pop_front();
+	}
+}
+
+void Functions::removeOutliersFromVec(deque<double> &vec, double thresh) {
+	quicksort(vec,0,vec.size()-1);
+	double amt = vec.size() * thresh;
+	amt = round(amt);
+	for(unsigned int i=0; i<amt; i++) {
+		vec.pop_back();
+		vec.pop_front();
+	}
+}

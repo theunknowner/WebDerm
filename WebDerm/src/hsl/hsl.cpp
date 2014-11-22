@@ -285,3 +285,29 @@ String Hsl::printHS(double *HSL) {
 	String str(text);
 	return str;
 }
+
+int Hsl::getHueDirection(double hue1, double hue2) {
+	int left = -1;
+	int right = 1;
+	double border = 180.0;
+	double val=0;
+	hue1 = hue1 - floor(hue1/border) * 360;
+	hue2 = hue2 - floor(hue2/border) * 360;
+	if(hue1>hue2)
+		return right;
+	if(hue1<hue2)
+		return left;
+
+	return 0;
+}
+
+int Hsl::calcHueDifference(double hue1, double hue2) {
+	int left = -1;
+	int right = 1;
+	double border = 180.0;
+	double val=0;
+	hue1 = hue1 - floor(hue1/border) * 360;
+	hue2 = hue2 - floor(hue2/border) * 360;
+
+	return hue1-hue2;
+}

@@ -22,6 +22,8 @@ FileData::FileData(String file_path) {
 	range=0;
 
 	ksize = Size(2,2);
+
+	this->maxHslValues.resize(allColors.size(),deque<double>(3,0));
 }
 
 FileData::~FileData() {

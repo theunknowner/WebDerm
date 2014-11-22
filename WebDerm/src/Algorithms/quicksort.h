@@ -12,6 +12,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
-void quicksort(deque<double> &input, int p, int r);
+void quicksort(deque<double> &values, int p, int r);
+void quicksort(deque<int> &values, int p,int r);
 
 #endif /* QUICKSORT_H_ */

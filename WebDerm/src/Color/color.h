@@ -18,6 +18,7 @@ public:
 	void extractColorFromString(String color, deque<String> &vecColor);
 	int countColors(String color);
 	String reassignLevels(String color, int r, int g, int b);
+	String reassignLevels(String color, double h, double s, double l);
 	String getMainColor(String color);
 	String extractShade(String pix);
 	void output2ImageGray(deque< deque<String> > &input, String name);
