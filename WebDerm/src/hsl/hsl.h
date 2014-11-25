@@ -10,7 +10,6 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 
-extern double H, S, L;
 extern deque<String> hslColors;
 extern deque< deque<int> > hueThresh;
 extern deque< deque<double> > satThresh;

@@ -19,7 +19,6 @@
 #include "Histogram/histogram.h"
 #include "Shades/shades.h"
 #include "Entropy/entropy.h"
-#include "Algorithms/jaysort.h"
 
 int main(int argc,char** argv)
 {
@@ -52,6 +51,13 @@ int main(int argc,char** argv)
 	//getSkin(img, mask);
 	//img.copyTo(img2, mask);
 
+	FileData fd;
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_ShadeColors_10x10.csv",fd.colorVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_HSL_10x10.csv",fd.hslMat);
+	fd.pt = Point(260,303);
+	String newPix  = "Low3Pink";
+	String newShade = "Low3";
+	rule5(fd,newPix,newShade);
 	//Point pt1(430,244);
 	//Point pt2(306,439);
 	//String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
@@ -62,7 +68,7 @@ int main(int argc,char** argv)
 	Entropy en;
 	//en.runCompareEntropy();
 	//en.runCompareEntropy2();
-
+/*
 	img2 = c.shadeCorrection(img);
 	//img3 = c.changeImageBrightness(img2,-0.20,0);
 	img4 = c.changeImageBrightness(img2,0.8,1);

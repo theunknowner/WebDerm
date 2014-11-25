@@ -538,60 +538,68 @@ double rule4(FileData &fd, String &newPix, String newShade) {
 }
 
 //rule #5 - BrownPinks that look Pink
-double rule5(FileData &fd, String &newPix) {
-	double ruleNum=5;
-	double flag=false;
-	if(newPix.find("Brown")!=string::npos && newPix.find("Pink")!=string::npos) {
-		Hsl hsl;
-		Functions fn;
-		Color c;
-		double diffThresh=-4, hueDiffThresh=10;
-		double hueDiffPink=0, hueDiffBrown=0;
-		bool colorFlag[2] = {false,false};
-		double HSL[3];
-		HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',1);
-		HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',2);
-		HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(fd.pt.x),';',3);
-		for(unsigned int k=0; k<allColors.size(); k++) {
-			if(allColors.at(k)=="Pink") {
-				if(fd.maxHslValues.at(k).at(1)>0 && fd.maxHslValues.at(k).at(2)>0) {
-					hueDiffPink = abs(hsl.calcHueDifference(HSL[0],fd.maxHslValues.at(k).at(0)));
-					colorFlag[0]=true;
-				}
-			}
-			if(allColors.at(k)=="Brown") {
-				if(fd.maxHslValues.at(k).at(1)>0 && fd.maxHslValues.at(k).at(2)>0) {
-					hueDiffBrown = abs(hsl.calcHueDifference(HSL[0],fd.maxHslValues.at(k).at(0)));
-					colorFlag[1]=true;
-				}
-			}
-			if(colorFlag[0]==true && colorFlag[1]==true) {
-				if((hueDiffPink-hueDiffBrown)<=diffThresh && hueDiffBrown>=20 && hueDiffPink<20) {
-					newPix = "Pink";
-					newPix = c.reassignLevels(newPix,HSL[0],HSL[1],HSL[2]);
-					flag=true;
-					ruleNum = 5.1;
-					break;
-				}
-				if((hueDiffBrown-hueDiffPink)<=diffThresh) {
-					newPix = "Brown";
-					newPix = c.reassignLevels(newPix,HSL[0],HSL[1],HSL[2]);
-					flag=true;
-					ruleNum = 5.2;
-					break;
-				}
+double rule5(FileData &fd, String &newPix, String &newShade) {
+	double ruleNum = 5;
+	bool flag=false;
+	Color c;
+	Hsl hsl;
+	Rgb rgb;
+	Functions fn;
+	int scanSize = 20;
+	String color = c.getMainColor(newPix);
+	String pix;
+	double HSL[3];
+	int *RGB;
+	double nextHSL[3];
+	int *nextRGB;
+	const double H = 3.0/4.0;
+	const double demarcThresh = 0.55;
+	Point demarcPos;
+	double currentRelLum =0, nextRelLum=0;
+	double tempSlope=0, slope=0, avgSlope=0, maxAvgSlope=0;
+	int step=fd.pt.x;
+	if(color=="Pink") {
+		while(color=="Pink") {
+			HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
+			HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
+			HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
+			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+			currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2]);
+			nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',1);
+			nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',2);
+			nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',3);
+			nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
+			nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2]);
+
+			tempSlope = nextRelLum - currentRelLum;
+			slope = abs((slope * H) + (tempSlope*(1.0-H)));
+			step++;
+			if(slope>demarcThresh) break;
+			pix = fd.colorVec.at(fd.pt.y).at(step);
+			color = c.getMainColor(pix);
+		}
+
+		maxAvgSlope = 0;
+		for(int i=(step-2); i<=step; i++) {
+			HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
+			HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
+			HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
+			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+			currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2]);
+
+			nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step-i),';',1);
+			nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step-i),';',2);
+			nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step-i),';',3);
+			nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
+			nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2]);
+			avgSlope = abs((currentRelLum - nextRelLum)/i);
+			if(avgSlope>maxAvgSlope) {
+				maxAvgSlope = avgSlope;
+				demarcPos = Point(i,fd.pt.y);
 			}
 		}
-		/*if(j==278 && i==198) {
-			printf("HSL(%f,%f,%f)\n",h,s,l);
-			printf("Max Brown Hue: %f\n",fd.maxHslValues.at(4).at(0));
-			printf("Max Pink Hue: %f\n",fd.maxHslValues.at(25).at(0));
-			printf("Hue Pink Diff: %f\n",hueDiffPink);
-			printf("Hue Brown Diff: %f\n",hueDiffBrown);
-		}*/
 	}
 	if(flag==true) return ruleNum;
-
 	return 0;
 }
 
@@ -867,7 +875,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	String newPix = pix;
 	deque<double> ruleNumVec;
 
-	//ruleNumVec.push_back(rule5(fd,newPix));
+
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
 	ruleNumVec.push_back(rule3(fd,newPix,newShade));

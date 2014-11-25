@@ -1058,7 +1058,7 @@ inline double eyeF_fn1(double Y, double a, double b, double p)  {
 	return result;
 }
 
-void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor)  {
+void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 	int height = fd.colorVec.size()/ksize.height;
 	int width = fd.colorVec.at(0).size()/ksize.width;
 	int innerHeight = allColors.size();

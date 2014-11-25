@@ -16,6 +16,7 @@
 
 class FileData;
 double rule3(FileData &fd, String &newPix, String &newShade);
+double rule5(FileData &fd, String &newPix, String &newShade);
 
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 					int ratioLoc, int loc, deque<double> &ruleNo);
