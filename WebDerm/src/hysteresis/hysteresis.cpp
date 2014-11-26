@@ -330,7 +330,7 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 	cout << "Max Pink Lum: " << fd.maxHslValues.at(25).at(2) << endl;
 
 	Intensity in;
-	fd.colorVec = in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
+	in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
 	colorWindow.clear();
 	colorWindow.shrink_to_fit();
 	hslVec.clear();

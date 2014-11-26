@@ -54,10 +54,16 @@ int main(int argc,char** argv)
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_ShadeColors_10x10.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_HSL_10x10.csv",fd.hslMat);
-	fd.pt = Point(260,303);
-	String newPix  = "Low3Pink";
+	fd.pt = Point(278,279);
+	String newPix = "Pink";
 	String newShade = "Low3";
 	rule5(fd,newPix,newShade);
+	cout << newShade << endl;
+	fd.pt = Point(279,279);
+	newPix = "Pink";
+	newShade = "Low3";
+	rule5(fd,newPix,newShade);
+	cout << newShade << endl;
 	//Point pt1(430,244);
 	//Point pt2(306,439);
 	//String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";

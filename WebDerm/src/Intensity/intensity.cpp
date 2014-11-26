@@ -370,7 +370,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	double indexChange=0, ccCurr=0, localCC=0, ccPrev=0;
 	int shadeIndex=0, localIndex=0, localMaxIndex=0, localMinIndex=0;
 	double localMinCC=0, localMaxCC=0;
-	deque<String> colorVec1;
 	deque< deque<String> > colorVec3;
 	deque<int> localIndexes;
 	deque<double> localCCs;
@@ -381,6 +380,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	fd.intensityVec = calcIntensityMatrix(fd.windowVec);
 	fd.smoothIntensityVec = calcSmoothedIntensityMatrix(fd.intensityVec);
 	fd.range = range;
+	fd.colorVec.resize(fd.smoothIntensityVec.size(),deque<String>(fd.smoothIntensityVec.at(0).size(),""));
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			try {
@@ -399,7 +399,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 					else
 						shade = "";
 				}
-				colorVec1.push_back(shade);
+				fd.colorVec.at(i).at(j) = shade;
 			}
 			catch(const std::out_of_range &oor) {
 				printf("Intensity::calcMainColorMatrix()-1st Half out of range!\n");
@@ -409,8 +409,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 			}
 		}
 		flag=0;
-		fd.colorVec.push_back(colorVec1);
-		colorVec1.clear();
 	}
 
 	maxShadeIndex = sh.getShadeIndex(newMaxShade);
@@ -609,7 +607,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	} // end row
 	cout << "Done!" << endl;
 	fclose(fp);
-	colorVec1.clear(); colorVec1.shrink_to_fit();
 	colorVec3.clear(); colorVec3.shrink_to_fit();
 	localIndexes.clear(); localIndexes.shrink_to_fit();
 	localCCs.clear(); localCCs.shrink_to_fit();

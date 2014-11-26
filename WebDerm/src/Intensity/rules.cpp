@@ -7,7 +7,7 @@
 
 #include "rules.h"
 
-/** general rule #1 - Contrast with IndexChange**/
+/** general rule #1 - Shade Contrast with IndexChange**/
 double rule1(double &indexChange, String &shade, String &newShade) {
 	Shades sh;
 	bool flag=false;
@@ -75,7 +75,7 @@ double rule2(FileData &fd, String &newPix) {
 	return 0;
 }
 
-// contrast rule
+//rule#3 - contrast rule for Brown/BrownPink/Pink
 double rule3(FileData &fd, String &newPix, String &newShade) {
 	double ruleNum =3;
 	bool flag=false;
@@ -478,7 +478,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 	return 0;
 }
 
-/** contrast rule 2 for Grey that looks Violet/Purple**/
+//rule#4 - contrast rule 2 for Grey that looks Violet/Purple
 double rule4(FileData &fd, String &newPix, String newShade) {
 	double ruleNum=4;
 	double flag=false;
@@ -537,7 +537,7 @@ double rule4(FileData &fd, String &newPix, String newShade) {
 	return 0;
 }
 
-//rule #5 - BrownPinks that look Pink
+//rule #5 - Pink -> DarkPink
 double rule5(FileData &fd, String &newPix, String &newShade) {
 	double ruleNum = 5;
 	bool flag=false;
@@ -545,7 +545,6 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 	Hsl hsl;
 	Rgb rgb;
 	Functions fn;
-	int scanSize = 20;
 	String color = c.getMainColor(newPix);
 	String pix;
 	double HSL[3];
@@ -553,8 +552,10 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 	double nextHSL[3];
 	int *nextRGB;
 	const double H = 3.0/4.0;
-	const double demarcThresh = 0.55;
-	Point demarcPos;
+	const double demarcThresh = 0.004;
+	String shade = "Dark3";
+	Point demarcPos(-1,-1);
+	static int demarcFlag=0;
 	double currentRelLum =0, nextRelLum=0;
 	double tempSlope=0, slope=0, avgSlope=0, maxAvgSlope=0;
 	int step=fd.pt.x;
@@ -564,39 +565,65 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 			HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
 			HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
 			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
-			currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2]);
+			currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
 			nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',1);
 			nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',2);
 			nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',3);
 			nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
-			nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2]);
+			nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
 
-			tempSlope = nextRelLum - currentRelLum;
-			slope = abs((slope * H) + (tempSlope*(1.0-H)));
+			tempSlope = abs(nextRelLum - currentRelLum);
+			slope = (slope * H) + (tempSlope*(1.0-H));
+			//printf() for debugging
+			printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
+			printf(" HSL(%.f,%.2f,%.2f)\n",HSL[0],HSL[1],HSL[2]);
+			///////////////////////
 			step++;
-			if(slope>demarcThresh) break;
+			if(slope>demarcThresh) {
+				if(demarcFlag==0) demarcFlag=1; //entering DarkPink
+				if(demarcFlag==2) demarcFlag=0; //leaving DarkPink
+				break;
+			}
 			pix = fd.colorVec.at(fd.pt.y).at(step);
 			color = c.getMainColor(pix);
 		}
-
-		maxAvgSlope = 0;
-		for(int i=(step-2); i<=step; i++) {
+		//printf() for debugging
+		HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
+		HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
+		HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
+		RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+		currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+		printf("(%d,%d) - Curr:%f,",step,fd.pt.y,currentRelLum);
+		///////////////////////
+		if(demarcFlag==1) {
+			maxAvgSlope = 0;
 			HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 			HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
 			HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
 			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
-			currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2]);
-
-			nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step-i),';',1);
-			nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step-i),';',2);
-			nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step-i),';',3);
-			nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
-			nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2]);
-			avgSlope = abs((currentRelLum - nextRelLum)/i);
-			if(avgSlope>maxAvgSlope) {
-				maxAvgSlope = avgSlope;
-				demarcPos = Point(i,fd.pt.y);
+			currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+			for(int i=(step-2); i<=step; i++) {
+				nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(i),';',1);
+				nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(i),';',2);
+				nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(i),';',3);
+				nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
+				nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
+				avgSlope = abs(currentRelLum - nextRelLum);
+				if(avgSlope>maxAvgSlope) {
+					maxAvgSlope = avgSlope;
+					demarcPos = Point(i,fd.pt.y);
+				}
+				//printf() for debugging
+				//printf("(%d,%d) - Curr:%f, AvgSlope:%f,",i,fd.pt.y,currentRelLum,avgSlope);
+				//printf(" HSL(%.f,%.f,%.f)\n",nextHSL[0],nextHSL[1],nextHSL[2]);
+				////////////////////////
 			}
+			printf("DemarcPos - %d,%d\n",demarcPos.x,demarcPos.y);
+			demarcFlag=2; //in DarkPink
+		}
+		if(demarcFlag==2) {
+			newShade = shade;
+			flag=true;
 		}
 	}
 	if(flag==true) return ruleNum;
