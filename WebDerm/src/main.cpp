@@ -24,7 +24,7 @@ int main(int argc,char** argv)
 {
 	//runRenameFiles();
 	//runAllHysteresis();
-	//runHysteresis();
+	runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 	/*
@@ -35,7 +35,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -45,25 +45,33 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/herpes5.jpg",Size(700,700),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria7.jpg",Size(700,700),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
 	//img.copyTo(img2, mask);
 
-	FileData fd;
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_ShadeColors_10x10.csv",fd.colorVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_HSL_10x10.csv",fd.hslMat);
-	fd.pt = Point(278,279);
+	int row=279;
 	String newPix = "Pink";
-	String newShade = "Low3";
-	rule5(fd,newPix,newShade);
-	cout << newShade << endl;
-	fd.pt = Point(279,279);
-	newPix = "Pink";
-	newShade = "Low3";
-	rule5(fd,newPix,newShade);
-	cout << newShade << endl;
+	String newShade = "Low2";
+	FileData fd;
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_ShadeColors_10x10.csv",fd.windowVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_HSL_10x10.csv",fd.hslMat);
+	//for(unsigned int i=272; i<fd.windowVec.at(row).size(); i++) {
+		fd.pt = Point(342,row);
+		//String newPix = c.getMainColor(fd.windowVec.at(row).at(i));
+		//String newShade = sh.extractShade(fd.windowVec.at(row).at(i));
+		rule5(fd,newPix,newShade);
+		cout << newShade << endl;
+		fd.pt = Point(345,row);
+		rule5(fd,newPix,newShade);
+		cout << newShade << endl;
+		fd.pt = Point(347,row);
+		rule5(fd,newPix,newShade);
+		cout << newShade << endl;
+		//printf("(%d,%d) - %s\n",,fd.pt.y,newShade.c_str());
+	//}
+
 	//Point pt1(430,244);
 	//Point pt2(306,439);
 	//String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
@@ -87,9 +95,9 @@ int main(int argc,char** argv)
 	//imshow("img3",img3);
 	imshow("img4",img4);
 	waitKey(0);
-	imwrite("herpes5.png",img4);/**/
+	imwrite("urticaria7.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
-/*
+	/*
 	deque<deque<double> > vec1;
 	deque<deque<double> > vec2;
 	deque<deque<double> > matchVec;
@@ -116,7 +124,7 @@ int main(int argc,char** argv)
 	fclose(fp);
 	en.releaseMemory();
 /**/
-/*
+	/*
 	FileData fd;
 	fd.filename = "acne1";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
@@ -146,7 +154,7 @@ int main(int argc,char** argv)
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-/*
+	/*
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);

@@ -322,12 +322,6 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 		colorWindow.clear();
 		hslVec.clear();
 	}
-	cout << "Max Brown Hue: " << fd.maxHslValues.at(4).at(0) << endl;
-	cout << "Max Brown Sat: " << fd.maxHslValues.at(4).at(1) << endl;
-	cout << "Max Brown Lum: " << fd.maxHslValues.at(4).at(2) << endl;
-	cout << "Max Pink Hue: " << fd.maxHslValues.at(25).at(0) << endl;
-	cout << "Max Pink Sat: " << fd.maxHslValues.at(25).at(1) << endl;
-	cout << "Max Pink Lum: " << fd.maxHslValues.at(25).at(2) << endl;
 
 	Intensity in;
 	in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);

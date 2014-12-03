@@ -588,6 +588,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				printf("Intensity::calcMainColorMatrix()-2nd Half out of range!\n");
 				printf("smoothIntensityVec.Size: %lu\n",fd.smoothIntensityVec.size());
 				printf("Point(%d,%d)\n",j,i);
+				printf("Color: %s\n", pix2.c_str());
 				exit(1);
 			}
 		} // end col

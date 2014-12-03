@@ -551,51 +551,67 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 	int *RGB;
 	double nextHSL[3];
 	int *nextRGB;
-	const double H = 3.0/4.0;
-	const double demarcThresh = 0.004;
+	const double H = 0.65;
+	const double enterDemarcThresh = -0.0042;
+	const double exitDemarcThresh = 0.007;
 	String shade = "Dark3";
-	Point demarcPos(-1,-1);
+	static Point enterDemarcPos(-1,-1);
+	static Point exitDemarcPos(-1,-1);
 	static int demarcFlag=0;
 	double currentRelLum =0, nextRelLum=0;
 	double tempSlope=0, slope=0, avgSlope=0, maxAvgSlope=0;
 	int step=fd.pt.x;
-	if(color=="Pink") {
-		while(color=="Pink") {
+	if(enterDemarcPos.y!=fd.pt.y || (color!="Pink" && color!="PinkRed")) {
+		enterDemarcPos = Point(-1,-1);
+		exitDemarcPos = Point(-1,-1);
+		demarcFlag=0;
+	}
+	if(color=="Pink" || color=="PinkRed") {
+		while((color=="Pink" || color=="PinkRed") && fd.pt.x<(fd.hslMat.size()-1)) {
 			HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 			HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
 			HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
 			RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 			currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+			currentRelLum = roundDecimal(currentRelLum,2);
 			nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',1);
 			nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',2);
 			nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',3);
 			nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
 			nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
+			nextRelLum = roundDecimal(nextRelLum,2);
 
-			tempSlope = abs(nextRelLum - currentRelLum);
+			tempSlope = (nextRelLum - currentRelLum);
 			slope = (slope * H) + (tempSlope*(1.0-H));
 			//printf() for debugging
+			/*
 			printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
-			printf(" HSL(%.f,%.2f,%.2f)\n",HSL[0],HSL[1],HSL[2]);
+			printf(" HSL(%.f,%.2f,%.2f), Flag: %d\n",HSL[0],HSL[1],HSL[2],demarcFlag);
+			*/
 			///////////////////////
 			step++;
-			if(slope>demarcThresh) {
-				if(demarcFlag==0) demarcFlag=1; //entering DarkPink
-				if(demarcFlag==2) demarcFlag=0; //leaving DarkPink
+			if(slope<=enterDemarcThresh && demarcFlag==0) {
+				demarcFlag=1; //entering DarkPink
 				break;
 			}
-			pix = fd.colorVec.at(fd.pt.y).at(step);
+			if(slope>=exitDemarcThresh) {
+				demarcFlag=1;
+				break;
+			}
+			pix = fd.windowVec.at(fd.pt.y).at(step);
 			color = c.getMainColor(pix);
 		}
 		//printf() for debugging
+		/*
 		HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 		HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
 		HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
 		RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 		currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
-		printf("(%d,%d) - Curr:%f,",step,fd.pt.y,currentRelLum);
+		printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
+		*/
 		///////////////////////
-		if(demarcFlag==1) {
+		if(demarcFlag==1 || demarcFlag==2) {
 			maxAvgSlope = 0;
 			HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 			HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
@@ -608,22 +624,46 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 				nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(i),';',3);
 				nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
 				nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
-				avgSlope = abs(currentRelLum - nextRelLum);
-				if(avgSlope>maxAvgSlope) {
-					maxAvgSlope = avgSlope;
-					demarcPos = Point(i,fd.pt.y);
+				avgSlope = currentRelLum - nextRelLum;
+				if(abs(avgSlope)>maxAvgSlope) {
+					maxAvgSlope = abs(avgSlope);
+					if(avgSlope<0 && enterDemarcPos.x==-1 && enterDemarcPos.y==-1) {
+						enterDemarcPos = Point(i,fd.pt.y);
+						demarcFlag=2;
+					}
+					else if(avgSlope>0 && exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
+						exitDemarcPos = Point(i,fd.pt.y);
+						demarcFlag=2;
+					}
 				}
 				//printf() for debugging
 				//printf("(%d,%d) - Curr:%f, AvgSlope:%f,",i,fd.pt.y,currentRelLum,avgSlope);
 				//printf(" HSL(%.f,%.f,%.f)\n",nextHSL[0],nextHSL[1],nextHSL[2]);
 				////////////////////////
 			}
-			printf("DemarcPos - %d,%d\n",demarcPos.x,demarcPos.y);
-			demarcFlag=2; //in DarkPink
 		}
-		if(demarcFlag==2) {
-			newShade = shade;
-			flag=true;
+		/*
+		printf("Flag: %d\n",demarcFlag);
+		printf("%d,%d\n",fd.pt.x,fd.pt.y);
+		printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
+		printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
+		*/
+		if(enterDemarcPos.x!=-1 && enterDemarcPos.y!=-1) {
+			if(fd.pt.x>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
+				if(exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
+					newShade = shade;
+					flag=true;
+				}
+				else if(fd.pt.x<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
+					newShade = shade;
+					flag=true;
+				}
+				else {
+					enterDemarcPos = Point(-1,-1);
+					exitDemarcPos = Point(-1,-1);
+					demarcFlag=0;
+				}
+			}
 		}
 	}
 	if(flag==true) return ruleNum;
@@ -902,13 +942,13 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	String newPix = pix;
 	deque<double> ruleNumVec;
 
-
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
-	ruleNumVec.push_back(rule3(fd,newPix,newShade));
+	//ruleNumVec.push_back(rule3(fd,newPix,newShade));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));
+	ruleNumVec.push_back(rule5(fd,newPix,newShade));
 	ruleNumVec.push_back(rule7(pix,newPix));
 
 	if(ruleNumVec.size()>0) {

@@ -129,7 +129,7 @@ void runHysteresis()
 	Mat img;
 	img = runResizeImage(filename,Size(700,700),0);
 	if(img.data) {
-		//img = runColorNormalization(img);
+		img = runColorNormalization(img);
 		name = getFileName(filename);
 		int s = 3;
 		bool flag[s];
