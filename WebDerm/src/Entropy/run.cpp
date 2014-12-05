@@ -34,17 +34,19 @@ void Entropy::runAllEntropy() {
 	hsl.importHslThresholds();
 	rgb.importThresholds();
 	sh.importThresholds();
-	Size entSize(50,50);
+	Size entSize(10,10);
+	Size size(5,5);
+	String strSize = toString(size.width)+"x"+toString(size.height);
 	bool flag[2] = {false};
 	for(unsigned int i=0; i<files.size(); i++) {
 		Mat img = imread(files.at(i));
 		if(img.data) {
 			FileData fd;
 			fd.filename = getFileName(files.at(i),"_");
-			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
-			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
+			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_ShadeColors_"+strSize+".csv",fd.colorVec);
+			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
-				fd.ksize = Size(10,10);
+				fd.ksize = size;
 				eyeFn(fd,entSize,"");
 			}
 		}
@@ -91,7 +93,7 @@ void Entropy::runCompareEntropy() {
 		deque<deque<double> > vec2;
 		deque<deque<double> > matchVec;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/Test/";
+		String folder = "/home/jason/Desktop/Programs/Test2/";
 		String filepath, name;
 		double results;
 		deque<double> resultVec;
@@ -128,7 +130,7 @@ void Entropy::runCompareEntropy2() {
 		deque<deque<double> > vec2;
 		deque<deque<double> > matchVec;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/Test/";
+		String folder = "/home/jason/Desktop/Programs/Test2/";
 		String filepath, name;
 		double results;
 		deque<double> resultVec;

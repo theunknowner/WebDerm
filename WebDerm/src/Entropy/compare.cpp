@@ -240,7 +240,6 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 		if(colorsHit[i]==1) {
 			sum = max(ysv1[0],ysv2[0])/total;
 			resultVec.at(i) *= sum;
-			cout << allColors.at(i) << ": " << resultVec.at(i) << endl;
 			results += resultVec.at(i);
 		}
 	}

@@ -24,7 +24,7 @@ int main(int argc,char** argv)
 {
 	//runRenameFiles();
 	//runAllHysteresis();
-	runHysteresis();
+	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 	/*
@@ -35,7 +35,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -45,32 +45,11 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria7.jpg",Size(700,700),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph9.jpg",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
 	//getSkin(img, mask);
 	//img.copyTo(img2, mask);
-
-	int row=279;
-	String newPix = "Pink";
-	String newShade = "Low2";
-	FileData fd;
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_ShadeColors_10x10.csv",fd.windowVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/vesicles18_HSL_10x10.csv",fd.hslMat);
-	//for(unsigned int i=272; i<fd.windowVec.at(row).size(); i++) {
-		fd.pt = Point(342,row);
-		//String newPix = c.getMainColor(fd.windowVec.at(row).at(i));
-		//String newShade = sh.extractShade(fd.windowVec.at(row).at(i));
-		rule5(fd,newPix,newShade);
-		cout << newShade << endl;
-		fd.pt = Point(345,row);
-		rule5(fd,newPix,newShade);
-		cout << newShade << endl;
-		fd.pt = Point(347,row);
-		rule5(fd,newPix,newShade);
-		cout << newShade << endl;
-		//printf("(%d,%d) - %s\n",,fd.pt.y,newShade.c_str());
-	//}
 
 	//Point pt1(430,244);
 	//Point pt2(306,439);
@@ -82,11 +61,11 @@ int main(int argc,char** argv)
 	Entropy en;
 	//en.runCompareEntropy();
 	//en.runCompareEntropy2();
-/*
+
 	img2 = c.shadeCorrection(img);
 	//img3 = c.changeImageBrightness(img2,-0.20,0);
 	img4 = c.changeImageBrightness(img2,0.8,1);
-	blur(img4,img4,Size(10,10));
+	blur(img4,img4,Size(5,5));
 	//img4 = c.correctGamma(img2,2.2);
 	//namedWindow("img",CV_WINDOW_FREERATIO);
 	//namedWindow("img3",CV_WINDOW_FREERATIO);
@@ -95,7 +74,7 @@ int main(int argc,char** argv)
 	//imshow("img3",img3);
 	imshow("img4",img4);
 	waitKey(0);
-	imwrite("urticaria7.png",img4);/**/
+	imwrite("lph9-2.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
 	/*
 	deque<deque<double> > vec1;

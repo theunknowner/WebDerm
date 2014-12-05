@@ -33,7 +33,7 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 		sprintf(rl,"RelLum: %d",relLum);
 		putText(img3, coordText, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
 		putText(img3, rl, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-		imshow("Info",img3);
+        //imshow("Info",img3);
 	}
 	else {
 		Vec3b rgbVec = img2.at<Vec3b>(y,x);

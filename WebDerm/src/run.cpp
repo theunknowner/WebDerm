@@ -123,13 +123,13 @@ void runHysteresis()
 	Color c;
 	String filename;
 	String name;
-	Size size(10,10);
+	Size size(5,5);
 	cout << "Enter filename: ";
 	cin >> filename;
-	Mat img;
-	img = runResizeImage(filename,Size(700,700),0);
+	Mat img = imread(filename);
 	if(img.data) {
 		img = runColorNormalization(img);
+		img = runResizeImage(img,Size(140,140));
 		name = getFileName(filename);
 		int s = 3;
 		bool flag[s];
@@ -148,19 +148,12 @@ void runHysteresis()
 			fd.ksize = size;
 			fd.matImage = img;
 			hysteresis(fd);
-			/*
-		String windowVecFile = "/home/jason/Desktop/Programs/" + name + ".csv";
-		String hslVecFile = "/home/jason/Desktop/Programs/" + name + "_HSL.csv";
-		Intensity in;
-		if(!fd.loadFileMatrix(windowVecFile, fd.windowVec)) exit(1);
-		if(!fd.loadFileMatrix(hslVecFile, fd.hslMat)) exit(1);
-		fd.colorVec = in.calcMainColorMatrix(fd.matImage,fd.windowVec,fd.hslMat,fd.filename,fd);
-/**/
+
 			cout << "Writing Files..." << flush;
 			String strSize = toString(size.width)+"x"+toString(size.height);
 			writeSeq2File(fd.windowVec,name+"_"+strSize);
 			writeSeq2File(fd.hslMat,name+"_HSL_"+strSize);
-			//fd.writeFileMetaData();
+
 			c.output2ImageColor(fd.colorVec,size,name);
 			writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
 			cout << "Done!" << endl;
@@ -252,7 +245,7 @@ void runAllHysteresis() {
 	FileData fdFiles;
 	deque<String> files;
 	String name;
-	Size size(10,10);
+	Size size(5,5);
 	Mat img;
 	int s = 4;
 	bool flag[s];
@@ -270,9 +263,10 @@ void runAllHysteresis() {
 		boost::timer time;
 		for(unsigned int i=0; i<files.size(); i++) {
 			full_path = folder+files.at(i);
-			img = runResizeImage(full_path,Size(700,700),0);
+			img = imread(full_path);
 			if(img.data) {
 				img = runColorNormalization(img);
+				img = runResizeImage(img,Size(140,140));
 				name = getFileName(full_path);
 				FileData fd(full_path);
 				fd.matImage = img;
