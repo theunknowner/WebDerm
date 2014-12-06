@@ -334,6 +334,32 @@ Mat Color::changeImageBrightness(Mat &img, double amt, int type) {
 	return img2;
 }
 
+Mat Color::changeImageSaturation(Mat img, double amt) {
+	Mat img2 = img.clone();
+	Hsl hsl;
+	int r,g,b;
+	double *HSL;
+	int *RGB;
+	for(int i=0; i<img2.rows; i++) {
+		for(int j=0; j<img2.cols; j++) {
+			r = img2.at<Vec3b>(i,j)[2];
+			g = img2.at<Vec3b>(i,j)[1];
+			b = img2.at<Vec3b>(i,j)[0];
+			if(r!=0 && g!=0 && b!=0) {
+				HSL = hsl.rgb2hsl(r,g,b);
+				HSL[1] += amt;
+				if(HSL[1]>1.0) HSL[1] = 1.0;
+				if(HSL[1]<0) HSL[1] = 0;
+				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+				img2.at<Vec3b>(i,j)[2] = RGB[0];
+				img2.at<Vec3b>(i,j)[1] = RGB[1];
+				img2.at<Vec3b>(i,j)[0] = RGB[2];
+			}
+		}
+	}
+	return img2;
+}
+
 void Color::changeContrast(double &r, double &g, double &b, double alpha, double beta) {
 	double contrast[3];
 	contrast[2] = round((alpha * r) + beta);

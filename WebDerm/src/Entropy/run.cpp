@@ -93,7 +93,7 @@ void Entropy::runCompareEntropy() {
 		deque<deque<double> > vec2;
 		deque<deque<double> > matchVec;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/Test2/";
+		String folder = "/home/jason/Desktop/Programs/TestYSV2/";
 		String filepath, name;
 		double results;
 		deque<double> resultVec;
@@ -130,7 +130,7 @@ void Entropy::runCompareEntropy2() {
 		deque<deque<double> > vec2;
 		deque<deque<double> > matchVec;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/Test2/";
+		String folder = "/home/jason/Desktop/Programs/TestYSV2/";
 		String filepath, name;
 		double results;
 		deque<double> resultVec;

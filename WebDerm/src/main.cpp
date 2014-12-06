@@ -24,7 +24,7 @@ int main(int argc,char** argv)
 {
 	//runRenameFiles();
 	//runAllHysteresis();
-	//runHysteresis();
+	runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 	/*
@@ -35,7 +35,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -45,11 +45,8 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph9.jpg",Size(140,140),0);
+	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-	//img2 = runResizeImage(path+"Images/Vesicles/","vesicles25.jpg",Size(700,700),0);
-	//getSkin(img, mask);
-	//img.copyTo(img2, mask);
 
 	//Point pt1(430,244);
 	//Point pt2(306,439);
@@ -62,6 +59,17 @@ int main(int argc,char** argv)
 	//en.runCompareEntropy();
 	//en.runCompareEntropy2();
 
+	FileData fd;
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_5x5.csv",fd.windowVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_HSL_5x5.csv",fd.hslMat);
+	for(int i=74; i<90; i++) {
+		fd.pt = Point(i,65);
+		String newPix = "Pink";
+		String newShade = "Low2";
+		rule5(fd,newPix,newShade);
+		cout << newShade << endl;
+	}
+	/*
 	img2 = c.shadeCorrection(img);
 	//img3 = c.changeImageBrightness(img2,-0.20,0);
 	img4 = c.changeImageBrightness(img2,0.8,1);
@@ -69,12 +77,12 @@ int main(int argc,char** argv)
 	//img4 = c.correctGamma(img2,2.2);
 	//namedWindow("img",CV_WINDOW_FREERATIO);
 	//namedWindow("img3",CV_WINDOW_FREERATIO);
-	namedWindow("img4",CV_WINDOW_FREERATIO);
+	//namedWindow("img4",CV_WINDOW_FREERATIO);
 	//imshow("img",img);
 	//imshow("img3",img3);
-	imshow("img4",img4);
-	waitKey(0);
-	imwrite("lph9-2.png",img4);/**/
+	//imshow("img4",img4);
+	//waitKey(0);
+	imwrite("ves18-2.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
 	/*
 	deque<deque<double> > vec1;

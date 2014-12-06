@@ -25,6 +25,7 @@ public:
 	void output2ImageColor(deque< deque<String> > &window, Size size, String name);
 	String fixColors(String pix, double r, double g, double b);
 	Mat changeImageBrightness(Mat &img, double amt, int type=0);
+	Mat changeImageSaturation(Mat img, double amt);
 	Mat changeImageContrast(Mat img, double alpha=1, double beta=0);
 	void changeContrast(double &r, double &g, double &b, double alpha=1, double beta=0);
 	String optimizeColor(String pix);

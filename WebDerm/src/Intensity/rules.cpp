@@ -559,15 +559,15 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 	static Point exitDemarcPos(-1,-1);
 	static int demarcFlag=0;
 	double currentRelLum =0, nextRelLum=0;
-	double tempSlope=0, slope=0, avgSlope=0, maxAvgSlope=0;
+	double tempSlope=0, slope=0;
 	int step=fd.pt.x;
-	if(enterDemarcPos.y!=fd.pt.y || (color!="Pink" && color!="PinkRed")) {
+	if(enterDemarcPos.y!=fd.pt.y || (color!="Pink" && color!="PinkRed" && color!="BrownPink" && color!="BrownRed")) {
 		enterDemarcPos = Point(-1,-1);
 		exitDemarcPos = Point(-1,-1);
 		demarcFlag=0;
 	}
-	if(color=="Pink" || color=="PinkRed") {
-		while((color=="Pink" || color=="PinkRed") && step<(fd.hslMat.at(0).size()-1)) {
+	if(color=="Pink" || color=="PinkRed" || color=="BrownPink" || color=="BrownRed") {
+		while((color=="Pink" || color=="PinkRed" || color=="BrownPink" || color=="BrownRed") && step<(fd.hslMat.at(0).size()-1)) {
 			try {
 				HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 				HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
@@ -583,22 +583,23 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 				tempSlope = (nextRelLum - currentRelLum);
 				slope = (slope * H) + (tempSlope*(1.0-H));
 				//printf() for debugging
-				/*
+/*
 				printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
 				printf(" HSL(%.f,%.2f,%.2f), Flag: %d\n",HSL[0],HSL[1],HSL[2],demarcFlag);
-				*/
+*/
 				///////////////////////
+				step++;
 				if(slope<=enterDemarcThresh && demarcFlag==0) {
 					demarcFlag=1; //entering DarkPink
 					break;
 				}
-				if(slope>=exitDemarcThresh && demarcFlag==0) {
+				if(slope>=exitDemarcThresh) {
 					demarcFlag=1;
 					break;
 				}
-				pix = fd.windowVec.at(fd.pt.y).at(step+1);
+				pix = fd.windowVec.at(fd.pt.y).at(step);
 				color = c.getMainColor(pix);
-				step++;
+
 			} catch (const std::out_of_range &oor) {
 				printf("\nRule5: Try/Catch #1 Out of Range!\n");
 				printf("fd.hslMat.size(): %lu\n",fd.hslMat.size());
@@ -621,35 +622,36 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 */
 		///////////////////////
 		if(demarcFlag==1) {
-			try {
+			/*try {
 				maxAvgSlope = 0;
 				HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 				HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
 				HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
 				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 				currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
-				for(int i=(step-2); i<=step; i++) {
-					try {
-						nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(i),';',1);
-						nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(i),';',2);
-						nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(i),';',3);
-						nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
-						nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
-						avgSlope = currentRelLum - nextRelLum;
-						if(abs(avgSlope)>maxAvgSlope) {
-							maxAvgSlope = abs(avgSlope);
-							if(avgSlope<0 && enterDemarcPos.x==-1 && enterDemarcPos.y==-1) {
-								enterDemarcPos = Point(i,fd.pt.y);
-							}
-							else if(avgSlope>0 && exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
-								exitDemarcPos = Point(i,fd.pt.y);
-							}
+
+				try {
+					nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
+					nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
+					nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
+					nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
+					nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
+					avgSlope = currentRelLum - nextRelLum;
+					if(abs(avgSlope)>maxAvgSlope) {
+						maxAvgSlope = abs(avgSlope);
+						if(avgSlope<0 && enterDemarcPos.x==-1 && enterDemarcPos.y==-1) {
+							enterDemarcPos = Point(step,fd.pt.y);
 						}
-					} catch (const std::out_of_range &oor) {
-						printf("\nRule5: Try/Catch #2B Out of Range1\n");
-						printf("fd.hslMat.size(): %lu\n",fd.hslMat.size());
-						printf("Point(%d,%d)\n",i,fd.pt.y);
+						else if(avgSlope>0 && exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
+							enterDemarcPos = Point(fd.pt.x,fd.pt.y);
+							exitDemarcPos = Point(step,fd.pt.y);
+						}
 					}
+				} catch (const std::out_of_range &oor) {
+					printf("\nRule5: Try/Catch #2B Out of Range1\n");
+					printf("fd.hslMat.size(): %lu\n",fd.hslMat.size());
+					printf("Point(%d,%d)\n",step,fd.pt.y);
+
 					//printf() for debugging
 					//printf("(%d,%d) - Curr:%f, AvgSlope:%f,",i,fd.pt.y,currentRelLum,avgSlope);
 					//printf(" HSL(%.f,%.f,%.f)\n",nextHSL[0],nextHSL[1],nextHSL[2]);
@@ -660,6 +662,13 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 				printf("fd.hslMat.size(): %lu\n",fd.hslMat.size());
 				printf("Point(%d,%d)\n",step,fd.pt.y);
 				exit(1);
+			}*/
+			if(slope<=enterDemarcThresh) {
+				enterDemarcPos = Point(step-1,fd.pt.y);
+			}
+			else if(slope>=exitDemarcThresh) {
+				enterDemarcPos = Point(fd.pt.x,fd.pt.y);
+				exitDemarcPos = Point(step-1,fd.pt.y);
 			}
 		}
 /*
@@ -672,10 +681,12 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 			if(fd.pt.x>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
 				if(exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
 					newShade = shade;
+					newPix = "Pink";
 					flag=true;
 				}
 				else if(fd.pt.x<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
 					newShade = shade;
+					newPix = "Pink";
 					flag=true;
 				}
 				else {
@@ -685,7 +696,7 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 				}
 			}
 		}
-		else {
+		/*else {
 			if(fd.pt.x<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
 				newShade = shade;
 				flag=true;
@@ -695,7 +706,7 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 				exitDemarcPos = Point(-1,-1);
 				demarcFlag=0;
 			}
-		}
+		}*/
 	}
 	if(flag==true) return ruleNum;
 	return 0;
@@ -979,7 +990,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));
-	//ruleNumVec.push_back(rule5(fd,newPix,newShade));
+	ruleNumVec.push_back(rule5(fd,newPix,newShade));
 	ruleNumVec.push_back(rule7(pix,newPix));
 
 	if(ruleNumVec.size()>0) {
