@@ -539,8 +539,8 @@ void generateColorRegionTable(Mat &img, Point pt, Size size) {
 
 //generates a csv file with info of specified pixel-location
 void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
-	int ptY = pt.y-1;
-	int ptX = pt.x-1;
+	int ptY = pt.y;
+	int ptX = pt.x;
 	int r,g,b;
 	double h,s,l;
 	String pix,pix2;
@@ -554,8 +554,8 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 	FILE * fp;
 	fp = fopen("/home/jason/Desktop/workspace/ColorRegionTable.csv","w");
 	fprintf(fp,"Coord,Color,RGB,HSL,GrayLevel,ColorLevel,GrayLumLevel,ColorLumLevel,Darkness,GL/CL,GLL/CLL,GLL/CL\n");
-	for(int y=ptY; y<pt2.y; y++) {
-		for(int x=ptX; x<pt2.x; x++) {
+	for(int y=ptY; y<=pt2.y; y++) {
+		for(int x=ptX; x<=pt2.x; x++) {
 			r = img.at<Vec3b>(y,x)[2];
 			g = img.at<Vec3b>(y,x)[1];
 			b = img.at<Vec3b>(y,x)[0];
@@ -575,7 +575,7 @@ void generateColorRegionTable(Mat &img, Point pt, Point pt2) {
 			ratio2 = grayLumLevel/colorLumLevel;
 			ratio = grayLevel/colorLevel;
 			double ratio3 = grayLumLevel/colorLevel;
-			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),(%.0f;%.0f;%.0f),%f,%f,%f,%f,%f,%0.3f,%0.3f,",x+1,y+1,pix.c_str(),r,g,b,h,s,l,
+			fprintf(fp,"(%d;%d),%s,(%d;%d;%d),(%.0f;%.0f;%.0f),%f,%f,%f,%f,%f,%0.3f,%0.3f,",x,y,pix.c_str(),r,g,b,h,s,l,
 					grayLevel,colorLevel,grayLumLevel,colorLumLevel,lum,ratio,ratio2);
 			fprintf(fp,"%0.3f\n",ratio3);
 		}

@@ -86,9 +86,15 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 	int localScanSize = 20;
 	String color = c.getMainColor(newPix);
 	int HSL[3] = {0};
-	HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
-	HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2)*100;
-	HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3)*100;
+	try {
+		HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
+		HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',2)*100;
+		HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',3)*100;
+	} catch (const std::out_of_range &oor) {
+		printf("Rule3: Try/Catch #1 Out of Range!\n");
+		printf("fd.hslMat.size(): %lu\n",fd.hslMat.size());
+		printf("Point(%d,%d)\n",pt.x,pt.y);
+	}
 	HSL[0] = (int)(HSL[0] - floor(HSL[0]/180.) * 360);
 	HSL[1] = 100-HSL[1];
 	double currCumHSL = HSL[0] + HSL[1] + HSL[2];
@@ -223,13 +229,14 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		if(fn.countLesser(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2) {
 			if(HSL[1]<=70) {
 				if(fn.countGreater(4,round(abs(deltaHSL_0[1][0]/unitThresh[0])),round(abs(deltaHSL_45[1][0]/unitThresh[0])),round(abs(deltaHSL_90[1][0]/unitThresh[0])),0.)>=2) {
-					newPix = "Pink";
+					if(color=="Brown") newPix=="BrownPink";
+					if(color=="BrownPink") newPix = "Pink";
 					flag=true;
 					ruleNum = 3.1;
 				}
 			}
 		}
-		//in pink
+		//in Pink/BrownPink
 		if(fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2 &&
 				fn.countLesserEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],2.0)>=2) {
 			if(fn.countLesser(4,measuredContrast_0[0],measuredContrast_45[0],measuredContrast_90[0],1.0)>=2){
@@ -238,7 +245,8 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 					prevColor_45 = c.getMainColor(fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x));
 					prevColor_90 = c.getMainColor(fd.colorVec.at(hslPt_90[1].y).at(hslPt_90[1].x));
 					if(fn.countEqual("4",prevColor_0.c_str(),prevColor_45.c_str(),prevColor_90.c_str(),"Pink")>=2) {
-						newPix = "Pink";
+						if(color=="Brown") newPix=="BrownPink";
+						if(color=="BrownPink") newPix = "Pink";
 						flag=true;
 						ruleNum = 3.2;
 					}
@@ -254,7 +262,8 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 						if((shadeIndex90-currShadeIndex)>=1 && (shadeIndex90-currShadeIndex)<=2) flag90=1;
 						if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
 							if(fn.countLesserEqual(4,deltaHSL_0[1][0],deltaHSL_45[1][0],deltaHSL_90[1][0],-3.0)>=2) {
-								newPix = "Pink";
+								if(color=="Brown") newPix=="BrownPink";
+								if(color=="BrownPink") newPix = "Pink";
 								flag=true;
 								ruleNum = 3.21;
 							}
@@ -276,9 +285,9 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		strHsl += ";("+toString(deltaHSL_90[1][0])+";"+toString(deltaHSL_90[1][1])+";"+toString(deltaHSL_90[1][2])+")";
 		fd.d_HslMat.at(pt.y).at(pt.x) = strHsl;
 		char chArr[100];
-		sprintf(chArr,"Min(%d;%d);(%d;%d);(%d;%d)",hslPt_0[0].x+1,hslPt_0[0].y+1,hslPt_45[0].x+1,hslPt_45[0].y+1,hslPt_90[0].x+1,hslPt_90[0].y+1);
+		sprintf(chArr,"Min(%d;%d);(%d;%d);(%d;%d)",hslPt_0[0].x,hslPt_0[0].y,hslPt_45[0].x,hslPt_45[0].y,hslPt_90[0].x,hslPt_90[0].y);
 		String ptStr(chArr);
-		sprintf(chArr,"Max(%d;%d);(%d;%d);(%d;%d)",hslPt_0[1].x+1,hslPt_0[1].y+1,hslPt_45[1].x+1,hslPt_45[1].y+1,hslPt_90[1].x+1,hslPt_90[1].y+1);
+		sprintf(chArr,"Max(%d;%d);(%d;%d);(%d;%d)",hslPt_0[1].x,hslPt_0[1].y,hslPt_45[1].x,hslPt_45[1].y,hslPt_90[1].x,hslPt_90[1].y);
 		String ptStr2(chArr);
 		ptStr += ptStr2;
 		fd.hslPtMat.at(pt.y).at(pt.x) = ptStr;
@@ -401,9 +410,9 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		strHsl += ";("+toString(deltaHSL_90[1][0])+";"+toString(deltaHSL_90[1][1])+";"+toString(deltaHSL_90[1][2])+")";
 		fd.d_HslMat.at(pt.y).at(pt.x) = strHsl;
 		char chArr[100];
-		sprintf(chArr,"Min(%d;%d);(%d;%d);(%d;%d)",hslPt_0[0].x+1,hslPt_0[0].y+1,hslPt_45[0].x+1,hslPt_45[0].y+1,hslPt_90[0].x+1,hslPt_90[0].y+1);
+		sprintf(chArr,"Min(%d;%d);(%d;%d);(%d;%d)",hslPt_0[0].x,hslPt_0[0].y,hslPt_45[0].x,hslPt_45[0].y,hslPt_90[0].x,hslPt_90[0].y);
 		String ptStr(chArr);
-		sprintf(chArr,"Max(%d;%d);(%d;%d);(%d;%d)",hslPt_0[1].x+1,hslPt_0[1].y+1,hslPt_45[1].x+1,hslPt_45[1].y+1,hslPt_90[1].x+1,hslPt_90[1].y+1);
+		sprintf(chArr,"Max(%d;%d);(%d;%d);(%d;%d)",hslPt_0[1].x,hslPt_0[1].y,hslPt_45[1].x,hslPt_45[1].y,hslPt_90[1].x,hslPt_90[1].y);
 		String ptStr2(chArr);
 		ptStr += ptStr2;
 		fd.hslPtMat.at(pt.y).at(pt.x) = ptStr;
@@ -560,14 +569,14 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 	static int demarcFlag=0;
 	double currentRelLum =0, nextRelLum=0;
 	double tempSlope=0, slope=0;
-	int step=fd.pt.x;
-	if(enterDemarcPos.y!=fd.pt.y || (color!="Pink" && color!="PinkRed" && color!="BrownPink" && color!="BrownRed")) {
+	unsigned int step=fd.pt.x;
+	if(enterDemarcPos.y!=fd.pt.y || (color!="Pink" && color!="PinkRed")) {
 		enterDemarcPos = Point(-1,-1);
 		exitDemarcPos = Point(-1,-1);
 		demarcFlag=0;
 	}
-	if(color=="Pink" || color=="PinkRed" || color=="BrownPink" || color=="BrownRed") {
-		while((color=="Pink" || color=="PinkRed" || color=="BrownPink" || color=="BrownRed") && step<(fd.hslMat.at(0).size()-1)) {
+	if(color=="Pink" || color=="PinkRed") {
+		while((color=="Pink" || color=="PinkRed") && step<(fd.hslMat.at(0).size()-1)) {
 			try {
 				HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 				HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
@@ -583,10 +592,10 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 				tempSlope = (nextRelLum - currentRelLum);
 				slope = (slope * H) + (tempSlope*(1.0-H));
 				//printf() for debugging
-/*
+
 				printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
 				printf(" HSL(%.f,%.2f,%.2f), Flag: %d\n",HSL[0],HSL[1],HSL[2],demarcFlag);
-*/
+
 				///////////////////////
 				step++;
 				if(slope<=enterDemarcThresh && demarcFlag==0) {
@@ -597,29 +606,29 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 					demarcFlag=1;
 					break;
 				}
-				pix = fd.windowVec.at(fd.pt.y).at(step);
+				pix = fd.colorVec.at(fd.pt.y).at(step);
 				color = c.getMainColor(pix);
 
 			} catch (const std::out_of_range &oor) {
 				printf("\nRule5: Try/Catch #1 Out of Range!\n");
 				printf("fd.hslMat.size(): %lu\n",fd.hslMat.size());
 				printf("fd.hslMat.at(%d).size(): %lu\n",fd.pt.y,fd.hslMat.at(fd.pt.y).size());
-				printf("fd.windowVec.size(): %lu\n",fd.windowVec.size());
-				printf("fd.windowVec.at(%d).size(): %lu\n",fd.pt.y,fd.windowVec.at(fd.pt.y).size());
+				printf("fd.windowVec.size(): %lu\n",fd.colorVec.size());
+				printf("fd.windowVec.at(%d).size(): %lu\n",fd.pt.y,fd.colorVec.at(fd.pt.y).size());
 				printf("Point(%d,%d)\n",step,fd.pt.y);
 				printf("fd.pt(%d,%d)\n",fd.pt.x,fd.pt.y);
 				exit(1);
 			}
 		}
 		//printf() for debugging
-/*
+
 		HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 		HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
 		HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
 		RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 		currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
 		printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
-*/
+
 		///////////////////////
 		if(demarcFlag==1) {
 			/*try {
@@ -664,19 +673,20 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 				exit(1);
 			}*/
 			if(slope<=enterDemarcThresh) {
-				enterDemarcPos = Point(step-1,fd.pt.y);
+				enterDemarcPos = Point(step,fd.pt.y);
 			}
 			else if(slope>=exitDemarcThresh) {
-				enterDemarcPos = Point(fd.pt.x,fd.pt.y);
-				exitDemarcPos = Point(step-1,fd.pt.y);
+				if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1)
+					enterDemarcPos = Point(fd.pt.x,fd.pt.y);
+				exitDemarcPos = Point(step,fd.pt.y);
 			}
 		}
-/*
+
 		printf("Flag: %d\n",demarcFlag);
 		printf("%d,%d\n",fd.pt.x,fd.pt.y);
 		printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
 		printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
-*/
+
 		if(enterDemarcPos.x!=-1 && enterDemarcPos.y!=-1) {
 			if(fd.pt.x>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
 				if(exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
@@ -708,6 +718,163 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 			}
 		}*/
 	}
+	if(flag==true) return ruleNum;
+	return 0;
+}
+
+//rule 5 - Pink to DarkPink
+double rule5(FileData &fd) {
+	double ruleNum = 5;
+	bool flag=false;
+	Color c;
+	Hsl hsl;
+	Rgb rgb;
+	Functions fn;
+	Shades sh;
+	String oldPix, newPix,color,pix, oldShade,newShade;
+	double HSL[3];
+	int *RGB;
+	double nextHSL[3];
+	int *nextRGB;
+	const double H = 0.72;
+	const double enterDemarcThresh = -0.0046;
+	const double exitDemarcThresh = 0.005;
+	String shade = "Dark3";
+	Point enterDemarcPos(-1,-1);
+	Point exitDemarcPos(-1,-1);
+	int demarcFlag=0;
+	double currentRelLum =0, nextRelLum=0;
+	double tempSlope=0, slope=0;
+	unsigned int step=0;
+	//size_t pos1=0, pos2=0;
+	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
+		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
+			fd.pt = Point(j,i);
+			oldPix = c.getMainColor(fd.colorVec.at(i).at(j));
+			oldShade = sh.extractShade(fd.colorVec.at(i).at(j));
+			newPix = oldPix;
+			newShade = oldShade;
+			color = newPix;
+			step = fd.pt.x;
+			slope=0;
+			if(enterDemarcPos.y!=fd.pt.y || (color!="Pink" && color!="PinkRed")) {
+				enterDemarcPos = Point(-1,-1);
+				exitDemarcPos = Point(-1,-1);
+				demarcFlag=0;
+			}
+			if(color=="Pink" || color=="PinkRed") {
+				while((color=="Pink" || color=="PinkRed") && step<(fd.hslMat.at(0).size()-1)) {
+					try {
+						HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
+						HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
+						HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
+						RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+						currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+						nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',1);
+						nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',2);
+						nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',3);
+						nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
+						nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
+
+						tempSlope = (nextRelLum - currentRelLum);
+						slope = (slope * H) + (tempSlope*(1.0-H));
+						//printf() for debugging
+/*
+						printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
+						printf(" HSL(%.f,%.2f,%.2f), Flag: %d\n",HSL[0],HSL[1],HSL[2],demarcFlag);
+*/
+						///////////////////////
+						step++;
+						if(slope<=enterDemarcThresh && demarcFlag==0) {
+							demarcFlag=1; //entering DarkPink
+							break;
+						}
+						if(slope>=exitDemarcThresh) {
+							demarcFlag=1;
+							break;
+						}
+						pix = fd.colorVec.at(fd.pt.y).at(step);
+						color = c.getMainColor(pix);
+
+					} catch (const std::out_of_range &oor) {
+						printf("\nRule5: Try/Catch #1 Out of Range!\n");
+						printf("fd.hslMat.size(): %lu\n",fd.hslMat.size());
+						printf("fd.hslMat.at(%d).size(): %lu\n",fd.pt.y,fd.hslMat.at(fd.pt.y).size());
+						printf("fd.windowVec.size(): %lu\n",fd.colorVec.size());
+						printf("fd.windowVec.at(%d).size(): %lu\n",fd.pt.y,fd.colorVec.at(fd.pt.y).size());
+						printf("Point(%d,%d)\n",step,fd.pt.y);
+						printf("fd.pt(%d,%d)\n",fd.pt.x,fd.pt.y);
+						exit(1);
+					}
+				}
+				//printf() for debugging
+/*
+				HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
+				HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
+				HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
+				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+				currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+				printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
+*/
+				///////////////////////
+				if(demarcFlag==1) {
+					if(slope<=enterDemarcThresh) {
+						enterDemarcPos = Point(step,fd.pt.y);
+					}
+					else if(slope>=exitDemarcThresh) {
+						if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1)
+							enterDemarcPos = Point(fd.pt.x,fd.pt.y);
+						exitDemarcPos = Point(step,fd.pt.y);
+					}
+				}
+				/*
+				printf("Flag: %d\n",demarcFlag);
+				printf("%d,%d\n",fd.pt.x,fd.pt.y);
+				printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
+				printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
+				*/
+				if(enterDemarcPos.x!=-1 && enterDemarcPos.y!=-1) {
+					if(fd.pt.x>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
+						if(exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
+							for(unsigned int k=j; k<=step; k++) {
+								oldPix = c.getMainColor(fd.colorVec.at(i).at(k));
+								oldShade = sh.extractShade(fd.colorVec.at(i).at(k));
+								newShade = shade;
+								newPix = "Pink";
+								//pos1 = fd.colorVec.at(i).at(k).find(oldPix);
+								//pos2 = fd.colorVec.at(i).at(k).find(oldShade);
+								//fd.colorVec.at(i).at(k).replace(pos1,oldPix.length(),newPix);
+								//fd.colorVec.at(i).at(k).replace(pos2,oldShade.length(),newShade);
+								fd.colorVec.at(i).at(k) = newShade+newPix;
+							}
+							flag=true;
+						}
+						else if(fd.pt.x<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
+							for(unsigned int k=j; k<=step; k++) {
+								oldPix = c.getMainColor(fd.colorVec.at(i).at(k));
+								oldShade = sh.extractShade(fd.colorVec.at(i).at(k));
+								newShade = shade;
+								newPix = "Pink";
+								//pos1 = fd.colorVec.at(i).at(k).find(oldPix);
+								//pos2 = fd.colorVec.at(i).at(k).find(oldShade);
+								//fd.colorVec.at(i).at(k).replace(pos1,oldPix.length(),newPix);
+								//fd.colorVec.at(i).at(k).replace(pos2,oldShade.length(),newShade);
+								fd.colorVec.at(i).at(k) = newShade+newPix;
+							}
+							flag=true;
+						}
+						else {
+							enterDemarcPos = Point(-1,-1);
+							exitDemarcPos = Point(-1,-1);
+							demarcFlag=0;
+						}
+					}
+				}
+				j=step;
+			}// end if color
+		}//end for j
+	}//end for i
+
 	if(flag==true) return ruleNum;
 	return 0;
 }
@@ -986,11 +1153,11 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
-	//ruleNumVec.push_back(rule3(fd,newPix,newShade));
+	ruleNumVec.push_back(rule3(fd,newPix,newShade));
 	ruleNumVec.push_back(rule6(pix,newPix,newShade));
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));
-	ruleNumVec.push_back(rule5(fd,newPix,newShade));
+	//ruleNumVec.push_back(rule5(fd,newPix,newShade));
 	ruleNumVec.push_back(rule7(pix,newPix));
 
 	if(ruleNumVec.size()>0) {

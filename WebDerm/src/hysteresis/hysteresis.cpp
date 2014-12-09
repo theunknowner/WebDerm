@@ -325,6 +325,7 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 
 	Intensity in;
 	in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
+	rule5(fd);
 	colorWindow.clear();
 	colorWindow.shrink_to_fit();
 	hslVec.clear();

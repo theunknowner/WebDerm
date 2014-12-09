@@ -322,7 +322,7 @@ void FileData::getMinMaxPts(String input, deque< deque<Point> > &pt) {
 	tempPtVec.shrink_to_fit();
 }
 
-void FileData::extractRuleData(String filename, Point loc) {
+void FileData::extractRule3Data(String filename, Point loc) {
 	deque< deque<String> > hslPtsVec;
 	deque< deque<String> > mConVec;
 	deque< deque<String> > deltaHslVec;

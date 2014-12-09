@@ -46,34 +46,50 @@ int main(int argc,char** argv)
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
 	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
+	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/psoriasis1-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 
-	//Point pt1(430,244);
-	//Point pt2(306,439);
-	//String file1 = "/home/jason/Desktop/Programs/Entropy Output/lph4_Entropy.csv";
-	//String file2 = "/home/jason/Desktop/Programs/Entropy Output/Psoriasis1_Entropy.csv";
-	//deque< deque<double> > pEnt1;
-	//deque< deque<double> > pEnt2;
-	//deque<int> colorShadeShift(allColors.size(),0);
-	Entropy en;
-	//en.runCompareEntropy();
-	//en.runCompareEntropy2();
-
+	FileData fd;
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_ShadeColors_5x5.csv",fd.colorVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_HSL_5x5.csv",fd.hslMat);
+	rule5(fd);
+	cout << fd.colorVec.at(70).at(35) << endl;
+/*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_5x5.csv",fd.windowVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_ShadeColors_5x5.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_HSL_5x5.csv",fd.hslMat);
-	for(int i=74; i<90; i++) {
-		fd.pt = Point(i,65);
-		String newPix = "Pink";
-		String newShade = "Low2";
-		rule5(fd,newPix,newShade);
-		cout << newShade << endl;
+	init_2D_Deque(fd.m_ContrastMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	fd.pt = Point(35,70);
+	String newPix = c.getMainColor(fd.windowVec.at(fd.pt.y).at(fd.pt.x));
+	String newShade = sh.extractShade(fd.colorVec.at(fd.pt.y).at(fd.pt.x));
+	rule3(fd,newPix,newShade);
+	printf("HSL(%s)\n",fd.hslMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("Color: %s\n",fd.windowVec.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("%s\n",fd.hslPtMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("mCon: %s\n",fd.m_ContrastMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("dHSL: %s\n",fd.d_HslMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	//Entropy en;
+	//en.runCompareEntropy();
+	//en.runCompareEntropy2();
+/*
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		img = imread(folder+files.at(i));
+		if(img.data) {
+			String name = getFileName(files.at(i));
+			img2 = runColorNormalization(img);
+			img4 = runResizeImage(img2,Size(140,140));
+			blur(img4,img4,Size(5,5));
+			imwrite(name+"-2.png",img4);
+		}
 	}
-	/*
-	img2 = c.shadeCorrection(img);
-	//img3 = c.changeImageBrightness(img2,-0.20,0);
-	img4 = c.changeImageBrightness(img2,0.8,1);
-	blur(img4,img4,Size(5,5));
 	//img4 = c.correctGamma(img2,2.2);
 	//namedWindow("img",CV_WINDOW_FREERATIO);
 	//namedWindow("img3",CV_WINDOW_FREERATIO);
@@ -82,21 +98,10 @@ int main(int argc,char** argv)
 	//imshow("img3",img3);
 	//imshow("img4",img4);
 	//waitKey(0);
-	imwrite("ves18-2.png",img4);/**/
+	//imwrite("ves18-2.png",img4);/**/
 	//double a=1.0, b=0.001, p=0.33;
+
 	/*
-	deque<deque<double> > vec1;
-	deque<deque<double> > vec2;
-	deque<deque<double> > matchVec;
-	deque<double> resultVec;
-	String name1 = "acne1";
-	String name2 = "vesicles25";
-	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name1+"_10x10_YSV_Combined50x50.csv",vec1);
-	en.loadEntropyFiles("/home/jason/Desktop/Programs/Output/"+name2+"_10x10_YSV_Combined50x50.csv",vec2);
-	//resultVec = en.compareEntropy(vec1,vec2,matchVec);
-	//en.importEntropyThresholds();
-	en.compareEntropy(vec1,vec2,matchVec);
-/*
 	String filename2 = name1+"-"+name2+".csv";
 	FILE * fp;
 	fp = fopen(filename2.c_str(),"w");
@@ -147,15 +152,13 @@ int main(int argc,char** argv)
 	imshow(fd.filename+"_Squares",img3);
 	imshow(fd2.filename+"_Squares2",img4);
 	waitKey(0);
-	//colorShadeShift = en.calcShadeShift(pEnt1, pEnt2);
-	//en.outputShiftedEntropy(fd,fd2,Size(10,10),colorShadeShift);
 
-	Point pt1(265,196);
-	Point pt2(267,198);
+	Point pt1(7,41);
+	Point pt2(9,43);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	//checkColorsFromList(img2,pt1,pt2);
-	generateColorRegionTable(img4, pt1,pt2);
+	generateColorRegionTable(img, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
 	int col = 477;

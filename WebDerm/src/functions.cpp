@@ -665,7 +665,7 @@ int Functions::countEqual(int argNum, ...) {
 	return count;
 }
 
-
+//return smallest value && position to minIndex
 double Functions::getMin(deque<double> &vec, int &minIndex) {
 	double lowest=-1;
 	minIndex=-1;
@@ -686,6 +686,7 @@ double Functions::getMin(deque<double> &vec, int &minIndex) {
 	return lowest;
 }
 
+//returns largest value && position to maxIndex
 double Functions::getMax(deque<double> &vec, int &maxIndex) {
 	double largest=-1;
 	maxIndex=-1;
