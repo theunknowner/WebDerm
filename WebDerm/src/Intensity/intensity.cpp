@@ -606,7 +606,6 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 		localRatios.clear();
 		localRatio=0;
 	} // end row
-	cout << "Done!" << endl;
 	fclose(fp);
 	colorVec3.clear(); colorVec3.shrink_to_fit();
 	localIndexes.clear(); localIndexes.shrink_to_fit();

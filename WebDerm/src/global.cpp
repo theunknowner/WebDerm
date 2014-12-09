@@ -8,3 +8,4 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 String path = "/home/jason/Desktop/workspace/";
+bool debug = false;

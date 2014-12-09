@@ -10,5 +10,6 @@
 #include "stdafx.h"
 
 extern String path;
+extern bool debug;
 
 #endif

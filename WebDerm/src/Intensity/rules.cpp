@@ -733,12 +733,12 @@ double rule5(FileData &fd) {
 	Shades sh;
 	String oldPix, newPix,color,pix, oldShade,newShade;
 	double HSL[3];
-	int *RGB;
+	//int *RGB;
 	double nextHSL[3];
-	int *nextRGB;
+	//int *nextRGB;
 	const double H = 0.72;
 	const double enterDemarcThresh = -0.0046;
-	const double exitDemarcThresh = 0.005;
+	const double exitDemarcThresh = 0.0035;
 	String shade = "Dark3";
 	Point enterDemarcPos(-1,-1);
 	Point exitDemarcPos(-1,-1);
@@ -746,7 +746,10 @@ double rule5(FileData &fd) {
 	double currentRelLum =0, nextRelLum=0;
 	double tempSlope=0, slope=0;
 	unsigned int step=0;
+	double minSlope=100, maxSlope=0;
+	Point minSlopePt, maxSlopePt;
 	//size_t pos1=0, pos2=0;
+	Point myPt(65,22);
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
 			fd.pt = Point(j,i);
@@ -756,40 +759,58 @@ double rule5(FileData &fd) {
 			newShade = oldShade;
 			color = newPix;
 			step = fd.pt.x;
-			slope=0;
+			minSlope=100;
+			maxSlope=0;
 			if(enterDemarcPos.y!=fd.pt.y || (color!="Pink" && color!="PinkRed")) {
 				enterDemarcPos = Point(-1,-1);
 				exitDemarcPos = Point(-1,-1);
 				demarcFlag=0;
+				slope=0;
 			}
-			if(color=="Pink" || color=="PinkRed") {
-				while((color=="Pink" || color=="PinkRed") && step<(fd.hslMat.at(0).size()-1)) {
+			if((color=="Pink" || color=="PinkRed") && step<(fd.colorVec.at(0).size()-1)) {
+				while((color=="Pink" || color=="PinkRed") && step<(fd.colorVec.at(0).size()-1)) {
 					try {
 						HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
 						HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
 						HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
-						RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
-						currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+						//RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+						//currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+						currentRelLum = HSL[2];
 						nextHSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',1);
 						nextHSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',2);
 						nextHSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step+1),';',3);
-						nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
-						nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
-
+						//nextRGB = hsl.hsl2rgb(nextHSL[0],nextHSL[1],nextHSL[2]);
+						//nextRelLum = rgb.calcPerceivedBrightness(nextRGB[0],nextRGB[1],nextRGB[2])/255.0;
+						nextRelLum = nextHSL[2];
 						tempSlope = (nextRelLum - currentRelLum);
 						slope = (slope * H) + (tempSlope*(1.0-H));
+						if(slope<minSlope) {
+							minSlope = slope;
+							minSlopePt = Point(step,fd.pt.y);
+						}
+						if(slope>maxSlope) {
+							maxSlope = slope;
+							maxSlopePt = Point(step,fd.pt.y);
+						}
 						//printf() for debugging
-/*
-						printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
-						printf(" HSL(%.f,%.2f,%.2f), Flag: %d\n",HSL[0],HSL[1],HSL[2],demarcFlag);
-*/
+
+						debug=true;
+						if(j==myPt.x && i==myPt.y) {
+							printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
+							printf(" HSL(%.f,%.2f,%.2f), Flag: %d\n",HSL[0],HSL[1],HSL[2],demarcFlag);
+						}
+						/**/
 						///////////////////////
 						step++;
 						if(slope<=enterDemarcThresh && demarcFlag==0) {
+							enterDemarcPos = Point(step,fd.pt.y);
 							demarcFlag=1; //entering DarkPink
 							break;
 						}
-						if(slope>=exitDemarcThresh) {
+						if(slope>=exitDemarcThresh && tempSlope>0) {
+							if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1)
+								enterDemarcPos = minSlopePt;
+							exitDemarcPos = Point(step,fd.pt.y);
 							demarcFlag=1;
 							break;
 						}
@@ -806,37 +827,34 @@ double rule5(FileData &fd) {
 						printf("fd.pt(%d,%d)\n",fd.pt.x,fd.pt.y);
 						exit(1);
 					}
-				}
+				}//end while color
+
 				//printf() for debugging
-/*
-				HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
-				HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
-				HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
-				RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
-				currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
-				printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
-*/
-				///////////////////////
-				if(demarcFlag==1) {
-					if(slope<=enterDemarcThresh) {
-						enterDemarcPos = Point(step,fd.pt.y);
-					}
-					else if(slope>=exitDemarcThresh) {
-						if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1)
-							enterDemarcPos = Point(fd.pt.x,fd.pt.y);
-						exitDemarcPos = Point(step,fd.pt.y);
-					}
+
+				debug=true;
+				if(j==myPt.x && i==myPt.y) {
+					HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
+					HSL[1] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',2);
+					HSL[2] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',3);
+					//RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
+					//currentRelLum = rgb.calcPerceivedBrightness(RGB[0],RGB[1],RGB[2])/255.0;
+					currentRelLum = HSL[2];
+					//printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
+					printf("(%d,%d) - Curr:%f,",step,fd.pt.y,currentRelLum);
+					printf(" HSL(%.f,%.2f,%.2f), Flag: %d\n",HSL[0],HSL[1],HSL[2],demarcFlag);
+					printf("Flag: %d\n",demarcFlag);
+					printf("%d,%d\n",fd.pt.x,fd.pt.y);
+					printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
+					printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
+					cout << minSlopePt.x << endl;
+					cout << minSlopePt.y << endl;
 				}
-				/*
-				printf("Flag: %d\n",demarcFlag);
-				printf("%d,%d\n",fd.pt.x,fd.pt.y);
-				printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
-				printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
-				*/
+				/**/
+				//////////////////////////
 				if(enterDemarcPos.x!=-1 && enterDemarcPos.y!=-1) {
-					if(fd.pt.x>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
-						if(exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
-							for(unsigned int k=j; k<=step; k++) {
+					for(unsigned int k=j; k<step; k++) {
+						if(k>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
+							if(exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
 								oldPix = c.getMainColor(fd.colorVec.at(i).at(k));
 								oldShade = sh.extractShade(fd.colorVec.at(i).at(k));
 								newShade = shade;
@@ -846,11 +864,9 @@ double rule5(FileData &fd) {
 								//fd.colorVec.at(i).at(k).replace(pos1,oldPix.length(),newPix);
 								//fd.colorVec.at(i).at(k).replace(pos2,oldShade.length(),newShade);
 								fd.colorVec.at(i).at(k) = newShade+newPix;
+								flag=true;
 							}
-							flag=true;
-						}
-						else if(fd.pt.x<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
-							for(unsigned int k=j; k<=step; k++) {
+							else if(k<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
 								oldPix = c.getMainColor(fd.colorVec.at(i).at(k));
 								oldShade = sh.extractShade(fd.colorVec.at(i).at(k));
 								newShade = shade;
@@ -860,17 +876,18 @@ double rule5(FileData &fd) {
 								//fd.colorVec.at(i).at(k).replace(pos1,oldPix.length(),newPix);
 								//fd.colorVec.at(i).at(k).replace(pos2,oldShade.length(),newShade);
 								fd.colorVec.at(i).at(k) = newShade+newPix;
+								flag=true;
 							}
-							flag=true;
-						}
-						else {
-							enterDemarcPos = Point(-1,-1);
-							exitDemarcPos = Point(-1,-1);
-							demarcFlag=0;
+							else {
+								enterDemarcPos = Point(-1,-1);
+								exitDemarcPos = Point(-1,-1);
+								demarcFlag=0;
+								slope=0;
+							}
 						}
 					}
 				}
-				j=step;
+				j=step-1; //step-1 because j++ in next iteration
 			}// end if color
 		}//end for j
 	}//end for i

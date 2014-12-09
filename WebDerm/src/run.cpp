@@ -123,13 +123,13 @@ void runHysteresis()
 	Color c;
 	String filename;
 	String name;
-	Size size(5,5);
+	Size size(10,10);
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img = imread(filename);
 	if(img.data) {
 		img = runColorNormalization(img);
-		img = runResizeImage(img,Size(140,140));
+		img = runResizeImage(img,Size(700/size.width,700/size.height));
 		name = getFileName(filename);
 		int s = 3;
 		bool flag[s];

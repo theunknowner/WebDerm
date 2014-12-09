@@ -35,7 +35,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -48,12 +48,12 @@ int main(int argc,char** argv)
 	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/psoriasis1-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-
+/*
 	FileData fd;
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_ShadeColors_5x5.csv",fd.colorVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_HSL_5x5.csv",fd.hslMat);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_ShadeColors_5x5.csv",fd.colorVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_HSL_5x5.csv",fd.hslMat);
 	rule5(fd);
-	cout << fd.colorVec.at(70).at(35) << endl;
+	//cout << fd.colorVec.at(59).at(53) << endl;
 /*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_5x5.csv",fd.windowVec);
@@ -75,19 +75,20 @@ int main(int argc,char** argv)
 	//Entropy en;
 	//en.runCompareEntropy();
 	//en.runCompareEntropy2();
-/*
+
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
 	FileData fd;
+	Size size(10,10);
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		img = imread(folder+files.at(i));
 		if(img.data) {
 			String name = getFileName(files.at(i));
 			img2 = runColorNormalization(img);
-			img4 = runResizeImage(img2,Size(140,140));
-			blur(img4,img4,Size(5,5));
-			imwrite(name+"-2.png",img4);
+			img4 = runResizeImage(img2,Size(700/size.width,700/size.height));
+			blur(img4,img4,size);
+			imwrite(name+"-3.png",img4);
 		}
 	}
 	//img4 = c.correctGamma(img2,2.2);
