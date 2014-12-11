@@ -13,36 +13,57 @@ double S_HIGH;
 double S_LOW;
 double V_HIGH;
 double V_LOW;
-double Y_THRESH;	//% threshold Y must meet for special conditions
-double S_THRESH;
-double V_THRESH;
-double Y_DIST;	//distance threshold Y must meet for special conditions
-double S_DIST;
-double V_DIST;
-double Y_PERCEPTION;	//threshold in which the eyes starts noticing color
-double S_PERCEPTION;
+double * Y_THRESH;	//% threshold Y must meet for special conditions
+double * S_THRESH;
+double * V_THRESH;
+double * Y_DIST;	//distance threshold Y must meet for special conditions
+double * S_DIST;
+double * V_DIST;
+double * Y_PERCEPTION;	//threshold in which the eyes starts noticing color
+double * S_PERCEPTION;
 double Y_LARGE_THRESH;
 double distPass;
 deque<double> colorWeights; //holds the weights for color impact
 double Y1, Y2;
 
-void resetThreshVals() {
+void resetThreshVals(int size) {
 	Y_HIGH = 49.0;
 	Y_LOW = 15.0;
 	S_HIGH = 0.30;
 	S_LOW = 0.10;
 	V_HIGH = 0.10;
 	V_LOW = 0.04;
-	Y_THRESH = 0.70;
-	S_THRESH = 0.70;
-	V_THRESH = 0.70;
-	Y_DIST = 7;
-	S_DIST = 0.05;
-	V_DIST = 0.03;
-	Y_PERCEPTION = 5.0;
-	S_PERCEPTION = 0.045;
+	Y_THRESH = new double[size];
+	S_THRESH = new double[size];
+	V_THRESH = new double[size];
+	Y_DIST = new double[size];
+	S_DIST = new double[size];
+	V_DIST = new double[size];
+	Y_PERCEPTION = new double[size];
+	S_PERCEPTION = new double[size];
 	Y_LARGE_THRESH = 85.0;
 	distPass = 1;
+	for(int i=0; i<size; i++) {
+		Y_THRESH[i] = 0.70;
+		S_THRESH[i] = 0.70;
+		V_THRESH[i] = 0.70;
+		Y_DIST[i] = 7.0;
+		S_DIST[i] = 0.05;
+		V_DIST[i] = 0.03;
+		Y_PERCEPTION[i] = 5.0;
+		S_PERCEPTION[i] = 0.045;
+	}
+}
+
+void deletePointers() {
+	delete[] Y_THRESH;
+	delete[] S_THRESH;
+	delete[] V_THRESH;
+	delete[] Y_DIST;
+	delete[] S_DIST;
+	delete[] V_DIST;
+	delete[] Y_PERCEPTION;
+	delete[] S_PERCEPTION;
 }
 
 bool Entropy::importEntropyThresholds() {
@@ -75,7 +96,7 @@ void Entropy::releaseMemory() {
 	deque<double>().swap(colorWeights);
 }
 
-double compareY(double y1, double y2) {
+double compareY(double y1, double y2, int index, int componentSize) {
 	double val;
 	if((y1>Y_HIGH && y2>Y_HIGH)) {
 		val = min(y1,y2)/max(y1,y2);
@@ -83,8 +104,8 @@ double compareY(double y1, double y2) {
 	}
 	else if((y1<=Y_LOW && y2<=Y_LOW)) {
 		val = max(y1,y2)-min(y1,y2);
-		if(val<=Y_DIST) {
-			if(y1>=Y_PERCEPTION && y2>=Y_PERCEPTION)
+		if(val<=Y_DIST[index/componentSize]) {
+			if(y1>=Y_PERCEPTION[index/componentSize] && y2>=Y_PERCEPTION[index/componentSize])
 				return distPass;
 			else
 				return min(y1,y2)/max(y1,y2);
@@ -98,7 +119,7 @@ double compareY(double y1, double y2) {
 	}
 }
 
-double compareS(double s1, double s2) {
+double compareS(double s1, double s2, int index, int componentSize) {
 	double val;
 	if((s1>S_HIGH && s2>S_HIGH)) {
 		val = min(s1,s2)/max(s1,s2);
@@ -106,8 +127,8 @@ double compareS(double s1, double s2) {
 	}
 	else if((s1<=S_LOW && s2<=S_LOW)) {
 		val = max(s1,s2)-min(s1,s2);
-		if(val<=S_DIST) {
-			if(Y1>=Y_PERCEPTION && Y2>=Y_PERCEPTION)
+		if(val<=S_DIST[index/componentSize]) {
+			if(Y1>=Y_PERCEPTION[index/componentSize] && Y2>=Y_PERCEPTION[index/componentSize])
 				return distPass;
 			else
 				return min(s1,s2)/max(s1,s2);
@@ -121,12 +142,12 @@ double compareS(double s1, double s2) {
 	}
 }
 
-double compareV(double v1, double v2) {
+double compareV(double v1, double v2, int index, int componentSize) {
 	double val=0;
 	if((v1<=V_HIGH && v2<=V_HIGH)) {
 		val = max(v1,v2)-min(v1,v2);
-		if(val<=V_DIST) {
-			if(Y1>=Y_PERCEPTION && Y2>=Y_PERCEPTION)
+		if(val<=V_DIST[index/componentSize]) {
+			if(Y1>=Y_PERCEPTION[index/componentSize] && Y2>=Y_PERCEPTION[index/componentSize])
 				return distPass;
 			else
 				return min(v1,v2)/max(v1,v2);
@@ -149,7 +170,8 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat) 
 		getline(fs,temp);
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
-			//vec.pop_back(); //removes the weird empty space at the end of deque
+			if(vec.at(vec.size()-1)=="")
+				vec.pop_back(); //removes the weird empty space at the end of deque
 			for(unsigned int i=0; i<vec.size(); i++) {
 				vec.at(i) = vec.at(i).substr(0,vec.at(i).length());
 				if(i>0)
@@ -170,77 +192,92 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat) 
 }
 
 double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec) {
+	int componentSize = 3; //3 components -> 1)Y 2)S 3)V
+	int shadeComponents = vec1.at(0).size()/componentSize;
+	int colorComponents = vec1.size();
 	matchVec.resize(vec1.size(),deque<double>(vec1.at(0).size(),0));
-	deque<double> resultVec(vec1.size(),0);
-	double ysv1[3];
-	double ysv2[3];
-	double valY=0, valS=0, valV=0;
-	double avg=0, total=0;
-	int colorsHit[vec1.size()]; //variable to mark colors not ignored
-	fill_n(colorsHit,vec1.size(),0); // fill up the array
+	deque<deque<double> > resultVec(colorComponents,deque<double>(shadeComponents,0));
+	double ysv1[vec1.at(0).size()];
+	double ysv2[vec2.at(0).size()];
+	double valYSV[vec1.at(0).size()];
+	double avg=0;
+	double total=0;
+	int colorsHit[colorComponents][shadeComponents]; //variable to mark colors not ignored
 
 	for(unsigned int i=0; i<vec1.size(); i++) {
-		resetThreshVals();
+		resetThreshVals(vec1.at(i).size()/componentSize); //divide componentSize for YSV components
 		if(allColors.at(i)!="Brown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 				ysv1[j] = vec1.at(i).at(j);
 				ysv2[j] = vec2.at(i).at(j);
 			}
-			Y1 = ysv1[0];
-			Y2 = ysv2[0];
-			if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION)
-				Y_PERCEPTION = 2.0;
-
-			if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {
-				//Total Population(Y) comparison
-				valY = compareY(ysv1[0],ysv2[0]);
-				matchVec.at(i).at(0) = valY;
-
-				//Avg Density(S) comparison
-				valS = compareS(ysv1[1],ysv2[1]);
-				matchVec.at(i).at(1) = valS;
-
-				//Variability(V) comparison
-				valV = compareV(ysv1[2],ysv2[2]);
-				matchVec.at(i).at(2) = valV;
-
-				//Reassign Y_THRESH if S & V are the same
-				if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH) {
-					Y_THRESH *= 0.8;
-					Y_DIST = 10;
+			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
+				int indexY = j;
+				int indexS = j+1;
+				int indexV = j+2;
+				if(j%componentSize==0) {
+					Y1 = ysv1[j];
+					Y2 = ysv2[j];
 				}
-				//Reassign Y if S & V are the same
-				if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH)
-					valY *= 1.3;
-				//Reassign V if Y & S are different
-				if(valY<Y_THRESH && valS<S_THRESH) {
-					double diff = valY/Y_THRESH;
-					valV *= diff;
+				if(j%componentSize==0) {
+					if(ysv1[indexS]>S_PERCEPTION[indexS/componentSize] || ysv2[indexS]>S_PERCEPTION[indexS/componentSize])
+						Y_PERCEPTION[indexS/componentSize] = 2.0;
+
+					if(ysv1[j]>Y_PERCEPTION[j/componentSize] || ysv2[j]>Y_PERCEPTION[j/componentSize]) {
+						//Total Population(Y) comparison
+						valYSV[indexY] = compareY(ysv1[indexY],ysv2[indexY],indexY,componentSize);
+						matchVec.at(i).at(indexY) = valYSV[indexY];
+
+						//Avg Density(S) comparison
+						valYSV[indexS] = compareS(ysv1[indexS],ysv2[indexS],indexS,componentSize);
+						matchVec.at(i).at(indexS) = valYSV[indexS];
+
+						//Variability(V) comparison
+						valYSV[indexV] = compareV(ysv1[indexV],ysv2[indexV],indexV,componentSize);
+						matchVec.at(i).at(indexV) = valYSV[indexV];
+
+						//Reassign Y && Y_THRESH if S & V are the same
+						if(valYSV[indexY]<Y_THRESH[indexY/componentSize] && valYSV[indexS]>=S_THRESH[indexS/componentSize] && valYSV[indexV]>=V_THRESH[indexV/componentSize]) {
+							Y_THRESH[indexY/componentSize] *= 0.8;
+							Y_DIST[indexY/componentSize] = 10;
+							valYSV[indexY]*=1.3;
+						}
+
+						//Reassign V if Y & S are different
+						if(valYSV[indexY]<Y_THRESH[indexY/componentSize] && valYSV[indexS]<S_THRESH[indexS/componentSize]) {
+							double diff = valYSV[indexY]/Y_THRESH[indexY/componentSize];
+							valYSV[indexV] *= diff;
+						}
+
+						//Average value of YSV matching
+						avg = valYSV[indexY] + valYSV[indexS] + valYSV[indexV];
+						avg /= (double)componentSize;
+						resultVec.at(i).at(indexY/componentSize) += avg;
+
+						//Total of all the Y that are noticeable
+						total += max(ysv1[indexY],ysv2[indexY]);
+						colorsHit[i][indexY/componentSize] = 1;
+					}
 				}
-
-				//Average value of YSV matching
-				avg = valY + valS + valV;
-				avg /= 3.0;
-				resultVec.at(i) = avg;
-
-				//printf("%s : %f,%f,%f\n",allColors.at(i).c_str(),valY,valS,valV);
-
-				//Total of all the Y that are noticeable
-				total += max(ysv1[0],ysv2[0]);
-				colorsHit[i] = 1;
 			}
 		}
+		deletePointers();
 	}
 
 	//calculating image similarity results
-	double sum=0, results=0;
+	double sum;
+	double results;
 	for(unsigned int i=0; i<vec1.size(); i++) {
-		ysv1[0] = vec1.at(i).at(0);
-		ysv2[0] = vec2.at(i).at(0);
-		if(colorsHit[i]==1) {
-			sum = max(ysv1[0],ysv2[0])/total;
-			resultVec.at(i) *= sum;
-			results += resultVec.at(i);
+		for(unsigned int j=0; j<vec1.at(i).size(); j++) {
+			if(j%componentSize==0) {
+				ysv1[j] = vec1.at(i).at(j);
+				ysv2[j] = vec2.at(i).at(j);
+				if(colorsHit[i][j/componentSize]==1) {
+					sum = max(ysv1[j],ysv2[j])/total;
+					resultVec.at(i).at(j/componentSize) *= sum;
+					results += resultVec.at(i).at(j/componentSize);
+				}
+			}
 		}
 	}
 	//cout << "Mine: " << results << endl;
@@ -248,22 +285,25 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 }
 
 double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2) {
-	double dist[vec1.size()];
-	fill_n(dist,vec1.size(),-1);
-	double sum=0, total=0, totalYSV[3];
-	double ysv1[3], ysv2[3];
+	int componentSize = 3; //3 components -> 1)Y 2)S 3)V
+	int shadeComponents = vec1.at(0).size()/componentSize;
+	int colorComponents = vec1.size();
+	double dist[colorComponents];
+	fill_n(dist,colorComponents,-1);
+	double sum=0, total=0, totalYSV;
+	double ysv1[vec1.at(0).size()];
+	double ysv2[vec2.at(0).size()];
 	double ysvWeights[3];
 	fill_n(ysvWeights,3,1.0);
-	int colorsHit[vec1.size()];
-	fill_n(colorsHit,vec1.size(),0);
+	int colorsHit[colorComponents];
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		if(allColors.at(i)!="Brown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 				ysv1[j] = vec1.at(i).at(j);
 				ysv2[j] = vec2.at(i).at(j);
 				if(ysv1[j]>0 || ysv2[j]>0) {
-					totalYSV[j] = ysvWeights[j]*(pow(ysv1[j]-ysv2[j],2)/(pow(ysv1[j],2)+pow(ysv2[j],2)));
-					sum += totalYSV[j];
+					totalYSV = ysvWeights[j]*(pow(ysv1[j]-ysv2[j],2)/(pow(ysv1[j],2)+pow(ysv2[j],2)));
+					sum += totalYSV;
 				}
 			}
 			total += max(ysv1[0],ysv2[0]);

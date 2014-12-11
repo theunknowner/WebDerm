@@ -164,7 +164,7 @@ String combineShades(String shade) {
 
 deque<deque< deque< deque<double> > > > vec;
 deque<deque< deque< deque<double> > > > vec2;
-deque< deque< deque<int> > > gTargetCellCount;
+deque<deque< deque< deque<int> > > > gTargetCellCount;
 double vecTotal[5] = {0};
 
 deque<deque<deque<deque<double> > > > gRatio;
@@ -181,10 +181,8 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 	Hsl hsl;
 	Functions fn;
 	double h,s,l;
-	vec = createDeque4D(fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,allColors.size(),g_Shades2.size(),0);
-	vec2 = createDeque4D(fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,allColors.size(),g_Shades2.size(),0);
-	//init_3D_Deque(vec,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
-	//init_3D_Deque(vec2,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
+	vec = createDeque4D(fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,allColors.size(),g_Shades2.size(),0.);
+	vec2 = createDeque4D(fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,allColors.size(),g_Shades2.size(),0.);
 	init_2D_Deque(fd.shadeColorCount,g_Shades2.size(), allColors.size(),0);
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
@@ -349,8 +347,8 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 								pTotal = -pTotal * log2(pTotal);
 								/***Test Code***/
 								if(allColors.at(colorRow)=="Pink") {
-									vec[row/ksize.height][col/ksize.width][shadeCol] = pShadeColor.at(colorRow).at(shadeCol);
-									vec2[row/ksize.height][col/ksize.width][shadeCol] = pTotal;
+									vec[row/ksize.height][col/ksize.width][colorRow][shadeCol] = pShadeColor.at(colorRow).at(shadeCol);
+									vec2[row/ksize.height][col/ksize.width][colorRow][shadeCol] = pTotal;
 									vecTotal[shadeCol] = fd.shadeColorCount.at(colorRow).at(shadeCol);
 								}
 								/*************/
@@ -1030,9 +1028,9 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 	int width = fd.colorVec.at(0).size()/ksize.width;
 	int innerHeight = allColors.size();
 	int innerWidth = g_Shades2.size();
-	vec = createDeque4D(height,width,innerHeight,innerWidth,0);
-	vec2 = createDeque4D(height,width,innerHeight,innerWidth,0);
-	init_3D_Deque(gTargetCellCount,height,width,innerWidth);
+	vec = createDeque4D(height,width,innerHeight,innerWidth,0.);
+	vec2 = createDeque4D(height,width,innerHeight,innerWidth,0.);
+	gTargetCellCount = createDeque4D(height,width,innerHeight,innerWidth,0);
 	deque<deque<deque<deque<double> > > > ratio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	deque<deque<deque<deque<double> > > > smoothRatio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	Rgb rgb;
@@ -1227,9 +1225,10 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 						}
 						densityBin.at(c).at(d).at(binNum).push_back(smoothRatio[y1][x1][c][d]);
 						++totalBins.at(c).at(d);
-						if(targetColor!="") {
+						if(targetColor!="" && targetShade!="") {
 							int index = rgb.getColorIndex(targetColor);
-							if(c==index) {
+							int shadeIndex = sh.getShadeIndex2(targetShade);
+							if(c==index && d==shadeIndex) {
 								//pt.at(y1).at(x1) = 1;
 								targetCellCount.at(c).at(d) = cellCount.at(c).at(d);
 							}
@@ -1255,9 +1254,9 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 						int index = rgb.getColorIndex(targetColor);
 						int shadeIndex = sh.getShadeIndex2(targetShade);
 						if(c==index && d==shadeIndex) {
-							vec[y1][x1][d] = fnEye.at(c).at(d);
-							vec2[y1][x1][d] = dnEye.at(c).at(d);
-							gTargetCellCount[y1][x1][d] = targetCellCount.at(c).at(d);
+							vec[y1][x1][c][d] = fnEye.at(c).at(d);
+							vec2[y1][x1][c][d] = dnEye.at(c).at(d);
+							gTargetCellCount[y1][x1][c][d] = targetCellCount.at(c).at(d);
 						}
 					}
 				}
@@ -1416,27 +1415,28 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 		}
 	}
 	 */
-	/*
-	cout << fd.filename  << ": Writing YSV files..." << flush;
-	String filename4 = fd.filename+ "_"+ file_ksize+"_YSV_Combined"+strSize+".csv";
-	FILE * fp4;
-	fp4 = fopen(filename4.c_str(),"w");
-	fprintf(fp4,",Y-Dark,S-Dark,V-Dark,Y-Low,S-Low,V-Low\n");
-	for(unsigned int i=0; i<allColors.size(); i++) {
-		fprintf(fp4,"%s,",allColors.at(i).c_str());
-		for(unsigned int j=0; j<g_Shades2.size(); j++) {
-			if(j==0 || j==2)
-				fprintf(fp4,"%f,%f,%f,",fnEye.at(i).at(j),dnEye.at(i).at(j),stdevRatio.at(i).at(j));
-		}
-		fprintf(fp4,"\n");
-	}
-	cout << "Done!" << endl;
-	//fclose(fp);
-	//fclose(fp2);
-	//fclose(fp3);
-	fclose(fp4);
-	*/
 
+	if(targetColor=="" && targetShade=="") {
+		cout << fd.filename  << ": Writing YSV files..." << flush;
+		String filename4 = fd.filename+ "_"+ file_ksize+"_YSV_Combined"+strSize+".csv";
+		String shadeColor, shade, color;
+		FILE * fp4;
+		fp4 = fopen(filename4.c_str(),"w");
+		fprintf(fp4,",Y,S,V\n");
+		for(unsigned int i=0; i<allColors.size(); i++) {
+			for(unsigned int j=0; j<g_Shades2.size(); j++) {
+				if(j==0 || j==2) {
+					shadeColor = g_Shades2.at(j)+allColors.at(i);
+					fprintf(fp4,"%s,%f,%f,%f\n",shadeColor.c_str(),fnEye.at(i).at(j),dnEye.at(i).at(j),stdevRatio.at(i).at(j));
+				}
+			}
+		}
+		cout << "Done!" << endl;
+		//fclose(fp);
+		//fclose(fp2);
+		//fclose(fp3);
+		fclose(fp4);
+	}
 	gRatio = ratio;
 	gSmoothRatio = smoothRatio;
 	gSmoothRatioRm = smoothRatioOutlierRm;
@@ -1460,8 +1460,8 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor, String ta
 			if((i+ksize.width)>dst.cols) end = Point(dst.cols-1,dst.rows-1);
 			else end = Point(j+ksize.width,i+ksize.height);
 			//data = toString(roundDecimal(vec[i/ksize.height][j/ksize.width][2],3));
-			data3 = toString(roundDecimal(gTargetCellCount[i/ksize.height][j/ksize.width][2],3));
-			data2 = toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][2],3));
+			data3 = toString(roundDecimal(gTargetCellCount[i/ksize.height][j/ksize.width][indexColor][indexShade],3));
+			data2 = toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][indexColor][indexShade],3));
 			//dark = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][0],3));
 			//high = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][1],3));
 			low2 = toString(roundDecimal(gRatio[i/ksize.height][j/ksize.width][indexColor][indexShade],3));
