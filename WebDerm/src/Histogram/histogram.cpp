@@ -76,7 +76,7 @@ void Histogram::equalizeHistogram(Mat src, Mat &dst) {
 }
 
 /** HSL histogram info **/
-void Histogram::hist2SpreadSheet(Mat &src, String name) {
+void Histogram::hslHist2SpreadSheet(Mat &src, String name) {
 	FILE *fp;
 	String filename = path+name+"_hist.csv";
 	fp = fopen(filename.c_str(),"w");
@@ -139,7 +139,8 @@ void Histogram::hist2SpreadSheet(Mat &src, String name) {
 	}
 }
 
-void Histogram::outputHistogram(Mat &src, String name) {
+//output histogram to spreadsheet using HSL luminance
+void Histogram::outputHistogramLuminance(Mat &src, String name) {
 	Hsl hsl;
 	int r,g,b;
 	double *HSL;
@@ -162,6 +163,34 @@ void Histogram::outputHistogram(Mat &src, String name) {
 		}
 	}
 	String filename = path+name+"_hist.csv";
+	FILE *fp;
+	fp = fopen(filename.c_str(),"w");
+	for(unsigned int i=0; i<lumVec.size(); i++) {
+		if(lumVec.at(i)>0)
+			fprintf(fp,"%d,%d\n",i,lumVec.at(i));
+	}
+}
+
+//output Histogram to spreadsheet using relative luminanace
+void Histogram::outputHistogramRelativeLuminance(Mat &src, String name) {
+	Rgb rgb;
+	int r,g,b;
+	deque<int> lumVec(256,0);
+	double relLum=0;
+	int lum=0;
+	Mat grayImg = src.zeros(src.size(),CV_8U);
+	Mat dst;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			r = src.at<Vec3b>(i,j)[2];
+			g = src.at<Vec3b>(i,j)[1];
+			b = src.at<Vec3b>(i,j)[0];
+			relLum = rgb.calcPerceivedBrightness(r,g,b);
+			lum = round(relLum);
+			++lumVec.at(lum);
+		}
+	}
+	String filename = path+name+"_Histogram.csv";
 	FILE *fp;
 	fp = fopen(filename.c_str(),"w");
 	for(unsigned int i=0; i<lumVec.size(); i++) {

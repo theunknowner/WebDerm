@@ -28,10 +28,8 @@ public:
 	deque< deque<double> > outputSigmoid(FileData &fd, Size ksize, double a, double b, double p);
 	deque< deque<double> > outputCombinedSigmoid(FileData &fd, Size ksize, double a, double b, double p);
 
-	Mat showEntropySquares(Mat img, Size ksize);
-
-	void eyeFn(FileData &fd, Size ksize, String targetColor="");
-	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor);
+	void eyeFn(FileData &fd, Size ksize, String targetColor="",String targetShade="");
+	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor, String targetShade);
 
 	bool importEntropyThresholds();
 	void releaseMemory();

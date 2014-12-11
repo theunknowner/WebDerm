@@ -123,7 +123,7 @@ void runHysteresis()
 	Color c;
 	String filename;
 	String name;
-	Size size(10,10);
+	Size size(5,5);
 	cout << "Enter filename: ";
 	cin >> filename;
 	Mat img = imread(filename);

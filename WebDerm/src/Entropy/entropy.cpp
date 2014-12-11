@@ -162,8 +162,8 @@ String combineShades(String shade) {
 	return shade;
 }
 
-deque< deque< deque<double> > > vec;
-deque< deque< deque<double> > > vec2;
+deque<deque< deque< deque<double> > > > vec;
+deque<deque< deque< deque<double> > > > vec2;
 deque< deque< deque<int> > > gTargetCellCount;
 double vecTotal[5] = {0};
 
@@ -181,8 +181,10 @@ deque< deque<double> > Entropy::outputCombinedEntropy(FileData &fd, Size ksize) 
 	Hsl hsl;
 	Functions fn;
 	double h,s,l;
-	init_3D_Deque(vec,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
-	init_3D_Deque(vec2,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
+	vec = createDeque4D(fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,allColors.size(),g_Shades2.size(),0);
+	vec2 = createDeque4D(fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,allColors.size(),g_Shades2.size(),0);
+	//init_3D_Deque(vec,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
+	//init_3D_Deque(vec2,fd.colorVec.size()/ksize.height,fd.colorVec.at(0).size()/ksize.width,g_Shades2.size());
 	init_2D_Deque(fd.shadeColorCount,g_Shades2.size(), allColors.size(),0);
 	for(unsigned int i=0; i<fd.colorVec.size(); i++) {
 		for(unsigned int j=0; j<fd.colorVec.at(i).size(); j++) {
@@ -1017,54 +1019,19 @@ deque< deque<double> > Entropy::outputCombinedSigmoid(FileData &fd, Size ksize, 
 	return pEntropy;
 }
 
-Mat Entropy::showEntropySquares(Mat img, Size ksize)  {
-	Mat dst = img.clone();
-	Point end;
-	String dark,high,low,light,white;
-	cout << vecTotal[0] << endl;
-	cout << vecTotal[1] << endl;
-	cout << vecTotal[2] << endl;
-	cout << vecTotal[3] << endl;
-	for(int i=0; i<img.rows; i+=ksize.height)  {
-		for(int j=0; j<img.cols; j+=ksize.width)  {
-			if((i+ksize.width)>img.cols) end = Point(img.cols-1,img.rows-1);
-			else end = Point(j+ksize.width,i+ksize.height);
-
-			dark = toString(vec[i/ksize.height][j/ksize.width][0]);
-			high = toString(vec[i/ksize.height][j/ksize.width][1]);
-			low = toString(vec[i/ksize.height][j/ksize.width][2]);
-			light = toString(vec[i/ksize.height][j/ksize.width][3]);
-			//white = toString(vec[i/ksize.height][j/ksize.width][4]);
-			//dark += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][0],3))+" )";
-			//high += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][1],3))+" )";
-			//low += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][2],3))+" )";
-			//light += " ( "+toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][3],3))+" )";
-			putText(dst,dark,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
-			putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
-			putText(dst,low,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
-			putText(dst,light,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
-			rectangle(dst,Point(j,i),Point(end.x,end.y),Scalar(0,0,255));
-		}
-	}
-	//namedWindow("output",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//imshow("output",dst);
-	//waitKey(0);
-	return dst;
-}
-
 inline double eyeF_fn1(double Y, double a, double b, double p)  {
 	double result=0;
 	result = 1.0/(1+a*exp(-b*pow(Y,p)));
 	return result;
 }
 
-void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
+void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetShade) {
 	int height = fd.colorVec.size()/ksize.height;
 	int width = fd.colorVec.at(0).size()/ksize.width;
 	int innerHeight = allColors.size();
 	int innerWidth = g_Shades2.size();
-	init_3D_Deque(vec,height,width,innerWidth);
-	init_3D_Deque(vec2,height,width,innerWidth);
+	vec = createDeque4D(height,width,innerHeight,innerWidth,0);
+	vec2 = createDeque4D(height,width,innerHeight,innerWidth,0);
 	init_3D_Deque(gTargetCellCount,height,width,innerWidth);
 	deque<deque<deque<deque<double> > > > ratio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	deque<deque<deque<deque<double> > > > smoothRatio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
@@ -1104,7 +1071,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
 							shade = combineShades(shade);
-							shade = "Low";
+							if(shade.find("Dark")==string::npos)
+								shade = "Low";
 							color = c.combineColors(color);
 							if(fd.filename.find("acne")!=string::npos)  {
 								if(color=="Violet")  {
@@ -1205,12 +1173,10 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 	int binSize = 21;
 	deque< deque<double> > stdevRatio(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque< deque<double> > totalBins(allColors.size(),deque<double>(g_Shades2.size(),0));
-	//deque<deque<deque<double> > > densityBin(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(binSize,0)));
 	deque<deque<deque<deque<double> > > > densityBin(allColors.size(),deque<deque<deque<double> > >(g_Shades2.size(),deque<deque<double> >(binSize,deque<double>(1,-1))));
 	int binNum = 0;
-	//deque<deque<int> > pt(height,deque<int>(width,0));
-	deque<deque<Point> > ratioPtsList(allColors.size(), deque<Point>(1,Point(-1,-1)));
-	deque<deque<double> > smoothRatioSingleList(allColors.size(),deque<double>(1,-1));
+	deque<deque<deque<Point> > > ratioPtsList(allColors.size(), deque<deque<Point> >(g_Shades2.size(),deque<Point>(1,Point(-1,-1))));
+	deque<deque<deque<double> > > smoothRatioSingleList(allColors.size(), deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
 	deque<deque<deque<deque<double> > > > smoothRatioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	deque<deque<deque<deque<double> > > > ratioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	int x1=0,y1=0,minRow=0,minCol=0;
@@ -1240,14 +1206,14 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatio[y1][x1][c][d] /=count;
 					if(ratio[y1][x1][c][d]>min) {
-						if(smoothRatioSingleList.at(c).size()>0) {
-							if(smoothRatioSingleList.at(c).at(0)==-1) {
-								smoothRatioSingleList.at(c).pop_front();
-								ratioPtsList.at(c).pop_front();
+						if(smoothRatioSingleList.at(c).at(d).size()>0) {
+							if(smoothRatioSingleList.at(c).at(d).at(0)==-1) {
+								smoothRatioSingleList.at(c).at(d).pop_front();
+								ratioPtsList.at(c).at(d).pop_front();
 							}
 						}
-						smoothRatioSingleList.at(c).push_back(smoothRatio[y1][x1][c][d]);
-						ratioPtsList.at(c).push_back(Point(x1,y1));
+						smoothRatioSingleList.at(c).at(d).push_back(smoothRatio[y1][x1][c][d]);
+						ratioPtsList.at(c).at(d).push_back(Point(x1,y1));
 
 						cellCount.at(c).at(d)++;
 						fnEye.at(c).at(d) += smoothRatio[y1][x1][c][d];
@@ -1261,8 +1227,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 						}
 						densityBin.at(c).at(d).at(binNum).push_back(smoothRatio[y1][x1][c][d]);
 						++totalBins.at(c).at(d);
-						//stdevRatio.at(c).at(d) += log2(smoothRatio[y1][x1][c][d]+0.902)+0.15;
-						/*****************************/
 						if(targetColor!="") {
 							int index = rgb.getColorIndex(targetColor);
 							if(c==index) {
@@ -1287,9 +1251,10 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 							}
 						}
 					}
-					if(targetColor!="") {
+					if(targetColor!="" && targetShade!="") {
 						int index = rgb.getColorIndex(targetColor);
-						if(c==index) {
+						int shadeIndex = sh.getShadeIndex2(targetShade);
+						if(c==index && d==shadeIndex) {
 							vec[y1][x1][d] = fnEye.at(c).at(d);
 							vec2[y1][x1][d] = dnEye.at(c).at(d);
 							gTargetCellCount[y1][x1][d] = targetCellCount.at(c).at(d);
@@ -1307,60 +1272,62 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 	ratioOutlierRm = ratio;
 	deque<double> sortedList;
 	deque<Point> sortedPtsList;
-	for(int c=0; c<innerHeight; c++) {
-		if(smoothRatioSingleList.at(c).size()>0) {
-			if(smoothRatioSingleList.at(c).at(0)!=-1) {
-				if(sortedList.size()==0) {
-					sortedList.push_back(smoothRatioSingleList.at(c).at(0));
-					sortedPtsList.push_back(ratioPtsList.at(c).at(0));
-				}
-				for(unsigned int d=1; d<smoothRatioSingleList.at(c).size(); d++) {
-					for(unsigned int e=0; e<sortedList.size(); e++) {
-						if((sortedList.size()-e)<=1) {
-							if(smoothRatioSingleList.at(c).at(d)>=sortedList.at(e)) {
-								sortedList.push_back(smoothRatioSingleList.at(c).at(d));
-								sortedPtsList.push_back(ratioPtsList.at(c).at(d));
-								break;
+	for(i=0; i<innerHeight; i++) {
+		for (j=0; j<innerWidth; j++) {
+			if(smoothRatioSingleList.at(i).at(j).size()>0) {
+				if(smoothRatioSingleList.at(i).at(j).at(0)!=-1) {
+					if(sortedList.size()==0) {
+						sortedList.push_back(smoothRatioSingleList.at(i).at(j).at(0));
+						sortedPtsList.push_back(ratioPtsList.at(i).at(j).at(0));
+					}
+					for(unsigned int d=1; d<smoothRatioSingleList.at(i).at(j).size(); d++) {
+						for(unsigned int e=0; e<sortedList.size(); e++) {
+							if((sortedList.size()-e)<=1) {
+								if(smoothRatioSingleList.at(i).at(j).at(d)>=sortedList.at(e)) {
+									sortedList.push_back(smoothRatioSingleList.at(i).at(j).at(d));
+									sortedPtsList.push_back(ratioPtsList.at(i).at(j).at(d));
+									break;
+								}
+								else {
+									sortedList.push_front(smoothRatioSingleList.at(i).at(j).at(d));
+									sortedPtsList.push_front(ratioPtsList.at(i).at(j).at(d));
+									break;
+								}
 							}
 							else {
-								sortedList.push_front(smoothRatioSingleList.at(c).at(d));
-								sortedPtsList.push_front(ratioPtsList.at(c).at(d));
-								break;
-							}
-						}
-						else {
-							if(smoothRatioSingleList.at(c).at(d)>=sortedList.at(e) && smoothRatioSingleList.at(c).at(d)<=sortedList.at(e+1)) {
-								sortedList.insert(sortedList.begin()+e+1,smoothRatioSingleList.at(c).at(d));
-								sortedPtsList.insert(sortedPtsList.begin()+e+1,ratioPtsList.at(c).at(d));
-								break;
-							}
-							if(smoothRatioSingleList.at(c).at(d)<=sortedList.at(0)) {
-								sortedList.push_front(smoothRatioSingleList.at(c).at(d));
-								sortedPtsList.push_front(ratioPtsList.at(c).at(d));
-								break;
+								if(smoothRatioSingleList.at(i).at(j).at(d)>=sortedList.at(e) && smoothRatioSingleList.at(i).at(j).at(d)<=sortedList.at(e+1)) {
+									sortedList.insert(sortedList.begin()+e+1,smoothRatioSingleList.at(i).at(j).at(d));
+									sortedPtsList.insert(sortedPtsList.begin()+e+1,ratioPtsList.at(i).at(j).at(d));
+									break;
+								}
+								if(smoothRatioSingleList.at(i).at(j).at(d)<=sortedList.at(0)) {
+									sortedList.push_front(smoothRatioSingleList.at(i).at(j).at(d));
+									sortedPtsList.push_front(ratioPtsList.at(i).at(j).at(d));
+									break;
+								}
 							}
 						}
 					}
+					double t = sortedList.size()*outlierThresh;
+					t = round(t);
+					for(int d=0; d<t; d++) {
+						ratioOutlierRm[sortedPtsList.front().y][sortedPtsList.front().x][i][j]=0;
+						ratioOutlierRm[sortedPtsList.back().y][sortedPtsList.back().x][i][j]=0;
+						sortedPtsList.pop_back();
+						sortedPtsList.pop_front();
+						sortedList.pop_back();
+						sortedList.pop_front();
+					}
+					sortedList.clear();
+					sortedPtsList.clear();
+					deque<double>().swap(sortedList);
+					deque<Point>().swap(sortedPtsList);
 				}
-				double t = sortedList.size()*outlierThresh;
-				t = round(t);
-				for(int d=0; d<t; d++) {
-					ratioOutlierRm[sortedPtsList.front().y][sortedPtsList.front().x][c][2]=0;
-					ratioOutlierRm[sortedPtsList.back().y][sortedPtsList.back().x][c][2]=0;
-					sortedPtsList.pop_back();
-					sortedPtsList.pop_front();
-					sortedList.pop_back();
-					sortedList.pop_front();
-				}
-				sortedList.clear();
-				sortedPtsList.clear();
-				deque<double>().swap(sortedList);
-				deque<Point>().swap(sortedPtsList);
 			}
-		}
-	}
+		}//end for innerWidth
+	}//end for innerHeight
 	smoothRatioSingleList.clear();
-	smoothRatioSingleList.resize(allColors.size(),deque<double>(1,-1));
+	smoothRatioSingleList.resize(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
 	x1=0,y1=0,minRow=0,minCol=0,maxRow=0,maxCol=0,count=0;
 	while(y1<height) {
 		minRow=maxRow=y1;
@@ -1386,12 +1353,12 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatioOutlierRm[y1][x1][c][d] /=count;
 					if(ratioOutlierRm[y1][x1][c][d]>min) {
-						if(smoothRatioSingleList.at(c).size()>0) {
-							if(smoothRatioSingleList.at(c).at(0)==-1) {
-								smoothRatioSingleList.at(c).pop_front();
+						if(smoothRatioSingleList.at(c).at(d).size()>0) {
+							if(smoothRatioSingleList.at(c).at(d).at(0)==-1) {
+								smoothRatioSingleList.at(c).at(d).pop_front();
 							}
 						}
-						smoothRatioSingleList.at(c).push_back(smoothRatioOutlierRm[y1][x1][c][d]);
+						smoothRatioSingleList.at(c).at(d).push_back(smoothRatioOutlierRm[y1][x1][c][d]);
 					}
 				}
 			}
@@ -1402,9 +1369,11 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 		++y1;
 	}
 	for(int c=0; c<innerHeight; c++) {
-		if(smoothRatioSingleList.at(c).size()>0) {
-			if(smoothRatioSingleList.at(c).at(0)!=-1) {
-				stdevRatio.at(c).at(2) = standardDev(smoothRatioSingleList.at(c));
+		for (int d=0; d<innerWidth; d++) {
+			if(smoothRatioSingleList.at(c).at(d).size()>0) {
+				if(smoothRatioSingleList.at(c).at(d).at(0)!=-1) {
+					stdevRatio.at(c).at(d) = standardDev(smoothRatioSingleList.at(c).at(d));
+				}
 			}
 		}
 	}
@@ -1446,56 +1415,69 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor) {
 			}
 		}
 	}
-*/
+	 */
+	/*
 	cout << fd.filename  << ": Writing YSV files..." << flush;
 	String filename4 = fd.filename+ "_"+ file_ksize+"_YSV_Combined"+strSize+".csv";
 	FILE * fp4;
 	fp4 = fopen(filename4.c_str(),"w");
-	fprintf(fp4,",Y,S,V\n");
+	fprintf(fp4,",Y-Dark,S-Dark,V-Dark,Y-Low,S-Low,V-Low\n");
 	for(unsigned int i=0; i<allColors.size(); i++) {
-		fprintf(fp4,"%s,%f,%f,%f\n",allColors.at(i).c_str(),fnEye.at(i).at(2),dnEye.at(i).at(2),stdevRatio.at(i).at(2));
+		fprintf(fp4,"%s,",allColors.at(i).c_str());
+		for(unsigned int j=0; j<g_Shades2.size(); j++) {
+			if(j==0 || j==2)
+				fprintf(fp4,"%f,%f,%f,",fnEye.at(i).at(j),dnEye.at(i).at(j),stdevRatio.at(i).at(j));
+		}
+		fprintf(fp4,"\n");
 	}
 	cout << "Done!" << endl;
 	//fclose(fp);
 	//fclose(fp2);
 	//fclose(fp3);
 	fclose(fp4);
+	*/
+
 	gRatio = ratio;
 	gSmoothRatio = smoothRatio;
 	gSmoothRatioRm = smoothRatioOutlierRm;
 	gRatioRm = ratioOutlierRm;
 }
 
-Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor)  {
+Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor, String targetShade)  {
 	Mat dst = img.clone();
 	Point end;
 	String dark,high,low,light,white;
 	String low2;
 	String data,data2,data3;
 	Rgb rgb;
+	Shades sh;
 	int indexColor = rgb.getColorIndex(targetColor);
-
-	for(int i=0; i<img.rows; i+=ksize.height)  {
-		for(int j=0; j<img.cols; j+=ksize.width)  {
-			if((i+ksize.width)>img.cols) end = Point(img.cols-1,img.rows-1);
+	int indexShade = sh.getShadeIndex2(targetShade);
+	resize(dst,dst,Size(700,700));
+	ksize = Size(50,50);
+	for(int i=0; i<dst.rows; i+=ksize.height)  {
+		for(int j=0; j<dst.cols; j+=ksize.width)  {
+			if((i+ksize.width)>dst.cols) end = Point(dst.cols-1,dst.rows-1);
 			else end = Point(j+ksize.width,i+ksize.height);
 			//data = toString(roundDecimal(vec[i/ksize.height][j/ksize.width][2],3));
 			data3 = toString(roundDecimal(gTargetCellCount[i/ksize.height][j/ksize.width][2],3));
 			data2 = toString(roundDecimal(vec2[i/ksize.height][j/ksize.width][2],3));
 			//dark = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][0],3));
 			//high = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][1],3));
-			low2 = toString(roundDecimal(gRatio[i/ksize.height][j/ksize.width][indexColor][2],3));
-			low = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][2],3));
+			low2 = toString(roundDecimal(gRatio[i/ksize.height][j/ksize.width][indexColor][indexShade],3));
+			low = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][indexShade],3));
 			//data = toString(roundDecimal(gRatioRm[i/ksize.height][j/ksize.width][indexColor][2],3));
 			//data2 = toString(roundDecimal(gSmoothRatioRm[i/ksize.height][j/ksize.width][indexColor][2],3));
 			//light = toString(roundDecimal(gSmoothRatio[i/ksize.height][j/ksize.width][indexColor][3],3));
 			//white = toString(vec[i/ksize.height][j/ksize.width][4]);
 			//putText(dst,dark,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			//putText(dst,high,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
-			putText(dst,data3,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
-			putText(dst,data2,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+
+			//putText(dst,data3,Point(j+5,i+10),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+			//putText(dst,data2,Point(j+5,i+20),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,low2,Point(j+5,i+30),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			putText(dst,low,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
+
 			//putText(dst,light,Point(j+5,i+40),FONT_HERSHEY_SIMPLEX,0.3,Scalar(255,0,0));
 			rectangle(dst,Point(j,i),Point(end.x,end.y),Scalar(0,0,255));
 		}

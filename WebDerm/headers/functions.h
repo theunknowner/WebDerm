@@ -37,7 +37,7 @@ void init_3D_Deque(deque< deque< deque<String> > > &vec, int cols, int rows, int
 void init_3D_Deque(deque< deque< deque<double> > > &vec, int cols, int rows, int dep, double val=0);
 void init_3D_Deque(deque< deque< deque<int> > > &vec, int cols, int rows, int dep, int val=0);
 
-deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val);
+deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val=0);
 
 class Functions {
 public:

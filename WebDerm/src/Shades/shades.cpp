@@ -118,6 +118,15 @@ void Shades::release_memory() {
 	g_ShadeThresh2.shrink_to_fit();
 }
 
+//compares shade1 with shade2 and returns difference
+//if diff is <0 -> shade1 is darker, >0 -> shade1 is lighter
+int Shades::shadeDifference(String shade1, String shade2) {
+	int shadeIndex1 = this->getShadeIndex(shade1);
+	int shadeIndex2 = this->getShadeIndex(shade2);
+	int diff = shadeIndex1 - shadeIndex2;
+	return diff;
+}
+
 int Shades::getShadeIndex2(String shade) {
 	unsigned int index=0;
 	int shadeCount = g_Shades2.size();

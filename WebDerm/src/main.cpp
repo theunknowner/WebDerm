@@ -24,7 +24,7 @@ int main(int argc,char** argv)
 {
 	//runRenameFiles();
 	//runAllHysteresis();
-	runHysteresis();
+	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 	/*
@@ -46,14 +46,14 @@ int main(int argc,char** argv)
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
 	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
-	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/psoriasis1-2.png",Size(140,140),0);
+	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/urticaria7-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 /*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_ShadeColors_5x5.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_HSL_5x5.csv",fd.hslMat);
 	rule5(fd);
-	//cout << fd.colorVec.at(59).at(53) << endl;
+	//cout << fd.colorVec.at(72).at(61) << endl;
 /*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/vesicles18_5x5.csv",fd.windowVec);
@@ -72,10 +72,11 @@ int main(int argc,char** argv)
 	printf("%s\n",fd.hslPtMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	printf("mCon: %s\n",fd.m_ContrastMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	printf("dHSL: %s\n",fd.d_HslMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	/**/
 	//Entropy en;
 	//en.runCompareEntropy();
 	//en.runCompareEntropy2();
-
+/*
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
 	FileData fd;
@@ -117,43 +118,46 @@ int main(int argc,char** argv)
 	fclose(fp);
 	en.releaseMemory();
 /**/
-	/*
+	Entropy en;
 	FileData fd;
-	fd.filename = "acne1";
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd.filename+"_HSL_10x10.csv",fd.hslMat);
-	fd.ksize = Size(10,10);
-	Size entSize(50,50);
+	fd.filename = "vesicles18";
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd.filename+"_ShadeColors_5x5.csv",fd.colorVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd.filename+"_HSL_5x5.csv",fd.hslMat);
+	fd.ksize = Size(5,5);
+	Size entSize(10,10);
 	String targetColor = "Pink";
+	String targetShade = "Dark";
 	en.eyeFn(fd,entSize,targetColor);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
-	img3 = c.output2ImageTargetColor(fd.colorVec,Size(10,10),fd.filename,targetColor);
+	img3 = c.output2ImageTargetColor(fd.colorVec,Size(5,5),fd.filename,targetColor);
 	//img3 = en.showEntropySquares(img3,entSize);
-	img3 = en.showEyeFnSquares(img3,entSize,targetColor);
+	img3 = en.showEyeFnSquares(img3,entSize,targetColor,targetShade);
 	//Mouse::mouseOutputColor(img3,fd);
-
+/*
 	FileData fd2;
 	fd2.filename = "vesicles25";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
 	fd2.ksize = Size(10,10);
 	String targetColor2 = "Pink";
+	String targetShade2 = "Dark";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
 	img4 = c.output2ImageTargetColor(fd2.colorVec,Size(10,10),fd2.filename,targetColor2);
 	//img4 = en.showEntropySquares(img4,entSize);
-	img4 = en.showEyeFnSquares(img4,entSize,targetColor2);
+	img4 = en.showEyeFnSquares(img4,entSize,targetColor2,targetShade2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-	/*
+
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);
-	imshow(fd2.filename+"_Squares2",img4);
+	//imshow(fd2.filename+"_Squares2",img4);
 	waitKey(0);
 
+/*
 	Point pt1(7,41);
 	Point pt2(9,43);
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
