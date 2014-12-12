@@ -24,7 +24,8 @@ double S_PERCEPTION;
 double Y_LARGE_THRESH;
 double distPass;
 double Y1, Y2;
-deque<double> colorWeights; //holds the weights for color impact
+deque<double> colorWeights; //holds the weights for color impact - My algo
+deque<double> colorWeights2; //Dr. Dube's algo
 
 void resetThreshVals() {
 	Y_HIGH = 49.0;
@@ -58,6 +59,9 @@ bool Entropy::importEntropyThresholds() {
 				if(i==1) {
 					colorWeights.push_back(atof(vec.at(i).c_str()));
 				}
+				if(i==2) {
+					colorWeights2.push_back(atof(vec.at(i).c_str()));
+				}
 			}
 			vec.clear();
 		}
@@ -76,7 +80,7 @@ void Entropy::releaseMemory() {
 	deque<double>().swap(colorWeights);
 }
 
-double compareY(double y1, double y2) {
+double compareY(double y1, double y2, double weight) {
 	double val;
 	if((y1>Y_HIGH && y2>Y_HIGH)) {
 		val = min(y1,y2)/max(y1,y2);
@@ -99,7 +103,7 @@ double compareY(double y1, double y2) {
 	}
 }
 
-double compareS(double s1, double s2) {
+double compareS(double s1, double s2, double weight) {
 	double val;
 	if((s1>S_HIGH && s2>S_HIGH)) {
 		val = min(s1,s2)/max(s1,s2);
@@ -122,7 +126,7 @@ double compareS(double s1, double s2) {
 	}
 }
 
-double compareV(double v1, double v2) {
+double compareV(double v1, double v2, double weight) {
 	double val=0;
 	if((v1<=V_HIGH && v2<=V_HIGH)) {
 		val = max(v1,v2)-min(v1,v2);
@@ -195,13 +199,13 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 
 			if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {
 				//Total Population(Y) comparison
-				valY = compareY(ysv1[0],ysv2[0]);
+				valY = compareY(ysv1[0],ysv2[0],1);
 
 				//Avg Density(S) comparison
-				valS = compareS(ysv1[1],ysv2[1]);
+				valS = compareS(ysv1[1],ysv2[1],1);
 
 				//Variability(V) comparison
-				valV = compareV(ysv1[2],ysv2[2]);
+				valV = compareV(ysv1[2],ysv2[2],1);
 
 				//Reassign Y && Y_THRESH if S & V are the same
 				if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH) {
@@ -217,11 +221,12 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 				}
 
 				//Average value of YSV matching
-				avg = valY + valS + valV;
+				avg = (valY + valS + valV);
 				avg /= 3.0;
 				resultVec.at(i) = avg;
 
-				//printf("%s : %f,%f,%f\n",allColors.at(i).c_str(),valY,valS,valV);
+
+				//printf("%s : %f,%f,%f\n",colorNameVec.at(i).c_str(),valY,valS,valV);
 
 				//Total of all the Y that are noticeable
 				total += max(ysv1[0],ysv2[0]);
@@ -229,18 +234,57 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 			}
 		}
 	}
+	//preparing the moving weights
+	double weightTotal=0;
+	int totalColorsHit=0;
+	double normWeights[colorWeights.size()];
+	double normSignifWeight[colorWeights.size()];
+	for(unsigned int i=0; i<colorWeights.size(); i++) {
+		if(colorsHit[i]==1) {
+			cout << colorNameVec.at(i) << endl;
+			weightTotal += colorWeights.at(i);
+			totalColorsHit += colorsHit[i];
+		}
+	}
+	for(unsigned int i=0; i<colorWeights.size(); i++) {
+		if(colorsHit[i]==1) {
+			normWeights[i] = colorWeights.at(i)/weightTotal;
+			normSignifWeight[i] = normWeights[i] * totalColorsHit;
+		}
+	}
 
+	double colorSignif[colorWeights.size()];
+	double newTotal=0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		ysv1[0] = vec1.at(i).at(0);
+		ysv2[0] = vec1.at(i).at(0);
+		if(colorsHit[i]==1) {
+			colorSignif[i] = max(ysv1[0],ysv2[0]) * normSignifWeight[i];
+			newTotal += colorSignif[i];
+		}
+	}
+
+	double sum=0, results=0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		if(colorsHit[i]==1) {
+			sum = colorSignif[i]/newTotal;
+			resultVec.at(i) *= sum;
+			results += resultVec.at(i);
+		}
+	}
 	//calculating image similarity results
+	/*
 	double sum=0, results=0;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		ysv1[0] = vec1.at(i).at(0);
 		ysv2[0] = vec2.at(i).at(0);
 		if(colorsHit[i]==1) {
 			sum = max(ysv1[0],ysv2[0])/total;
+			printf("%s : %f\n",colorNameVec.at(i).c_str(),resultVec.at(i));
 			resultVec.at(i) *= sum;
 			results += resultVec.at(i);
 		}
-	}
+	}*/
 	//cout << "Mine: " << results << endl;
 	return results;
 }
@@ -255,7 +299,6 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 	double ysvWeights[componentSize]; //weight of importance of YSV
 	fill_n(ysvWeights,componentSize,1.0);
 	int colorsHit[colorComponents];
-	fill_n(colorsHit,colorComponents,0);
 
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		if(colorNameVec.at(i)!="LowBrown") {
@@ -268,9 +311,10 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 				}
 			}
 			total += max(ysv1[0],ysv2[0]);
-			if(ysv1[0]>0 || ysv2[0]>0)
+			if(ysv1[0]>0 || ysv2[0]>0) {
 				dist[i] = sqrt(sum) / sqrt(3);
-			colorsHit[i] = 1;
+				colorsHit[i] = 1;
+			}
 		}
 		sum=0;
 	}
@@ -280,10 +324,11 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 			ysv1[0] = vec1.at(i).at(0);
 			ysv2[0] = vec2.at(i).at(0);
 			if(ysv1[0]>0 || ysv2[0]>0) {
-				sum = (max(ysv1[0],ysv2[0])/total) * dist[i] * colorWeights.at(i);
-				//printf("%s: %f\n",allColors.at(i).c_str(),dist[i]);
+				sum = (max(ysv1[0],ysv2[0])/total) * dist[i] * colorWeights2.at(i);
+				//printf("%d) %s: %f\n",i,colorNameVec.at(i).c_str(),sum);
 				avgDist +=sum;
 			}
+			//printf("%d) %s: %f\n",i,colorNameVec.at(i).c_str(),sum);
 		}
 	}
 	avgDist = 1 - min(avgDist,1.0);

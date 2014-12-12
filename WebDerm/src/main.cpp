@@ -79,7 +79,7 @@ int main(int argc,char** argv)
 	Entropy en;
 	en.importEntropyThresholds();
 	en.runCompareEntropy();
-	en.runCompareEntropy2();
+	//en.runCompareEntropy2();
 /*
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
@@ -130,8 +130,8 @@ int main(int argc,char** argv)
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd.filename+"_HSL_5x5.csv",fd.hslMat);
 	fd.ksize = Size(5,5);
 	Size entSize(5,5);
-	String targetColor = "Pink";
-	String targetShade = "Low";
+	String targetColor = "Brown";
+	String targetShade = "Dark";
 	en.eyeFn(fd,entSize,targetColor,targetShade);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
@@ -141,12 +141,12 @@ int main(int argc,char** argv)
 	//Mouse::mouseOutputColor(img3,fd);
 
 	FileData fd2;
-	fd2.filename = "psoriasis18";
+	fd2.filename = "herpes-zoster1";
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd2.filename+"_ShadeColors_5x5.csv",fd2.colorVec);
 	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd2.filename+"_HSL_5x5.csv",fd2.hslMat);
 	fd2.ksize = fd.ksize;
-	String targetColor2 = "Pink";
-	String targetShade2 = "Low";
+	String targetColor2 = "Brown";
+	String targetShade2 = "Dark";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
