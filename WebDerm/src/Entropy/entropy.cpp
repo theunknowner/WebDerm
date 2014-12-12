@@ -1423,8 +1423,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 		FILE * fp4;
 		fp4 = fopen(filename4.c_str(),"w");
 		fprintf(fp4,",Y,S,V\n");
-		for(unsigned int i=0; i<allColors.size(); i++) {
-			for(unsigned int j=0; j<g_Shades2.size(); j++) {
+		for(unsigned int j=0; j<g_Shades2.size(); j++) {
+			for(unsigned int i=0; i<allColors.size(); i++) {
 				if(j==0 || j==2) {
 					shadeColor = g_Shades2.at(j)+allColors.at(i);
 					fprintf(fp4,"%s,%f,%f,%f\n",shadeColor.c_str(),fnEye.at(i).at(j),dnEye.at(i).at(j),stdevRatio.at(i).at(j));
@@ -1454,7 +1454,7 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor, String ta
 	int indexColor = rgb.getColorIndex(targetColor);
 	int indexShade = sh.getShadeIndex2(targetShade);
 	resize(dst,dst,Size(700,700));
-	ksize = Size(50,50);
+	ksize = Size(25,25);
 	for(int i=0; i<dst.rows; i+=ksize.height)  {
 		for(int j=0; j<dst.cols; j+=ksize.width)  {
 			if((i+ksize.width)>dst.cols) end = Point(dst.cols-1,dst.rows-1);

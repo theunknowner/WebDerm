@@ -33,9 +33,9 @@ public:
 
 	bool importEntropyThresholds();
 	void releaseMemory();
-	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat);
-	double compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<deque<double> > &matchVec);
-	double compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2);
+	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, deque<String> &colorNameVec);
+	double compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
+	double compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 
 	void runAllEntropy();
 	void runEntropy();

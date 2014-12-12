@@ -34,7 +34,7 @@ void Entropy::runAllEntropy() {
 	hsl.importHslThresholds();
 	rgb.importThresholds();
 	sh.importThresholds();
-	Size entSize(10,10);
+	Size entSize(5,5);
 	Size size(5,5);
 	String strSize = toString(size.width)+"x"+toString(size.height);
 	bool flag[2] = {false};
@@ -47,7 +47,7 @@ void Entropy::runAllEntropy() {
 			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
-				eyeFn(fd,entSize,"");
+				eyeFn(fd,entSize,"","");
 			}
 		}
 		img.release();
@@ -62,11 +62,11 @@ void Entropy::runEntropy() {
 	cout << "Enter image name: ";
 	cin >> input;
 	bool flag[2] = {false};
-	Size entSize(50,50);
+	Size entSize(5,5);
 	FileData fd;
 	fd.filename = input;
-	flag[0]=fd.loadFileMatrix(fd.filename+"_ShadeColors_10x10.csv",fd.colorVec);
-	flag[1]=fd.loadFileMatrix(fd.filename+"_HSL_10x10.csv",fd.hslMat);
+	flag[0]=fd.loadFileMatrix(fd.filename+"_ShadeColors_5x5.csv",fd.colorVec);
+	flag[1]=fd.loadFileMatrix(fd.filename+"_HSL_5x5.csv",fd.hslMat);
 	if(flag[0]==true && flag[1]==true) {
 		Rgb rgb;
 		Hsl hsl;
@@ -74,8 +74,9 @@ void Entropy::runEntropy() {
 		hsl.importHslThresholds();
 		rgb.importThresholds();
 		sh.importThresholds();
-		fd.ksize=Size(10,10);
-		eyeFn(fd,entSize,"");
+		this->importEntropyThresholds();
+		fd.ksize=Size(5,5);
+		eyeFn(fd,entSize,"","");
 		rgb.release_memory();
 		hsl.release_memory();
 		sh.release_memory();
@@ -85,13 +86,13 @@ void Entropy::runEntropy() {
 void Entropy::runCompareEntropy() {
 	String input;
 	deque<deque<double> > vec1;
+	deque<String> colorNameVec;
 	cout << "Enter filename: ";
 	cin >> input;
 	Entropy en;
-	if(en.loadEntropyFiles(input,vec1)) {
+	if(en.loadEntropyFiles(input,vec1,colorNameVec)) {
 		deque<String> files;
 		deque<deque<double> > vec2;
-		deque<deque<double> > matchVec;
 		FileData fd;
 		String folder = "/home/jason/Desktop/Programs/TestYSV2/";
 		String filepath, name;
@@ -103,14 +104,12 @@ void Entropy::runCompareEntropy() {
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"_");
-			en.loadEntropyFiles(filepath,vec2);
-			results = en.compareEntropy(vec1,vec2,matchVec);
+			en.loadEntropyFiles(filepath,vec2,colorNameVec);
+			results = en.compareEntropy(vec1,vec2,colorNameVec);
 			resultVec.push_back(results);
 			nameVec.push_back(name);
 			vec2.clear();
 			vec2.shrink_to_fit();
-			matchVec.clear();
-			matchVec.shrink_to_fit();
 		}
 		jaysort(resultVec,origPos);
 		for(unsigned int i=0; i<resultVec.size(); i++) {
@@ -121,11 +120,12 @@ void Entropy::runCompareEntropy() {
 
 void Entropy::runCompareEntropy2() {
 	String input;
+	deque<String> colorNameVec;
 	deque<deque<double> > vec1;
 	cout << "Enter filename: ";
 	cin >> input;
 	Entropy en;
-	if(en.loadEntropyFiles(input,vec1)) {
+	if(en.loadEntropyFiles(input,vec1,colorNameVec)) {
 		deque<String> files;
 		deque<deque<double> > vec2;
 		deque<deque<double> > matchVec;
@@ -140,8 +140,8 @@ void Entropy::runCompareEntropy2() {
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"_");
-			en.loadEntropyFiles(filepath,vec2);
-			results = en.compareEntropy2(vec1,vec2);
+			en.loadEntropyFiles(filepath,vec2,colorNameVec);
+			results = en.compareEntropy2(vec1,vec2,colorNameVec);
 			resultVec.push_back(results);
 			nameVec.push_back(name);
 			vec2.clear();

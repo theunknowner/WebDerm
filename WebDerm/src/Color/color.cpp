@@ -614,7 +614,7 @@ String Color::combineColors(String color)  {
 	return color;
 }
 
-Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget) {
+Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget, String shadeTarget) {
 	String filename = path+"Thresholds/output-shades.csv";
 	fstream fs(filename.c_str());
 	if(fs.is_open()) {
@@ -686,7 +686,7 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 						}
 					}
 				}
-				if(color==colorTarget) {
+				if(color==colorTarget && shade.find(shadeTarget)!=string::npos) {
 					RGB = hsl.hsl2rgb(HSL[0],HSL[1],HSL[2]);
 					img.at<Vec3b>(i,j)[2] = RGB[0];
 					img.at<Vec3b>(i,j)[1] = RGB[1];
@@ -709,6 +709,10 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 		deque<int>().swap(thresh1);
 		deque< deque<int> >().swap(values);
 		return img;
+	}
+	else {
+		printf("Output2ImageTargetColor: Cannot open image!\n");
+		exit(1);
 	}
 }
 

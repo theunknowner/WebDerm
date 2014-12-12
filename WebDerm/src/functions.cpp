@@ -157,8 +157,13 @@ void init_3D_Deque(deque< deque< deque<int> > > &vec, int cols, int rows, int de
 	deque< deque<int> >().swap(tempVec2);
 }
 
-deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val) {
+deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, double val) {
 	deque<deque<deque<deque<double> > > > deq(dim1,deque<deque<deque<double> > >(dim2,deque<deque<double> >(dim3,deque<double>(dim4,val))));
+	return deq;
+}
+
+deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val) {
+	deque<deque<deque<deque<int> > > > deq(dim1,deque<deque<deque<int> > >(dim2,deque<deque<int> >(dim3,deque<int>(dim4,val))));
 	return deq;
 }
 

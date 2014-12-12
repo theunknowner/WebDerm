@@ -38,7 +38,7 @@ public:
 	int* changeRgbRelLum(double r, double g, double b, double amt);
 
 	String combineColors(String color);
-	Mat output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget);
+	Mat output2ImageTargetColor(deque< deque<String> > &window, Size size, String name, String colorTarget, String shadeTarget);
 
 	Mat correctGamma(Mat& img, double gamma);
 

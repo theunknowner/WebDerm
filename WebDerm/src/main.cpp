@@ -22,6 +22,8 @@
 
 int main(int argc,char** argv)
 {
+	//Entropy en;
+	//en.runAllEntropy();
 	//runRenameFiles();
 	//runAllHysteresis();
 	//runHysteresis();
@@ -73,9 +75,11 @@ int main(int argc,char** argv)
 	printf("mCon: %s\n",fd.m_ContrastMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	printf("dHSL: %s\n",fd.d_HslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	/**/
-	//Entropy en;
-	//en.runCompareEntropy();
-	//en.runCompareEntropy2();
+
+	Entropy en;
+	en.importEntropyThresholds();
+	en.runCompareEntropy();
+	en.runCompareEntropy2();
 /*
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
@@ -117,44 +121,45 @@ int main(int argc,char** argv)
 	}
 	fclose(fp);
 	en.releaseMemory();
-/**/
+*/
+/*
 	Entropy en;
 	FileData fd;
-	fd.filename = "vesicles18";
+	fd.filename = "acne-vulgaris1";
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd.filename+"_ShadeColors_5x5.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd.filename+"_HSL_5x5.csv",fd.hslMat);
 	fd.ksize = Size(5,5);
-	Size entSize(10,10);
+	Size entSize(5,5);
 	String targetColor = "Pink";
-	String targetShade = "Dark";
-	en.eyeFn(fd,entSize,targetColor);
+	String targetShade = "Low";
+	en.eyeFn(fd,entSize,targetColor,targetShade);
 	//pEnt1 = en.outputCombinedSigmoid(fd,Size(10,10),a,b,p);
 	//pEnt1 = en.outputCombinedEntropy(fd,entSize);
-	img3 = c.output2ImageTargetColor(fd.colorVec,Size(5,5),fd.filename,targetColor);
+	img3 = c.output2ImageTargetColor(fd.colorVec,Size(5,5),fd.filename,targetColor,targetShade);
 	//img3 = en.showEntropySquares(img3,entSize);
 	img3 = en.showEyeFnSquares(img3,entSize,targetColor,targetShade);
 	//Mouse::mouseOutputColor(img3,fd);
-/*
+
 	FileData fd2;
-	fd2.filename = "vesicles25";
-	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_ShadeColors_10x10.csv",fd2.colorVec);
-	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output/"+fd2.filename+"_HSL_10x10.csv",fd2.hslMat);
-	fd2.ksize = Size(10,10);
+	fd2.filename = "psoriasis18";
+	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd2.filename+"_ShadeColors_5x5.csv",fd2.colorVec);
+	fd2.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd2.filename+"_HSL_5x5.csv",fd2.hslMat);
+	fd2.ksize = fd.ksize;
 	String targetColor2 = "Pink";
-	String targetShade2 = "Dark";
+	String targetShade2 = "Low";
 	en.eyeFn(fd2,entSize,targetColor2);
 	//pEnt2 = en.outputCombinedSigmoid(fd2,Size(10,10),a,b,p);
 	//pEnt2 = en.outputCombinedEntropy(fd2,entSize);
-	img4 = c.output2ImageTargetColor(fd2.colorVec,Size(10,10),fd2.filename,targetColor2);
+	img4 = c.output2ImageTargetColor(fd2.colorVec,fd2.ksize,fd2.filename,targetColor2,targetShade2);
 	//img4 = en.showEntropySquares(img4,entSize);
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2,targetShade2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-
+/*
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);
-	//imshow(fd2.filename+"_Squares2",img4);
+	imshow(fd2.filename+"_Squares2",img4);
 	waitKey(0);
 
 /*
