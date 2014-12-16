@@ -155,7 +155,9 @@ deque< deque<double> > Entropy::outputEntropy(FileData &fd, Size ksize) {
 }
 
 String combineShades(String shade) {
-	if(shade.find("Dark")!=string::npos) return "Dark";
+	if(shade.find("Dark2")!=string::npos || shade.find("Dark1")!=string::npos)
+		return "Dark2";
+	if(shade.find("Dark3")!=string::npos) return "Dark3";
 	if(shade.find("High")!=string::npos) return "High";
 	if(shade.find("Low")!=string::npos) return "Low";
 	if(shade.find("Light")!=string::npos) return "Light";
@@ -1161,11 +1163,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 		exit(1);
 	}
 	double result=0;
-	deque<deque<Point> > dnMinPt(allColors.size(),deque<Point>(g_Shades2.size(),Point(0,0)));
-	deque<deque<Point> > dnMaxPt(allColors.size(),deque<Point>(g_Shades2.size(),Point(0,0)));
-	deque< deque<bool> > dnMinMaxInit(allColors.size(),deque<bool>(g_Shades2.size(),false));
-	deque< deque<double> > dnMin(allColors.size(),deque<double>(g_Shades2.size(),0));
-	deque< deque<double> > dnMax(allColors.size(),deque<double>(g_Shades2.size(),0));
 	deque< deque<int> > cellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	deque< deque<int> > targetCellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	int binSize = 21;
@@ -1231,22 +1228,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 							if(c==index && d==shadeIndex) {
 								//pt.at(y1).at(x1) = 1;
 								targetCellCount.at(c).at(d) = cellCount.at(c).at(d);
-							}
-						}
-						if(dnMinMaxInit.at(c).at(d)==false) {
-							dnMin.at(c).at(d) = dnMax.at(c).at(d) = fnEye.at(c).at(d) * dnEye.at(c).at(d);
-							dnMinPt.at(c).at(d) = dnMaxPt.at(c).at(d) = Point(x1,y1);
-							dnMinMaxInit.at(c).at(d) = true;
-						}
-						else {
-							result = fnEye.at(c).at(d) * dnEye.at(c).at(d);
-							if(result<dnMin.at(c).at(d)) {
-								dnMin.at(c).at(d) = result;
-								dnMinPt.at(c).at(d) = Point(x1,y1);
-							}
-							if(result>dnMax.at(c).at(d)) {
-								dnMax.at(c).at(d) = result;
-								dnMaxPt.at(c).at(d) = Point(x1,y1);
 							}
 						}
 					}
@@ -1425,7 +1406,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 		fprintf(fp4,",Y,S,V\n");
 		for(unsigned int j=0; j<g_Shades2.size(); j++) {
 			for(unsigned int i=0; i<allColors.size(); i++) {
-				if(j==0 || j==2) {
+				if(j==0 || j==1 || j==3) {
 					shadeColor = g_Shades2.at(j)+allColors.at(i);
 					fprintf(fp4,"%s,%f,%f,%f\n",shadeColor.c_str(),fnEye.at(i).at(j),dnEye.at(i).at(j),stdevRatio.at(i).at(j));
 				}
@@ -1454,7 +1435,7 @@ Mat Entropy::showEyeFnSquares(Mat img, Size ksize, String targetColor, String ta
 	int indexColor = rgb.getColorIndex(targetColor);
 	int indexShade = sh.getShadeIndex2(targetShade);
 	resize(dst,dst,Size(700,700));
-	ksize = Size(25,25);
+	ksize = Size(50,50);
 	for(int i=0; i<dst.rows; i+=ksize.height)  {
 		for(int j=0; j<dst.cols; j+=ksize.width)  {
 			if((i+ksize.width)>dst.cols) end = Point(dst.cols-1,dst.rows-1);

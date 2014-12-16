@@ -187,7 +187,7 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		resetThreshVals();
-		if(colorNameVec.at(i)!="LowBrown") {
+		if(colorNameVec.at(i)!="LowBrown" && colorNameVec.at(i)!="LowGreyBrown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 				ysv1[j] = vec1.at(i).at(j);
 				ysv2[j] = vec2.at(i).at(j);
@@ -241,7 +241,6 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 	double normSignifWeight[colorWeights.size()];
 	for(unsigned int i=0; i<colorWeights.size(); i++) {
 		if(colorsHit[i]==1) {
-			cout << colorNameVec.at(i) << endl;
 			weightTotal += colorWeights.at(i);
 			totalColorsHit += colorsHit[i];
 		}
@@ -269,6 +268,7 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 		if(colorsHit[i]==1) {
 			sum = colorSignif[i]/newTotal;
 			resultVec.at(i) *= sum;
+			//printf("%s: %f\n",colorNameVec.at(i).c_str(), resultVec.at(i));
 			results += resultVec.at(i);
 		}
 	}
@@ -301,7 +301,7 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 	int colorsHit[colorComponents];
 
 	for(unsigned int i=0; i<vec1.size(); i++) {
-		if(colorNameVec.at(i)!="LowBrown") {
+		if(colorNameVec.at(i)!="LowBrown"&& colorNameVec.at(i)!="LowGreyBrown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 				ysv1[j] = vec1.at(i).at(j);
 				ysv2[j] = vec2.at(i).at(j);
