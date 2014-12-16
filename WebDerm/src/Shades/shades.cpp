@@ -107,6 +107,14 @@ String Shades::extractShade(String pix) {
 	return shade;
 }
 
+String Shades::calcShade(double intensity) {
+	for(unsigned int i=0; i<g_ShadeThresh.size(); i++) {
+		if(intensity<g_ShadeThresh.at(i).at(1) && intensity>=g_ShadeThresh.at(i).at(0))
+			return g_Shades.at(i);
+	}
+	return "NONE";
+}
+
 void Shades::release_memory() {
 	g_Shades.clear();
 	g_ShadeThresh.clear();

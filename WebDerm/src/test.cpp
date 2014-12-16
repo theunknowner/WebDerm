@@ -276,12 +276,17 @@ String testColorAtLoc(Mat &img, Point pt, double &h) {
 	int ind= -3;
 	double dist=0;
 	int hue=0;
+	double * HSL;
 	String pix;
-	r = img.at<Vec3b>(pt.y-1,pt.x-1)[2];
-	g = img.at<Vec3b>(pt.y-1,pt.x-1)[1];
-	b = img.at<Vec3b>(pt.y-1,pt.x-1)[0];
+	r = img.at<Vec3b>(pt.y,pt.x)[2];
+	g = img.at<Vec3b>(pt.y,pt.x)[1];
+	b = img.at<Vec3b>(pt.y,pt.x)[0];
 	pix = rgb.checkBlack(r,g,b);
-	hsl.rgb2hsl(r,g,b);
+	HSL = hsl.rgb2hsl(r,g,b);
+	HSL[1] = roundDecimal(HSL[1],2);
+	HSL[2] = roundDecimal(HSL[2],2);
+	printf("RGB(%d,%d,%d)\n",r,g,b);
+	printf("HSL(%.f,%.2f,%.2f)\n",HSL[0],HSL[1],HSL[2]);
 	if(pix=="OTHER") {
 		pix = rgb.calcColor2(r,g,b);
 		if(pix=="OTHER") {
@@ -292,6 +297,6 @@ String testColorAtLoc(Mat &img, Point pt, double &h) {
 	hue %= 360;
 	hue /= 360;
 	h = hue;
-	cout << pix << img.at<Vec3b>(pt.y-1,pt.x-1) << ";" << ind+2 << ";" << hue<< endl;
+	//cout << pix << img.at<Vec3b>(pt.y,pt.x) << ";" << ind+2 << ";" << hue<< endl;
 	return pix;
 }

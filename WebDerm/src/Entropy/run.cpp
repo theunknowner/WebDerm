@@ -24,7 +24,7 @@ void Entropy::runAllEntropy() {
 			}
 			catch ( const std::exception & ex ) {
 				std::cout << dir_itr->path().filename() << " " << ex.what() << std::endl;
-				exit(0);
+				exit(1);
 			}
 		}
 	}
@@ -104,14 +104,12 @@ void Entropy::runCompareEntropy() {
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"_");
-			if(name=="clp4") {
 			en.loadEntropyFiles(filepath,vec2,colorNameVec);
 			results = en.compareEntropy(vec1,vec2,colorNameVec);
 			resultVec.push_back(results);
 			nameVec.push_back(name);
 			vec2.clear();
 			vec2.shrink_to_fit();
-			}
 		}
 		jaysort(resultVec,origPos);
 		for(unsigned int i=0; i<resultVec.size(); i++) {

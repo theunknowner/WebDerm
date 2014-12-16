@@ -175,7 +175,8 @@ void Intensity::setMinMax(deque< deque<double> > &input) {
 	deque<double>().swap(vec);
 }
 
-String Intensity::calcShade(double inten) {
+//calculates the shade given the intensity value while excluding outliers
+String Intensity::calcShadeExcludingOutliers(double inten) {
 	Shades sh;
 	if(global_flag==0) {
 		minIndex = sh.getShadeIndex(oldMinShade);
@@ -389,13 +390,13 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 				ccCurr = fd.smoothIntensityVec.at(i).at(j);
 				if(flag==0) { //initial first pixel-area
 					if(pix!="Zero") {
-						shade = calcShade(ccCurr);
+						shade = calcShadeExcludingOutliers(ccCurr);
 						flag=1;
 					}
 				}
 				else if(flag!=0) {
 					if(pix!="Zero")
-						shade = calcShade(ccCurr);
+						shade = calcShadeExcludingOutliers(ccCurr);
 					else
 						shade = "";
 				}
@@ -440,6 +441,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.minMaxHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	cout << "Calculating Contrast..." << flush;
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {

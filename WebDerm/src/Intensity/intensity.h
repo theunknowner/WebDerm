@@ -53,7 +53,7 @@ public:
 	double sigmoidFn(double intensity);
 	void setMinMaxShades();
 	void setMinMax(deque< deque<double> > &input);
-	String calcShade(double inten);
+	String calcShadeExcludingOutliers(double inten);
 	deque< deque<double> > calcNormalizedIntensityMatrix(deque< deque<double> > &vec);
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);

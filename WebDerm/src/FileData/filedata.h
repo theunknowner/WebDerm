@@ -48,6 +48,7 @@ public:
 	deque< deque<String> > d_HslMat;
 	deque< deque<String> > hslPtMat;
 	deque< deque<double> > cumHslMat;
+	deque< deque<String> > minMaxHslMat;
 
 	deque< deque<int> > shadeColorCount;
 	deque<deque<double> > maxHslValues; //max HSL values of each color

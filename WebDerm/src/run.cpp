@@ -242,6 +242,8 @@ void runAllHysteresis() {
 	String folder, full_path;
 	cout << "Enter folder_name: ";
 	cin >> folder;
+	if(folder.at(folder.length()-1)!='/') folder += "/";
+
 	FileData fdFiles;
 	deque<String> files;
 	String name;

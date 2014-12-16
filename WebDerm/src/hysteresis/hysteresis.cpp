@@ -265,50 +265,6 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 			h = HSL[0];
 			s = roundDecimal(HSL[1],2);
 			l = roundDecimal(HSL[2],2);
-			pix = hsl.getHslColor(h,s,l);
-			for(unsigned int k=0; k<allColors.size(); k++) {
-				try {
-					if(allColors.at(k)==pix) {
-						double direction = hsl.getHueDirection(h,fd.maxHslValues.at(k).at(0));
-						bool flag = false;
-						if(pix=="Brown" && direction==1)
-							flag=true;
-						if(pix=="Pink" && direction==-1)
-							flag=true;
-						if(pix=="BrownPink") {
-							int index = rgb.getColorIndex("Brown");
-							direction = hsl.getHueDirection(h,fd.maxHslValues.at(index).at(0));
-							if(direction==1) {
-								fd.maxHslValues.at(index).at(0) = h;
-								fd.maxHslValues.at(index).at(1) = s;
-								fd.maxHslValues.at(index).at(2) = l;
-							}
-
-							index = rgb.getColorIndex("Pink");
-							direction = hsl.getHueDirection(h,fd.maxHslValues.at(index).at(0));
-							if(direction==-1) {
-								fd.maxHslValues.at(index).at(0) = h;
-								fd.maxHslValues.at(index).at(1) = s;
-								fd.maxHslValues.at(index).at(2) = l;
-							}
-						}
-
-						if(flag==true) {
-							fd.maxHslValues.at(k).at(0) = h;
-							fd.maxHslValues.at(k).at(1) = s;
-							fd.maxHslValues.at(k).at(2) = l;
-						}
-						break;
-					}
-				}
-				catch (const std::out_of_range &oor) {
-					printf("Hysteresis out of range!\n");
-					printf("allColors.size(): %lu\n",allColors.size());
-					printf("fd.maxHslValues.size(): %lu\n",fd.maxHslValues.size());
-					printf("At: %d\n",k);
-					exit(1);
-				}
-			}
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER") {
 				pix = rgb.calcColor(r,g,b);
