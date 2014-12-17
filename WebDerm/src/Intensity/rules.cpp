@@ -952,9 +952,9 @@ double rule8(FileData &fd, String &newPix, int loc) {
 		printf("Rule8: Index Out of bounds!\n");
 		printf("Point(%d,%d)\n",pt.x,pt.y);
 		printf("HSL(%0.0f,%0.2f,%0.2f)\n",hue,sat,lum);
-		exit(0);
+		exit(1);
 	}
-	if(pt.y>0) {
+	if(pt.y>0 && color!="Black") {
 		int j = pt.x-1; //45deg
 		int x = j; //0deg
 		int endY = (pt.y-localScanSize);
@@ -1128,6 +1128,23 @@ double rule9(FileData &fd, String &newPix) {
 	return 0;
 }
 
+//White to LightGrey
+double rule10(String &newPix, String &newShade) {
+	bool flag=false;
+	double ruleNum = 10;
+	Color c;
+	Shades sh;
+	String color = c.getMainColor(newPix);
+	if(color=="White" || newShade=="White") {
+		newPix = "Grey";
+		newShade = sh.getShade(sh.getShadeCount()-2);
+		flag=true;
+	}
+	if(flag==true) return ruleNum;
+
+	return 0;
+}
+
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 		int ratioLoc, int loc, deque<double> &ruleNo) {
 	bool flag=false;
@@ -1142,6 +1159,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));
 	ruleNumVec.push_back(rule7(pix,newPix));
+	ruleNumVec.push_back(rule10(newPix,newShade));
 
 	if(ruleNumVec.size()>0) {
 		for(unsigned int i=0; i<ruleNumVec.size(); i++) {

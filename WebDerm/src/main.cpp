@@ -50,14 +50,14 @@ int main(int argc,char** argv)
 	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-/*
+	/*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_ShadeColors_5x5.csv",fd.colorVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_HSL_5x5.csv",fd.hslMat);
 	rule5(fd);
 	//cout << fd.colorVec.at(72).at(61) << endl;
-*/
-/*
+	 */
+	/*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_5x5.csv",fd.windowVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_ShadeColors_5x5.csv",fd.colorVec);
@@ -80,16 +80,23 @@ int main(int argc,char** argv)
 	cout << newPix << endl;
 	/**/
 
+	String name = "lph7";
 	Entropy en;
 	en.importEntropyThresholds();
-	en.runCompareEntropy();
-	en.runCompareEntropy2();
-
+	en.runCompareEntropy(name);
+	//en.runCompareEntropy2(name);
 /*
+	img = runResizeImage("/home/jason/Desktop/Programs/fairskin2.jpg",Size(140,140),0);
+	Size size(5,5);
+	img2 = runColorNormalization(img);
+	img4 = runResizeImage(img2,Size(700/size.width,700/size.height));
+	blur(img4,img4,size);
+	imwrite("fairskin2.png",img4);
+	/*
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
 	FileData fd;
-	Size size(10,10);
+	Size size(5,5);
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		img = imread(folder+files.at(i));
@@ -126,8 +133,8 @@ int main(int argc,char** argv)
 	}
 	fclose(fp);
 	en.releaseMemory();
-*/
-/*
+	 */
+	/*
 	Entropy en;
 	FileData fd;
 	fd.filename = "herpes13";
@@ -157,7 +164,7 @@ int main(int argc,char** argv)
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2,targetShade2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-/*
+	/*
 	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(fd.filename+"_Squares",img3);
@@ -170,7 +177,7 @@ int main(int argc,char** argv)
 	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
 	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
 	//checkColorsFromList(img2,pt1,pt2);
-	generateColorRegionTable(img, pt1,pt2);
+	//generateColorRegionTable(img, pt1,pt2);
 	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
 /*
 	int col = 477;

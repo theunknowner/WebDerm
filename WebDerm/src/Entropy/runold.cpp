@@ -7,7 +7,7 @@
 
 #include "entropy.h"
 
-void Entropy::runAllEntropy() {
+void Entropy::runAllEntropyOld() {
 	String filepath;
 	deque<String> files;
 	fs::path full_path( fs::current_path() );
@@ -47,7 +47,7 @@ void Entropy::runAllEntropy() {
 			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
-				eyeFn(fd,entSize,"","");
+				eyeFnOld(fd,entSize,"","");
 			}
 		}
 		img.release();
@@ -57,7 +57,7 @@ void Entropy::runAllEntropy() {
 	sh.release_memory();
 }
 
-void Entropy::runEntropy() {
+void Entropy::runEntropyOld() {
 	String input;
 	cout << "Enter image name: ";
 	cin >> input;
@@ -83,7 +83,7 @@ void Entropy::runEntropy() {
 	}
 }
 
-void Entropy::runCompareEntropy(String targetName) {
+void Entropy::runCompareEntropyOld(String targetName) {
 	String input;
 	deque<deque<double> > vec1;
 	deque<String> colorNameVec;
@@ -94,7 +94,7 @@ void Entropy::runCompareEntropy(String targetName) {
 		deque<String> files;
 		deque<deque<double> > vec2;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/TestYSV_ New/";
+		String folder = "/home/jason/Desktop/Programs/TestYSV_Old/";
 		String filepath, name;
 		double results;
 		deque<double> resultVec;
@@ -106,7 +106,7 @@ void Entropy::runCompareEntropy(String targetName) {
 			name = getFileName(files.at(i),"_");
 			if(name==targetName || targetName=="") {
 			en.loadEntropyFiles(filepath,vec2,colorNameVec);
-			results = en.compareEntropy(vec1,vec2,colorNameVec);
+			results = en.compareEntropyOld(vec1,vec2,colorNameVec);
 			resultVec.push_back(results);
 			nameVec.push_back(name);
 			vec2.clear();
@@ -120,7 +120,7 @@ void Entropy::runCompareEntropy(String targetName) {
 	}
 }
 
-void Entropy::runCompareEntropy2(String targetName) {
+void Entropy::runCompareEntropy2Old(String targetName) {
 	String input;
 	deque<String> colorNameVec;
 	deque<deque<double> > vec1;
@@ -131,7 +131,7 @@ void Entropy::runCompareEntropy2(String targetName) {
 		deque<String> files;
 		deque<deque<double> > vec2;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
+		String folder = "/home/jason/Desktop/Programs/TestYSV_Old/";
 		String filepath, name;
 		double results;
 		deque<double> resultVec;
@@ -143,7 +143,7 @@ void Entropy::runCompareEntropy2(String targetName) {
 			name = getFileName(files.at(i),"_");
 			if(name==targetName || targetName=="") {
 			en.loadEntropyFiles(filepath,vec2,colorNameVec);
-			results = en.compareEntropy2(vec1,vec2,colorNameVec);
+			results = en.compareEntropy2Old(vec1,vec2,colorNameVec);
 			resultVec.push_back(results);
 			nameVec.push_back(name);
 			vec2.clear();
