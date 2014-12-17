@@ -89,12 +89,11 @@ void Entropy::runCompareEntropy(String targetName) {
 	deque<String> colorNameVec;
 	cout << "Enter filename: ";
 	cin >> input;
-	Entropy en;
-	if(en.loadEntropyFiles(input,vec1,colorNameVec)) {
+	if(this->loadEntropyFiles(input,vec1,colorNameVec)) {
 		deque<String> files;
 		deque<deque<double> > vec2;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/TestYSV_ New/";
+		String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
 		String filepath, name;
 		double results;
 		deque<double> resultVec;
@@ -105,12 +104,12 @@ void Entropy::runCompareEntropy(String targetName) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"_");
 			if(name==targetName || targetName=="") {
-			en.loadEntropyFiles(filepath,vec2,colorNameVec);
-			results = en.compareEntropy(vec1,vec2,colorNameVec);
-			resultVec.push_back(results);
-			nameVec.push_back(name);
-			vec2.clear();
-			vec2.shrink_to_fit();
+				this->loadEntropyFiles(filepath,vec2,colorNameVec);
+				results = this->compareEntropy(vec1,vec2,colorNameVec);
+				resultVec.push_back(results);
+				nameVec.push_back(name);
+				vec2.clear();
+				vec2.shrink_to_fit();
 			}
 		}
 		jaysort(resultVec,origPos);
@@ -126,8 +125,7 @@ void Entropy::runCompareEntropy2(String targetName) {
 	deque<deque<double> > vec1;
 	cout << "Enter filename: ";
 	cin >> input;
-	Entropy en;
-	if(en.loadEntropyFiles(input,vec1,colorNameVec)) {
+	if(this->loadEntropyFiles(input,vec1,colorNameVec)) {
 		deque<String> files;
 		deque<deque<double> > vec2;
 		FileData fd;
@@ -142,12 +140,12 @@ void Entropy::runCompareEntropy2(String targetName) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"_");
 			if(name==targetName || targetName=="") {
-			en.loadEntropyFiles(filepath,vec2,colorNameVec);
-			results = en.compareEntropy2(vec1,vec2,colorNameVec);
-			resultVec.push_back(results);
-			nameVec.push_back(name);
-			vec2.clear();
-			vec2.shrink_to_fit();
+				this->loadEntropyFiles(filepath,vec2,colorNameVec);
+				results = this->compareEntropy2(vec1,vec2,colorNameVec);
+				resultVec.push_back(results);
+				nameVec.push_back(name);
+				vec2.clear();
+				vec2.shrink_to_fit();
 			}
 		}
 		jaysort(resultVec,origPos);
@@ -156,3 +154,96 @@ void Entropy::runCompareEntropy2(String targetName) {
 		}
 	}
 }
+
+void Entropy::runCompareEntropyList(String fileList, String folder) {
+	fstream fs(fileList.c_str());
+	if(fs.is_open()) {
+		String temp,filepath,name;
+		deque<String> listPairVec;
+		deque<deque<double> > vec1;
+		deque<deque<double> > vec2;
+		deque<String> colorNameVec;
+		deque<String> files;
+		double results;
+		float countPairs=0, countResults=0;
+		FileData fd;
+		fd.getFilesFromDirectory(folder,files);
+		while(getline(fs,temp)) {
+			countPairs++;
+			getSubstr(temp,',',listPairVec);
+			for(unsigned int i=0; i<files.size(); i++) {
+				filepath = folder+files.at(i);
+				name = getFileName(files.at(i),"_");
+				if(name==listPairVec.at(0)) {
+					break;
+				}
+			}
+			if(this->loadEntropyFiles(filepath,vec1,colorNameVec)) {
+				for(unsigned int i=0; i<files.size(); i++) {
+					filepath = folder+files.at(i);
+					name = getFileName(files.at(i),"_");
+					if(name==listPairVec.at(1)) {
+						this->loadEntropyFiles(filepath,vec2,colorNameVec);
+						results = this->compareEntropy(vec1,vec2,colorNameVec);
+						if(results>=0.70) countResults++;
+						printf("%s-%s: %f\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),results);
+					}
+				}
+			}
+			listPairVec.clear();
+		}
+		float ratio = countResults/countPairs;
+		printf("%.f/%.f = %f matched\n",countResults,countPairs,ratio);
+		fs.close();
+	}
+	else {
+		cout << "Failed to open file!" << endl;
+	}
+}
+
+void Entropy::runCompareEntropyList2(String fileList, String folder) {
+	fstream fs(fileList.c_str());
+	if(fs.is_open()) {
+		String temp,filepath,name;
+		deque<String> listPairVec;
+		deque<deque<double> > vec1;
+		deque<deque<double> > vec2;
+		deque<String> colorNameVec;
+		deque<String> files;
+		float results;
+		float countPairs=0, countResults=0;
+		FileData fd;
+		fd.getFilesFromDirectory(folder,files);
+		while(getline(fs,temp)) {
+			countPairs++;
+			getSubstr(temp,',',listPairVec);
+			for(unsigned int i=0; i<files.size(); i++) {
+				filepath = folder+files.at(i);
+				name = getFileName(files.at(i),"_");
+				if(name==listPairVec.at(0)) {
+					break;
+				}
+			}
+			if(this->loadEntropyFiles(filepath,vec1,colorNameVec)) {
+				for(unsigned int i=0; i<files.size(); i++) {
+					filepath = folder+files.at(i);
+					name = getFileName(files.at(i),"_");
+					if(name==listPairVec.at(1)) {
+						this->loadEntropyFiles(filepath,vec2,colorNameVec);
+						results = this->compareEntropy2(vec1,vec2,colorNameVec);
+						if(results>=0.70) countResults++;
+						printf("%s-%s: %f\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),results);
+					}
+				}
+			}
+			listPairVec.clear();
+		}
+		float ratio = countResults/countPairs;
+		printf("%.f/%.f = %f matched\n",countResults,countPairs,ratio);
+		fs.close();
+	}
+	else {
+		cout << "Failed to open file!" << endl;
+	}
+}
+

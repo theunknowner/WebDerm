@@ -47,7 +47,7 @@ void Entropy::runAllEntropyOld() {
 			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
-				eyeFnOld(fd,entSize,"","");
+				this->eyeFnOld(fd,entSize,"","");
 			}
 		}
 		img.release();
@@ -76,7 +76,7 @@ void Entropy::runEntropyOld() {
 		sh.importThresholds();
 		this->importEntropyThresholds();
 		fd.ksize=Size(5,5);
-		eyeFn(fd,entSize,"","");
+		this->eyeFn(fd,entSize,"","");
 		rgb.release_memory();
 		hsl.release_memory();
 		sh.release_memory();
@@ -89,8 +89,7 @@ void Entropy::runCompareEntropyOld(String targetName) {
 	deque<String> colorNameVec;
 	cout << "Enter filename: ";
 	cin >> input;
-	Entropy en;
-	if(en.loadEntropyFiles(input,vec1,colorNameVec)) {
+	if(this->loadEntropyFiles(input,vec1,colorNameVec)) {
 		deque<String> files;
 		deque<deque<double> > vec2;
 		FileData fd;
@@ -105,8 +104,8 @@ void Entropy::runCompareEntropyOld(String targetName) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"_");
 			if(name==targetName || targetName=="") {
-			en.loadEntropyFiles(filepath,vec2,colorNameVec);
-			results = en.compareEntropyOld(vec1,vec2,colorNameVec);
+			this->loadEntropyFiles(filepath,vec2,colorNameVec);
+			results = this->compareEntropyOld(vec1,vec2,colorNameVec);
 			resultVec.push_back(results);
 			nameVec.push_back(name);
 			vec2.clear();

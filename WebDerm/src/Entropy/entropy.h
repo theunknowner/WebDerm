@@ -65,6 +65,8 @@ public:
 	void runEntropy();
 	void runCompareEntropy(String targetName);
 	void runCompareEntropy2(String targetName);
+	void runCompareEntropyList(String fileList, String folder);
+	void runCompareEntropyList2(String fileList, String folder);
 
 	void eyeFnOld(FileData &fd, Size ksize, String targetColor="",String targetShade="");
 	bool importEntropyThresholdsOld();

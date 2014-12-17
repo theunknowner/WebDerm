@@ -613,6 +613,8 @@ String Color::combineColors(String color)  {
 			return "Pink";
 	if(color.find("Brown")!=string::npos && color.find("Orange")!=string::npos)
 		color = "Brown";
+	if(color.find("Brown")!=string::npos && color.find("Yellow")!=string::npos)
+		color = "Brown";
 	return color;
 }
 

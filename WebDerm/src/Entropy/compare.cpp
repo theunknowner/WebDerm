@@ -131,6 +131,7 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, 
 		String temp;
 		deque<String> vec;
 		deque<double> thresh;
+		dataMat.clear();
 		colorNameVec.clear();
 		getline(fs,temp);
 		while(getline(fs,temp)) {
@@ -164,7 +165,6 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 	double valY=0, valS=0, valV=0;
 	double avg=0, total=0;
 	int colorsHit[vec1.size()]; //variable to mark colors not ignored
-
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		this->resetThreshVals();
 		if(colorNameVec.at(i)!="LowBrown" && colorNameVec.at(i)!="LowGreyBrown") {
@@ -179,13 +179,13 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 
 			if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {
 				//Total Population(Y) comparison
-				valY = compareY(ysv1[0],ysv2[0],1);
+				valY = this->compareY(ysv1[0],ysv2[0],1);
 
 				//Avg Density(S) comparison
-				valS = compareS(ysv1[1],ysv2[1],1);
+				valS = this->compareS(ysv1[1],ysv2[1],1);
 
 				//Variability(V) comparison
-				valV = compareV(ysv1[2],ysv2[2],1);
+				valV = this->compareV(ysv1[2],ysv2[2],1);
 
 				//Reassign Y && Y_THRESH if S & V are the same
 				if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH) {
@@ -221,22 +221,36 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 	double normSignifWeight[this->colorWeights.size()];
 	for(unsigned int i=0; i<this->colorWeights.size(); i++) {
 		if(colorsHit[i]==1) {
+
 			weightTotal += this->colorWeights.at(i);
-			totalColorsHit += colorsHit[i];
+			totalColorsHit++;
+		}
+	}
+
+	double colorPercent=0;
+	deque<double> newColorWeights = this->colorWeights;
+	double newWeightTotal=0; //reset for new adjusted weightTotal
+	for(unsigned int i=0; i<this->colorWeights.size(); i++) {
+		if(colorsHit[i]==1) {
+			ysv1[0] = vec1.at(i).at(0);
+			ysv2[0] = vec2.at(i).at(0);
+			colorPercent = max(ysv1[0],ysv2[0])/total;
+			double weightAdjustFactor = weightTotal*colorPercent;
+			newColorWeights.at(i) = this->colorWeights.at(i)*weightAdjustFactor;
+			newWeightTotal += newColorWeights.at(i);
 		}
 	}
 	for(unsigned int i=0; i<this->colorWeights.size(); i++) {
 		if(colorsHit[i]==1) {
-			normWeights[i] = this->colorWeights.at(i)/weightTotal;
+			normWeights[i] = newColorWeights.at(i)/newWeightTotal;
 			normSignifWeight[i] = normWeights[i] * totalColorsHit;
 		}
 	}
-
 	double colorSignif[this->colorWeights.size()];
 	double newTotal=0;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		ysv1[0] = vec1.at(i).at(0);
-		ysv2[0] = vec1.at(i).at(0);
+		ysv2[0] = vec2.at(i).at(0);
 		if(colorsHit[i]==1) {
 			colorSignif[i] = max(ysv1[0],ysv2[0]) * normSignifWeight[i];
 			newTotal += colorSignif[i];
@@ -246,25 +260,14 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 	double sum=0, results=0;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		if(colorsHit[i]==1) {
+			ysv1[0] = vec1.at(i).at(0);
+			ysv2[0] = vec2.at(i).at(0);
 			sum = colorSignif[i]/newTotal;
 			sum *= resultVec.at(i);
 			printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 			results += sum;
 		}
 	}
-	//calculating image similarity results
-	/*
-	double sum=0, results=0;
-	for(unsigned int i=0; i<vec1.size(); i++) {
-		ysv1[0] = vec1.at(i).at(0);
-		ysv2[0] = vec2.at(i).at(0);
-		if(colorsHit[i]==1) {
-			sum = max(ysv1[0],ysv2[0])/total;
-			printf("%s : %f\n",colorNameVec.at(i).c_str(),resultVec.at(i));
-			resultVec.at(i) *= sum;
-			results += resultVec.at(i);
-		}
-	}*/
 	//cout << "Mine: " << results << endl;
 	return results;
 }
@@ -304,14 +307,13 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 			ysv1[0] = vec1.at(i).at(0);
 			ysv2[0] = vec2.at(i).at(0);
 			if(ysv1[0]>0 || ysv2[0]>0) {
-				sum = (max(ysv1[0],ysv2[0])/total) * dist[i] * this->colorWeights2.at(i);
-				//printf("%d) %s: %f\n",i,colorNameVec.at(i).c_str(),sum);
+				sum = (max(ysv1[0],ysv2[0])/total) * 1-dist[i] * this->colorWeights2.at(i);
 				avgDist +=sum;
 			}
 			printf("%s: %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],dist[i]);
 		}
 	}
-	avgDist = 1 - min(avgDist,1.0);
+	//avgDist = 1 - min(avgDist,1.0);
 	return avgDist;
 	//printf("Dr.Dube: %f\n",avgDist);
 }

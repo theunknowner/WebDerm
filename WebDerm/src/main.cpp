@@ -80,11 +80,15 @@ int main(int argc,char** argv)
 	cout << newPix << endl;
 	/**/
 
-	String name = "lph7";
+	String name = "lph15";
+	String file = "/home/jason/Desktop/workspace/ImagePairsSame.csv";
+	String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
 	Entropy en;
 	en.importEntropyThresholds();
 	en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
+	//en.runCompareEntropyList(file,folder);
+	//en.runCompareEntropyList2(file,folder);
 /*
 	img = runResizeImage("/home/jason/Desktop/Programs/fairskin2.jpg",Size(140,140),0);
 	Size size(5,5);
