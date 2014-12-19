@@ -19,6 +19,8 @@
 #include "Histogram/histogram.h"
 #include "Shades/shades.h"
 #include "Entropy/entropy.h"
+#include "Shape/circle.h"
+#include "neuralnetworks/shapeml.h"
 
 int main(int argc,char** argv)
 {
@@ -50,6 +52,37 @@ int main(int argc,char** argv)
 	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
+	String file = "/home/jason/Desktop/workspace/trainingdata.csv";
+	ShapeML sml;
+
+	img2 = img2.zeros(200,200,CV_8U);
+	Circle circle;
+	deque<Point> points;
+	FILE * fp;
+	fp = fopen("/home/jason/Desktop/workspace/points.csv","w");
+	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	srand(time(0));
+	for(int i=0; i<8; i++) {
+		double radius = 10;
+		double spread = i*5.0;
+		int offset = radius + spread + 60;
+		int offsetX, offsetY;
+		img2 = img2.zeros(200,200,CV_8U);
+		circle.generateRandomPoints(points,radius,spread,18,20);
+		for(unsigned int j=0; j<points.size(); j++) {
+			fprintf(fp,"%d;%d,",points.at(j).x,points.at(j).y);
+			//printf("%d: %d,%d\n",i,points.at(j).x,points.at(j).y)
+			offsetX = points.at(j).x + offset;
+			offsetY = points.at(j).y + offset;
+			printf("(%d,%d): %d,%d -> %d,%d\n",i,j,points.at(j).x,points.at(j).y,offsetX,offsetY);
+			img2.at<uchar>(offsetY,offsetX) = 255;
+		}
+		imshow("img",img2);
+		waitKey(0);
+		fprintf(fp,"\n");
+		points.clear();
+	}
+	fclose(fp);
 	/*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_ShadeColors_5x5.csv",fd.colorVec);
@@ -79,7 +112,7 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-
+	/*
 	String name = "lph15";
 	String file = "/home/jason/Desktop/workspace/ImagePairsSame.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
