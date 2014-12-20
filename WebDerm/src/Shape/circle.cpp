@@ -85,9 +85,11 @@ void Circle::importPoints(String file, vector<vector<Point> > &points) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
 				pos = vec.at(i).find(";");
-				x = atoi(vec.at(i).substr(0,pos).c_str());
-				y = atoi(vec.at(i).substr(pos+1,vec.at(i).length()).c_str());
-				pts.push_back(Point(x,y));
+				if(pos!=string::npos) {
+					x = atoi(vec.at(i).substr(0,pos).c_str());
+					y = atoi(vec.at(i).substr(pos+1,vec.at(i).length()).c_str());
+					pts.push_back(Point(x,y));
+				}
 			}
 			points.push_back(pts);
 			vec.clear();
@@ -100,10 +102,34 @@ void Circle::importPoints(String file, vector<vector<Point> > &points) {
 	}
 }
 
+//color in the points on the  binary image
+void Circle::pointsToImage(Mat &img, vector<Point> points, int connect) {
+	int x,y;
+	int offset = 90;
+	Point first(points.at(0).x+offset,points.at(0).y+offset);
+	for(unsigned int i=0; i<points.size(); i++) {
+		x = points.at(i).x;
+		y = points.at(i).y;
+		Point start(x+offset,y+offset);
+		if(connect==1) {
+			if(i==points.size()-1) {
+				line(img,start,first,Scalar(255));
+			}
+			else {
+				Point end(points.at(i+1).x+offset,points.at(i+1).y+offset);
+				line(img,start,end,Scalar(255));
+			}
+		}
+		else {
+			img.at<uchar>(y+offset,x+offset) = 255;
+		}
+	}
+}
+
 /*points are generated base on origin Point as (0,0)
  * So to display in an image, the points need to be offset to positive
  */
-void Circle::generateCirclePoints(deque<Point> &points, double radius, double degree, int numberOfPoints) {
+void Circle::generateCirclePoints(vector<Point> &points, double radius, double degree, int numberOfPoints) {
 	double radToDeg = 3.14159/180.0;
 	double angle=0;
 	int x,y;
@@ -119,7 +145,7 @@ void Circle::generateCirclePoints(deque<Point> &points, double radius, double de
 /*points are generated base on origin Point as (0,0)
  * So to display in an image, the points need to be offset to positive
  */
-void Circle::generateRandomPoints(deque<Point> &points, double radius, double spread, double degree, int numberOfPoints) {
+void Circle::generateRandomPoints(vector<Point> &points, double radius, double spread, double degree, int numberOfPoints) {
 	int newRadius = radius + spread;
 	double radToDeg = 3.14159/180.0;
 	double angle=0;
@@ -142,8 +168,7 @@ void Circle::generateRandomPoints(deque<Point> &points, double radius, double sp
 /*points are generated base on origin Point as (0,0)
  * So to display in an image, the points need to be offset to positive
  */
-void Circle::generateEllipsePoints(deque<Point> &points, double radius1, double radius2, double degree, int numberOfPoints) {
-	double origRadius = radius1;
+void Circle::generateEllipsePoints(vector<Point> &points, double radius1, double radius2, double degree, int numberOfPoints) {
 	double radToDeg = 3.14159/180.0;
 	double angle=0;
 	int x,y;

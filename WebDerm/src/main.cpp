@@ -52,44 +52,36 @@ int main(int argc,char** argv)
 	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-	String file = "/home/jason/Desktop/workspace/trainingdata.csv";
-	ShapeML sml;
-
-	img2 = img2.zeros(200,200,CV_8U);
+	String file = "/home/jason/Desktop/workspace/trainingdata2.csv";
+	String file2 = "/home/jason/Desktop/workspace/testdata.csv";
+/*
 	Circle circle;
-	deque<Point> points;
-	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/points.csv","w");
+	vector<vector<Point> > points;
+	circle.importPoints("/home/jason/Desktop/workspace/ellipsepoints.csv",points);
 	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	srand(time(0));
-	for(int i=0; i<8; i++) {
-		double radius = 10;
-		double spread = i*5.0;
-		int offset = radius + spread + 60;
-		int offsetX, offsetY;
+	for(unsigned int i=0; i<points.size(); i++) {
 		img2 = img2.zeros(200,200,CV_8U);
-		circle.generateRandomPoints(points,radius,spread,18,20);
-		for(unsigned int j=0; j<points.size(); j++) {
-			fprintf(fp,"%d;%d,",points.at(j).x,points.at(j).y);
-			//printf("%d: %d,%d\n",i,points.at(j).x,points.at(j).y)
-			offsetX = points.at(j).x + offset;
-			offsetY = points.at(j).y + offset;
-			printf("(%d,%d): %d,%d -> %d,%d\n",i,j,points.at(j).x,points.at(j).y,offsetX,offsetY);
-			img2.at<uchar>(offsetY,offsetX) = 255;
-		}
+		circle.pointsToImage(img2,points.at(i),1);
+		imfill(img2);
 		imshow("img",img2);
 		waitKey(0);
-		fprintf(fp,"\n");
-		points.clear();
+	}*/
+
+	ShapeML sml;
+	vector<vector<double> >labels;
+	vector<vector<int> > trainingData;
+	sml.importTrainingData(file,trainingData,labels);
+	sml.trainNeuralNetwork(trainingData,labels);
+	sml.saveData();
+
+	vector<vector<int> > testData;
+	sml.importTestData(file2,testData);
+	vector<vector<double> > results(testData.size(),vector<double>(labels.at(0).size(),0));
+	sml.predict(testData,results);
+	for(unsigned int i=0; i<results.size(); i++) {
+		printf("%f,%f\n",results.at(i).at(0), results.at(i).at(1));
+		//cout << i << endl;
 	}
-	fclose(fp);
-	/*
-	FileData fd;
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_ShadeColors_5x5.csv",fd.colorVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/urticaria7_HSL_5x5.csv",fd.hslMat);
-	rule5(fd);
-	//cout << fd.colorVec.at(72).at(61) << endl;
-	 */
 	/*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_5x5.csv",fd.windowVec);

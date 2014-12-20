@@ -24,7 +24,8 @@ void getSubstr(String str, char delimiter, deque<String> &vec)
 		if(i==(str.size()-1))
 		{
 			temp = str.substr(j,str.size()-j);
-			vec.push_back(temp.c_str());
+			if(temp!="")
+				vec.push_back(temp.c_str());
 			j=0;
 		}
 	}

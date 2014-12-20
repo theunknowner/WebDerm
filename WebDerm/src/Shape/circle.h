@@ -18,10 +18,11 @@ public:
 	Point getContourCenter(vector<vector<Point> > contours);
 	double findRadiusFromContours(vector<vector<Point> > contours);
 	void importPoints(String file, vector<vector<Point> > &points);
+	void pointsToImage(Mat &img, vector<Point> points, int connect);
 
-	void generateCirclePoints(deque<Point> &points, double radius, double degree, int numberOfPoints);
-	void generateRandomPoints(deque<Point> &points, double radius, double spread, double degree, int numberOfPoints);
-	void generateEllipsePoints(deque<Point> &points, double radius1, double radius2, double degree, int numberOfPoints);
+	void generateCirclePoints(vector<Point> &points, double radius, double degree, int numberOfPoints);
+	void generateRandomPoints(vector<Point> &points, double radius, double spread, double degree, int numberOfPoints);
+	void generateEllipsePoints(vector<Point> &points, double radius1, double radius2, double degree, int numberOfPoints);
 };
 
 #endif /* CIRCLE_H_ */
