@@ -15,8 +15,9 @@ class ShapeML {
 private:
 	int inputPerceptrons;
 	int outputPerceptrons;
+	int max_iterations;
 	const int hiddenPerceptrons = 20;
-	const double learningRate = 0.25;
+	const double learningRate = 1.0;
 	vector< vector<double> > inputHiddenLayerWeights;
 	vector< vector<double> >hiddenOutputLayerWeights;
 	vector<double> outputLayerBiasWeights;
@@ -38,10 +39,10 @@ private:
 
 public:
 	~ShapeML();
-	void trainNeuralNetwork(vector<vector<int> > trainingData, vector<vector<double> > labels);
-	void importTrainingData(String file, vector<vector<int> > &trainingData, vector<vector<double> > &labels);
-	void importTestData(String file, vector<vector<int> > &testData);
-	void predict(vector<vector<int> > &testData, vector<vector<double> > &results);
+	void train(vector<vector<double> > trainingData, vector<vector<double> > labels, int iterations=1);
+	void importData(String file, vector<vector<double> > &trainingData, vector<vector<double> > &labels);
+	void importTestData(String file, vector<vector<double> > &testData);
+	void predict(vector<vector<double> > &testData, vector<vector<double> > &results);
 	void saveData();
 	void loadData(String file);
 	void printVectorInfo();

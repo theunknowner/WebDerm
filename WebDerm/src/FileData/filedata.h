@@ -65,7 +65,7 @@ public:
 	bool loadFileMatrix(String file_path, deque< deque<String> > &dataMat);
 
 	int listFiles(String directory);
-	bool getFilesFromDirectory(String directory, deque<String> &files);
+	bool getFilesFromDirectory(String directory, deque<String> &files, int flag=0);
 	void deleteContainingName(String directory, String filename);
 	void renameFiles(String directory, String oldname, String newname);
 

@@ -94,33 +94,28 @@ void ShapeML::releaseMemory() {
 }
 
 //imports training data and labels
-void ShapeML::importTrainingData(String file, vector<vector<int> > &data, vector<vector<double> > &labels) {
+void ShapeML::importData(String file, vector<vector<double> > &data, vector<vector<double> > &labels) {
 	fstream fs(file.c_str());
 	if(fs.is_open()) {
 		String temp;
 		deque<String> vec;
-		vector<int> pts;
+		vector<double> pts;
 		vector<double> lbl;
-		size_t pos=0;
-		int x,y;
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i<20) {
-					pos = vec.at(i).find(";");
-					x = atoi(vec.at(i).substr(0,pos).c_str());
-					y = atoi(vec.at(i).substr(pos+1,vec.at(i).length()).c_str());
-					pts.push_back(x);
-					pts.push_back(y);
+				if(i<400) {
+					pts.push_back(atof(vec.at(i).c_str()));
 				}
 				else {
-					lbl.push_back(atoi(vec.at(i).c_str()));
+					lbl.push_back(atof(vec.at(i).c_str()));
 				}
 			}
 			data.push_back(pts);
 			labels.push_back(lbl);
 			vec.clear();
 			pts.clear();
+			lbl.clear();
 		}
 		fs.close();
 	}
@@ -129,21 +124,20 @@ void ShapeML::importTrainingData(String file, vector<vector<int> > &data, vector
 	}
 }
 
-void ShapeML::importTestData(String file, vector<vector<int> > &testData) {
+void ShapeML::importTestData(String file, vector<vector<double> > &testData) {
 	fstream fs(file.c_str());
 	if(fs.is_open()) {
 		String temp;
 		deque<String> vec;
-		vector<int> pts;
-		vector<int> lbl;
+		vector<double> pts;
 		size_t pos=0;
 		int x,y;
 		while(getline(fs,temp)) {
 			getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
 				pos = vec.at(i).find(";");
-				x = atoi(vec.at(i).substr(0,pos).c_str());
-				y = atoi(vec.at(i).substr(pos+1,vec.at(i).length()).c_str());
+				x = atof(vec.at(i).substr(0,pos).c_str());
+				y = atof(vec.at(i).substr(pos+1,vec.at(i).length()).c_str());
 				pts.push_back(x);
 				pts.push_back(y);
 			}
@@ -157,55 +151,59 @@ void ShapeML::importTestData(String file, vector<vector<int> > &testData) {
 		cout << "Import test data failed!" << endl;
 	}
 }
-void ShapeML::trainNeuralNetwork(vector<vector<int> > trainingData, vector<vector<double> > labels) {
+
+void ShapeML::train(vector<vector<double> > trainingData, vector<vector<double> > labels, int iterations) {
 	this->init(trainingData.at(0).size(), labels.at(0).size());
-	for(unsigned int dataNum=0; dataNum<trainingData.size(); dataNum++) {
-		for(int hidNum=0; hidNum<this->hiddenPerceptrons; hidNum++) {
-			for(int inputNum=0; inputNum<this->inputPerceptrons; inputNum++) {
-				this->inputLayerPerceptrons.at(inputNum) = this->inputLayerFunction(trainingData.at(dataNum).at(inputNum));
-				double results = this->inputLayerPerceptrons.at(inputNum) * this->inputHiddenLayerWeights.at(hidNum).at(inputNum);
-				this->hiddenLayerPerceptrons.at(hidNum) += results;
-			}
-			this->hiddenLayerPerceptrons.at(hidNum) = this->actFunctionLayer1(this->hiddenLayerPerceptrons.at(hidNum)+this->hiddenLayerBiasWeights.at(hidNum));
-		}
-		//printf("%d: %f\n",dataNum,this->hiddenLayerPerceptrons.at(0));
-		for(int outNum=0; outNum<this->outputPerceptrons; outNum++) {
+	this->max_iterations = iterations;
+	for (int iter=0; iter<this->max_iterations; iter++) {
+		for(unsigned int dataNum=0; dataNum<trainingData.size(); dataNum++) {
 			for(int hidNum=0; hidNum<this->hiddenPerceptrons; hidNum++) {
-				double results = this->hiddenLayerPerceptrons.at(hidNum) * this->hiddenOutputLayerWeights.at(outNum).at(hidNum);
-				this->outputLayerPerceptrons.at(outNum) += results;
+				for(int inputNum=0; inputNum<this->inputPerceptrons; inputNum++) {
+					this->inputLayerPerceptrons.at(inputNum) = this->inputLayerFunction(trainingData.at(dataNum).at(inputNum));
+					double results = this->inputLayerPerceptrons.at(inputNum) * this->inputHiddenLayerWeights.at(hidNum).at(inputNum);
+					this->hiddenLayerPerceptrons.at(hidNum) += results;
+				}
+				this->hiddenLayerPerceptrons.at(hidNum) = this->actFunctionLayer1(this->hiddenLayerPerceptrons.at(hidNum)+this->hiddenLayerBiasWeights.at(hidNum));
 			}
-			double results = this->outputLayerFunction(this->outputLayerBiasWeights.at(outNum) + this->outputLayerPerceptrons.at(outNum));
-			this->outputPerceptronErrors.at(outNum) = this->computeError(results,labels.at(dataNum).at(outNum)) * fx0(this->outputLayerBiasWeights.at(outNum)*this->outputLayerPerceptrons.at(outNum)) * -1;
-			this->outputLayerPerceptrons.at(outNum) = results;
-		}
-		printf("%d: %f,%f\n",dataNum,this->outputPerceptronErrors.at(0),this->outputPerceptronErrors.at(1));
-		//printf("%f,%f\n",this->outputLayerPerceptrons.at(0),outputLayerPerceptrons.at(1));
-		//compute error for hiddenLayerPerceptron
-		for(int i=0; i<this->hiddenPerceptrons; i++) {
-			for(int j=0; j<this->outputPerceptrons; j++) {
-				this->hiddenPerceptronErrors.at(i) += (this->outputPerceptronErrors.at(j) * this->hiddenOutputLayerWeights.at(j).at(i));
+			//printf("%d: %f\n",dataNum,this->hiddenLayerPerceptrons.at(0));
+			for(int outNum=0; outNum<this->outputPerceptrons; outNum++) {
+				for(int hidNum=0; hidNum<this->hiddenPerceptrons; hidNum++) {
+					double results = this->hiddenLayerPerceptrons.at(hidNum) * this->hiddenOutputLayerWeights.at(outNum).at(hidNum);
+					this->outputLayerPerceptrons.at(outNum) += results;
+				}
+				double results = this->outputLayerFunction(this->outputLayerBiasWeights.at(outNum) + this->outputLayerPerceptrons.at(outNum));
+				this->outputPerceptronErrors.at(outNum) = this->computeError(results,labels.at(dataNum).at(outNum)) * fx0(this->outputLayerBiasWeights.at(outNum)*this->outputLayerPerceptrons.at(outNum)) * -1;
+				this->outputLayerPerceptrons.at(outNum) = results;
 			}
-			this->hiddenPerceptronErrors.at(i) = this->hiddenLayerPerceptrons.at(i)*(1-this->hiddenLayerPerceptrons.at(i))*this->hiddenPerceptronErrors.at(i);
-			//printf("%d: %f\n",dataNum,hiddenPerceptronErrors.at(i));
-		}
-		//back propagation for weights between hidden and output layer
-		for(int i=0; i<this->hiddenPerceptrons; i++) {
-			for(int j=0; j<this->outputPerceptrons; j++) {
-				this->hiddenOutputLayerWeights.at(j).at(i) += (this->learningRate * this->outputPerceptronErrors.at(j) * this->hiddenLayerPerceptrons.at(i));
+			//printf("%d: %f,%f\n",dataNum,this->outputPerceptronErrors.at(0),this->outputPerceptronErrors.at(1));
+			//printf("%f,%f\n",this->outputLayerPerceptrons.at(0),outputLayerPerceptrons.at(1));
+			//compute error for hiddenLayerPerceptron
+			for(int i=0; i<this->hiddenPerceptrons; i++) {
+				for(int j=0; j<this->outputPerceptrons; j++) {
+					this->hiddenPerceptronErrors.at(i) += (this->outputPerceptronErrors.at(j) * this->hiddenOutputLayerWeights.at(j).at(i));
+				}
+				this->hiddenPerceptronErrors.at(i) = this->hiddenLayerPerceptrons.at(i)*(1-this->hiddenLayerPerceptrons.at(i))*this->hiddenPerceptronErrors.at(i);
+				//printf("%d: %f\n",dataNum,hiddenPerceptronErrors.at(i));
 			}
-		}
-		//back propagation for weights between input and hidden layer
-		for(int i=0; i<this->hiddenPerceptrons; i++) {
-			for(unsigned int j=0; j<this->inputLayerPerceptrons.size(); j++) {
-				this->inputHiddenLayerWeights.at(i).at(j) += learningRate * this->hiddenPerceptronErrors.at(i) * this->inputLayerPerceptrons.at(j);
+			//back propagation for weights between hidden and output layer
+			for(int i=0; i<this->hiddenPerceptrons; i++) {
+				for(int j=0; j<this->outputPerceptrons; j++) {
+					this->hiddenOutputLayerWeights.at(j).at(i) += (this->learningRate * this->outputPerceptronErrors.at(j) * this->hiddenLayerPerceptrons.at(i));
+				}
 			}
-			this->hiddenLayerBiasWeights.at(i) += (learningRate * this->hiddenPerceptronErrors.at(i));
+			//back propagation for weights between input and hidden layer
+			for(int i=0; i<this->hiddenPerceptrons; i++) {
+				for(unsigned int j=0; j<this->inputLayerPerceptrons.size(); j++) {
+					this->inputHiddenLayerWeights.at(i).at(j) += learningRate * this->hiddenPerceptronErrors.at(i) * this->inputLayerPerceptrons.at(j);
+				}
+				this->hiddenLayerBiasWeights.at(i) += (learningRate * this->hiddenPerceptronErrors.at(i));
+			}
+			this->resetPerceptrons();
 		}
-		this->resetPerceptrons();
 	}
 }
 
-void ShapeML::predict(vector<vector<int> > &testData, vector<vector<double> > &results) {
+void ShapeML::predict(vector<vector<double> > &testData, vector<vector<double> > &results) {
 	this->resetPerceptrons();
 	for(unsigned int dataNum=0; dataNum<testData.size(); dataNum++) {
 		for(int hidNum=0; hidNum<this->hiddenPerceptrons; hidNum++) {

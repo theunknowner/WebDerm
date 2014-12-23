@@ -17,8 +17,6 @@ public:
 	vector<vector<Point> > findContourPoints(Mat &img);
 	Point getContourCenter(vector<vector<Point> > contours);
 	double findRadiusFromContours(vector<vector<Point> > contours);
-	void importPoints(String file, vector<vector<Point> > &points);
-	void pointsToImage(Mat &img, vector<Point> points, int connect);
 
 	void generateCirclePoints(vector<Point> &points, double radius, double degree, int numberOfPoints);
 	void generateRandomPoints(vector<Point> &points, double radius, double spread, double degree, int numberOfPoints);

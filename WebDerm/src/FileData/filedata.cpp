@@ -205,7 +205,8 @@ int FileData::listFiles(String directory) {
 	return 0;
 }
 
-bool FileData::getFilesFromDirectory(String directory, deque<String> &files) {
+//set flag to 1 to include files from subfolders
+bool FileData::getFilesFromDirectory(String directory, deque<String> &files, int flag) {
 	String filepath;
 	fs::path full_path( fs::initial_path<fs::path>() );
 	full_path = fs::system_complete( fs::path( directory ) );
@@ -225,6 +226,12 @@ bool FileData::getFilesFromDirectory(String directory, deque<String> &files) {
 				if ( fs::is_regular_file( dir_itr->status() ) ) {
 					filepath = dir_itr->path().filename().string();
 					files.push_back(filepath);
+				}
+				else {
+					if(flag==1) {
+						filepath = dir_itr->path().string();
+						this->getFilesFromDirectory(filepath,files);
+					}
 				}
 			}
 			catch ( const std::exception & ex ) {

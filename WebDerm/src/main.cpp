@@ -20,7 +20,9 @@
 #include "Shades/shades.h"
 #include "Entropy/entropy.h"
 #include "Shape/circle.h"
+#include "Shape/shape.h"
 #include "neuralnetworks/shapeml.h"
+#include "neuralnetworks/testml.h"
 
 int main(int argc,char** argv)
 {
@@ -52,31 +54,144 @@ int main(int argc,char** argv)
 	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-	String file = "/home/jason/Desktop/workspace/trainingdata2.csv";
-	String file2 = "/home/jason/Desktop/workspace/testdata.csv";
+
+	TestML ml;
 /*
-	Circle circle;
-	vector<vector<Point> > points;
-	circle.importPoints("/home/jason/Desktop/workspace/ellipsepoints.csv",points);
+	//merge training data
+	vector<Mat> circleSamples;
+	vector<Mat> randomSamples;
+	String circleSamplePath = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
+	String randomSamplePath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
+	ml.importSamples(circleSamplePath,circleSamples);
+	ml.importSamples(randomSamplePath,randomSamples);
+	int trainingSampleSize = circleSamples.size() + randomSamples.size();
+	int outputSize = 2;
+	Size size(20,20);
+	Mat trainingData(trainingSampleSize,size.width*size.height,CV_32F);
+	Mat trainingLabel(trainingSampleSize,outputSize,CV_32F);
+	int x=0,y=0;
+	for(unsigned int i=0; i<circleSamples.size(); i++) {
+		Mat img = circleSamples.at(i);
+		for(int j=0; j<img.rows; j++) {
+			for(int k=0; k<img.cols; k++) {
+				trainingData.at<float>(y,x) = img.at<uchar>(j,k);
+				x++;
+			}
+		}
+		trainingLabel.at<float>(y,0) = 1.0;
+		trainingLabel.at<float>(y,1) = -1.0;
+		y++;
+		x=0;
+	}
+	x=0;
+	for(unsigned int i=0; i<randomSamples.size(); i++) {
+		Mat img = randomSamples.at(i);
+		for(int j=0; j<img.rows; j++) {
+			for(int k=0; k<img.cols; k++) {
+				trainingData.at<float>(y,x) = img.at<uchar>(j,k);
+				x++;
+			}
+		}
+		trainingLabel.at<float>(y,0) = -1.0;
+		trainingLabel.at<float>(y,1) = 1.0;
+		y++;
+		x=0;
+	}
+	ml.writeData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabel);
+	// end merge training data
+/**/
+/*
+	vector<Mat> samples;
+	String testSamplesPath = "/home/jason/Desktop/workspace/Samples2/Test/";
+	ml.importSamples(testSamplesPath,samples);
+	Mat testData(samples.size(),400,CV_32F);
+	Mat testLabels(samples.size(),2,CV_32F);
+	int x=0;
+	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	for(unsigned int i=0; i<samples.size(); i++) {
+		Mat img = samples.at(i);
+		//imshow("img",img);
+		//waitKey(0);
+		for(int j=0; j<img.rows; j++) {
+			for(int k=0; k<img.cols; k++) {
+				testData.at<float>(i,x) = img.at<uchar>(j,k);
+				x++;
+			}
+		}
+		x=0;
+		testLabels.at<float>(i,0) = 1.0;
+		testLabels.at<float>(i,1) = -1.0;
+	}
+	ml.writeData("/home/jason/Desktop/workspace/Samples2/test_set.csv",testData,testLabels);
+/**/
+	/*
+	vector<vector<double> > trainingData;
+	vector<vector<double> > trainingLabels;
+	ml.importVecData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabels);
+	int sampleSize = trainingData.size();
+	int inputSize = trainingData.at(0).size();
+	int outputSize = trainingLabels.at(0).size();
+	int hiddenNodes = 20;
+	Mat training_set(sampleSize,inputSize,CV_32F);
+	Mat training_labels(sampleSize,outputSize,CV_32F);
+	ml.vecToMat(trainingData,trainingLabels,training_set,training_labels);
+	Mat layers(3,1,CV_32S);
+	layers.at<int>(0,0) = inputSize;
+	layers.at<int>(1,0) = hiddenNodes;
+	layers.at<int>(2,0) = outputSize;
+	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
+	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001);
+	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
+	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
+	cout << "Iterations: " << iter << endl;
+	CvFileStorage* storage = cvOpenFileStorage("/home/jason/Desktop/workspace/Samples/Training/param.xml", 0, CV_STORAGE_WRITE );
+	ann.write(storage,"shapeML");
+	cvReleaseFileStorage(&storage);
+
+	vector<vector<double> > testData;
+	vector<vector<double> > testLabels;
+	ml.importVecData("/home/jason/Desktop/workspace/Samples/test_set.csv",testData,testLabels);
+	sampleSize = testData.size();
+	Mat test_set(sampleSize,inputSize,CV_32F);
+	Mat test_labels(sampleSize,outputSize,CV_32F);
+	Mat results(sampleSize,outputSize,CV_32F);
+	ml.vecToMat(testData,testLabels,test_set,test_labels);
+	ann.predict(test_set,results);
+	for(int i=0; i<results.rows; i++) {
+		cout << results.row(i) << endl;
+	}
+	*/
+/*
+	Shape shp;
+	vector<vector<Point> > training_points;
+	shp.importPoints("/home/jason/Desktop/workspace/testdata.csv",training_points);
 	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	for(unsigned int i=0; i<points.size(); i++) {
+	String name;
+	for(int i=0; i<training_points.size(); i++) {
 		img2 = img2.zeros(200,200,CV_8U);
-		circle.pointsToImage(img2,points.at(i),1);
+		shp.pointsToImage(img2,training_points.at(i),1);
 		imfill(img2);
-		imshow("img",img2);
-		waitKey(0);
-	}*/
+		name = "img"+toString(i+1)+".png";
+		imwrite(name,img2);
+		//imshow("img",img2);
+		//waitKey(0);
+	}
+/**/
+
+	String file = "/home/jason/Desktop/workspace/Samples2/training_set.csv";
+	String file2 = "/home/jason/Desktop/workspace/Samples2/test_set.csv";
 
 	ShapeML sml;
-	vector<vector<double> >labels;
-	vector<vector<int> > trainingData;
-	sml.importTrainingData(file,trainingData,labels);
-	sml.trainNeuralNetwork(trainingData,labels);
+	vector<vector<double> >training_labels;
+	vector<vector<double> > training_data;
+	sml.importData(file,training_data,training_labels);
+	sml.train(training_data,training_labels,300);
 	sml.saveData();
 
-	vector<vector<int> > testData;
-	sml.importTestData(file2,testData);
-	vector<vector<double> > results(testData.size(),vector<double>(labels.at(0).size(),0));
+	vector<vector<double> > testData;
+	vector<vector<double> > testLabels;
+	sml.importData(file2,testData,testLabels);
+	vector<vector<double> > results(testData.size(),vector<double>(testLabels.at(0).size(),0));
 	sml.predict(testData,results);
 	for(unsigned int i=0; i<results.size(); i++) {
 		printf("%f,%f\n",results.at(i).at(0), results.at(i).at(1));
