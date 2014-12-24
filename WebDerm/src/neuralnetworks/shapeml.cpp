@@ -12,22 +12,16 @@ ShapeML::~ShapeML() {
 }
 
 const double a=1.0;
-const double b=.04;
+const double b=.1;
 //activation function
 double ShapeML::fx(double input) {
-	int s0 = input > 0 ? 1 : -1;
-	double df = exp(-fabs(input));
-	double t0 = 1./(1.+ df);
-	double result = t0 * a * (1.0 - df) * s0;
+	double result = (2.0*a)/(1.0+exp(-b*input)) - a;
 	return result;
 }
 
 //derivative of fx()
 double ShapeML::fx0(double input) {
-	double scale = 2*b*a;
-	double df = exp(-fabs(input));
-	double t0 = 1./(1.+ df);
-	double result = scale * b * df * t0 * t0;
+	double result = (-2.0*a*b*exp(-b*input))/pow((1.0+exp(-b*input)),2);
 	return result;
 }
 
@@ -213,7 +207,7 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 					double input = this->iLayerPerceptrons.at(i);
 					this->ihLayerTotal.at(j) += (input * this->ihLayerWeights.at(i).at(j));
 				}
-				this->ihLayerTotal.at(j) += this->hLayerBiasWeights.at(j) * b;
+				this->ihLayerTotal.at(j) += this->hLayerBiasWeights.at(j);
 				this->hLayerPerceptrons.at(j) = this->fx(this->ihLayerTotal.at(j));
 				//printf("hNode: %d, hOutput: %f\n",j,this->hLayerPerceptrons.at(j));
 			}
@@ -227,7 +221,7 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 						cout << this->hLayerPerceptrons.at(j) << endl;
 					}*/
 				}
-				this->hoLayerTotal.at(k) += this->oLayerBiasWeights.at(k) * b;
+				this->hoLayerTotal.at(k) += this->oLayerBiasWeights.at(k);
 				this->oLayerPerceptrons.at(k) = this->fx(this->hoLayerTotal.at(k));
 				/*if(dataNum==0) {
 					printf("O: %d, Sum: %f\n",k,this->hoLayerTotal.at(k));
@@ -241,7 +235,7 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 			for(int k=0; k<this->outputPerceptrons; k++) {
 				//eps = this->totalError(this->oLayerPerceptrons,labels.at(dataNum));
 				eps = this->computeError(this->oLayerPerceptrons.at(k),labels.at(dataNum).at(k));
-				this->oPerceptronErrors.at(k) = eps * (this->oLayerPerceptrons.at(k)) * (1-this->oLayerPerceptrons.at(k));
+				this->oPerceptronErrors.at(k) = eps; * this->fx0(this->hoLayerTotal.at(k));
 			}
 			//printf info
 			double o1 = this->oLayerPerceptrons.at(0);
@@ -259,7 +253,7 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 				for(int k=0; k<this->outputPerceptrons; k++) {
 					error += (this->oPerceptronErrors.at(k) * this->hoLayerWeights.at(j).at(k));
 				}
-				this->hPerceptronErrors.at(j) = 1 * error * (1-this->hLayerPerceptrons.at(j)) * this->hLayerPerceptrons.at(j);
+				this->hPerceptronErrors.at(j) = error * this->fx0(this->ihLayerTotal.at(j));
 			}
 			//back propagation to update weights between input and hidden layer
 			for(int j=0; j<this->hiddenPerceptrons; j++) {
