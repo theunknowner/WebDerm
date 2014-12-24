@@ -17,32 +17,39 @@ private:
 	int outputPerceptrons;
 	int max_iterations;
 	const int hiddenPerceptrons = 20;
-	const double learningRate = 1.0;
-	vector< vector<double> > inputHiddenLayerWeights;
-	vector< vector<double> >hiddenOutputLayerWeights;
-	vector<double> outputLayerBiasWeights;
-	vector<double> hiddenLayerBiasWeights;
-	vector<double> hiddenLayerPerceptrons;
-	vector<double> inputLayerPerceptrons;
-	vector<double> outputLayerPerceptrons;
-	vector<double> outputPerceptronErrors;
-	vector<double> hiddenPerceptronErrors;
+	const double eta = 0.13; //learning rate
+	const double alpha = 0.04; //momentum
+	vector< vector<double> > ihLayerWeights;
+	vector< vector<double> >hoLayerWeights;
+	vector< vector<double> > ihPrevWeightDelta;
+	vector< vector<double> > hoPrevWeightDelta;
+	vector<double> hPrevBiasDelta;
+	vector<double> oPrevBiasDelta;
+	vector<double> oLayerBiasWeights;
+	vector<double> hLayerBiasWeights;
+	vector<double> hLayerPerceptrons;
+	vector<double> oLayerPerceptrons;
+	vector<double> oPerceptronErrors;
+	vector<double> hPerceptronErrors;
+	vector<double> ihLayerTotal;
+	vector<double> hoLayerTotal;
+
 
 	double fx0(double input);
-	double actFunctionLayer1(double input);
-	double inputLayerFunction(double input);
-	double outputLayerFunction(double input);
-	double computeError(double realOutput, double expectedOutput);
+	double activationFunction(double input);
+	double computeError(double actualOutput, double idealOutput);
+	double totalError(vector<double> actualOutput, vector<double> idealOutput);
 	void resetPerceptrons();
 	void init(int inputSize, int outputSize);
+	void init_weights();
 	void releaseMemory();
 
 public:
 	~ShapeML();
-	void train(vector<vector<double> > trainingData, vector<vector<double> > labels, int iterations=1);
+	int train(vector<vector<double> > trainingData, vector<vector<double> > labels, int iterations=1);
 	void importData(String file, vector<vector<double> > &trainingData, vector<vector<double> > &labels);
-	void importTestData(String file, vector<vector<double> > &testData);
 	void predict(vector<vector<double> > &testData, vector<vector<double> > &results);
+	void normalizeData(vector<vector<double> > &data);
 	void saveData();
 	void loadData(String file);
 	void printVectorInfo();

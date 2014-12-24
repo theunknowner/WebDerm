@@ -185,9 +185,10 @@ int main(int argc,char** argv)
 	vector<vector<double> >training_labels;
 	vector<vector<double> > training_data;
 	sml.importData(file,training_data,training_labels);
-	sml.train(training_data,training_labels,300);
+	int iter = sml.train(training_data,training_labels,3500);
+	//cout << iter << endl;
 	sml.saveData();
-
+/*
 	vector<vector<double> > testData;
 	vector<vector<double> > testLabels;
 	sml.importData(file2,testData,testLabels);
