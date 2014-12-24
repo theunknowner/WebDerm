@@ -124,7 +124,7 @@ int main(int argc,char** argv)
 	}
 	ml.writeData("/home/jason/Desktop/workspace/Samples2/test_set.csv",testData,testLabels);
 /**/
-	/*
+/*
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
 	ml.importVecData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabels);
@@ -158,9 +158,10 @@ int main(int argc,char** argv)
 	ml.vecToMat(testData,testLabels,test_set,test_labels);
 	ann.predict(test_set,results);
 	for(int i=0; i<results.rows; i++) {
+		printf("Sample: %d, ",i+1);
 		cout << results.row(i) << endl;
 	}
-	*/
+	/**/
 /*
 	Shape shp;
 	vector<vector<Point> > training_points;
@@ -178,24 +179,23 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	String file = "/home/jason/Desktop/workspace/Samples2/training_set.csv";
-	String file2 = "/home/jason/Desktop/workspace/Samples2/test_set.csv";
-
+	String file = "/home/jason/Desktop/workspace/Samples/training_set.csv";
+	String file2 = "/home/jason/Desktop/workspace/Samples/test_set.csv";
 	ShapeML sml;
 	vector<vector<double> >training_labels;
 	vector<vector<double> > training_data;
 	sml.importData(file,training_data,training_labels);
-	int iter = sml.train(training_data,training_labels,3500);
+	int iter = sml.train(training_data,training_labels,10);
 	//cout << iter << endl;
 	sml.saveData();
-/*
+
 	vector<vector<double> > testData;
 	vector<vector<double> > testLabels;
 	sml.importData(file2,testData,testLabels);
 	vector<vector<double> > results(testData.size(),vector<double>(testLabels.at(0).size(),0));
 	sml.predict(testData,results);
 	for(unsigned int i=0; i<results.size(); i++) {
-		printf("%f,%f\n",results.at(i).at(0), results.at(i).at(1));
+		printf("Sample: %d, Out1: %f, Out2: %f\n",i, results.at(i).at(0), results.at(i).at(1));
 		//cout << i << endl;
 	}
 	/*

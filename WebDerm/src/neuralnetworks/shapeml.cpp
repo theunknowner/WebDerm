@@ -12,16 +12,34 @@ ShapeML::~ShapeML() {
 }
 
 const double a=1.0;
-const double b=0.01;
+const double b=.04;
 //activation function
-double ShapeML::activationFunction(double input) {
-	double result = (2.0*a)/(1.0+exp(-b*input)) - a;
+double ShapeML::fx(double input) {
+	int s0 = input > 0 ? 1 : -1;
+	double df = exp(-fabs(input));
+	double t0 = 1./(1.+ df);
+	double result = t0 * a * (1.0 - df) * s0;
+	return result;
+}
+
+//derivative of fx()
+double ShapeML::fx0(double input) {
+	double scale = 2*b*a;
+	double df = exp(-fabs(input));
+	double t0 = 1./(1.+ df);
+	double result = scale * b * df * t0 * t0;
+	return result;
+}
+
+double sigmFn(double input) {
+	double A=1.0, B=1.0;
+	double result = B * (1-exp(-A*input))/(1+exp(-A*input));
 	return result;
 }
 
 //input = outputLayerFunction results, realOutput = label
-double ShapeML::computeError(double actualOutput, double idealOutput) {
-	double results = (idealOutput-actualOutput);
+double ShapeML::computeError(double actualOutput, double targetOutput) {
+	double results = (actualOutput-targetOutput);
 	return results;
 }
 
@@ -29,25 +47,25 @@ double ShapeML::computeError(double actualOutput, double idealOutput) {
 double ShapeML::totalError(vector<double> actualOutput, vector<double> idealOutput) {
 	double sum = 0;
 	for(unsigned int i=0; i<actualOutput.size(); i++) {
-		sum += abs(idealOutput.at(i) - actualOutput.at(i));
+		sum += pow(fabs(idealOutput.at(i) - actualOutput.at(i)),2);
 	}
+	sum = sqrt(sum);
 	return sum;
-}
-
-double ShapeML::fx0(double input) {
-	double result = (-2.0*a*b*exp(-b*input))/pow((1.0+exp(-b*input)),2);
-	return result;
 }
 
 void ShapeML::init(int inputSize, int outputSize) {
 	this->inputPerceptrons = inputSize;
 	this->outputPerceptrons = outputSize;
 
+	this->iLayerPerceptrons.resize(this->inputPerceptrons,0);
 	this->hLayerPerceptrons.resize(this->hiddenPerceptrons,0);
 	this->oLayerPerceptrons.resize(this->outputPerceptrons,0);
 
+	this->iLayerWeights.resize(this->inputPerceptrons,0);
 	this->ihLayerWeights.resize(this->inputPerceptrons,vector<double>(this->hiddenPerceptrons,0));
 	this->hoLayerWeights.resize(this->hiddenPerceptrons,vector<double>(this->outputPerceptrons,0));
+
+	this->iLayerBiasWeights.resize(this->inputPerceptrons,0);
 	this->hLayerBiasWeights.resize(this->hiddenPerceptrons,0);
 	this->oLayerBiasWeights.resize(this->outputPerceptrons,0);
 
@@ -67,28 +85,34 @@ void ShapeML::init_weights() {
 	RNG rng(time(0));
 	double randWt=0;
 	for(int i=0; i<this->inputPerceptrons; i++) {
-		for(unsigned int j=0; j<this->hiddenPerceptrons; j++) {
+		//randWt = rng.uniform(0.0,1.0);
+		this->iLayerWeights.at(i) = 1.0;
+		//randWt = rng.uniform(-5,0);
+		this->iLayerBiasWeights.at(i) = 0.0;
+	}
+
+	for(int j=0; j<this->hiddenPerceptrons; j++) {
+		for(int i=0; i<this->inputPerceptrons; i++) {
 			randWt = rng.uniform(0.0,1.0);
 			this->ihLayerWeights.at(i).at(j) = randWt;
 		}
-	}
-	for(int j=0; j<this->hiddenPerceptrons; j++) {
-		randWt = rng.uniform(-10.0,0.0);
+		randWt = rng.uniform(-5,0);
 		this->hLayerBiasWeights.at(j) = randWt;
 	}
-	for(int j=0; j<this->hiddenPerceptrons; j++) {
-		for(int k=0; k<this->outputPerceptrons; k++) {
-			randWt = rng.uniform(1.0,2.0);
+
+	for(int k=0; k<this->outputPerceptrons; k++) {
+		for(int j=0; j<this->hiddenPerceptrons; j++) {
+			randWt = rng.uniform(0.0,1.0);
 			this->hoLayerWeights.at(j).at(k) = randWt;
 		}
-	}
-	for(int k=0; k<this->outputPerceptrons; k++) {
-		randWt = rng.uniform(-10.0, 0.0);
+		randWt = rng.uniform(-5, 0);
 		this->oLayerBiasWeights.at(k) = randWt;
 	}
 }
 
 void ShapeML::resetPerceptrons() {
+	this->iLayerPerceptrons.clear();
+	this->iLayerPerceptrons.resize(this->inputPerceptrons,0);
 	this->hLayerPerceptrons.clear();
 	this->hLayerPerceptrons.resize(this->hiddenPerceptrons,0);
 	this->oLayerPerceptrons.clear();
@@ -159,82 +183,105 @@ void ShapeML::importData(String file, vector<vector<double> > &data, vector<vect
 }
 
 double sigmoidFn(double input) {
-	double result = 1.0/(1.0+exp(-input));
+	double B = 0.015;
+	double result = 1.0/(1.0+exp(-B * input));
 	return result;
 }
 
-int ShapeML::train(vector<vector<double> > trainingData, vector<vector<double> > labels, int iterations) {
-	this->init(trainingData.at(0).size(), labels.at(0).size());
+double symSigFn(double input) {
+	double B = 0.06;
+	double result = (1-exp(-B * input))/(1+exp(-B * input));
+	return result;
+}
+
+int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels, int iterations) {
+	this->init(data.at(0).size(), labels.at(0).size());
 	this->init_weights();
 	this->max_iterations = iterations;
 	int iter = 0;
-	double eps = 1.0, epsThresh = 0.000001;
-	while(iter<this->max_iterations && eps>epsThresh) {
-		for(unsigned int dataNum=0; dataNum<trainingData.size(); dataNum++) {
+	double eps = 1.0, epsThresh = 0.01;
+	while(iter<this->max_iterations) {
+		for(unsigned int dataNum=0; dataNum<data.size(); dataNum++) {
+			//calculate input layer
+			for(int i=0; i<this->inputPerceptrons; i++) {
+				double input = data.at(dataNum).at(i) * this->iLayerWeights.at(i);
+				this->iLayerPerceptrons.at(i) = input + this->iLayerBiasWeights.at(i);
+			}
 			//calculate input to hidden layer total
 			for(int j=0; j<this->hiddenPerceptrons; j++) {
 				for(int i=0; i<this->inputPerceptrons; i++) {
-					double input = trainingData.at(dataNum).at(i);
+					double input = this->iLayerPerceptrons.at(i);
 					this->ihLayerTotal.at(j) += (input * this->ihLayerWeights.at(i).at(j));
 				}
-				this->ihLayerTotal.at(j) += this->hLayerBiasWeights.at(j);
-				this->hLayerPerceptrons.at(j) = this->activationFunction(this->ihLayerTotal.at(j));
+				this->ihLayerTotal.at(j) += this->hLayerBiasWeights.at(j) * b;
+				this->hLayerPerceptrons.at(j) = this->fx(this->ihLayerTotal.at(j));
+				//printf("hNode: %d, hOutput: %f\n",j,this->hLayerPerceptrons.at(j));
 			}
 			//calculate hidden to output layer total
 			for(int k=0; k<this->outputPerceptrons; k++) {
 				for(int j=0; j<this->hiddenPerceptrons; j++) {
 					double input = this->hLayerPerceptrons.at(j);
 					this->hoLayerTotal.at(k) += (input * this->hoLayerWeights.at(j).at(k));
+					/*
+					if(iter==4 && dataNum==0 && k==0) {
+						cout << this->hLayerPerceptrons.at(j) << endl;
+					}*/
 				}
-				this->hoLayerTotal.at(k) += this->oLayerBiasWeights.at(k);
-				this->oLayerPerceptrons.at(k) = this->activationFunction(this->hoLayerTotal.at(k));
+				this->hoLayerTotal.at(k) += this->oLayerBiasWeights.at(k) * b;
+				this->oLayerPerceptrons.at(k) = this->fx(this->hoLayerTotal.at(k));
+				/*if(dataNum==0) {
+					printf("O: %d, Sum: %f\n",k,this->hoLayerTotal.at(k));
+				}
+				if(dataNum==0) {
+					printf("Iter: %d, O#: %d, Output: %f\n",iter,k,this->oLayerPerceptrons.at(k));
+				}*/
 			}
+
 			//calculate error of output layer
 			for(int k=0; k<this->outputPerceptrons; k++) {
-				double error = this->computeError(this->oLayerPerceptrons.at(k),labels.at(dataNum).at(k));
-				this->oPerceptronErrors.at(k) = 1 * error * this->fx0(this->hoLayerTotal.at(k));
+				//eps = this->totalError(this->oLayerPerceptrons,labels.at(dataNum));
+				eps = this->computeError(this->oLayerPerceptrons.at(k),labels.at(dataNum).at(k));
+				this->oPerceptronErrors.at(k) = eps * (this->oLayerPerceptrons.at(k)) * (1-this->oLayerPerceptrons.at(k));
 			}
 			//printf info
 			double o1 = this->oLayerPerceptrons.at(0);
 			double o2 = this->oLayerPerceptrons.at(1);
 			double lbl1 = labels.at(dataNum).at(0);
 			double lbl2 = labels.at(dataNum).at(1);
-			double val1 = lbl1 - o1;
+			double val1 = o1-lbl1;
 			double val2 = lbl2 -o2;
-			printf("Iter: %d, Sample: %d | E1: (%f- %f)= %f | E2: (%f- %f)= %f\n",iter,dataNum,lbl1,o1,val1,lbl2,o2,val2);
-			eps = this->totalError(this->oLayerPerceptrons,labels.at(dataNum));
-			if(eps<epsThresh) {
-				return iter;
-			}
+			printf("Iter: %d, Sample: %d | E1: (%f- %f)= %f | E2: (%f- %f)= %f | ES: %f\n",iter+1,dataNum+1,lbl1,o1,val1,lbl2,o2,val2,eps);
+			//printf("Iter: %d, Sample: %d, Eps: %f\n",iter, dataNum, eps);
+
 			//calculate error of hidden layer
 			for(int j=0; j<this->hiddenPerceptrons; j++) {
 				double error=0;
 				for(int k=0; k<this->outputPerceptrons; k++) {
 					error += (this->oPerceptronErrors.at(k) * this->hoLayerWeights.at(j).at(k));
 				}
-				this->hPerceptronErrors.at(j) = 1 * error * this->fx0(this->ihLayerTotal.at(j));
+				this->hPerceptronErrors.at(j) = 1 * error * (1-this->hLayerPerceptrons.at(j)) * this->hLayerPerceptrons.at(j);
 			}
 			//back propagation to update weights between input and hidden layer
 			for(int j=0; j<this->hiddenPerceptrons; j++) {
 				for(int i=0; i<this->inputPerceptrons; i++) {
-					double delta = this->eta * this->hPerceptronErrors.at(j) * trainingData.at(dataNum).at(i);
+					double delta = this->eta * this->hPerceptronErrors.at(j) * data.at(dataNum).at(i);
 					this->ihLayerWeights.at(i).at(j) += delta + (alpha * this->ihPrevWeightDelta.at(i).at(j));
-					this->ihPrevWeightDelta.at(i).at(j) = delta;
+					this->ihPrevWeightDelta.at(i).at(j) = delta + (alpha * this->ihPrevWeightDelta.at(i).at(j));
 				}
 				double delta = this->eta * this->hPerceptronErrors.at(j) * 1.0;
 				this->hLayerBiasWeights.at(j) += delta + (alpha * this->hPrevBiasDelta.at(j));
-				this->hPrevBiasDelta.at(j) = delta;
+				this->hPrevBiasDelta.at(j) = delta + (alpha * this->hPrevBiasDelta.at(j));
 			}
 			//back propagation for weights between hidden and output layer
 			for(int k=0; k<this->outputPerceptrons; k++) {
 				for(int j=0; j<this->hiddenPerceptrons; j++) {
 					double delta = this->eta * this->oPerceptronErrors.at(k) * this->hLayerPerceptrons.at(j);
 					this->hoLayerWeights.at(j).at(k) += delta + (alpha * this->hoPrevWeightDelta.at(j).at(k));
-					this->hoPrevWeightDelta.at(j).at(k) = delta;
+					this->hoPrevWeightDelta.at(j).at(k) = delta + (alpha * this->hoPrevWeightDelta.at(j).at(k));
 				}
 				double delta = this->eta * this->oPerceptronErrors.at(k) * 1.0;
 				this->oLayerBiasWeights.at(k) += delta + (alpha * this->oPrevBiasDelta.at(k));
-				this->oPrevBiasDelta.at(k) = delta;
+				this->oPrevBiasDelta.at(k) = delta + (alpha * this->oPrevBiasDelta.at(k));
 			}
 			this->resetPerceptrons();
 		}
@@ -243,17 +290,22 @@ int ShapeML::train(vector<vector<double> > trainingData, vector<vector<double> >
 	return iter;
 }
 
-void ShapeML::predict(vector<vector<double> > &testData, vector<vector<double> > &results) {
+void ShapeML::predict(vector<vector<double> > &data, vector<vector<double> > &results) {
 	this->resetPerceptrons();
-	for(unsigned int dataNum=0; dataNum<testData.size(); dataNum++) {
+	for(unsigned int dataNum=0; dataNum<data.size(); dataNum++) {
+		//calculate input layer
+		for(int i=0; i<this->inputPerceptrons; i++) {
+			double input = data.at(dataNum).at(i) * this->iLayerWeights.at(i);
+			this->iLayerPerceptrons.at(i) = input + this->iLayerBiasWeights.at(i);
+		}
 		//calculate input to hidden layer total
 		for(int j=0; j<this->hiddenPerceptrons; j++) {
 			for(int i=0; i<this->inputPerceptrons; i++) {
-				double input = testData.at(dataNum).at(i);
+				double input = this->iLayerPerceptrons.at(i);
 				this->ihLayerTotal.at(j) += (input * this->ihLayerWeights.at(i).at(j));
 			}
-			this->ihLayerTotal.at(j) += this->hLayerBiasWeights.at(j);
-			this->hLayerPerceptrons.at(j) = this->activationFunction(this->ihLayerTotal.at(j));
+			this->ihLayerTotal.at(j) += this->hLayerBiasWeights.at(j) * b;
+			this->hLayerPerceptrons.at(j) = this->fx(this->ihLayerTotal.at(j));
 		}
 		//calculate hidden to output layer total
 		for(int k=0; k<this->outputPerceptrons; k++) {
@@ -261,8 +313,10 @@ void ShapeML::predict(vector<vector<double> > &testData, vector<vector<double> >
 				double input = this->hLayerPerceptrons.at(j);
 				this->hoLayerTotal.at(k) += (input * this->hoLayerWeights.at(j).at(k));
 			}
-			this->hoLayerTotal.at(k) += this->oLayerBiasWeights.at(k);
-			this->oLayerPerceptrons.at(k) = this->activationFunction(this->hoLayerTotal.at(k));
+			this->hoLayerTotal.at(k) += this->oLayerBiasWeights.at(k) * b;
+			this->oLayerPerceptrons.at(k) = this->fx(this->hoLayerTotal.at(k));
+
+			results.at(dataNum).at(k) = this->oLayerPerceptrons.at(k);
 		}
 		this->resetPerceptrons();
 	}

@@ -17,16 +17,19 @@ private:
 	int outputPerceptrons;
 	int max_iterations;
 	const int hiddenPerceptrons = 20;
-	const double eta = 0.13; //learning rate
-	const double alpha = 0.04; //momentum
+	const double eta = 0.1; //learning rate
+	const double alpha = 0.1; //momentum
+	vector<double> iLayerWeights;
 	vector< vector<double> > ihLayerWeights;
 	vector< vector<double> >hoLayerWeights;
 	vector< vector<double> > ihPrevWeightDelta;
 	vector< vector<double> > hoPrevWeightDelta;
 	vector<double> hPrevBiasDelta;
 	vector<double> oPrevBiasDelta;
+	vector<double> iLayerBiasWeights;
 	vector<double> oLayerBiasWeights;
 	vector<double> hLayerBiasWeights;
+	vector<double> iLayerPerceptrons;
 	vector<double> hLayerPerceptrons;
 	vector<double> oLayerPerceptrons;
 	vector<double> oPerceptronErrors;
@@ -36,7 +39,7 @@ private:
 
 
 	double fx0(double input);
-	double activationFunction(double input);
+	double fx(double input);
 	double computeError(double actualOutput, double idealOutput);
 	double totalError(vector<double> actualOutput, vector<double> idealOutput);
 	void resetPerceptrons();
