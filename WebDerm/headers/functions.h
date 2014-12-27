@@ -25,6 +25,7 @@ std::size_t length(const T (&)[N] )
 #define stringify(name) #name
 
 String toString(int val);
+String toString(unsigned int val);
 String toString(double val);
 String toString(bool val);
 double roundDecimal(double num, int places);

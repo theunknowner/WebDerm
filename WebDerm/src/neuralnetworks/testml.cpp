@@ -57,7 +57,7 @@ void TestML::importSamples(String folder, vector<Mat> &samples) {
 	String filename;
 	fd.getFilesFromDirectory(folder,files);
 	for(int i=1; i<=files.size(); i++) {
-		filename = folder+"img"+toString(i)+".png";
+		filename = folder+"sample"+toString(i)+".png";
 		Mat img = imread(filename,0);
 		if(img.data) {
 			img = fn.cropImage(img);

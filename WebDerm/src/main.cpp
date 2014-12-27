@@ -178,6 +178,20 @@ int main(int argc,char** argv)
 		//waitKey(0);
 	}
 /**/
+/*
+	vector<Mat> samples;
+	ml.importSamples("/home/jason/Desktop/workspace/Samples/Test/",samples);
+	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	for(unsigned int i=0; i<samples.size(); i++) {
+		double count=0;
+		for(int j=0; j<samples.at(i).rows; j++) {
+			count += countNonZero(samples.at(i).row(j));
+		}
+		cout << count << endl;
+		imshow("img",samples.at(i));
+		waitKey(0);
+	}
+/**/
 
 	String file = "/home/jason/Desktop/workspace/Samples/training_set.csv";
 	String file2 = "/home/jason/Desktop/workspace/Samples/test_set.csv";
@@ -185,7 +199,7 @@ int main(int argc,char** argv)
 	vector<vector<double> >training_labels;
 	vector<vector<double> > training_data;
 	sml.importData(file,training_data,training_labels);
-	int iter = sml.train(training_data,training_labels,10);
+	int iter = sml.train(training_data,training_labels,300);
 	//cout << iter << endl;
 	sml.saveData();
 

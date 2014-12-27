@@ -14,6 +14,13 @@ String toString(int val)
 	return stringStream.str();
 }
 
+String toString(unsigned int val)
+{
+	ostringstream stringStream;
+	stringStream << val;
+	return stringStream.str();
+}
+
 String toString(double val)
 {
 	ostringstream stringStream;
