@@ -20,6 +20,9 @@ public:
 	void erosion(Mat src, Mat &dst, Size size, Point anchor=Point(-1,-1));
 	void erosion2(Mat src, Mat &dst, Size size,Point anchor=Point(-1,-1));
 	Mat uniqueLumPercentile(Mat src, double percentile);
+	Mat extractShape(Mat src, Size size, Point anchor=Point(-1,-1));
+	void hysteresisDilation(Mat src, Mat &dst, Size size, Point anchor=Point(-1,-1));
+	void hysteresisErosion(Mat src, Mat &dst, Size size, Point anchor=Point(-1,-1));
 };
 
 #endif /* SHAPEMORPH_H_ */

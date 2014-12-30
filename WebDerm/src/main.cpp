@@ -56,6 +56,7 @@ int main(int argc,char** argv)
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	TestML ml;
 	ShapeMorph sm;
 	img = runColorNormalization(img);
@@ -63,7 +64,7 @@ int main(int argc,char** argv)
 	img2 = sm.findShapes(img);
 	imshow("img",img2);
 	waitKey(0);
-/*
+	/*
 	//merge training data
 	vector<Mat> circleSamples;
 	vector<Mat> randomSamples;
@@ -107,7 +108,7 @@ int main(int argc,char** argv)
 	ml.writeData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabel);
 	// end merge training data
 /**/
-/*
+	/*
 	vector<Mat> samples;
 	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
 	ml.importSamples(samplesPath,samples);
@@ -135,7 +136,7 @@ int main(int argc,char** argv)
 	}
 	ml.writeData("/home/jason/Desktop/workspace/Samples/change_set.csv",data,labels);
 /**/
-/*
+	/*
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
 	ml.importVecData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabels);
@@ -173,7 +174,7 @@ int main(int argc,char** argv)
 		cout << results.row(i) << endl;
 	}
 	/**/
-/*
+	/*
 	vector<Mat> samples;
 	ml.importSamples("/home/jason/Desktop/workspace/Samples/Test/",samples);
 	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -187,7 +188,7 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-/*
+	/*
 	String file = "/home/jason/Desktop/workspace/Samples/training_set.csv";
 	String file2 = "/home/jason/Desktop/workspace/Samples/test_set.csv";
 	ShapeML sml;
