@@ -23,6 +23,7 @@
 #include "Shape/shape.h"
 #include "neuralnetworks/shapeml.h"
 #include "neuralnetworks/testml.h"
+#include "Shape/shapemorph.h"
 
 int main(int argc,char** argv)
 {
@@ -51,11 +52,17 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-
+	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	TestML ml;
+	ShapeMorph sm;
+	img = runColorNormalization(img);
+	cvtColor(img,img,CV_RGB2GRAY);
+	img2 = sm.findShapes(img);
+	imshow("img",img2);
+	waitKey(0);
 /*
 	//merge training data
 	vector<Mat> circleSamples;
@@ -102,27 +109,31 @@ int main(int argc,char** argv)
 /**/
 /*
 	vector<Mat> samples;
-	String testSamplesPath = "/home/jason/Desktop/workspace/Samples2/Test/";
-	ml.importSamples(testSamplesPath,samples);
-	Mat testData(samples.size(),400,CV_32F);
-	Mat testLabels(samples.size(),2,CV_32F);
+	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
+	ml.importSamples(samplesPath,samples);
+	Mat data(samples.size(),400,CV_32F);
+	Mat labels(samples.size(),2,CV_32F);
 	int x=0;
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	for(unsigned int i=0; i<samples.size(); i++) {
-		Mat img = samples.at(i);
-		//imshow("img",img);
+		Mat samp = samples.at(i);
+		//imshow("img",samp);
 		//waitKey(0);
-		for(int j=0; j<img.rows; j++) {
-			for(int k=0; k<img.cols; k++) {
-				testData.at<float>(i,x) = img.at<uchar>(j,k);
+		String name;
+		//name = "circle(" + toString(n) + ").png";
+		//imwrite(name,samp);
+		//n++;
+		for(int j=0; j<samp.rows; j++) {
+			for(int k=0; k<samp.cols; k++) {
+				data.at<float>(i,x) = samp.at<uchar>(j,k);
 				x++;
 			}
 		}
 		x=0;
-		testLabels.at<float>(i,0) = 1.0;
-		testLabels.at<float>(i,1) = -1.0;
+		labels.at<float>(i,0) = 1.0;
+		labels.at<float>(i,1) = -1.0;
 	}
-	ml.writeData("/home/jason/Desktop/workspace/Samples2/test_set.csv",testData,testLabels);
+	ml.writeData("/home/jason/Desktop/workspace/Samples/change_set.csv",data,labels);
 /**/
 /*
 	vector<vector<double> > trainingData;
@@ -148,36 +159,20 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 
-	vector<vector<double> > testData;
-	vector<vector<double> > testLabels;
-	ml.importVecData("/home/jason/Desktop/workspace/Samples/test_set.csv",testData,testLabels);
-	sampleSize = testData.size();
+	vector<vector<double> > data;
+	vector<vector<double> > labels;
+	ml.importVecData("/home/jason/Desktop/workspace/Samples/test_set.csv",data,labels);
+	sampleSize = data.size();
 	Mat test_set(sampleSize,inputSize,CV_32F);
 	Mat test_labels(sampleSize,outputSize,CV_32F);
 	Mat results(sampleSize,outputSize,CV_32F);
-	ml.vecToMat(testData,testLabels,test_set,test_labels);
+	ml.vecToMat(data,labels,test_set,test_labels);
 	ann.predict(test_set,results);
 	for(int i=0; i<results.rows; i++) {
 		printf("Sample: %d, ",i+1);
 		cout << results.row(i) << endl;
 	}
 	/**/
-/*
-	Shape shp;
-	vector<vector<Point> > training_points;
-	shp.importPoints("/home/jason/Desktop/workspace/testdata.csv",training_points);
-	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	String name;
-	for(int i=0; i<training_points.size(); i++) {
-		img2 = img2.zeros(200,200,CV_8U);
-		shp.pointsToImage(img2,training_points.at(i),1);
-		imfill(img2);
-		name = "img"+toString(i+1)+".png";
-		imwrite(name,img2);
-		//imshow("img",img2);
-		//waitKey(0);
-	}
-/**/
 /*
 	vector<Mat> samples;
 	ml.importSamples("/home/jason/Desktop/workspace/Samples/Test/",samples);
@@ -192,7 +187,7 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-
+/*
 	String file = "/home/jason/Desktop/workspace/Samples/training_set.csv";
 	String file2 = "/home/jason/Desktop/workspace/Samples/test_set.csv";
 	ShapeML sml;
@@ -203,11 +198,11 @@ int main(int argc,char** argv)
 	//cout << iter << endl;
 	sml.saveData();
 
-	vector<vector<double> > testData;
-	vector<vector<double> > testLabels;
-	sml.importData(file2,testData,testLabels);
-	vector<vector<double> > results(testData.size(),vector<double>(testLabels.at(0).size(),0));
-	sml.predict(testData,results);
+	vector<vector<double> > data;
+	vector<vector<double> > labels;
+	sml.importData(file2,data,labels);
+	vector<vector<double> > results(data.size(),vector<double>(labels.at(0).size(),0));
+	sml.predict(data,results);
 	for(unsigned int i=0; i<results.size(); i++) {
 		printf("Sample: %d, Out1: %f, Out2: %f\n",i, results.at(i).at(0), results.at(i).at(1));
 		//cout << i << endl;

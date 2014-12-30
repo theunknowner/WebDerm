@@ -45,11 +45,11 @@ double roundDecimal(double num, int places)
 }
 
 String decimal2hex(int num) {
-   stringstream ss;
-   ss << std::hex << num;
-   String str(ss.str());
-   if(str.length()==1) str = "0"+str;
-   return str;
+	stringstream ss;
+	ss << std::hex << num;
+	String str(ss.str());
+	if(str.length()==1) str = "0"+str;
+	return str;
 }
 
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
@@ -698,6 +698,18 @@ double Functions::getMin(deque<double> &vec, int &minIndex) {
 	return lowest;
 }
 
+int Functions::getMin(Mat &src) {
+	int lowest = -1;
+	lowest = src.at<uchar>(0,0);
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			if(lowest>src.at<uchar>(i,j))
+				lowest = src.at<uchar>(i,j);
+		}
+	}
+	return lowest;
+}
+
 //returns largest value && position to maxIndex
 double Functions::getMax(deque<double> &vec, int &maxIndex) {
 	double largest=-1;
@@ -715,6 +727,18 @@ double Functions::getMax(deque<double> &vec, int &maxIndex) {
 	catch(const std::out_of_range &oor) {
 		//printf("Functions::getMax(deque<double> vec, maxIndex) out of range!\n");
 		return -1;
+	}
+	return largest;
+}
+
+int Functions::getMax(Mat &src) {
+	int largest=-1;
+	largest = src.at<uchar>(0,0);
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			if(largest<src.at<uchar>(i,j))
+				largest = src.at<uchar>(i,j);
+		}
 	}
 	return largest;
 }

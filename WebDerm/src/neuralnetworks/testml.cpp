@@ -56,12 +56,13 @@ void TestML::importSamples(String folder, vector<Mat> &samples) {
 	deque<String> files;
 	String filename;
 	fd.getFilesFromDirectory(folder,files);
-	for(int i=1; i<=files.size(); i++) {
-		filename = folder+"sample"+toString(i)+".png";
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = getFileName(files.at(i),"(");
+		filename = folder+name+"("+toString(i+1)+")"+".jpg";
 		Mat img = imread(filename,0);
 		if(img.data) {
-			img = fn.cropImage(img);
-			resize(img,img,Size(20,20),INTER_AREA);
+			//img = fn.cropImage(img);
+			//resize(img,img,Size(20,20),INTER_AREA);
 			img = this->fixBinaryImage(img);
 			samples.push_back(img);
 		}
@@ -97,8 +98,10 @@ Mat TestML::fixBinaryImage(Mat input) {
 	Mat output = input.clone();
 	for(int i=0; i<output.rows; i++) {
 		for(int j=0; j<output.cols; j++) {
-			if(output.at<uchar>(i,j)!=0)
+			if(output.at<uchar>(i,j)>40)
 				output.at<uchar>(i,j) = 255;
+			else
+				output.at<uchar>(i,j) = 0;
 		}
 	}
 	return output;

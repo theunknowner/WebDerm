@@ -63,6 +63,8 @@ public:
 
 	double getMin(deque<double> &vec, int &minIndex);
 	double getMax(deque<double> &vec, int &maxIndex);
+	int getMin(Mat &src);
+	int getMax(Mat &src);
 
 	void removeOutliersFromVec(deque<int> &vec, double thresh);
 	void removeOutliersFromVec(deque<double> &vec, double thresh);
