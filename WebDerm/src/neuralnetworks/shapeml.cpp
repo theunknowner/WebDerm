@@ -22,8 +22,8 @@ double ShapeML::fx(double input, double a, double b) {
 
 //derivative of fx()
 double ShapeML::fx0(double input, double a, double b) {
-	double result = (-4.0*a*b*exp(-2*b*input))/pow(1.0+exp(-2*b*input),2);
-	//double result = a * -(1 - pow(tanh(b*input),2));
+	//double result = (-4.0*a*b*exp(-2*b*input))/pow(1.0+exp(-2*b*input),2);
+	double result = 1.14393 * (1 - pow(tanh(b*input),2));
 	//double result = (2*a*b*exp(-b*input))/pow(1+exp(-b*input),2);
 	return result;
 }
@@ -95,7 +95,7 @@ void ShapeML::init_weights() {
 
 	for(int j=0; j<this->hiddenNeurons; j++) {
 		for(int i=0; i<this->inputNeurons; i++) {
-			randWt = rng.uniform(0.0,1.0);
+			randWt = rng.uniform(-1.0,1.0);
 			this->ihLayerNeuronWeight.at(i).at(j) = randWt;
 		}
 		randWt = rng.uniform(2.5,5.0);
@@ -104,7 +104,7 @@ void ShapeML::init_weights() {
 
 	for(int k=0; k<this->outputNeurons; k++) {
 		for(int j=0; j<this->hiddenNeurons; j++) {
-			randWt = rng.uniform(0.0,1.0);
+			randWt = rng.uniform(-1.0,1.0);
 			this->hoLayerNeuronWeight.at(j).at(k) = randWt;
 		}
 		randWt = rng.uniform(2.5, 5.0);
@@ -185,7 +185,7 @@ void ShapeML::importData(String file, vector<vector<double> > &data, vector<vect
 }
 
 double sigmoidFn(double input) {
-	double B = 0.015;
+	double B = 1.0;
 	double result = 1.0/(1.0+exp(-B * input));
 	return result;
 }
@@ -202,7 +202,7 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 	this->max_iterations = iterations;
 	int iter = 0;
 	double eps = 1.0;
-	double a=1.0, b=0.01;
+	double a=1.7159, b=2./3.;
 	//FILE * fp, *fp2;
 	//String filename,filename2;
 	int flag=0, iNode=-1, jNode=-1;
@@ -247,6 +247,7 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 					}*/
 				}
 				this->oLayerNeuronTotal.at(k) += this->oLayerNeuronBiasWeights.at(k);
+				//this->oLayerPerceptrons.at(k) = this->fx(this->oLayerNeuronTotal.at(k),a,b);
 				this->oLayerPerceptrons.at(k) = this->fx(this->oLayerNeuronTotal.at(k),a,b);
 				//if(dataNum==0) {
 				//	printf("Iter: %d, Sample: %d, oNode: %d, Input: %f, oOutput: %f\n",iter,dataNum,k,this->oLayerNeuronTotal.at(k),this->oLayerPerceptrons.at(k));
@@ -256,10 +257,12 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 			//calculate error of output layer
 			for(int k=0; k<this->outputNeurons; k++) {
 				//eps = this->totalError(this->oLayerPerceptrons,labels.at(dataNum));
-				eps = this->oLayerPerceptrons.at(k) - labels.at(dataNum).at(k);
+				//eps = this->oLayerPerceptrons.at(k) - labels.at(dataNum).at(k);
+				eps = this->oLayerPerceptrons.at(k)*(1-this->oLayerPerceptrons.at(k))*(labels.at(dataNum).at(k)-this->oLayerPerceptrons.at(k));
 				//double deriv = (1. - this->oLayerPerceptrons.at(k)) + (1.+this->oLayerPerceptrons.at(k));
 				//this->oNeuronGrad.at(k) = deriv * (labels.at(dataNum).at(k)-this->oLayerPerceptrons.at(k));
-				this->oNeuronGrad.at(k) = eps * this->fx0(this->oLayerNeuronTotal.at(k),a,b);
+				//this->oNeuronGrad.at(k) = eps * this->fx0(this->oLayerNeuronTotal.at(k),a,b);
+				this->oNeuronGrad.at(k) = eps;
 				//if(dataNum==0) {
 				//	printf("Deriv = (1-%f)+(1+%f)\n",this->oLayerPerceptrons.at(k),this->oLayerPerceptrons.at(k));
 				//	printf("Error = (%f-%f)\n",labels.at(dataNum).at(k),this->oLayerPerceptrons.at(k));
@@ -288,7 +291,8 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 				}
 				gSum[j] = sum;
 				hfx0[j] = this->fx0(this->hLayerNeuronTotal.at(j),a,b);
-				this->hNeuronGrad.at(j) = sum * this->fx0(this->hLayerNeuronTotal.at(j),a,b);
+				//this->hNeuronGrad.at(j) = sum * this->fx0(this->hLayerNeuronTotal.at(j),a,b);
+				this->hNeuronGrad.at(j) = this->
 				//this->hNeuronGrad.at(j) = deriv * sum;
 				//if(dataNum==0) {
 				//	printf("Iter: %d, Sample: %d, oNode: %d, Deriv: %f, hGrad: %f\n",iter,dataNum,j,deriv,this->hNeuronGrad.at(j));
