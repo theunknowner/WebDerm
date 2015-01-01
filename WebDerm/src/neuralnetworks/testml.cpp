@@ -58,11 +58,14 @@ void TestML::importSamples(String folder, vector<Mat> &samples) {
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = getFileName(files.at(i),"(");
-		filename = folder+name+"("+toString(i+1)+")"+".jpg";
+		filename = folder+name+"("+toString(i+1)+")"+".png";
 		Mat img = imread(filename,0);
 		if(img.data) {
-			//img = fn.cropImage(img);
-			//resize(img,img,Size(20,20),INTER_AREA);
+			img = fn.cropImage(img);
+			resize(img,img,Size(20,20),INTER_AREA);
+			img = this->fixBinaryImage(img);
+			img = fn.cropImage(img);
+			resize(img,img,Size(20,20),INTER_AREA);
 			img = this->fixBinaryImage(img);
 			samples.push_back(img);
 		}

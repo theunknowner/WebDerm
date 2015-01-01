@@ -16,13 +16,14 @@ private:
 
 public:
 	Mat findShapes(Mat src);
-	void dilation(Mat src, Mat &dst, Size size,Point anchor=Point(-1,-1));
-	void erosion(Mat src, Mat &dst, Size size, Point anchor=Point(-1,-1));
+	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
+	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));
 	void erosion2(Mat src, Mat &dst, Size size,Point anchor=Point(-1,-1));
 	Mat uniqueLumPercentile(Mat src, double percentile);
 	Mat extractShape(Mat src, Size size, Point anchor=Point(-1,-1));
-	void hysteresisDilation(Mat src, Mat &dst, Size size, Point anchor=Point(-1,-1));
-	void hysteresisErosion(Mat src, Mat &dst, Size size, Point anchor=Point(-1,-1));
+	Mat hysteresisDilation(Mat src, Size size, Point anchor=Point(-1,-1));
+	Mat hysteresisErosion(Mat src, Size size, Point anchor=Point(-1,-1));
+	Mat contrast(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */

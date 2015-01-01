@@ -39,9 +39,13 @@ double sigmFn(double input) {
 	return result;
 }
 
-//input = outputLayerFunction results, realOutput = label
-double ShapeML::computeError(double actualOutput, double targetOutput) {
-	double results = (actualOutput-targetOutput);
+//mean square error
+double ShapeML::mse(vector<double> actualOutput, vector<double> targetOutput) {
+	double results=0;
+	for(unsigned int i=0; i<targetOutput.size(); i++) {
+		results += pow(targetOutput.at(i)-actualOutput.at(i),2);
+	}
+	results /= targetOutput.size();
 	return results;
 }
 
@@ -61,7 +65,7 @@ void ShapeML::init(int inputSize, int outputSize) {
 
 	this->iLayerNeuron.resize(this->inputNeurons,0);
 	this->hLayerNeurons.resize(this->hiddenNeurons,0);
-	this->oLayerPerceptrons.resize(this->outputNeurons,0);
+	this->oLayerNeurons.resize(this->outputNeurons,0);
 
 	this->iLayerNeuronWeight.resize(this->inputNeurons,0);
 	this->ihLayerNeuronWeight.resize(this->inputNeurons,vector<double>(this->hiddenNeurons,0));
@@ -76,16 +80,14 @@ void ShapeML::init(int inputSize, int outputSize) {
 
 	this->hLayerNeuronTotal.resize(this->hiddenNeurons,0);
 	this->oLayerNeuronTotal.resize(this->outputNeurons,0);
-
-	this->ihPrevWeightDelta.resize(this->inputNeurons,vector<double>(this->hiddenNeurons,0));
-	this->hPrevBiasDelta.resize(this->hiddenNeurons,0);
-	this->hoPrevWeightDelta.resize(this->hiddenNeurons,vector<double>(this->outputNeurons,0));
-	this->oPrevBiasDelta.resize(this->outputNeurons,0);
 }
 
 void ShapeML::init_weights() {
 	RNG rng(time(0));
 	double randWt=0;
+	double B = 0.7 * pow(this->hiddenNeurons,(1./this->inputNeurons));
+	double norm=0, norm2=0, sum=0, sum2=0;
+
 	for(int i=0; i<this->inputNeurons; i++) {
 		//randWt = rng.uniform(0.0,1.0);
 		this->iLayerNeuronWeight.at(i) = 1.0;
@@ -97,18 +99,39 @@ void ShapeML::init_weights() {
 		for(int i=0; i<this->inputNeurons; i++) {
 			randWt = rng.uniform(-1.0,1.0);
 			this->ihLayerNeuronWeight.at(i).at(j) = randWt;
+			sum += pow(this->ihLayerNeuronWeight.at(i).at(j),2);
 		}
 		randWt = rng.uniform(2.5,5.0);
 		this->hNeuronBiasWeight.at(j) = randWt;
+		sum2 += pow(this->hNeuronBiasWeight.at(j),2);
+	}
+	norm=sqrt(sum);
+	norm2=sqrt(sum2);
+	for(int j=1; j<this->hiddenNeurons; j++) {
+		for(int i=0; i<this->inputNeurons; i++) {
+			this->ihLayerNeuronWeight.at(i).at(j) = (B*this->ihLayerNeuronWeight.at(i).at(j))/norm;
+		}
+		this->hNeuronBiasWeight.at(j) = (B*this->hNeuronBiasWeight.at(j))/norm2;
 	}
 
+	sum=0; sum2=0;
 	for(int k=0; k<this->outputNeurons; k++) {
 		for(int j=0; j<this->hiddenNeurons; j++) {
 			randWt = rng.uniform(-1.0,1.0);
 			this->hoLayerNeuronWeight.at(j).at(k) = randWt;
+			sum += pow(this->hoLayerNeuronWeight.at(j).at(k),2);
 		}
 		randWt = rng.uniform(2.5, 5.0);
 		this->oLayerNeuronBiasWeights.at(k) = randWt;
+		sum2 += pow(this->oLayerNeuronBiasWeights.at(k),2);
+	}
+	norm = sqrt(sum);
+	norm2 = sqrt(sum2);
+	for(int k=0; k<this->outputNeurons; k++) {
+		for(int j=0; j<this->hiddenNeurons; j++) {
+			this->hoLayerNeuronWeight.at(j).at(k) = (B*this->hoLayerNeuronWeight.at(j).at(k))/norm;
+		}
+		this->oLayerNeuronBiasWeights.at(k) = (B*this->oLayerNeuronBiasWeights.at(k))/norm2;
 	}
 }
 
@@ -117,8 +140,8 @@ void ShapeML::resetPerceptrons() {
 	this->iLayerNeuron.resize(this->inputNeurons,0);
 	this->hLayerNeurons.clear();
 	this->hLayerNeurons.resize(this->hiddenNeurons,0);
-	this->oLayerPerceptrons.clear();
-	this->oLayerPerceptrons.resize(this->outputNeurons,0);
+	this->oLayerNeurons.clear();
+	this->oLayerNeurons.resize(this->outputNeurons,0);
 	this->hNeuronGrad.clear();
 	this->hNeuronGrad.resize(this->hiddenNeurons,0);
 	this->oNeuronGrad.clear();
@@ -132,8 +155,8 @@ void ShapeML::resetPerceptrons() {
 void ShapeML::releaseMemory() {
 	this->hLayerNeurons.clear();
 	this->hLayerNeurons.shrink_to_fit();
-	this->oLayerPerceptrons.clear();
-	this->oLayerPerceptrons.shrink_to_fit();
+	this->oLayerNeurons.clear();
+	this->oLayerNeurons.shrink_to_fit();
 	this->ihLayerNeuronWeight.clear();
 	this->ihLayerNeuronWeight.shrink_to_fit();
 	this->hNeuronBiasWeight.clear();
@@ -196,18 +219,30 @@ double symSigFn(double input) {
 	return result;
 }
 
+void prepareData(vector<vector<double> > &data) {
+	double min= -1.0, max = 1.0;
+	double range = max-min;
+	for(unsigned int i=0; i<data.size(); i++) {
+		for(unsigned int j=0; j<data.at(i).size(); j++) {
+			data.at(i).at(j) = data.at(i).at(j)*range + min;
+		}
+	}
+}
+
 int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels, int iterations) {
 	this->init(data.at(0).size(), labels.at(0).size());
 	this->init_weights();
 	this->max_iterations = iterations;
 	int iter = 0;
 	double eps = 1.0;
+	double E=0;
 	double a=1.7159, b=2./3.;
 	//FILE * fp, *fp2;
 	//String filename,filename2;
 	int flag=0, iNode=-1, jNode=-1;
 	double hTotalUnbias[20] = {0};
 	double sampleTotal[20] = {0};
+	prepareData(data);
 	while(iter<this->max_iterations) {
 		for(unsigned int dataNum=0; dataNum<data.size(); dataNum++) {
 			//filename = "/home/jason/Desktop/workspace/ih-weight-debug"+toString(iter+1)+"-"+toString(dataNum+1)+".csv";
@@ -241,42 +276,40 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 				for(int j=0; j<this->hiddenNeurons; j++) {
 					double input = this->hLayerNeurons.at(j);
 					this->oLayerNeuronTotal.at(k) += (input * this->hoLayerNeuronWeight.at(j).at(k));
-					/*
-					if(iter==4 && dataNum==0 && k==0) {
-						cout << this->hLayerNeurons.at(j) << endl;
-					}*/
 				}
 				this->oLayerNeuronTotal.at(k) += this->oLayerNeuronBiasWeights.at(k);
-				//this->oLayerPerceptrons.at(k) = this->fx(this->oLayerNeuronTotal.at(k),a,b);
-				this->oLayerPerceptrons.at(k) = this->fx(this->oLayerNeuronTotal.at(k),a,b);
+				//this->oLayerNeurons.at(k) = this->fx(this->oLayerNeuronTotal.at(k),a,b);
+				this->oLayerNeurons.at(k) = this->fx(this->oLayerNeuronTotal.at(k),a,b);
 				//if(dataNum==0) {
-				//	printf("Iter: %d, Sample: %d, oNode: %d, Input: %f, oOutput: %f\n",iter,dataNum,k,this->oLayerNeuronTotal.at(k),this->oLayerPerceptrons.at(k));
+				//	printf("Iter: %d, Sample: %d, oNode: %d, Input: %f, oOutput: %f\n",iter,dataNum,k,this->oLayerNeuronTotal.at(k),this->oLayerNeurons.at(k));
 				//}
 			}
 
 			//calculate error of output layer
 			for(int k=0; k<this->outputNeurons; k++) {
-				//eps = this->totalError(this->oLayerPerceptrons,labels.at(dataNum));
-				//eps = this->oLayerPerceptrons.at(k) - labels.at(dataNum).at(k);
-				eps = this->oLayerPerceptrons.at(k)*(1-this->oLayerPerceptrons.at(k))*(labels.at(dataNum).at(k)-this->oLayerPerceptrons.at(k));
-				//double deriv = (1. - this->oLayerPerceptrons.at(k)) + (1.+this->oLayerPerceptrons.at(k));
-				//this->oNeuronGrad.at(k) = deriv * (labels.at(dataNum).at(k)-this->oLayerPerceptrons.at(k));
+				//eps = this->oLayerNeurons.at(k) - labels.at(dataNum).at(k);
+				eps = this->fx0(this->oLayerNeurons.at(k),a,b)*(labels.at(dataNum).at(k)-this->oLayerNeurons.at(k));
+				//this->oNeuronGrad.at(k) = deriv * (labels.at(dataNum).at(k)-this->oLayerNeurons.at(k));
 				//this->oNeuronGrad.at(k) = eps * this->fx0(this->oLayerNeuronTotal.at(k),a,b);
 				this->oNeuronGrad.at(k) = eps;
 				//if(dataNum==0) {
-				//	printf("Deriv = (1-%f)+(1+%f)\n",this->oLayerPerceptrons.at(k),this->oLayerPerceptrons.at(k));
-				//	printf("Error = (%f-%f)\n",labels.at(dataNum).at(k),this->oLayerPerceptrons.at(k));
+				//	printf("Deriv = (1-%f)+(1+%f)\n",this->oLayerNeurons.at(k),this->oLayerNeurons.at(k));
+				//	printf("Error = (%f-%f)\n",labels.at(dataNum).at(k),this->oLayerNeurons.at(k));
 				//	printf("Iter: %d, Sample: %d, oNode: %d, Deriv: %f, oOutput: %f\n",iter,dataNum,k,deriv,this->oNeuronGrad.at(k));
 				//}
 			}
+
+			//calculate Mean Square Error
+			E = this->mse(this->oLayerNeurons,labels.at(dataNum));
+
 			//printf info
-			double o1 = this->oLayerPerceptrons.at(0);
-			double o2 = this->oLayerPerceptrons.at(1);
+			double o1 = this->oLayerNeurons.at(0);
+			double o2 = this->oLayerNeurons.at(1);
 			double lbl1 = labels.at(dataNum).at(0);
 			double lbl2 = labels.at(dataNum).at(1);
 			double val1 = o1-lbl1;
 			double val2 = o2-lbl2;
-			printf("Iter: %d, Sample: %d | E1: (%f- %f)= %f | E2: (%f- %f)= %f\n",iter+1,dataNum+1,o1,lbl1,val1,o2,lbl2,val2);
+			//printf("Iter: %d, Sample: %d | E1: (%f- %f)= %f | E2: (%f- %f)= %f\n",iter+1,dataNum+1,o1,lbl1,val1,o2,lbl2,val2);
 			//printf("Iter: %d, Sample: %d | E1: (%f- %f)= %f, Input: %f\n",iter+1,dataNum+1,o1,lbl1,val1,this->oLayerNeuronTotal.at(0));
 			//printf("Iter: %d, Sample: %d, Eps: %f\n",iter, dataNum, eps);
 
@@ -292,17 +325,36 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 				gSum[j] = sum;
 				hfx0[j] = this->fx0(this->hLayerNeuronTotal.at(j),a,b);
 				//this->hNeuronGrad.at(j) = sum * this->fx0(this->hLayerNeuronTotal.at(j),a,b);
-				this->hNeuronGrad.at(j) = this->
+				this->hNeuronGrad.at(j) = this->fx0(this->hLayerNeurons.at(j),a,b)*sum;
 				//this->hNeuronGrad.at(j) = deriv * sum;
 				//if(dataNum==0) {
 				//	printf("Iter: %d, Sample: %d, oNode: %d, Deriv: %f, hGrad: %f\n",iter,dataNum,j,deriv,this->hNeuronGrad.at(j));
 				//}
 			}
 
+			//back propagation for weights between hidden and output layer
+			double prevWeightDelta=0, prevBiasDelta=0;
+			for(int k=0; k<this->outputNeurons; k++) {
+				for(int j=0; j<this->hiddenNeurons; j++) {
+					double delta = (alpha * prevWeightDelta) +(this->eta * this->oNeuronGrad.at(k) * this->hLayerNeurons.at(j));
+					//double val = (this->eta * this->oNeuronGrad.at(k) * this->hLayerNeurons.at(j));
+					//fprintf(fp2,"%f,",this->hoLayerNeuronWeight.at(j).at(k));
+					this->hoLayerNeuronWeight.at(j).at(k) += delta;
+					prevWeightDelta = delta;
+					//if(k==1)
+					//printf("Iter: %d, Sample: %d, hNode: %d, Delta: %f, Val: %f, oGrad: %f, hOutput: %f, E1: (%f- %f)= %f\n",iter+1,dataNum+1,j+1,delta,val,this->oNeuronGrad.at(k),this->hLayerNeurons.at(j),o2,lbl2,val2);
+				}
+				//fprintf(fp2,"\n");
+				double delta = (alpha * prevBiasDelta)+(this->eta * this->oNeuronGrad.at(k));
+				this->oLayerNeuronBiasWeights.at(k) += delta;
+				prevBiasDelta = delta;
+			}
+
 			//back propagation to update weights between input and hidden layer
+			prevWeightDelta=0; prevBiasDelta=0;
 			for(int j=0; j<this->hiddenNeurons; j++) {
 				for(int i=0; i<this->inputNeurons; i++) {
-					double delta = (alpha * this->ihPrevWeightDelta.at(i).at(j))+(this->eta * this->hNeuronGrad.at(j) * data.at(dataNum).at(i));
+					double delta = (alpha * prevWeightDelta)+(this->eta * this->hNeuronGrad.at(j) * data.at(dataNum).at(i));
 					//fprintf(fp,"%f,",this->ihLayerNeuronWeight.at(i).at(j));
 					this->ihLayerNeuronWeight.at(i).at(j) += delta;
 					/*if(this->ihLayerNeuronWeight.at(i).at(j)<0 && flag==0 && iNode==-1) {
@@ -330,34 +382,20 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 						printf("------------------------------------------------------------------------------------------------------\n");
 						flag++;
 					}*/
-					this->ihPrevWeightDelta.at(i).at(j) = delta;
+					prevWeightDelta = delta;
 				}
 				//fprintf(fp,"\n");
 				//printf("Iter: %d, Sample: %d, hNode: %d, hGrad: %f, hOutput: %f\n",iter+1,dataNum+1,j+1,this->hNeuronGrad.at(j),this->hLayerNeurons.at(j));
-				double delta = (alpha * this->hPrevBiasDelta.at(j)) + (this->eta * this->hNeuronGrad.at(j));
+				double delta = (alpha * prevBiasDelta) + (this->eta * this->hNeuronGrad.at(j));
 				this->hNeuronBiasWeight.at(j) += delta;
-				this->hPrevBiasDelta.at(j) = delta;
-			}
-			//back propagation for weights between hidden and output layer
-			for(int k=0; k<this->outputNeurons; k++) {
-				for(int j=0; j<this->hiddenNeurons; j++) {
-					double delta = (alpha * this->hoPrevWeightDelta.at(j).at(k))+(this->eta * this->oNeuronGrad.at(k) * this->hLayerNeurons.at(j));
-					double val = (this->eta * this->oNeuronGrad.at(k) * this->hLayerNeurons.at(j));
-					//fprintf(fp2,"%f,",this->hoLayerNeuronWeight.at(j).at(k));
-					this->hoLayerNeuronWeight.at(j).at(k) += delta;
-					this->hoPrevWeightDelta.at(j).at(k) = delta;
-					//if(k==1)
-					//printf("Iter: %d, Sample: %d, hNode: %d, Delta: %f, Val: %f, oGrad: %f, hOutput: %f, E1: (%f- %f)= %f\n",iter+1,dataNum+1,j+1,delta,val,this->oNeuronGrad.at(k),this->hLayerNeurons.at(j),o2,lbl2,val2);
-				}
-				//fprintf(fp2,"\n");
-				double delta = (alpha * this->oPrevBiasDelta.at(k))+(this->eta * this->oNeuronGrad.at(k));
-				this->oLayerNeuronBiasWeights.at(k) += delta;
-				this->oPrevBiasDelta.at(k) = delta;
+				prevBiasDelta = delta;
 			}
 			this->resetPerceptrons();
 			//fclose(fp);
 			//fclose(fp2);
 		}
+		printf("Iter: %d, Error: %g\n",iter,E);
+		//if(E<0.001) break;
 		iter++;
 	}
 	return iter;
@@ -365,6 +403,8 @@ int ShapeML::train(vector<vector<double> > data, vector<vector<double> > labels,
 
 void ShapeML::predict(vector<vector<double> > &data, vector<vector<double> > &results) {
 	this->resetPerceptrons();
+	double a=1.7159, b=2./3.;
+	prepareData(data);
 	for(unsigned int dataNum=0; dataNum<data.size(); dataNum++) {
 		//calculate input layer
 		for(int i=0; i<this->inputNeurons; i++) {
@@ -378,7 +418,7 @@ void ShapeML::predict(vector<vector<double> > &data, vector<vector<double> > &re
 				this->hLayerNeuronTotal.at(j) += input;
 			}
 			this->hLayerNeuronTotal.at(j) += this->hNeuronBiasWeight.at(j);
-			this->hLayerNeurons.at(j) = sigmFn(this->hLayerNeuronTotal.at(j));
+			this->hLayerNeurons.at(j) = this->fx(this->hLayerNeuronTotal.at(j),a,b);
 		}
 		//calculate hidden to output layer total
 		for(int k=0; k<this->outputNeurons; k++) {
@@ -387,9 +427,9 @@ void ShapeML::predict(vector<vector<double> > &data, vector<vector<double> > &re
 				this->oLayerNeuronTotal.at(k) += (input * this->hoLayerNeuronWeight.at(j).at(k));
 			}
 			this->oLayerNeuronTotal.at(k) += this->oLayerNeuronBiasWeights.at(k);
-			this->oLayerPerceptrons.at(k) = tanh(this->oLayerNeuronTotal.at(k));
+			this->oLayerNeurons.at(k) = this->fx(this->oLayerNeuronTotal.at(k),a,b);
 		}
-		results.at(dataNum) = this->oLayerPerceptrons;
+		results.at(dataNum) = this->oLayerNeurons;
 		this->resetPerceptrons();
 	}
 }
@@ -438,7 +478,7 @@ void ShapeML::cvtImageToCSV(Mat &img, String file) {
 
 void ShapeML::printVectorInfo() {
 	printf("hiddenLayerPerceptrons: %lu\n",this->hLayerNeurons.size());
-	printf("outputLayerPerceptrons: %lu\n",this->oLayerPerceptrons.size());
+	printf("outputLayerPerceptrons: %lu\n",this->oLayerNeurons.size());
 	printf("inputHiddenLayerWeights: %lu,%lu\n",this->ihLayerNeuronWeight.size(),this->ihLayerNeuronWeight.at(0).size());
 	printf("hiddenLayerBiasWeights: %lu\n",this->hNeuronBiasWeight.size());
 	printf("hiddenOutputLayerWeights: %lu,%lu\n",this->hoLayerNeuronWeight.size(),this->hoLayerNeuronWeight.at(0).size());

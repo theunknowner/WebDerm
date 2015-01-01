@@ -55,15 +55,16 @@ int main(int argc,char** argv)
 	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	TestML ml;
+/*
 	ShapeMorph sm;
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_RGB2GRAY);
 	img2 = sm.findShapes(img);
 	imshow("img",img2);
 	waitKey(0);
+	/**/
 	/*
 	//merge training data
 	vector<Mat> circleSamples;
@@ -108,22 +109,20 @@ int main(int argc,char** argv)
 	ml.writeData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabel);
 	// end merge training data
 /**/
-	/*
+/*
+	TestML ml;
 	vector<Mat> samples;
-	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
+	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
 	ml.importSamples(samplesPath,samples);
 	Mat data(samples.size(),400,CV_32F);
 	Mat labels(samples.size(),2,CV_32F);
 	int x=0;
-	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	for(unsigned int i=0; i<samples.size(); i++) {
 		Mat samp = samples.at(i);
-		//imshow("img",samp);
-		//waitKey(0);
+		imshow("img",samp);
+		waitKey(0);
 		String name;
-		//name = "circle(" + toString(n) + ").png";
-		//imwrite(name,samp);
-		//n++;
 		for(int j=0; j<samp.rows; j++) {
 			for(int k=0; k<samp.cols; k++) {
 				data.at<float>(i,x) = samp.at<uchar>(j,k);
@@ -131,15 +130,15 @@ int main(int argc,char** argv)
 			}
 		}
 		x=0;
-		labels.at<float>(i,0) = 1.0;
-		labels.at<float>(i,1) = -1.0;
+		labels.at<float>(i,0) = -1.0;
+		labels.at<float>(i,1) = 1.0;
 	}
 	ml.writeData("/home/jason/Desktop/workspace/Samples/change_set.csv",data,labels);
 /**/
-	/*
+	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
-	ml.importVecData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabels);
+	ml.importVecData("/home/jason/Desktop/workspace/Samples2/training_set.csv",trainingData,trainingLabels);
 	int sampleSize = trainingData.size();
 	int inputSize = trainingData.at(0).size();
 	int outputSize = trainingLabels.at(0).size();
@@ -188,7 +187,7 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-	/*
+/*
 	String file = "/home/jason/Desktop/workspace/Samples/training_set.csv";
 	String file2 = "/home/jason/Desktop/workspace/Samples/test_set.csv";
 	ShapeML sml;
@@ -198,7 +197,7 @@ int main(int argc,char** argv)
 	int iter = sml.train(training_data,training_labels,300);
 	//cout << iter << endl;
 	sml.saveData();
-
+/*
 	vector<vector<double> > data;
 	vector<vector<double> > labels;
 	sml.importData(file2,data,labels);
