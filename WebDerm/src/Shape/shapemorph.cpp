@@ -37,8 +37,27 @@ Mat ShapeMorph::findShapes(Mat src) {
 	dImg =this->dilation(_src,size,Point(0,size.height-1));
 	//this->erosion2(dImg,eImg,size,Point(size.width-1,0));
 	gradImg = dImg - eImg;
+	deque<int> dataVec;
+	deque<int> output;
+	deque<int> lumFlag(256,0);
+	for(int i=0; i<gradImg.rows; i++) {
+		for(int j=0; j<gradImg.cols; j++) {
+			int lum = gradImg.at<uchar>(i,j);
+			if(lum>0) {
+				dataVec.push_back(lum);
+				lumFlag.at(lum)++;
+			}
+		}
+	}
+	deque<int> lumVec;
+	for(int i=0; i<lumFlag.size(); i++) {
+		if(lumFlag.at(i)>0) {
+			lumVec.push_back(i);
+		}
+	}
+	this->kmeansCluster(dataVec,lumVec,output);
 	//dst = this->uniqueLumPercentile(gradImg,0.35);
-	dst = this->contrast(gradImg);
+	//dst = this->contrast(gradImg);
 	//Mat element = getStructuringElement(MORPH_RECT,size,anchor);
 	//morphologyEx(_src,closeImg,MORPH_CLOSE,element,anchor);
 	//dImg = this->hysteresisDilation(_src,size,anchor);
@@ -46,13 +65,13 @@ Mat ShapeMorph::findShapes(Mat src) {
 	//dst = dImg - eImg;
 	//Mat element = getStructuringElement(MORPH_RECT,size,anchor);
 	//morphologyEx(dst,dst,MORPH_CLOSE,element,anchor);
-	namedWindow("gradImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//namedWindow("gradImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("closeImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("hystImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	imshow("gradImg",gradImg);
+	//imshow("gradImg",gradImg);
 	//imshow("closeImg",dst);
 	//imshow("hystImg",eImg);
-	imwrite("shapemorph.png",dst);
+	//imwrite("shapemorph.png",dst);
 	return dst;
 }
 
@@ -376,4 +395,51 @@ Mat ShapeMorph::contrast(Mat src) {
 		}//end for j
 	}//end for i
 	return result;
+}
+
+void ShapeMorph::kmeansCluster(deque<int> input, deque<int> flags, deque<int> &output) {
+	Mat samples(input.size(), 1, CV_32F);
+	for(unsigned int i=0; i<input.size(); i++) {
+		samples.at<float>(i,0) = input.at(i);
+	}
+	int clusterCount = round(sqrt(flags.size()/2));
+	Mat labels;
+	int attempts = 5;
+	Mat centers;
+	cout << "clusters: " << clusterCount << endl;
+	cout << "input size: " << input.size() << endl;
+	cout << "flag size: " << flags.size() << endl;
+	int compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
+	cout << "compactness: " << compact << endl;
+	cout << "label size:" << labels.rows << endl;
+	cout << "centers size:" << centers.rows << endl;
+	deque<int> centerCount(clusterCount,0);
+	deque<deque<int> > ranges(clusterCount,deque<int>(2,0));
+	for(unsigned int i=0; i<ranges.size(); i++) {
+		for(unsigned int j=0; j<ranges.at(i).size(); j++) {
+			if(j==0) {
+				ranges.at(i).at(j) = 256;
+			}
+			else if(j==1) {
+				ranges.at(i).at(j) = 0;
+			}
+		}
+	}
+	for(int i=0; i<labels.rows; i++) {
+		//output.push_back(labels.at<int>(i,0));
+		int idx = labels.at<int>(i,0);
+		centerCount.at(idx)++;
+		if(input.at(i)>ranges.at(idx).at(1)) {
+			ranges.at(idx).at(1) = input.at(i);
+		}
+		else if(input.at(i)<ranges.at(idx).at(0)) {
+			ranges.at(idx).at(0) = input.at(i);
+		}
+		//cout << labels.at<int>(i,0) << endl;
+	}
+	for(int i=0; i<centers.rows; i++) {
+		//output.push_back(labels.at<int>(i,0));
+		//cout << centers.at<float>(i,0) << endl;
+		printf("%f - %d - Min: %d, Max: %d\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
+	}
 }

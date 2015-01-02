@@ -24,6 +24,7 @@ public:
 	Mat hysteresisDilation(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat hysteresisErosion(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat contrast(Mat src);
+	void kmeansCluster(deque<int> input, deque<int> flags, deque<int> &output);
 };
 
 #endif /* SHAPEMORPH_H_ */

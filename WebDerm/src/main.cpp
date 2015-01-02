@@ -57,13 +57,13 @@ int main(int argc,char** argv)
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-/*
+
 	ShapeMorph sm;
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_RGB2GRAY);
 	img2 = sm.findShapes(img);
-	imshow("img",img2);
-	waitKey(0);
+	//imshow("img",img2);
+	//waitKey(0);
 	/**/
 	/*
 	//merge training data
@@ -135,6 +135,7 @@ int main(int argc,char** argv)
 	}
 	ml.writeData("/home/jason/Desktop/workspace/Samples/change_set.csv",data,labels);
 /**/
+	/*
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
