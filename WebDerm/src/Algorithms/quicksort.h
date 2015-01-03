@@ -14,5 +14,6 @@
 
 void quicksort(deque<double> &values, int p, int r);
 void quicksort(deque<int> &values, int p,int r);
+void quicksort(Mat &values, int p, int r);
 
 #endif /* QUICKSORT_H_ */

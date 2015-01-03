@@ -7,7 +7,7 @@
 
 #include "shapemorph.h"
 
-Mat prepareImage(Mat src) {
+Mat ShapeMorph::prepareImage(Mat src) {
 	Mat dst(src.rows,src.cols,src.type());
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
@@ -31,35 +31,16 @@ void increaseLC(Mat &src) {
 Mat ShapeMorph::findShapes(Mat src) {
 	Size size(3,3);
 	Mat openImg,closeImg,gradImg, dst, dImg, eImg;
-	Mat _src = prepareImage(src);
 	Point anchor(0,size.height-1);
-	eImg = this->erosion(_src,size,Point(0,size.height-1));
-	dImg =this->dilation(_src,size,Point(0,size.height-1));
+	eImg = this->erosion(src,size);
+	dImg =this->dilation(src,size);
 	//this->erosion2(dImg,eImg,size,Point(size.width-1,0));
 	gradImg = dImg - eImg;
-	deque<int> dataVec;
-	deque<int> output;
-	deque<int> lumFlag(256,0);
-	for(int i=0; i<gradImg.rows; i++) {
-		for(int j=0; j<gradImg.cols; j++) {
-			int lum = gradImg.at<uchar>(i,j);
-			if(lum>0) {
-				dataVec.push_back(lum);
-				lumFlag.at(lum)++;
-			}
-		}
-	}
-	deque<int> lumVec;
-	for(int i=0; i<lumFlag.size(); i++) {
-		if(lumFlag.at(i)>0) {
-			lumVec.push_back(i);
-		}
-	}
-	this->kmeansCluster(dataVec,lumVec,output);
+	dst = this->kmeansCluster(gradImg);
 	//dst = this->uniqueLumPercentile(gradImg,0.35);
-	//dst = this->contrast(gradImg);
-	//Mat element = getStructuringElement(MORPH_RECT,size,anchor);
-	//morphologyEx(_src,closeImg,MORPH_CLOSE,element,anchor);
+	//dst = this->contrast1(gradImg);
+	//Mat element = getStructuringElement(MORPH_RECT,Size(7,7));
+	//morphologyEx(dst,dst,MORPH_CLOSE,element);
 	//dImg = this->hysteresisDilation(_src,size,anchor);
 	//eImg = this->hysteresisErosion(gradImg,size,anchor);
 	//dst = dImg - eImg;
@@ -164,7 +145,7 @@ Mat ShapeMorph::uniqueLumPercentile(Mat src, double percentile) {
 			lums.push_back(i);
 		}
 	}
-	//writeSeq2File(dataVec,"data2");
+	writeSeq2File(lumsFlag,"data2");
 	int n = percentile * lums.size();
 	int thresh = lums.at(n);
 	for(int i=0; i<src.rows; i++) {
@@ -303,8 +284,7 @@ Mat ShapeMorph::hysteresisErosion(Mat src, Size size, Point anchor) {
 	return results;
 }
 
-Mat ShapeMorph::contrast(Mat src) {
-	String oldPix, newPix,color,pix, shade, oldShade,newShade;
+Mat ShapeMorph::contrast1(Mat src) {
 	Mat result = Mat::zeros(src.rows, src.cols, CV_8U);
 	const double H = 0.72;
 	const double enterDemarcThresh = 5;
@@ -397,22 +377,133 @@ Mat ShapeMorph::contrast(Mat src) {
 	return result;
 }
 
-void ShapeMorph::kmeansCluster(deque<int> input, deque<int> flags, deque<int> &output) {
-	Mat samples(input.size(), 1, CV_32F);
-	for(unsigned int i=0; i<input.size(); i++) {
-		samples.at<float>(i,0) = input.at(i);
+Mat ShapeMorph::contrast2(Mat src) {
+	Mat result = Mat::zeros(src.rows, src.cols, CV_8U);
+	const double H = 0.28;
+	const double enterDemarcThresh = 5;
+	const double exitDemarcThresh = -2;
+	Point enterDemarcPos(-1,-1);
+	Point exitDemarcPos(-1,-1);
+	int demarcFlag=0;
+	int currentRelLum =0, nextRelLum=0;
+	double tempSlope=0, slope=0;
+	int step=0;
+	double minSlope=100;
+	Point minSlopePt, maxSlopePt;
+	Point pt;
+	Point myPt = Point(0,31); //for debugging use
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			pt = Point(j,i);
+			step = pt.x;
+			minSlope=100;
+			enterDemarcPos = Point(-1,-1);
+			exitDemarcPos = Point(-1,-1);
+			demarcFlag=0;
+			slope=0;
+			if(step<(src.cols-1)) {
+				while(step<(src.cols-1)) {
+					currentRelLum = src.at<uchar>(i,step);
+					nextRelLum = src.at<uchar>(i,step+1);
+					tempSlope = (nextRelLum - currentRelLum);
+					slope = (slope * H) + (tempSlope*(1.0-H));
+					if(slope<minSlope) {
+						minSlope = slope;
+						minSlopePt = Point(step,pt.y);
+					}
+					//printf() for debugging
+
+					debug=true;
+					if(j==myPt.x && i==myPt.y) {
+						printf("(%d,%d) - Curr:%d, Temp:%f, Slope:%f\n",step,pt.y,currentRelLum,tempSlope,slope);
+					}
+					/**/
+					///////////////////////
+					step++;
+					if(slope>=enterDemarcThresh && demarcFlag==0) {
+						enterDemarcPos = Point(step,pt.y);
+						demarcFlag=1; //entering Dark shade
+					}
+					if((slope<=exitDemarcThresh && tempSlope<0)) {
+						if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1)
+							enterDemarcPos = minSlopePt;
+						exitDemarcPos = Point(step,pt.y);
+						demarcFlag=1;
+						break;
+					}
+				}//end while loop
+				if(exitDemarcPos==Point(-1,-1) && demarcFlag==1)
+					exitDemarcPos = Point(step,pt.y);
+				//printf() for debugging
+
+				debug=true;
+				if(j==myPt.x && i==myPt.y) {
+					currentRelLum = src.at<uchar>(pt.y,step);
+					//printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
+					printf("(%d,%d) - Curr:%d,",step,pt.y,currentRelLum);
+					printf("Flag: %d\n",demarcFlag);
+					printf("%d,%d\n",pt.x,pt.y);
+					printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
+					printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
+				}
+				/**/
+				//////////////////////////
+				if(enterDemarcPos!=Point(-1,-1)) {
+					for(int k=j; k<exitDemarcPos.x; k++) {
+						if(k>=enterDemarcPos.x && pt.y>=enterDemarcPos.y) {
+							if(k<=exitDemarcPos.x && pt.y<=exitDemarcPos.y) {
+								result.at<uchar>(i,k) = 255;
+							}
+							else {
+								enterDemarcPos = Point(-1,-1);
+								exitDemarcPos = Point(-1,-1);
+								demarcFlag=0;
+								slope=0;
+							}
+						}
+					}
+				}
+				j=step-1; //step-1 because j++ in next iteration
+			}// end if color
+		}//end for j
+	}//end for i
+	return result;
+}
+
+Mat ShapeMorph::kmeansCluster(Mat src) {
+	deque<int> dataVec;
+	deque<int> lumFlag(256,0);
+	deque<int> lumVec;
+	deque<Point> ptVec;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			int lum = src.at<uchar>(i,j);
+			if(lum>0) {
+				dataVec.push_back(lum);
+				lumFlag.at(lum)++;
+				ptVec.push_back(Point(j,i));
+			}
+		}
 	}
-	int clusterCount = round(sqrt(flags.size()/2));
+	for(unsigned int i=0; i<lumFlag.size(); i++) {
+		if(lumFlag.at(i)>0) {
+			lumVec.push_back(i);
+		}
+	}
+
+	Mat samples(dataVec.size(), 1, CV_32F);
+	for(unsigned int i=0; i<dataVec.size(); i++) {
+		samples.at<float>(i,0) = dataVec.at(i);
+	}
+	int clusterCount = round(sqrt(lumVec.size()/2));
 	Mat labels;
 	int attempts = 5;
 	Mat centers;
 	cout << "clusters: " << clusterCount << endl;
-	cout << "input size: " << input.size() << endl;
-	cout << "flag size: " << flags.size() << endl;
+	cout << "input size: " << dataVec.size() << endl;
+	cout << "flag size: " << lumVec.size() << endl;
 	int compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
 	cout << "compactness: " << compact << endl;
-	cout << "label size:" << labels.rows << endl;
-	cout << "centers size:" << centers.rows << endl;
 	deque<int> centerCount(clusterCount,0);
 	deque<deque<int> > ranges(clusterCount,deque<int>(2,0));
 	for(unsigned int i=0; i<ranges.size(); i++) {
@@ -425,21 +516,74 @@ void ShapeMorph::kmeansCluster(deque<int> input, deque<int> flags, deque<int> &o
 			}
 		}
 	}
+	Mat origPos;
+	jaysort(centers,origPos);
 	for(int i=0; i<labels.rows; i++) {
 		//output.push_back(labels.at<int>(i,0));
 		int idx = labels.at<int>(i,0);
+		for(int j=0; j<origPos.rows; j++) {
+			if(idx==origPos.at<int>(j,0)) {
+				idx = j;
+				labels.at<int>(i,0) = idx;
+				break;
+			}
+		}
 		centerCount.at(idx)++;
-		if(input.at(i)>ranges.at(idx).at(1)) {
-			ranges.at(idx).at(1) = input.at(i);
+		if(dataVec.at(i)>ranges.at(idx).at(1)) {
+			ranges.at(idx).at(1) = dataVec.at(i);
 		}
-		else if(input.at(i)<ranges.at(idx).at(0)) {
-			ranges.at(idx).at(0) = input.at(i);
+		else if(dataVec.at(i)<ranges.at(idx).at(0)) {
+			ranges.at(idx).at(0) = dataVec.at(i);
 		}
-		//cout << labels.at<int>(i,0) << endl;
 	}
 	for(int i=0; i<centers.rows; i++) {
-		//output.push_back(labels.at<int>(i,0));
-		//cout << centers.at<float>(i,0) << endl;
 		printf("%f - %d - Min: %d, Max: %d\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
 	}
+	Mat result = Mat::zeros(src.rows, src.cols, src.type());
+	Mat clusterImg = Mat::zeros(src.rows,src.cols,CV_8UC3);
+	Vec3b red(0,0,255);
+	Vec3b blue(255,0,0);
+	Vec3b green(0,255,0);
+	Vec3b yellow(0,255,255);
+	Vec3b purple(255,0,255);
+	Vec3b teal(255,255,0);
+	for(unsigned int i=0; i<ptVec.size(); i++) {
+		int idx = labels.at<int>(i,0);
+		if(idx==(centers.rows-1) || idx==(centers.rows-2)) {
+			result.at<uchar>(ptVec.at(i).y,ptVec.at(i).x) = 255;
+		}
+	}
+	//imshow("img",clusterImg);
+	//waitKey(0);
+	return result;
+}
+
+Mat ShapeMorph::getStructElem(Size size, int shape) {
+	Mat result = Mat::zeros(size,CV_8U);
+	if(shape==CIRCLE) {
+		circle(result,Point((result.cols-1)/2,(result.rows-1)/2),round(size.width/2),Scalar(1),-1);
+	}
+	else if(shape==RECT) {
+		rectangle(result,Point(0,0),Point(result.cols-1,result.rows-1),Scalar(1),-1);
+	}
+	return result;
+}
+
+Mat ShapeMorph::elementaryDilation(Mat src) {
+	Mat result = src.clone();
+	for(int i=0; i<result.rows; i++) {
+		for(int j=0; j<result.cols; j++) {
+			if(j==0) {
+				result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
+			}
+			else if(j==(src.cols-1)) {
+				result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
+			}
+			else {
+				result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
+				result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
+			}
+		}
+	}
+	return result;
 }

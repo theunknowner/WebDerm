@@ -9,6 +9,13 @@
 
 deque<double> numbersDouble;
 deque<int> numbersInt;
+Mat numbersFloatMat;
+
+inline void exchangeFloatMat(int i, int j) {
+	double temp = numbersFloatMat.at<float>(i,0);
+	numbersFloatMat.at<float>(i,0) = numbersFloatMat.at<float>(j,0);
+	numbersFloatMat.at<float>(j,0) = temp;
+}
 
 inline void exchangeDouble(int i, int j) {
 	double temp = numbersDouble.at(i);
@@ -20,6 +27,42 @@ inline void exchangeInt(int i, int j) {
 	int temp = numbersInt.at(i);
 	numbersInt.at(i) = numbersInt.at(j);
 	numbersInt.at(j) = temp;
+}
+
+inline void sortFloatMat(int low, int high) {
+	int i = low, j = high;
+	// Get the pivot element from the middle of the list
+	double pivot = numbersFloatMat.at<float>(low + (high-low)/2,0);
+
+	// Divide into two lists
+	while (i <= j) {
+		// If the current value from the left list is smaller then the pivot
+		// element then get the next element from the left list
+		while (numbersFloatMat.at<float>(i,0) < pivot) {
+			i++;
+		}
+		// If the current value from the right list is larger then the pivot
+		// element then get the next element from the right list
+		while (numbersFloatMat.at<float>(j,0) > pivot) {
+			j--;
+		}
+
+		// If we have found a values in the left list which is larger then
+		// the pivot element and if we have found a value in the right list
+		// which is smaller then the pivot element then we exchangeDouble the
+		// values.
+		// As we are done we can increase i and j
+		if (i <= j) {
+			exchangeFloatMat(i, j);
+			i++;
+			j--;
+		}
+	}
+	// Recursion
+	if (low < j)
+		sortFloatMat(low, j);
+	if (i < high)
+		sortFloatMat(i, high);
 }
 
 inline void sortDouble(int low, int high) {
@@ -115,6 +158,15 @@ void quicksort(deque<int> &values, int p, int r) {
 	sortInt(p, r);
 
 	values = numbersInt;
+}
+
+void quicksort(Mat &values, int p, int r) {
+	if(values.rows==0) {
+		return;
+	}
+	numbersFloatMat = values;
+	sortFloatMat(p,r);
+	values = numbersFloatMat;
 }
 
 void printResult() {

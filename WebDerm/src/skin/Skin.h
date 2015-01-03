@@ -12,7 +12,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
-void imfill(Mat &img);
 void getSkin(Mat &img, Mat &mask);
 void getSkinUsingThresh(Mat &img, Mat &mask);
 void getSkinUsingCorrelation(Mat &img, Mat &mask);

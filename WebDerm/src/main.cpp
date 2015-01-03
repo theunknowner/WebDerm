@@ -52,94 +52,61 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis1.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 
 	ShapeMorph sm;
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_RGB2GRAY);
 	img2 = sm.findShapes(img);
-	//imshow("img",img2);
-	//waitKey(0);
+
+	Size size(2,2);
+	//Mat element = sm.getStructElem(size,sm.RECT);
+	Mat element = getStructuringElement(MORPH_RECT,size);
+	//img = sm.prepareImage(img);
+	//morphologyEx(img,img2,MORPH_OPEN,element);
+	//morphologyEx(img,img3,MORPH_CLOSE,element);
+	//img4 = img3 - img2;
+	//element = getStructuringElement(MORPH_RECT,Size(7,7));
+	//morphologyEx(img2,img4,MORPH_OPEN,element);
+	//morphologyEx(img4,img4,MORPH_CLOSE,element);
+	//img4 *= 2;
+	//sm.uniqueLumPercentile(img4,0.65);
+	imshow("img",img4);
+	imshow("img2",img2);
+	waitKey(0);
 	/**/
-	/*
-	//merge training data
-	vector<Mat> circleSamples;
-	vector<Mat> randomSamples;
-	String circleSamplePath = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
-	String randomSamplePath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
-	ml.importSamples(circleSamplePath,circleSamples);
-	ml.importSamples(randomSamplePath,randomSamples);
-	int trainingSampleSize = circleSamples.size() + randomSamples.size();
-	int outputSize = 2;
-	Size size(20,20);
-	Mat trainingData(trainingSampleSize,size.width*size.height,CV_32F);
-	Mat trainingLabel(trainingSampleSize,outputSize,CV_32F);
-	int x=0,y=0;
-	for(unsigned int i=0; i<circleSamples.size(); i++) {
-		Mat img = circleSamples.at(i);
-		for(int j=0; j<img.rows; j++) {
-			for(int k=0; k<img.cols; k++) {
-				trainingData.at<float>(y,x) = img.at<uchar>(j,k);
-				x++;
-			}
-		}
-		trainingLabel.at<float>(y,0) = 1.0;
-		trainingLabel.at<float>(y,1) = -1.0;
-		y++;
-		x=0;
-	}
-	x=0;
-	for(unsigned int i=0; i<randomSamples.size(); i++) {
-		Mat img = randomSamples.at(i);
-		for(int j=0; j<img.rows; j++) {
-			for(int k=0; k<img.cols; k++) {
-				trainingData.at<float>(y,x) = img.at<uchar>(j,k);
-				x++;
-			}
-		}
-		trainingLabel.at<float>(y,0) = -1.0;
-		trainingLabel.at<float>(y,1) = 1.0;
-		y++;
-		x=0;
-	}
-	ml.writeData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabel);
-	// end merge training data
-/**/
 /*
 	TestML ml;
 	vector<Mat> samples;
 	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
-	ml.importSamples(samplesPath,samples);
-	Mat data(samples.size(),400,CV_32F);
-	Mat labels(samples.size(),2,CV_32F);
-	int x=0;
-	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	for(unsigned int i=0; i<samples.size(); i++) {
-		Mat samp = samples.at(i);
-		imshow("img",samp);
-		waitKey(0);
-		String name;
-		for(int j=0; j<samp.rows; j++) {
-			for(int k=0; k<samp.cols; k++) {
-				data.at<float>(i,x) = samp.at<uchar>(j,k);
-				x++;
-			}
-		}
-		x=0;
-		labels.at<float>(i,0) = -1.0;
-		labels.at<float>(i,1) = 1.0;
+	vector<double> labels(2,0);
+	for(unsigned int i=0; i<labels.size(); i++) {
+		if(i==0) labels.at(i)=-1;
+		if(i==1) labels.at(i)=1;
 	}
-	ml.writeData("/home/jason/Desktop/workspace/Samples/change_set.csv",data,labels);
+	ml.convertImagesToData(samplesPath,labels);
 /**/
 	/*
+	deque<String> files;
+	FileData fd;
+	String folder = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String oldname = folder+files.at(i);
+		String newname = folder+"circle("+toString(i+1)+").png";
+		cout << newname << endl;
+		rename(oldname.c_str(),newname.c_str());
+	}
+/**/
+/*
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
-	ml.importVecData("/home/jason/Desktop/workspace/Samples2/training_set.csv",trainingData,trainingLabels);
+	ml.importCsvData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabels);
 	int sampleSize = trainingData.size();
 	int inputSize = trainingData.at(0).size();
 	int outputSize = trainingLabels.at(0).size();
@@ -162,7 +129,7 @@ int main(int argc,char** argv)
 
 	vector<vector<double> > data;
 	vector<vector<double> > labels;
-	ml.importVecData("/home/jason/Desktop/workspace/Samples/test_set.csv",data,labels);
+	ml.importCsvData("/home/jason/Desktop/workspace/Samples/test_set.csv",data,labels);
 	sampleSize = data.size();
 	Mat test_set(sampleSize,inputSize,CV_32F);
 	Mat test_labels(sampleSize,outputSize,CV_32F);

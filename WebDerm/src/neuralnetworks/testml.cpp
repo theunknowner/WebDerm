@@ -7,7 +7,7 @@
 
 #include "testml.h"
 
-void TestML::importVecData(String file, vector<vector<double> > &data, vector<vector<double> > &labels) {
+void TestML::importCsvData(String file, vector<vector<double> > &data, vector<vector<double> > &labels) {
 	fstream fs(file.c_str());
 	if(fs.is_open()) {
 		String temp;
@@ -85,6 +85,28 @@ void TestML::writeData(String path, Mat &dataSet, Mat &labels) {
 		fprintf(fp,"\n");
 	}
 	fclose(fp);
+}
+
+void TestML::convertImagesToData(String folder, vector<double> outputLabels) {
+	vector<Mat> samples;
+	this->importSamples(folder,samples);
+	Mat data(samples.size(),400,CV_32F);
+	Mat labels(samples.size(),outputLabels.size(),CV_32F);
+	int x=0;
+	for(unsigned int i=0; i<samples.size(); i++) {
+		Mat samp = samples.at(i);
+		for(int j=0; j<samp.rows; j++) {
+			for(int k=0; k<samp.cols; k++) {
+				data.at<float>(i,x) = samp.at<uchar>(j,k);
+				x++;
+			}
+		}
+		x=0;
+		for(unsigned int n=0; n<outputLabels.size(); n++) {
+			labels.at<float>(i,n) = outputLabels.at(n);
+		}
+	}
+	this->writeData(folder+"data_set.csv",data,labels);
 }
 
 void TestML::printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels) {

@@ -52,6 +52,18 @@ String decimal2hex(int num) {
 	return str;
 }
 
+void imfill(Mat &img)
+{
+	vector<vector<Point> > contours; 	//holds all the contour points
+	vector<Vec4i> hierarchy;
+	findContours( img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+	Mat drawing = Mat::zeros( img.size(), CV_8U );
+	drawContours( drawing, contours, -1, Scalar(255), CV_FILLED, 8, hierarchy, 1, Point(0,0) );
+	img.release();
+	img = drawing.clone();
+	drawing.release();
+}
+
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
 	deque<String> tempVec;
 	vec.clear();

@@ -10,11 +10,14 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+
 
 class ShapeMorph {
 private:
 
 public:
+	enum {RECT=0,CIRCLE=1};
 	Mat findShapes(Mat src);
 	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
 	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));
@@ -23,8 +26,12 @@ public:
 	Mat extractShape(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat hysteresisDilation(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat hysteresisErosion(Mat src, Size size, Point anchor=Point(-1,-1));
-	Mat contrast(Mat src);
-	void kmeansCluster(deque<int> input, deque<int> flags, deque<int> &output);
+	Mat contrast1(Mat src);
+	Mat contrast2(Mat src);
+	Mat kmeansCluster(Mat src);
+	Mat getStructElem(Size size,int shape);
+	Mat elementaryDilation(Mat src);
+	Mat prepareImage(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */

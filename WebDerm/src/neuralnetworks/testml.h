@@ -14,10 +14,11 @@
 
 class TestML {
 public:
-	void importVecData(String file, vector<vector<double> > &data, vector<vector<double> > &labels);
+	void importCsvData(String file, vector<vector<double> > &data, vector<vector<double> > &labels);
 	void vecToMat(vector<vector<double> > &data, vector<vector<double> > &labels, Mat &mData, Mat &mLabels);
 	void importSamples(String folder, vector<Mat> &samples);
 	void writeData(String path, Mat &dataSet, Mat &labels);
+	void convertImagesToData(String folder,vector<double> outputLabels);
 	void printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels);
 	Mat fixBinaryImage(Mat input);
 };

@@ -11,5 +11,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 void jaysort(deque<double> &vec, deque<int> &origPos);
+void jaysort(Mat &src, Mat &pos);
 
 #endif /* JAYSORT_H_ */
