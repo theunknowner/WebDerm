@@ -52,31 +52,33 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis1.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-
+	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	ShapeMorph sm;
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_RGB2GRAY);
-	img2 = sm.findShapes(img);
-
-	Size size(2,2);
+	//img2 = sm.findShapes(img);
+	//img3 = sm.connectImage(img2,10);
+	//img3 = img2.clone();
+	//imfill(img3);
+	//Size size(2,2);
 	//Mat element = sm.getStructElem(size,sm.RECT);
-	Mat element = getStructuringElement(MORPH_RECT,size);
+	//Mat element = getStructuringElement(MORPH_RECT,size);
 	//img = sm.prepareImage(img);
-	//morphologyEx(img,img2,MORPH_OPEN,element);
-	//morphologyEx(img,img3,MORPH_CLOSE,element);
+	img2 = sm.grayscaleReconstruct(img);
+	//img2 *=100;
+	//morphologyEx(img2,img3,MORPH_OPEN,element);
+	//morphologyEx(img2,img3,MORPH_CLOSE,element);
 	//img4 = img3 - img2;
 	//element = getStructuringElement(MORPH_RECT,Size(7,7));
 	//morphologyEx(img2,img4,MORPH_OPEN,element);
 	//morphologyEx(img4,img4,MORPH_CLOSE,element);
-	//img4 *= 2;
 	//sm.uniqueLumPercentile(img4,0.65);
-	imshow("img",img4);
-	imshow("img2",img2);
+	imshow("img",img2);
+	//imshow("img2",img);
 	waitKey(0);
 	/**/
 /*

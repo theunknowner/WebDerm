@@ -41,9 +41,6 @@ Mat ShapeMorph::findShapes(Mat src) {
 	//dst = this->contrast1(gradImg);
 	//Mat element = getStructuringElement(MORPH_RECT,Size(7,7));
 	//morphologyEx(dst,dst,MORPH_CLOSE,element);
-	//dImg = this->hysteresisDilation(_src,size,anchor);
-	//eImg = this->hysteresisErosion(gradImg,size,anchor);
-	//dst = dImg - eImg;
 	//Mat element = getStructuringElement(MORPH_RECT,size,anchor);
 	//morphologyEx(dst,dst,MORPH_CLOSE,element,anchor);
 	//namedWindow("gradImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -541,20 +538,14 @@ Mat ShapeMorph::kmeansCluster(Mat src) {
 	}
 	Mat result = Mat::zeros(src.rows, src.cols, src.type());
 	Mat clusterImg = Mat::zeros(src.rows,src.cols,CV_8UC3);
-	Vec3b red(0,0,255);
-	Vec3b blue(255,0,0);
-	Vec3b green(0,255,0);
-	Vec3b yellow(0,255,255);
-	Vec3b purple(255,0,255);
-	Vec3b teal(255,255,0);
+	int idxThresh = ceil(clusterCount*0.5);
+	//cout << idxThresh << endl;
 	for(unsigned int i=0; i<ptVec.size(); i++) {
 		int idx = labels.at<int>(i,0);
-		if(idx==(centers.rows-1) || idx==(centers.rows-2)) {
+		if(idx>(centers.rows-idxThresh)) {
 			result.at<uchar>(ptVec.at(i).y,ptVec.at(i).x) = 255;
 		}
 	}
-	//imshow("img",clusterImg);
-	//waitKey(0);
 	return result;
 }
 
@@ -569,21 +560,189 @@ Mat ShapeMorph::getStructElem(Size size, int shape) {
 	return result;
 }
 
-Mat ShapeMorph::elementaryDilation(Mat src) {
+Mat ShapeMorph::elementaryDilation(Mat src, int flag) {
 	Mat result = src.clone();
-	for(int i=0; i<result.rows; i++) {
-		for(int j=0; j<result.cols; j++) {
-			if(j==0) {
-				result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
-			}
-			else if(j==(src.cols-1)) {
-				result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
-			}
-			else {
-				result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
-				result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
+	if(flag==0) {
+		for(int i=0; i<result.rows; i++) {
+			for(int j=0; j<result.cols; j++) {
+				if(j==0) {
+					result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
+				}
+				else if(j==(src.cols-1)) {
+					result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
+				}
+				else {
+					result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
+					result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
+				}
 			}
 		}
 	}
+	if(flag==1) {
+
+	}
+
 	return result;
+}
+
+//filters noise and connects shape of image
+Mat ShapeMorph::connectImage(Mat src, int radius) {
+	int threshCount = 25;
+	int threshQuadrant = 18;
+	Mat results = src.clone();
+	int dist = (radius*2)+1;
+	Size size(dist,dist);
+	int pixels_top=0, pixels_bottom=0, pixels_left=0, pixels_right=0;
+	int pixelsTL=0, pixelsTR=0, pixelsBL=0, pixelsBR=0;
+	Point begin;
+	Mat window = Mat::zeros(size.height, size.width, CV_8U);
+	int row=0, col=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			int flagTL=0, flagTR=0, flagBL=0, flagBR=0;
+			int flagL=0, flagR=0, flagT=0, flagB=0;
+			window = Mat::zeros(size.height, size.width, CV_8U);
+			begin = Point(col-floor(size.width/2),row-floor(size.height/2));
+			for(int i=0; i<size.height; i++) {
+				for(int j=0; j<size.width; j++) {
+					if(i+begin.y>=0 && j+begin.x>=0)
+						window.at<uchar>(i,j) = src.at<uchar>(i+begin.y,j+begin.x);
+				}
+			}
+			Mat roiTL = window(Rect(0,0,ceil(size.width/2.),ceil(size.height/2.)));
+			Mat roiTR = window(Rect(floor(size.width/2.),0,ceil(size.width/2.),ceil(size.height/2.)));
+			Mat roiBL = window(Rect(0,floor(size.height/2.),ceil(size.width/2.),ceil(size.height/2.)));
+			Mat roiBR = window(Rect(floor(size.width/2.),floor(size.height/2.),ceil(size.width/2.),ceil(size.height/2)));
+			pixelsTL = countNonZero(roiTL);
+			pixelsTR = countNonZero(roiTR);
+			pixelsBL = countNonZero(roiBL);
+			pixelsBR = countNonZero(roiBR);
+			pixels_top = pixelsTL + pixelsTR;
+			pixels_bottom = pixelsBL + pixelsBR;
+			pixels_left = pixelsTL + pixelsBL;
+			pixels_right = pixelsTR + pixelsBR;
+			//int totalPix = pixels_top+pixels_bottom;
+			//debug printf info
+			/*
+			if(col==66 && row==47) {
+				printf("TL: %d\n",pixelsTL);
+				printf("TR: %d\n",pixelsTR);
+				printf("BL: %d\n",pixelsBL);
+				printf("BR: %d\n",pixelsBR);
+				printf("Left: %d\n",pixels_left);
+				printf("Right: %d\n",pixels_right);
+				printf("Top: %d\n",pixels_top);
+				printf("Bottom: %d\n",pixels_bottom);
+				printf("Total: %d\n",totalPix);
+				//namedWindow("roi",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+				//imshow("roi",window);
+				//waitKey(0);
+			}
+			 */
+			if(pixelsTL>=threshQuadrant) flagTL=1;
+			if(pixelsTR>=threshQuadrant) flagTR=1;
+			if(pixelsBL>=threshQuadrant) flagBL=1;
+			if(pixelsBR>=threshQuadrant) flagBR=1;
+			if(pixels_left>=threshCount) flagL=1;
+			if(pixels_right>=threshCount) flagR=1;
+			if(pixels_top>=threshCount) flagT=1;
+			if(pixels_bottom>=threshCount) flagB=1;
+
+			if((flagL+flagR+flagT+flagB<=2)&&(flagTL+flagTR+flagBL+flagBR<=2)) {
+				results.at<uchar>(row,col) = 0;
+			}
+			col++;
+		}
+		col=0;
+		row++;
+	}
+	results = this->connectPixels(results,size,10.0);
+	//imfill(results);
+	return results;
+}
+
+Mat ShapeMorph::grayscaleReconstruct(Mat src) {
+	Mat img1 = src.clone()-1;
+	Mat img2, img3;
+	Mat compareMat = Mat::zeros(src.rows,src.cols,CV_8U);
+	while(true) {
+		img2 = this->elementaryDilation(img1);
+		min(src,img2,img3);
+		compareMat = img1==img3;
+		if(countNonZero(compareMat)==src.total()) break;
+		img1 = img3.clone();
+	}
+	Mat _src = 255 - src;
+	Mat img3c = src - img3; //RMIN positions
+	img1 = Mat::zeros(_src.rows, _src.cols, CV_8U);
+	deque<int> ptVec;
+	double minDist=100;
+	int minPt=0;
+	for(int i=0; i<img3c.rows; i++) {
+		for(int j=0; j<img3c.cols; j++) {
+			if(img3c.at<uchar>(i,j)>0)
+				if(i==0) {
+					printf("%d: %d\n",j,_src.at<uchar>(i,j));
+				}
+				ptVec.push_back(j);
+		}
+		for(int j=0; j<img3c.cols; j++) {
+			if(img3c.at<uchar>(i,j)==0) {
+				for(unsigned int k=0; k<ptVec.size(); k++) {
+					if(j-ptVec.at(k)<minDist) {
+						minDist = j-ptVec.at(k);
+						minPt = ptVec.at(k);
+					}
+					else if(j-ptVec.at(k)==minDist) {
+						if(ptVec.at(k)>minPt)
+							minPt = ptVec.at(k);
+					}
+				}
+				img1.at<uchar>(i,j) = _src.at<uchar>(i,minPt);
+			}
+		}
+		ptVec.clear();
+		minDist=100;
+	}
+	while(true) {
+		img2 = this->elementaryDilation(img1);
+		min(_src,img2,img3);
+		compareMat = img1==img3;
+		if(countNonZero(compareMat)==src.total()) break;
+		img1 = img3.clone();
+	}
+	Mat result = _src - img3;
+	namedWindow("img3",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	imshow("img3",img3);
+	return result;
+}
+
+//draw a line from point to every point after
+Mat ShapeMorph::connectPixels(Mat src, Size size, double dist) {
+	Mat results = src.clone();
+	deque<Point> ptVec;
+	int row=0, col=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if((i<src.rows && j<src.cols))
+						if(results.at<uchar>(i,j)>0)
+							ptVec.push_back(Point(j,i));
+				}
+			}
+			for(unsigned int i=0; i<ptVec.size(); i++) {
+				for(unsigned int j=i; j<ptVec.size(); j++) {
+					if(eucDist(ptVec.at(i),ptVec.at(j))<dist) {
+						line(results,ptVec.at(i),ptVec.at(j),Scalar(255));
+					}
+				}
+			}
+			ptVec.clear();
+			col+=(int)dist;
+		}
+		col=0;
+		row+=(int)dist;
+	}
+	return results;
 }

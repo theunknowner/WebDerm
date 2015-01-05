@@ -29,5 +29,6 @@ double min(deque<double> vec);
 double euclideanDist(deque<double> &vec1, deque<double> &vec2);
 double euclideanDist(double *vec1, double *vec2);
 double euclideanDist(int *vec1, int *vec2);
+double eucDist(Point pt1, Point pt2);
 
 #endif /* MATHS_H_ */

@@ -238,3 +238,13 @@ double euclideanDist(deque<double> &vec1, deque<double> &vec2) {
 	result = sqrt(result);
 	return result;
 }
+
+double eucDist(Point pt1, Point pt2) {
+	double result=0;
+	double valX=0, valY=0;
+	valX = pow(pt1.x-pt2.x,2);
+	valY = pow(pt1.y-pt2.y,2);
+	result = valX+valY;
+	result = sqrt(result);
+	return result;
+}

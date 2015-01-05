@@ -11,6 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
 
 class ShapeMorph {
@@ -30,8 +31,12 @@ public:
 	Mat contrast2(Mat src);
 	Mat kmeansCluster(Mat src);
 	Mat getStructElem(Size size,int shape);
-	Mat elementaryDilation(Mat src);
+	Mat elementaryDilation(Mat src, int flag=0);
 	Mat prepareImage(Mat src);
+	Mat connectImage(Mat src, int radius);
+	Mat grayscaleReconstruct(Mat src);
+	Mat liquidDilation(Mat src, Point seedPt=Point(-1,-1));
+	Mat connectPixels(Mat src, Size size, double dist);
 };
 
 #endif /* SHAPEMORPH_H_ */
