@@ -442,7 +442,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.minMaxHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	cout << "Calculating Contrast..." << flush;
+	cout << "Calculating Contrast..." << endl;
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			try {

@@ -17,11 +17,11 @@ Mat ShapeMorph::prepareImage(Mat src) {
 	return dst;
 }
 
-void increaseLC(Mat &src) {
+void increaseLC(Mat &src, double amt) {
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
 			int lum = src.at<uchar>(i,j);
-			lum *= 2;
+			lum *= amt;
 			if(lum>255) lum=255;
 			src.at<uchar>(i,j) = lum;
 		}
@@ -36,7 +36,8 @@ Mat ShapeMorph::findShapes(Mat src) {
 	dImg =this->dilation(src,size);
 	//this->erosion2(dImg,eImg,size,Point(size.width-1,0));
 	gradImg = dImg - eImg;
-	dst = this->kmeansCluster(gradImg);
+	gradImg *= 1.5;
+	dst = this->kmeansClusterLC(gradImg);
 	//dst = this->uniqueLumPercentile(gradImg,0.35);
 	//dst = this->contrast1(gradImg);
 	//Mat element = getStructuringElement(MORPH_RECT,Size(7,7));
@@ -467,7 +468,8 @@ Mat ShapeMorph::contrast2(Mat src) {
 	return result;
 }
 
-Mat ShapeMorph::kmeansCluster(Mat src) {
+//kmeans clustering using LC values
+Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	deque<int> dataVec;
 	deque<int> lumFlag(256,0);
 	deque<int> lumVec;
@@ -487,18 +489,19 @@ Mat ShapeMorph::kmeansCluster(Mat src) {
 			lumVec.push_back(i);
 		}
 	}
-
 	Mat samples(dataVec.size(), 1, CV_32F);
 	for(unsigned int i=0; i<dataVec.size(); i++) {
 		samples.at<float>(i,0) = dataVec.at(i);
 	}
-	int clusterCount = round(sqrt(lumVec.size()/2));
+	int lumRange = lumVec.at(lumVec.size()-1) - lumVec.at(0);
+	int clusterCount = round(sqrt(lumRange/2))<lumVec.size() ? round(sqrt(lumRange/2)) : lumVec.size();
 	Mat labels;
 	int attempts = 5;
 	Mat centers;
-	cout << "clusters: " << clusterCount << endl;
-	cout << "input size: " << dataVec.size() << endl;
-	cout << "flag size: " << lumVec.size() << endl;
+	printf("Min Lum: %d, Max Lum: %d\n",lumVec.at(0),lumVec.at(lumVec.size()-1));
+	cout << "Initial clusters: " << clusterCount << endl;
+	cout << "Input size: " << dataVec.size() << endl;
+	cout << "Flag size: " << lumVec.size() << endl;
 	int compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
 	cout << "compactness: " << compact << endl;
 	deque<int> centerCount(clusterCount,0);
@@ -538,12 +541,84 @@ Mat ShapeMorph::kmeansCluster(Mat src) {
 	}
 	Mat result = Mat::zeros(src.rows, src.cols, src.type());
 	Mat clusterImg = Mat::zeros(src.rows,src.cols,CV_8UC3);
-	int idxThresh = ceil(clusterCount*0.5);
+	int idxThresh = ceil(clusterCount*0.5); //! threshold for cluster filtering
 	//cout << idxThresh << endl;
 	for(unsigned int i=0; i<ptVec.size(); i++) {
 		int idx = labels.at<int>(i,0);
-		if(idx>(centers.rows-idxThresh)) {
+		if(idx>idxThresh) {
 			result.at<uchar>(ptVec.at(i).y,ptVec.at(i).x) = 255;
+		}
+	}
+	return result;
+}
+
+Mat ShapeMorph::kmeansClusterPt(Mat src) {
+	deque<Point> dataVec;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			int lum = src.at<uchar>(i,j);
+			if(lum>0) {
+				dataVec.push_back(Point(j,i));
+			}
+		}
+	}
+	Mat samples(dataVec.size(), 2, CV_32F);
+	for(unsigned int i=0; i<dataVec.size(); i++) {
+		samples.at<float>(i,0) = dataVec.at(i).x;
+		samples.at<float>(i,1) = dataVec.at(i).y;
+	}
+	int clusterCount = round(sqrt(dataVec.size()/2));
+	Mat labels;
+	int attempts = 5;
+	Mat centers;
+	cout << "Initial clusters: " << clusterCount << endl;
+	cout << "Input size: " << dataVec.size() << endl;
+	int compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
+	cout << "compactness: " << compact << endl;
+	deque<int> centerCount(clusterCount,0);
+	deque<deque<Point> > ranges(clusterCount,deque<Point>(2,Point(-1,-1)));
+	for(unsigned int i=0; i<ranges.size(); i++) {
+		for(unsigned int j=0; j<ranges.at(i).size(); j++) {
+			if(j==0) {
+				ranges.at(i).at(j) = Point(src.cols,src.rows);
+			}
+			else if(j==1) {
+				ranges.at(i).at(j) = Point(-1,-1);
+			}
+		}
+	}
+	Mat origPos;
+	jaysort(centers,origPos);
+	for(int i=0; i<labels.rows; i++) {
+		//output.push_back(labels.at<int>(i,0));
+		int idx = labels.at<int>(i,0);
+		for(int j=0; j<origPos.rows; j++) {
+			if(idx==origPos.at<int>(j,0)) {
+				idx = j;
+				labels.at<int>(i,0) = idx;
+				break;
+			}
+		}
+		centerCount.at(idx)++;
+		/*if(dataVec.at(i)>ranges.at(idx).at(1)) {
+			ranges.at(idx).at(1) = dataVec.at(i);
+		}
+		else if(dataVec.at(i)<ranges.at(idx).at(0)) {
+			ranges.at(idx).at(0) = dataVec.at(i);
+		}*/
+	}
+	/*
+	for(int i=0; i<centers.rows; i++) {
+		printf("%f - %d - Min: %d, Max: %d\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
+	}*/
+	Mat result = Mat::zeros(src.rows, src.cols, src.type());
+	Mat clusterImg = Mat::zeros(src.rows,src.cols,CV_8UC3);
+	int idxThresh = ceil(clusterCount*0.5); //! threshold for cluster filtering
+	//cout << idxThresh << endl;
+	for(unsigned int i=0; i<dataVec.size(); i++) {
+		int idx = labels.at<int>(i,0);
+		if(idx>idxThresh) {
+			result.at<uchar>(dataVec.at(i).y,dataVec.at(i).x) = 255;
 		}
 	}
 	return result;
@@ -586,7 +661,7 @@ Mat ShapeMorph::elementaryDilation(Mat src, int flag) {
 }
 
 //filters noise and connects shape of image
-Mat ShapeMorph::connectImage(Mat src, int radius) {
+Mat ShapeMorph::filterNoise(Mat src, int radius) {
 	int threshCount = 25;
 	int threshQuadrant = 18;
 	Mat results = src.clone();
@@ -656,7 +731,6 @@ Mat ShapeMorph::connectImage(Mat src, int radius) {
 		col=0;
 		row++;
 	}
-	results = this->connectPixels(results,size,10.0);
 	//imfill(results);
 	return results;
 }
@@ -675,35 +749,55 @@ Mat ShapeMorph::grayscaleReconstruct(Mat src) {
 	Mat _src = 255 - src;
 	Mat img3c = src - img3; //RMIN positions
 	img1 = Mat::zeros(_src.rows, _src.cols, CV_8U);
+	//int maxVal=0;
 	deque<int> ptVec;
-	double minDist=100;
-	int minPt=0;
 	for(int i=0; i<img3c.rows; i++) {
 		for(int j=0; j<img3c.cols; j++) {
-			if(img3c.at<uchar>(i,j)>0)
-				if(i==0) {
-					printf("%d: %d\n",j,_src.at<uchar>(i,j));
-				}
+			if(img3c.at<uchar>(i,j)>0) {
+				/*if(_src.at<uchar>(i,j)>maxVal) {
+					maxVal = _src.at<uchar>(i,j);
+				}*/
 				ptVec.push_back(j);
-		}
-		for(int j=0; j<img3c.cols; j++) {
-			if(img3c.at<uchar>(i,j)==0) {
-				for(unsigned int k=0; k<ptVec.size(); k++) {
-					if(j-ptVec.at(k)<minDist) {
-						minDist = j-ptVec.at(k);
-						minPt = ptVec.at(k);
-					}
-					else if(j-ptVec.at(k)==minDist) {
-						if(ptVec.at(k)>minPt)
-							minPt = ptVec.at(k);
-					}
-				}
-				img1.at<uchar>(i,j) = _src.at<uchar>(i,minPt);
 			}
 		}
+		for(int j=0; j<img3c.cols; j++) {
+			for(unsigned int k=0; k<ptVec.size(); k++) {
+				if(k<ptVec.size()-1) {
+					if(j==ptVec.at(k)) {
+						img1.at<uchar>(i,j) = _src.at<uchar>(i,j);
+						break;
+					}
+					else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
+						int val1 = _src.at<uchar>(i,ptVec.at(k));
+						int val2 = _src.at<uchar>(i,ptVec.at(k+1));
+						int val = _src.at<uchar>(i,j);
+						img1.at<uchar>(i,j) = min(max(val1,val2),val);
+						break;
+					}
+					else if(j<ptVec.at(k)) {
+						int val1 = _src.at<uchar>(i,ptVec.at(k));
+						int val = _src.at<uchar>(i,j);
+						img1.at<uchar>(i,j) = min(val1,val);
+						break;
+					}
+				}
+				else {
+					if(j>ptVec.at(k)) {
+						int val1 = _src.at<uchar>(i,ptVec.at(k));
+						int val = _src.at<uchar>(i,j);
+						img1.at<uchar>(i,j) = min(val1,val);
+						break;
+					}
+				}
+			}
+		}
+		/*for(int j=0; j<img3c.cols; j++) {
+			int val = _src.at<uchar>(i,j);
+			img1.at<uchar>(i,j) = min(maxVal,val);
+		}*/
+		//maxVal=0;
 		ptVec.clear();
-		minDist=100;
-	}
+	}// end for row i
 	while(true) {
 		img2 = this->elementaryDilation(img1);
 		min(_src,img2,img3);
@@ -712,13 +806,13 @@ Mat ShapeMorph::grayscaleReconstruct(Mat src) {
 		img1 = img3.clone();
 	}
 	Mat result = _src - img3;
-	namedWindow("img3",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	imshow("img3",img3);
+	//namedWindow("img3",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//imshow("img3",img3);
 	return result;
 }
 
 //draw a line from point to every point after
-Mat ShapeMorph::connectPixels(Mat src, Size size, double dist) {
+Mat ShapeMorph::connectImage(Mat src, Size size, double dist) {
 	Mat results = src.clone();
 	deque<Point> ptVec;
 	int row=0, col=0;
@@ -743,6 +837,53 @@ Mat ShapeMorph::connectPixels(Mat src, Size size, double dist) {
 		}
 		col=0;
 		row+=(int)dist;
+	}
+	return results;
+}
+
+//returns luminance based heat map using Point density
+Mat ShapeMorph::detectHeat(Mat src, Size size) {
+	float sensitivity = 0.08; //weight of each point with D distance
+	Mat kernel = Mat::zeros(size.height, size.width,CV_32F);
+	Point origin(floor(size.width/2),floor(size.height/2));
+	for(int i=0; i<kernel.rows; i++) {
+		for(int j=0; j<kernel.cols; j++) {
+			double dist = eucDist(Point(i,j),origin);
+			double weight = 1.0 - (dist*sensitivity);
+			kernel.at<float>(i,j) = weight;
+		}
+	}
+	int row=0, col=0;
+	Point begin;
+	Mat heatMap = Mat::zeros(src.rows,src.cols,CV_32F);
+	double total=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			begin = Point(col-floor(size.width/2),row-floor(size.height/2));
+			for(int i=0; i<kernel.rows; i++) {
+				for(int j=0; j<kernel.cols; j++) {
+					int x = j+begin.x;
+					int y = i+begin.y;
+					if(y>=0 && x>=0 && y<src.rows && x<src.cols) {
+						if(src.at<uchar>(y,x)>0)
+							total += kernel.at<float>(i,j);
+					}
+				}
+			}
+			heatMap.at<float>(row,col) = total/kernel.total();
+			total=0;
+			col++;
+		}
+		col=0;
+		row++;
+	}
+	Mat results(heatMap.rows, heatMap.cols, CV_8U,Scalar(0));
+	for(int i=0; i<heatMap.rows; i++) {
+		for(int j=0; j<heatMap.cols; j++) {
+			int value = round(heatMap.at<float>(i,j) * 255);
+			//if(value>30)
+			results.at<uchar>(i,j) = value;
+		}
 	}
 	return results;
 }

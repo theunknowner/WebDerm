@@ -401,6 +401,7 @@ double Rgb::calcGrayLevel(int red, int green, int blue)
 	return sat;
 }
 
+//get level after gray
 double Rgb::getGrayLevel2(String color)
 {
 	double level=0;
@@ -417,6 +418,7 @@ double Rgb::getGrayLevel2(String color)
 	return level;
 }
 
+//get level before gray
 double Rgb::getGrayLevel1(String color) {
 	double level=0;
 	size_t pos=0;
@@ -561,7 +563,7 @@ String Rgb::calcColor2(int red, int green, int blue) {
 						}
 						if(c.countColors(hslColors.at(i))>=2)
 							pix = c.reassignLevels(pix,red,green,blue);
-						return pix;
+						return toString(grayLevel) + pix;
 					}
 				}
 			}

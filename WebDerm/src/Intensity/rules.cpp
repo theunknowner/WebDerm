@@ -30,6 +30,7 @@ double rule2(FileData &fd, String &newPix) {
 	bool flag=false;
 	Hsl hsl;
 	Color c;
+	Rgb rgb;
 	Functions fn;
 	double pThreshMove=1.15;
 	int index=-1;
@@ -39,7 +40,8 @@ double rule2(FileData &fd, String &newPix) {
 	double fSat=0, fSat2 = 0;
 	String color = hsl.getHslColor(hue,sat,lum,index);
 	String grey;
-
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
 	try {
 		fSat = (sat-satThresh.at(index).at(1));
 		fSat /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
@@ -64,7 +66,7 @@ double rule2(FileData &fd, String &newPix) {
 		if(grey=="Grey") {
 			fSat2 = sat - satThresh.at(index-1).at(1);
 			if(fSat<(-1) || fSat2<=0.02) {
-				newPix = "Grey" + color;
+				newPix = toString(grayLevel)+"Grey" + color+ toString(colorLevel);
 				flag=true;
 			}
 		}
@@ -80,9 +82,13 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 	double ruleNum =3;
 	bool flag=false;
 	Color c;
+	Rgb rgb;
 	Functions fn;
 	Shades sh;
 	Point pt = fd.pt;
+	String pix="";
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
 	int localScanSize = 20;
 	String color = c.getMainColor(newPix);
 	int HSL[3] = {0};
@@ -228,8 +234,8 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		if(fn.countLesser(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2) {
 			if(HSL[1]<=70) {
 				if(fn.countGreater(4,round(abs(deltaHSL_0[1][0]/unitThresh[0])),round(abs(deltaHSL_45[1][0]/unitThresh[0])),round(abs(deltaHSL_90[1][0]/unitThresh[0])),0.)>=2) {
-					if(color=="Brown") newPix="BrownPink";
-					if(color=="BrownPink") newPix = "Pink";
+					if(color=="Brown") pix="BrownPink";
+					if(color=="BrownPink") pix = "Pink";
 					flag=true;
 					ruleNum = 3.1;
 				}
@@ -244,8 +250,8 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 					prevColor_45 = c.getMainColor(fd.colorVec.at(hslPt_45[1].y).at(hslPt_45[1].x));
 					prevColor_90 = c.getMainColor(fd.colorVec.at(hslPt_90[1].y).at(hslPt_90[1].x));
 					if(fn.countEqual("4",prevColor_0.c_str(),prevColor_45.c_str(),prevColor_90.c_str(),"Pink")>=2) {
-						if(color=="Brown") newPix="BrownPink";
-						if(color=="BrownPink") newPix = "Pink";
+						if(color=="Brown") pix="BrownPink";
+						if(color=="BrownPink") pix = "Pink";
 						flag=true;
 						ruleNum = 3.2;
 					}
@@ -261,8 +267,8 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 						if((shadeIndex90-currShadeIndex)>=1 && (shadeIndex90-currShadeIndex)<=2) flag90=1;
 						if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
 							if(fn.countLesserEqual(4,deltaHSL_0[1][0],deltaHSL_45[1][0],deltaHSL_90[1][0],-3.0)>=2) {
-								if(color=="Brown") newPix="BrownPink";
-								if(color=="BrownPink") newPix = "Pink";
+								if(color=="Brown") pix="BrownPink";
+								if(color=="BrownPink") pix = "Pink";
 								flag=true;
 								ruleNum = 3.21;
 							}
@@ -399,7 +405,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		}
 
 		if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
-			newPix = "PinkRed";
+			pix = "PinkRed";
 			flag=true;
 			ruleNum = 3.3;
 		}
@@ -495,6 +501,8 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 		fd.hslPtMat.at(pt.y).at(pt.x) = color;
 	}
 
+	if(pix!="")
+		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 
 	return 0;
@@ -505,8 +513,12 @@ double rule4(FileData &fd, String &newPix, String newShade) {
 	double ruleNum=4;
 	double flag=false;
 	Color c;
+	Rgb rgb;
 	Functions fn;
 	Point pt = fd.pt;
+	String pix="";
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
 	int localScanSize = 20;
 	String color = c.getMainColor(newPix);
 	String prevColor_0, prevColor_45, prevColor_90;
@@ -550,10 +562,12 @@ double rule4(FileData &fd, String &newPix, String newShade) {
 		if(colorCount90>=10) flag90=1;
 
 		if(fn.countGreaterEqual(4,flag0,flag45,flag90,1)>=2) {
-			newPix = "Purple";
+			pix = "Purple";
 			flag=true;
 		}
 	}
+	if(pix!="")
+		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 
 	return 0;
@@ -568,7 +582,9 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 	Rgb rgb;
 	Functions fn;
 	String color = c.getMainColor(newPix);
-	String pix;
+	String pix="";
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
 	double HSL[3];
 	int *RGB;
 	double nextHSL[3];
@@ -619,8 +635,8 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 					demarcFlag=1;
 					break;
 				}
-				pix = fd.colorVec.at(fd.pt.y).at(step);
-				color = c.getMainColor(pix);
+				color = fd.colorVec.at(fd.pt.y).at(step);
+				color = c.getMainColor(color);
 
 			} catch (const std::out_of_range &oor) {
 				printf("\nRule5: Try/Catch #1 Out of Range!\n");
@@ -663,12 +679,12 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 			if(fd.pt.x>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
 				if(exitDemarcPos.x==-1 && exitDemarcPos.y==-1) {
 					newShade = shade;
-					newPix = "Pink";
+					pix = "Pink";
 					flag=true;
 				}
 				else if(fd.pt.x<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
 					newShade = shade;
-					newPix = "Pink";
+					pix = "Pink";
 					flag=true;
 				}
 				else {
@@ -690,6 +706,8 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 			}
 		}*/
 	}
+	if(pix!="")
+		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 	return 0;
 }
@@ -699,11 +717,13 @@ double rule5(FileData &fd) {
 	double ruleNum = 5;
 	bool flag=false;
 	Color c;
-	Hsl hsl;
 	Rgb rgb;
 	Functions fn;
 	Shades sh;
-	String oldPix, newPix,color,pix, shade, oldShade,newShade;
+	String oldPix, newPix,color, shade, oldShade,newShade;
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
+	String pix="";
 	double HSL[3];
 	double nextHSL[3];
 	//int *RGB;
@@ -763,7 +783,7 @@ double rule5(FileData &fd) {
 							minSlopePt = Point(step,fd.pt.y);
 						}
 						//printf() for debugging
-/*
+						/*
 						debug=true;
 						if(j==myPt.x && i==myPt.y) {
 							printf("(%d,%d) - Curr:%f, Temp:%f, Slope:%f,",step,fd.pt.y,currentRelLum,tempSlope,slope);
@@ -787,9 +807,9 @@ double rule5(FileData &fd) {
 						//if(demarcFlag==1 && HSL[2]>=enterLuminance) {
 						//	exitDemarcPos = Point(step,fd.pt.y);
 						//}
-						pix = fd.colorVec.at(fd.pt.y).at(step);
-						shade = sh.extractShade(pix);
-						color = c.getMainColor(pix);
+						color = fd.colorVec.at(fd.pt.y).at(step);
+						shade = sh.extractShade(color);
+						color = c.getMainColor(color);
 
 					} catch (const std::out_of_range &oor) {
 						printf("\nRule5: Try/Catch #1 Out of Range!\n");
@@ -805,7 +825,7 @@ double rule5(FileData &fd) {
 				if(exitDemarcPos==Point(-1,-1) && demarcFlag==1)
 					exitDemarcPos = Point(step,fd.pt.y);
 				//printf() for debugging
-/*
+				/*
 				debug=true;
 				if(j==myPt.x && i==myPt.y) {
 					HSL[0] = fn.getDelimitedValuesFromString(fd.hslMat.at(fd.pt.y).at(step),';',1);
@@ -825,24 +845,24 @@ double rule5(FileData &fd) {
 				/**/
 				//////////////////////////
 				if(enterDemarcPos!=Point(-1,-1)) {
-					for(unsigned int k=j; k<exitDemarcPos.x; k++) {
+					for(int k=j; k<exitDemarcPos.x; k++) {
 						if(k>=enterDemarcPos.x && fd.pt.y>=enterDemarcPos.y) {
 							if(k<=exitDemarcPos.x && fd.pt.y<=exitDemarcPos.y) {
 								oldPix = c.getMainColor(fd.colorVec.at(i).at(k));
 								oldShade = sh.extractShade(fd.colorVec.at(i).at(k));
 								newShade = targetShade;
-								newPix = "Pink";
+								pix = "Pink";
 								//pos1 = fd.colorVec.at(i).at(k).find(oldPix);
 								//pos2 = fd.colorVec.at(i).at(k).find(oldShade);
 								//fd.colorVec.at(i).at(k).replace(pos1,oldPix.length(),newPix);
 								//fd.colorVec.at(i).at(k).replace(pos2,oldShade.length(),newShade);
-								fd.colorVec.at(i).at(k) = newShade+newPix;
+								fd.colorVec.at(i).at(k) = newShade+pix;
 								flag=true;
 							}
 							else if(newShade.find("Dark")!=string::npos) {
 								newShade = targetShade;
-								newPix = "Pink";
-								fd.colorVec.at(i).at(k) = newShade+newPix;
+								pix = "Pink";
+								fd.colorVec.at(i).at(k) = newShade+pix;
 								flag=true;
 							}
 							else {
@@ -859,22 +879,26 @@ double rule5(FileData &fd) {
 		}//end for j
 	}//end for i
 
+	if(pix!="")
+		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 	return 0;
 }
 
 /** rule 6 - Assign Dark Grey **/
-double rule6(String& pix, String& newPix, String& newShade) {
+double rule6(String& newPix, String& newShade) {
 	double ruleNum = 6;
 	bool flag = false;
 	Rgb rgb;
 	Color c;
 	String color = c.getMainColor(newPix);
+	String pix = "";
 	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
 
 	if(newShade.find("Dark")!=string::npos) {
 		if(grayLevel>=90) {
-			newPix = "Grey";
+			pix = "Grey";
 			flag=true;
 		}
 	}
@@ -899,23 +923,30 @@ double rule6(String& pix, String& newPix, String& newShade) {
 			}
 		}
 	}*/
-
+	if(pix!="")
+		newPix = toString(grayLevel)+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 
 	return 0;
 }
 
 /** P0: General rule 7 - Fix non-existent double colors **/
-double rule7(String &pix, String &newPix) {
+double rule7(String &newPix) {
 	double ruleNum = 7;
 	bool flag=false;
 	Color c;
+	Rgb rgb;
 	String color = c.getMainColor(newPix);
+	String pix="";
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
+
 	if(color.find("Blue")!=string::npos && color.find("Purple")!=string::npos) {
-		newPix = "Purple";
+		pix = "Purple";
 		flag=true;
 	}
-
+	if(pix!="")
+		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 
 	return 0;
@@ -932,6 +963,9 @@ double rule8(FileData &fd, String &newPix, int loc) {
 	Functions fn;
 	Point pt = fd.pt;
 	String color = c.getMainColor(fd.windowVec.at(pt.y).at(pt.x));
+	String pix="";
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
 	int index=-1;
 	double localScanSize = 20;
 	double hue = fn.getDelimitedValuesFromString(fd.hslMat.at(pt.y).at(pt.x),';',1);
@@ -1012,18 +1046,19 @@ double rule8(FileData &fd, String &newPix, int loc) {
 	if((deg0_flag+deg45_flag)>=2||(deg0_flag+deg90_flag)>=2||(deg45_flag+deg90_flag)>=2) {
 		lum += 0.10;
 		if(lum>1) lum = 1;
-		newPix = hsl.getHslColor(hue,sat,lum,index);
+		pix = hsl.getHslColor(hue,sat,lum,index);
 		flag=true;
 		ruleNum = 8.1;
 	}
 	if((deg0_flag+deg45_flag)<=-2||(deg0_flag+deg90_flag)<=-2||(deg45_flag+deg90_flag)<=-2) {
 		lum -= 0.10;
 		if(lum<0) lum=0;
-		newPix = hsl.getHslColor(hue,sat,lum,index);
+		pix = hsl.getHslColor(hue,sat,lum,index);
 		flag=true;
 		ruleNum = 8.2;
 	}
-
+	if(pix!="")
+		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 
 	return 0;
@@ -1039,20 +1074,22 @@ double rule9(FileData &fd, String &newPix) {
 	String color = c.getMainColor(newPix);
 	String prevColor_0deg, prevColor_45deg, prevColor_90deg;
 	String pix0=newPix,pix45=newPix,pix90=newPix;
+	String pix="";
 	double grayLevel = rgb.getGrayLevel1(newPix);
 	double colorLevel = rgb.getColorLevel(newPix);
 
 	double absRatioThresh = 1.35;
-	double relRatioThreshUpper = 1.25;
-	double relRatioThreshLower = 0.85;
+	double relRatioThreshUpper = 1.20;
+	double relRatioThreshLower = 1.05;
 	double absRatio = roundDecimal(grayLevel/colorLevel,2);
+	double glThresh=70;
 	double relRatio_0deg;
 	double relRatio_45deg=0, relRatio_90deg=0;
 	bool relRatio_0deg_flag = false;
 	bool relRatio_45deg_flag = false;
 	bool relRatio_90deg_flag = false;
 	double localRatioScanSize = fd.localRatioScanSize;
-
+	if(colorLevel<40) glThresh = 65;
 	if(c.containsColor(toString(4),color.c_str(),"Brown","Pink","Blue")) {
 		if(pt.y>0) {
 			int j=pt.x-1; //45deg
@@ -1065,12 +1102,14 @@ double rule9(FileData &fd, String &newPix) {
 					relRatio_0deg = absRatio/fd.absRatioVec.at(x);
 					relRatio_0deg = roundDecimal(relRatio_0deg,2);
 					prevColor_0deg = fd.colorVec.at(pt.y).at(x);
-					if(relRatio_0deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=70) {
+					//entering
+					if(relRatio_0deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=glThresh) {
 						pix0 = "Grey";
 						relRatio_0deg_flag = true;
 					}
-					else if(relRatio_0deg>=relRatioThreshLower&&relRatio_0deg<=relRatioThreshUpper && prevColor_0deg=="Grey" && grayLevel>=70) {
-						pix45 = prevColor_0deg;
+					//inside
+					else if(relRatio_0deg>=relRatioThreshLower&&relRatio_0deg<=relRatioThreshUpper && prevColor_0deg=="Grey" && grayLevel>=glThresh) {
+						pix0 = prevColor_0deg;
 						relRatio_0deg_flag = true;
 					}
 				}
@@ -1079,11 +1118,13 @@ double rule9(FileData &fd, String &newPix) {
 					relRatio_45deg = absRatio/fd.absRatioMat.at(i).at(j);
 					relRatio_45deg = roundDecimal(relRatio_45deg,2);
 					prevColor_45deg = fd.colorVec.at(i).at(j);
-					if(relRatio_45deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=70) {
+					//entering
+					if(relRatio_45deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=glThresh) {
 						pix45 = "Grey";
 						relRatio_45deg_flag = true;
 					}
-					else if(relRatio_45deg>=relRatioThreshLower&&relRatio_45deg<=relRatioThreshUpper && prevColor_45deg=="Grey" && grayLevel>=70) {
+					//inside
+					else if(relRatio_45deg>=relRatioThreshLower&&relRatio_45deg<=relRatioThreshUpper && prevColor_45deg=="Grey" && grayLevel>=glThresh) {
 						pix45 = prevColor_45deg;
 						relRatio_45deg_flag = true;
 					}
@@ -1093,11 +1134,13 @@ double rule9(FileData &fd, String &newPix) {
 					relRatio_90deg = absRatio/fd.absRatioMat.at(i).at(pt.x);
 					relRatio_90deg = roundDecimal(relRatio_90deg,2);
 					prevColor_90deg = fd.colorVec.at(i).at(pt.x);
-					if(relRatio_90deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=70) {
+					//entering
+					if(relRatio_90deg>relRatioThreshUpper && absRatio>absRatioThresh && grayLevel>=glThresh) {
 						pix90 = "Grey";
 						relRatio_90deg_flag = true;
 					}
-					else if(relRatio_90deg>=relRatioThreshLower&&relRatio_90deg<=relRatioThreshUpper && prevColor_90deg=="Grey" && grayLevel>=70) {
+					//inside
+					else if(relRatio_90deg>=relRatioThreshLower&&relRatio_90deg<=relRatioThreshUpper && prevColor_90deg=="Grey" && grayLevel>=glThresh) {
 						pix90 = prevColor_90deg;
 						relRatio_90deg_flag = true;
 					}
@@ -1105,24 +1148,27 @@ double rule9(FileData &fd, String &newPix) {
 				if(relRatio_0deg_flag==true && relRatio_45deg_flag==true && relRatio_90deg_flag==true)
 					break;
 
-				/*if(pt.x==451 && pt.y==361) {
-					printf("%0.2f ; %0.2f ; %0.2f\n",relRatio_0deg,relRatio_45deg,relRatio_90deg);
+				if(pt.x==64 && pt.y==51) {
+					//printf("Abs:%f, [0]:%0.2f(%d,%d); [45]:%0.2f(%d,%d); [90]:%0.2f(%d,%d)\n",absRatio,fd.absRatioVec.at(x+1),x+1,pt.y,fd.absRatioMat.at(i).at(j+1),j+1,i,fd.absRatioMat.at(i).at(pt.x),pt.x,i);
+					printf("GL:%.f, ",grayLevel);
+					printf("Abs:%f, [0]:%0.2f(%d,%d); [45]:%0.2f(%d,%d); [90]:%0.2f(%d,%d)\n",absRatio,relRatio_0deg,x+1,pt.y,relRatio_45deg,j+1,i,relRatio_90deg,pt.x,i);
 					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_0deg,glRatio_0deg,cl_0deg,clRatio_0deg);
 					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_45deg,glRatio_45deg,cl_45deg,clRatio_45deg);
 					//printf("(%.0f;%.3f;%.0f;%.3f)\n", gl_90deg,glRatio_90deg,cl_90deg,clRatio_90deg);
-				}*/
+				}
 			}
 		}
 		if(pix0==pix45||pix0==pix90) {
-			newPix=pix0;
+			pix=pix0;
 			flag=true;
 		}
 		else if(pix45==pix90) {
-			newPix=pix45;
+			pix=pix45;
 			flag=true;
 		}
 	}
-
+	if(pix!="")
+		newPix = toString(grayLevel)+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 
 	return 0;
@@ -1133,13 +1179,19 @@ double rule10(String &newPix, String &newShade) {
 	bool flag=false;
 	double ruleNum = 10;
 	Color c;
+	Rgb rgb;
 	Shades sh;
 	String color = c.getMainColor(newPix);
+	String pix="";
+	double grayLevel = rgb.getGrayLevel1(newPix);
+	double colorLevel = rgb.getColorLevel(newPix);
 	if(color=="White" || newShade=="White") {
-		newPix = "Grey";
+		pix = "Grey";
 		newShade = sh.getShade(sh.getShadeCount()-2);
 		flag=true;
 	}
+	if(pix!="")
+		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
 	if(flag==true) return ruleNum;
 
 	return 0;
@@ -1155,10 +1207,10 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
 	ruleNumVec.push_back(rule2(fd,newPix));
 	ruleNumVec.push_back(rule3(fd,newPix,newShade));
-	ruleNumVec.push_back(rule6(pix,newPix,newShade));
+	ruleNumVec.push_back(rule6(newPix,newShade));
 	ruleNumVec.push_back(rule9(fd,newPix));
 	ruleNumVec.push_back(rule8(fd,newPix,loc));
-	ruleNumVec.push_back(rule7(pix,newPix));
+	ruleNumVec.push_back(rule7(newPix));
 	ruleNumVec.push_back(rule10(newPix,newShade));
 
 	if(ruleNumVec.size()>0) {

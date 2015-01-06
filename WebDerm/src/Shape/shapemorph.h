@@ -29,14 +29,15 @@ public:
 	Mat hysteresisErosion(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat contrast1(Mat src);
 	Mat contrast2(Mat src);
-	Mat kmeansCluster(Mat src);
+	Mat kmeansClusterLC(Mat src);
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat src, int flag=0);
 	Mat prepareImage(Mat src);
-	Mat connectImage(Mat src, int radius);
+	Mat filterNoise(Mat src, int radius);
 	Mat grayscaleReconstruct(Mat src);
-	Mat liquidDilation(Mat src, Point seedPt=Point(-1,-1));
-	Mat connectPixels(Mat src, Size size, double dist);
+	Mat connectImage(Mat src, Size size, double dist);
+	Mat detectHeat(Mat src, Size size);
+	Mat kmeansClusterPt(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */

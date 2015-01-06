@@ -31,7 +31,7 @@ int main(int argc,char** argv)
 	//en.runAllEntropy();
 	//runRenameFiles();
 	//runAllHysteresis();
-	//runHysteresis();
+	runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 	/*
@@ -42,7 +42,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -51,25 +51,27 @@ int main(int argc,char** argv)
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
-	Mat img, img2,img3, img4,mask;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
+	Mat img, img2,img3, img4, img5;
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis1.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	ShapeMorph sm;
 	img = runColorNormalization(img);
-	cvtColor(img,img,CV_RGB2GRAY);
+	//blur(img,img,Size(2,2));
+	//cvtColor(img,img,CV_RGB2GRAY);
 	//img2 = sm.findShapes(img);
-	//img3 = sm.connectImage(img2,10);
+	//img3 = sm.detectHeat(img2, Size(11,11));
+	//img3 = sm.filterNoise(img2,10);
+	//img4 = sm.connectImage(img3,Size(21,21),10.0);
 	//img3 = img2.clone();
 	//imfill(img3);
 	//Size size(2,2);
 	//Mat element = sm.getStructElem(size,sm.RECT);
 	//Mat element = getStructuringElement(MORPH_RECT,size);
 	//img = sm.prepareImage(img);
-	img2 = sm.grayscaleReconstruct(img);
-	//img2 *=100;
+	//img2 = sm.grayscaleReconstruct(img);
 	//morphologyEx(img2,img3,MORPH_OPEN,element);
 	//morphologyEx(img2,img3,MORPH_CLOSE,element);
 	//img4 = img3 - img2;
@@ -77,7 +79,7 @@ int main(int argc,char** argv)
 	//morphologyEx(img2,img4,MORPH_OPEN,element);
 	//morphologyEx(img4,img4,MORPH_CLOSE,element);
 	//sm.uniqueLumPercentile(img4,0.65);
-	imshow("img",img2);
+	//imshow("img",img2);
 	//imshow("img2",img);
 	waitKey(0);
 	/**/

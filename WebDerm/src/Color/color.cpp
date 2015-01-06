@@ -118,7 +118,6 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	deque<String> colorVec;
 	String pix2;
 	extractColorFromString(pix, colorVec);
-	double grayLevel = rgb.calcGrayLevel(r,g,b);
 	double colorLevel = rgb.calcColorLevel(r,g,b);
 	double grayLumLevel = rgb.calcGrayLumLevel(r,g,b);
 	for(unsigned int i=0; i<colorVec.size(); i++) {
@@ -129,7 +128,7 @@ String Color::reassignLevels(String pix, int r, int g, int b) {
 	}
 	colorVec.clear();
 	colorVec.shrink_to_fit();
-	return toString(grayLevel) + pix2;
+	return pix2;
 }
 
 //gets color and recalculates gray and color levels

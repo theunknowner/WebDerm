@@ -13,5 +13,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 double standardDev(deque<double> &input);
+double standardDev(deque<int> &input);
+double standardDev(Mat src);
 
 #endif /* STDDEV_H_ */
