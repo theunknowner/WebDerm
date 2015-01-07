@@ -7,6 +7,9 @@
 
 #include "rules.h"
 
+const int ruleCount = 11;
+vector<int> ruleFlags(ruleCount,1);
+
 /** general rule #1 - Shade Contrast with IndexChange**/
 double rule1(double &indexChange, String &shade, String &newShade) {
 	Shades sh;
@@ -503,7 +506,10 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 
 	if(pix!="")
 		newPix = toString(grayLevel)+"Gray"+pix+toString(colorLevel);
-	if(flag==true) return ruleNum;
+	if(flag==true) {
+		ruleFlags.at(9) = 0;
+		return ruleNum;
+	}
 
 	return 0;
 }
@@ -1148,10 +1154,11 @@ double rule9(FileData &fd, String &newPix) {
 				if(relRatio_0deg_flag==true && relRatio_45deg_flag==true && relRatio_90deg_flag==true)
 					break;
 
-				if(pt.x==64 && pt.y==51) {
+				if(pt.x==32 && pt.y==56) {
 					//printf("Abs:%f, [0]:%0.2f(%d,%d); [45]:%0.2f(%d,%d); [90]:%0.2f(%d,%d)\n",absRatio,fd.absRatioVec.at(x+1),x+1,pt.y,fd.absRatioMat.at(i).at(j+1),j+1,i,fd.absRatioMat.at(i).at(pt.x),pt.x,i);
 					printf("GL:%.f, ",grayLevel);
-					printf("Abs:%f, [0]:%0.2f(%d,%d); [45]:%0.2f(%d,%d); [90]:%0.2f(%d,%d)\n",absRatio,relRatio_0deg,x+1,pt.y,relRatio_45deg,j+1,i,relRatio_90deg,pt.x,i);
+					printf("Abs:%f, [0]:%0.2f(%d,%d); [45]:%0.2f(%d,%d); [90]:%0.2f(%d,%d), ",absRatio,relRatio_0deg,x+1,pt.y,relRatio_45deg,j+1,i,relRatio_90deg,pt.x,i);
+					printf("%s, %s, %s\n",pix0.c_str(),pix45.c_str(),pix90.c_str());
 					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_0deg,glRatio_0deg,cl_0deg,clRatio_0deg);
 					//printf("(%.0f;%.3f;%.0f;%.3f)", gl_45deg,glRatio_45deg,cl_45deg,clRatio_45deg);
 					//printf("(%.0f;%.3f;%.0f;%.3f)\n", gl_90deg,glRatio_90deg,cl_90deg,clRatio_90deg);
@@ -1204,14 +1211,22 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	String newPix = pix;
 	deque<double> ruleNumVec;
 
-	ruleNumVec.push_back(rule1(indexChange, shade, newShade));
-	ruleNumVec.push_back(rule2(fd,newPix));
-	ruleNumVec.push_back(rule3(fd,newPix,newShade));
-	ruleNumVec.push_back(rule6(newPix,newShade));
-	ruleNumVec.push_back(rule9(fd,newPix));
-	ruleNumVec.push_back(rule8(fd,newPix,loc));
-	ruleNumVec.push_back(rule7(newPix));
-	ruleNumVec.push_back(rule10(newPix,newShade));
+	if(ruleFlags.at(1)==1)
+		ruleNumVec.push_back(rule1(indexChange, shade, newShade));
+	if(ruleFlags.at(2)==1)
+		ruleNumVec.push_back(rule2(fd,newPix));
+	if(ruleFlags.at(3)==1)
+		ruleNumVec.push_back(rule3(fd,newPix,newShade));
+	if(ruleFlags.at(6)==1)
+		ruleNumVec.push_back(rule6(newPix,newShade));
+	if(ruleFlags.at(9)==1)
+		ruleNumVec.push_back(rule9(fd,newPix));
+	if(ruleFlags.at(8)==1)
+		ruleNumVec.push_back(rule8(fd,newPix,loc));
+	if(ruleFlags.at(7)==1)
+		ruleNumVec.push_back(rule7(newPix));
+	if(ruleFlags.at(10)==1)
+		ruleNumVec.push_back(rule10(newPix,newShade));
 
 	if(ruleNumVec.size()>0) {
 		for(unsigned int i=0; i<ruleNumVec.size(); i++) {
@@ -1221,6 +1236,8 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 			}
 		}
 	}
+	ruleFlags.clear();
+	ruleFlags.resize(ruleCount,1);
 	deque<double>().swap(ruleNumVec);
 	shade = newShade;
 	pix = newPix;

@@ -22,21 +22,22 @@ public:
 	Mat findShapes(Mat src);
 	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
 	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));
-	void erosion2(Mat src, Mat &dst, Size size,Point anchor=Point(-1,-1));
-	Mat uniqueLumPercentile(Mat src, double percentile);
-	Mat extractShape(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat hysteresisDilation(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat hysteresisErosion(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat contrast1(Mat src);
 	Mat contrast2(Mat src);
-	Mat kmeansClusterLC(Mat src);
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat src, int flag=0);
 	Mat prepareImage(Mat src);
-	Mat filterNoise(Mat src, int radius);
 	Mat grayscaleReconstruct(Mat src);
+	vector<Mat> liquidExtraction(Mat src);
+
 	Mat connectImage(Mat src, Size size, double dist);
+
+	Mat filterNoise(Mat src, int radius);
 	Mat detectHeat(Mat src, Size size);
+
+	Mat kmeansClusterLC(Mat src);
 	Mat kmeansClusterPt(Mat src);
 };
 

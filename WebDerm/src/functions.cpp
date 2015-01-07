@@ -64,6 +64,14 @@ void imfill(Mat &img)
 	drawing.release();
 }
 
+void imgshow(Mat src) {
+	static int num=1;
+	String name = "img" + toString(num);
+	namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	imshow(name,src);
+	num++;
+}
+
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
 	deque<String> tempVec;
 	vec.clear();
@@ -262,20 +270,19 @@ Mat Functions::cropImage(Mat input)
 		}
 	}
 	img1 = input(Rect(ptX,ptY,roiWidth,roiHeight));
-
-	for(int i=img1.cols-1;i>0;i--)
+	for(int i=img1.cols-1;i>=0;i--)
 	{
 		if(countNonZero(img1.col(i))>0)
 		{
-			roiWidth = i;
+			roiWidth = i+1;
 			break;
 		}
 	}
-	for(int j=img1.rows-1;j>0;j--)
+	for(int j=img1.rows-1;j>=0;j--)
 	{
 		if(countNonZero(img1.row(j))>0)
 		{
-			roiHeight = j;
+			roiHeight = j+1;
 			break;
 		}
 	}

@@ -31,7 +31,7 @@ int main(int argc,char** argv)
 	//en.runAllEntropy();
 	//runRenameFiles();
 	//runAllHysteresis();
-	runHysteresis();
+	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
 	/*
@@ -42,7 +42,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -52,22 +52,24 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis1.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/melanoma8a.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	ShapeMorph sm;
 	img = runColorNormalization(img);
-	//blur(img,img,Size(2,2));
-	//cvtColor(img,img,CV_RGB2GRAY);
-	//img2 = sm.findShapes(img);
-	//img3 = sm.detectHeat(img2, Size(11,11));
-	//img3 = sm.filterNoise(img2,10);
-	//img4 = sm.connectImage(img3,Size(21,21),10.0);
+	cvtColor(img,img,CV_RGB2GRAY);
+	img2 = sm.findShapes(img);
+	img3 = sm.detectHeat(img2, Size(11,11));
+	img4 = sm.connectImage(img3,Size(21,21),11.0);
+	vector<Mat> featureVec = sm.liquidExtraction(img4);
+	//imgshow(img3);
+	//imgshow(img4);
+	//imshow("img",img4);
+	//imshow("img2",img3);
+	//waitKey(0);
 	//img3 = img2.clone();
-	//imfill(img3);
-	//Size size(2,2);
 	//Mat element = sm.getStructElem(size,sm.RECT);
 	//Mat element = getStructuringElement(MORPH_RECT,size);
 	//img = sm.prepareImage(img);
@@ -78,19 +80,14 @@ int main(int argc,char** argv)
 	//element = getStructuringElement(MORPH_RECT,Size(7,7));
 	//morphologyEx(img2,img4,MORPH_OPEN,element);
 	//morphologyEx(img4,img4,MORPH_CLOSE,element);
-	//sm.uniqueLumPercentile(img4,0.65);
-	//imshow("img",img2);
-	//imshow("img2",img);
-	waitKey(0);
 	/**/
 /*
 	TestML ml;
-	vector<Mat> samples;
-	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
+	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
 	vector<double> labels(2,0);
 	for(unsigned int i=0; i<labels.size(); i++) {
-		if(i==0) labels.at(i)=-1;
-		if(i==1) labels.at(i)=1;
+		if(i==0) labels.at(i)=1;
+		if(i==1) labels.at(i)=-1;
 	}
 	ml.convertImagesToData(samplesPath,labels);
 /**/
@@ -106,7 +103,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-/*
+
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
@@ -115,14 +112,16 @@ int main(int argc,char** argv)
 	int inputSize = trainingData.at(0).size();
 	int outputSize = trainingLabels.at(0).size();
 	int hiddenNodes = 20;
-	Mat training_set(sampleSize,inputSize,CV_32F);
-	Mat training_labels(sampleSize,outputSize,CV_32F);
+	ml.setLayerParams(inputSize,hiddenNodes,outputSize);
+	Mat training_set(sampleSize,ml.inputSize,CV_32F);
+	Mat training_labels(sampleSize,ml.outputSize,CV_32F);
 	ml.vecToMat(trainingData,trainingLabels,training_set,training_labels);
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
 	layers.at<int>(2,0) = outputSize;
 	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
+/*
 	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001);
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
@@ -130,7 +129,28 @@ int main(int argc,char** argv)
 	CvFileStorage* storage = cvOpenFileStorage("/home/jason/Desktop/workspace/Samples/Training/param.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
+/**/
 
+	//TestML ml;
+	vector<Mat> sampleVec;
+	Mat sample;
+	for(unsigned int i=0; i<featureVec.size(); i++) {
+		//String name = "feature"+toString(i+1)+".png";
+		//imwrite(name,featureVec.at(i));
+		sample = ml.prepareImage(featureVec.at(i));
+		sampleVec.push_back(sample);
+		sample.release();
+	}
+	Mat results;
+	ml.setLayerParams(400,20,2);
+	Mat sample_set = ml.prepareMatSamples(sampleVec);
+	ann.load("/home/jason/Desktop/workspace/Samples/Training/param.xml");
+	ann.predict(sample_set,results);
+	for(int i=0; i<results.rows; i++) {
+		printf("Sample: %d, ",i+1);
+		cout << results.row(i) << endl;
+	}
+/*
 	vector<vector<double> > data;
 	vector<vector<double> > labels;
 	ml.importCsvData("/home/jason/Desktop/workspace/Samples/test_set.csv",data,labels);

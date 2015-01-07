@@ -7,6 +7,45 @@
 
 #include "testml.h"
 
+void TestML::setLayerParams(int inputSize, int hiddenNodes, int outputSize) {
+	this->inputSize = inputSize;
+	this->hiddenNodes = hiddenNodes;
+	this->outputSize = outputSize;
+}
+
+Mat TestML::prepareImage(Mat sample) {
+	Functions fn;
+	Mat img;
+	Size size(20,20);
+	img = fn.cropImage(sample);
+	img = runResizeImage(img,size);
+	img = this->fixBinaryImage(img);
+	img = fn.cropImage(img);
+	img = runResizeImage(img,size);
+	img = this->fixBinaryImage(img);
+	return img;
+}
+
+Mat TestML::prepareMatSamples(vector<Mat> sampleVec) {
+	int rows = sampleVec.at(0).rows;
+	int cols = sampleVec.at(0).cols;
+	if((rows*cols)==this->inputSize) {
+		Mat sampleSet(sampleVec.size(),rows*cols,CV_32F);
+		for(unsigned int i=0; i<sampleVec.size(); i++) {
+			for(int j=0; j<rows; j++) {
+				for(int k=0; k<cols; k++) {
+					sampleSet.at<float>(i,k+j*cols) = sampleVec.at(i).at<uchar>(j,k);
+				}
+			}
+		}
+		return sampleSet;
+	}
+	else {
+		cout << "prepareMatSamples: input size != rows*cols" << endl;
+		return Mat();
+	}
+}
+
 void TestML::importCsvData(String file, vector<vector<double> > &data, vector<vector<double> > &labels) {
 	fstream fs(file.c_str());
 	if(fs.is_open()) {
@@ -52,7 +91,6 @@ void TestML::vecToMat(vector<vector<double> > &data, vector<vector<double> > &la
 
 void TestML::importSamples(String folder, vector<Mat> &samples) {
 	FileData fd;
-	Functions fn;
 	deque<String> files;
 	String filename;
 	fd.getFilesFromDirectory(folder,files);
@@ -61,12 +99,7 @@ void TestML::importSamples(String folder, vector<Mat> &samples) {
 		filename = folder+name+"("+toString(i+1)+")"+".png";
 		Mat img = imread(filename,0);
 		if(img.data) {
-			img = fn.cropImage(img);
-			resize(img,img,Size(20,20),INTER_AREA);
-			img = this->fixBinaryImage(img);
-			img = fn.cropImage(img);
-			resize(img,img,Size(20,20),INTER_AREA);
-			img = this->fixBinaryImage(img);
+			img = this->prepareImage(img);
 			samples.push_back(img);
 		}
 	}

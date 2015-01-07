@@ -22,5 +22,4 @@ double rule5(FileData &fd);
 bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 					int ratioLoc, int loc, deque<double> &ruleNo);
 
-void testRule(Point pt);
 #endif /* RULES_H_ */
