@@ -8,7 +8,7 @@
 #include "hysteresis.h"
 
 void hysteresis(FileData &fd) {
-	hysteresis2(fd.matImage,fd.ksize,fd.filename,fd);
+	hysteresis2(fd.getImage(),fd.ksize,fd.filename,fd);
 }
 
 //hysteresis moving 1 col/row at a time
@@ -235,7 +235,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 		col=0; row++;
 	}//end while row
 	Intensity in;
-	fd.colorVec = in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
+	fd.colorVec = in.calcMainColorMatrix(fd.getImage(), fd.windowVec, fd.hslMat, fd.filename, fd);
 	deque<String>().swap(pixelColorWindow);
 	deque<String>().swap(colorWindow);
 	deque<int>().swap(index);
@@ -279,7 +279,7 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 		hslVec.clear();
 	}
 	Intensity in;
-	in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
+	in.calcMainColorMatrix(fd.getImage(), fd.windowVec, fd.hslMat, fd.filename, fd);
 	rule5(fd);
 	cout << "Done!" << endl;
 	colorWindow.clear();
@@ -467,7 +467,7 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 		col=0; row+=size.height;
 	}//end while row
 	Intensity in;
-	fd.colorVec = in.calcMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
+	fd.colorVec = in.calcMainColorMatrix(fd.getImage(), fd.windowVec, fd.hslMat, fd.filename, fd);
 	deque<String>().swap(pixelColorWindow);
 	deque<int>().swap(index);
 	deque<double>().swap(hueWindow);

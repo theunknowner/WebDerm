@@ -71,6 +71,16 @@ void FileData::getFileMatrix(deque< deque<String> > &vec) {
 	deque< deque<String> >().swap(dataMatrix);
 }
 
+//sets image and size
+void FileData::setImage(Mat img) {
+	this->matImage = img.clone();
+	this->imgSize = Size(img.cols, img.rows);
+}
+
+Mat FileData::getImage() {
+	return this->matImage;
+}
+
 void FileData::writeFileMetaData() {
 	String filename = this->filename + "_FileData.csv";
 	FILE * fp;

@@ -1219,8 +1219,8 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 		ruleNumVec.push_back(rule3(fd,newPix,newShade));
 	if(ruleFlags.at(6)==1)
 		ruleNumVec.push_back(rule6(newPix,newShade));
-	if(ruleFlags.at(9)==1)
-		ruleNumVec.push_back(rule9(fd,newPix));
+	//if(ruleFlags.at(9)==1)
+		//ruleNumVec.push_back(rule9(fd,newPix));
 	if(ruleFlags.at(8)==1)
 		ruleNumVec.push_back(rule8(fd,newPix,loc));
 	if(ruleFlags.at(7)==1)

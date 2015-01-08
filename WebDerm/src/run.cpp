@@ -82,7 +82,7 @@ Mat runResizeImage(String foldername, String filename, Size size,int write)
 	return img2;
 }
 
-Mat runResizeImage(String filename, Size size,int write)
+Mat runResizeImage(String filename, Size size, int write)
 {
 	deque<String> vec;
 	Mat img = imread(filename);
@@ -146,7 +146,7 @@ void runHysteresis()
 			boost::timer time;
 			FileData fd(filename);
 			fd.ksize = size;
-			fd.matImage = img;
+			fd.setImage(img);
 			hysteresis(fd);
 
 			cout << "Writing Files..." << flush;
@@ -208,7 +208,7 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			img.copyTo(img2, mask);
 			name = getFileName(filenames[i]);
 			FileData fd(filenames[i]);
-			fd.matImage = img2;
+			fd.setImage(img2);
 			fd.ksize = size;
 			hysteresis(fd);
 			writeSeq2File(fd.windowVec,name);
@@ -271,7 +271,7 @@ void runAllHysteresis() {
 				img = runResizeImage(img,Size(140,140));
 				name = getFileName(full_path);
 				FileData fd(full_path);
-				fd.matImage = img;
+				fd.setImage(img);
 				fd.ksize = size;
 				hysteresis(fd);
 

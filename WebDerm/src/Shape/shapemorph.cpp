@@ -36,7 +36,7 @@ Mat ShapeMorph::findShapes(Mat src) {
 	dImg =this->dilation(src,size);
 	//this->erosion2(dImg,eImg,size,Point(size.width-1,0));
 	gradImg = dImg - eImg;
-	gradImg *= 1.5;
+	gradImg *= 1.6;
 	dst = this->kmeansClusterLC(gradImg);
 	//dst = this->uniqueLumPercentile(gradImg,0.35);
 	//dst = this->contrast1(gradImg);
@@ -741,12 +741,12 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	Mat labels;
 	int attempts = 5;
 	Mat centers;
-	printf("Min Lum: %d, Max Lum: %d\n",lumVec.at(0),lumVec.at(lumVec.size()-1));
-	cout << "Initial clusters: " << clusterCount << endl;
-	cout << "Input size: " << dataVec.size() << endl;
-	cout << "Flag size: " << lumVec.size() << endl;
+	//printf("Min Lum: %d, Max Lum: %d\n",lumVec.at(0),lumVec.at(lumVec.size()-1));
+	//cout << "Initial clusters: " << clusterCount << endl;
+	//cout << "Input size: " << dataVec.size() << endl;
+	//cout << "Flag size: " << lumVec.size() << endl;
 	int compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
-	cout << "compactness: " << compact << endl;
+	//cout << "compactness: " << compact << endl;
 	deque<int> centerCount(clusterCount,0);
 	deque<deque<int> > ranges(clusterCount,deque<int>(2,0));
 	for(unsigned int i=0; i<ranges.size(); i++) {
@@ -762,7 +762,6 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	Mat origPos;
 	jaysort(centers,origPos);
 	for(int i=0; i<labels.rows; i++) {
-		//output.push_back(labels.at<int>(i,0));
 		int idx = labels.at<int>(i,0);
 		for(int j=0; j<origPos.rows; j++) {
 			if(idx==origPos.at<int>(j,0)) {
@@ -779,9 +778,9 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 			ranges.at(idx).at(0) = dataVec.at(i);
 		}
 	}
-	for(int i=0; i<centers.rows; i++) {
-		printf("%f - %d - Min: %d, Max: %d\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
-	}
+	//for(int i=0; i<centers.rows; i++) {
+	//	printf("%f - %d - Min: %d, Max: %d\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
+	//}
 	Mat result = Mat::zeros(src.rows, src.cols, src.type());
 	Mat clusterImg = Mat::zeros(src.rows,src.cols,CV_8UC3);
 	int idxThresh = ceil(clusterCount*0.5); //! threshold for cluster filtering

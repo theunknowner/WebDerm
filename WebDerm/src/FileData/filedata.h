@@ -16,6 +16,8 @@ class FileData {
 private:
 	String file_path;
 	deque< deque<String> > dataMatrix;
+	Size imgSize;
+	Mat matImage;
 
 public:
 	String filename;
@@ -30,7 +32,6 @@ public:
 	int totalShades;
 	double range;
 	Size ksize;
-	Mat matImage;
 	Point pt; // current pt location of the filedata matrices
 	double localRatioScanSize;
 	double localScanSize;
@@ -58,6 +59,9 @@ public:
 	void setFilePath(String file_path);
 	String getFilePath();
 	void getFileMatrix(deque< deque<String> > &vec);
+
+	void setImage(Mat img);
+	Mat getImage();
 
 	void writeFileMetaData();
 	void writeFileMetaData(int n_args, String* strArr, double *valArr);

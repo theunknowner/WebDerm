@@ -15,6 +15,9 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Graph/graph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
+
 
 class FileData;
 class Entropy {
@@ -43,39 +46,32 @@ private:
 	double compareS(double s1, double s2, double weight);
 	double compareV(double v1, double v2, double weight);
 
+	deque< deque<double> > totalPopulation; //Y
+	deque< deque<double> > populationDensity; //S
+	deque< deque<double> > densityVariation; //V
+	deque<double> shapeMetric; //T
+
 public:
-	deque< deque<double> > outputEntropy(FileData &fd, Size ksize);
-	deque< deque<double> > outputCombinedEntropy(FileData &fd, Size ksize);
-	deque<int> calcShadeShift(deque< deque<double> > &vec1, deque< deque<double> > &vec2);
-	void outputShiftedEntropy(FileData &fd1, FileData &fd2, Size ksize, deque<int> &colorShiftAmt);
+	Size entSize;
 
-	deque< deque<double> > outputSigmoid(FileData &fd, Size ksize, double a, double b, double p);
-	deque< deque<double> > outputCombinedSigmoid(FileData &fd, Size ksize, double a, double b, double p);
-
+	//entropy.cpp
 	void eyeFn(FileData &fd, Size ksize, String targetColor="",String targetShade="");
 	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor, String targetShade);
+	void writeEntropyFile(String filename, FileData &fd);
+	void shapeFn(FileData &fd);
 
+	//entcompare.cpp
 	bool importEntropyThresholds();
 	void releaseMemory();
 	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, deque<String> &colorNameVec);
 	double compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 	double compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 
+	//entropyrun.cpp
 	void runAllEntropy();
 	void runEntropy();
 	void runCompareEntropy(String targetName);
 	void runCompareEntropy2(String targetName);
-	void runCompareEntropyList(String fileList, String folder);
-	void runCompareEntropyList2(String fileList, String folder);
-
-	void eyeFnOld(FileData &fd, Size ksize, String targetColor="",String targetShade="");
-	bool importEntropyThresholdsOld();
-	double compareEntropyOld(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
-	double compareEntropy2Old(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
-	void runAllEntropyOld();
-	void runEntropyOld();
-	void runCompareEntropyOld(String targetName="");
-	void runCompareEntropy2Old(String targetName="");
 };
 
 #endif /* ENTROPY_H_ */

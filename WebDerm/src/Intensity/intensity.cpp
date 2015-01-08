@@ -353,7 +353,7 @@ deque< deque<double> > Intensity::calcSmoothedIntensityMatrix(deque< deque<doubl
 	return vec2;
 }
 
-deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
+deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
 		deque< deque<String> > &hslMat,String name, FileData &fd) {
 	Rgb rgb;
 	Hsl hsl;
@@ -627,12 +627,12 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat &img, deque< deque<Str
 	return fd.colorVec;
 }
 
-void Intensity::writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
+void Intensity::writeMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
 		deque< deque<String> > &hslMat,String name, FileData &fd) {
 	fd.colorVec = calcMainColorMatrix(img, windowVec, hslMat, name, fd);
 	writeSeq2File(fd.colorVec,name+"_ShadeColors");
 }
 
 void Intensity::writeMainColorMatrix(FileData &fd) {
-	writeMainColorMatrix(fd.matImage, fd.windowVec, fd.hslMat, fd.filename, fd);
+	writeMainColorMatrix(fd.getImage(), fd.windowVec, fd.hslMat, fd.filename, fd);
 }

@@ -27,8 +27,8 @@
 
 int main(int argc,char** argv)
 {
-	//Entropy en;
-	//en.runAllEntropy();
+	Entropy en;
+	en.runAllEntropy();
 	//runRenameFiles();
 	//runAllHysteresis();
 	//runHysteresis();
@@ -42,7 +42,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/**/
+	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -52,19 +52,29 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/melanoma8a.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/melanoma8b.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	ShapeMorph sm;
+	//img = imread("/home/jason/Desktop/Programs/mel8b1.png",0);
+	//img2 = imread("/home/jason/Desktop/Programs/mel8b2.png",0);
+	//img3 = img==img2;
+	//cout << countNonZero(img3) << endl;
 	img = runColorNormalization(img);
-	cvtColor(img,img,CV_RGB2GRAY);
-	img2 = sm.findShapes(img);
-	img3 = sm.detectHeat(img2, Size(11,11));
-	img4 = sm.connectImage(img3,Size(21,21),11.0);
-	vector<Mat> featureVec = sm.liquidExtraction(img4);
-	//imgshow(img3);
+	cvtColor(img,img,CV_BGR2GRAY);
+	//img2 = sm.findShapes(img);
+	//img3 = sm.detectHeat(img2, Size(11,11));
+	//img4 = sm.connectImage(img3,Size(21,21),9.0);
+	//vector<Mat> featureVec = sm.liquidExtraction(img4);
+
+	FileData fd;
+	fd.filename = "melanoma8b";
+	fd.setImage(img);
+	Entropy en;
+	en.shapeFn(fd);
+/**/
 	//imgshow(img4);
 	//imshow("img",img4);
 	//imshow("img2",img3);
@@ -103,7 +113,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-
+/*
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
@@ -130,7 +140,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-
+/*
 	//TestML ml;
 	vector<Mat> sampleVec;
 	Mat sample;

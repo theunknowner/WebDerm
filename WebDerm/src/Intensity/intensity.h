@@ -57,9 +57,9 @@ public:
 	deque< deque<double> > calcNormalizedIntensityMatrix(deque< deque<double> > &vec);
 	deque< deque<double> > calcIntensityMatrix(deque< deque<String> > &windowVec);
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);
-	deque< deque<String> > calcMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
+	deque< deque<String> > calcMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
 									deque< deque<String> > &hslMat,String name, FileData &fd);
-	void writeMainColorMatrix(Mat &img, deque< deque<String> > &windowVec,
+	void writeMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
 							deque< deque<String> > &hslMat,String name, FileData &fd);
 	void writeMainColorMatrix(FileData &fd);
 

@@ -23,7 +23,7 @@ void runBlurImage();
 void runResizeImage();
 void runResizeAllImages();
 Mat runResizeImage(String foldername, String filename, Size size,int write);
-Mat runResizeImage(String filename, Size size,int write);
+Mat runResizeImage(String filename, Size size, int write=0);
 Mat runResizeImage(Mat img, Size size);
 void runHysteresis();
 void runAllHysteresis(String *filenames, int fileSize);
