@@ -447,8 +447,9 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 
 void Entropy::shapeFn(FileData &fd) {
 	ShapeMorph sm;
+	Mat img = fd.getImage();
 	Mat img2, img3, img4;
-	img2 = sm.findShapes(fd.getImage());
+	img2 = sm.findShapes(img);
 	img3 = sm.detectHeat(img2, Size(11,11));
 	img4 = sm.connectImage(img3,Size(21,21),9.0);
 	vector<Mat> featureVec = sm.liquidExtraction(img4);
@@ -463,22 +464,25 @@ void Entropy::shapeFn(FileData &fd) {
 	ml.setLayerParams(inputSize,hiddenNodes,outputSize);
 	vector<Mat> sampleVec;
 	Mat sample;
+	double totalPix=0;
 	for(int i=0; i<sampleSize; i++) {
 		sample = ml.prepareImage(featureVec.at(i));
 		sampleVec.push_back(sample);
 		sample.release();
+		totalPix += countNonZero(featureVec.at(i));
+		//String name = "feature"+toString(i+1)+".png";
+		//imwrite(name,featureVec.at(i));
 	}
 	Mat results;
 	Mat sample_set = ml.prepareMatSamples(sampleVec);
 	ann.predict(sample_set,results);
 
-	double circleThresh=0.60, randomThresh=-0.40;
 	deque<int> circleVec, randomVec;
 	for(int i=0; i<results.rows; i++) {
-		if(results.at<float>(i,0)>circleThresh && results.at<float>(i,1)<=randomThresh) {
+		if(results.at<float>(i,0)>sm.circleThresh && results.at<float>(i,1)<=sm.randomThresh) {
 			circleVec.push_back(i);
 		}
-		if(results.at<float>(i,0)<=circleThresh && results.at<float>(i,1)>randomThresh) {
+		else {
 			randomVec.push_back(i);
 		}
 		//printf("Sample: %d, ",i+1);
@@ -486,13 +490,29 @@ void Entropy::shapeFn(FileData &fd) {
 	}
 	//printf("Circles: %lu\n", circleVec.size());
 	//printf("Randoms: %lu\n", randomVec.size());
+	double pixThresh = 0.50;
+	int circleFlag=0, randomFlag=0;
+	double circleTotal=0, randomTotal=0, circlePixPercent=0,randPixPercent=0;
+	for(unsigned int i=0; i<circleVec.size(); i++) {
+		circleTotal += countNonZero(featureVec.at(circleVec.at(i)));
+	}
+	for(unsigned int i=0; i<randomVec.size(); i++) {
+		randomTotal += countNonZero(featureVec.at(randomVec.at(i)));
+	}
+	circlePixPercent = circleTotal/totalPix;
+	randPixPercent = randomTotal/totalPix;
+	if(circlePixPercent>=pixThresh) circleFlag=1;
+	if(randPixPercent>=pixThresh) randomFlag=1;
 	double avgT[results.cols];
 	fill_n(avgT,results.cols,0.);
 	this->shapeMetric.clear();
-	if(circleVec.size()>=randomVec.size()) {
+	if(circleFlag==1) {
 		for(unsigned int i=0; i<circleVec.size(); i++) {
 			for(int j=0; j<results.cols; j++) {
-				avgT[j] += results.at<float>(circleVec.at(i),j);
+				double val = results.at<float>(circleVec.at(i),j);
+				if(val>1) val=1;
+				if(val<-1) val=-1;
+				avgT[j] += val;
 			}
 		}
 		for(int j=0; j<results.cols; j++) {
@@ -500,10 +520,13 @@ void Entropy::shapeFn(FileData &fd) {
 			this->shapeMetric.push_back(avgT[j]);
 		}
 	}
-	if(circleVec.size()<randomVec.size()) {
+	if(randomFlag==1) {
 		for(unsigned int i=0; i<randomVec.size(); i++) {
 			for(int j=0; j<results.cols; j++) {
-				avgT[j] += results.at<float>(randomVec.at(i),j);
+				double val = results.at<float>(randomVec.at(i),j);
+				if(val>1) val=1;
+				if(val<-1) val=-1;
+				avgT[j] += val;
 			}
 		}
 		for(int j=0; j<results.cols; j++) {

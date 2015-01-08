@@ -19,6 +19,8 @@ private:
 
 public:
 	enum {RECT=0,CIRCLE=1};
+	const double circleThresh = 0.60;
+	const double randomThresh = -0.40;
 	Mat findShapes(Mat src);
 	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
 	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));

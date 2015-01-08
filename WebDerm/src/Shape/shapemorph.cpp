@@ -713,6 +713,9 @@ Mat ShapeMorph::detectHeat(Mat src, Size size) {
 
 //kmeans clustering using LC values
 Mat ShapeMorph::kmeansClusterLC(Mat src) {
+	static unsigned int defaultSeed = theRNG().state;
+	theRNG().state = defaultSeed; //reset RNG seed for kmeans initial centroids
+
 	deque<int> dataVec;
 	deque<int> lumFlag(256,0);
 	deque<int> lumVec;
@@ -745,7 +748,7 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	//cout << "Initial clusters: " << clusterCount << endl;
 	//cout << "Input size: " << dataVec.size() << endl;
 	//cout << "Flag size: " << lumVec.size() << endl;
-	int compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
+	double compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
 	//cout << "compactness: " << compact << endl;
 	deque<int> centerCount(clusterCount,0);
 	deque<deque<int> > ranges(clusterCount,deque<int>(2,0));

@@ -45,6 +45,7 @@ private:
 	double compareY(double y1, double y2, double weight);
 	double compareS(double s1, double s2, double weight);
 	double compareV(double v1, double v2, double weight);
+	double compareT(deque<double> t1, deque<double> t2, double weight);
 
 	deque< deque<double> > totalPopulation; //Y
 	deque< deque<double> > populationDensity; //S
@@ -72,6 +73,11 @@ public:
 	void runEntropy();
 	void runCompareEntropy(String targetName);
 	void runCompareEntropy2(String targetName);
+	void runCompareEntropyList(String fileList, String folder);
+	void runCompareEntropyList2(String fileList, String folder);
+
+	//demo_entropy.cpp
+	void demo_runCompareEntropy();
 };
 
 #endif /* ENTROPY_H_ */

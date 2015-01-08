@@ -125,6 +125,32 @@ double Entropy::compareV(double v1, double v2, double weight) {
 	}
 }
 
+double Entropy::compareT(deque<double> t1, deque<double> t2, double weight) {
+	if(t1.size()!=t2.size()) {
+		cout << "Entropy::compareT() t1.size != t2.size" << endl;
+		exit(1);
+	}
+	if(t1.at(0)<0 && t1.at(1)>0 && t2.at(0)<0 && t2.at(1>0)) {
+		if(t1.at(0)<t1.at(1) && t2.at(0)<t2.at(1))
+			return -1;
+	}
+	double minVal=-1., maxVal=1.;
+	double dist=0, val=0;
+	for(unsigned int i=0; i<t1.size(); i++) {
+		double val1 = (t1.at(i)-minVal)/(maxVal-minVal); //normalize t1 from -1:1 -> 0:1
+		double val2 = (t2.at(i)-minVal)/(maxVal-minVal); //normalize t2 from -1:1 -> 0:1
+		if(i==1) {
+			val1 = 1. - val1;
+			val2 = 1. - val2;
+		}
+		val = min(val1,val2)/max(val1,val2);
+		dist += val;
+	}
+	dist /= t1.size();
+	return dist;
+}
+
+
 bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, deque<String> &colorNameVec) {
 	fstream fs(filepath.c_str());
 	if(fs.is_open()) {
@@ -160,17 +186,27 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, 
 
 double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
 	deque<double> resultVec(vec1.size(),0);
-	double ysv1[3];
-	double ysv2[3];
-	double valY=0, valS=0, valV=0;
+	const int ysvSize = 3; //y,s,v
+	const int tSize = 2; // t1,t2
+	double ysv1[ysvSize];
+	double ysv2[ysvSize];
+	deque<double> t1(tSize,0);
+	deque<double> t2(tSize,0);
+	double valY=0, valS=0, valV=0, valT=0;
 	double avg=0, total=0;
 	int colorsHit[vec1.size()]; //variable to mark colors not ignored
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		this->resetThreshVals();
 		if(colorNameVec.at(i)!="LowBrown" && colorNameVec.at(i)!="LowGreyBrown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
-				ysv1[j] = vec1.at(i).at(j);
-				ysv2[j] = vec2.at(i).at(j);
+				if(i==0 && j>=ysvSize) {
+					t1.at(j-ysvSize) = vec1.at(i).at(j);
+					t2.at(j-ysvSize) = vec2.at(i).at(j);
+				}
+				else {
+					ysv1[j] = vec1.at(i).at(j);
+					ysv2[j] = vec2.at(i).at(j);
+				}
 			}
 			Y1 = ysv1[0];
 			Y2 = ysv2[0];
@@ -204,7 +240,6 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 				avg = (valY + valS + valV);
 				avg /= 3.0;
 				resultVec.at(i) = avg;
-
 
 				//printf("%s : %f,%f,%f\n",colorNameVec.at(i).c_str(),valY,valS,valV);
 
@@ -264,38 +299,58 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 			ysv2[0] = vec2.at(i).at(0);
 			sum = colorSignif[i]/newTotal;
 			sum *= resultVec.at(i);
-			printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
+			//printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 			results += sum;
 		}
+	}
+	valT = this->compareT(t1,t2,1);
+	//printf("ShapeDist: %f, Before_YsvDist: %f\n",valT,results);
+	if(valT>=0) {
+		results += valT;
+		results /= 2;
 	}
 	//cout << "Mine: " << results << endl;
 	return results;
 }
 
 double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
-	int componentSize = 3;
+	const int ysvSize = 3; //y,s,v
+	const int tSize = 2; //t1,t2
 	int colorComponents = vec1.size();
-	double dist[colorComponents];
-	fill_n(dist,colorComponents,-1);
-	double sum=0, total=0, totalYSV[componentSize];
-	double ysv1[componentSize], ysv2[componentSize];
-	double ysvWeights[componentSize]; //weight of importance of YSV
-	fill_n(ysvWeights,componentSize,1.0);
+	double distYSV[colorComponents];
+	fill_n(distYSV,colorComponents,-1);
+	double sum=0, total=0, totalYSV[ysvSize];
+	double sumT=0, totalT=0, distT=0;
+	double ysv1[ysvSize], ysv2[ysvSize];
+	double t1[tSize], t2[tSize];
+	double ysvWeights[ysvSize]; //weight of importance of YSV
+	fill_n(ysvWeights,ysvSize,1.0);
 	int colorsHit[colorComponents];
 
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		if(colorNameVec.at(i)!="LowBrown"&& colorNameVec.at(i)!="LowGreyBrown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
-				ysv1[j] = vec1.at(i).at(j);
-				ysv2[j] = vec2.at(i).at(j);
-				if(ysv1[j]>0 || ysv2[j]>0) {
-					totalYSV[j] = ysvWeights[j]*(pow(ysv1[j]-ysv2[j],2)/(pow(ysv1[j],2)+pow(ysv2[j],2)));
-					sum += totalYSV[j];
+				if(i==0 && j>=ysvSize) {
+					t1[j] = vec1.at(i).at(j);
+					t2[j] = vec2.at(i).at(j);
+					totalT = pow(t1[j]-t2[j],2)/(pow(t1[j],2)+pow(t2[j],2));
+					sumT += totalT;
 				}
+				else {
+					ysv1[j] = vec1.at(i).at(j);
+					ysv2[j] = vec2.at(i).at(j);
+					if(ysv1[j]>0 || ysv2[j]>0) {
+						totalYSV[j] = ysvWeights[j]*(pow(ysv1[j]-ysv2[j],2)/(pow(ysv1[j],2)+pow(ysv2[j],2)));
+						sum += totalYSV[j];
+					}
+				}
+			}
+			if(i==0) {
+				distT = sqrt(sum) / sqrt(tSize);
 			}
 			total += max(ysv1[0],ysv2[0]);
 			if(ysv1[0]>0 || ysv2[0]>0) {
-				dist[i] = sqrt(sum) / sqrt(3);
+				distYSV[i] = sqrt(sum) / sqrt(3);
 				colorsHit[i] = 1;
 			}
 		}
@@ -307,13 +362,14 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 			ysv1[0] = vec1.at(i).at(0);
 			ysv2[0] = vec2.at(i).at(0);
 			if(ysv1[0]>0 || ysv2[0]>0) {
-				sum = (max(ysv1[0],ysv2[0])/total) * 1-dist[i] * this->colorWeights2.at(i);
+				sum = (max(ysv1[0],ysv2[0])/total) * 1-distYSV[i] * this->colorWeights2.at(i);
 				avgDist +=sum;
 			}
-			printf("%s: %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],dist[i]);
+			printf("%s: %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],distYSV[i]);
 		}
 	}
 	//avgDist = 1 - min(avgDist,1.0);
+	avgDist = (avgDist/2) + (distT/2);
 	return avgDist;
 	//printf("Dr.Dube: %f\n",avgDist);
 }

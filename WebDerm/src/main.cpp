@@ -27,8 +27,8 @@
 
 int main(int argc,char** argv)
 {
-	Entropy en;
-	en.runAllEntropy();
+	//Entropy en;
+	//en.runAllEntropy();
 	//runRenameFiles();
 	//runAllHysteresis();
 	//runHysteresis();
@@ -42,7 +42,7 @@ int main(int argc,char** argv)
 						path+"Images/Acne/acne6.jpg"};
 	int fileSize = length(filename);
 	runAllHysteresis(filename,fileSize);
-	/*
+	/**/
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -51,28 +51,31 @@ int main(int argc,char** argv)
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
-	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/melanoma8b.jpg",Size(140,140),0);
+	//Mat img, img2,img3, img4, img5;
+	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	ShapeMorph sm;
-	//img = imread("/home/jason/Desktop/Programs/mel8b1.png",0);
-	//img2 = imread("/home/jason/Desktop/Programs/mel8b2.png",0);
-	//img3 = img==img2;
-	//cout << countNonZero(img3) << endl;
-	img = runColorNormalization(img);
-	cvtColor(img,img,CV_BGR2GRAY);
+	//ShapeMorph sm;
+	//img = runColorNormalization(img);
+	//cvtColor(img,img,CV_BGR2GRAY);
 	//img2 = sm.findShapes(img);
 	//img3 = sm.detectHeat(img2, Size(11,11));
 	//img4 = sm.connectImage(img3,Size(21,21),9.0);
 	//vector<Mat> featureVec = sm.liquidExtraction(img4);
-
-	FileData fd;
-	fd.filename = "melanoma8b";
-	fd.setImage(img);
 	Entropy en;
+	en.importEntropyThresholds();
+	en.demo_runCompareEntropy();
+/*
+	FileData fd;
+	Entropy en;
+	//fd.setImage(img);
+	//en.shapeFn(fd);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
+	img = runColorNormalization(img);
+	cvtColor(img,img,CV_BGR2GRAY);
+	fd.setImage(img);
 	en.shapeFn(fd);
 /**/
 	//imgshow(img4);
@@ -93,11 +96,11 @@ int main(int argc,char** argv)
 	/**/
 /*
 	TestML ml;
-	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
+	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
 	vector<double> labels(2,0);
 	for(unsigned int i=0; i<labels.size(); i++) {
-		if(i==0) labels.at(i)=1;
-		if(i==1) labels.at(i)=-1;
+		if(i==0) labels.at(i)=-1;
+		if(i==1) labels.at(i)=1;
 	}
 	ml.convertImagesToData(samplesPath,labels);
 /**/
@@ -231,10 +234,10 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-	/*
-	String name = "lph15";
-	String file = "/home/jason/Desktop/workspace/ImagePairsSame.csv";
-	String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
+/*
+	String name = "clp4";
+	//String file = "/home/jason/Desktop/workspace/ImagePairsSame.csv";
+	//String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
 	Entropy en;
 	en.importEntropyThresholds();
 	en.runCompareEntropy(name);
