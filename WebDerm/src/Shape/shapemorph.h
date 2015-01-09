@@ -24,8 +24,6 @@ public:
 	Mat findShapes(Mat src);
 	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
 	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));
-	Mat hysteresisDilation(Mat src, Size size, Point anchor=Point(-1,-1));
-	Mat hysteresisErosion(Mat src, Size size, Point anchor=Point(-1,-1));
 	Mat contrast1(Mat src);
 	Mat contrast2(Mat src);
 	Mat getStructElem(Size size,int shape);

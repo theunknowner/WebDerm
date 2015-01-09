@@ -101,94 +101,6 @@ Mat ShapeMorph::erosion(Mat src, Size size, Point anchor) {
 	return results;
 }
 
-Mat ShapeMorph::hysteresisDilation(Mat src, Size size, Point anchor) {
-	double h=0.5, scale=1.5;
-	Mat window = Mat::zeros(src.rows, src.cols, src.type());
-	//Mat results = Mat::zeros(src.rows,src.cols, src.type());
-	Mat results = src.clone();
-	Functions fn;
-	int row=0, col=0, lum=0;
-	int max_rows = src.rows - size.height;
-	int max_cols = src.cols - size.width;
-	if(anchor==Point(-1,-1)) anchor = Point(floor(size.width/2),floor(size.height/2));
-	int lum0=-1,lum45=-1,lum90=-1;
-	Point pt0, pt45, pt90;
-	while(row<=max_rows) {
-		while(col<=max_cols) {
-			Mat window = src(Rect(col,row,size.width,size.height));
-			lum = fn.getMax(window);
-			pt0 = Point(col+anchor.x-1,row+anchor.y);
-			pt45 = Point(col+anchor.x-1,row+anchor.y-1);
-			pt90 = Point(col+anchor.x,row+anchor.y-1);
-			if(pt0.y>=0 && pt0.x>=0) {
-				lum0 = results.at<uchar>(pt0.y,pt0.x);
-			}
-			if(pt45.y>=0 && pt45.x>=0) {
-				lum45 = results.at<uchar>(pt45.y,pt45.x);
-			}
-			if(pt90.y>=0 && pt90.x>=0) {
-				lum90 = results.at<uchar>(pt90.y,pt90.x);
-			}
-			if(lum0>=0 && lum45>=0 && lum90>=0) {
-				double avg = ((lum0+lum45+lum90)/3.0);
-				double newLum = h*lum*scale+(1.0-h)*avg;
-				lum = round(newLum);
-				if(lum>255) lum=255;
-				if(lum<0) lum=0;
-			}
-			results.at<uchar>(row+anchor.y,col) = lum;
-			col++;
-			lum0=-1; lum45=-1; lum90=-1;
-		}
-		col=0;
-		row++;
-	}
-	return results;
-}
-
-Mat ShapeMorph::hysteresisErosion(Mat src, Size size, Point anchor) {
-	double h=0.5, scale=1.5;
-	Mat window = Mat::zeros(size.height, size.width, CV_8U);
-	Mat results = src.clone();
-	Functions fn;
-	int row=0, col=0, lum=0;
-	int max_rows = src.rows - size.height;
-	int max_cols = src.cols - size.width;
-	if(anchor==Point(-1,-1)) anchor = Point(floor(size.width/2),floor(size.height/2));
-	Point arrAnchors[4] = {Point(0,size.height-1),Point(size.width-1,0),
-			Point(size.width-1,size.height-1),Point(0,0)};
-	while(row<=max_rows) {
-		while(col<=max_cols) {
-			for(int n=0; n<4; n++) {
-				anchor = arrAnchors[n];
-				int beginX = col - anchor.x;
-				int beginY = row - anchor.y;
-				for(int i=0; i<size.height; i++) {
-					for(int j=0; j<size.width; j++) {
-						int x = j+beginX;
-						int y = i+beginY;
-						if(x>=0 && y>=0 && x<src.cols && y<src.rows)
-							window.at<uchar>(i,j) = src.at<uchar>(y,x);
-						else {
-							if(x<0) x = 0;
-							if(x>=src.cols) x = src.cols-1;
-							if(y<0) y=0;
-							if(y>=src.rows) y = src.rows-1;
-							window.at<uchar>(i,j) = src.at<uchar>(y,x);
-						}
-					}
-				}
-				lum = fn.getMin(window);
-				results.at<uchar>(row,col) += lum;
-			}
-			col++;
-		}
-		col=0;
-		row++;
-	}
-	return results;
-}
-
 Mat ShapeMorph::contrast1(Mat src) {
 	Mat result = Mat::zeros(src.rows, src.cols, CV_8U);
 	const double H = 0.72;
@@ -545,7 +457,7 @@ vector<Mat> ShapeMorph::liquidExtraction(Mat src) {
 	}//end while row
 
 	vector<Mat> featureVec;
-	int pixelCountThresh = 60;
+	int pixelCountThresh = 30;
 	for(unsigned int i=0; i<numFeatures.size(); i++) {
 		Mat feature(src.rows, src.cols, CV_8U,Scalar(0));
 		if(numFeatures.at(i).size()>=pixelCountThresh) {
@@ -704,7 +616,7 @@ Mat ShapeMorph::detectHeat(Mat src, Size size) {
 	for(int i=0; i<heatMap.rows; i++) {
 		for(int j=0; j<heatMap.cols; j++) {
 			int value = round(heatMap.at<float>(i,j) * 255);
-			if(value>25)
+			if(value>25 && src.at<uchar>(i,j)>0)
 				results.at<uchar>(i,j) = 255;
 		}
 	}
@@ -791,7 +703,7 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	for(unsigned int i=0; i<ptVec.size(); i++) {
 		int idx = labels.at<int>(i,0);
 		if(idx>idxThresh) {
-			result.at<uchar>(ptVec.at(i).y,ptVec.at(i).x) = 255;
+			result.at<uchar>(ptVec.at(i).y,ptVec.at(i).x) = src.at<uchar>(ptVec.at(i).y,ptVec.at(i).x);
 		}
 	}
 	return result;
