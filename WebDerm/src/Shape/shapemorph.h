@@ -27,10 +27,11 @@ public:
 	Mat contrast1(Mat src);
 	Mat contrast2(Mat src);
 	Mat getStructElem(Size size,int shape);
-	Mat elementaryDilation(Mat src, int flag=0);
+	Mat elementaryDilation(Mat origImg, Mat scaleImg);
 	Mat prepareImage(Mat src);
 	Mat grayscaleReconstruct(Mat src);
-	vector<Mat> liquidExtraction(Mat src);
+	vector<Mat> liquidFeatureExtraction(Mat src);
+	vector<Mat> filterFeatures(vector<Mat> featureVec);
 
 	Mat connectImage(Mat src, Size size, double dist);
 

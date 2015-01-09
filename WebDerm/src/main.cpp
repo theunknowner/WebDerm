@@ -51,30 +51,24 @@ int main(int argc,char** argv)
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
-	//Mat img, img2,img3, img4, img5;
-	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
+	Mat img, img2,img3, img4, img5;
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis1.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//ShapeMorph sm;
-	//img = runColorNormalization(img);
-	//cvtColor(img,img,CV_BGR2GRAY);
+	ShapeMorph sm;
+	img = runColorNormalization(img);
+	cvtColor(img,img,CV_BGR2GRAY);
+	img2 = sm.grayscaleReconstruct(img);
+	imwrite("psoriasis1_Gray.png",img);
 	//img2 = sm.findShapes(img);
 	//img3 = sm.detectHeat(img2, Size(11,11));
 	//img4 = sm.connectImage(img3,Size(21,21),9.0);
 	//vector<Mat> featureVec = sm.liquidExtraction(img4);
-	Entropy en;
-	en.importEntropyThresholds();
-	en.demo_runCompareEntropy();
 /*
 	FileData fd;
 	Entropy en;
-	//fd.setImage(img);
-	//en.shapeFn(fd);
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
-	img = runColorNormalization(img);
-	cvtColor(img,img,CV_BGR2GRAY);
 	fd.setImage(img);
 	en.shapeFn(fd);
 /**/

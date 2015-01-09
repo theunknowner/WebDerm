@@ -64,11 +64,15 @@ void imfill(Mat &img)
 	drawing.release();
 }
 
-void imgshow(Mat src) {
+//flag=0: keep window, flag=1: destroy window
+void imgshow(Mat src, int flag) {
 	static int num=1;
 	String name = "img" + toString(num);
 	namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(name,src);
+	waitKey(0);
+	if(flag==1)
+		destroyAllWindows();
 	num++;
 }
 

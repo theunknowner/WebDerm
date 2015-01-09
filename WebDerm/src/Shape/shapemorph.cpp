@@ -29,28 +29,16 @@ void increaseLC(Mat &src, double amt) {
 }
 
 Mat ShapeMorph::findShapes(Mat src) {
+	Mat _src = 255 - src;
 	Size size(3,3);
 	Mat openImg,closeImg,gradImg, dst, dImg, eImg;
 	Point anchor(0,size.height-1);
 	eImg = this->erosion(src,size);
 	dImg =this->dilation(src,size);
-	//this->erosion2(dImg,eImg,size,Point(size.width-1,0));
 	gradImg = dImg - eImg;
 	gradImg *= 1.6;
-	dst = this->kmeansClusterLC(gradImg);
-	//dst = this->uniqueLumPercentile(gradImg,0.35);
-	//dst = this->contrast1(gradImg);
-	//Mat element = getStructuringElement(MORPH_RECT,Size(7,7));
-	//morphologyEx(dst,dst,MORPH_CLOSE,element);
-	//Mat element = getStructuringElement(MORPH_RECT,size,anchor);
-	//morphologyEx(dst,dst,MORPH_CLOSE,element,anchor);
-	//namedWindow("gradImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//namedWindow("closeImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//namedWindow("hystImg",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//imshow("gradImg",gradImg);
-	//imshow("closeImg",dst);
-	//imshow("hystImg",eImg);
-	//imwrite("shapemorph.png",dst);
+	Mat mask = this->kmeansClusterLC(gradImg);
+	_src.copyTo(dst,mask); //mask everything except points that are clustered
 	return dst;
 }
 
@@ -298,53 +286,51 @@ Mat ShapeMorph::getStructElem(Size size, int shape) {
 	return result;
 }
 
-Mat ShapeMorph::elementaryDilation(Mat src, int flag) {
-	Mat result = src.clone();
-	if(flag==0) {
-		for(int i=0; i<result.rows; i++) {
-			for(int j=0; j<result.cols; j++) {
-				if(j==0) {
-					result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
-				}
-				else if(j==(src.cols-1)) {
-					result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
-				}
-				else {
-					result.at<uchar>(i,j-1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
-					result.at<uchar>(i,j+1) = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
-				}
+Mat ShapeMorph::elementaryDilation(Mat origImg, Mat scaleImg) {
+	Mat result = scaleImg.clone();
+	for(int i=0; i<result.rows; i++) {
+		for(int j=0; j<result.cols; j++) {
+			if(j==0) {
+				int val = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));
+				val = min(val,(int)origImg.at<uchar>(i,j+1));
+				result.at<uchar>(i,j+1) = val;
+			}
+			else if(j==(scaleImg.cols-1)) {
+				int val = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
+				val = min(val,(int)origImg.at<uchar>(i,j-1));
+				result.at<uchar>(i,j-1) = val;
+			}
+			else {
+				int val = max(result.at<uchar>(i,j),result.at<uchar>(i,j-1));
+				val = min(val,(int)origImg.at<uchar>(i,j-1));
+				result.at<uchar>(i,j-1) = val;
+
+				val = max(result.at<uchar>(i,j),result.at<uchar>(i,j+1));;
+				val = min(val,(int)origImg.at<uchar>(i,j+1));
+				result.at<uchar>(i,j+1) = val;
 			}
 		}
 	}
-	if(flag==1) {
-
-	}
-
 	return result;
 }
 
 Mat ShapeMorph::grayscaleReconstruct(Mat src) {
 	Mat img1 = src.clone()-1;
-	Mat img2, img3;
+	Mat img2;
 	Mat compareMat = Mat::zeros(src.rows,src.cols,CV_8U);
 	while(true) {
-		img2 = this->elementaryDilation(img1);
-		min(src,img2,img3);
-		compareMat = img1==img3;
+		img2 = this->elementaryDilation(src,img1);
+		compareMat = img1==img2;
 		if(countNonZero(compareMat)==src.total()) break;
-		img1 = img3.clone();
+		img1 = img2.clone();
 	}
-	Mat _src = 255 - src;
-	Mat img3c = src - img3; //RMIN positions
+	Mat _src = 255 - src; //invert image for LC values
+	Mat img3c = src - img2; //RMIN positions
 	img1 = Mat::zeros(_src.rows, _src.cols, CV_8U);
-	//int maxVal=0;
 	deque<int> ptVec;
 	for(int i=0; i<img3c.rows; i++) {
 		for(int j=0; j<img3c.cols; j++) {
 			if(img3c.at<uchar>(i,j)>0) {
-				/*if(_src.at<uchar>(i,j)>maxVal) {
-					maxVal = _src.at<uchar>(i,j);
-				}*/
 				ptVec.push_back(j);
 			}
 		}
@@ -379,27 +365,19 @@ Mat ShapeMorph::grayscaleReconstruct(Mat src) {
 				}
 			}
 		}
-		/*for(int j=0; j<img3c.cols; j++) {
-			int val = _src.at<uchar>(i,j);
-			img1.at<uchar>(i,j) = min(maxVal,val);
-		}*/
-		//maxVal=0;
 		ptVec.clear();
 	}// end for row i
 	while(true) {
-		img2 = this->elementaryDilation(img1);
-		min(_src,img2,img3);
-		compareMat = img1==img3;
+		img2 = this->elementaryDilation(_src,img1);
+		compareMat = img1==img2;
 		if(countNonZero(compareMat)==src.total()) break;
-		img1 = img3.clone();
+		img1 = img2.clone();
 	}
-	Mat result = _src - img3;
-	//namedWindow("img3",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//imshow("img3",img3);
+	Mat result = _src - img2;
 	return result;
 }
 
-vector<Mat> ShapeMorph::liquidExtraction(Mat src) {
+vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	deque<deque<Point> > numFeatures;
 	deque<Point> ptVec;
@@ -457,17 +435,35 @@ vector<Mat> ShapeMorph::liquidExtraction(Mat src) {
 	}//end while row
 
 	vector<Mat> featureVec;
-	int pixelCountThresh = 30;
 	for(unsigned int i=0; i<numFeatures.size(); i++) {
 		Mat feature(src.rows, src.cols, CV_8U,Scalar(0));
-		if(numFeatures.at(i).size()>=pixelCountThresh) {
-			for(unsigned int j=0; j<numFeatures.at(i).size(); j++) {
-				feature.at<uchar>(numFeatures.at(i).at(j)) = 255;
-			}
-			featureVec.push_back(feature);
+		for(unsigned int j=0; j<numFeatures.at(i).size(); j++) {
+			feature.at<uchar>(numFeatures.at(i).at(j)) = src.at<uchar>(numFeatures.at(i).at(j));
 		}
+		featureVec.push_back(feature);
 	}
 	return featureVec;
+}
+
+vector<Mat> ShapeMorph::filterFeatures(vector<Mat> featureVec) {
+	vector<Mat> results;
+	vector<double> lcVec;
+	double lcThresh = 100.0;
+	int pixelCountThresh = 30;
+	for(unsigned int n=0; n<featureVec.size(); n++) {
+		double avgLC=0;
+		int countPix = countNonZero(featureVec.at(n));
+		for(int i=0; i<featureVec.at(n).rows; i++) {
+			for(int j=0; j<featureVec.at(n).cols; j++) {
+				avgLC += featureVec.at(n).at<uchar>(i,j);
+			}
+		}
+		avgLC /= countPix;
+		if(countPix>=pixelCountThresh && avgLC>lcThresh) {
+			results.push_back(featureVec.at(n));
+		}
+	}
+	return results;
 }
 
 
@@ -623,7 +619,7 @@ Mat ShapeMorph::detectHeat(Mat src, Size size) {
 	return results;
 }
 
-//kmeans clustering using LC values
+//returns mask using kmeans clustering of LC values
 Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	static unsigned int defaultSeed = theRNG().state;
 	theRNG().state = defaultSeed; //reset RNG seed for kmeans initial centroids
@@ -703,7 +699,7 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	for(unsigned int i=0; i<ptVec.size(); i++) {
 		int idx = labels.at<int>(i,0);
 		if(idx>idxThresh) {
-			result.at<uchar>(ptVec.at(i).y,ptVec.at(i).x) = src.at<uchar>(ptVec.at(i).y,ptVec.at(i).x);
+			result.at<uchar>(ptVec.at(i).y,ptVec.at(i).x) = 255;
 		}
 	}
 	return result;

@@ -153,8 +153,9 @@ void writeSeq2File(Mat src, String name) {
 	fp = fopen(filename.c_str(),"w");
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
-			fprintf(fp,"%d\n",src.at<uchar>(i,j));
+			fprintf(fp,"%d,",src.at<uchar>(i,j));
 		}
+		fprintf(fp,"\n");
 	}
 	fclose(fp);
 }

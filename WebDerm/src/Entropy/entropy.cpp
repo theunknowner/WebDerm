@@ -450,9 +450,12 @@ void Entropy::shapeFn(FileData &fd) {
 	Mat img = fd.getImage();
 	Mat img2, img3, img4;
 	img2 = sm.findShapes(img);
-	img3 = sm.detectHeat(img2, Size(11,11));
-	img4 = sm.connectImage(img3,Size(21,21),9.0);
-	vector<Mat> featureVec = sm.liquidExtraction(img4);
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(img2);
+	featureVec = sm.filterFeatures(featureVec);
+	for(unsigned int i=0; i<featureVec.size(); i++) {
+		img3 = sm.detectHeat(featureVec.at(i), Size(11,11));
+		featureVec.at(i) = sm.connectImage(img3,Size(21,21),9.0);
+	}
 	TestML ml;
 	CvANN_MLP ann;
 	ann.load("/home/jason/Desktop/workspace/Samples/Training/param.xml");
@@ -466,6 +469,8 @@ void Entropy::shapeFn(FileData &fd) {
 	Mat sample;
 	double totalPix=0;
 	for(int i=0; i<sampleSize; i++) {
+		imgshow(featureVec.at(i));
+		waitKey(0);
 		sample = ml.prepareImage(featureVec.at(i));
 		sampleVec.push_back(sample);
 		sample.release();
