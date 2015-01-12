@@ -361,7 +361,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 	Shades sh;
 	Functions fn;
 	FILE *fp;
-	String filename = name + "_Rule_Table.csv";
+	String filename = name + "-Rule-Table.csv";
 	fp=fopen(filename.c_str(),"w");
 	fprintf(fp,"Color,NewColor,HSL,Shade,NewShade,IndexChange,Rules,Coord,Image\n");
 	int flag=0;
@@ -442,7 +442,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
 	init_2D_Deque(fd.minMaxHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	cout << "Calculating Contrast..." << endl;
+	cout << "Calculating Contrast..." << flush;
 	for(unsigned int i=0; i<fd.smoothIntensityVec.size(); i++) {
 		for(unsigned int j=0; j<fd.smoothIntensityVec.at(i).size(); j++) {
 			try {

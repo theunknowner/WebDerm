@@ -30,7 +30,7 @@ void Entropy::demo_runCompareEntropy() {
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		filepath = folder+files.at(i);
-		String targetName = getFileName(files.at(i),"_");
+		String targetName = getFileName(files.at(i),"-");
 		if(targetName==name1)
 			flag[0] = this->loadEntropyFiles(filepath,vec1,colorNameVec);
 		if(targetName==name2)

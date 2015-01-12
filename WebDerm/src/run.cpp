@@ -151,11 +151,11 @@ void runHysteresis()
 
 			cout << "Writing Files..." << flush;
 			String strSize = toString(size.width)+"x"+toString(size.height);
-			writeSeq2File(fd.windowVec,name+"_"+strSize);
-			writeSeq2File(fd.hslMat,name+"_HSL_"+strSize);
+			writeSeq2File(fd.windowVec,name+"-"+strSize);
+			writeSeq2File(fd.hslMat,name+"-HSL-"+strSize);
 
 			c.output2ImageColor(fd.colorVec,size,name);
-			writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
+			writeSeq2File(fd.colorVec,name+"-ShadeColors-"+strSize);
 			cout << "Done!" << endl;
 
 			int hours=0, minutes=0, seconds=0;
@@ -212,18 +212,18 @@ void runAllHysteresis(String *filenames, int fileSize) {
 			fd.ksize = size;
 			hysteresis(fd);
 			writeSeq2File(fd.windowVec,name);
-			writeSeq2File(fd.hslMat,name+"_HSL");
+			writeSeq2File(fd.hslMat,name+"-HSL");
 			fd.writeFileMetaData();
 			c.output2ImageColor(fd.colorVec,size,name);
-			writeSeq2File(fd.absRatioMat,name+"_AbsoluteRatios");
-			writeSeq2File(fd.intensityVec,name+"_ColorIntensity");
-			writeSeq2File(fd.smoothIntensityVec,name+"_SmoothIntensity");
-			writeSeq2File(fd.colorVec,name+"_ShadeColors");
-			writeSeq2File(fd.rulesMat,name+"_RulesMat");
-			writeSeq2File(fd.m_ContrastMat,name+"_measuredContrast");
-			writeSeq2File(fd.d_HslMat,name+"_deltaHSL");
-			writeSeq2File(fd.hslPtMat,name+"_hslPts");
-			writeSeq2File(fd.cumHslMat,name+"_cumHSL");
+			writeSeq2File(fd.absRatioMat,name+"-AbsoluteRatios");
+			writeSeq2File(fd.intensityVec,name+"-ColorIntensity");
+			writeSeq2File(fd.smoothIntensityVec,name+"-SmoothIntensity");
+			writeSeq2File(fd.colorVec,name+"-ShadeColors");
+			writeSeq2File(fd.rulesMat,name+"-RulesMat");
+			writeSeq2File(fd.m_ContrastMat,name+"-measuredContrast");
+			writeSeq2File(fd.d_HslMat,name+"-deltaHSL");
+			writeSeq2File(fd.hslPtMat,name+"-hslPts");
+			writeSeq2File(fd.cumHslMat,name+"-cumHSL");
 
 			//release images for next use
 			img.release(); img2.release(); mask.release();
@@ -277,11 +277,11 @@ void runAllHysteresis() {
 
 				cout << "Writing Files..." << flush;
 				String strSize = toString(size.width)+"x"+toString(size.height);
-				writeSeq2File(fd.windowVec,name+"_"+strSize);
-				writeSeq2File(fd.hslMat,name+"_HSL_"+strSize);
+				writeSeq2File(fd.windowVec,name+"-"+strSize);
+				writeSeq2File(fd.hslMat,name+"-HSL-"+strSize);
 				//fd.writeFileMetaData();
 				c.output2ImageColor(fd.colorVec,size,name);
-				writeSeq2File(fd.colorVec,name+"_ShadeColors_"+strSize);
+				writeSeq2File(fd.colorVec,name+"-ShadeColors-"+strSize);
 				cout << "Done!" << endl;
 
 				//release images for next use

@@ -89,106 +89,17 @@ Mat ShapeMorph::erosion(Mat src, Size size, Point anchor) {
 	return results;
 }
 
-Mat ShapeMorph::contrast1(Mat src) {
+//custom hysteresis-gradient function
+Mat ShapeMorph::hysteresisGradient(Mat src) {
 	Mat result = Mat::zeros(src.rows, src.cols, CV_8U);
-	const double H = 0.72;
-	const double enterDemarcThresh = 5;
-	const double exitDemarcThresh = -2;
-	Point enterDemarcPos(-1,-1);
-	Point exitDemarcPos(-1,-1);
-	int demarcFlag=0;
-	int currentRelLum =0, nextRelLum=0;
-	double tempSlope=0, slope=0;
-	int step=0;
-	double minSlope=100;
-	Point minSlopePt, maxSlopePt;
-	Point pt;
-	Point myPt = Point(0,31); //for debugging use
-	for(int i=0; i<src.rows; i++) {
-		for(int j=0; j<src.cols; j++) {
-			pt = Point(j,i);
-			step = pt.x;
-			minSlope=100;
-			enterDemarcPos = Point(-1,-1);
-			exitDemarcPos = Point(-1,-1);
-			demarcFlag=0;
-			slope=0;
-			if(step<(src.cols-1)) {
-				while(step<(src.cols-1)) {
-					currentRelLum = src.at<uchar>(i,step);
-					nextRelLum = src.at<uchar>(i,step+1);
-					tempSlope = (nextRelLum - currentRelLum);
-					slope = (slope * H) + (tempSlope*(1.0-H));
-					if(slope<minSlope) {
-						minSlope = slope;
-						minSlopePt = Point(step,pt.y);
-					}
-					//printf() for debugging
-
-					debug=true;
-					if(j==myPt.x && i==myPt.y) {
-						printf("(%d,%d) - Curr:%d, Temp:%f, Slope:%f\n",step,pt.y,currentRelLum,tempSlope,slope);
-					}
-					/**/
-					///////////////////////
-					step++;
-					if(slope>=enterDemarcThresh && demarcFlag==0) {
-						enterDemarcPos = Point(step,pt.y);
-						demarcFlag=1; //entering Dark shade
-					}
-					if((slope<=exitDemarcThresh && tempSlope<0)) {
-						if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1)
-							enterDemarcPos = minSlopePt;
-						exitDemarcPos = Point(step,pt.y);
-						demarcFlag=1;
-						break;
-					}
-				}//end while loop
-				if(exitDemarcPos==Point(-1,-1) && demarcFlag==1)
-					exitDemarcPos = Point(step,pt.y);
-				//printf() for debugging
-
-				debug=true;
-				if(j==myPt.x && i==myPt.y) {
-					currentRelLum = src.at<uchar>(pt.y,step);
-					//printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
-					printf("(%d,%d) - Curr:%d,",step,pt.y,currentRelLum);
-					printf("Flag: %d\n",demarcFlag);
-					printf("%d,%d\n",pt.x,pt.y);
-					printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
-					printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
-				}
-				/**/
-				//////////////////////////
-				if(enterDemarcPos!=Point(-1,-1)) {
-					for(int k=j; k<exitDemarcPos.x; k++) {
-						if(k>=enterDemarcPos.x && pt.y>=enterDemarcPos.y) {
-							if(k<=exitDemarcPos.x && pt.y<=exitDemarcPos.y) {
-								result.at<uchar>(i,k) = 255;
-							}
-							else {
-								enterDemarcPos = Point(-1,-1);
-								exitDemarcPos = Point(-1,-1);
-								demarcFlag=0;
-								slope=0;
-							}
-						}
-					}
-				}
-				j=step-1; //step-1 because j++ in next iteration
-			}// end if color
-		}//end for j
-	}//end for i
-	return result;
-}
-
-Mat ShapeMorph::contrast2(Mat src) {
-	Mat result = Mat::zeros(src.rows, src.cols, CV_8U);
+	Mat map(src.rows, src.cols,CV_8U,Scalar(0));
 	const double H = 0.28;
-	const double enterDemarcThresh = 5;
+	const double enterDemarcThresh = 30;
 	const double exitDemarcThresh = -2;
+	const double elevationThresh = 20;
 	Point enterDemarcPos(-1,-1);
 	Point exitDemarcPos(-1,-1);
+	double cumulativeSP=0;
 	int demarcFlag=0;
 	int currentRelLum =0, nextRelLum=0;
 	double tempSlope=0, slope=0;
@@ -217,7 +128,7 @@ Mat ShapeMorph::contrast2(Mat src) {
 						minSlopePt = Point(step,pt.y);
 					}
 					//printf() for debugging
-
+					/*
 					debug=true;
 					if(j==myPt.x && i==myPt.y) {
 						printf("(%d,%d) - Curr:%d, Temp:%f, Slope:%f\n",step,pt.y,currentRelLum,tempSlope,slope);
@@ -228,19 +139,25 @@ Mat ShapeMorph::contrast2(Mat src) {
 					if(slope>=enterDemarcThresh && demarcFlag==0) {
 						enterDemarcPos = Point(step,pt.y);
 						demarcFlag=1; //entering Dark shade
+						map.at<uchar>(enterDemarcPos) = 1;
 					}
 					if((slope<=exitDemarcThresh && tempSlope<0)) {
-						if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1)
+						if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1) {
 							enterDemarcPos = minSlopePt;
+							map.at<uchar>(enterDemarcPos) = 1;
+						}
 						exitDemarcPos = Point(step,pt.y);
 						demarcFlag=1;
+						map.at<uchar>(exitDemarcPos) = 2;
 						break;
 					}
 				}//end while loop
-				if(exitDemarcPos==Point(-1,-1) && demarcFlag==1)
+				if(exitDemarcPos==Point(-1,-1) && demarcFlag==1) {
 					exitDemarcPos = Point(step,pt.y);
+					map.at<uchar>(exitDemarcPos) = 2;
+				}
 				//printf() for debugging
-
+				/*
 				debug=true;
 				if(j==myPt.x && i==myPt.y) {
 					currentRelLum = src.at<uchar>(pt.y,step);
@@ -257,7 +174,8 @@ Mat ShapeMorph::contrast2(Mat src) {
 					for(int k=j; k<exitDemarcPos.x; k++) {
 						if(k>=enterDemarcPos.x && pt.y>=enterDemarcPos.y) {
 							if(k<=exitDemarcPos.x && pt.y<=exitDemarcPos.y) {
-								result.at<uchar>(i,k) = 255;
+								//result.at<uchar>(i,k) = 255;
+								result.at<uchar>(i,k) = src.at<uchar>(i,k);
 							}
 							else {
 								enterDemarcPos = Point(-1,-1);
@@ -272,7 +190,7 @@ Mat ShapeMorph::contrast2(Mat src) {
 			}// end if color
 		}//end for j
 	}//end for i
-	return result;
+	return map;
 }
 
 Mat ShapeMorph::getStructElem(Size size, int shape) {
@@ -314,6 +232,109 @@ Mat ShapeMorph::elementaryDilation(Mat origImg, Mat scaleImg) {
 	return result;
 }
 
+//Ands the two images/ Assigns min of two images
+Mat ShapeMorph::custAnd(Mat origImg, Mat scaleImg) {
+	deque<int> ptVec;
+	Mat results(origImg.rows,origImg.cols, CV_8U, Scalar(0));
+	for(int i=0; i<scaleImg.rows; i++) {
+		for(int j=0; j<scaleImg.cols; j++) {
+			if(scaleImg.at<uchar>(i,j)>0) {
+				ptVec.push_back(j);
+			}
+		}
+		for(int j=0; j<scaleImg.cols; j++) {
+			for(unsigned int k=0; k<ptVec.size(); k++) {
+				if(k<ptVec.size()-1) {
+					if(j==ptVec.at(k)) {
+						scaleImg.at<uchar>(i,j) = origImg.at<uchar>(i,j);
+						break;
+					}
+					else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
+						int val1 = origImg.at<uchar>(i,ptVec.at(k));
+						int val2 = origImg.at<uchar>(i,ptVec.at(k+1));
+						int val = origImg.at<uchar>(i,j);
+						results.at<uchar>(i,j) = min(max(val1,val2),val);
+						break;
+					}
+					else if(j<ptVec.at(k)) {
+						int val1 = origImg.at<uchar>(i,ptVec.at(k));
+						int val = origImg.at<uchar>(i,j);
+						results.at<uchar>(i,j) = min(val1,val);
+						break;
+					}
+				}
+				else {
+					if(j>ptVec.at(k)) {
+						int val1 = origImg.at<uchar>(i,ptVec.at(k));
+						int val = origImg.at<uchar>(i,j);
+						results.at<uchar>(i,j) = min(val1,val);
+						break;
+					}
+				}
+			}
+		}
+		ptVec.clear();
+	}// end for row i
+	return results;
+}
+
+Mat ShapeMorph::custAnd2(Mat origImg, Mat scaleImg) {
+	deque<int> ptVec;
+	Mat results(origImg.rows,origImg.cols, CV_8U, Scalar(0));
+	Mat map = this->hysteresisGradient(origImg);
+	int flag=0, rmin=0;
+	for(int i=0; i<scaleImg.rows; i++) {
+		for(int j=0; j<scaleImg.cols; j++) {
+			if(scaleImg.at<uchar>(i,j)>0) {
+				ptVec.push_back(j);
+			}
+		}
+		for(int j=0; j<scaleImg.cols; j++) {
+			if(map.at<uchar>(i,j)==1) flag=1;
+			if(map.at<uchar>(i,j)==2) flag=0;
+			if(flag==0) rmin = origImg.at<uchar>(i,j);
+			for(unsigned int k=0; k<ptVec.size(); k++) {
+				if(k<ptVec.size()-1) {
+					if(j==ptVec.at(k)) {
+						if(flag==0) {
+							scaleImg.at<uchar>(i,j) = rmin;
+							flag=1;
+						}
+						else if(flag==1) {
+							scaleImg.at<uchar>(i,j) = rmin;
+
+						}
+						break;
+					}
+					else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
+						int val1 = origImg.at<uchar>(i,ptVec.at(k));
+						int val2 = origImg.at<uchar>(i,ptVec.at(k+1));
+						int val = origImg.at<uchar>(i,j);
+						results.at<uchar>(i,j) = min(max(val1,val2),val);
+						break;
+					}
+					else if(j<ptVec.at(k)) {
+						int val1 = origImg.at<uchar>(i,ptVec.at(k));
+						int val = origImg.at<uchar>(i,j);
+						results.at<uchar>(i,j) = min(val1,val);
+						break;
+					}
+				}
+				else {
+					if(j>ptVec.at(k)) {
+						int val1 = origImg.at<uchar>(i,ptVec.at(k));
+						int val = origImg.at<uchar>(i,j);
+						results.at<uchar>(i,j) = min(val1,val);
+						break;
+					}
+				}
+			}
+		}
+		ptVec.clear();
+	}// end for row i
+	return results;
+}
+
 Mat ShapeMorph::grayscaleReconstruct(Mat src) {
 	Mat img1 = src.clone()-1;
 	Mat img2;
@@ -325,48 +346,8 @@ Mat ShapeMorph::grayscaleReconstruct(Mat src) {
 		img1 = img2.clone();
 	}
 	Mat _src = 255 - src; //invert image for LC values
-	Mat img3c = src - img2; //RMIN positions
-	img1 = Mat::zeros(_src.rows, _src.cols, CV_8U);
-	deque<int> ptVec;
-	for(int i=0; i<img3c.rows; i++) {
-		for(int j=0; j<img3c.cols; j++) {
-			if(img3c.at<uchar>(i,j)>0) {
-				ptVec.push_back(j);
-			}
-		}
-		for(int j=0; j<img3c.cols; j++) {
-			for(unsigned int k=0; k<ptVec.size(); k++) {
-				if(k<ptVec.size()-1) {
-					if(j==ptVec.at(k)) {
-						img1.at<uchar>(i,j) = _src.at<uchar>(i,j);
-						break;
-					}
-					else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
-						int val1 = _src.at<uchar>(i,ptVec.at(k));
-						int val2 = _src.at<uchar>(i,ptVec.at(k+1));
-						int val = _src.at<uchar>(i,j);
-						img1.at<uchar>(i,j) = min(max(val1,val2),val);
-						break;
-					}
-					else if(j<ptVec.at(k)) {
-						int val1 = _src.at<uchar>(i,ptVec.at(k));
-						int val = _src.at<uchar>(i,j);
-						img1.at<uchar>(i,j) = min(val1,val);
-						break;
-					}
-				}
-				else {
-					if(j>ptVec.at(k)) {
-						int val1 = _src.at<uchar>(i,ptVec.at(k));
-						int val = _src.at<uchar>(i,j);
-						img1.at<uchar>(i,j) = min(val1,val);
-						break;
-					}
-				}
-			}
-		}
-		ptVec.clear();
-	}// end for row i
+	Mat img3c = src - img2; //img3c -> RMIN positions
+	img1 = custAnd(_src,img3c);
 	while(true) {
 		img2 = this->elementaryDilation(_src,img1);
 		compareMat = img1==img2;
@@ -782,4 +763,71 @@ Mat ShapeMorph::kmeansClusterPt(Mat src) {
 		//}
 	}
 	return clusterImg;
+}
+
+Mat ShapeMorph::customFn(Mat src) {
+	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
+	Size size(10,10);
+	int minLCThresh = 5;
+	double enterDKThresh = 5.0;
+	double enterDNThresh = 3.;
+	double exitDKThresh = 5.0;
+	double exitDNThresh = 3.;
+	int entryFlag=0;
+	double totalDK=0, totalDN=0;
+	double avgDK=0, density=0;
+	double dkRatio=0, dnRatio=0;
+	double cumulativeDK=0, cumulativeDN=0;
+	int row=0, col=0;
+	Point begin;
+	Mat drkMat(src.rows,src.cols,CV_32F,Scalar(0));
+	Mat dnMat(src.rows,src.cols,CV_32F,Scalar(0));
+	while(row<src.rows) {
+		while(col<src.cols) {
+			begin=Point(col-floor(size.width/2),row-floor(size.height/2));
+			for(int i=begin.y; i<(begin.y+size.height); i++) {
+				for(int j=begin.x; j<(begin.x+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						if(src.at<uchar>(i,j)>minLCThresh) {
+							totalDK += src.at<uchar>(i,j);
+						}
+						if(src.at<uchar>(i,j)>minLCThresh)
+							totalDN++;
+					}
+				}
+			}
+			avgDK = totalDK/size.area();
+			density = totalDN/size.area();
+			drkMat.at<float>(row,col) = avgDK;
+			dnMat.at<float>(row,col) = density;
+			if(col>0) {
+				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
+				if(drkMat.at<float>(row,col-1)==0) dkRatio=0;
+				dnRatio = dnMat.at<float>(row,col)/dnMat.at<float>(row,col-1);
+				if(dnMat.at<float>(row,col-1)==0) dnRatio=0;
+				cumulativeDK += dkRatio - 1.0;
+				cumulativeDN += dnRatio - 1.0;
+				if(row==36) {
+					printf("%d,%d: %f,%f,%f,%f\n",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
+				}
+			}
+			if(cumulativeDK>=enterDKThresh || cumulativeDN>=enterDNThresh) {
+				entryFlag=1;
+			}
+			else if(cumulativeDK<=exitDKThresh || cumulativeDN<=exitDNThresh) {
+				entryFlag=0;
+			}
+			if(entryFlag==1)
+				map.at<uchar>(row,col) = 255;
+
+			totalDK=0;
+			totalDN=0;
+			col++;
+		}
+		cumulativeDK=0;
+		cumulativeDN=0;
+		col=0;
+		row++;
+	}
+	return map;
 }

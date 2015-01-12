@@ -44,15 +44,15 @@ void Entropy::runAllEntropy() {
 		Mat img = imread(files.at(i));
 		if(img.data) {
 			FileData fd;
-			fd.filename = getFileName(files.at(i),"_");
+			fd.filename = getFileName(files.at(i),"-");
 			String file = "/home/jason/Desktop/Programs/Looks_Like/"+fd.filename+".jpg";
 			Mat regImg = runResizeImage(file,imgSize,0);
 			Mat normImg = runColorNormalization(regImg);
 			Mat grayImg;
 			cvtColor(normImg,grayImg,CV_BGR2GRAY);
 			fd.setImage(grayImg);
-			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_ShadeColors_"+strSize+".csv",fd.colorVec);
-			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"_HSL_"+strSize+".csv",fd.hslMat);
+			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-ShadeColors-"+strSize+".csv",fd.colorVec);
+			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-HSL-"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
 				this->shapeFn(fd);
@@ -74,8 +74,8 @@ void Entropy::runEntropy() {
 	Size entSize(10,10);
 	FileData fd;
 	fd.filename = input;
-	flag[0]=fd.loadFileMatrix(fd.filename+"_ShadeColors_5x5.csv",fd.colorVec);
-	flag[1]=fd.loadFileMatrix(fd.filename+"_HSL_5x5.csv",fd.hslMat);
+	flag[0]=fd.loadFileMatrix(fd.filename+"-ShadeColors-5x5.csv",fd.colorVec);
+	flag[1]=fd.loadFileMatrix(fd.filename+"-HSL-5x5.csv",fd.hslMat);
 	if(flag[0]==true && flag[1]==true) {
 		Rgb rgb;
 		Hsl hsl;
@@ -113,7 +113,7 @@ void Entropy::runCompareEntropy(String targetName) {
 		fd.getFilesFromDirectory(folder,files);
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
-			name = getFileName(files.at(i),"_");
+			name = getFileName(files.at(i),"-");
 			if(name==targetName || targetName=="") {
 				this->loadEntropyFiles(filepath,vec2,colorNameVec);
 				results = this->compareEntropy(vec1,vec2,colorNameVec);
@@ -149,7 +149,7 @@ void Entropy::runCompareEntropy2(String targetName) {
 		fd.getFilesFromDirectory(folder,files);
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
-			name = getFileName(files.at(i),"_");
+			name = getFileName(files.at(i),"-");
 			if(name==targetName || targetName=="") {
 				this->loadEntropyFiles(filepath,vec2,colorNameVec);
 				results = this->compareEntropy2(vec1,vec2,colorNameVec);
@@ -184,7 +184,7 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 			getSubstr(temp,',',listPairVec);
 			for(unsigned int i=0; i<files.size(); i++) {
 				filepath = folder+files.at(i);
-				name = getFileName(files.at(i),"_");
+				name = getFileName(files.at(i),"-");
 				if(name==listPairVec.at(0)) {
 					break;
 				}
@@ -230,7 +230,7 @@ void Entropy::runCompareEntropyList2(String fileList, String folder) {
 			getSubstr(temp,',',listPairVec);
 			for(unsigned int i=0; i<files.size(); i++) {
 				filepath = folder+files.at(i);
-				name = getFileName(files.at(i),"_");
+				name = getFileName(files.at(i),"-");
 				if(name==listPairVec.at(0)) {
 					break;
 				}

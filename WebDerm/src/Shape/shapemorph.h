@@ -24,11 +24,12 @@ public:
 	Mat findShapes(Mat src);
 	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
 	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));
-	Mat contrast1(Mat src);
-	Mat contrast2(Mat src);
+	Mat hysteresisGradient(Mat src);
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat origImg, Mat scaleImg);
 	Mat prepareImage(Mat src);
+	Mat custAnd(Mat origImg, Mat scaleImg);
+	Mat custAnd2(Mat origImg, Mat scaleImg);
 	Mat grayscaleReconstruct(Mat src);
 	vector<Mat> liquidFeatureExtraction(Mat src);
 	vector<Mat> filterFeatures(vector<Mat> featureVec);
@@ -40,6 +41,8 @@ public:
 
 	Mat kmeansClusterLC(Mat src);
 	Mat kmeansClusterPt(Mat src);
+
+	Mat customFn(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */
