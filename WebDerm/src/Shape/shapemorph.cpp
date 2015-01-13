@@ -767,18 +767,20 @@ Mat ShapeMorph::kmeansClusterPt(Mat src) {
 
 Mat ShapeMorph::customFn(Mat src) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
-	Size size(10,10);
-	int minLCThresh = 5;
-	double enterDKThresh = 5.0;
-	double enterDNThresh = 3.;
-	double exitDKThresh = 5.0;
-	double exitDNThresh = 3.;
+	Size size(5,5);
+	const int minLCThresh = 5;
+	const double minDNThresh = round(size.area() * 0.15);
+	double enterDKThresh = 0.6;
+	double enterDNThresh = 3.5;
+	double exitDKThresh = 0.6;
+	double exitDNThresh = 3.5;
 	int entryFlag=0;
 	double totalDK=0, totalDN=0;
 	double avgDK=0, density=0;
 	double dkRatio=0, dnRatio=0;
 	double cumulativeDK=0, cumulativeDN=0;
 	int row=0, col=0;
+	int countDK=0;
 	Point begin;
 	Mat drkMat(src.rows,src.cols,CV_32F,Scalar(0));
 	Mat dnMat(src.rows,src.cols,CV_32F,Scalar(0));
@@ -790,38 +792,40 @@ Mat ShapeMorph::customFn(Mat src) {
 					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
 						if(src.at<uchar>(i,j)>minLCThresh) {
 							totalDK += src.at<uchar>(i,j);
+							countDK++;
 						}
 						if(src.at<uchar>(i,j)>minLCThresh)
 							totalDN++;
 					}
 				}
 			}
-			avgDK = totalDK/size.area();
+			avgDK = totalDK/countDK;
+			if(countDK==0) avgDK=0;
 			density = totalDN/size.area();
 			drkMat.at<float>(row,col) = avgDK;
 			dnMat.at<float>(row,col) = density;
-			if(col>0) {
+			if(col>0 && drkMat.at<float>(row,col-1)>minLCThresh && totalDN>minDNThresh) {
 				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
-				if(drkMat.at<float>(row,col-1)==0) dkRatio=0;
 				dnRatio = dnMat.at<float>(row,col)/dnMat.at<float>(row,col-1);
-				if(dnMat.at<float>(row,col-1)==0) dnRatio=0;
 				cumulativeDK += dkRatio - 1.0;
 				cumulativeDN += dnRatio - 1.0;
 				if(row==36) {
-					printf("%d,%d: %f,%f,%f,%f\n",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
+					//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
+					printf("DK: %d,%d: %f,%f,%f,%f,  ",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
+					printf("DN: %d,%d: %f,%f,%f,%f\n",col,row,dnMat.at<float>(row,col-1),dnMat.at<float>(row,col),dnRatio,cumulativeDN);
 				}
+				if(cumulativeDK>=enterDKThresh || cumulativeDN>=enterDNThresh) {
+					entryFlag=1;
+				}
+				else if(cumulativeDK<=exitDKThresh || cumulativeDN<=exitDNThresh) {
+					entryFlag=0;
+				}
+				if(entryFlag==1)
+					map.at<uchar>(row,col) = 255;
 			}
-			if(cumulativeDK>=enterDKThresh || cumulativeDN>=enterDNThresh) {
-				entryFlag=1;
-			}
-			else if(cumulativeDK<=exitDKThresh || cumulativeDN<=exitDNThresh) {
-				entryFlag=0;
-			}
-			if(entryFlag==1)
-				map.at<uchar>(row,col) = 255;
-
 			totalDK=0;
 			totalDN=0;
+			countDK=0;
 			col++;
 		}
 		cumulativeDK=0;
