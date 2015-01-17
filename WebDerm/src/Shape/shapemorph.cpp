@@ -233,128 +233,155 @@ Mat ShapeMorph::elementaryDilation(Mat origImg, Mat scaleImg) {
 }
 
 //Ands the two images/ Assigns min of two images
-Mat ShapeMorph::custAnd(Mat origImg, Mat scaleImg) {
+Mat ShapeMorph::custAnd(Mat origImg, Mat scaleImg, Mat map) {
 	deque<int> ptVec;
 	Mat results(origImg.rows,origImg.cols, CV_8U, Scalar(0));
-	for(int i=0; i<scaleImg.rows; i++) {
-		for(int j=0; j<scaleImg.cols; j++) {
-			if(scaleImg.at<uchar>(i,j)>0) {
-				ptVec.push_back(j);
-			}
-		}
-		for(int j=0; j<scaleImg.cols; j++) {
-			for(unsigned int k=0; k<ptVec.size(); k++) {
-				if(k<ptVec.size()-1) {
-					if(j==ptVec.at(k)) {
-						scaleImg.at<uchar>(i,j) = origImg.at<uchar>(i,j);
-						break;
-					}
-					else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
-						int val1 = origImg.at<uchar>(i,ptVec.at(k));
-						int val2 = origImg.at<uchar>(i,ptVec.at(k+1));
-						int val = origImg.at<uchar>(i,j);
-						results.at<uchar>(i,j) = min(max(val1,val2),val);
-						break;
-					}
-					else if(j<ptVec.at(k)) {
-						int val1 = origImg.at<uchar>(i,ptVec.at(k));
-						int val = origImg.at<uchar>(i,j);
-						results.at<uchar>(i,j) = min(val1,val);
-						break;
-					}
-				}
-				else {
-					if(j>ptVec.at(k)) {
-						int val1 = origImg.at<uchar>(i,ptVec.at(k));
-						int val = origImg.at<uchar>(i,j);
-						results.at<uchar>(i,j) = min(val1,val);
-						break;
-					}
+	if(!map.empty()) {
+		int flag=0, rmin=0;
+		for(int i=0; i<scaleImg.rows; i++) {
+			for(int j=0; j<scaleImg.cols; j++) {
+				if(scaleImg.at<uchar>(i,j)>0) {
+					ptVec.push_back(j);
 				}
 			}
-		}
-		ptVec.clear();
-	}// end for row i
+			for(int j=0; j<scaleImg.cols; j++) {
+				if(flag==0) rmin = origImg.at<uchar>(i,j);
+				if(map.at<uchar>(i,j)==255) flag=1;
+				if(map.at<uchar>(i,j)==0) flag=0;
+				for(unsigned int k=0; k<ptVec.size(); k++) {
+					if(k<ptVec.size()-1) {
+						if(j==ptVec.at(k)) {
+							scaleImg.at<uchar>(i,j) = min(rmin,(int)origImg.at<uchar>(i,j));
+							break;
+						}
+						else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
+							if(flag==1) {
+								results.at<uchar>(i,j) = min(rmin,(int)origImg.at<uchar>(i,j));
+							}
+							else {
+								int val1 = origImg.at<uchar>(i,ptVec.at(k));
+								int val2 = origImg.at<uchar>(i,ptVec.at(k+1));
+								int val = origImg.at<uchar>(i,j);
+								results.at<uchar>(i,j) = min(max(val1,val2),val);
+							}
+							break;
+						}
+						else if(j<ptVec.at(k)) {
+							if(flag==1) {
+								results.at<uchar>(i,j) = min(rmin,(int)origImg.at<uchar>(i,j));
+							}
+							else {
+								int val1 = origImg.at<uchar>(i,ptVec.at(k));
+								int val = origImg.at<uchar>(i,j);
+								results.at<uchar>(i,j) = min(val1,val);
+							}
+							break;
+						}
+					}
+					else {
+						if(j>ptVec.at(k)) {
+							if(flag==1) {
+								results.at<uchar>(i,j) = min(rmin,(int)origImg.at<uchar>(i,j));
+							}
+							else {
+								int val1 = origImg.at<uchar>(i,ptVec.at(k));
+								int val = origImg.at<uchar>(i,j);
+								results.at<uchar>(i,j) = min(val1,val);
+							}
+							break;
+						}
+					}
+				}
+			}
+			ptVec.clear();
+		}// end for row i
+	}
+	else {
+		for(int i=0; i<scaleImg.rows; i++) {
+			for(int j=0; j<scaleImg.cols; j++) {
+				if(scaleImg.at<uchar>(i,j)>0) {
+					ptVec.push_back(j);
+				}
+			}
+			for(int j=0; j<scaleImg.cols; j++) {
+				for(unsigned int k=0; k<ptVec.size(); k++) {
+					if(k<ptVec.size()-1) {
+						if(j==ptVec.at(k)) {
+							scaleImg.at<uchar>(i,j) = origImg.at<uchar>(i,j);
+							break;
+						}
+						else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
+							int val1 = origImg.at<uchar>(i,ptVec.at(k));
+							int val2 = origImg.at<uchar>(i,ptVec.at(k+1));
+							int val = origImg.at<uchar>(i,j);
+							results.at<uchar>(i,j) = min(max(val1,val2),val);
+							break;
+						}
+						else if(j<ptVec.at(k)) {
+							int val1 = origImg.at<uchar>(i,ptVec.at(k));
+							int val = origImg.at<uchar>(i,j);
+							results.at<uchar>(i,j) = min(val1,val);
+							break;
+						}
+					}
+					else {
+						if(j>ptVec.at(k)) {
+							int val1 = origImg.at<uchar>(i,ptVec.at(k));
+							int val = origImg.at<uchar>(i,j);
+							results.at<uchar>(i,j) = min(val1,val);
+							break;
+						}
+					}
+				}
+			}
+			ptVec.clear();
+		}// end for row i
+	}
 	return results;
 }
 
-Mat ShapeMorph::custAnd2(Mat origImg, Mat scaleImg) {
-	deque<int> ptVec;
-	Mat results(origImg.rows,origImg.cols, CV_8U, Scalar(0));
-	Mat map = this->hysteresisGradient(origImg);
-	int flag=0, rmin=0;
-	for(int i=0; i<scaleImg.rows; i++) {
-		for(int j=0; j<scaleImg.cols; j++) {
-			if(scaleImg.at<uchar>(i,j)>0) {
-				ptVec.push_back(j);
-			}
-		}
-		for(int j=0; j<scaleImg.cols; j++) {
-			if(map.at<uchar>(i,j)==1) flag=1;
-			if(map.at<uchar>(i,j)==2) flag=0;
-			if(flag==0) rmin = origImg.at<uchar>(i,j);
-			for(unsigned int k=0; k<ptVec.size(); k++) {
-				if(k<ptVec.size()-1) {
-					if(j==ptVec.at(k)) {
-						if(flag==0) {
-							scaleImg.at<uchar>(i,j) = rmin;
-							flag=1;
-						}
-						else if(flag==1) {
-							scaleImg.at<uchar>(i,j) = rmin;
-
-						}
-						break;
-					}
-					else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
-						int val1 = origImg.at<uchar>(i,ptVec.at(k));
-						int val2 = origImg.at<uchar>(i,ptVec.at(k+1));
-						int val = origImg.at<uchar>(i,j);
-						results.at<uchar>(i,j) = min(max(val1,val2),val);
-						break;
-					}
-					else if(j<ptVec.at(k)) {
-						int val1 = origImg.at<uchar>(i,ptVec.at(k));
-						int val = origImg.at<uchar>(i,j);
-						results.at<uchar>(i,j) = min(val1,val);
-						break;
-					}
-				}
-				else {
-					if(j>ptVec.at(k)) {
-						int val1 = origImg.at<uchar>(i,ptVec.at(k));
-						int val = origImg.at<uchar>(i,j);
-						results.at<uchar>(i,j) = min(val1,val);
-						break;
-					}
-				}
-			}
-		}
-		ptVec.clear();
-	}// end for row i
-	return results;
-}
-
-Mat ShapeMorph::grayscaleReconstruct(Mat src) {
-	Mat img1 = src.clone()-1;
-	Mat img2;
+Mat ShapeMorph::grayscaleReconstruct(Mat src, Mat scaleImg) {
+	Mat _scaleImg = scaleImg.clone();
+	Mat tempImg;
 	Mat compareMat = Mat::zeros(src.rows,src.cols,CV_8U);
 	while(true) {
-		img2 = this->elementaryDilation(src,img1);
-		compareMat = img1==img2;
+		tempImg = this->elementaryDilation(src,_scaleImg);
+		compareMat = _scaleImg==tempImg;
 		if(countNonZero(compareMat)==src.total()) break;
-		img1 = img2.clone();
+		_scaleImg = tempImg.clone();
 	}
+	Mat result = src - tempImg;
+	return result;
+}
+
+Mat ShapeMorph::custGrayscaleRecon(Mat src) {
+	Mat scaleImg = src.clone()-1;
+	Mat rmins = this->grayscaleReconstruct(src,scaleImg);
 	Mat _src = 255 - src; //invert image for LC values
-	Mat img3c = src - img2; //img3c -> RMIN positions
-	img1 = custAnd(_src,img3c);
-	while(true) {
-		img2 = this->elementaryDilation(_src,img1);
-		compareMat = img1==img2;
-		if(countNonZero(compareMat)==src.total()) break;
-		img1 = img2.clone();
-	}
-	Mat result = _src - img2;
+	Mat mask = custAnd(_src,rmins);
+	Mat result = this->grayscaleReconstruct(_src,mask);
+	return result;
+}
+
+Mat ShapeMorph::gsReconUsingRmin1(Mat src) {
+	Mat scaleImg = src.clone()-1;
+	Mat rmins = this->grayscaleReconstruct(src,scaleImg);
+	Mat _src = 255 - src; //invert image for LC values
+	Mat mask = custAnd(_src,rmins);
+	Mat gsr = this->grayscaleReconstruct(_src,mask);
+	Mat map = this->customFn(gsr);
+	mask = this->custAnd(_src,rmins,map);
+	Mat result = this->grayscaleReconstruct(_src,mask);
+	return result;
+}
+
+Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
+	Mat scaleImg = src.clone()-1;
+	Mat rmins = this->grayscaleReconstruct(src,scaleImg);
+	Mat _src = 255 - src; //invert image for LC values
+	Mat map = this->customFn2(_src);
+	Mat mask = custAnd(_src,rmins,map);
+	Mat result = this->grayscaleReconstruct(_src,mask);
 	return result;
 }
 
@@ -577,7 +604,7 @@ Mat ShapeMorph::detectHeat(Mat src, Size size) {
 					int x = j+begin.x;
 					int y = i+begin.y;
 					if(y>=0 && x>=0 && y<src.rows && x<src.cols) {
-						if(src.at<uchar>(y,x)>0)
+						if(src.at<uchar>(y,x)>5)
 							total += kernel.at<float>(i,j);
 					}
 				}
@@ -606,7 +633,7 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	theRNG().state = defaultSeed; //reset RNG seed for kmeans initial centroids
 
 	deque<int> dataVec;
-	deque<int> lumFlag(256,0);
+	deque<int> uniqueLum(256,0);
 	deque<int> lumVec;
 	deque<Point> ptVec;
 	for(int i=0; i<src.rows; i++) {
@@ -614,13 +641,13 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 			int lum = src.at<uchar>(i,j);
 			if(lum>0) {
 				dataVec.push_back(lum);
-				lumFlag.at(lum)++;
+				uniqueLum.at(lum)++;
 				ptVec.push_back(Point(j,i));
 			}
 		}
 	}
-	for(unsigned int i=0; i<lumFlag.size(); i++) {
-		if(lumFlag.at(i)>0) {
+	for(unsigned int i=0; i<uniqueLum.size(); i++) {
+		if(uniqueLum.at(i)>0) {
 			lumVec.push_back(i);
 		}
 	}
@@ -630,13 +657,15 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	}
 	int lumRange = lumVec.at(lumVec.size()-1) - lumVec.at(0);
 	int clusterCount = round(sqrt(lumRange/2))<lumVec.size() ? round(sqrt(lumRange/2)) : lumVec.size();
+	clusterCount = min(11,clusterCount);
 	Mat labels;
 	int attempts = 5;
 	Mat centers;
-	//printf("Min Lum: %d, Max Lum: %d\n",lumVec.at(0),lumVec.at(lumVec.size()-1));
-	//cout << "Initial clusters: " << clusterCount << endl;
-	//cout << "Input size: " << dataVec.size() << endl;
-	//cout << "Flag size: " << lumVec.size() << endl;
+	printf("Min Lum: %d, Max Lum: %d, Range: %d\n",lumVec.at(0),lumVec.at(lumVec.size()-1), lumRange);
+	cout << "Initial clusters: " << clusterCount << endl;
+	cout << "Input size: " << dataVec.size() << endl;
+	cout << "Unique Lum size: " << uniqueLum.size() << endl;
+	cout << "Unique Lum considered: " << lumVec.size() << endl;
 	double compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
 	//cout << "compactness: " << compact << endl;
 	deque<int> centerCount(clusterCount,0);
@@ -644,7 +673,7 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 	for(unsigned int i=0; i<ranges.size(); i++) {
 		for(unsigned int j=0; j<ranges.at(i).size(); j++) {
 			if(j==0) {
-				ranges.at(i).at(j) = 256;
+				ranges.at(i).at(j) = uniqueLum.size();
 			}
 			else if(j==1) {
 				ranges.at(i).at(j) = 0;
@@ -670,13 +699,13 @@ Mat ShapeMorph::kmeansClusterLC(Mat src) {
 			ranges.at(idx).at(0) = dataVec.at(i);
 		}
 	}
-	//for(int i=0; i<centers.rows; i++) {
-	//	printf("%f - %d - Min: %d, Max: %d\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
-	//}
+	for(int i=0; i<centers.rows; i++) {
+		printf("%d) %f - %d - Min: %d, Max: %d\n",i,centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
+	}
 	Mat result = Mat::zeros(src.rows, src.cols, src.type());
 	Mat clusterImg = Mat::zeros(src.rows,src.cols,CV_8UC3);
 	int idxThresh = ceil(clusterCount*0.5); //! threshold for cluster filtering
-	//cout << idxThresh << endl;
+	printf("idxThresh: %d\n",idxThresh);
 	for(unsigned int i=0; i<ptVec.size(); i++) {
 		int idx = labels.at<int>(i,0);
 		if(idx>idxThresh) {
@@ -765,6 +794,7 @@ Mat ShapeMorph::kmeansClusterPt(Mat src) {
 	return clusterImg;
 }
 
+//! entry/exit map of edges
 Mat ShapeMorph::customFn(Mat src) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	Size size(5,5);
@@ -809,11 +839,11 @@ Mat ShapeMorph::customFn(Mat src) {
 				dnRatio = dnMat.at<float>(row,col)/dnMat.at<float>(row,col-1);
 				cumulativeDK += dkRatio - 1.0;
 				cumulativeDN += dnRatio - 1.0;
-				if(row==36) {
+				/*if(row==36) {
 					//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
 					printf("DK: %d,%d: %f,%f,%f,%f,  ",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
 					printf("DN: %d,%d: %f,%f,%f,%f\n",col,row,dnMat.at<float>(row,col-1),dnMat.at<float>(row,col),dnRatio,cumulativeDN);
-				}
+				}*/
 				if(cumulativeDK>=enterDKThresh || cumulativeDN>=enterDNThresh) {
 					entryFlag=1;
 				}
@@ -834,4 +864,196 @@ Mat ShapeMorph::customFn(Mat src) {
 		row++;
 	}
 	return map;
+}
+
+//! returns entry/exit map of edges
+Mat ShapeMorph::customFn2(Mat src) {
+	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
+	Size size(5,5);
+	const int minLCThresh = 5;
+	double enterDKThresh = 0.1;
+	double exitDKThresh = 0.1;
+	double dkThresh2 = 1.03;
+	int entryFlag=0;
+	double totalDK=0, totalDN=0;
+	double avgDK=0, density=0;
+	double dkRatio=0, dnRatio=0;
+	double cumulativeDK=0, cumulativeDN=0;
+	int row=0, col=0;
+	int countDK=0;
+	Point begin;
+	Mat drkMat(src.rows,src.cols,CV_32F,Scalar(0));
+	Mat dnMat(src.rows,src.cols,CV_32F,Scalar(0));
+	while(row<src.rows) {
+		while(col<src.cols) {
+			begin=Point(col-floor(size.width/2),row-floor(size.height/2));
+			for(int i=begin.y; i<(begin.y+size.height); i++) {
+				for(int j=begin.x; j<(begin.x+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						totalDK += src.at<uchar>(i,j);
+						countDK++;
+						if(src.at<uchar>(i,j)>minLCThresh)
+							totalDN++;
+					}
+				}
+			}
+			avgDK = totalDK/countDK;
+			if(countDK==0) avgDK=0;
+			density = totalDN/size.area();
+			drkMat.at<float>(row,col) = avgDK;
+			dnMat.at<float>(row,col) = density;
+			if(col>0) {
+				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
+				dnRatio = dnMat.at<float>(row,col)/dnMat.at<float>(row,col-1);
+				cumulativeDK += dkRatio - 1.0;
+				cumulativeDN += dnRatio - 1.0;
+				/*if(row==11) {
+					//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
+					printf("DK: %d,%d: %f,%f,%f,%f,  ",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
+					printf("DN: %d,%d: %f,%f,%f,%f\n",col,row,dnMat.at<float>(row,col-1),dnMat.at<float>(row,col),dnRatio,cumulativeDN);
+				}*/
+				if(cumulativeDK>=enterDKThresh || dkRatio>=dkThresh2) {
+					entryFlag=1;
+				}
+				else if(cumulativeDK<=exitDKThresh || dkRatio<=dkThresh2) {
+					entryFlag=0;
+				}
+				if(entryFlag==1)
+					map.at<uchar>(row,col) = 255;
+			}
+			totalDK=0;
+			totalDN=0;
+			countDK=0;
+			col++;
+		}
+		cumulativeDK=0;
+		cumulativeDN=0;
+		col=0;
+		row++;
+	}
+	return map;
+}
+
+Mat ShapeMorph::densityDetection(Mat src) {
+	Mat tempResult(src.rows, src.cols, CV_32F, Scalar(0));
+	Mat results(src.rows, src.cols, CV_8U, Scalar(0));
+	Mat interPtsMap(src.rows,src.cols,CV_32S,Scalar(0));
+	deque<deque<Point> > interPts(src.rows*src.cols,deque<Point>(1,Point(-1,-1)));
+	deque<deque<double> > distVec(src.rows*src.cols,deque<double>(1,-1.0));
+	const double alpha = 0.75;
+	const double epsilon = 0.5;
+	double absDiscernThresh = 1.0;
+	const double cutoffThresh = 1.0;
+	int row=0, col=0;
+	double dist=0, cutoffDist=0;
+	double maxVal=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			int index = col + row*src.cols;
+			if(interPts.at(index).at(0)==Point(-1,-1))
+				interPts.at(index).pop_front();
+			if(distVec.at(index).at(0)==-1.0)
+				distVec.at(index).pop_front();
+			double dbl_Lc = sqrt((int)src.at<uchar>(row,col));
+			if(dbl_Lc>absDiscernThresh) {
+				tempResult.at<float>(row,col) = dbl_Lc;
+				double cutoffVal = cutoffThresh + 1.0;
+				while(cutoffVal>cutoffThresh) {
+					cutoffDist++;
+					cutoffVal = pow(alpha,cutoffDist) * pow(dbl_Lc,epsilon);
+					//if(col==102 && row==80) {
+					//	printf("LC: %f, Val: %f, Dist: %f\n",dbl_Lc,cutoffVal,cutoffDist);
+					//}
+				}
+				cutoffDist--;
+				for(int i=(row-cutoffDist); i<=(row+cutoffDist); i++) {
+					for(int j=(col-cutoffDist); j<=(col+cutoffDist); j++) {
+						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+							int index = j + i*src.cols;
+							dist = floor(eucDist(Point(j,i),Point(col,row)));
+							if(dist<=cutoffDist) {
+								interPts.at(index).push_back(Point(col,row));
+								distVec.at(index).push_back(dist);
+							}
+						}
+					}
+				}
+			}
+			cutoffDist=0;
+			col++;
+		}
+		col=0;
+		row++;
+	}
+	/*int index = 130 + 92 * src.cols;
+	for(int i=0; i<interPts.at(index).size(); i++) {
+		cout << interPts.at(index).at(i) << " - ";
+		cout << _src.at<float>(interPts.at(index).at(i)) << " - ";
+		cout << distVec.at(index).at(i) << endl;
+	}*/
+	//double val1 = tempResult.at<float>(80,102);
+	//double change = val1/tempResult.at<float>(128,20);
+	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
+	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
+	//printf("Change: %f\n",change );
+	int iter=1;
+	for(int n=0; n<iter; n++) {
+		for(int i=0; i<src.rows; i++) {
+			for(int j=0; j<src.cols; j++) {
+				int index = j + i*src.cols;
+				for(unsigned int k=0; k<interPts.at(index).size(); k++) {
+					if(interPts.at(index).size()>=2) {
+						double dbl_Lc = sqrt((int)src.at<uchar>(interPts.at(index).at(k)));
+						double val1 = pow(alpha,distVec.at(index).at(k)) * pow(dbl_Lc,epsilon);
+						val1 *=20.0; //same as iterating 20 times
+						dbl_Lc *=20.0;
+						val1 = tempResult.at<float>(i,j) + val1;
+						if(val1<0) val1=0;
+						tempResult.at<float>(i,j) = val1;
+						maxVal = max(val1,maxVal);
+						interPtsMap.at<int>(interPts.at(index).at(k))++;
+					}
+				}
+			}
+		}
+		//val1 = tempResult.at<float>(80,102);
+		//change = val1/tempResult.at<float>(128,20);
+		//printf("(102,80): %f, ",tempResult.at<float>(80,102));
+		//printf("(20,128): %f, ",tempResult.at<float>(128,20));
+		//printf("Change: %f\n",change );
+	}
+	//if point is a star and did not intersect -> penalize
+	for(int i=0; i<interPtsMap.rows; i++) {
+		for(int j=0; j<interPtsMap.cols; j++) {
+			double lc = (int)src.at<uchar>(i,j);
+			if(lc>absDiscernThresh) {
+				lc = sqrt(lc);
+				if(interPtsMap.at<int>(i,j)==0) {
+					double val = tempResult.at<float>(i,j) - (lc/2.);
+					if(val<0) val=0;
+					tempResult.at<float>(i,j) = val;
+				}
+			}
+		}
+	}
+	//double val1 = tempResult.at<float>(80,102);
+	//double change = val1/tempResult.at<float>(128,20);
+	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
+	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
+	//printf("Change: %f\n",change );
+	//nomalize tempResult to results from 0-255
+	//cout << maxVal << endl;
+	/*for(int i=0; i<tempResult.rows; i++) {
+		for(int j=0; j<tempResult.cols; j++) {
+			double val = tempResult.at<float>(i,j);
+			//if(val>0) val=255;
+			//if(val>255) val=255;
+			double normVal = (val-minVal)/(maxVal-minVal);
+			val = round(normVal*255.0);
+			results.at<uchar>(i,j) = val;
+		}
+	}*/
+	//imgshow(results);
+	return tempResult;
+	//return results;
 }

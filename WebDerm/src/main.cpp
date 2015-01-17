@@ -24,6 +24,7 @@
 #include "neuralnetworks/shapeml.h"
 #include "neuralnetworks/testml.h"
 #include "Shape/shapemorph.h"
+#include "Algorithms/cluster.h"
 
 int main(int argc,char** argv)
 {
@@ -61,18 +62,23 @@ int main(int argc,char** argv)
 	Size size(3,3);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
+	//Mat result = sm.gsReconUsingRmin1(img);
+	Mat result2 = sm.gsReconUsingRmin2(img);
+	img3 = sm.densityDetection(result2);
+	//Cluster clst;
+	//img4 = clst.kmeansClusterGeneric(img3);
+	//Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	//morphologyEx(result2,img5,MORPH_CLOSE,element);
+	//imgshow(img5);
+	//imgshow(result2);
+	//imgshow(img5);
 	//img = 255 - img;
-	//img2 = sm.hysteresisGradient(img);
-	img2 = sm.grayscaleReconstruct(img);
-	img4 = sm.customFn(img2);
-	imgshow(img4);
-	//imgshow(img);
-	//imwrite("psoriasis17-3x3-GrayRec-Closing.png",img3);
+	//imwrite("vitiligo2-Inverted-Grayscale.png",img);
 	//img2 = sm.findShapes(img);
 	//img3 = sm.detectHeat(img2, Size(11,11));
 	//img4 = sm.connectImage(img3,Size(21,21),9.0);
 	//vector<Mat> featureVec = sm.liquidExtraction(img4);
-/*
+	/*
 	FileData fd;
 	Entropy en;
 	fd.setImage(img);
@@ -99,19 +105,19 @@ int main(int argc,char** argv)
 	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
 	vector<double> labels(2,0);
 	for(unsigned int i=0; i<labels.size(); i++) {
-		if(i==0) labels.at(i)=-1;
-		if(i==1) labels.at(i)=1;
+		if(i==0) labels.at(i)=1;
+		if(i==1) labels.at(i)=-1;
 	}
 	ml.convertImagesToData(samplesPath,labels);
 /**/
-	/*
+/*
 	deque<String> files;
 	FileData fd;
-	String folder = "/home/jason/Desktop/workspace/Samples/Training/Circles/";
+	String folder = "/home/jason/Desktop/workspace/Samples/Training/Random/";
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		String oldname = folder+files.at(i);
-		String newname = folder+"circle("+toString(i+1)+").png";
+		String newname = folder+"random(0"+toString(i+1)+").png";
 		cout << newname << endl;
 		rename(oldname.c_str(),newname.c_str());
 	}
@@ -147,13 +153,9 @@ int main(int argc,char** argv)
 	//TestML ml;
 	vector<Mat> sampleVec;
 	Mat sample;
-	for(unsigned int i=0; i<featureVec.size(); i++) {
-		//String name = "feature"+toString(i+1)+".png";
-		//imwrite(name,featureVec.at(i));
-		sample = ml.prepareImage(featureVec.at(i));
-		sampleVec.push_back(sample);
-		sample.release();
-	}
+	sample = ml.prepareImage(vecMat.at(idx));
+	sampleVec.push_back(sample);
+	sample.release();
 	Mat results;
 	ml.setLayerParams(400,20,2);
 	Mat sample_set = ml.prepareMatSamples(sampleVec);
@@ -163,7 +165,7 @@ int main(int argc,char** argv)
 		printf("Sample: %d, ",i+1);
 		cout << results.row(i) << endl;
 	}
-/*
+	/*
 	vector<vector<double> > data;
 	vector<vector<double> > labels;
 	ml.importCsvData("/home/jason/Desktop/workspace/Samples/test_set.csv",data,labels);
@@ -192,7 +194,7 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-/*
+	/*
 	String file = "/home/jason/Desktop/workspace/Samples/training_set.csv";
 	String file2 = "/home/jason/Desktop/workspace/Samples/test_set.csv";
 	ShapeML sml;
@@ -234,7 +236,7 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-/*
+	/*
 	String name = "clp4";
 	//String file = "/home/jason/Desktop/workspace/ImagePairsSame.csv";
 	//String folder = "/home/jason/Desktop/Programs/TestYSV_New/";

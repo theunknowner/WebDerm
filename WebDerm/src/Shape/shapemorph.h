@@ -28,9 +28,8 @@ public:
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat origImg, Mat scaleImg);
 	Mat prepareImage(Mat src);
-	Mat custAnd(Mat origImg, Mat scaleImg);
-	Mat custAnd2(Mat origImg, Mat scaleImg);
-	Mat grayscaleReconstruct(Mat src);
+	Mat custAnd(Mat origImg, Mat scaleImg, Mat map=Mat());
+	Mat grayscaleReconstruct(Mat src, Mat scaleImg);
 	vector<Mat> liquidFeatureExtraction(Mat src);
 	vector<Mat> filterFeatures(vector<Mat> featureVec);
 
@@ -43,6 +42,13 @@ public:
 	Mat kmeansClusterPt(Mat src);
 
 	Mat customFn(Mat src);
+	Mat customFn2(Mat src);
+
+	Mat custGrayscaleRecon(Mat src);
+	Mat gsReconUsingRmin1(Mat src);
+	Mat gsReconUsingRmin2(Mat src);
+
+	Mat densityDetection(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */

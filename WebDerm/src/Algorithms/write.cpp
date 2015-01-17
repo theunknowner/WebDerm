@@ -82,7 +82,7 @@ void writeSeq2File(deque<double> &vec, String name) {
 
 	else
 		for(unsigned int i=0; i<vec.size(); i++) {
-			fprintf(fp,"%f,",vec.at(i));
+			fprintf(fp,"%f\n",vec.at(i));
 		}
 	fclose(fp);
 }
@@ -153,7 +153,7 @@ void writeSeq2File(Mat src, String name) {
 	fp = fopen(filename.c_str(),"w");
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
-			fprintf(fp,"%d,",src.at<uchar>(i,j));
+			fprintf(fp,"%d,",src.at<int>(i,j));
 		}
 		fprintf(fp,"\n");
 	}

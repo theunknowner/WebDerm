@@ -94,11 +94,12 @@ void TestML::importSamples(String folder, vector<Mat> &samples) {
 	deque<String> files;
 	String filename;
 	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = getFileName(files.at(i),"(");
-		filename = folder+name+"("+toString(i+1)+")"+".png";
+		filename = folder+files.at(i);
 		Mat img = imread(filename,0);
-		if(img.data) {
+		if(!img.empty()) {
 			img = this->prepareImage(img);
 			samples.push_back(img);
 		}
