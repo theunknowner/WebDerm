@@ -67,17 +67,28 @@ int main(int argc,char** argv)
 	img3 = sm.densityDetection(result2);
 	//Cluster clst;
 	//img4 = clst.kmeansClusterGeneric(img3);
-	//Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	//morphologyEx(result2,img5,MORPH_CLOSE,element);
-	//imgshow(img5);
-	//imgshow(result2);
+	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	morphologyEx(img3,img4,MORPH_CLOSE,element);
+	imgshow(img4);
+	imgshow(result2);
+	//imwrite("psoriasis17-GrayscaleReconstruct.png",result2);
 	//imgshow(img5);
 	//img = 255 - img;
 	//imwrite("vitiligo2-Inverted-Grayscale.png",img);
 	//img2 = sm.findShapes(img);
 	//img3 = sm.detectHeat(img2, Size(11,11));
 	//img4 = sm.connectImage(img3,Size(21,21),9.0);
-	//vector<Mat> featureVec = sm.liquidExtraction(img4);
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
+	int largest=0, idx=0;
+	for(unsigned int i=0; i<featureVec.size(); i++) {
+		int count = countNonZero(featureVec.at(i));
+		if(count>largest) {
+			largest = count;
+			idx = i;
+		}
+	}
+	//imwrite("psoriasis17-ExtractedFeature.png",featureVec.at(idx));
+	imgshow(featureVec.at(idx));
 	/*
 	FileData fd;
 	Entropy en;
@@ -102,18 +113,18 @@ int main(int argc,char** argv)
 	/**/
 /*
 	TestML ml;
-	String samplesPath = "/home/jason/Desktop/workspace/Samples/Training/Random/";
-	vector<double> labels(2,0);
+	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
+	vector<double> labels(5,0);
 	for(unsigned int i=0; i<labels.size(); i++) {
-		if(i==0) labels.at(i)=1;
-		if(i==1) labels.at(i)=-1;
+		if(i==4) labels.at(i)=1;
+		else labels.at(i)=-1;
 	}
 	ml.convertImagesToData(samplesPath,labels);
 /**/
 /*
 	deque<String> files;
 	FileData fd;
-	String folder = "/home/jason/Desktop/workspace/Samples/Training/Random/";
+	String folder = "/home/jason/git/Samples/Samples/Training/Circles/";
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		String oldname = folder+files.at(i);
@@ -126,7 +137,7 @@ int main(int argc,char** argv)
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
-	ml.importCsvData("/home/jason/Desktop/workspace/Samples/training_set.csv",trainingData,trainingLabels);
+	ml.importCsvData("/home/jason/git/Samples/Samples/training_set.csv",trainingData,trainingLabels);
 	int sampleSize = trainingData.size();
 	int inputSize = trainingData.at(0).size();
 	int outputSize = trainingLabels.at(0).size();
@@ -145,7 +156,7 @@ int main(int argc,char** argv)
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
 	cout << "Iterations: " << iter << endl;
-	CvFileStorage* storage = cvOpenFileStorage("/home/jason/Desktop/workspace/Samples/Training/param.xml", 0, CV_STORAGE_WRITE );
+	CvFileStorage* storage = cvOpenFileStorage("/home/jason/git/Samples/Samples/param.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
@@ -153,27 +164,28 @@ int main(int argc,char** argv)
 	//TestML ml;
 	vector<Mat> sampleVec;
 	Mat sample;
-	sample = ml.prepareImage(vecMat.at(idx));
+	sample = ml.prepareImage(featureVec.at(idx));
 	sampleVec.push_back(sample);
 	sample.release();
 	Mat results;
-	ml.setLayerParams(400,20,2);
+	ml.setLayerParams(400,20,5);
 	Mat sample_set = ml.prepareMatSamples(sampleVec);
-	ann.load("/home/jason/Desktop/workspace/Samples/Training/param.xml");
+	ann.load("/home/jason/git/Samples/Samples/param.xml");
 	ann.predict(sample_set,results);
 	for(int i=0; i<results.rows; i++) {
 		printf("Sample: %d, ",i+1);
 		cout << results.row(i) << endl;
 	}
-	/*
+/*
 	vector<vector<double> > data;
 	vector<vector<double> > labels;
-	ml.importCsvData("/home/jason/Desktop/workspace/Samples/test_set.csv",data,labels);
+	ml.importCsvData("/home/jason/git/Samples/Samples/test_set.csv",data,labels);
 	sampleSize = data.size();
 	Mat test_set(sampleSize,inputSize,CV_32F);
 	Mat test_labels(sampleSize,outputSize,CV_32F);
 	Mat results(sampleSize,outputSize,CV_32F);
 	ml.vecToMat(data,labels,test_set,test_labels);
+	ann.load("/home/jason/git/Samples/Samples/param.xml");
 	ann.predict(test_set,results);
 	for(int i=0; i<results.rows; i++) {
 		printf("Sample: %d, ",i+1);
@@ -182,7 +194,7 @@ int main(int argc,char** argv)
 	/**/
 	/*
 	vector<Mat> samples;
-	ml.importSamples("/home/jason/Desktop/workspace/Samples/Test/",samples);
+	ml.importSamples("/home/jason/git/Samples/Samples/Test/",samples);
 	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	for(unsigned int i=0; i<samples.size(); i++) {
 		double count=0;
@@ -195,8 +207,8 @@ int main(int argc,char** argv)
 	}
 /**/
 	/*
-	String file = "/home/jason/Desktop/workspace/Samples/training_set.csv";
-	String file2 = "/home/jason/Desktop/workspace/Samples/test_set.csv";
+	String file = "/home/jason/git/Samples/Samples/training_set.csv";
+	String file2 = "/home/jason/git/Samples/Samples/test_set.csv";
 	ShapeML sml;
 	vector<vector<double> >training_labels;
 	vector<vector<double> > training_data;

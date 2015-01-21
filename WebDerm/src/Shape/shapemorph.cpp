@@ -935,125 +935,68 @@ Mat ShapeMorph::customFn2(Mat src) {
 }
 
 Mat ShapeMorph::densityDetection(Mat src) {
-	Mat tempResult(src.rows, src.cols, CV_32F, Scalar(0));
-	Mat results(src.rows, src.cols, CV_8U, Scalar(0));
-	Mat interPtsMap(src.rows,src.cols,CV_32S,Scalar(0));
-	deque<deque<Point> > interPts(src.rows*src.cols,deque<Point>(1,Point(-1,-1)));
-	deque<deque<double> > distVec(src.rows*src.cols,deque<double>(1,-1.0));
-	const double alpha = 0.75;
-	const double epsilon = 0.5;
-	double absDiscernThresh = 1.0;
-	const double cutoffThresh = 1.0;
+	Size size(10,10);
+	const double C=1.0;
+	const double alpha=1.5;
+	const double beta=0.0;
 	int row=0, col=0;
-	double dist=0, cutoffDist=0;
-	double maxVal=0;
+	deque<double> fnVec;
+	double density=0, countDk=0, avgDk=0;
+	double absDiscernThresh=6.0;
 	while(row<src.rows) {
 		while(col<src.cols) {
-			int index = col + row*src.cols;
-			if(interPts.at(index).at(0)==Point(-1,-1))
-				interPts.at(index).pop_front();
-			if(distVec.at(index).at(0)==-1.0)
-				distVec.at(index).pop_front();
-			double dbl_Lc = sqrt((int)src.at<uchar>(row,col));
-			if(dbl_Lc>absDiscernThresh) {
-				tempResult.at<float>(row,col) = dbl_Lc;
-				double cutoffVal = cutoffThresh + 1.0;
-				while(cutoffVal>cutoffThresh) {
-					cutoffDist++;
-					cutoffVal = pow(alpha,cutoffDist) * pow(dbl_Lc,epsilon);
-					//if(col==102 && row==80) {
-					//	printf("LC: %f, Val: %f, Dist: %f\n",dbl_Lc,cutoffVal,cutoffDist);
-					//}
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					int lc = src.at<uchar>(i,j);
+					if(lc>absDiscernThresh) {
+						density++;
+						avgDk += lc;
+						countDk++;
+					}
 				}
-				cutoffDist--;
-				for(int i=(row-cutoffDist); i<=(row+cutoffDist); i++) {
-					for(int j=(col-cutoffDist); j<=(col+cutoffDist); j++) {
+			}
+			density /= size.area();
+			avgDk /= countDk;
+			if(countDk==0) avgDk = 0;
+			double fx = C * pow(density,alpha) * pow(avgDk,beta);
+			fnVec.push_back(fx);
+			avgDk=0;
+			density=0;
+			countDk=0;
+			col+=size.width;
+		}
+		col=0;
+		row+=size.height;
+	}
+	writeSeq2File(fnVec,"data");
+	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
+	row=0; col=0;
+	double q=0.75;
+	double b = 0.0456;
+	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
+	Size square(ceil(a),ceil(a));
+	cout << a << endl;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			int lc = src.at<uchar>(row,col);
+			if(lc>absDiscernThresh) {
+				Point begin = Point(col-floor(square.width/2),row-floor(square.height/2));
+				for(int i=begin.y; i<(begin.y+square.height); i++) {
+					for(int j=begin.x; j<(begin.x+square.width); j++) {
 						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-							int index = j + i*src.cols;
-							dist = floor(eucDist(Point(j,i),Point(col,row)));
-							if(dist<=cutoffDist) {
-								interPts.at(index).push_back(Point(col,row));
-								distVec.at(index).push_back(dist);
+							lc = src.at<uchar>(i,j);
+							double dist = eucDist(Point(j,i),Point(col,row));
+							if(dist<=a && lc>absDiscernThresh) {
+								line(result,Point(j,i),Point(col,row),Scalar(255),1);
 							}
 						}
 					}
 				}
 			}
-			cutoffDist=0;
 			col++;
 		}
 		col=0;
 		row++;
 	}
-	/*int index = 130 + 92 * src.cols;
-	for(int i=0; i<interPts.at(index).size(); i++) {
-		cout << interPts.at(index).at(i) << " - ";
-		cout << _src.at<float>(interPts.at(index).at(i)) << " - ";
-		cout << distVec.at(index).at(i) << endl;
-	}*/
-	//double val1 = tempResult.at<float>(80,102);
-	//double change = val1/tempResult.at<float>(128,20);
-	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
-	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
-	//printf("Change: %f\n",change );
-	int iter=1;
-	for(int n=0; n<iter; n++) {
-		for(int i=0; i<src.rows; i++) {
-			for(int j=0; j<src.cols; j++) {
-				int index = j + i*src.cols;
-				for(unsigned int k=0; k<interPts.at(index).size(); k++) {
-					if(interPts.at(index).size()>=2) {
-						double dbl_Lc = sqrt((int)src.at<uchar>(interPts.at(index).at(k)));
-						double val1 = pow(alpha,distVec.at(index).at(k)) * pow(dbl_Lc,epsilon);
-						val1 *=20.0; //same as iterating 20 times
-						dbl_Lc *=20.0;
-						val1 = tempResult.at<float>(i,j) + val1;
-						if(val1<0) val1=0;
-						tempResult.at<float>(i,j) = val1;
-						maxVal = max(val1,maxVal);
-						interPtsMap.at<int>(interPts.at(index).at(k))++;
-					}
-				}
-			}
-		}
-		//val1 = tempResult.at<float>(80,102);
-		//change = val1/tempResult.at<float>(128,20);
-		//printf("(102,80): %f, ",tempResult.at<float>(80,102));
-		//printf("(20,128): %f, ",tempResult.at<float>(128,20));
-		//printf("Change: %f\n",change );
-	}
-	//if point is a star and did not intersect -> penalize
-	for(int i=0; i<interPtsMap.rows; i++) {
-		for(int j=0; j<interPtsMap.cols; j++) {
-			double lc = (int)src.at<uchar>(i,j);
-			if(lc>absDiscernThresh) {
-				lc = sqrt(lc);
-				if(interPtsMap.at<int>(i,j)==0) {
-					double val = tempResult.at<float>(i,j) - (lc/2.);
-					if(val<0) val=0;
-					tempResult.at<float>(i,j) = val;
-				}
-			}
-		}
-	}
-	//double val1 = tempResult.at<float>(80,102);
-	//double change = val1/tempResult.at<float>(128,20);
-	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
-	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
-	//printf("Change: %f\n",change );
-	//nomalize tempResult to results from 0-255
-	//cout << maxVal << endl;
-	/*for(int i=0; i<tempResult.rows; i++) {
-		for(int j=0; j<tempResult.cols; j++) {
-			double val = tempResult.at<float>(i,j);
-			//if(val>0) val=255;
-			//if(val>255) val=255;
-			double normVal = (val-minVal)/(maxVal-minVal);
-			val = round(normVal*255.0);
-			results.at<uchar>(i,j) = val;
-		}
-	}*/
-	//imgshow(results);
-	return tempResult;
-	//return results;
+	return result;
 }
