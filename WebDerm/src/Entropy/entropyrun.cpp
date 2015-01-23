@@ -45,6 +45,7 @@ void Entropy::runAllEntropy() {
 		if(img.data) {
 			FileData fd;
 			fd.filename = getFileName(files.at(i),"-");
+			cout << fd.filename << endl;
 			String file = "/home/jason/Desktop/Programs/Looks_Like/"+fd.filename+".jpg";
 			Mat regImg = runResizeImage(file,imgSize,0);
 			Mat normImg = runColorNormalization(regImg);
@@ -55,7 +56,8 @@ void Entropy::runAllEntropy() {
 			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-HSL-"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
-				this->shapeFn(fd);
+				//this->shapeFn(fd);
+				this->shapeFn2(fd);
 				this->eyeFn(fd,entSize,"","");
 			}
 		}
@@ -72,8 +74,16 @@ void Entropy::runEntropy() {
 	cin >> input;
 	bool flag[2] = {false};
 	Size entSize(10,10);
+	Size size(5,5);
+	Size imgSize(140,140);
 	FileData fd;
 	fd.filename = input;
+	String file = "/home/jason/Desktop/Programs/Looks_Like/"+fd.filename+".jpg";
+	Mat regImg = runResizeImage(file,imgSize,0);
+	Mat normImg = runColorNormalization(regImg);
+	Mat grayImg;
+	cvtColor(normImg,grayImg,CV_BGR2GRAY);
+	fd.setImage(grayImg);
 	flag[0]=fd.loadFileMatrix(fd.filename+"-ShadeColors-5x5.csv",fd.colorVec);
 	flag[1]=fd.loadFileMatrix(fd.filename+"-HSL-5x5.csv",fd.hslMat);
 	if(flag[0]==true && flag[1]==true) {
@@ -86,6 +96,7 @@ void Entropy::runEntropy() {
 		this->importEntropyThresholds();
 		fd.ksize=Size(5,5);
 		this->entSize = entSize;
+		this->shapeFn2(fd);
 		eyeFn(fd,entSize,"","");
 		rgb.release_memory();
 		hsl.release_memory();
@@ -192,7 +203,7 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 			if(this->loadEntropyFiles(filepath,vec1,colorNameVec)) {
 				for(unsigned int i=0; i<files.size(); i++) {
 					filepath = folder+files.at(i);
-					name = getFileName(files.at(i),"_");
+					name = getFileName(files.at(i),"-");
 					if(name==listPairVec.at(1)) {
 						this->loadEntropyFiles(filepath,vec2,colorNameVec);
 						results = this->compareEntropy(vec1,vec2,colorNameVec);

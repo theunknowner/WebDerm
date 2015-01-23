@@ -130,6 +130,7 @@ double Entropy::compareT(deque<double> t1, deque<double> t2, double weight) {
 		cout << "Entropy::compareT() t1.size != t2.size" << endl;
 		exit(1);
 	}
+	/*
 	if(t1.at(0)<0 && t1.at(1)>0 && t2.at(0)<0 && t2.at(1>0)) {
 		if(t1.at(0)<t1.at(1) && t2.at(0)<t2.at(1))
 			return -1;
@@ -147,7 +148,26 @@ double Entropy::compareT(deque<double> t1, deque<double> t2, double weight) {
 		dist += val;
 	}
 	dist /= t1.size();
-	return dist;
+	return dist;*/
+	double max1=0, max2=0;
+	unsigned int idx1=0, idx2=0;
+	for(int i=0; i<t1.size(); i++) {
+		if(t1.at(i)>max1) {
+			max1 = t1.at(i);
+			idx1 = i;
+		}
+		if(t2.at(i)>max2) {
+			max2 = t1.at(i);
+			idx2 = i;
+		}
+	}
+	int t1Shape=0, t2Shape=0;
+	t1Shape = idx1<(t1.size()-1) ? 0:1;
+	t2Shape = idx2<(t2.size()-1) ? 0:1;
+	if(t1Shape==t2Shape)
+		return 1.0;
+	else
+		return 0.0;
 }
 
 
@@ -187,7 +207,7 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, 
 double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
 	deque<double> resultVec(vec1.size(),0);
 	const int ysvSize = 3; //y,s,v
-	const int tSize = 2; // t1,t2
+	const int tSize = 5; // t1,t2...tn
 	double ysv1[ysvSize];
 	double ysv2[ysvSize];
 	deque<double> t1(tSize,0);

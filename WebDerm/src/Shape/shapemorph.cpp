@@ -442,13 +442,16 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src) {
 		row++;
 	}//end while row
 
+	int numOfPtsThresh = 10;
 	vector<Mat> featureVec;
 	for(unsigned int i=0; i<numFeatures.size(); i++) {
 		Mat feature(src.rows, src.cols, CV_8U,Scalar(0));
-		for(unsigned int j=0; j<numFeatures.at(i).size(); j++) {
-			feature.at<uchar>(numFeatures.at(i).at(j)) = src.at<uchar>(numFeatures.at(i).at(j));
+		if(numFeatures.at(i).size()>=numOfPtsThresh) {
+			for(unsigned int j=0; j<numFeatures.at(i).size(); j++) {
+				feature.at<uchar>(numFeatures.at(i).at(j)) = src.at<uchar>(numFeatures.at(i).at(j));
+			}
+			featureVec.push_back(feature);
 		}
-		featureVec.push_back(feature);
 	}
 	return featureVec;
 }
@@ -935,10 +938,11 @@ Mat ShapeMorph::customFn2(Mat src) {
 }
 
 Mat ShapeMorph::densityDetection(Mat src) {
+	Mat map = src.clone();
 	Size size(10,10);
 	const double C=1.0;
-	const double alpha=1.5;
-	const double beta=0.0;
+	const double alpha=1.0;
+	const double beta=3.0;
 	int row=0, col=0;
 	deque<double> fnVec;
 	double density=0, countDk=0, avgDk=0;
@@ -947,56 +951,65 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		while(col<src.cols) {
 			for(int i=row; i<(row+size.height); i++) {
 				for(int j=col; j<(col+size.width); j++) {
-					int lc = src.at<uchar>(i,j);
-					if(lc>absDiscernThresh) {
-						density++;
-						avgDk += lc;
-						countDk++;
-					}
-				}
-			}
-			density /= size.area();
-			avgDk /= countDk;
-			if(countDk==0) avgDk = 0;
-			double fx = C * pow(density,alpha) * pow(avgDk,beta);
-			fnVec.push_back(fx);
-			avgDk=0;
-			density=0;
-			countDk=0;
-			col+=size.width;
-		}
-		col=0;
-		row+=size.height;
-	}
-	writeSeq2File(fnVec,"data");
-	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
-	row=0; col=0;
-	double q=0.75;
-	double b = 0.0456;
-	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
-	Size square(ceil(a),ceil(a));
-	cout << a << endl;
-	while(row<src.rows) {
-		while(col<src.cols) {
-			int lc = src.at<uchar>(row,col);
-			if(lc>absDiscernThresh) {
-				Point begin = Point(col-floor(square.width/2),row-floor(square.height/2));
-				for(int i=begin.y; i<(begin.y+square.height); i++) {
-					for(int j=begin.x; j<(begin.x+square.width); j++) {
-						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-							lc = src.at<uchar>(i,j);
-							double dist = eucDist(Point(j,i),Point(col,row));
-							if(dist<=a && lc>absDiscernThresh) {
-								line(result,Point(j,i),Point(col,row),Scalar(255),1);
-							}
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						int lc = src.at<uchar>(i,j);
+						if(lc>absDiscernThresh) {
+							density++;
+							avgDk += lc;
+							countDk++;
+							//fnVec.push_back((double)lc);
 						}
 					}
 				}
 			}
-			col++;
+			density /= size.area();
+			//printf("(%d,%d): %f\n",col,row,density);
+			avgDk /= countDk;
+			if(countDk==0) avgDk = 0;
+			double fx = C * pow(density,alpha) * pow(avgDk,beta);
+			fnVec.push_back(fx);
+			if(fx<=5917) {
+				for(int i=row; i<(row+size.height); i++) {
+					for(int j=col; j<(col+size.width); j++) {
+						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+							map.at<uchar>(i,j)=0;
+						}
+					}
+				}
+			}
+			avgDk=0;
+			density=0;
+			countDk=0;
+			col+=size.width;
+			//col++;
 		}
 		col=0;
-		row++;
+		row+=size.height;
+		//row++;
 	}
-	return result;
+	writeSeq2File(fnVec,"data");
+	//kmeans clustering
+	/*
+	Mat input(fnVec.size(),1,CV_32F,Scalar(0));
+	for(unsigned int i=0; i<fnVec.size(); i++) {
+		input.at<float>(i,0) = fnVec.at(i);
+	}
+	Cluster clst;
+	clst.kmeansClusterGeneric(input);
+	 */
+	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
+	row=0; col=0;
+	double q=0.5;
+	double b = 0.6;
+	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
+	cout << a << endl;
+	Size square(ceil(a),ceil(a));
+	for(int i=0; i<map.rows; i++) {
+		for(int j=0; j<map.cols; j++) {
+			if(map.at<uchar>(i,j)>0) {
+				result.at<uchar>(i,j) = 255;
+			}
+		}
+	}
+	return map;
 }

@@ -404,3 +404,17 @@ deque< deque<double> > FileData::stringVec2Double(deque< deque<String> > &vec) {
 	}
 	return doubleVec;
 }
+
+Mat FileData::stringVec2Mat1D(deque<deque<String> > &vec) {
+	deque<double> vec1d;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		for(unsigned int j=0; j<vec.at(i).size(); j++) {
+			vec1d.push_back(atof(vec.at(i).at(j).c_str()));
+		}
+	}
+	Mat results(vec1d.size(),1,CV_32F,Scalar(0));
+	for(unsigned int i=0; i<vec1d.size(); i++) {
+		results.at<float>(i,0) = vec1d.at(i);
+	}
+	return results;
+}

@@ -77,6 +77,7 @@ public:
 	void extractRule3Data(String filename, Point loc);
 
 	deque< deque<double> > stringVec2Double(deque< deque<String> > &vec);
+	Mat stringVec2Mat1D(deque<deque<String> > &vec);
 
 };
 

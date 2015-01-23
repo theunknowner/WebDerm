@@ -30,7 +30,7 @@ Mat Cluster::kmeansClusterGeneric(Mat src, double maxVal) {
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
 			double val = src.at<float>(i,j);
-			if(val>0) {
+			if(val>=0) {
 				//storing all sample data when conditions are met
 				dataVec.push_back(val);
 				//counting amount of each unique sample
@@ -40,7 +40,7 @@ Mat Cluster::kmeansClusterGeneric(Mat src, double maxVal) {
 			}
 		}
 	}
-	writeSeq2File(dataVec,"data");
+	//writeSeq2File(dataVec,"data");
 	//getting unique samples that are being considered, usually when count>0
 	for(unsigned int i=0; i<uniqueSamples.size(); i++) {
 		if(uniqueSamples.at(i)>0) {
@@ -59,13 +59,14 @@ Mat Cluster::kmeansClusterGeneric(Mat src, double maxVal) {
 	Mat labels;
 	int attempts = 5;
 	Mat centers;
-	printf("Min Lum: %.f, Max Lum: %f, Range: %d\n",sampleData.at(0),sampleData.at(sampleData.size()-1),dataRange);
+	printf("Min Val: %d, Max Val: %d, Range: %d\n",sampleData.at(0),sampleData.at(sampleData.size()-1),dataRange);
 	cout << "Initial clusters: " << clusterCount << endl;
 	cout << "Input size: " << dataVec.size() <<"/" << src.total() << endl;
 	cout << "Unique Samples: " << maxVal << endl;
-	cout << "Unique samples considered: " << sampleData.size() << endl;
+	cout << "Unique samples considered: " << sampleData.size()-1 << endl;
 	double compact = kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
 	cout << "compactness: " << compact << endl;
+	deque<double> centerCountPercent(clusterCount,0);
 	deque<int> centerCount(clusterCount,0);
 	deque<deque<double> > ranges(clusterCount,deque<double>(2,0.0));
 	for(unsigned int i=0; i<ranges.size(); i++) {
@@ -97,8 +98,11 @@ Mat Cluster::kmeansClusterGeneric(Mat src, double maxVal) {
 			ranges.at(idx).at(0) = dataVec.at(i);
 		}
 	}
+	/*for(int i=0; i<centers.rows; i++) {
+		centerCountPercent.at(i) = centerCount.
+	}*/
 	for(int i=0; i<centers.rows; i++) {
-		printf("%f - %d - Min: %d, Max: %d\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
+		printf("%f - %d - Min: %f, Max: %f\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
 	}
 	Mat result = Mat::zeros(src.rows, src.cols, CV_8U);
 	//Mat clusterImg = Mat::zeros(src.rows,src.cols,CV_8UC3);

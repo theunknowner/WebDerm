@@ -30,6 +30,7 @@ int main(int argc,char** argv)
 {
 	//Entropy en;
 	//en.runAllEntropy();
+	//en.runEntropy();
 	//runRenameFiles();
 	//runAllHysteresis();
 	//runHysteresis();
@@ -53,7 +54,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis17.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -62,6 +63,7 @@ int main(int argc,char** argv)
 	Size size(3,3);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
+
 	//Mat result = sm.gsReconUsingRmin1(img);
 	Mat result2 = sm.gsReconUsingRmin2(img);
 	img3 = sm.densityDetection(result2);
@@ -69,8 +71,8 @@ int main(int argc,char** argv)
 	//img4 = clst.kmeansClusterGeneric(img3);
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
 	morphologyEx(img3,img4,MORPH_CLOSE,element);
-	imgshow(img4);
-	imgshow(result2);
+	//imgshow(img4);
+	//imgshow(result2);
 	//imwrite("psoriasis17-GrayscaleReconstruct.png",result2);
 	//imgshow(img5);
 	//img = 255 - img;
@@ -79,16 +81,27 @@ int main(int argc,char** argv)
 	//img3 = sm.detectHeat(img2, Size(11,11));
 	//img4 = sm.connectImage(img3,Size(21,21),9.0);
 	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
+	element = getStructuringElement(MORPH_RECT,Size(7,7));
 	int largest=0, idx=0;
 	for(unsigned int i=0; i<featureVec.size(); i++) {
-		int count = countNonZero(featureVec.at(i));
-		if(count>largest) {
-			largest = count;
+		//morphologyEx(featureVec.at(i),img5,MORPH_CLOSE,element);
+		if(countNonZero(featureVec.at(i))>largest) {
+			largest = countNonZero(featureVec.at(i));
 			idx = i;
 		}
 	}
-	//imwrite("psoriasis17-ExtractedFeature.png",featureVec.at(idx));
-	imgshow(featureVec.at(idx));
+	imgshow(result2);
+	imgshow(img3);
+	imgshow(img4);
+	//imgshow(featureVec.at(idx));
+/*
+	deque<deque<String> > vec;
+	FileData fd;
+	fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/data.csv",vec);
+	Mat src = fd.stringVec2Mat1D(vec);
+	Cluster clst;
+	clst.kmeansClusterGeneric(src);
+
 	/*
 	FileData fd;
 	Entropy en;
@@ -248,13 +261,13 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-	/*
-	String name = "clp4";
-	//String file = "/home/jason/Desktop/workspace/ImagePairsSame.csv";
-	//String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
+/*
+	String name = "lph7";
+	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
+	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	en.runCompareEntropy(name);
+	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);

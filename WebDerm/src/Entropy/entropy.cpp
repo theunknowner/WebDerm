@@ -419,18 +419,21 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 	String strSize = toString(this->entSize.width)+"x"+toString(this->entSize.height);
 	String file_ksize = toString(fd.ksize.width)+"x"+toString(fd.ksize.height);
 	cout << filename  << ": Writing YSV files..." << flush;
-	String filename4 = filename+ "_"+ file_ksize+"_YSV_Combined"+strSize+".csv";
+	String filename4 = filename+ "-"+ file_ksize+"-YSV-Combined"+strSize+".csv";
 	String shadeColor, shade, color;
 	FILE * fp4;
 	fp4 = fopen(filename4.c_str(),"w");
-	fprintf(fp4,",Y,S,V,T1,T2\n");
+	fprintf(fp4,",Y,S,V,T1,T2,T3,T4,T5\n");
 	for(unsigned int j=0; j<g_Shades2.size(); j++) {
 		for(unsigned int i=0; i<allColors.size(); i++) {
 			if(i==0 && j==0) {
 				if(j==0 || j==1 || j==3) {
 					shadeColor = g_Shades2.at(j)+allColors.at(i);
 					fprintf(fp4,"%s,%f,%f,%f,",shadeColor.c_str(),this->totalPopulation.at(i).at(j),this->populationDensity.at(i).at(j),this->densityVariation.at(i).at(j));
-					fprintf(fp4,"%f,%f\n",this->shapeMetric.at(0),this->shapeMetric.at(1));
+					for(unsigned int k=0; k<this->shapeMetric.size();k++) {
+						fprintf(fp4,"%f,",this->shapeMetric.at(k));
+					}
+					fprintf(fp4,"\n");
 				}
 			}
 			else {
@@ -485,6 +488,118 @@ void Entropy::shapeFn(FileData &fd) {
 	deque<int> circleVec, randomVec;
 	for(int i=0; i<results.rows; i++) {
 		if(results.at<float>(i,0)>sm.circleThresh && results.at<float>(i,1)<=sm.randomThresh) {
+			circleVec.push_back(i);
+		}
+		else {
+			randomVec.push_back(i);
+		}
+		//printf("Sample: %d, ",i+1);
+		//cout << results.row(i) << endl;
+	}
+	//printf("Circles: %lu\n", circleVec.size());
+	//printf("Randoms: %lu\n", randomVec.size());
+	double pixThresh = 0.50;
+	int circleFlag=0, randomFlag=0;
+	double circleTotal=0, randomTotal=0, circlePixPercent=0,randPixPercent=0;
+	for(unsigned int i=0; i<circleVec.size(); i++) {
+		circleTotal += countNonZero(featureVec.at(circleVec.at(i)));
+	}
+	for(unsigned int i=0; i<randomVec.size(); i++) {
+		randomTotal += countNonZero(featureVec.at(randomVec.at(i)));
+	}
+	circlePixPercent = circleTotal/totalPix;
+	randPixPercent = randomTotal/totalPix;
+	if(circlePixPercent>=pixThresh) circleFlag=1;
+	if(randPixPercent>=pixThresh) randomFlag=1;
+	double avgT[results.cols];
+	fill_n(avgT,results.cols,0.);
+	this->shapeMetric.clear();
+	if(circleFlag==1) {
+		for(unsigned int i=0; i<circleVec.size(); i++) {
+			for(int j=0; j<results.cols; j++) {
+				double val = results.at<float>(circleVec.at(i),j);
+				if(val>1) val=1;
+				if(val<-1) val=-1;
+				avgT[j] += val;
+			}
+		}
+		for(int j=0; j<results.cols; j++) {
+			avgT[j] /= circleVec.size();
+			this->shapeMetric.push_back(avgT[j]);
+		}
+	}
+	if(randomFlag==1) {
+		for(unsigned int i=0; i<randomVec.size(); i++) {
+			for(int j=0; j<results.cols; j++) {
+				double val = results.at<float>(randomVec.at(i),j);
+				if(val>1) val=1;
+				if(val<-1) val=-1;
+				avgT[j] += val;
+			}
+		}
+		for(int j=0; j<results.cols; j++) {
+			avgT[j] /= randomVec.size();
+			this->shapeMetric.push_back(avgT[j]);
+		}
+	}
+}
+
+void Entropy::shapeFn2(FileData &fd) {
+	ShapeMorph sm;
+	Mat img = fd.getImage();
+	Mat img2, img3, img4, img5;
+	img2 = sm.gsReconUsingRmin2(img);
+	img3 = sm.densityDetection(img2);
+	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	morphologyEx(img3,img4,MORPH_CLOSE,element);
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
+	element = getStructuringElement(MORPH_RECT,Size(7,7));
+	for(unsigned int i=0; i<featureVec.size(); i++) {
+		morphologyEx(featureVec.at(i),featureVec.at(i),MORPH_CLOSE,element);
+	}
+
+	TestML ml;
+	CvANN_MLP ann;
+	ann.load("/home/jason/git/Samples/Samples/param.xml");
+	Mat layers = ann.get_layer_sizes();
+	int sampleSize = featureVec.size();
+	int inputSize = layers.at<int>(0,0);
+	int outputSize = layers.at<int>(0,2);
+	int hiddenNodes = layers.at<int>(0,1);
+	ml.setLayerParams(inputSize,hiddenNodes,outputSize);
+	vector<Mat> sampleVec;
+	Mat sample;
+	double totalPix=0;
+	for(int i=0; i<sampleSize; i++) {
+		imgshow(featureVec.at(i));
+		sample = ml.prepareImage(featureVec.at(i));
+		sampleVec.push_back(sample);
+		sample.release();
+		totalPix += countNonZero(featureVec.at(i));
+		//String name = "feature"+toString(i+1)+".png";
+		//imwrite(name,featureVec.at(i));
+	}
+	Mat results;
+	Mat sample_set = ml.prepareMatSamples(sampleVec);
+	ann.predict(sample_set,results);
+
+	deque<int> circleVec, randomVec;
+	deque<int> largestOutputVec;
+	double max=0;
+	int idx=0;
+	for(int i=0; i<results.rows; i++) {
+		for(int j=0; j<results.cols; j++) {
+			if(results.at<float>(i,j)>max) {
+				max = results.at<float>(i,j);
+				idx = j;
+			}
+		}
+		largestOutputVec.push_back(idx);
+		max=0;
+		idx=0;
+	}
+	for(int i=0; i<results.rows; i++) {
+		if(largestOutputVec.at(i)<(results.cols-1)) {
 			circleVec.push_back(i);
 		}
 		else {

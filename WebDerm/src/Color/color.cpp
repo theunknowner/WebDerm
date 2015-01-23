@@ -270,7 +270,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, Size size, String 
 			}
 		}
 		String str = toString(size.width)+"x"+toString(size.height);
-		String file = name + "_outputShades_"+str+".png";
+		String file = name + "-outputShades-"+str+".png";
 		imwrite(file,img);
 		img.release();
 		fs.close();
