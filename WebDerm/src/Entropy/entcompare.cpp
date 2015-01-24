@@ -60,7 +60,7 @@ void Entropy::releaseMemory() {
 	deque<double>().swap(this->colorWeights);
 }
 
-double Entropy::compareY(double y1, double y2, double weight) {
+double Entropy::fn_compareY(double y1, double y2, double weight) {
 	double val;
 	if((y1>Y_HIGH && y2>Y_HIGH)) {
 		val = min(y1,y2)/max(y1,y2);
@@ -83,7 +83,7 @@ double Entropy::compareY(double y1, double y2, double weight) {
 	}
 }
 
-double Entropy::compareS(double s1, double s2, double weight) {
+double Entropy::fn_compareS(double s1, double s2, double weight) {
 	double val;
 	if((s1>S_HIGH && s2>S_HIGH)) {
 		val = min(s1,s2)/max(s1,s2);
@@ -106,7 +106,7 @@ double Entropy::compareS(double s1, double s2, double weight) {
 	}
 }
 
-double Entropy::compareV(double v1, double v2, double weight) {
+double Entropy::fn_compareV(double v1, double v2, double weight) {
 	double val=0;
 	if((v1<=V_HIGH && v2<=V_HIGH)) {
 		val = max(v1,v2)-min(v1,v2);
@@ -125,7 +125,7 @@ double Entropy::compareV(double v1, double v2, double weight) {
 	}
 }
 
-double Entropy::compareT(deque<double> t1, deque<double> t2, double weight) {
+double Entropy::fn_compareT(deque<double> t1, deque<double> t2, double weight) {
 	if(t1.size()!=t2.size()) {
 		cout << "Entropy::compareT() t1.size != t2.size" << endl;
 		exit(1);
@@ -151,7 +151,7 @@ double Entropy::compareT(deque<double> t1, deque<double> t2, double weight) {
 	return dist;*/
 	double max1=0, max2=0;
 	unsigned int idx1=0, idx2=0;
-	for(int i=0; i<t1.size(); i++) {
+	for(unsigned int i=0; i<t1.size(); i++) {
 		if(t1.at(i)>max1) {
 			max1 = t1.at(i);
 			idx1 = i;
@@ -204,7 +204,7 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, 
 	return false;
 }
 
-double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
+double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
 	deque<double> resultVec(vec1.size(),0);
 	const int ysvSize = 3; //y,s,v
 	const int tSize = 5; // t1,t2...tn
@@ -235,13 +235,13 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 
 			if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {
 				//Total Population(Y) comparison
-				valY = this->compareY(ysv1[0],ysv2[0],1);
+				valY = this->fn_compareY(ysv1[0],ysv2[0],1);
 
 				//Avg Density(S) comparison
-				valS = this->compareS(ysv1[1],ysv2[1],1);
+				valS = this->fn_compareS(ysv1[1],ysv2[1],1);
 
 				//Variability(V) comparison
-				valV = this->compareV(ysv1[2],ysv2[2],1);
+				valV = this->fn_compareV(ysv1[2],ysv2[2],1);
 
 				//Reassign Y && Y_THRESH if S & V are the same
 				if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH) {
@@ -323,14 +323,34 @@ double Entropy::compareEntropy(deque<deque<double> > vec1, deque<deque<double> >
 			results += sum;
 		}
 	}
-	valT = this->compareT(t1,t2,1);
+	//valT = this->fn_compareT(t1,t2,1);
 	//printf("ShapeDist: %f, Before_YsvDist: %f\n",valT,results);
-	if(valT>=0) {
-		results += valT;
-		results /= 2;
-	}
+	//if(valT==0.0) {
+	//	results = 0.0;
+	//}
 	//cout << "Mine: " << results << endl;
 	return results;
+}
+
+double Entropy::compareT(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
+	const int ysvSize = 3; //y,s,v
+	const int tSize = 5; // t1,t2...tn
+	deque<double> t1(tSize,0);
+	deque<double> t2(tSize,0);
+	double valT=0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		this->resetThreshVals();
+		if(colorNameVec.at(i)!="LowBrown" && colorNameVec.at(i)!="LowGreyBrown") {
+			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
+				if(i==0 && j>=ysvSize) {
+					t1.at(j-ysvSize) = vec1.at(i).at(j);
+					t2.at(j-ysvSize) = vec2.at(i).at(j);
+				}
+			}
+		}
+	}
+	valT = this->fn_compareT(t1,t2,1);
+	return valT;
 }
 
 double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {

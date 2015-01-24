@@ -132,7 +132,21 @@ void writeSeq2File(deque<Point> &ptVec, String name) {
 
 	else
 		for(unsigned int i=0; i<ptVec.size(); i++) {
-			fprintf(fp,"(%d,%d)\n",ptVec.at(i).x, ptVec.at(i).y);
+			fprintf(fp,"%d,%d\n",ptVec.at(i).x, ptVec.at(i).y);
+		}
+	fclose(fp);
+}
+
+void writeSeq2File(deque<Point2f> &ptVec, String name) {
+	String filename = name + ".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	if(ptVec.size()==0)
+		cout << name << " Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<ptVec.size(); i++) {
+			fprintf(fp,"%f,%f\n",ptVec.at(i).x, ptVec.at(i).y);
 		}
 	fclose(fp);
 }

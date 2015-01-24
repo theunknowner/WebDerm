@@ -251,7 +251,7 @@ Mat ShapeMorph::custAnd(Mat origImg, Mat scaleImg, Mat map) {
 				for(unsigned int k=0; k<ptVec.size(); k++) {
 					if(k<ptVec.size()-1) {
 						if(j==ptVec.at(k)) {
-							scaleImg.at<uchar>(i,j) = min(rmin,(int)origImg.at<uchar>(i,j));
+							results.at<uchar>(i,j) = min(rmin,(int)origImg.at<uchar>(i,j));
 							break;
 						}
 						else if(j>ptVec.at(k) && j<ptVec.at(k+1)) {
@@ -262,7 +262,8 @@ Mat ShapeMorph::custAnd(Mat origImg, Mat scaleImg, Mat map) {
 								int val1 = origImg.at<uchar>(i,ptVec.at(k));
 								int val2 = origImg.at<uchar>(i,ptVec.at(k+1));
 								int val = origImg.at<uchar>(i,j);
-								results.at<uchar>(i,j) = min(max(val1,val2),val);
+								rmin = max(val1,val2);
+								results.at<uchar>(i,j) = min(rmin,val);
 							}
 							break;
 						}
@@ -273,6 +274,7 @@ Mat ShapeMorph::custAnd(Mat origImg, Mat scaleImg, Mat map) {
 							else {
 								int val1 = origImg.at<uchar>(i,ptVec.at(k));
 								int val = origImg.at<uchar>(i,j);
+								rmin = val1;
 								results.at<uchar>(i,j) = min(val1,val);
 							}
 							break;
@@ -286,6 +288,7 @@ Mat ShapeMorph::custAnd(Mat origImg, Mat scaleImg, Mat map) {
 							else {
 								int val1 = origImg.at<uchar>(i,ptVec.at(k));
 								int val = origImg.at<uchar>(i,j);
+								rmin=val1;
 								results.at<uchar>(i,j) = min(val1,val);
 							}
 							break;
@@ -380,6 +383,7 @@ Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
 	Mat rmins = this->grayscaleReconstruct(src,scaleImg);
 	Mat _src = 255 - src; //invert image for LC values
 	Mat map = this->customFn2(_src);
+	imgshow(map);
 	Mat mask = custAnd(_src,rmins,map);
 	Mat result = this->grayscaleReconstruct(_src,mask);
 	return result;
@@ -876,7 +880,8 @@ Mat ShapeMorph::customFn2(Mat src) {
 	const int minLCThresh = 5;
 	double enterDKThresh = 0.1;
 	double exitDKThresh = 0.1;
-	double dkThresh2 = 1.03;
+	double enterDKThresh2 = 1.03;
+	double exitDKThresh2 = 0.97;
 	int entryFlag=0;
 	double totalDK=0, totalDN=0;
 	double avgDK=0, density=0;
@@ -910,15 +915,17 @@ Mat ShapeMorph::customFn2(Mat src) {
 				dnRatio = dnMat.at<float>(row,col)/dnMat.at<float>(row,col-1);
 				cumulativeDK += dkRatio - 1.0;
 				cumulativeDN += dnRatio - 1.0;
-				/*if(row==11) {
+				if(row==81) {
 					//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
 					printf("DK: %d,%d: %f,%f,%f,%f,  ",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
 					printf("DN: %d,%d: %f,%f,%f,%f\n",col,row,dnMat.at<float>(row,col-1),dnMat.at<float>(row,col),dnRatio,cumulativeDN);
-				}*/
-				if(cumulativeDK>=enterDKThresh || dkRatio>=dkThresh2) {
-					entryFlag=1;
 				}
-				else if(cumulativeDK<=exitDKThresh || dkRatio<=dkThresh2) {
+				if(cumulativeDK>=enterDKThresh || dkRatio>=enterDKThresh2) {
+					entryFlag=1;
+					if(dkRatio<=exitDKThresh2)
+						entryFlag=0;
+				}
+				else if(cumulativeDK<=exitDKThresh || dkRatio<=exitDKThresh2) {
 					entryFlag=0;
 				}
 				if(entryFlag==1)
@@ -939,10 +946,10 @@ Mat ShapeMorph::customFn2(Mat src) {
 
 Mat ShapeMorph::densityDetection(Mat src) {
 	Mat map = src.clone();
-	Size size(10,10);
+	Size size(5,5);
 	const double C=1.0;
 	const double alpha=1.0;
-	const double beta=3.0;
+	const double beta=1.5;
 	int row=0, col=0;
 	deque<double> fnVec;
 	double density=0, countDk=0, avgDk=0;
@@ -957,18 +964,56 @@ Mat ShapeMorph::densityDetection(Mat src) {
 							density++;
 							avgDk += lc;
 							countDk++;
-							//fnVec.push_back((double)lc);
 						}
 					}
 				}
 			}
 			density /= size.area();
-			//printf("(%d,%d): %f\n",col,row,density);
 			avgDk /= countDk;
 			if(countDk==0) avgDk = 0;
 			double fx = C * pow(density,alpha) * pow(avgDk,beta);
 			fnVec.push_back(fx);
-			if(fx<=5917) {
+			avgDk=0;
+			density=0;
+			countDk=0;
+			col+=size.width;
+			//col++;
+		}
+		col=0;
+		row+=size.height;
+		//row++;
+	}
+	//calculate knee of curve for fx for filtering
+	KneeCurve kc;
+	int bestIdx = kc.kneeCurvePoint(fnVec);
+	double maxDist = kc.getMaxDist();
+	//fx threshold filtering
+	double fxThresh = fnVec.at(bestIdx);
+	double percent = 1.0 - ((double)bestIdx/fnVec.size());
+	if(percent<0.20)
+		bestIdx = fnVec.size()*0.5;
+	fxThresh = fnVec.at(bestIdx);
+
+	row=0; col=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						int lc = src.at<uchar>(i,j);
+						if(lc>absDiscernThresh) {
+							density++;
+							avgDk += lc;
+							countDk++;
+						}
+					}
+				}
+			}
+			density /= size.area();
+			avgDk /= countDk;
+			if(countDk==0) avgDk = 0;
+			double fx = C * pow(density,alpha) * pow(avgDk,beta);
+			if(fx<=fxThresh) {
 				for(int i=row; i<(row+size.height); i++) {
 					for(int j=col; j<(col+size.width); j++) {
 						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
@@ -987,23 +1032,9 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		row+=size.height;
 		//row++;
 	}
-	writeSeq2File(fnVec,"data");
-	//kmeans clustering
-	/*
-	Mat input(fnVec.size(),1,CV_32F,Scalar(0));
-	for(unsigned int i=0; i<fnVec.size(); i++) {
-		input.at<float>(i,0) = fnVec.at(i);
-	}
-	Cluster clst;
-	clst.kmeansClusterGeneric(input);
-	 */
+	//writeSeq2File(fnVec,"data");
+
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
-	row=0; col=0;
-	double q=0.5;
-	double b = 0.6;
-	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
-	cout << a << endl;
-	Size square(ceil(a),ceil(a));
 	for(int i=0; i<map.rows; i++) {
 		for(int j=0; j<map.cols; j++) {
 			if(map.at<uchar>(i,j)>0) {
@@ -1011,5 +1042,5 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			}
 		}
 	}
-	return map;
+	return result;
 }

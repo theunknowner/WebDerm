@@ -13,6 +13,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
 
 
 class ShapeMorph {

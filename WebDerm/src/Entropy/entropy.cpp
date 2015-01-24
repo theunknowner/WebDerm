@@ -547,22 +547,29 @@ void Entropy::shapeFn(FileData &fd) {
 void Entropy::shapeFn2(FileData &fd) {
 	ShapeMorph sm;
 	Mat img = fd.getImage();
-	Mat img2, img3, img4, img5;
+	Mat img2, img3, img4;
 	img2 = sm.gsReconUsingRmin2(img);
 	img3 = sm.densityDetection(img2);
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
 	morphologyEx(img3,img4,MORPH_CLOSE,element);
 	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
 	element = getStructuringElement(MORPH_RECT,Size(7,7));
+	//gets the largest feature
+	int largest=0, idx=0;
 	for(unsigned int i=0; i<featureVec.size(); i++) {
-		morphologyEx(featureVec.at(i),featureVec.at(i),MORPH_CLOSE,element);
+		int count = countNonZero(featureVec.at(i));
+		if(count>largest) {
+			largest = count;
+			idx = i;
+		}
 	}
-
+	Mat bestFeature;
+	morphologyEx(featureVec.at(idx),bestFeature,MORPH_CLOSE,element);
 	TestML ml;
 	CvANN_MLP ann;
 	ann.load("/home/jason/git/Samples/Samples/param.xml");
 	Mat layers = ann.get_layer_sizes();
-	int sampleSize = featureVec.size();
+	int sampleSize = 1;
 	int inputSize = layers.at<int>(0,0);
 	int outputSize = layers.at<int>(0,2);
 	int hiddenNodes = layers.at<int>(0,1);
@@ -571,22 +578,20 @@ void Entropy::shapeFn2(FileData &fd) {
 	Mat sample;
 	double totalPix=0;
 	for(int i=0; i<sampleSize; i++) {
-		imgshow(featureVec.at(i));
-		sample = ml.prepareImage(featureVec.at(i));
+		sample = ml.prepareImage(bestFeature);
 		sampleVec.push_back(sample);
 		sample.release();
-		totalPix += countNonZero(featureVec.at(i));
+		totalPix += countNonZero(bestFeature);
 		//String name = "feature"+toString(i+1)+".png";
 		//imwrite(name,featureVec.at(i));
 	}
 	Mat results;
 	Mat sample_set = ml.prepareMatSamples(sampleVec);
 	ann.predict(sample_set,results);
-
-	deque<int> circleVec, randomVec;
+	//gets the index of the largest output for each sample
 	deque<int> largestOutputVec;
 	double max=0;
-	int idx=0;
+	idx=0;
 	for(int i=0; i<results.rows; i++) {
 		for(int j=0; j<results.cols; j++) {
 			if(results.at<float>(i,j)>max) {
@@ -598,6 +603,8 @@ void Entropy::shapeFn2(FileData &fd) {
 		max=0;
 		idx=0;
 	}
+	//push sample index to circle or random base on largest output
+	deque<int> circleVec, randomVec;
 	for(int i=0; i<results.rows; i++) {
 		if(largestOutputVec.at(i)<(results.cols-1)) {
 			circleVec.push_back(i);
@@ -613,14 +620,17 @@ void Entropy::shapeFn2(FileData &fd) {
 	double pixThresh = 0.50;
 	int circleFlag=0, randomFlag=0;
 	double circleTotal=0, randomTotal=0, circlePixPercent=0,randPixPercent=0;
+	//count total non-zero pixels of all features
 	for(unsigned int i=0; i<circleVec.size(); i++) {
-		circleTotal += countNonZero(featureVec.at(circleVec.at(i)));
+		circleTotal += countNonZero(bestFeature);
 	}
 	for(unsigned int i=0; i<randomVec.size(); i++) {
-		randomTotal += countNonZero(featureVec.at(randomVec.at(i)));
+		randomTotal += countNonZero(bestFeature);
 	}
+	//check percentage of circle and random shapes
 	circlePixPercent = circleTotal/totalPix;
 	randPixPercent = randomTotal/totalPix;
+	//which ever is greater gets a flag=1
 	if(circlePixPercent>=pixThresh) circleFlag=1;
 	if(randPixPercent>=pixThresh) randomFlag=1;
 	double avgT[results.cols];

@@ -37,7 +37,7 @@ void Entropy::demo_runCompareEntropy() {
 			flag[1] = this->loadEntropyFiles(filepath,vec2,colorNameVec);
 	}
 	if(flag[0]==true && flag[1]==true) {
-		results = this->compareEntropy(vec1,vec2,colorNameVec);
+		results = this->compareYSV(vec1,vec2,colorNameVec);
 		resultVec.push_back(results);
 		vec2.clear();
 		vec2.shrink_to_fit();

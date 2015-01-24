@@ -127,7 +127,7 @@ void Entropy::runCompareEntropy(String targetName) {
 			name = getFileName(files.at(i),"-");
 			if(name==targetName || targetName=="") {
 				this->loadEntropyFiles(filepath,vec2,colorNameVec);
-				results = this->compareEntropy(vec1,vec2,colorNameVec);
+				results = this->compareYSV(vec1,vec2,colorNameVec);
 				resultVec.push_back(results);
 				nameVec.push_back(name);
 				vec2.clear();
@@ -186,7 +186,7 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 		deque<deque<double> > vec2;
 		deque<String> colorNameVec;
 		deque<String> files;
-		double results;
+		double resultsYSV, resultsT;
 		float countPairs=0, countResults=0;
 		FileData fd;
 		fd.getFilesFromDirectory(folder,files);
@@ -206,9 +206,10 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 					name = getFileName(files.at(i),"-");
 					if(name==listPairVec.at(1)) {
 						this->loadEntropyFiles(filepath,vec2,colorNameVec);
-						results = this->compareEntropy(vec1,vec2,colorNameVec);
-						if(results>=0.70) countResults++;
-						printf("%s-%s: %f\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),results);
+						resultsYSV = this->compareYSV(vec1,vec2,colorNameVec);
+						resultsT = this->compareT(vec1,vec2,colorNameVec);
+						if(resultsYSV>=0.70 && resultsT==1.0) countResults++;
+						printf("%s-%s: %f | %f\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),resultsYSV,resultsT);
 					}
 				}
 			}

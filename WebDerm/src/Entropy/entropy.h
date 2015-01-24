@@ -42,10 +42,10 @@ private:
 	deque<double> colorWeights; //holds the weights for color impact - My algo
 	deque<double> colorWeights2; //Dr. Dube's algo
 	void resetThreshVals();
-	double compareY(double y1, double y2, double weight);
-	double compareS(double s1, double s2, double weight);
-	double compareV(double v1, double v2, double weight);
-	double compareT(deque<double> t1, deque<double> t2, double weight);
+	double fn_compareY(double y1, double y2, double weight);
+	double fn_compareS(double s1, double s2, double weight);
+	double fn_compareV(double v1, double v2, double weight);
+	double fn_compareT(deque<double> t1, deque<double> t2, double weight);
 
 	deque< deque<double> > totalPopulation; //Y
 	deque< deque<double> > populationDensity; //S
@@ -66,7 +66,8 @@ public:
 	bool importEntropyThresholds();
 	void releaseMemory();
 	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, deque<String> &colorNameVec);
-	double compareEntropy(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
+	double compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
+	double compareT(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 	double compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 
 	//entropyrun.cpp

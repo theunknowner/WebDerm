@@ -54,7 +54,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles18.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis19a.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -84,16 +84,17 @@ int main(int argc,char** argv)
 	element = getStructuringElement(MORPH_RECT,Size(7,7));
 	int largest=0, idx=0;
 	for(unsigned int i=0; i<featureVec.size(); i++) {
-		//morphologyEx(featureVec.at(i),img5,MORPH_CLOSE,element);
 		if(countNonZero(featureVec.at(i))>largest) {
 			largest = countNonZero(featureVec.at(i));
 			idx = i;
 		}
 	}
+	morphologyEx(featureVec.at(idx),img5,MORPH_CLOSE,element);
 	imgshow(result2);
-	imgshow(img3);
-	imgshow(img4);
-	//imgshow(featureVec.at(idx));
+	//imgshow(img3);
+	//imgshow(img4);
+	//imgshow(img5);
+	//imwrite("img.png",img5);
 /*
 	deque<deque<String> > vec;
 	FileData fd;
@@ -177,7 +178,8 @@ int main(int argc,char** argv)
 	//TestML ml;
 	vector<Mat> sampleVec;
 	Mat sample;
-	sample = ml.prepareImage(featureVec.at(idx));
+	sample = ml.prepareImage(img5);
+	imgshow(sample);
 	sampleVec.push_back(sample);
 	sample.release();
 	Mat results;
@@ -269,7 +271,7 @@ int main(int argc,char** argv)
 	en.importEntropyThresholds();
 	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	//en.runCompareEntropyList(file,folder);
+	en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 /*
 	img = runResizeImage("/home/jason/Desktop/Programs/fairskin2.jpg",Size(140,140),0);
