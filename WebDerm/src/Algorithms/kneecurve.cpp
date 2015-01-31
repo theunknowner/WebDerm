@@ -11,23 +11,43 @@
 //! pass by reference so the original gets sorted
 int KneeCurve::kneeCurvePoint(deque<double> &vec) {
 	sort(vec.begin(),vec.end());
-	Point2f xy0 = Point2f(0,vec.at(0));
-	Point2f xy1 = Point2f((vec.size()-1),vec.at(vec.size()-1));
-	this->maxDist = 0;
-	this->bestIdx=0;
+	Mat vecFromFirst(vec.size(),2,CV_32F,Scalar(0));
+	Mat firstPt(1,2,CV_32F,Scalar(0));
+	Mat lastPt(1,2,CV_32F,Scalar(0));
+	Mat firstPtPow,lastPtPow;
+	firstPt.at<float>(0,0) = 0;
+	firstPt.at<float>(0,1) = vec.at(0);
+	lastPt.at<float>(0,0) = vec.size()-1;
+	lastPt.at<float>(0,1) = vec.at(vec.size()-1);
 	for(unsigned int i=0; i<vec.size(); i++) {
-		Point2f xy2 = Point2f(i,vec.at(i));
-		double a = 1 + pow((xy1.y-xy0.y)/(xy1.x-xy0.x),2);
-		double b = -2*xy0.x*pow((xy1.y-xy0.y)/(xy1.x-xy0.x),2);
-		b += 2*xy0.y*((xy1.y-xy0.y)/(xy1.x-xy0.x));
-		b -= ((xy0.y+xy2.y)*(xy1.y-xy0.y)/(xy1.x-xy0.x))-(xy0.x-xy2.x);
-		double c = pow(xy0.y,2)+pow((xy1.y-xy0.y)/(xy1.x-xy0.x),2)*pow(xy0.x,2);
-		c -= 2*xy0.y*((xy1.y-xy0.y)/(xy1.x-xy0.x))*xy0.x;
-		c -= xy0.y*(xy0.y+xy2.y)+((xy0.y+xy2.y)*(xy1.y-xy0.y)/(xy1.x-xy0.x));
-		c += (xy0.y*xy2.y)+(xy0.x*xy2.x);
-		double x = (-b+sqrt(pow(b,2)-4*a*c))/(2*a);
-		double y = xy0.y+((xy1.y-xy0.y)/(xy1.x-xy0.x))*(x-xy0.x);
-		double dist = eucDist(xy2,Point(x,y));
+		vecFromFirst.at<float>(i,0) = i - firstPt.at<float>(0,0);
+		vecFromFirst.at<float>(i,1) = vec.at(i) - firstPt.at<float>(0,1);
+	}
+	pow(lastPt,2,lastPtPow);
+	double sqrtSum = sqrt(sum(lastPtPow).val[0]);
+	Mat lastPtNorm = lastPt / sqrtSum;
+	Mat lastPtNormRep(0,0,CV_32F,Scalar(0));
+	while(lastPtNormRep.rows!=vec.size()) {
+		lastPtNormRep.push_back(lastPtNorm.row(0));
+	}
+	Mat scalarProduct;
+	multiply(vecFromFirst,lastPtNormRep,scalarProduct);
+	Mat vecFromFirstParallel = scalarProduct.col(0) * lastPtNorm;
+	Mat vecToLine = vecFromFirst - vecFromFirstParallel;
+	Mat vecToLinePow;
+	pow(vecToLine,2,vecToLinePow);
+	Mat sumMat(vecToLine.rows,1,CV_32F,Scalar(0));
+	for(int i=0; i<vecToLinePow.rows; i++) {
+		for(int j=0; j<vecToLinePow.cols; j++) {
+			sumMat.at<float>(i,0) += vecToLinePow.at<float>(i,j);
+		}
+	}
+	Mat distMat;
+	sqrt(sumMat,distMat);
+	this->maxDist = 0;
+	this->bestIdx = 0;
+	for(int i=0; i<distMat.rows; i++) {
+		double dist = distMat.at<float>(i,0);
 		if(dist>this->maxDist) {
 			this->maxDist = dist;
 			this->bestIdx = i;

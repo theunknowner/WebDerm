@@ -383,7 +383,6 @@ Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
 	Mat rmins = this->grayscaleReconstruct(src,scaleImg);
 	Mat _src = 255 - src; //invert image for LC values
 	Mat map = this->customFn2(_src);
-	imgshow(map);
 	Mat mask = custAnd(_src,rmins,map);
 	Mat result = this->grayscaleReconstruct(_src,mask);
 	return result;
@@ -881,12 +880,12 @@ Mat ShapeMorph::customFn2(Mat src) {
 	double enterDKThresh = 0.1;
 	double exitDKThresh = 0.1;
 	double enterDKThresh2 = 1.03;
-	double exitDKThresh2 = 0.97;
+	double exitDKThresh2 = 1.0;
 	int entryFlag=0;
-	double totalDK=0, totalDN=0;
-	double avgDK=0, density=0;
-	double dkRatio=0, dnRatio=0;
-	double cumulativeDK=0, cumulativeDN=0;
+	double totalDK=0;
+	double avgDK=0;
+	double dkRatio=0;
+	double cumulativeDK=0;
 	int row=0, col=0;
 	int countDK=0;
 	Point begin;
@@ -900,44 +899,44 @@ Mat ShapeMorph::customFn2(Mat src) {
 					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
 						totalDK += src.at<uchar>(i,j);
 						countDK++;
-						if(src.at<uchar>(i,j)>minLCThresh)
-							totalDN++;
 					}
 				}
 			}
 			avgDK = totalDK/countDK;
 			if(countDK==0) avgDK=0;
-			density = totalDN/size.area();
 			drkMat.at<float>(row,col) = avgDK;
-			dnMat.at<float>(row,col) = density;
 			if(col>0) {
 				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
-				dnRatio = dnMat.at<float>(row,col)/dnMat.at<float>(row,col-1);
 				cumulativeDK += dkRatio - 1.0;
-				cumulativeDN += dnRatio - 1.0;
-				if(row==81) {
-					//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
-					printf("DK: %d,%d: %f,%f,%f,%f,  ",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
-					printf("DN: %d,%d: %f,%f,%f,%f\n",col,row,dnMat.at<float>(row,col-1),dnMat.at<float>(row,col),dnRatio,cumulativeDN);
+				if(entryFlag==0) {
+					if(cumulativeDK>=enterDKThresh)
+						entryFlag=1;
+					if(dkRatio>=enterDKThresh2) {
+						entryFlag=1;
+						cumulativeDK=enterDKThresh;
+					}
 				}
-				if(cumulativeDK>=enterDKThresh || dkRatio>=enterDKThresh2) {
-					entryFlag=1;
-					if(dkRatio<=exitDKThresh2)
+				if(entryFlag==1) {
+					if(cumulativeDK<=exitDKThresh)
 						entryFlag=0;
+					if(dkRatio<=exitDKThresh2) {
+						entryFlag=0;
+						cumulativeDK=0;
+					}
 				}
-				else if(cumulativeDK<=exitDKThresh || dkRatio<=exitDKThresh2) {
-					entryFlag=0;
-				}
+				//if(row==25) {
+				//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
+				//	printf("DK: %d,%d: %f,%f,%f,%f,  ",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
+				//	printf("Flag: %d\n",entryFlag);
+				//}
 				if(entryFlag==1)
 					map.at<uchar>(row,col) = 255;
 			}
 			totalDK=0;
-			totalDN=0;
 			countDK=0;
 			col++;
 		}
 		cumulativeDK=0;
-		cumulativeDN=0;
 		col=0;
 		row++;
 	}
@@ -946,12 +945,14 @@ Mat ShapeMorph::customFn2(Mat src) {
 
 Mat ShapeMorph::densityDetection(Mat src) {
 	Mat map = src.clone();
-	Size size(5,5);
+	Size size(12,12);
 	const double C=1.0;
 	const double alpha=1.0;
-	const double beta=1.5;
+	const double beta=1.0;
 	int row=0, col=0;
 	deque<double> fnVec;
+	deque<double> avgDkVec;
+	deque<double> avgDnVec;
 	double density=0, countDk=0, avgDk=0;
 	double absDiscernThresh=6.0;
 	while(row<src.rows) {
@@ -973,6 +974,8 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			if(countDk==0) avgDk = 0;
 			double fx = C * pow(density,alpha) * pow(avgDk,beta);
 			fnVec.push_back(fx);
+			avgDkVec.push_back(avgDk);
+			avgDnVec.push_back(density);
 			avgDk=0;
 			density=0;
 			countDk=0;
@@ -983,17 +986,21 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		row+=size.height;
 		//row++;
 	}
+	writeSeq2File(fnVec,"data");
 	//calculate knee of curve for fx for filtering
 	KneeCurve kc;
 	int bestIdx = kc.kneeCurvePoint(fnVec);
-	double maxDist = kc.getMaxDist();
+	cout << "BestIdx: " << bestIdx << endl;
 	//fx threshold filtering
 	double fxThresh = fnVec.at(bestIdx);
 	double percent = 1.0 - ((double)bestIdx/fnVec.size());
-	if(percent<0.20)
-		bestIdx = fnVec.size()*0.5;
-	fxThresh = fnVec.at(bestIdx);
-
+	//if(percent<0.20) {
+	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
+	//	bestIdx = round(fnVec.size()*0.5);
+	//}
+	//fxThresh = fnVec.at(bestIdx);
+	cout << "New BestIdx: " << bestIdx << endl;
+	cout << "FxThresh: " << fxThresh << endl;
 	row=0; col=0;
 	while(row<src.rows) {
 		while(col<src.cols) {
@@ -1041,6 +1048,102 @@ Mat ShapeMorph::densityDetection(Mat src) {
 				result.at<uchar>(i,j) = 255;
 			}
 		}
+	}
+	return result;
+}
+
+//old density detection
+Mat ShapeMorph::densityDetection2(Mat src) {
+	Size size(12,12);
+	const double C=1.0;
+	const double alpha=1.0;
+	const double beta=4.0;
+	int row=0, col=0;
+	deque<double> fnVec;
+	deque<double> avgDkVec;
+	deque<double> avgDnVec;
+	double density=0, countDk=0, avgDk=0;
+	double absDiscernThresh=6.0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						int lc = src.at<uchar>(i,j);
+						if(lc>absDiscernThresh) {
+							density++;
+							avgDk += lc;
+							countDk++;
+						}
+					}
+				}
+			}
+			density /= size.area();
+			avgDk /= countDk;
+			if(countDk==0) avgDk = 0;
+			double fx = C * pow(density,alpha) * pow(avgDk,beta);
+			fnVec.push_back(fx);
+			avgDkVec.push_back(avgDk);
+			avgDnVec.push_back(density);
+			avgDk=0;
+			density=0;
+			countDk=0;
+			col+=size.width;
+		}
+		col=0;
+		row+=size.height;
+	}
+	KneeCurve kc;
+	//cout << kc.kneeCurvePoint(avgDkVec) << endl;
+	//cout << kc.kneeCurvePoint(avgDnVec) << endl;
+	int bestIdx = kc.kneeCurvePoint(fnVec);
+	double maxDist = kc.getMaxDist();
+	//cout << maxDist << endl;
+	cout << "BestIdx: " << bestIdx << endl;
+	//fx threshold filtering
+	double fxThresh = fnVec.at(bestIdx);
+	//double percent = 1.0 - ((double)bestIdx/fnVec.size());
+	//if(percent<0.20) {
+	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
+	//	bestIdx = round(fnVec.size()*0.5);
+	//}
+	fxThresh = fnVec.at(bestIdx);
+	cout << "New BestIdx: " << bestIdx << endl;
+	cout << "FxThresh: " << fxThresh << endl;
+	double q = 0.9999;
+	double b = fxThresh;
+	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
+	a += 1.0;
+	cout << a << endl;
+	//writeSeq2File(avgDkVec,"avgDKdata");
+	//writeSeq2File(avgDnVec,"avgDNdata");
+	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
+	row=0; col=0;
+	Size square(ceil(a),ceil(a));
+	while(row<src.rows) {
+		while(col<src.cols) {
+			int lc = src.at<uchar>(row,col);
+			if(lc>absDiscernThresh) {
+				Point begin = Point(col-square.width,row-square.height);
+				Point end = Point(col+square.width,row+square.height);
+				for(int i=begin.y; i<end.y; i++) {
+					for(int j=begin.x; j<end.x; j++) {
+						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+							lc = src.at<uchar>(i,j);
+							double dist = eucDist(Point(j,i),Point(col,row));
+							if(dist<=a && lc>absDiscernThresh) {
+								if(Point(j,i)!=Point(col,row)) {
+									line(result,Point(j,i),Point(col,row),Scalar(255),1);
+								}
+							}
+						}
+					}
+				}
+			}
+			col++;
+		}
+		col=0;
+		row++;
 	}
 	return result;
 }

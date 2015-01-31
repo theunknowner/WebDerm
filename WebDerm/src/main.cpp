@@ -36,15 +36,6 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	/*
-	String filename[]= {path+"Images/Acne/acne1.jpg",
-						path+"Images/Acne/acne2.jpg",
-						path+"Images/Acne/acne3.jpg",
-						path+"Images/Acne/acne5.jpg",
-						path+"Images/Acne/acne6.jpg"};
-	int fileSize = length(filename);
-	runAllHysteresis(filename,fileSize);
-	/**/
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -54,7 +45,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis19a.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/tinea_corporis1.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -67,33 +58,36 @@ int main(int argc,char** argv)
 	//Mat result = sm.gsReconUsingRmin1(img);
 	Mat result2 = sm.gsReconUsingRmin2(img);
 	img3 = sm.densityDetection(result2);
-	//Cluster clst;
-	//img4 = clst.kmeansClusterGeneric(img3);
-	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	morphologyEx(img3,img4,MORPH_CLOSE,element);
+	//Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	//morphologyEx(img3,img4,MORPH_CLOSE,element);
 	//imgshow(img4);
 	//imgshow(result2);
-	//imwrite("psoriasis17-GrayscaleReconstruct.png",result2);
 	//imgshow(img5);
 	//img = 255 - img;
-	//imwrite("vitiligo2-Inverted-Grayscale.png",img);
 	//img2 = sm.findShapes(img);
 	//img3 = sm.detectHeat(img2, Size(11,11));
 	//img4 = sm.connectImage(img3,Size(21,21),9.0);
-	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
-	element = getStructuringElement(MORPH_RECT,Size(7,7));
-	int largest=0, idx=0;
+	//vector<Mat> featureVec = sm.liquidFeatureExtraction(img3);
+	//Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	/*int largest=0, idx=0;
 	for(unsigned int i=0; i<featureVec.size(); i++) {
 		if(countNonZero(featureVec.at(i))>largest) {
 			largest = countNonZero(featureVec.at(i));
 			idx = i;
 		}
 	}
-	morphologyEx(featureVec.at(idx),img5,MORPH_CLOSE,element);
+	img5 = sm.dilation(featureVec.at(idx),Size(7,7));
+*/
+	//morphologyEx(featureVec.at(idx),img5,MORPH_CLOSE,element);
 	imgshow(result2);
-	//imgshow(img3);
+	imgshow(img3);
 	//imgshow(img4);
 	//imgshow(img5);
+	//Mat src(140,140,CV_8U,Scalar(0));
+	//src.at<uchar>(30,30) = 100;
+	//src.at<uchar>(100,40) = 100;
+	//line(src,Point(30,30),Point(40,100),Scalar(255),1);
+	//imgshow(src);
 	//imwrite("img.png",img5);
 /*
 	deque<deque<String> > vec;
@@ -179,7 +173,6 @@ int main(int argc,char** argv)
 	vector<Mat> sampleVec;
 	Mat sample;
 	sample = ml.prepareImage(img5);
-	imgshow(sample);
 	sampleVec.push_back(sample);
 	sample.release();
 	Mat results;

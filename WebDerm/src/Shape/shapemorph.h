@@ -51,6 +51,7 @@ public:
 	Mat gsReconUsingRmin2(Mat src);
 
 	Mat densityDetection(Mat src);
+	Mat densityDetection2(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */
