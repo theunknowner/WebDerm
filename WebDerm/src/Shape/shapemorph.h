@@ -10,10 +10,12 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/GridDisplay/griddisplay.h"
 
 
 class ShapeMorph {
@@ -51,7 +53,8 @@ public:
 	Mat gsReconUsingRmin2(Mat src);
 
 	Mat densityDetection(Mat src);
-	Mat densityDetection2(Mat src);
+
+	vector<Mat> runShapeMorphTest(deque<String> &nameVec, deque<int> &labels);
 };
 
 #endif /* SHAPEMORPH_H_ */

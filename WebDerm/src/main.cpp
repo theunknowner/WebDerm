@@ -45,7 +45,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/tinea_corporis1.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vitiligo3.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -56,40 +56,35 @@ int main(int argc,char** argv)
 	cvtColor(img,img,CV_BGR2GRAY);
 
 	//Mat result = sm.gsReconUsingRmin1(img);
+	img = 255 - img;
+	//imgshow(img);
 	Mat result2 = sm.gsReconUsingRmin2(img);
 	img3 = sm.densityDetection(result2);
-	//Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	//morphologyEx(img3,img4,MORPH_CLOSE,element);
-	//imgshow(img4);
-	//imgshow(result2);
-	//imgshow(img5);
 	//img = 255 - img;
 	//img2 = sm.findShapes(img);
 	//img3 = sm.detectHeat(img2, Size(11,11));
 	//img4 = sm.connectImage(img3,Size(21,21),9.0);
-	//vector<Mat> featureVec = sm.liquidFeatureExtraction(img3);
-	//Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	/*int largest=0, idx=0;
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(img3);
+	int largest=0, idx=0;
 	for(unsigned int i=0; i<featureVec.size(); i++) {
 		if(countNonZero(featureVec.at(i))>largest) {
 			largest = countNonZero(featureVec.at(i));
 			idx = i;
 		}
 	}
-	img5 = sm.dilation(featureVec.at(idx),Size(7,7));
-*/
+	//Mat element = getStructuringElement(MORPH_RECT,Size(7,7));
 	//morphologyEx(featureVec.at(idx),img5,MORPH_CLOSE,element);
+	img5 = sm.dilation(featureVec.at(idx),Size(5,5));
+	vector<Mat> matVec;
+	matVec.push_back(img5);
 	imgshow(result2);
 	imgshow(img3);
 	//imgshow(img4);
-	//imgshow(img5);
-	//Mat src(140,140,CV_8U,Scalar(0));
-	//src.at<uchar>(30,30) = 100;
-	//src.at<uchar>(100,40) = 100;
-	//line(src,Point(30,30),Point(40,100),Scalar(255),1);
-	//imgshow(src);
-	//imwrite("img.png",img5);
-/*
+	imgshow(img5);
+	deque<String> nameVec;
+	deque<int> labels;
+	//vector<Mat> matVec = sm.runShapeMorphTest(nameVec,labels);
+	/*
 	deque<deque<String> > vec;
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/data.csv",vec);
@@ -119,7 +114,7 @@ int main(int argc,char** argv)
 	//morphologyEx(img2,img4,MORPH_OPEN,element);
 	//morphologyEx(img4,img4,MORPH_CLOSE,element);
 	/**/
-/*
+	/*
 	TestML ml;
 	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
 	vector<double> labels(5,0);
@@ -129,7 +124,7 @@ int main(int argc,char** argv)
 	}
 	ml.convertImagesToData(samplesPath,labels);
 /**/
-/*
+	/*
 	deque<String> files;
 	FileData fd;
 	String folder = "/home/jason/git/Samples/Samples/Training/Circles/";
@@ -141,7 +136,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-/*
+
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
@@ -159,7 +154,7 @@ int main(int argc,char** argv)
 	layers.at<int>(1,0) = hiddenNodes;
 	layers.at<int>(2,0) = outputSize;
 	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
-/*
+	/*
 	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001);
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
@@ -168,13 +163,16 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-/*
+
 	//TestML ml;
 	vector<Mat> sampleVec;
 	Mat sample;
-	sample = ml.prepareImage(img5);
-	sampleVec.push_back(sample);
-	sample.release();
+	for(unsigned int i=0; i<matVec.size(); i++) {
+		sample = ml.prepareImage(matVec.at(i));
+		imgshow(sample);
+		sampleVec.push_back(sample);
+		sample.release();
+	}
 	Mat results;
 	ml.setLayerParams(400,20,5);
 	Mat sample_set = ml.prepareMatSamples(sampleVec);
@@ -183,8 +181,11 @@ int main(int argc,char** argv)
 	for(int i=0; i<results.rows; i++) {
 		printf("Sample: %d, ",i+1);
 		cout << results.row(i) << endl;
+		//printf("%s: ",nameVec.at(i).c_str());
+		//cout << results.row(i) << " - ";
+		//cout << labels.at(i) << endl;
 	}
-/*
+	/*
 	vector<vector<double> > data;
 	vector<vector<double> > labels;
 	ml.importCsvData("/home/jason/git/Samples/Samples/test_set.csv",data,labels);
@@ -256,7 +257,7 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-/*
+	/*
 	String name = "lph7";
 	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";

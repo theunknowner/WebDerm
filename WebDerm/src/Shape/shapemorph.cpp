@@ -876,7 +876,6 @@ Mat ShapeMorph::customFn(Mat src) {
 Mat ShapeMorph::customFn2(Mat src) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	Size size(5,5);
-	const int minLCThresh = 5;
 	double enterDKThresh = 0.1;
 	double exitDKThresh = 0.1;
 	double enterDKThresh2 = 1.03;
@@ -908,7 +907,9 @@ Mat ShapeMorph::customFn2(Mat src) {
 			if(col>0) {
 				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
 				cumulativeDK += dkRatio - 1.0;
-				if(entryFlag==0) {
+				if(avgDK>=200)
+					entryFlag=1;
+				if(entryFlag==0 && avgDK<200) {
 					if(cumulativeDK>=enterDKThresh)
 						entryFlag=1;
 					if(dkRatio>=enterDKThresh2) {
@@ -916,15 +917,15 @@ Mat ShapeMorph::customFn2(Mat src) {
 						cumulativeDK=enterDKThresh;
 					}
 				}
-				if(entryFlag==1) {
-					if(cumulativeDK<=exitDKThresh)
+				if(entryFlag==1 && avgDK<200) {
+					if(cumulativeDK<exitDKThresh)
 						entryFlag=0;
-					if(dkRatio<=exitDKThresh2) {
+					if(dkRatio<exitDKThresh2) {
 						entryFlag=0;
 						cumulativeDK=0;
 					}
 				}
-				//if(row==25) {
+				//if(row==37) {
 				//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
 				//	printf("DK: %d,%d: %f,%f,%f,%f,  ",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
 				//	printf("Flag: %d\n",entryFlag);
@@ -944,17 +945,17 @@ Mat ShapeMorph::customFn2(Mat src) {
 }
 
 Mat ShapeMorph::densityDetection(Mat src) {
-	Mat map = src.clone();
+	//Mat map = src.clone();
+	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
 	Size size(12,12);
 	const double C=1.0;
 	const double alpha=1.0;
 	const double beta=1.0;
 	int row=0, col=0;
 	deque<double> fnVec;
-	deque<double> avgDkVec;
-	deque<double> avgDnVec;
 	double density=0, countDk=0, avgDk=0;
 	double absDiscernThresh=6.0;
+
 	while(row<src.rows) {
 		while(col<src.cols) {
 			for(int i=row; i<(row+size.height); i++) {
@@ -974,19 +975,18 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			if(countDk==0) avgDk = 0;
 			double fx = C * pow(density,alpha) * pow(avgDk,beta);
 			fnVec.push_back(fx);
-			avgDkVec.push_back(avgDk);
-			avgDnVec.push_back(density);
 			avgDk=0;
 			density=0;
 			countDk=0;
-			col+=size.width;
-			//col++;
+			//col+=size.width;
+			col++;
 		}
 		col=0;
-		row+=size.height;
-		//row++;
+		//row+=size.height;
+		row++;
 	}
-	writeSeq2File(fnVec,"data");
+
+	//writeSeq2File(fnVec,"data");
 	//calculate knee of curve for fx for filtering
 	KneeCurve kc;
 	int bestIdx = kc.kneeCurvePoint(fnVec);
@@ -994,11 +994,11 @@ Mat ShapeMorph::densityDetection(Mat src) {
 	//fx threshold filtering
 	double fxThresh = fnVec.at(bestIdx);
 	double percent = 1.0 - ((double)bestIdx/fnVec.size());
-	//if(percent<0.20) {
-	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
-	//	bestIdx = round(fnVec.size()*0.5);
-	//}
-	//fxThresh = fnVec.at(bestIdx);
+	if(percent<0.15) {
+		//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
+		bestIdx = round(bestIdx*0.95);
+	}
+	fxThresh = fnVec.at(bestIdx);
 	cout << "New BestIdx: " << bestIdx << endl;
 	cout << "FxThresh: " << fxThresh << endl;
 	row=0; col=0;
@@ -1020,11 +1020,12 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			avgDk /= countDk;
 			if(countDk==0) avgDk = 0;
 			double fx = C * pow(density,alpha) * pow(avgDk,beta);
-			if(fx<=fxThresh) {
+			if(fx>fxThresh) {
 				for(int i=row; i<(row+size.height); i++) {
 					for(int j=col; j<(col+size.width); j++) {
 						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-							map.at<uchar>(i,j)=0;
+							if(src.at<uchar>(i,j)>absDiscernThresh)
+								map.at<uchar>(i,j)=255;
 						}
 					}
 				}
@@ -1032,15 +1033,15 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			avgDk=0;
 			density=0;
 			countDk=0;
-			col+=size.width;
-			//col++;
+			//col+=size.width;
+			col++;
 		}
 		col=0;
-		row+=size.height;
-		//row++;
+		//row+=size.height;
+		row++;
 	}
 	//writeSeq2File(fnVec,"data");
-
+	/*
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	for(int i=0; i<map.rows; i++) {
 		for(int j=0; j<map.cols; j++) {
@@ -1049,91 +1050,32 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			}
 		}
 	}
-	return result;
-}
-
-//old density detection
-Mat ShapeMorph::densityDetection2(Mat src) {
-	Size size(12,12);
-	const double C=1.0;
-	const double alpha=1.0;
-	const double beta=4.0;
-	int row=0, col=0;
-	deque<double> fnVec;
-	deque<double> avgDkVec;
-	deque<double> avgDnVec;
-	double density=0, countDk=0, avgDk=0;
-	double absDiscernThresh=6.0;
-	while(row<src.rows) {
-		while(col<src.cols) {
-			for(int i=row; i<(row+size.height); i++) {
-				for(int j=col; j<(col+size.width); j++) {
-					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-						int lc = src.at<uchar>(i,j);
-						if(lc>absDiscernThresh) {
-							density++;
-							avgDk += lc;
-							countDk++;
-						}
-					}
-				}
-			}
-			density /= size.area();
-			avgDk /= countDk;
-			if(countDk==0) avgDk = 0;
-			double fx = C * pow(density,alpha) * pow(avgDk,beta);
-			fnVec.push_back(fx);
-			avgDkVec.push_back(avgDk);
-			avgDnVec.push_back(density);
-			avgDk=0;
-			density=0;
-			countDk=0;
-			col+=size.width;
-		}
-		col=0;
-		row+=size.height;
-	}
-	KneeCurve kc;
-	//cout << kc.kneeCurvePoint(avgDkVec) << endl;
-	//cout << kc.kneeCurvePoint(avgDnVec) << endl;
-	int bestIdx = kc.kneeCurvePoint(fnVec);
-	double maxDist = kc.getMaxDist();
-	//cout << maxDist << endl;
-	cout << "BestIdx: " << bestIdx << endl;
-	//fx threshold filtering
-	double fxThresh = fnVec.at(bestIdx);
-	//double percent = 1.0 - ((double)bestIdx/fnVec.size());
-	//if(percent<0.20) {
-	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
-	//	bestIdx = round(fnVec.size()*0.5);
-	//}
-	fxThresh = fnVec.at(bestIdx);
-	cout << "New BestIdx: " << bestIdx << endl;
-	cout << "FxThresh: " << fxThresh << endl;
-	double q = 0.9999;
+	 */
+	//connect nearest neighbors
+	double q = 0.99999;
 	double b = fxThresh;
 	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
 	a += 1.0;
 	cout << a << endl;
-	//writeSeq2File(avgDkVec,"avgDKdata");
-	//writeSeq2File(avgDnVec,"avgDNdata");
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	Size square(ceil(a),ceil(a));
+	a = round(a);
 	while(row<src.rows) {
 		while(col<src.cols) {
-			int lc = src.at<uchar>(row,col);
-			if(lc>absDiscernThresh) {
+			int lc = map.at<uchar>(row,col);
+			if(lc>0) {
 				Point begin = Point(col-square.width,row-square.height);
 				Point end = Point(col+square.width,row+square.height);
 				for(int i=begin.y; i<end.y; i++) {
 					for(int j=begin.x; j<end.x; j++) {
 						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
 							lc = src.at<uchar>(i,j);
-							double dist = eucDist(Point(j,i),Point(col,row));
+							//double dist = eucDist(Point(j,i),Point(col,row));
+							double dist = abs(j-col) + abs(i-row);
 							if(dist<=a && lc>absDiscernThresh) {
 								if(Point(j,i)!=Point(col,row)) {
-									line(result,Point(j,i),Point(col,row),Scalar(255),1);
+									line(result,Point(j,i),Point(col,row),Scalar(255),3);
 								}
 							}
 						}
@@ -1146,4 +1088,47 @@ Mat ShapeMorph::densityDetection2(Mat src) {
 		row++;
 	}
 	return result;
+}
+
+vector<Mat> ShapeMorph::runShapeMorphTest(deque<String> &nameVec, deque<int> &labels) {
+	fstream fs("/home/jason/Desktop/workspace/Test_Images.csv");
+	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
+	vector<Mat> samplesVec;
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0)
+					nameVec.push_back(vec.at(i));
+				if(i==1)
+					labels.push_back(atoi(vec.at(i).c_str()));
+			}
+			vec.clear();
+		}
+		for(unsigned int i=0; i<nameVec.size(); i++) {
+			String file = folder + nameVec.at(i) + ".jpg";
+			Mat img = runResizeImage(file,Size(140,140),0);
+			Size size(3,3);
+			img = runColorNormalization(img);
+			cvtColor(img,img,CV_BGR2GRAY);
+			Mat result2 = this->gsReconUsingRmin2(img);
+			Mat img3 = this->densityDetection(result2);
+			vector<Mat> featureVec = this->liquidFeatureExtraction(img3);
+			int largest=0, idx=0;
+			for(unsigned int i=0; i<featureVec.size(); i++) {
+				if(countNonZero(featureVec.at(i))>largest) {
+					largest = countNonZero(featureVec.at(i));
+					idx = i;
+				}
+			}
+			Mat img5 = this->dilation(featureVec.at(idx),Size(5,5));
+			samplesVec.push_back(img5);
+		}
+	}
+	else {
+		cout << "runShapeMorphTest() can't open file!" << endl;
+	}
+	return samplesVec;
 }
