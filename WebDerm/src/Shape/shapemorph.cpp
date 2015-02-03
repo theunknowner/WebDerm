@@ -8,24 +8,106 @@
 #include "shapemorph.h"
 
 Mat ShapeMorph::prepareImage(Mat src) {
-	Mat dst(src.rows,src.cols,src.type());
-	for(int i=0; i<src.rows; i++) {
-		for(int j=0; j<src.cols; j++) {
-			dst.at<uchar>(i,j) = 255 - src.at<uchar>(i,j);
+	int initFlag=0;
+	int lightToDarkFlag = 0;
+	int darkToLightFlag = 0;
+	Size size(3,3);
+	double avgLum=0, totalLum=0;
+	int countLum=0;
+	int stepsY = 1;
+	int stepsX = size.width;
+	Mat lumMat(ceil((double)src.rows/stepsY), ceil((double)src.cols/stepsX), CV_32F, Scalar(0));
+	double threshold = 10;
+	int row=0, col=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						int lum = src.at<uchar>(i,j);
+						totalLum += lum;
+						countLum++;
+					}
+				}
+			}
+			avgLum = totalLum / countLum;
+			lumMat.at<float>(row/stepsY,col/stepsX) = avgLum;
+			//if(row==66) {
+			//	printf("%d: %f\n",col,avgLum);
+			//}
+			totalLum=0;
+			countLum=0;
+			if(col>0) {
+				double currLum = lumMat.at<float>(row/stepsY,col/stepsX);
+				double prevLum = lumMat.at<float>(row/stepsY,(col/stepsX)-1);
+				if((currLum-prevLum)>=threshold && initFlag==0) {
+					darkToLightFlag++;
+					initFlag=1;
+				}
+				if((currLum-prevLum)<=-threshold && initFlag==0) {
+					lightToDarkFlag++;
+					initFlag=1;
+				}
+			}
+			col+=stepsX;
 		}
+		initFlag=0;
+		col=0;
+		row+=stepsY;
 	}
-	return dst;
+	Mat result;
+	cout << darkToLightFlag << endl;
+	cout << lightToDarkFlag << endl;
+	if(darkToLightFlag>lightToDarkFlag)
+		result = 255 - src;
+	else
+		result = src.clone();
+	return result;
 }
 
-void increaseLC(Mat &src, double amt) {
-	for(int i=0; i<src.rows; i++) {
-		for(int j=0; j<src.cols; j++) {
-			int lum = src.at<uchar>(i,j);
-			lum *= amt;
-			if(lum>255) lum=255;
-			src.at<uchar>(i,j) = lum;
+//! experimental function/method for filtering using luminance
+Mat ShapeMorph::lumFilter(Mat src) {
+	Mat _src = 255 - src;
+	Mat results(src.rows, src.cols, CV_8U, Scalar(0));
+	deque<double> lumVec;
+	Size size(20,20);
+	int row=0, col=0;
+	KneeCurve kc;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						double lum = _src.at<uchar>(i,j);
+						lumVec.push_back(lum);
+					}
+				}
+			}
+			int bestIdx = kc.kneeCurvePoint(lumVec);
+			double lumThresh = lumVec.at(bestIdx);
+			double percent = 1.0 - ((double)bestIdx/lumVec.size());
+			if(percent<0.15) {
+				//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
+				bestIdx = round(bestIdx*0.95);
+			}
+			lumThresh = lumVec.at(bestIdx);
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						double lum = _src.at<uchar>(i,j);
+						if(lum>=lumThresh) {
+							results.at<uchar>(i,j) = 255;
+						}
+					}
+				}
+			}
+			lumVec.clear();
+			col+=size.width;
 		}
+		col=0;
+		row+=size.height;
 	}
+	return results;
 }
 
 Mat ShapeMorph::findShapes(Mat src) {
@@ -907,9 +989,9 @@ Mat ShapeMorph::customFn2(Mat src) {
 			if(col>0) {
 				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
 				cumulativeDK += dkRatio - 1.0;
-				if(avgDK>=200)
+				if(avgDK>=180)
 					entryFlag=1;
-				if(entryFlag==0 && avgDK<200) {
+				if(entryFlag==0 && avgDK<180) {
 					if(cumulativeDK>=enterDKThresh)
 						entryFlag=1;
 					if(dkRatio>=enterDKThresh2) {
@@ -917,7 +999,7 @@ Mat ShapeMorph::customFn2(Mat src) {
 						cumulativeDK=enterDKThresh;
 					}
 				}
-				if(entryFlag==1 && avgDK<200) {
+				if(entryFlag==1 && avgDK<180) {
 					if(cumulativeDK<exitDKThresh)
 						entryFlag=0;
 					if(dkRatio<exitDKThresh2) {
@@ -1113,7 +1195,8 @@ vector<Mat> ShapeMorph::runShapeMorphTest(deque<String> &nameVec, deque<int> &la
 			Size size(3,3);
 			img = runColorNormalization(img);
 			cvtColor(img,img,CV_BGR2GRAY);
-			Mat result2 = this->gsReconUsingRmin2(img);
+			Mat img2 = this->prepareImage(img);
+			Mat result2 = this->gsReconUsingRmin2(img2);
 			Mat img3 = this->densityDetection(result2);
 			vector<Mat> featureVec = this->liquidFeatureExtraction(img3);
 			int largest=0, idx=0;

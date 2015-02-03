@@ -550,10 +550,7 @@ void Entropy::shapeFn2(FileData &fd) {
 	Mat img2, img3, img4;
 	img2 = sm.gsReconUsingRmin2(img);
 	img3 = sm.densityDetection(img2);
-	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	morphologyEx(img3,img4,MORPH_CLOSE,element);
-	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
-	element = getStructuringElement(MORPH_RECT,Size(7,7));
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(img3);
 	//gets the largest feature
 	int largest=0, idx=0;
 	for(unsigned int i=0; i<featureVec.size(); i++) {
@@ -563,8 +560,7 @@ void Entropy::shapeFn2(FileData &fd) {
 			idx = i;
 		}
 	}
-	Mat bestFeature;
-	morphologyEx(featureVec.at(idx),bestFeature,MORPH_CLOSE,element);
+	Mat bestFeature = sm.dilation(featureVec.at(idx),Size(5,5));
 	TestML ml;
 	CvANN_MLP ann;
 	ann.load("/home/jason/git/Samples/Samples/param.xml");

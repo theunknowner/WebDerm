@@ -117,26 +117,19 @@ void Entropy::runCompareEntropy(String targetName) {
 		//String folder = "/home/jason/Desktop/Programs/TestYSV_New/";
 		String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 		String filepath, name;
-		double results;
-		deque<double> resultVec;
-		deque<String> nameVec;
-		deque<int> origPos;
+		double resultsYSV, resultsT;
 		fd.getFilesFromDirectory(folder,files);
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"-");
 			if(name==targetName || targetName=="") {
 				this->loadEntropyFiles(filepath,vec2,colorNameVec);
-				results = this->compareYSV(vec1,vec2,colorNameVec);
-				resultVec.push_back(results);
-				nameVec.push_back(name);
+				resultsYSV = this->compareYSV(vec1,vec2,colorNameVec);
+				resultsT = this->compareT(vec1,vec2,colorNameVec);
 				vec2.clear();
 				vec2.shrink_to_fit();
+				printf("%s: %f | %f\n",name.c_str(),resultsYSV, resultsT);
 			}
-		}
-		jaysort(resultVec,origPos);
-		for(unsigned int i=0; i<resultVec.size(); i++) {
-			printf("%s: %f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i));
 		}
 	}
 }
@@ -202,14 +195,18 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 			}
 			if(this->loadEntropyFiles(filepath,vec1,colorNameVec)) {
 				for(unsigned int i=0; i<files.size(); i++) {
+					int flagMatch = 0;
 					filepath = folder+files.at(i);
 					name = getFileName(files.at(i),"-");
 					if(name==listPairVec.at(1)) {
 						this->loadEntropyFiles(filepath,vec2,colorNameVec);
 						resultsYSV = this->compareYSV(vec1,vec2,colorNameVec);
 						resultsT = this->compareT(vec1,vec2,colorNameVec);
-						if(resultsYSV>=0.70 && resultsT==1.0) countResults++;
-						printf("%s-%s: %f | %f\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),resultsYSV,resultsT);
+						if(resultsYSV>=0.70) {
+							countResults++;
+							flagMatch=1;
+						}
+						printf("%s-%s: %f | %f => %d\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),resultsYSV,resultsT,flagMatch);
 					}
 				}
 			}

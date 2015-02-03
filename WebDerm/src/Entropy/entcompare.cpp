@@ -149,15 +149,15 @@ double Entropy::fn_compareT(deque<double> t1, deque<double> t2, double weight) {
 	}
 	dist /= t1.size();
 	return dist;*/
-	double max1=0, max2=0;
 	unsigned int idx1=0, idx2=0;
+	double max1=t1.at(idx1), max2=t2.at(idx2);
 	for(unsigned int i=0; i<t1.size(); i++) {
 		if(t1.at(i)>max1) {
 			max1 = t1.at(i);
 			idx1 = i;
 		}
 		if(t2.at(i)>max2) {
-			max2 = t1.at(i);
+			max2 = t2.at(i);
 			idx2 = i;
 		}
 	}
@@ -212,7 +212,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 	double ysv2[ysvSize];
 	deque<double> t1(tSize,0);
 	deque<double> t2(tSize,0);
-	double valY=0, valS=0, valV=0, valT=0;
+	double valY=0, valS=0, valV=0;
 	double avg=0, total=0;
 	int colorsHit[vec1.size()]; //variable to mark colors not ignored
 	for(unsigned int i=0; i<vec1.size(); i++) {
@@ -276,7 +276,6 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 	double normSignifWeight[this->colorWeights.size()];
 	for(unsigned int i=0; i<this->colorWeights.size(); i++) {
 		if(colorsHit[i]==1) {
-
 			weightTotal += this->colorWeights.at(i);
 			totalColorsHit++;
 		}
@@ -323,11 +322,48 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			results += sum;
 		}
 	}
-	//valT = this->fn_compareT(t1,t2,1);
-	//printf("ShapeDist: %f, Before_YsvDist: %f\n",valT,results);
-	//if(valT==0.0) {
-	//	results = 0.0;
-	//}
+	/***PRINT OUTPUT FOR DAZZLING DISPLAY***/
+	String text = "deque<double> resultVec(vec1.size(),0);\n"
+			"const int ysvSize = 3; //y,s,v\n"
+			"const int tSize = 5; // t1,t2...tn\n"
+			"double ysv1[ysvSize];\n"
+			"double ysv2[ysvSize];\n"
+			"deque<double> t1(tSize,0);\n"
+			"deque<double> t2(tSize,0);\n"
+			"double valY=0, valS=0, valV=0;\n"
+			"double avg=0, total=0;\n"
+			"int colorsHit[vec1.size()]; //variable to mark colors not ignored\n"
+			"for(unsigned int i=0; i<vec1.size(); i++) {\n"
+			"this->resetThreshVals();\n"
+			"if(colorNameVec.at(i)!=""LowBrown"" && colorNameVec.at(i)!=""LowGreyBrown"") {\n"
+			"for(unsigned int j=0; j<vec1.at(i).size(); j++) {\n"
+				"if(i==0 && j>=ysvSize) {\n"
+					"t1.at(j-ysvSize) = vec1.at(i).at(j);\n"
+					"t2.at(j-ysvSize) = vec2.at(i).at(j);\n"
+				"}\n"
+				"else {\n"
+					"ysv1[j] = vec1.at(i).at(j);\n"
+					"ysv2[j] = vec2.at(i).at(j);\n"
+				"}\n"
+			"}\n"
+			"Y1 = ysv1[0];\n"
+			"Y2 = ysv2[0];\n"
+			"if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION)\n"
+				"Y_PERCEPTION = 2.0;\n"
+			"if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {\n"
+				"//Total Population(Y) comparison\n"
+				"valY = this->fn_compareY(ysv1[0],ysv2[0],1);\n"
+				"//Avg Density(S) comparison\n"
+				"valS = this->fn_compareS(ysv1[1],ysv2[1],1);\n"
+				"//Variability(V) comparison\n"
+				"valV = this->fn_compareV(ysv1[2],ysv2[2],1);\n"
+				"//Reassign Y && Y_THRESH if S & V are the same\n"
+				"if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH) {\n"
+					"Y_THRESH *= 0.8;\n"
+					"Y_DIST = 10;\n"
+					"valY *= 1.3;\n"
+				"}";
+	cout << text << endl;
 	//cout << "Mine: " << results << endl;
 	return results;
 }

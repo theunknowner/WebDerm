@@ -23,32 +23,37 @@ void Entropy::demo_runCompareEntropy() {
 	FileData fd;
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/TestYSV_Output_Demo/";
 	String filepath, name;
-	double results;
-	deque<double> resultVec;
+	double resultYSV=0, resultT=0;
 	deque<int> origPos;
 	bool flag[2] = {false};
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		filepath = folder+files.at(i);
 		String targetName = getFileName(files.at(i),"-");
-		if(targetName==name1)
+		if(targetName==name1) {
 			flag[0] = this->loadEntropyFiles(filepath,vec1,colorNameVec);
-		if(targetName==name2)
+			cout << "First image found!" << endl;
+		}
+		if(targetName==name2) {
 			flag[1] = this->loadEntropyFiles(filepath,vec2,colorNameVec);
+			cout<< "Second image found!" << endl;
+		}
 	}
+
 	if(flag[0]==true && flag[1]==true) {
-		results = this->compareYSV(vec1,vec2,colorNameVec);
-		resultVec.push_back(results);
+		double results=0;
+		resultYSV = this->compareYSV(vec1,vec2,colorNameVec);
+		resultT = this->compareT(vec1,vec2,colorNameVec);
 		vec2.clear();
 		vec2.shrink_to_fit();
-		jaysort(resultVec,origPos);
-		for(unsigned int i=0; i<resultVec.size(); i++) {
-			printf("%s vs. %s\n",name1.c_str(),name2.c_str());
-			printf("RESULTS: %f", resultVec.at(i));
-			if(resultVec.at(i)>0.60)
-				cout << "  *** MATCH ***" << endl;
-			else
-				cout << "  *** NO MATCH ***" << endl;
-		}
+		results = (resultYSV + resultT)/2;
+		printf("%s vs. %s\n",name1.c_str(),name2.c_str());
+		cout << "RESULTS: " << results << flush;
+		//printf("RESULTS: %f", resultYSV);
+		if(results>0.60)
+			cout << "  *** MATCH ***" << endl;
+		else
+			cout << "  *** NO MATCH ***" << endl;
+
 	}
 }
