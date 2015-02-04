@@ -12,48 +12,55 @@ Mat ShapeMorph::prepareImage(Mat src) {
 	int lightToDarkFlag = 0;
 	int darkToLightFlag = 0;
 	Size size(3,3);
-	double avgLum=0, totalLum=0;
-	int countLum=0;
-	int stepsY = 1;
-	int stepsX = size.width;
-	Mat lumMat(ceil((double)src.rows/stepsY), ceil((double)src.cols/stepsX), CV_32F, Scalar(0));
-	double threshold = 10;
+	int boundaryLeft = 15;
+	int boundaryRight = src.cols-boundaryLeft;
+	double dkThresh = 0.22;
+	double darkToLiteThresh = 1.03;
+	double liteToDarkThresh = 0.97;
+	double totalDK=0, avgDK=0, dkRatio=0, cumulativeDK=0;
 	int row=0, col=0;
+	int countDK=0;
+	Point begin;
+	Mat drkMat(src.rows,src.cols,CV_32F,Scalar(0));
 	while(row<src.rows) {
 		while(col<src.cols) {
-			for(int i=row; i<(row+size.height); i++) {
-				for(int j=col; j<(col+size.width); j++) {
+			begin=Point(col-floor(size.width/2),row-floor(size.height/2));
+			for(int i=begin.y; i<(begin.y+size.height); i++) {
+				for(int j=begin.x; j<(begin.x+size.width); j++) {
 					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-						int lum = src.at<uchar>(i,j);
-						totalLum += lum;
-						countLum++;
+						totalDK += src.at<uchar>(i,j);
+						countDK++;
 					}
 				}
 			}
-			avgLum = totalLum / countLum;
-			lumMat.at<float>(row/stepsY,col/stepsX) = avgLum;
-			//if(row==66) {
-			//	printf("%d: %f\n",col,avgLum);
-			//}
-			totalLum=0;
-			countLum=0;
-			if(col>0) {
-				double currLum = lumMat.at<float>(row/stepsY,col/stepsX);
-				double prevLum = lumMat.at<float>(row/stepsY,(col/stepsX)-1);
-				if((currLum-prevLum)>=threshold && initFlag==0) {
+			avgDK = totalDK/countDK;
+			if(countDK==0) avgDK=0;
+			drkMat.at<float>(row,col) = avgDK;
+			if(col>=boundaryLeft && col<=boundaryRight) {
+				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
+				cumulativeDK += dkRatio - 1.0;
+				//if(row==0) {
+				//	//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
+				//	printf("DK: %d,%d: %f,%f,%f,%f\n",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
+				//}
+				if(cumulativeDK>=dkThresh || dkRatio>=darkToLiteThresh) {
 					darkToLightFlag++;
-					initFlag=1;
+					break;
 				}
-				if((currLum-prevLum)<=-threshold && initFlag==0) {
+				if(cumulativeDK<-dkThresh || dkRatio<=liteToDarkThresh) {
 					lightToDarkFlag++;
-					initFlag=1;
+					break;
 				}
 			}
-			col+=stepsX;
+			totalDK=0;
+			countDK=0;
+			col++;
 		}
-		initFlag=0;
+		totalDK=0;
+		countDK=0;
+		cumulativeDK=0;
 		col=0;
-		row+=stepsY;
+		row++;
 	}
 	Mat result;
 	cout << "Dark2Lite: " << darkToLightFlag << endl;
@@ -87,22 +94,23 @@ Mat ShapeMorph::lumFilter(Mat src) {
 			}
 			int bestIdx = round(kc.kneeCurvePoint(lumVec) * 0.95);
 			double lumThresh = lumVec.at(bestIdx);
+			/*
 			if((col/size.width)==4 && (row/size.height)==3) {
 				cout << "OldIdx: " << bestIdx << endl;
 				cout << "OldThresh: " << lumThresh << endl;
 			}
+			*/
 			double percent = 1.0 - ((double)bestIdx/lumVec.size());
 			if(percent<0.15) {
 				//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
 				bestIdx = round(bestIdx*0.75);
 			}
 			lumThresh = lumVec.at(bestIdx);
-
-			if((col/size.width)==4 && (row/size.height)==3) {
+			/*if((col/size.width)==4 && (row/size.height)==3) {
 				cout << "NewIdx:" << bestIdx << endl;
 				cout << "NewThresh: " << lumThresh << endl;
 				writeSeq2File(lumVec,"data");
-			}
+			}*/
 			for(int i=row; i<(row+size.height); i++) {
 				for(int j=col; j<(col+size.width); j++) {
 					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
@@ -115,10 +123,10 @@ Mat ShapeMorph::lumFilter(Mat src) {
 				}
 			}
 			lumVec.clear();
-			col+=size.width;
+			col+=(size.width);
 		}
 		col=0;
-		row+=size.height;
+		row+=(size.height);
 	}
 
 	//imgshow(results);
@@ -528,6 +536,8 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src) {
 					Point left(temp.at(0).x-1,temp.at(0).y);
 					Point right(temp.at(0).x+1,temp.at(0).y);
 					Point down(temp.at(0).x,temp.at(0).y+1);
+					Point downLeft(temp.at(0).x-1,temp.at(0).y+1);
+					Point downRight(temp.at(0).x+1,temp.at(0).y+1);
 					if(up.y>=0) {
 						if(map.at<uchar>(up)==0 && src.at<uchar>(up)>0) {
 							ptVec.push_back(up);
@@ -554,6 +564,20 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src) {
 							ptVec.push_back(down);
 							map.at<uchar>(down)=255;
 							temp.push_back(down);
+						}
+					}
+					if(down.y<src.rows && left.x>=0) {
+						if(map.at<uchar>(downLeft)==0 && src.at<uchar>(downLeft)>0) {
+							ptVec.push_back(downLeft);
+							map.at<uchar>(downLeft)=255;
+							temp.push_back(downLeft);
+						}
+					}
+					if(down.y<src.rows && right.x<src.cols) {
+						if(map.at<uchar>(downRight)==0 && src.at<uchar>(downRight)>0) {
+							ptVec.push_back(downRight);
+							map.at<uchar>(downRight)=255;
+							temp.push_back(downRight);
 						}
 					}
 					temp.pop_front();
@@ -1073,7 +1097,7 @@ Mat ShapeMorph::densityDetection(Mat src) {
 	Size size(12,12);
 	const double C=1.0;
 	const double alpha=1.0;
-	const double beta=0.5;
+	const double beta=0.0;
 	int row=0, col=0;
 	deque<double> fnVec;
 	double density=0, countDk=0, avgDk=0;
@@ -1097,7 +1121,8 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			avgDk /= countDk;
 			if(countDk==0) avgDk = 0;
 			double fx = C * pow(density,alpha) * pow(avgDk,beta);
-			fnVec.push_back(fx);
+			if(fx>0)
+				fnVec.push_back(fx);
 			avgDk=0;
 			density=0;
 			countDk=0;
@@ -1143,6 +1168,9 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			avgDk /= countDk;
 			if(countDk==0) avgDk = 0;
 			double fx = C * pow(density,alpha) * pow(avgDk,beta);
+			if(col==39 && row==92) {
+				cout << fx << endl;
+			}
 			if(fx>fxThresh) {
 				for(int i=row; i<(row+size.height); i++) {
 					for(int j=col; j<(col+size.width); j++) {
@@ -1164,21 +1192,12 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		row++;
 	}
 	//writeSeq2File(fnVec,"data");
-	/*
-	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
-	for(int i=0; i<map.rows; i++) {
-		for(int j=0; j<map.cols; j++) {
-			if(map.at<uchar>(i,j)>0) {
-				result.at<uchar>(i,j) = 255;
-			}
-		}
-	}
-	 */
+
 	//connect nearest neighbors
 	double q = 0.99999;
 	double b = fxThresh;
-	double a = pow(-log(1.0-q)/(3.14159 * b),0.5)* 2.0;
-	a += 1.0;
+	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
+	//a += 1.0;
 	cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
