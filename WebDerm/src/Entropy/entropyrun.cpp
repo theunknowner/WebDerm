@@ -180,7 +180,7 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 		deque<String> colorNameVec;
 		deque<String> files;
 		double resultsYSV, resultsT;
-		float countPairs=0, countResults=0;
+		float countPairs=0, countMatch=0, countSortOfMatch=0;
 		FileData fd;
 		fd.getFilesFromDirectory(folder,files);
 		while(getline(fs,temp)) {
@@ -195,7 +195,7 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 			}
 			if(this->loadEntropyFiles(filepath,vec1,colorNameVec)) {
 				for(unsigned int i=0; i<files.size(); i++) {
-					int flagMatch = 0;
+					int flagMatch = 0, flagSortOfMatch=0;
 					filepath = folder+files.at(i);
 					name = getFileName(files.at(i),"-");
 					if(name==listPairVec.at(1)) {
@@ -203,8 +203,12 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 						resultsYSV = this->compareYSV(vec1,vec2,colorNameVec);
 						resultsT = this->compareT(vec1,vec2,colorNameVec);
 						if(resultsYSV>=0.70) {
-							countResults++;
+							countMatch++;
 							flagMatch=1;
+						}
+						if(resultsYSV<0.70 && resultsYSV>=0.60) {
+							countSortOfMatch++;
+							flagSortOfMatch=1;
 						}
 						printf("%s-%s: %f | %f => %d\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),resultsYSV,resultsT,flagMatch);
 					}
@@ -212,8 +216,10 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 			}
 			listPairVec.clear();
 		}
-		float ratio = countResults/countPairs;
-		printf("%.f/%.f = %f matched\n",countResults,countPairs,ratio);
+		float ratio = countMatch/countPairs;
+		float ratio2 = countSortOfMatch/countPairs;
+		printf("%.f/%.f = %f matched\n",countMatch,countPairs,ratio);
+		printf("%.f/%.f = %f sort of matched\n",countSortOfMatch,countPairs,ratio2);
 		fs.close();
 	}
 	else {

@@ -35,16 +35,20 @@ void GridDisplay::setGridSize(Size size) {
 }
 
 void GridDisplay::drawGrid() {
-	int stepX = round((double)this->matSize.width/this->gridSize.width);
-	int stepY = round((double)this->matSize.height/this->gridSize.height);
+	int width = round((double)this->matSize.width/this->gridSize.width);
+	int height = round((double)this->matSize.height/this->gridSize.height);
+	Size boxSize(width,height);
 	Point endPt;
-	for(int i=0; i<this->img.rows; i+=stepY) {
-		for(int j=0; j<this->img.cols; j+=stepX) {
-			endPt.x = min(j+gridSize.width-1,img.cols-1);
-			endPt.y = min(i+gridSize.height-1,img.rows-1);
-			rectangle(this->img,Point(j,i),endPt,Scalar(100));
-
+	int row=0, col=0;
+	while(row<this->img.rows) {
+		while(col<this->img.cols) {
+			endPt.x = min(col+boxSize.width-1,img.cols-1);
+			endPt.y = min(row+boxSize.height-1,img.rows-1);
+			rectangle(this->img,Point(col,row),endPt,Scalar(100));
+			col = endPt.x+1;
 		}
+		col=0;
+		row = endPt.y+1;
 	}
 }
 

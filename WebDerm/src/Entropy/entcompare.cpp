@@ -322,48 +322,6 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			results += sum;
 		}
 	}
-	/***PRINT OUTPUT FOR DAZZLING DISPLAY***/
-	String text = "deque<double> resultVec(vec1.size(),0);\n"
-			"const int ysvSize = 3; //y,s,v\n"
-			"const int tSize = 5; // t1,t2...tn\n"
-			"double ysv1[ysvSize];\n"
-			"double ysv2[ysvSize];\n"
-			"deque<double> t1(tSize,0);\n"
-			"deque<double> t2(tSize,0);\n"
-			"double valY=0, valS=0, valV=0;\n"
-			"double avg=0, total=0;\n"
-			"int colorsHit[vec1.size()]; //variable to mark colors not ignored\n"
-			"for(unsigned int i=0; i<vec1.size(); i++) {\n"
-			"this->resetThreshVals();\n"
-			"if(colorNameVec.at(i)!=""LowBrown"" && colorNameVec.at(i)!=""LowGreyBrown"") {\n"
-			"for(unsigned int j=0; j<vec1.at(i).size(); j++) {\n"
-				"if(i==0 && j>=ysvSize) {\n"
-					"t1.at(j-ysvSize) = vec1.at(i).at(j);\n"
-					"t2.at(j-ysvSize) = vec2.at(i).at(j);\n"
-				"}\n"
-				"else {\n"
-					"ysv1[j] = vec1.at(i).at(j);\n"
-					"ysv2[j] = vec2.at(i).at(j);\n"
-				"}\n"
-			"}\n"
-			"Y1 = ysv1[0];\n"
-			"Y2 = ysv2[0];\n"
-			"if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION)\n"
-				"Y_PERCEPTION = 2.0;\n"
-			"if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {\n"
-				"//Total Population(Y) comparison\n"
-				"valY = this->fn_compareY(ysv1[0],ysv2[0],1);\n"
-				"//Avg Density(S) comparison\n"
-				"valS = this->fn_compareS(ysv1[1],ysv2[1],1);\n"
-				"//Variability(V) comparison\n"
-				"valV = this->fn_compareV(ysv1[2],ysv2[2],1);\n"
-				"//Reassign Y && Y_THRESH if S & V are the same\n"
-				"if(valS>=S_THRESH && valV>=V_THRESH && valY<Y_THRESH) {\n"
-					"Y_THRESH *= 0.8;\n"
-					"Y_DIST = 10;\n"
-					"valY *= 1.3;\n"
-				"}";
-	cout << text << endl;
 	//cout << "Mine: " << results << endl;
 	return results;
 }

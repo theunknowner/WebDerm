@@ -25,6 +25,8 @@
 #include "neuralnetworks/testml.h"
 #include "Shape/shapemorph.h"
 #include "Algorithms/cluster.h"
+#include "Algorithms/kneecurve.h"
+#include "GridDisplay/griddisplay.h"
 
 int main(int argc,char** argv)
 {
@@ -38,37 +40,6 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-
-	ShapeMorph sm;
-	String folder2 = "/home/jason/Desktop/Programs/Demo/Images/";
-	String input, name;
-	cout << "Enter image: ";
-	cin >> input;
-	name = getFileName(input);
-	String file = folder2 + name + ".jpg";
-	Mat img = runResizeImage(file,Size(140,140),0);
-	Size size(3,3);
-	img = runColorNormalization(img);
-	cvtColor(img,img,CV_BGR2GRAY);
-	Mat img2 = sm.prepareImage(img);
-	Mat result2 = sm.gsReconUsingRmin2(img2);
-	Mat img3 = sm.densityDetection(result2);
-	vector<Mat> featureVec = sm.liquidFeatureExtraction(img3);
-	int largest=0, idx=0;
-	for(unsigned int i=0; i<featureVec.size(); i++) {
-		if(countNonZero(featureVec.at(i))>largest) {
-			largest = countNonZero(featureVec.at(i));
-			idx = i;
-		}
-	}
-	Mat img5 = sm.dilation(featureVec.at(idx),Size(5,5));
-	imgshow(img2);
-	imgshow(result2);
-	imgshow(img3);
-	imgshow(img5);
-	vector<Mat> matVec;
-	matVec.push_back(img5);
-	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -78,8 +49,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-
-	//img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/tinea_corporis1.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles9.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -88,33 +58,50 @@ int main(int argc,char** argv)
 	Size size(3,3);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
-/*
+
 	img2 = sm.prepareImage(img);
 	img3 = sm.lumFilter(img2);
 	imgshow(img2);
 	imgshow(img3);
-	 */
-	/*
-	img2 = sm.prepareImage(img);
-	Mat result2 = sm.gsReconUsingRmin2(img2);
-	img3 = sm.densityDetection(result2);
-	vector<Mat> featureVec = sm.liquidFeatureExtraction(img3);
-	int largest=0, idx=0;
+/*
+	GridDisplay gd;
+	gd.setImage(img2);
+	gd.setGridSize(Size(7,7));
+	gd.drawGrid();
+	gd.displayGrid();
+*/
+	//img2 = sm.prepareImage(img);
+	//Mat result2 = sm.gsReconUsingRmin2(img2);
+	img4 = sm.densityDetection(img3);
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
+	int countPix=0, idx=0;
+	deque<int> countVec;
+	deque<int> idxVec;
 	for(unsigned int i=0; i<featureVec.size(); i++) {
-		if(countNonZero(featureVec.at(i))>largest) {
-			largest = countNonZero(featureVec.at(i));
-			idx = i;
-		}
+		countPix = countNonZero(featureVec.at(i));
+		idx = i;
+		countVec.push_back(countPix);
 	}
-	img5 = sm.dilation(featureVec.at(idx),Size(5,5));
+	jaysort(countVec,idxVec);
+	vector<Mat> matVec;
+	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	while(true) {
+		static unsigned int n=1;
+		//matVec.push_back(featureVec.at(idxVec.at(idxVec.size()-n)));
+		morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),img5,MORPH_CLOSE,element);
+		//img5 = sm.dilation(featureVec.at(idxVec.at(idxVec.size()-n)),Size(3,3));
+		matVec.push_back(img5.clone());
+		imgshow(matVec.at(matVec.size()-1));
+		n++;
+		if(matVec.size()>=5) break;
+		if(n>idxVec.size()) break;
+	}
+	//img5 = sm.dilation(featureVec.at(idx),Size(5,5));
 	//vector<Mat> matVec;
 	//matVec.push_back(img5);
-	imgshow(result2);
-	imgshow(img3);
-	//imgshow(img4);
-	imgshow(img5);
-	vector<Mat> matVec;
-	matVec.push_back(img5);
+	//imgshow(result2);
+	//imgshow(img3);
+	imgshow(img4);
 	/**/
 	/*
 	deque<String> nameVec;
@@ -191,7 +178,7 @@ int main(int argc,char** argv)
 	layers.at<int>(1,0) = hiddenNodes;
 	layers.at<int>(2,0) = outputSize;
 	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
-/*
+	/*
 	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001);
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
@@ -295,8 +282,8 @@ int main(int argc,char** argv)
 	cout << newPix << endl;
 	/**/
 	/*
-	String name = "psoriasis16";
-	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
+	String name = "tinea_corporis8a";
+	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();

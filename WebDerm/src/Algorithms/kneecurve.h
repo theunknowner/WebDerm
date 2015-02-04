@@ -17,6 +17,9 @@ class KneeCurve {
 public:
 	int kneeCurvePoint(deque<double> &vec);
 	double getMaxDist();
+	void removeOutliers(deque<double> &vec, double percent);
+
+	void loadVectorFile(String path, deque<double> &vec);
 };
 
 #endif /* KNEECURVE_H_ */

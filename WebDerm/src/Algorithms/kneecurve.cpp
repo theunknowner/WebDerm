@@ -17,8 +17,8 @@ int KneeCurve::kneeCurvePoint(deque<double> &vec) {
 	Mat firstPtPow,lastPtPow;
 	firstPt.at<float>(0,0) = 0;
 	firstPt.at<float>(0,1) = vec.at(0);
-	lastPt.at<float>(0,0) = vec.size()-1;
-	lastPt.at<float>(0,1) = vec.at(vec.size()-1);
+	lastPt.at<float>(0,0) = (vec.size()-1) - firstPt.at<float>(0,0);
+	lastPt.at<float>(0,1) = vec.at(vec.size()-1) - firstPt.at<float>(0,1);
 	for(unsigned int i=0; i<vec.size(); i++) {
 		vecFromFirst.at<float>(i,0) = i - firstPt.at<float>(0,0);
 		vecFromFirst.at<float>(i,1) = vec.at(i) - firstPt.at<float>(0,1);
@@ -58,4 +58,23 @@ int KneeCurve::kneeCurvePoint(deque<double> &vec) {
 
 double KneeCurve::getMaxDist() {
 	return this->maxDist;
+}
+
+void KneeCurve::removeOutliers(deque<double> &vec, double percent) {
+	sort(vec.begin(),vec.end());
+	int amt = round(vec.size() * percent);
+	for(int i=0; i<amt; i++) {
+		vec.pop_back();
+		vec.pop_front();
+	}
+}
+
+void KneeCurve::loadVectorFile(String path, deque<double> &vec) {
+	fstream fs(path.c_str());
+	if(fs.is_open()) {
+		String temp;
+		while(getline(fs,temp)) {
+			vec.push_back(atof(temp.c_str()));
+		}
+	}
 }
