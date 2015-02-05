@@ -164,6 +164,7 @@ double Entropy::fn_compareT(deque<double> t1, deque<double> t2, double weight) {
 	int t1Shape=0, t2Shape=0;
 	t1Shape = idx1<(t1.size()-1) ? 0:1;
 	t2Shape = idx2<(t2.size()-1) ? 0:1;
+	printf("%d | %d\n",idx1,idx2);
 	if(t1Shape==t2Shape)
 		return 1.0;
 	else

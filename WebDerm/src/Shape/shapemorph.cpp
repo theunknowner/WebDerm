@@ -8,7 +8,6 @@
 #include "shapemorph.h"
 
 Mat ShapeMorph::prepareImage(Mat src) {
-	int initFlag=0;
 	int lightToDarkFlag = 0;
 	int darkToLightFlag = 0;
 	Size size(3,3);
@@ -63,8 +62,8 @@ Mat ShapeMorph::prepareImage(Mat src) {
 		row++;
 	}
 	Mat result;
-	cout << "Dark2Lite: " << darkToLightFlag << endl;
-	cout << "Lite2Dark: " << lightToDarkFlag << endl;
+	//cout << "Dark2Lite: " << darkToLightFlag << endl;
+	//cout << "Lite2Dark: " << lightToDarkFlag << endl;
 	if(lightToDarkFlag>darkToLightFlag)
 		result = 255 - src;
 	else
@@ -94,12 +93,12 @@ Mat ShapeMorph::lumFilter(Mat src) {
 			}
 			int bestIdx = round(kc.kneeCurvePoint(lumVec) * 0.95);
 			double lumThresh = lumVec.at(bestIdx);
-			/*
+/*
 			if((col/size.width)==4 && (row/size.height)==3) {
 				cout << "OldIdx: " << bestIdx << endl;
 				cout << "OldThresh: " << lumThresh << endl;
 			}
-			*/
+*/
 			double percent = 1.0 - ((double)bestIdx/lumVec.size());
 			if(percent<0.15) {
 				//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
@@ -128,7 +127,7 @@ Mat ShapeMorph::lumFilter(Mat src) {
 		col=0;
 		row+=(size.height);
 	}
-
+/*
 	//imgshow(results);
 	kc.removeOutliers(lumVec2,0.005);
 	for(unsigned int i=0; i<lumVec2.size(); i++) {
@@ -136,8 +135,11 @@ Mat ShapeMorph::lumFilter(Mat src) {
 	}
 	int uniqueLums = countNonZero(uniqueLumVec);
 	double factor = uniqueLums/256.0;
+	cout << uniqueLums << endl;
 	int bestIdx = kc.kneeCurvePoint(lumVec2);
 	double lumThresh = lumVec2.at(bestIdx);
+	cout << bestIdx << endl;
+	cout << lumThresh << endl;
 	double percent = 1.0 - ((double)bestIdx/lumVec2.size());
 	if(percent<0.15) {
 		//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
@@ -146,7 +148,7 @@ Mat ShapeMorph::lumFilter(Mat src) {
 	lumThresh = lumVec2.at(bestIdx);
 	cout << "BestIdx: " << bestIdx << endl;
 	cout << "LumThresh: " << lumThresh << endl;
-	//writeSeq2File(lumVec2,"data");
+	writeSeq2File(lumVec2,"data");
 	for(int i=0; i<results.rows; i++) {
 		for(int j=0; j<results.cols; j++) {
 			double lum = results.at<uchar>(i,j);
@@ -155,7 +157,7 @@ Mat ShapeMorph::lumFilter(Mat src) {
 			}
 		}
 	}
-
+*/
 	return results;
 }
 
@@ -1134,22 +1136,25 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		row++;
 	}
 
-	//writeSeq2File(fnVec,"data");
+	writeSeq2File(fnVec,"data");
 	//calculate knee of curve for fx for filtering
 	KneeCurve kc;
-	int bestIdx = round(kc.kneeCurvePoint(fnVec) * 0.95);
+	int bestIdx = kc.kneeCurvePoint(fnVec);
+	cout << bestIdx << endl;
+	//bestIdx = round(bestIdx*1.05);
 	cout << "BestIdx: " << bestIdx << endl;
 	//fx threshold filtering
 	double fxThresh = fnVec.at(bestIdx);
 	double percent = 1.0 - ((double)bestIdx/fnVec.size());
-	if(percent<0.15) {
+	//if(percent<0.15) {
 		//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
-		bestIdx = round(bestIdx*0.75);
-	}
+	//	bestIdx = round(bestIdx*0.75);
+	//}
 	fxThresh = fnVec.at(bestIdx);
 	cout << "New BestIdx: " << bestIdx << endl;
 	cout << "FxThresh: " << fxThresh << endl;
 	row=0; col=0;
+
 	while(row<src.rows) {
 		while(col<src.cols) {
 			for(int i=row; i<(row+size.height); i++) {
@@ -1168,9 +1173,6 @@ Mat ShapeMorph::densityDetection(Mat src) {
 			avgDk /= countDk;
 			if(countDk==0) avgDk = 0;
 			double fx = C * pow(density,alpha) * pow(avgDk,beta);
-			if(col==39 && row==92) {
-				cout << fx << endl;
-			}
 			if(fx>fxThresh) {
 				for(int i=row; i<(row+size.height); i++) {
 					for(int j=col; j<(col+size.width); j++) {
@@ -1191,28 +1193,28 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		//row+=size.height;
 		row++;
 	}
+
 	//writeSeq2File(fnVec,"data");
 
 	//connect nearest neighbors
 	double q = 0.99999;
 	double b = fxThresh;
 	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
-	//a += 1.0;
-	cout << a << endl;
+	//cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	Size square(ceil(a),ceil(a));
 	a = round(a);
 	while(row<src.rows) {
 		while(col<src.cols) {
-			int lc = map.at<uchar>(row,col);
+			int lc = src.at<uchar>(row,col);
 			if(lc>0) {
 				Point begin = Point(col-square.width,row-square.height);
 				Point end = Point(col+square.width,row+square.height);
 				for(int i=begin.y; i<end.y; i++) {
 					for(int j=begin.x; j<end.x; j++) {
 						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-							lc = src.at<uchar>(i,j);
+							lc = map.at<uchar>(i,j);
 							//double dist = eucDist(Point(j,i),Point(col,row));
 							double dist = abs(j-col) + abs(i-row);
 							if(dist<=a && lc>absDiscernThresh) {
@@ -1229,6 +1231,7 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		col=0;
 		row++;
 	}
+	cout << countNonZero(result) << endl;
 	return result;
 }
 

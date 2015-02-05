@@ -195,20 +195,23 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 			}
 			if(this->loadEntropyFiles(filepath,vec1,colorNameVec)) {
 				for(unsigned int i=0; i<files.size(); i++) {
-					int flagMatch = 0, flagSortOfMatch=0;
+					int flagMatch = 0;
 					filepath = folder+files.at(i);
 					name = getFileName(files.at(i),"-");
 					if(name==listPairVec.at(1)) {
 						this->loadEntropyFiles(filepath,vec2,colorNameVec);
 						resultsYSV = this->compareYSV(vec1,vec2,colorNameVec);
 						resultsT = this->compareT(vec1,vec2,colorNameVec);
-						if(resultsYSV>=0.70) {
+						if(resultsYSV>=0.70 && resultsT>=1.0) {
 							countMatch++;
 							flagMatch=1;
 						}
-						if(resultsYSV<0.70 && resultsYSV>=0.60) {
+						else if(resultsYSV<0.70 && resultsYSV>=0.60 && resultsT>=1.0) {
 							countSortOfMatch++;
-							flagSortOfMatch=1;
+							flagMatch=0;
+						}
+						else {
+							flagMatch=-1;
 						}
 						printf("%s-%s: %f | %f => %d\n",listPairVec.at(0).c_str(),listPairVec.at(1).c_str(),resultsYSV,resultsT,flagMatch);
 					}

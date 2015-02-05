@@ -49,7 +49,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vesicles9.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria5.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -63,6 +63,7 @@ int main(int argc,char** argv)
 	img3 = sm.lumFilter(img2);
 	imgshow(img2);
 	imgshow(img3);
+
 /*
 	GridDisplay gd;
 	gd.setImage(img2);
@@ -70,8 +71,7 @@ int main(int argc,char** argv)
 	gd.drawGrid();
 	gd.displayGrid();
 */
-	//img2 = sm.prepareImage(img);
-	//Mat result2 = sm.gsReconUsingRmin2(img2);
+
 	img4 = sm.densityDetection(img3);
 	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
 	int countPix=0, idx=0;
@@ -91,7 +91,8 @@ int main(int argc,char** argv)
 		morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),img5,MORPH_CLOSE,element);
 		//img5 = sm.dilation(featureVec.at(idxVec.at(idxVec.size()-n)),Size(3,3));
 		matVec.push_back(img5.clone());
-		imgshow(matVec.at(matVec.size()-1));
+		//imgshow(matVec.at(matVec.size()-1));
+		//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
 		n++;
 		if(matVec.size()>=5) break;
 		if(n>idxVec.size()) break;
@@ -122,23 +123,7 @@ int main(int argc,char** argv)
 	fd.setImage(img);
 	en.shapeFn(fd);
 /**/
-	//imgshow(img4);
-	//imshow("img",img4);
-	//imshow("img2",img3);
-	//waitKey(0);
-	//img3 = img2.clone();
-	//Mat element = sm.getStructElem(size,sm.RECT);
-	//Mat element = getStructuringElement(MORPH_RECT,size);
-	//img = sm.prepareImage(img);
-	//img2 = sm.grayscaleReconstruct(img);
-	//morphologyEx(img2,img3,MORPH_OPEN,element);
-	//morphologyEx(img2,img3,MORPH_CLOSE,element);
-	//img4 = img3 - img2;
-	//element = getStructuringElement(MORPH_RECT,Size(7,7));
-	//morphologyEx(img2,img4,MORPH_OPEN,element);
-	//morphologyEx(img4,img4,MORPH_CLOSE,element);
-	/**/
-	/*
+/*
 	TestML ml;
 	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
 	vector<double> labels(5,0);
@@ -178,7 +163,7 @@ int main(int argc,char** argv)
 	layers.at<int>(1,0) = hiddenNodes;
 	layers.at<int>(2,0) = outputSize;
 	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
-	/*
+/*
 	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001);
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
@@ -240,26 +225,6 @@ int main(int argc,char** argv)
 	}
 /**/
 	/*
-	String file = "/home/jason/git/Samples/Samples/training_set.csv";
-	String file2 = "/home/jason/git/Samples/Samples/test_set.csv";
-	ShapeML sml;
-	vector<vector<double> >training_labels;
-	vector<vector<double> > training_data;
-	sml.importData(file,training_data,training_labels);
-	int iter = sml.train(training_data,training_labels,300);
-	//cout << iter << endl;
-	sml.saveData();
-/*
-	vector<vector<double> > data;
-	vector<vector<double> > labels;
-	sml.importData(file2,data,labels);
-	vector<vector<double> > results(data.size(),vector<double>(labels.at(0).size(),0));
-	sml.predict(data,results);
-	for(unsigned int i=0; i<results.size(); i++) {
-		printf("Sample: %d, Out1: %f, Out2: %f\n",i, results.at(i).at(0), results.at(i).at(1));
-		//cout << i << endl;
-	}
-	/*
 	FileData fd;
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_5x5.csv",fd.windowVec);
 	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_ShadeColors_5x5.csv",fd.colorVec);
@@ -281,9 +246,9 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-	/*
-	String name = "tinea_corporis8a";
-	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
+/*
+	String name = "clp4";
+	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
@@ -291,55 +256,7 @@ int main(int argc,char** argv)
 	//en.runCompareEntropy2(name);
 	en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
-/*
-	img = runResizeImage("/home/jason/Desktop/Programs/fairskin2.jpg",Size(140,140),0);
-	Size size(5,5);
-	img2 = runColorNormalization(img);
-	img4 = runResizeImage(img2,Size(700/size.width,700/size.height));
-	blur(img4,img4,size);
-	imwrite("fairskin2.png",img4);
-	/*
-	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
-	FileData fd;
-	Size size(5,5);
-	fd.getFilesFromDirectory(folder,files);
-	for(unsigned int i=0; i<files.size(); i++) {
-		img = imread(folder+files.at(i));
-		if(img.data) {
-			String name = getFileName(files.at(i));
-			img2 = runColorNormalization(img);
-			img4 = runResizeImage(img2,Size(700/size.width,700/size.height));
-			blur(img4,img4,size);
-			imwrite(name+"-3.png",img4);
-		}
-	}
-	//img4 = c.correctGamma(img2,2.2);
-	//namedWindow("img",CV_WINDOW_FREERATIO);
-	//namedWindow("img3",CV_WINDOW_FREERATIO);
-	//namedWindow("img4",CV_WINDOW_FREERATIO);
-	//imshow("img",img);
-	//imshow("img3",img3);
-	//imshow("img4",img4);
-	//waitKey(0);
-	//imwrite("ves18-2.png",img4);/**/
-	//double a=1.0, b=0.001, p=0.33;
 
-	/*
-	String filename2 = name1+"-"+name2+".csv";
-	FILE * fp;
-	fp = fopen(filename2.c_str(),"w");
-	fprintf(fp,",Y,S,V,Match\n");
-	for(unsigned int i=0; i<matchVec.size(); i++) {
-		fprintf(fp,"%s,",allColors.at(i).c_str());
-		for(unsigned int j=0; j<matchVec.at(i).size(); j++) {
-			fprintf(fp,"%f,",matchVec.at(i).at(j));
-		}
-		fprintf(fp,"%f\n",resultVec.at(i));
-	}
-	fclose(fp);
-	en.releaseMemory();
-	 */
 	/*
 	Entropy en;
 	FileData fd;
