@@ -76,5 +76,7 @@ void KneeCurve::loadVectorFile(String path, deque<double> &vec) {
 		while(getline(fs,temp)) {
 			vec.push_back(atof(temp.c_str()));
 		}
+		fs.flush();
+		fs.close();
 	}
 }

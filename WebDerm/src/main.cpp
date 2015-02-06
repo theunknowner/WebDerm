@@ -49,7 +49,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria5.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/vitiligo3.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -58,21 +58,103 @@ int main(int argc,char** argv)
 	Size size(3,3);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
+	/*
+	deque<double> vec;
+	KneeCurve kc;
+	kc.loadVectorFile("/home/jason/git/WebDerm/WebDerm/data.csv",vec);
+	cout << kc.kneeCurvePoint(vec) << endl;
+/**/
+	img = sm.prepareImage(img);
+	imgshow(img);
+	KneeCurve kc;
+	deque<double> vec;
+	Mat imgEdgeRemoval = img.clone();
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			vec.push_back(lum);
+		}
+	}
+	int bestIdx = kc.kneeCurvePoint(vec);
+	double thresh = vec.at(15588);
+	cout << bestIdx << endl;
+	cout << thresh << endl;
+	writeSeq2File(vec,"vec");
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			if(lum<thresh)
+				imgEdgeRemoval.at<uchar>(i,j) = 0;
+		}
+	}
+	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	morphologyEx(imgEdgeRemoval,imgEdgeRemoval,MORPH_CLOSE,element);
+	imgshow(imgEdgeRemoval);
+	Mat map(img.rows, img.cols, CV_8U, Scalar(0));
+	for(int i=0; i<imgEdgeRemoval.rows; i++) {
+		int leftFlag=0, rightFlag=0;
+		int j2=imgEdgeRemoval.cols-1;
+		for(int j=0; j<imgEdgeRemoval.cols; j++) {
+			double lum = imgEdgeRemoval.at<uchar>(i,j);
+			double lum2 = imgEdgeRemoval.at<uchar>(i,j2);
+			if(lum>5 && leftFlag==0) {
+				map.at<uchar>(i,j) = 255;
+			}
+			else
+				leftFlag=1;
+			if(lum2>5 && rightFlag==0) {
+				map.at<uchar>(i,j2) = 255;
+				j2--;
+			}
+			else
+				rightFlag=1;
+			if(leftFlag==1 && rightFlag==1)
+				break;
+		}
+	}
+	imgshow(map);
+	deque<double> vec2;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			int val = map.at<uchar>(i,j);
+			if(val!=255) {
+				vec2.push_back(lum);
+			}
+		}
+	}
 
+	kc.removeOutliers(vec2,0.025);
+	bestIdx = kc.kneeCurvePoint(vec2);
+	writeSeq2File(vec2,"data");
+	cout << bestIdx << endl;
+	thresh = vec2.at(bestIdx);
+	cout << thresh << endl;
+	Mat result=img.clone();
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			int val = map.at<uchar>(i,j);
+			if(lum<thresh || val==255)
+				result.at<uchar>(i,j) = 0;
+		}
+	}
+	imgshow(result);
+	/*
 	img2 = sm.prepareImage(img);
 	img3 = sm.lumFilter(img2);
 	imgshow(img2);
 	imgshow(img3);
-
-/*
+/**/
+	/*
 	GridDisplay gd;
-	gd.setImage(img2);
-	gd.setGridSize(Size(7,7));
+	gd.setImage(result);
+	gd.setGridSize(Size(28,28));
 	gd.drawGrid();
 	gd.displayGrid();
-*/
+	*/
 
-	img4 = sm.densityDetection(img3);
+	img4 = sm.densityDetection(result);
 	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
 	int countPix=0, idx=0;
 	deque<int> countVec;
@@ -84,11 +166,11 @@ int main(int argc,char** argv)
 	}
 	jaysort(countVec,idxVec);
 	vector<Mat> matVec;
-	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	element = getStructuringElement(MORPH_RECT,Size(3,3));
 	while(true) {
 		static unsigned int n=1;
 		//matVec.push_back(featureVec.at(idxVec.at(idxVec.size()-n)));
-		morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),img5,MORPH_CLOSE,element);
+		//morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),img5,MORPH_CLOSE,element);
 		//img5 = sm.dilation(featureVec.at(idxVec.at(idxVec.size()-n)),Size(3,3));
 		matVec.push_back(img5.clone());
 		//imgshow(matVec.at(matVec.size()-1));
@@ -123,7 +205,7 @@ int main(int argc,char** argv)
 	fd.setImage(img);
 	en.shapeFn(fd);
 /**/
-/*
+	/*
 	TestML ml;
 	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
 	vector<double> labels(5,0);
@@ -145,7 +227,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-
+	/*
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
@@ -172,7 +254,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-
+	/*
 	//TestML ml;
 	vector<Mat> sampleVec;
 	Mat sample;
@@ -246,7 +328,7 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-/*
+	/*
 	String name = "clp4";
 	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
