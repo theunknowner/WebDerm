@@ -16,8 +16,10 @@ class KneeCurve {
 	int bestIdx;
 public:
 	int kneeCurvePoint(deque<double> &vec);
+	int kneeCurvePoint(vector<double> & vec);
 	double getMaxDist();
 	void removeOutliers(deque<double> &vec, double percent);
+	void removeOutliers(vector<double> &vec, double percent);
 
 	void loadVectorFile(String path, deque<double> &vec);
 };

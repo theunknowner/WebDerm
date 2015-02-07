@@ -16,7 +16,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/scripts/scripts.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Contrast/contrast.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "test.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
 
 void runBlurImage();

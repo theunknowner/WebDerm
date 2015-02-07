@@ -60,7 +60,6 @@ public:
 	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor, String targetShade);
 	void writeEntropyFile(String filename, FileData &fd);
 	void shapeFn(FileData &fd);
-	void shapeFn2(FileData &fd);
 
 	//entcompare.cpp
 	bool importEntropyThresholds();

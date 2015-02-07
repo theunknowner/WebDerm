@@ -10,6 +10,7 @@
 
 #include "global.h"
 #include "functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/test.h"
 
 void getSubstr(String str, char delimiter, deque<String> &vec);
 void getCoordinates(Mat &img, int red, int green, int blue);

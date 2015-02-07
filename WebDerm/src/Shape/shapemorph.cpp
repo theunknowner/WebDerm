@@ -71,108 +71,155 @@ Mat ShapeMorph::prepareImage(Mat src) {
 	return result;
 }
 
-//! experimental function/method for filtering using luminance
-Mat ShapeMorph::lumFilter(Mat src) {
-	Mat _src = src.clone();
-	Mat results(src.rows, src.cols, CV_8U, Scalar(0));
-	deque<double> lumVec;
-	deque<double> lumVec2;
-	vector<int> uniqueLumVec(256,0);
-	Size size(20,20);
-	int row=0, col=0;
+//! filter curve on original grayscale image
+Mat ShapeMorph::origFilter(Mat src) {
 	KneeCurve kc;
-	while(row<src.rows) {
-		while(col<src.cols) {
-			for(int i=row; i<(row+size.height); i++) {
-				for(int j=col; j<(col+size.width); j++) {
-					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-						double lum = _src.at<uchar>(i,j);
-						lumVec.push_back(lum);
-					}
-				}
-			}
-			int bestIdx = round(kc.kneeCurvePoint(lumVec) * 0.95);
-			double lumThresh = lumVec.at(bestIdx);
+	Poly poly;
+	Mat img = this->prepareImage(src);
 
-			if((col/size.width)==3 && (row/size.height)==4) {
-				cout << "OldIdx: " << bestIdx << endl;
-				cout << "OldThresh: " << lumThresh << endl;
-			}
-
-			double percent = 1.0 - ((double)bestIdx/lumVec.size());
-			if(percent<0.15) {
-				//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
-				bestIdx = round(bestIdx*0.75);
-			}
-			lumThresh = lumVec.at(bestIdx);
-			if((col/size.width)==3 && (row/size.height)==4) {
-				cout << "NewIdx:" << bestIdx << endl;
-				cout << "NewThresh: " << lumThresh << endl;
-				writeSeq2File(lumVec,"data0");
-			}
-			for(int i=row; i<(row+size.height); i++) {
-				for(int j=col; j<(col+size.width); j++) {
-					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-						double lum = _src.at<uchar>(i,j);
-						if(lum>=lumThresh) {
-							results.at<uchar>(i,j) = _src.at<uchar>(i,j);
-							lumVec2.push_back(lum);
-						}
-					}
-				}
-			}
-			lumVec.clear();
-			col+=(size.width);
+	//removing stuff on edge
+	deque<double> vec;
+	Mat imgEdgeRemoval(img.rows,img.cols,CV_8U,Scalar(255));
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			vec.push_back(lum);
 		}
-		col=0;
-		row+=(size.height);
 	}
-/*
-	//imgshow(results);
-	kc.removeOutliers(lumVec2,0.005);
-	for(unsigned int i=0; i<lumVec2.size(); i++) {
-		uniqueLumVec.at(lumVec2.at(i)) = 1;
+	//kc.removeOutliers(vec,0.025);
+	int index = kc.kneeCurvePoint(vec);
+	double thresh = vec.at(index);
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			if(lum<thresh)
+				imgEdgeRemoval.at<uchar>(i,j) = 0;
+		}
 	}
-	int uniqueLums = countNonZero(uniqueLumVec);
-	double factor = uniqueLums/256.0;
-	cout << uniqueLums << endl;
-	int bestIdx = kc.kneeCurvePoint(lumVec2);
-	double lumThresh = lumVec2.at(bestIdx);
-	cout << bestIdx << endl;
-	cout << lumThresh << endl;
-	double percent = 1.0 - ((double)bestIdx/lumVec2.size());
-	if(percent<0.15) {
-		//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
-		bestIdx = round(bestIdx*factor);
+	Mat mapEdgeRemoval(img.rows, img.cols, CV_8U, Scalar(0));
+	for(int i=0; i<imgEdgeRemoval.rows; i++) {
+		int leftFlag=0, rightFlag=0;
+		int j2=imgEdgeRemoval.cols-1;
+		for(int j=0; j<imgEdgeRemoval.cols; j++) {
+			double lum = imgEdgeRemoval.at<uchar>(i,j);
+			double lum2 = imgEdgeRemoval.at<uchar>(i,j2);
+			if(lum==255 && leftFlag==0) {
+				mapEdgeRemoval.at<uchar>(i,j) = 255;
+			}
+			else
+				leftFlag=1;
+			if(lum2==255 && rightFlag==0) {
+				mapEdgeRemoval.at<uchar>(i,j2) = 255;
+				j2--;
+			}
+			else
+				rightFlag=1;
+			if(leftFlag==1 && rightFlag==1)
+				break;
+		}
 	}
-	lumThresh = lumVec2.at(bestIdx);
-	cout << "BestIdx: " << bestIdx << endl;
-	cout << "LumThresh: " << lumThresh << endl;
-	writeSeq2File(lumVec2,"data");
-	for(int i=0; i<results.rows; i++) {
-		for(int j=0; j<results.cols; j++) {
-			double lum = results.at<uchar>(i,j);
-			if(lum<lumThresh) {
-				results.at<uchar>(i,j) = 0;
+	vector<double> yVec;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			int val = mapEdgeRemoval.at<uchar>(i,j);
+			if(val!=255) {
+				yVec.push_back(lum);
 			}
 		}
 	}
-*/
-	return results;
+	kc.removeOutliers(yVec,0.025);
+	writeSeq2File(yVec,"yVec");
+	vector<double> xVec;
+	for(unsigned int i=0; i<yVec.size(); i++) {
+		xVec.push_back((double)i);
+	}
+	vector<double> p = poly.polyfit(xVec,yVec,1);
+	vector<double> y1 = poly.polyval(p,xVec);
+	//MSE
+	double sum=0;
+	for(unsigned int i=0; i<y1.size(); i++) {
+		double val = (yVec.at(i)-y1.at(i))/yVec.at(i);
+		val = pow(val,2);
+		sum += val;
+	}
+	sum = sqrt(sum);
+	cout << sum << endl;
+	if(sum<9.0) {
+		return Mat(); //if curve is a line, return and exit
+	}
+	int bestIdx = kc.kneeCurvePoint(yVec);
+	thresh = yVec.at(bestIdx);
+
+	Mat result=img.clone();
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img.at<uchar>(i,j);
+			int val = mapEdgeRemoval.at<uchar>(i,j);
+			if(val==255 || lum<thresh)
+				result.at<uchar>(i,j) = 0;
+		}
+	}
+	return result;
 }
 
-Mat ShapeMorph::findShapes(Mat src) {
-	Mat _src = 255 - src;
-	Size size(3,3);
-	Mat openImg,closeImg,gradImg, dst, dImg, eImg;
-	Point anchor(0,size.height-1);
-	eImg = this->erosion(src,size);
-	dImg =this->dilation(src,size);
-	gradImg = dImg - eImg;
-	gradImg *= 1.6;
-	Mat mask = this->kmeansClusterLC(gradImg);
-	_src.copyTo(dst,mask); //mask everything except points that are clustered
-	return dst;
+Mat ShapeMorph::closeFilter(Mat src) {
+	KneeCurve kc;
+	Poly poly;
+	Mat img;
+	Mat element = getStructuringElement(MORPH_RECT,Size(17,17));
+	morphologyEx(src,img,MORPH_CLOSE,element);
+	Mat img2 = img - src;
+
+	//curve fitting
+	vector<double> yVec;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double lum = img2.at<uchar>(i,j);
+			if(lum>5)
+				yVec.push_back(lum);
+		}
+	}
+	kc.removeOutliers(yVec,0.025);
+	vector<double> xVec;
+	for(unsigned int i=0; i<yVec.size(); i++) {
+		xVec.push_back((double)i);
+	}
+	vector<double> p = poly.polyfit(xVec,yVec,1);
+	vector<double> y1 = poly.polyval(p,xVec);
+	//MSE
+	double sum=0;
+	for(unsigned int i=0; i<y1.size(); i++) {
+		double val = (yVec.at(i)-y1.at(i))/yVec.at(i);
+		val = pow(val,2);
+		sum += val;
+	}
+	sum = sqrt(sum);
+	cout << sum << endl;
+	if(sum<9.0) {
+		cout << "closeFilter curve is straight line!" << endl;
+		return Mat();
+	}
+	int bestIdx = kc.kneeCurvePoint(yVec);
+	double thresh = yVec.at(bestIdx);
+
+	Mat result=img2.clone();
+	for(int i=0; i<img2.rows; i++) {
+		for(int j=0; j<img2.cols; j++) {
+			double lum = img2.at<uchar>(i,j);
+			if(lum<thresh)
+				result.at<uchar>(i,j) = 0;
+		}
+	}
+	return result;
+}
+
+//! experimental function/method for filtering using luminance
+Mat ShapeMorph::lumFilter(Mat src) {
+	Mat result = this->origFilter(src);
+	if(result.empty())
+		result = this->closeFilter(src);
+	return result;
 }
 
 Mat ShapeMorph::dilation(Mat src, Size size, Point anchor) {
@@ -1145,7 +1192,7 @@ Mat ShapeMorph::densityDetection(Mat src) {
 	double fxThresh = fnVec.at(bestIdx);
 	double percent = 1.0 - ((double)bestIdx/fnVec.size());
 	//if(percent<0.15) {
-		//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
+	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
 	//	bestIdx = round(bestIdx*0.75);
 	//}
 	fxThresh = fnVec.at(bestIdx);
@@ -1191,14 +1238,13 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		//row+=size.height;
 		row++;
 	}
-	*/
+	 */
 	//imgshow(map);
 
 	//connect nearest neighbors
-	double q = 0.99999;
+	double q = 0.9;
 	double b = fxThresh;
 	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
-	a -= 0.5;
 	cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;

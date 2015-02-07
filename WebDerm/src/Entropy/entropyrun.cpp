@@ -57,7 +57,7 @@ void Entropy::runAllEntropy() {
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
 				//this->shapeFn(fd);
-				this->shapeFn2(fd);
+				this->shapeFn(fd);
 				this->eyeFn(fd,entSize,"","");
 			}
 		}
@@ -96,7 +96,7 @@ void Entropy::runEntropy() {
 		this->importEntropyThresholds();
 		fd.ksize=Size(5,5);
 		this->entSize = entSize;
-		this->shapeFn2(fd);
+		this->shapeFn(fd);
 		eyeFn(fd,entSize,"","");
 		rgb.release_memory();
 		hsl.release_memory();
