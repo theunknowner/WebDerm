@@ -76,9 +76,8 @@ Mat ShapeMorph::origFilter(Mat src) {
 	KneeCurve kc;
 	Poly poly;
 	Mat img = this->prepareImage(src);
-
 	//removing stuff on edge
-	deque<double> vec;
+	vector<double> vec;
 	Mat imgEdgeRemoval(img.rows,img.cols,CV_8U,Scalar(255));
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
@@ -86,9 +85,26 @@ Mat ShapeMorph::origFilter(Mat src) {
 			vec.push_back(lum);
 		}
 	}
-	//kc.removeOutliers(vec,0.025);
+	vector<double> xVec;
+	sort(vec.begin(),vec.end());
+	for(unsigned int i=0; i<vec.size(); i++) {
+		xVec.push_back((double)i);
+	}
+	vector<double> p = poly.polyfit(xVec,vec,1);
+	vector<double> y1 = poly.polyval(p,xVec);
+	//MSE
+	double sum=0;
+	for(unsigned int i=0; i<y1.size(); i++) {
+		double val = (vec.at(i)-y1.at(i))/vec.at(i);
+		val = pow(val,2);
+		sum += val;
+	}
+	sum = sqrt(sum);
+	if(sum<2.0)
+		vec.erase(vec.begin(),vec.begin()+(vec.size()/2));
 	int index = kc.kneeCurvePoint(vec);
 	double thresh = vec.at(index);
+
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
 			double lum = img.at<uchar>(i,j);
@@ -118,6 +134,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 				break;
 		}
 	}
+	// get lum values
 	vector<double> yVec;
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
@@ -129,15 +146,15 @@ Mat ShapeMorph::origFilter(Mat src) {
 		}
 	}
 	kc.removeOutliers(yVec,0.025);
-	writeSeq2File(yVec,"yVec");
-	vector<double> xVec;
+	//writeSeq2File(yVec,"yVec");
+	xVec.clear();
 	for(unsigned int i=0; i<yVec.size(); i++) {
 		xVec.push_back((double)i);
 	}
-	vector<double> p = poly.polyfit(xVec,yVec,1);
-	vector<double> y1 = poly.polyval(p,xVec);
-	//MSE
-	double sum=0;
+	p = poly.polyfit(xVec,yVec,1);
+	y1 = poly.polyval(p,xVec);
+	//MSE reusing variables from previous MSE
+	sum=0;
 	for(unsigned int i=0; i<y1.size(); i++) {
 		double val = (yVec.at(i)-y1.at(i))/yVec.at(i);
 		val = pow(val,2);
@@ -145,12 +162,13 @@ Mat ShapeMorph::origFilter(Mat src) {
 	}
 	sum = sqrt(sum);
 	cout << sum << endl;
-	if(sum<9.0) {
-		return Mat(); //if curve is a line, return and exit
-	}
+	//if(sum<2.0) {
+	//	yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
+	//}
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	thresh = yVec.at(bestIdx);
-
+	cout << bestIdx << endl;
+	cout << thresh << endl;
 	Mat result=img.clone();
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
@@ -163,6 +181,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 	return result;
 }
 
+//! filter using close(Img) - Img
 Mat ShapeMorph::closeFilter(Mat src) {
 	KneeCurve kc;
 	Poly poly;
@@ -195,11 +214,7 @@ Mat ShapeMorph::closeFilter(Mat src) {
 		sum += val;
 	}
 	sum = sqrt(sum);
-	cout << sum << endl;
-	if(sum<9.0) {
-		cout << "closeFilter curve is straight line!" << endl;
-		return Mat();
-	}
+	//cout << sum << endl;
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	double thresh = yVec.at(bestIdx);
 
@@ -214,12 +229,64 @@ Mat ShapeMorph::closeFilter(Mat src) {
 	return result;
 }
 
-//! experimental function/method for filtering using luminance
-Mat ShapeMorph::lumFilter(Mat src) {
-	Mat result = this->origFilter(src);
-	if(result.empty())
-		result = this->closeFilter(src);
-	return result;
+//! using origFilter
+vector<Mat> ShapeMorph::lumFilter1(Mat src) {
+	Mat img1 = this->origFilter(src);
+	Mat img2 = this->densityDetection(img1);
+	vector<Mat> featureVec = this->liquidFeatureExtraction(img2);
+	int countPix=0, idx=0;
+	deque<int> countVec;
+	deque<int> idxVec;
+	for(unsigned int i=0; i<featureVec.size(); i++) {
+		countPix = countNonZero(featureVec.at(i));
+		idx = i;
+		countVec.push_back(countPix);
+	}
+	jaysort(countVec,idxVec);
+	Mat result;
+	vector<Mat> matVec;
+	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	while(true) {
+		static unsigned int n=1;
+		morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
+		matVec.push_back(result.clone());
+		//imgshow(matVec.at(matVec.size()-1));
+		//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
+		n++;
+		if(matVec.size()>=5) break;
+		if(n>idxVec.size()) break;
+	}
+	return matVec;
+}
+
+//! using closeFilter
+vector<Mat> ShapeMorph::lumFilter2(Mat src) {
+	Mat img1 = this->closeFilter(src);
+	Mat img2 = this->densityDetection(img1);
+	vector<Mat> featureVec = this->liquidFeatureExtraction(img2);
+	int countPix=0, idx=0;
+	deque<int> countVec;
+	deque<int> idxVec;
+	for(unsigned int i=0; i<featureVec.size(); i++) {
+		countPix = countNonZero(featureVec.at(i));
+		idx = i;
+		countVec.push_back(countPix);
+	}
+	jaysort(countVec,idxVec);
+	Mat result;
+	vector<Mat> matVec;
+	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	while(true) {
+		static unsigned int n=1;
+		morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
+		matVec.push_back(result.clone());
+		//imgshow(matVec.at(matVec.size()-1));
+		//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
+		n++;
+		if(matVec.size()>=5) break;
+		if(n>idxVec.size()) break;
+	}
+	return matVec;
 }
 
 Mat ShapeMorph::dilation(Mat src, Size size, Point anchor) {
@@ -1182,24 +1249,24 @@ Mat ShapeMorph::densityDetection(Mat src) {
 		row++;
 	}
 
-	writeSeq2File(fnVec,"fnVec");
+	//writeSeq2File(fnVec,"fnVec");
 	//calculate knee of curve for fx for filtering
 	KneeCurve kc;
 	int bestIdx = kc.kneeCurvePoint(fnVec);
 	//bestIdx = round(bestIdx*1.05);
-	cout << "BestIdx: " << bestIdx << endl;
+	//cout << "BestIdx: " << bestIdx << endl;
 	//fx threshold filtering
 	double fxThresh = fnVec.at(bestIdx);
-	double percent = 1.0 - ((double)bestIdx/fnVec.size());
+	//double percent = 1.0 - ((double)bestIdx/fnVec.size());
 	//if(percent<0.15) {
 	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
 	//	bestIdx = round(bestIdx*0.75);
 	//}
 	fxThresh = fnVec.at(bestIdx);
-	cout << "New BestIdx: " << bestIdx << endl;
-	cout << "FxThresh: " << fxThresh << endl;
-	row=0; col=0;
+	//cout << "New BestIdx: " << bestIdx << endl;
+	//cout << "FxThresh: " << fxThresh << endl;
 	/*
+	row=0; col=0;
 	while(row<src.rows) {
 		while(col<src.cols) {
 			for(int i=row; i<(row+size.height); i++) {
@@ -1242,10 +1309,10 @@ Mat ShapeMorph::densityDetection(Mat src) {
 	//imgshow(map);
 
 	//connect nearest neighbors
-	double q = 0.9;
+	double q = 0.999;
 	double b = fxThresh;
 	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
-	cout << a << endl;
+	//cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	Size square(ceil(a),ceil(a));

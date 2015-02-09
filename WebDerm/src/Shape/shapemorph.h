@@ -31,7 +31,6 @@ public:
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat origImg, Mat scaleImg);
 	Mat prepareImage(Mat src);
-	Mat lumFilter(Mat src);
 	Mat custAnd(Mat origImg, Mat scaleImg, Mat map=Mat());
 	Mat grayscaleReconstruct(Mat src, Mat scaleImg);
 	vector<Mat> liquidFeatureExtraction(Mat src);
@@ -52,6 +51,8 @@ public:
 	Mat gsReconUsingRmin1(Mat src);
 	Mat gsReconUsingRmin2(Mat src);
 
+	vector<Mat> lumFilter1(Mat src);
+	vector<Mat> lumFilter2(Mat src);
 	Mat densityDetection(Mat src);
 	Mat origFilter(Mat src);
 	Mat closeFilter(Mat src);
