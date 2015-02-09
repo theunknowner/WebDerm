@@ -7,10 +7,8 @@
 
 #include "testml.h"
 
-void TestML::setLayerParams(int inputSize, int hiddenNodes, int outputSize) {
-	this->inputSize = inputSize;
-	this->hiddenNodes = hiddenNodes;
-	this->outputSize = outputSize;
+void TestML::setLayerParams(Mat layers) {
+	this->layers = layers;
 }
 
 Mat TestML::prepareImage(Mat sample) {
@@ -29,7 +27,7 @@ Mat TestML::prepareImage(Mat sample) {
 Mat TestML::prepareMatSamples(vector<Mat> sampleVec) {
 	int rows = sampleVec.at(0).rows;
 	int cols = sampleVec.at(0).cols;
-	if((rows*cols)==this->inputSize) {
+	if((rows*cols)==this->layers.at<int>(0,0)) {
 		Mat sampleSet(sampleVec.size(),rows*cols,CV_32F);
 		for(unsigned int i=0; i<sampleVec.size(); i++) {
 			for(int j=0; j<rows; j++) {
@@ -164,4 +162,25 @@ Mat TestML::fixBinaryImage(Mat input) {
 		}
 	}
 	return output;
+}
+Mat TestML::runANN(vector<Mat> matVec) {
+	CvANN_MLP ann;
+	ann.load("/home/jason/git/Samples/Samples/param.xml");
+	Mat layers = ann.get_layer_sizes();
+	this->setLayerParams(layers);
+	vector<Mat> sampleVec;
+	Mat sample;
+	for(unsigned int i=0; i<matVec.size(); i++) {
+		sample = this->prepareImage(matVec.at(i));
+		sampleVec.push_back(sample);
+		sample.release();
+	}
+	Mat results;
+	Mat sample_set = this->prepareMatSamples(sampleVec);
+	ann.predict(sample_set,results);
+	/*for(int i=0; i<results.rows; i++) {
+		printf("Sample: %d, ",i+1);
+		cout << results.row(i) << endl;
+	}*/
+	return results;
 }

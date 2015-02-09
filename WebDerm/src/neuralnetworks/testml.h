@@ -15,11 +15,8 @@
 
 class TestML {
 public:
-	int layers;
-	int inputSize;
-	int outputSize;
-	int hiddenNodes;
-	void setLayerParams(int inputSize, int hiddenNodes, int outputSize);
+	Mat layers;
+	void setLayerParams(Mat layers);
 	Mat prepareImage(Mat sample);
 	Mat prepareMatSamples(vector<Mat> sampleVec);
 	void importCsvData(String file, vector<vector<double> > &data, vector<vector<double> > &labels);
@@ -29,6 +26,8 @@ public:
 	void convertImagesToData(String folder,vector<double> outputLabels);
 	void printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels);
 	Mat fixBinaryImage(Mat input);
+
+	Mat runANN(vector<Mat> matVec);
 };
 
 #endif /* TESTML_H_ */
