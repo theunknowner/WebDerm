@@ -149,26 +149,21 @@ double Entropy::fn_compareT(deque<double> t1, deque<double> t2, double weight) {
 	}
 	dist /= t1.size();
 	return dist;*/
+	double interval = 0.33; //this interval is the scale interval for shapeMetric
 	unsigned int idx1=0, idx2=0;
-	double max1=t1.at(idx1), max2=t2.at(idx2);
-	for(unsigned int i=0; i<t1.size(); i++) {
-		if(t1.at(i)>max1) {
-			max1 = t1.at(i);
-			idx1 = i;
-		}
-		if(t2.at(i)>max2) {
-			max2 = t2.at(i);
-			idx2 = i;
-		}
+	double max1=t1.at(0), max2=t2.at(0);
+
+	double result=0.0;
+	if(max1==max2)
+		result = 1.0;
+	else {
+		double val = round((max(max1,max2)-min(max1,max2))/interval);
+		if(val<=1.0 && min(max1,max2)!=0.0)
+			result = 1.0;
+		else
+			result = 0.0;
 	}
-	int t1Shape=0, t2Shape=0;
-	t1Shape = idx1<(t1.size()-1) ? 0:1;
-	t2Shape = idx2<(t2.size()-1) ? 0:1;
-	printf("%d | %d\n",idx1,idx2);
-	if(t1Shape==t2Shape)
-		return 1.0;
-	else
-		return 0.0;
+	return result;
 }
 
 
@@ -208,7 +203,7 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, 
 double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
 	deque<double> resultVec(vec1.size(),0);
 	const int ysvSize = 3; //y,s,v
-	const int tSize = 5; // t1,t2...tn
+	const int tSize = 1; // t1,t2...tn
 	double ysv1[ysvSize];
 	double ysv2[ysvSize];
 	deque<double> t1(tSize,0);
@@ -329,7 +324,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 
 double Entropy::compareT(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
 	const int ysvSize = 3; //y,s,v
-	const int tSize = 5; // t1,t2...tn
+	const int tSize = 1; // t1,t2...tn
 	deque<double> t1(tSize,0);
 	deque<double> t2(tSize,0);
 	double valT=0;

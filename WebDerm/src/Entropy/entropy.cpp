@@ -423,7 +423,7 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 	String shadeColor, shade, color;
 	FILE * fp4;
 	fp4 = fopen(filename4.c_str(),"w");
-	fprintf(fp4,",Y,S,V,T1,T2,T3,T4,T5\n");
+	fprintf(fp4,",Y,S,V,T\n");
 	for(unsigned int j=0; j<g_Shades2.size(); j++) {
 		for(unsigned int i=0; i<allColors.size(); i++) {
 			if(i==0 && j==0) {
@@ -450,120 +450,55 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 
 void Entropy::shapeFn(FileData &fd) {
 	ShapeMorph sm;
-	Mat img = fd.getImage();
-	Mat img2, img3, img4, bestFeature;
-	img2 = sm.prepareImage(img);
-	img3 = sm.lumFilter(img2);
-	img4 = sm.densityDetection(img3);
-	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
-	//gets the largest feature
-	int largest=0, idx=0;
-	for(unsigned int i=0; i<featureVec.size(); i++) {
-		int count = countNonZero(featureVec.at(i));
-		if(count>largest) {
-			largest = count;
-			idx = i;
-		}
-	}
-	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	morphologyEx(featureVec.at(idx),bestFeature,MORPH_CLOSE,element);
+	Mat img1 = fd.getImage();
+	vector<Mat> matVec = sm.lumFilter1(img1);
+	vector<Mat> matVec2 = sm.lumFilter2(img1);
 	TestML ml;
-	CvANN_MLP ann;
-	ann.load("/home/jason/git/Samples/Samples/param.xml");
-	Mat layers = ann.get_layer_sizes();
-	int sampleSize = 1;
-	int inputSize = layers.at<int>(0,0);
-	int outputSize = layers.at<int>(0,2);
-	int hiddenNodes = layers.at<int>(0,1);
-	ml.setLayerParams(inputSize,hiddenNodes,outputSize);
-	vector<Mat> sampleVec;
-	Mat sample;
-	double totalPix=0;
-	for(int i=0; i<sampleSize; i++) {
-		sample = ml.prepareImage(bestFeature);
-		sampleVec.push_back(sample);
-		sample.release();
-		totalPix += countNonZero(bestFeature);
-		//String name = "feature"+toString(i+1)+".png";
-		//imwrite(name,featureVec.at(i));
-	}
-	Mat results;
-	Mat sample_set = ml.prepareMatSamples(sampleVec);
-	ann.predict(sample_set,results);
+	Mat results = ml.runANN(matVec);
+	Mat results2 = ml.runANN(matVec2);
 	//gets the index of the largest output for each sample
 	deque<int> largestOutputVec;
-	double max=0;
-	idx=0;
+	double max=results.at<float>(0,0);
+	double max2=results2.at<float>(0,0);
+	int idx=0, idx2=0;
 	for(int i=0; i<results.rows; i++) {
 		for(int j=0; j<results.cols; j++) {
-			if(results.at<float>(i,j)>max) {
-				max = results.at<float>(i,j);
-				idx = j;
+			try {
+				if(results.at<float>(i,j)>max) {
+					max = results.at<float>(i,j);
+					idx = j;
+				}
+				if(results2.at<float>(i,j)>max2) {
+					max2 = results2.at<float>(i,j);
+					idx2 = j;
+				}
+			}
+			catch(const std::out_of_range &oor) {
+				printf("Catch #1: Entropy::shapeFn() out of range!\n");
+				exit(1);
 			}
 		}
 		largestOutputVec.push_back(idx);
-		max=0;
-		idx=0;
+		largestOutputVec.push_back(idx2);
 	}
-	//push sample index to circle or random base on largest output
-	deque<int> circleVec, randomVec;
-	for(int i=0; i<results.rows; i++) {
-		if(largestOutputVec.at(i)<(results.cols-1)) {
-			circleVec.push_back(i);
-		}
-		else {
-			randomVec.push_back(i);
-		}
-		//printf("Sample: %d, ",i+1);
-		//cout << results.row(i) << endl;
+	//count circle or random base on largest output
+	deque<int> shapeVec(largestOutputVec.size(),0);
+	for(unsigned int i=0; i<largestOutputVec.size(); i++) {
+		if(largestOutputVec.at(i)<(results.cols-1))
+			shapeVec.at(i) = 1;
+		else
+			shapeVec.at(i) = 0;
 	}
-	//printf("Circles: %lu\n", circleVec.size());
-	//printf("Randoms: %lu\n", randomVec.size());
-	double pixThresh = 0.50;
-	int circleFlag=0, randomFlag=0;
-	double circleTotal=0, randomTotal=0, circlePixPercent=0,randPixPercent=0;
-	//count total non-zero pixels of all features
-	for(unsigned int i=0; i<circleVec.size(); i++) {
-		circleTotal += countNonZero(bestFeature);
-	}
-	for(unsigned int i=0; i<randomVec.size(); i++) {
-		randomTotal += countNonZero(bestFeature);
-	}
-	//check percentage of circle and random shapes
-	circlePixPercent = circleTotal/totalPix;
-	randPixPercent = randomTotal/totalPix;
-	//which ever is greater gets a flag=1
-	if(circlePixPercent>=pixThresh) circleFlag=1;
-	if(randPixPercent>=pixThresh) randomFlag=1;
-	double avgT[results.cols];
-	fill_n(avgT,results.cols,0.);
+
+	// this this the scale from 0->1 for chances of circle
+	// 0=High random, 0.33=Low circle, 0.66=Med circle, 1=High circle
 	this->shapeMetric.clear();
-	if(circleFlag==1) {
-		for(unsigned int i=0; i<circleVec.size(); i++) {
-			for(int j=0; j<results.cols; j++) {
-				double val = results.at<float>(circleVec.at(i),j);
-				if(val>1) val=1;
-				if(val<-1) val=-1;
-				avgT[j] += val;
-			}
-		}
-		for(int j=0; j<results.cols; j++) {
-			avgT[j] /= circleVec.size();
-			this->shapeMetric.push_back(avgT[j]);
-		}
-	}
-	if(randomFlag==1) {
-		for(unsigned int i=0; i<randomVec.size(); i++) {
-			for(int j=0; j<results.cols; j++) {
-				double val = results.at<float>(randomVec.at(i),j);
-				if(val>1) val=1;
-				if(val<-1) val=-1;
-				avgT[j] += val;
-			}
-		}
-		for(int j=0; j<results.cols; j++) {
-			avgT[j] /= randomVec.size();
-			this->shapeMetric.push_back(avgT[j]);
-		}
-	}
+	if(shapeVec.at(0)==1 && shapeVec.at(1)==1)
+		this->shapeMetric.push_back(1.0);
+	if(shapeVec.at(0)==1 && shapeVec.at(1)==0)
+		this->shapeMetric.push_back(0.66);
+	if(shapeVec.at(0)==0 && shapeVec.at(1)==1)
+		this->shapeMetric.push_back(0.33);
+	if(shapeVec.at(0)==0 && shapeVec.at(1)==0)
+		this->shapeMetric.push_back(0.0);
 }

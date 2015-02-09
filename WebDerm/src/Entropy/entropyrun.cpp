@@ -56,7 +56,6 @@ void Entropy::runAllEntropy() {
 			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-HSL-"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
-				//this->shapeFn(fd);
 				this->shapeFn(fd);
 				this->eyeFn(fd,entSize,"","");
 			}

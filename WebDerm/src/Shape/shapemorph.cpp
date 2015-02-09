@@ -147,28 +147,8 @@ Mat ShapeMorph::origFilter(Mat src) {
 	}
 	kc.removeOutliers(yVec,0.025);
 	//writeSeq2File(yVec,"yVec");
-	xVec.clear();
-	for(unsigned int i=0; i<yVec.size(); i++) {
-		xVec.push_back((double)i);
-	}
-	p = poly.polyfit(xVec,yVec,1);
-	y1 = poly.polyval(p,xVec);
-	//MSE reusing variables from previous MSE
-	sum=0;
-	for(unsigned int i=0; i<y1.size(); i++) {
-		double val = (yVec.at(i)-y1.at(i))/yVec.at(i);
-		val = pow(val,2);
-		sum += val;
-	}
-	sum = sqrt(sum);
-	cout << sum << endl;
-	//if(sum<2.0) {
-	//	yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
-	//}
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	thresh = yVec.at(bestIdx);
-	cout << bestIdx << endl;
-	cout << thresh << endl;
 	Mat result=img.clone();
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
@@ -189,7 +169,6 @@ Mat ShapeMorph::closeFilter(Mat src) {
 	Mat element = getStructuringElement(MORPH_RECT,Size(17,17));
 	morphologyEx(src,img,MORPH_CLOSE,element);
 	Mat img2 = img - src;
-
 	//curve fitting
 	vector<double> yVec;
 	for(int i=0; i<img.rows; i++) {
@@ -200,6 +179,8 @@ Mat ShapeMorph::closeFilter(Mat src) {
 		}
 	}
 	kc.removeOutliers(yVec,0.025);
+	///NOT IN USE RIGHT NOW///
+	/*
 	vector<double> xVec;
 	for(unsigned int i=0; i<yVec.size(); i++) {
 		xVec.push_back((double)i);
@@ -215,6 +196,7 @@ Mat ShapeMorph::closeFilter(Mat src) {
 	}
 	sum = sqrt(sum);
 	//cout << sum << endl;
+	 */
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	double thresh = yVec.at(bestIdx);
 
@@ -246,15 +228,25 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	unsigned int featuresToHold = 1;
+	unsigned int n=1;
 	while(true) {
-		static unsigned int n=1;
-		morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
-		matVec.push_back(result.clone());
-		//imgshow(matVec.at(matVec.size()-1));
-		//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
-		n++;
-		if(matVec.size()>=5) break;
-		if(n>idxVec.size()) break;
+		try {
+			morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
+			matVec.push_back(result.clone());
+			//imgshow(matVec.at(matVec.size()-1));
+			//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
+			n++;
+			if(matVec.size()>=featuresToHold) break;
+			if(n>idxVec.size()) break;
+		}
+		catch(const std::out_of_range &oor) {
+			printf("Catch #1: ShapeMorph::lumFilter1() out of range!\n");
+			printf("n: %d\n", n);
+			printf("featureVec.size() = %lu\n",featureVec.size());
+			printf("idxVec.size() = %lu\n", idxVec.size());
+			exit(1);
+		}
 	}
 	return matVec;
 }
@@ -276,15 +268,25 @@ vector<Mat> ShapeMorph::lumFilter2(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
+	int featuresToHold = 5;
+	unsigned int n=1;
 	while(true) {
-		static unsigned int n=1;
-		morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
-		matVec.push_back(result.clone());
-		//imgshow(matVec.at(matVec.size()-1));
-		//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
-		n++;
-		if(matVec.size()>=5) break;
-		if(n>idxVec.size()) break;
+		try {
+			morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
+			matVec.push_back(result.clone());
+			//imgshow(matVec.at(matVec.size()-1));
+			//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
+			n++;
+			if(matVec.size()>=featuresToHold) break;
+			if(n>idxVec.size()) break;
+		}
+		catch(const std::out_of_range &oor) {
+			printf("Catch #1: ShapeMorph::lumFilter2() out of range!\n");
+			printf("n: %d\n", n);
+			printf("featureVec.size() = %lu\n",featureVec.size());
+			printf("idxVec.size() = %lu\n", idxVec.size());
+			exit(1);
+		}
 	}
 	return matVec;
 }

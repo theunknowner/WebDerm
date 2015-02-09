@@ -41,7 +41,6 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -51,7 +50,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/psoriasis1.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -60,10 +59,29 @@ int main(int argc,char** argv)
 	Size size(3,3);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
-	Mat result = sm.lumFilter(img);
-	imgshow(result);
+
+	vector<Mat> matVec = sm.lumFilter1(img);
+	vector<Mat> matVec2 = sm.lumFilter2(img);
+	//imgshow(matVec.at(0));
+	//imgshow(matVec2.at(0));
+	TestML ml;
+	Mat results = ml.runANN(matVec);
+	for(int i=0; i<results.rows; i++) {
+		printf("Sample: %d, ",i+1);
+		cout << results.row(i) << endl;
+	}
+	results = ml.runANN(matVec2);
+	for(int i=0; i<results.rows; i++) {
+		printf("Sample: %d, ",i+1);
+		cout << results.row(i) << endl;
+	}
 	/*
-	img4 = sm.densityDetection(result);
+	Mat result1 = sm.origFilter(img);
+	Mat result2 = sm.closeFilter(img);
+	imgshow(result1);
+	imgshow(result2);
+/*
+	img4 = sm.densityDetection(result1);
 	vector<Mat> featureVec = sm.liquidFeatureExtraction(img4);
 	int countPix=0, idx=0;
 	deque<int> countVec;
@@ -88,7 +106,7 @@ int main(int argc,char** argv)
 		if(matVec.size()>=5) break;
 		if(n>idxVec.size()) break;
 	}
-	imgshow(img4);
+	//imgshow(img4);
 	/*
 	deque<double> vec;
 	KneeCurve kc;
@@ -121,7 +139,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-	/*
+/*
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
@@ -148,8 +166,9 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-	/*
+/*
 	//TestML ml;
+	CvANN_MLP ann;
 	vector<Mat> sampleVec;
 	Mat sample;
 	for(unsigned int i=0; i<matVec.size(); i++) {
@@ -222,15 +241,15 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-	/*
+/*
 	String name = "clp4";
 	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	//en.runCompareEntropy(name);
+	en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	en.runCompareEntropyList(file,folder);
+	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 
 	/*
