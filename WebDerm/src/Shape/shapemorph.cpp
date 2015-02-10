@@ -228,7 +228,7 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	unsigned int featuresToHold = 1;
+	unsigned int featuresToHold = 5;
 	unsigned int n=1;
 	while(true) {
 		try {
@@ -268,7 +268,7 @@ vector<Mat> ShapeMorph::lumFilter2(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	int featuresToHold = 5;
+	int featuresToHold = 1;
 	unsigned int n=1;
 	while(true) {
 		try {

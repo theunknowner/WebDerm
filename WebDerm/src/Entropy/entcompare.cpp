@@ -154,11 +154,13 @@ double Entropy::fn_compareT(deque<double> t1, deque<double> t2, double weight) {
 	double max1=t1.at(0), max2=t2.at(0);
 
 	double result=0.0;
-	if(max1==max2)
+	if(max1==max2 && max(max1,max2)==0)
+		result = -1.0;
+	else if(max1==max2)
 		result = 1.0;
 	else {
 		double val = round((max(max1,max2)-min(max1,max2))/interval);
-		if(val<=1.0 && min(max1,max2)!=0.0)
+		if(val<=1.0)
 			result = 1.0;
 		else
 			result = 0.0;
@@ -226,10 +228,15 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			}
 			Y1 = ysv1[0];
 			Y2 = ysv2[0];
-			if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION)
-				Y_PERCEPTION = 2.0;
+			if(ysv1[1]>S_PERCEPTION || ysv2[1]>S_PERCEPTION) {
+				//ysv1[0] *= (ysv1[1] / S_PERCEPTION);
+				//ysv2[0] *= (ysv2[1] / S_PERCEPTION);
+				Y1 *= (ysv1[1] / S_PERCEPTION);
+				Y2 *= (ysv2[1] / S_PERCEPTION);
+				Y_PERCEPTION /= (max(ysv1[1],ysv2[1])/S_PERCEPTION);
+			}
 
-			if(ysv1[0]>Y_PERCEPTION || ysv2[0]>Y_PERCEPTION) {
+			if(Y1>Y_PERCEPTION || Y2>Y_PERCEPTION) {
 				//Total Population(Y) comparison
 				valY = this->fn_compareY(ysv1[0],ysv2[0],1);
 
@@ -314,7 +321,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			ysv2[0] = vec2.at(i).at(0);
 			sum = colorSignif[i]/newTotal;
 			sum *= resultVec.at(i);
-			//printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
+			printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 			results += sum;
 		}
 	}

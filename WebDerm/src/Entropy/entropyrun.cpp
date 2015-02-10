@@ -201,11 +201,15 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 						this->loadEntropyFiles(filepath,vec2,colorNameVec);
 						resultsYSV = this->compareYSV(vec1,vec2,colorNameVec);
 						resultsT = this->compareT(vec1,vec2,colorNameVec);
-						if(resultsYSV>=0.70 && resultsT>=1.0) {
+						if(resultsYSV>=0.75 && resultsT>=1.0) {
 							countMatch++;
 							flagMatch=1;
 						}
-						else if(resultsYSV<0.70 && resultsYSV>=0.60 && resultsT>=1.0) {
+						else if(resultsYSV>=0.75 && resultsT<=-1.0) {
+							countSortOfMatch++;
+							flagMatch=0;
+						}
+						else if(resultsYSV<0.75 && resultsYSV>=0.60 && resultsT>=1.0) {
 							countSortOfMatch++;
 							flagMatch=0;
 						}

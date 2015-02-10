@@ -41,6 +41,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
+
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -50,7 +51,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph9.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -59,11 +60,13 @@ int main(int argc,char** argv)
 	Size size(3,3);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
-
+/*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
-	//imgshow(matVec.at(0));
-	//imgshow(matVec2.at(0));
+	imgshow(matVec.at(0));
+	imgshow(matVec2.at(0));
+	imwrite("img1.png",matVec.at(0));
+	imwrite("img2.png",matVec2.at(0));
 	TestML ml;
 	Mat results = ml.runANN(matVec);
 	for(int i=0; i<results.rows; i++) {
@@ -75,6 +78,7 @@ int main(int argc,char** argv)
 		printf("Sample: %d, ",i+1);
 		cout << results.row(i) << endl;
 	}
+	waitKey(0);
 	/*
 	Mat result1 = sm.origFilter(img);
 	Mat result2 = sm.closeFilter(img);
@@ -117,7 +121,7 @@ int main(int argc,char** argv)
 	//testAlgo2();
 	//testAlgo3();
 
-	/*
+/*
 	TestML ml;
 	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
 	vector<double> labels(5,0);
@@ -148,16 +152,15 @@ int main(int argc,char** argv)
 	int inputSize = trainingData.at(0).size();
 	int outputSize = trainingLabels.at(0).size();
 	int hiddenNodes = 20;
-	ml.setLayerParams(inputSize,hiddenNodes,outputSize);
-	Mat training_set(sampleSize,ml.inputSize,CV_32F);
-	Mat training_labels(sampleSize,ml.outputSize,CV_32F);
+	Mat training_set(sampleSize,inputSize,CV_32F);
+	Mat training_labels(sampleSize,outputSize,CV_32F);
 	ml.vecToMat(trainingData,trainingLabels,training_set,training_labels);
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
 	layers.at<int>(2,0) = outputSize;
 	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
-/*
+
 	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001);
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
@@ -242,7 +245,7 @@ int main(int argc,char** argv)
 	cout << newPix << endl;
 	/**/
 /*
-	String name = "clp4";
+	String name = "melanoma5";
 	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
