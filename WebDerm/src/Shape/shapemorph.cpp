@@ -78,7 +78,8 @@ Mat ShapeMorph::origFilter(Mat src) {
 	Mat img = this->prepareImage(src);
 	//removing stuff on edge
 	vector<double> vec;
-	Mat imgEdgeRemoval(img.rows,img.cols,CV_8U,Scalar(255));
+	//Mat darkestStuff(img.rows,img.cols,CV_8U,Scalar(255));
+	Mat darkestStuff = img.clone();
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
 			double lum = img.at<uchar>(i,j);
@@ -100,7 +101,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 		sum += val;
 	}
 	sum = sqrt(sum);
-	if(sum<2.0)
+	if(sum<2.5)
 		vec.erase(vec.begin(),vec.begin()+(vec.size()/2));
 	int index = kc.kneeCurvePoint(vec);
 	double thresh = vec.at(index);
@@ -109,31 +110,74 @@ Mat ShapeMorph::origFilter(Mat src) {
 		for(int j=0; j<img.cols; j++) {
 			double lum = img.at<uchar>(i,j);
 			if(lum<thresh)
-				imgEdgeRemoval.at<uchar>(i,j) = 0;
+				darkestStuff.at<uchar>(i,j) = 0;
 		}
 	}
+	imgshow(img);
+	imgshow(darkestStuff);
+	//custom dilation
+	Size size(5,1);
+	int row=0, col=0;
+	Mat _darkestStuff = darkestStuff.clone();
+	while(row<darkestStuff.rows) {
+		bool flag=false;
+		if(row<15 || (darkestStuff.rows-row)<15) flag=true;
+		while(col<darkestStuff.cols) {
+			int maxVal=0;
+			if(flag==true) {
+				Point begin(col-floor(size.width/2),row-floor(size.height/2));
+				for(int i=begin.y; i<(begin.y+size.height); i++) {
+					for(int j=begin.x; j<(begin.x+size.width); j++) {
+						if(j>=0 && i>=0 && j<darkestStuff.cols && i<darkestStuff.rows) {
+							int val = darkestStuff.at<uchar>(i,j);
+							if(val>maxVal) maxVal = val;
+						}
+					}
+				}
+				_darkestStuff.at<uchar>(row,col) = maxVal;
+			}
+			else {
+				if(col<15 || (darkestStuff.cols-col)<15) {
+					Point begin(col-floor(size.width/2),row-floor(size.height/2));
+					for(int i=begin.y; i<(begin.y+size.height); i++) {
+						for(int j=begin.x; j<(begin.x+size.width); j++) {
+							if(j>=0 && i>=0 && j<darkestStuff.cols && i<darkestStuff.rows) {
+								int val = darkestStuff.at<uchar>(i,j);
+								if(val>maxVal) maxVal = val;
+							}
+						}
+					}
+					_darkestStuff.at<uchar>(row,col) = maxVal;
+				}
+			}
+			col++;
+		}
+		col=0;
+		row++;
+	}
+	//imgshow(_darkestStuff);
 	Mat mapEdgeRemoval(img.rows, img.cols, CV_8U, Scalar(0));
-	for(int i=0; i<imgEdgeRemoval.rows; i++) {
-		int leftFlag=0, rightFlag=0;
-		int j2=imgEdgeRemoval.cols-1;
-		for(int j=0; j<imgEdgeRemoval.cols; j++) {
-			double lum = imgEdgeRemoval.at<uchar>(i,j);
-			double lum2 = imgEdgeRemoval.at<uchar>(i,j2);
-			if(lum==255 && leftFlag==0) {
-				mapEdgeRemoval.at<uchar>(i,j) = 255;
+	for(int i=0; i<_darkestStuff.rows; i++) {
+		int flag=false;
+		if(i<15 || (_darkestStuff.rows-i)<15) flag=true;
+		for(int j=0; j<_darkestStuff.cols; j++) {
+			if(flag==true) {
+				int val = _darkestStuff.at<uchar>(i,j);
+				if(val>5) {
+					mapEdgeRemoval.at<uchar>(i,j) = 255;
+				}
 			}
-			else
-				leftFlag=1;
-			if(lum2==255 && rightFlag==0) {
-				mapEdgeRemoval.at<uchar>(i,j2) = 255;
-				j2--;
+			else {
+				if(j<15 || (_darkestStuff.cols-j)<15) {
+					int val = _darkestStuff.at<uchar>(i,j);
+					if(val>5) {
+						mapEdgeRemoval.at<uchar>(i,j) = 255;
+					}
+				}
 			}
-			else
-				rightFlag=1;
-			if(leftFlag==1 && rightFlag==1)
-				break;
 		}
 	}
+	//imgshow(mapEdgeRemoval);
 	// get lum values
 	vector<double> yVec;
 	for(int i=0; i<img.rows; i++) {
@@ -149,6 +193,8 @@ Mat ShapeMorph::origFilter(Mat src) {
 	//writeSeq2File(yVec,"yVec");
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	thresh = yVec.at(bestIdx);
+	//cout << bestIdx << endl;
+	//cout << thresh << endl;
 	Mat result=img.clone();
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
@@ -158,6 +204,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 				result.at<uchar>(i,j) = 0;
 		}
 	}
+	imgshow(result);
 	return result;
 }
 
@@ -169,41 +216,87 @@ Mat ShapeMorph::closeFilter(Mat src) {
 	Mat element = getStructuringElement(MORPH_RECT,Size(17,17));
 	morphologyEx(src,img,MORPH_CLOSE,element);
 	Mat img2 = img - src;
-	//curve fitting
-	vector<double> yVec;
+
+	//get darkest area from Close(img)-img
+	vector<double> yVec1;
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
 			double lum = img2.at<uchar>(i,j);
 			if(lum>5)
-				yVec.push_back(lum);
+				yVec1.push_back(lum);
 		}
 	}
-	kc.removeOutliers(yVec,0.025);
-	///NOT IN USE RIGHT NOW///
-	/*
-	vector<double> xVec;
-	for(unsigned int i=0; i<yVec.size(); i++) {
-		xVec.push_back((double)i);
-	}
-	vector<double> p = poly.polyfit(xVec,yVec,1);
-	vector<double> y1 = poly.polyval(p,xVec);
-	//MSE
-	double sum=0;
-	for(unsigned int i=0; i<y1.size(); i++) {
-		double val = (yVec.at(i)-y1.at(i))/yVec.at(i);
-		val = pow(val,2);
-		sum += val;
-	}
-	sum = sqrt(sum);
-	//cout << sum << endl;
-	 */
-	int bestIdx = kc.kneeCurvePoint(yVec);
-	double thresh = yVec.at(bestIdx);
-
-	Mat result=img2.clone();
+	int bestIdx = kc.kneeCurvePoint(yVec1);
+	double thresh = yVec1.at(bestIdx);
+	Mat _img2=img2.clone();
 	for(int i=0; i<img2.rows; i++) {
 		for(int j=0; j<img2.cols; j++) {
 			double lum = img2.at<uchar>(i,j);
+			if(lum<thresh)
+				_img2.at<uchar>(i,j) = 0;
+		}
+	}
+
+	//edge removal for Close(img)-img Only
+	Mat mapEdgeRemoval(img2.rows,img2.cols,CV_8U,Scalar(255));
+	Size size(5,5);
+	Mat window1, window2;
+	int row=0, col=0, colLimit=img2.cols;
+	while(row<img2.rows) {
+		Size _size = size;
+		if(row>15 || (img2.rows-row)>15) colLimit = 15;
+		while(col<=colLimit) {
+			window1 = _img2(Rect(col+_size.width,row,_size.width,_size.height));
+			window2 = _img2(Rect(col,row,_size.width,_size.height));
+			double avg1=0, avg2=0;
+			int count1=0, count2=0;
+			for(int i=0; i<window1.rows; i++) {
+				for(int j=0; j<window1.cols; j++) {
+					double val1 = window1.at<uchar>(i,j);
+					double val2 = window2.at<uchar>(i,j);
+					if(val1>5.0) {
+						avg1 += val1;
+						count1++;
+					}
+					if(val2>5.0) {
+						avg2 += val2;
+						count2++;
+					}
+				}
+			}
+			avg1 /= count1;
+			avg2 /= count2;
+			if((avg1-avg2)<=-16.0) {
+				for(int i=row; i<(row+window2.rows); i++) {
+					for(int j=col; j<(col+window2.cols); j++) {
+						mapEdgeRemoval.at<uchar>(i,j) = 0;
+					}
+				}
+			}
+			col++;
+		}
+		col=0;
+		row+=size.height;
+	}
+	Mat img3;
+	img2.copyTo(img3,mapEdgeRemoval);
+
+	//knee of curve filtering after edge removal
+	vector<double> yVec2;
+	for(int i=0; i<img3.rows; i++) {
+		for(int j=0; j<img3.cols; j++) {
+			double lum = img3.at<uchar>(i,j);
+			if(lum>5)
+				yVec2.push_back(lum);
+		}
+	}
+	kc.removeOutliers(yVec2,0.025);
+	bestIdx = kc.kneeCurvePoint(yVec2);
+	thresh = yVec2.at(bestIdx);
+	Mat result=img3.clone();
+	for(int i=0; i<img3.rows; i++) {
+		for(int j=0; j<img3.cols; j++) {
+			double lum = img3.at<uchar>(i,j);
 			if(lum<thresh)
 				result.at<uchar>(i,j) = 0;
 		}
@@ -228,7 +321,7 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	unsigned int featuresToHold = 5;
+	unsigned int featuresToHold = 1;
 	unsigned int n=1;
 	while(true) {
 		try {
@@ -1390,4 +1483,8 @@ vector<Mat> ShapeMorph::runShapeMorphTest(deque<String> &nameVec, deque<int> &la
 		cout << "runShapeMorphTest() can't open file!" << endl;
 	}
 	return samplesVec;
+}
+
+Mat ShapeMorph::removeNoiseEdge(Mat src) {
+
 }
