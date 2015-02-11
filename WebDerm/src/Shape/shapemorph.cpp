@@ -121,7 +121,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 	Mat _darkestStuff = darkestStuff.clone();
 	while(row<darkestStuff.rows) {
 		bool flag=false;
-		if(row<15 || (darkestStuff.rows-row)<15) flag=true;
+		if(row<5 || (darkestStuff.rows-row)<5) flag=true;
 		while(col<darkestStuff.cols) {
 			int maxVal=0;
 			if(flag==true) {
@@ -137,7 +137,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 				_darkestStuff.at<uchar>(row,col) = maxVal;
 			}
 			else {
-				if(col<15 || (darkestStuff.cols-col)<15) {
+				if(col<5 || (darkestStuff.cols-col)<5) {
 					Point begin(col-floor(size.width/2),row-floor(size.height/2));
 					for(int i=begin.y; i<(begin.y+size.height); i++) {
 						for(int j=begin.x; j<(begin.x+size.width); j++) {
@@ -155,11 +155,11 @@ Mat ShapeMorph::origFilter(Mat src) {
 		col=0;
 		row++;
 	}
-	//imgshow(_darkestStuff);
+	imgshow(_darkestStuff);
 	Mat mapEdgeRemoval(img.rows, img.cols, CV_8U, Scalar(0));
 	for(int i=0; i<_darkestStuff.rows; i++) {
 		int flag=false;
-		if(i<15 || (_darkestStuff.rows-i)<15) flag=true;
+		if(i<5 || (_darkestStuff.rows-i)<5) flag=true;
 		for(int j=0; j<_darkestStuff.cols; j++) {
 			if(flag==true) {
 				int val = _darkestStuff.at<uchar>(i,j);
@@ -168,7 +168,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 				}
 			}
 			else {
-				if(j<15 || (_darkestStuff.cols-j)<15) {
+				if(j<5 || (_darkestStuff.cols-j)<5) {
 					int val = _darkestStuff.at<uchar>(i,j);
 					if(val>5) {
 						mapEdgeRemoval.at<uchar>(i,j) = 255;
@@ -177,7 +177,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 			}
 		}
 	}
-	//imgshow(mapEdgeRemoval);
+	imgshow(mapEdgeRemoval);
 	// get lum values
 	vector<double> yVec;
 	for(int i=0; i<img.rows; i++) {
@@ -321,13 +321,13 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	unsigned int featuresToHold = 1;
+	unsigned int featuresToHold = 5;
 	unsigned int n=1;
 	while(true) {
 		try {
 			morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
 			matVec.push_back(result.clone());
-			//imgshow(matVec.at(matVec.size()-1));
+			imgshow(matVec.at(matVec.size()-1));
 			//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
 			n++;
 			if(matVec.size()>=featuresToHold) break;

@@ -160,7 +160,7 @@ double Entropy::fn_compareT(deque<double> t1, deque<double> t2, double weight) {
 		result = 1.0;
 	else {
 		double val = round((max(max1,max2)-min(max1,max2))/interval);
-		if(val<=1.0)
+		if(val<=1.0 && min(max1,max2)!=0)
 			result = 1.0;
 		else
 			result = 0.0;
@@ -321,7 +321,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			ysv2[0] = vec2.at(i).at(0);
 			sum = colorSignif[i]/newTotal;
 			sum *= resultVec.at(i);
-			printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
+			//printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 			results += sum;
 		}
 	}

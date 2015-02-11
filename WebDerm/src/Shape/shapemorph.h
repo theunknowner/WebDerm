@@ -16,10 +16,9 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/GridDisplay/griddisplay.h"
-
+#include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 
 class ShapeMorph {
-private:
 
 public:
 	enum {RECT=0,CIRCLE=1};
@@ -56,6 +55,7 @@ public:
 	Mat densityDetection(Mat src);
 	Mat origFilter(Mat src);
 	Mat closeFilter(Mat src);
+	Mat removeNoiseEdge(Mat src);
 
 	vector<Mat> runShapeMorphTest(deque<String> &nameVec, deque<int> &labels);
 };
