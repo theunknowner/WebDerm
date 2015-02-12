@@ -51,7 +51,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/lph7.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/herpes1.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -62,13 +62,13 @@ int main(int argc,char** argv)
 	cvtColor(img,img,CV_BGR2GRAY);
 
 	vector<Mat> matVec = sm.lumFilter1(img);
-	//vector<Mat> matVec2 = sm.lumFilter2(img);
-	/*
+	vector<Mat> matVec2 = sm.lumFilter2(img);
+
 	imgshow(matVec.at(0));
 	imgshow(matVec2.at(0));
-	/*
-	imwrite("img1.png",matVec.at(0));
-	imwrite("img2.png",matVec2.at(0));
+
+	//imwrite("img1.png",matVec.at(0));
+	//imwrite("img2.png",matVec2.at(0));
 	TestML ml;
 	Mat results = ml.runANN(matVec);
 	for(int i=0; i<results.rows; i++) {
@@ -246,15 +246,16 @@ int main(int argc,char** argv)
 	cout << newPix << endl;
 	/**/
 /*
-	String name = "melanoma5";
-	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
+	String name = "lph9";
+	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	//en.runCompareEntropy(name);
+	en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	en.runCompareEntropyList(file,folder);
+	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
+	//en.runCompareAllEntropy(folder);
 
 	/*
 	Entropy en;

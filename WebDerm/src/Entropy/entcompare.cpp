@@ -212,7 +212,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 	deque<double> t2(tSize,0);
 	double valY=0, valS=0, valV=0;
 	double avg=0, total=0;
-	int colorsHit[vec1.size()]; //variable to mark colors not ignored
+	vector<int> colorsHit(vec1.size(),0); //variable to mark colors not ignored
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		this->resetThreshVals();
 		if(colorNameVec.at(i)!="LowBrown" && colorNameVec.at(i)!="LowGreyBrown") {
@@ -268,7 +268,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 
 				//Total of all the Y that are noticeable
 				total += max(ysv1[0],ysv2[0]);
-				colorsHit[i] = 1;
+				colorsHit.at(i) = 1;
 			}
 		}
 	}
@@ -321,7 +321,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			ysv2[0] = vec2.at(i).at(0);
 			sum = colorSignif[i]/newTotal;
 			sum *= resultVec.at(i);
-			//printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
+			printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 			results += sum;
 		}
 	}

@@ -78,8 +78,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 	Mat img = this->prepareImage(src);
 	//removing stuff on edge
 	vector<double> vec;
-	//Mat darkestStuff(img.rows,img.cols,CV_8U,Scalar(255));
-	Mat darkestStuff = img.clone();
+	Mat darkestStuff(img.rows,img.cols,CV_8U,Scalar(255));
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
 			double lum = img.at<uchar>(i,j);
@@ -115,96 +114,74 @@ Mat ShapeMorph::origFilter(Mat src) {
 	}
 	imgshow(img);
 	imgshow(darkestStuff);
-	//custom dilation
-	Size size(5,1);
-	int row=0, col=0;
-	Mat _darkestStuff = darkestStuff.clone();
-	while(row<darkestStuff.rows) {
-		bool flag=false;
-		if(row<5 || (darkestStuff.rows-row)<5) flag=true;
-		while(col<darkestStuff.cols) {
-			int maxVal=0;
-			if(flag==true) {
-				Point begin(col-floor(size.width/2),row-floor(size.height/2));
-				for(int i=begin.y; i<(begin.y+size.height); i++) {
-					for(int j=begin.x; j<(begin.x+size.width); j++) {
-						if(j>=0 && i>=0 && j<darkestStuff.cols && i<darkestStuff.rows) {
-							int val = darkestStuff.at<uchar>(i,j);
-							if(val>maxVal) maxVal = val;
-						}
-					}
-				}
-				_darkestStuff.at<uchar>(row,col) = maxVal;
-			}
-			else {
-				if(col<5 || (darkestStuff.cols-col)<5) {
-					Point begin(col-floor(size.width/2),row-floor(size.height/2));
-					for(int i=begin.y; i<(begin.y+size.height); i++) {
-						for(int j=begin.x; j<(begin.x+size.width); j++) {
-							if(j>=0 && i>=0 && j<darkestStuff.cols && i<darkestStuff.rows) {
-								int val = darkestStuff.at<uchar>(i,j);
-								if(val>maxVal) maxVal = val;
-							}
-						}
-					}
-					_darkestStuff.at<uchar>(row,col) = maxVal;
-				}
-			}
-			col++;
-		}
-		col=0;
-		row++;
-	}
-	imgshow(_darkestStuff);
-	Mat mapEdgeRemoval(img.rows, img.cols, CV_8U, Scalar(0));
-	for(int i=0; i<_darkestStuff.rows; i++) {
-		int flag=false;
-		if(i<5 || (_darkestStuff.rows-i)<5) flag=true;
-		for(int j=0; j<_darkestStuff.cols; j++) {
-			if(flag==true) {
-				int val = _darkestStuff.at<uchar>(i,j);
-				if(val>5) {
-					mapEdgeRemoval.at<uchar>(i,j) = 255;
-				}
-			}
-			else {
-				if(j<5 || (_darkestStuff.cols-j)<5) {
-					int val = _darkestStuff.at<uchar>(i,j);
-					if(val>5) {
-						mapEdgeRemoval.at<uchar>(i,j) = 255;
-					}
+
+	//remove dark stuff clinging to image boundary
+	deque<Mat> islandsVec = this->liquidFeatureExtraction(darkestStuff,5.0);
+	Mat mapEdgeRemoval(img.rows, img.cols, CV_8U, Scalar(255));
+	for(unsigned int i=0; i<islandsVec.size(); i++) {
+		Mat edges(darkestStuff.size(),CV_8U,Scalar(0));
+		vector<vector<Point> > contour = this->findBoundary(islandsVec.at(i).clone());
+		drawContours(edges,contour,-1,Scalar(255));
+		int count = this->countEdgeTouching(edges,6,12);
+		int total = countNonZero(edges);
+		double percent = (double)count/total;
+		//printf("%d/%d: %f\n",count,total,percent);
+		if(percent>=0.47) {
+			for(int j=0; j<islandsVec.at(i).rows; j++) {
+				for(int k=0; k<islandsVec.at(i).cols; k++) {
+					int val = islandsVec.at(i).at<uchar>(j,k);
+					if(val==255)
+						mapEdgeRemoval.at<uchar>(j,k) = 0;
 				}
 			}
 		}
 	}
-	imgshow(mapEdgeRemoval);
 	// get lum values
+	Mat afterRemoval;
+	img.copyTo(afterRemoval,mapEdgeRemoval);
+	imgshow(afterRemoval);
 	vector<double> yVec;
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			double lum = img.at<uchar>(i,j);
-			int val = mapEdgeRemoval.at<uchar>(i,j);
-			if(val!=255) {
+	for(int i=0; i<afterRemoval.rows; i++) {
+		for(int j=0; j<afterRemoval.cols; j++) {
+			double lum = afterRemoval.at<uchar>(i,j);
+			if(lum>5) {
 				yVec.push_back(lum);
 			}
 		}
 	}
+	//filter the remaining image after removal of noise and outliers
 	kc.removeOutliers(yVec,0.025);
-	//writeSeq2File(yVec,"yVec");
+	writeSeq2File(yVec,"yVec");
+	xVec.clear();
+	for(unsigned int i=0; i<yVec.size(); i++) {
+		xVec.push_back((double)i);
+	}
+	p = poly.polyfit(xVec,yVec,1);
+	y1 = poly.polyval(p,xVec);
+	//MSE
+	sum=0;
+	for(unsigned int i=0; i<y1.size(); i++) {
+		double val = (yVec.at(i)-y1.at(i))/yVec.at(i);
+		val = pow(val,2);
+		sum += val;
+	}
+	sum = sqrt(sum);
+	cout << sum << endl;
+	if(sum<2.5)
+		yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
+	//yVec.erase(yVec.begin(),yVec.begin()+2495);
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	thresh = yVec.at(bestIdx);
-	//cout << bestIdx << endl;
-	//cout << thresh << endl;
-	Mat result=img.clone();
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			double lum = img.at<uchar>(i,j);
-			int val = mapEdgeRemoval.at<uchar>(i,j);
-			if(val==255 || lum<thresh)
+	cout << bestIdx << endl;
+	cout << thresh << endl;
+	Mat result=afterRemoval.clone();
+	for(int i=0; i<afterRemoval.rows; i++) {
+		for(int j=0; j<afterRemoval.cols; j++) {
+			double lum = afterRemoval.at<uchar>(i,j);
+			if(lum<thresh)
 				result.at<uchar>(i,j) = 0;
 		}
 	}
-	imgshow(result);
 	return result;
 }
 
@@ -226,6 +203,7 @@ Mat ShapeMorph::closeFilter(Mat src) {
 				yVec1.push_back(lum);
 		}
 	}
+	kc.removeOutliers(yVec1,0.025);
 	int bestIdx = kc.kneeCurvePoint(yVec1);
 	double thresh = yVec1.at(bestIdx);
 	Mat _img2=img2.clone();
@@ -280,7 +258,6 @@ Mat ShapeMorph::closeFilter(Mat src) {
 	}
 	Mat img3;
 	img2.copyTo(img3,mapEdgeRemoval);
-
 	//knee of curve filtering after edge removal
 	vector<double> yVec2;
 	for(int i=0; i<img3.rows; i++) {
@@ -307,8 +284,31 @@ Mat ShapeMorph::closeFilter(Mat src) {
 //! using origFilter
 vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat img1 = this->origFilter(src);
-	Mat img2 = this->densityDetection(img1);
-	vector<Mat> featureVec = this->liquidFeatureExtraction(img2);
+	imgshow(img1);
+	Mat img2 = this->densityDetection(img1,0.999);
+	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
+
+	//remove features clinging to image boundary
+	unsigned int m=0;
+	while(m<featureVec.size()) {
+		Mat edges(img2.size(),CV_8U,Scalar(0));
+		vector<vector<Point> > contour = this->findBoundary(featureVec.at(m).clone());
+		drawContours(edges,contour,-1,Scalar(255));
+		int count = this->countEdgeTouching(edges,10,15);
+		int total = countNonZero(edges);
+		double percent = (double)count/total;
+		int featurePixCount = countNonZero(featureVec.at(m));
+		int imagePixCount = countNonZero(img2);
+		double percentOfImage = (double)featurePixCount/imagePixCount;
+		//printf("%d/%d: %f, %f\n",count,total,percent,percentOfImage);
+		//imgshow(edges);
+		if(percent>=0.47 && percentOfImage<0.50) {
+			featureVec.erase(featureVec.begin()+m);
+		}
+		else
+			m++;
+	}
+
 	int countPix=0, idx=0;
 	deque<int> countVec;
 	deque<int> idxVec;
@@ -321,13 +321,13 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	unsigned int featuresToHold = 5;
+	unsigned int featuresToHold = 1;
 	unsigned int n=1;
 	while(true) {
 		try {
 			morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
 			matVec.push_back(result.clone());
-			imgshow(matVec.at(matVec.size()-1));
+			//imgshow(matVec.at(matVec.size()-1));
 			//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
 			n++;
 			if(matVec.size()>=featuresToHold) break;
@@ -347,8 +347,8 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 //! using closeFilter
 vector<Mat> ShapeMorph::lumFilter2(Mat src) {
 	Mat img1 = this->closeFilter(src);
-	Mat img2 = this->densityDetection(img1);
-	vector<Mat> featureVec = this->liquidFeatureExtraction(img2);
+	Mat img2 = this->densityDetection(img1,0.9);
+	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
 	int countPix=0, idx=0;
 	deque<int> countVec;
 	deque<int> idxVec;
@@ -730,7 +730,7 @@ Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
 	return result;
 }
 
-vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src) {
+deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	deque<deque<Point> > numFeatures;
 	deque<Point> ptVec;
@@ -750,42 +750,42 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src) {
 					Point downLeft(temp.at(0).x-1,temp.at(0).y+1);
 					Point downRight(temp.at(0).x+1,temp.at(0).y+1);
 					if(up.y>=0) {
-						if(map.at<uchar>(up)==0 && src.at<uchar>(up)>0) {
+						if(map.at<uchar>(up)==0 && src.at<uchar>(up)>thresh) {
 							ptVec.push_back(up);
 							map.at<uchar>(up)=255;
 							temp.push_back(up);
 						}
 					}
 					if(left.x>=0) {
-						if(map.at<uchar>(left)==0 && src.at<uchar>(left)>0) {
+						if(map.at<uchar>(left)==0 && src.at<uchar>(left)>thresh) {
 							ptVec.push_back(left);
 							map.at<uchar>(left)=255;
 							temp.push_back(left);
 						}
 					}
 					if(right.x<src.cols) {
-						if(map.at<uchar>(right)==0 && src.at<uchar>(right)>0) {
+						if(map.at<uchar>(right)==0 && src.at<uchar>(right)>thresh) {
 							ptVec.push_back(right);
 							map.at<uchar>(right)=255;
 							temp.push_back(right);
 						}
 					}
 					if(down.y<src.rows) {
-						if(map.at<uchar>(down)==0 && src.at<uchar>(down)>0) {
+						if(map.at<uchar>(down)==0 && src.at<uchar>(down)>thresh) {
 							ptVec.push_back(down);
 							map.at<uchar>(down)=255;
 							temp.push_back(down);
 						}
 					}
 					if(down.y<src.rows && left.x>=0) {
-						if(map.at<uchar>(downLeft)==0 && src.at<uchar>(downLeft)>0) {
+						if(map.at<uchar>(downLeft)==0 && src.at<uchar>(downLeft)>thresh) {
 							ptVec.push_back(downLeft);
 							map.at<uchar>(downLeft)=255;
 							temp.push_back(downLeft);
 						}
 					}
 					if(down.y<src.rows && right.x<src.cols) {
-						if(map.at<uchar>(downRight)==0 && src.at<uchar>(downRight)>0) {
+						if(map.at<uchar>(downRight)==0 && src.at<uchar>(downRight)>thresh) {
 							ptVec.push_back(downRight);
 							map.at<uchar>(downRight)=255;
 							temp.push_back(downRight);
@@ -804,7 +804,7 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src) {
 	}//end while row
 
 	int numOfPtsThresh = 10;
-	vector<Mat> featureVec;
+	deque<Mat> featureVec;
 	for(unsigned int i=0; i<numFeatures.size(); i++) {
 		Mat feature(src.rows, src.cols, CV_8U,Scalar(0));
 		if(numFeatures.at(i).size()>=numOfPtsThresh) {
@@ -1302,7 +1302,7 @@ Mat ShapeMorph::customFn2(Mat src) {
 	return map;
 }
 
-Mat ShapeMorph::densityDetection(Mat src) {
+Mat ShapeMorph::densityDetection(Mat src, double q) {
 	//Mat map = src.clone();
 	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
 	Size size(5,5);
@@ -1404,10 +1404,9 @@ Mat ShapeMorph::densityDetection(Mat src) {
 	//imgshow(map);
 
 	//connect nearest neighbors
-	double q = 0.999;
 	double b = fxThresh;
 	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
-	//cout << a << endl;
+	cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	Size square(ceil(a),ceil(a));
@@ -1466,8 +1465,8 @@ vector<Mat> ShapeMorph::runShapeMorphTest(deque<String> &nameVec, deque<int> &la
 			cvtColor(img,img,CV_BGR2GRAY);
 			Mat img2 = this->prepareImage(img);
 			Mat result2 = this->gsReconUsingRmin2(img2);
-			Mat img3 = this->densityDetection(result2);
-			vector<Mat> featureVec = this->liquidFeatureExtraction(img3);
+			Mat img3 = this->densityDetection(result2,0.999);
+			deque<Mat> featureVec = this->liquidFeatureExtraction(img3);
 			int largest=0, idx=0;
 			for(unsigned int i=0; i<featureVec.size(); i++) {
 				if(countNonZero(featureVec.at(i))>largest) {
@@ -1485,6 +1484,66 @@ vector<Mat> ShapeMorph::runShapeMorphTest(deque<String> &nameVec, deque<int> &la
 	return samplesVec;
 }
 
-Mat ShapeMorph::removeNoiseEdge(Mat src) {
+//! combines and/or filters features
+void ShapeMorph::combineFilterFeatures(vector<Mat> &featureVec) {
+	vector<Mat> _featureVec = featureVec;
+	//int pixSize = countNonZero
+	//for(unsigned int i=0; i<_featureVec.size(); i++) {
 
+	//}
+}
+
+vector<vector<Point> > ShapeMorph::findBoundary(Mat src) {
+	vector<vector<Point> > contour;
+	findContours(src, contour, RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	return contour;
+}
+
+int ShapeMorph::countEdgeTouching(Mat src, int edgeSize) {
+	Mat _src = src.clone();
+	Mat topEdge = _src(Rect(edgeSize,0,src.cols-edgeSize*2,edgeSize));
+	Mat bottomEdge = _src(Rect(edgeSize,src.rows-edgeSize,src.cols-edgeSize*2,edgeSize));
+	Mat leftEdge = _src(Rect(0,edgeSize,edgeSize,src.rows-edgeSize*2));
+	Mat rightEdge = _src(Rect(src.cols-edgeSize,edgeSize,edgeSize,src.rows-edgeSize*2));
+	Mat topLeftEdge = _src(Rect(0,0,edgeSize,edgeSize));
+	Mat topRightEdge = _src(Rect(src.cols-edgeSize,0,edgeSize,edgeSize));
+	Mat bottomLeftEdge = _src(Rect(0,src.rows-edgeSize,edgeSize,edgeSize));
+	Mat bottomRightEdge = _src(Rect(src.cols-edgeSize,src.rows-edgeSize,edgeSize,edgeSize));
+	//int totalPix = countNonZero(src);
+	int topEdgePix = countNonZero(topEdge);
+	int leftEdgePix = countNonZero(leftEdge);
+	int bottomEdgePix = countNonZero(bottomEdge);
+	int rightEdgePix = countNonZero(rightEdge);
+	int topLeftEdgePix = countNonZero(topLeftEdge);
+	int topRightEdgePix = countNonZero(topRightEdge);
+	int bottomLeftEdgePix = countNonZero(bottomLeftEdge);
+	int bottomRightEdgePix = countNonZero(bottomRightEdge);
+	int totalEdgePix = topEdgePix+leftEdgePix+bottomEdgePix+rightEdgePix+
+			topLeftEdgePix+topRightEdgePix+bottomLeftEdgePix+bottomRightEdgePix;
+	return totalEdgePix;
+}
+
+//! for edges & corners of different sizes
+int ShapeMorph::countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize) {
+	Mat _src = src.clone();
+	Mat topEdge = _src(Rect(cornerEdgeSize,0,src.cols-cornerEdgeSize*2,sideEdgeSize));
+	Mat bottomEdge = _src(Rect(cornerEdgeSize,src.rows-sideEdgeSize,src.cols-cornerEdgeSize*2,sideEdgeSize));
+	Mat leftEdge = _src(Rect(0,cornerEdgeSize,sideEdgeSize,src.rows-cornerEdgeSize*2));
+	Mat rightEdge = _src(Rect(src.cols-sideEdgeSize,cornerEdgeSize,sideEdgeSize,src.rows-cornerEdgeSize*2));
+	Mat topLeftEdge = _src(Rect(0,0,cornerEdgeSize,cornerEdgeSize));
+	Mat topRightEdge = _src(Rect(src.cols-cornerEdgeSize,0,cornerEdgeSize,cornerEdgeSize));
+	Mat bottomLeftEdge = _src(Rect(0,src.rows-cornerEdgeSize,cornerEdgeSize,cornerEdgeSize));
+	Mat bottomRightEdge = _src(Rect(src.cols-cornerEdgeSize,src.rows-cornerEdgeSize,cornerEdgeSize,cornerEdgeSize));
+	//int totalPix = countNonZero(src);
+	int topEdgePix = countNonZero(topEdge);
+	int leftEdgePix = countNonZero(leftEdge);
+	int bottomEdgePix = countNonZero(bottomEdge);
+	int rightEdgePix = countNonZero(rightEdge);
+	int topLeftEdgePix = countNonZero(topLeftEdge);
+	int topRightEdgePix = countNonZero(topRightEdge);
+	int bottomLeftEdgePix = countNonZero(bottomLeftEdge);
+	int bottomRightEdgePix = countNonZero(bottomRightEdge);
+	int totalEdgePix = topEdgePix+leftEdgePix+bottomEdgePix+rightEdgePix+
+			topLeftEdgePix+topRightEdgePix+bottomLeftEdgePix+bottomRightEdgePix;
+	return totalEdgePix;
 }

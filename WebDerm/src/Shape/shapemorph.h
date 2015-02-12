@@ -32,7 +32,7 @@ public:
 	Mat prepareImage(Mat src);
 	Mat custAnd(Mat origImg, Mat scaleImg, Mat map=Mat());
 	Mat grayscaleReconstruct(Mat src, Mat scaleImg);
-	vector<Mat> liquidFeatureExtraction(Mat src);
+	deque<Mat> liquidFeatureExtraction(Mat src, double thresh=0);
 	vector<Mat> filterFeatures(vector<Mat> featureVec);
 
 	Mat connectImage(Mat src, Size size, double dist);
@@ -52,10 +52,13 @@ public:
 
 	vector<Mat> lumFilter1(Mat src);
 	vector<Mat> lumFilter2(Mat src);
-	Mat densityDetection(Mat src);
+	Mat densityDetection(Mat src,double q);
 	Mat origFilter(Mat src);
 	Mat closeFilter(Mat src);
-	Mat removeNoiseEdge(Mat src);
+	void combineFilterFeatures(vector<Mat> &featureVec);
+	vector<vector<Point> > findBoundary(Mat src);
+	int countEdgeTouching(Mat src, int edgeSize);
+	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 
 	vector<Mat> runShapeMorphTest(deque<String> &nameVec, deque<int> &labels);
 };
