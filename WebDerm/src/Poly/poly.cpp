@@ -80,6 +80,28 @@ vector<double> Poly::polyval( const vector<double>& oCoeff, const vector<double>
 	return oY;
 }
 
+//! check if a line from start-end point intersects the curve
+//! if true->returns pos, if false->returns -1
+int Poly::lineIntersect(vector<double> &vec) {
+	vector<double> xVec;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		xVec.push_back((double)i);
+	}
+	double slope = (vec.at(vec.size()-1)-vec.at(0))/(xVec.at(xVec.size()-1)-xVec.at(0));
+	vector<double> lineVec(vec.size(),vec.at(0));
+	for(unsigned int i=1; i<vec.size(); i++) {
+		double val = slope*(xVec.at(i)-xVec.at(i-1))+lineVec.at(i-1);
+		lineVec.at(i) = val;
+	}
+	for(unsigned int i=0; i<lineVec.size(); i++) {
+		double val = round(lineVec.at(i));
+		if(val>vec.at(i))
+			return i;
+	}
+
+	return -1;
+}
+
 void Poly::loadVectorFile(String path, vector<double> &vec) {
 	fstream fs(path.c_str());
 	if(fs.is_open()) {

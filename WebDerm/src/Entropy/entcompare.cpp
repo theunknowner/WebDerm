@@ -321,7 +321,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			ysv2[0] = vec2.at(i).at(0);
 			sum = colorSignif[i]/newTotal;
 			sum *= resultVec.at(i);
-			printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
+			//printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 			results += sum;
 		}
 	}

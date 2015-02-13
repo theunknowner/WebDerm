@@ -51,24 +51,25 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/herpes1.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria5.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	ShapeMorph sm;
-	Size size(3,3);
+	Size size(5,5);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
 
+	/*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
 
 	imgshow(matVec.at(0));
 	imgshow(matVec2.at(0));
-
-	//imwrite("img1.png",matVec.at(0));
-	//imwrite("img2.png",matVec2.at(0));
+/*
+	imwrite("img1.png",matVec.at(0));
+	imwrite("img2.png",matVec2.at(0));
 	TestML ml;
 	Mat results = ml.runANN(matVec);
 	for(int i=0; i<results.rows; i++) {
@@ -124,10 +125,10 @@ int main(int argc,char** argv)
 	//testAlgo3();
 /*
 	TestML ml;
-	String samplesPath = "/home/jason/git/Samples/Samples/Training/Circles-Donut-Incomplete/";
+	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
 	vector<double> labels(5,0);
 	for(unsigned int i=0; i<labels.size(); i++) {
-		if(i==3) labels.at(i)=1;
+		if(i==4) labels.at(i)=1;
 		else labels.at(i)=-1;
 	}
 	ml.convertImagesToData(samplesPath,labels);
@@ -246,14 +247,14 @@ int main(int argc,char** argv)
 	cout << newPix << endl;
 	/**/
 /*
-	String name = "lph9";
+	String name = "herpes_zoster3";
 	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	en.runCompareEntropy(name);
+	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	//en.runCompareEntropyList(file,folder);
+	en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 	//en.runCompareAllEntropy(folder);
 

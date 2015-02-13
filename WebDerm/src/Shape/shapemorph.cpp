@@ -11,8 +11,8 @@ Mat ShapeMorph::prepareImage(Mat src) {
 	int lightToDarkFlag = 0;
 	int darkToLightFlag = 0;
 	Size size(3,3);
-	int boundaryLeft = 15;
-	int boundaryRight = src.cols-boundaryLeft;
+	int boundaryLeft = 2;
+	int boundaryRight = src.cols-boundaryLeft-1;
 	double dkThresh = 0.22;
 	double darkToLiteThresh = 1.03;
 	double liteToDarkThresh = 0.97;
@@ -112,9 +112,10 @@ Mat ShapeMorph::origFilter(Mat src) {
 				darkestStuff.at<uchar>(i,j) = 0;
 		}
 	}
-	imgshow(img);
-	imgshow(darkestStuff);
-
+	//imgshow(img);
+	//imgshow(darkestStuff);
+	darkestStuff = this->dilation(darkestStuff,Size(1,5));
+	//imgshow(darkestStuff);
 	//remove dark stuff clinging to image boundary
 	deque<Mat> islandsVec = this->liquidFeatureExtraction(darkestStuff,5.0);
 	Mat mapEdgeRemoval(img.rows, img.cols, CV_8U, Scalar(255));
@@ -125,8 +126,10 @@ Mat ShapeMorph::origFilter(Mat src) {
 		int count = this->countEdgeTouching(edges,6,12);
 		int total = countNonZero(edges);
 		double percent = (double)count/total;
-		//printf("%d/%d: %f\n",count,total,percent);
-		if(percent>=0.47) {
+		int featurePixCount = countNonZero(islandsVec.at(i));
+		double percentOfImage = (double)featurePixCount/darkestStuff.total();
+		//printf("%d/%d: %f, %f\n",count,total,percent,percentOfImage);
+		if(percent>=0.47 && percentOfImage<0.10) {
 			for(int j=0; j<islandsVec.at(i).rows; j++) {
 				for(int k=0; k<islandsVec.at(i).cols; k++) {
 					int val = islandsVec.at(i).at<uchar>(j,k);
@@ -139,7 +142,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 	// get lum values
 	Mat afterRemoval;
 	img.copyTo(afterRemoval,mapEdgeRemoval);
-	imgshow(afterRemoval);
+	//imgshow(afterRemoval);
 	vector<double> yVec;
 	for(int i=0; i<afterRemoval.rows; i++) {
 		for(int j=0; j<afterRemoval.cols; j++) {
@@ -151,7 +154,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 	}
 	//filter the remaining image after removal of noise and outliers
 	kc.removeOutliers(yVec,0.025);
-	writeSeq2File(yVec,"yVec");
+	//writeSeq2File(yVec,"yVec");
 	xVec.clear();
 	for(unsigned int i=0; i<yVec.size(); i++) {
 		xVec.push_back((double)i);
@@ -166,14 +169,19 @@ Mat ShapeMorph::origFilter(Mat src) {
 		sum += val;
 	}
 	sum = sqrt(sum);
-	cout << sum << endl;
+	//int intersect = poly.lineIntersect(yVec);
 	if(sum<2.5)
 		yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
-	//yVec.erase(yVec.begin(),yVec.begin()+2495);
+	/*else {
+		if(intersect!=-1) {
+			yVec.erase(yVec.begin(),yVec.begin()+intersect);
+			yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
+		}
+	}*/
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	thresh = yVec.at(bestIdx);
-	cout << bestIdx << endl;
-	cout << thresh << endl;
+	//cout << bestIdx << endl;
+	//cout << thresh << endl;
 	Mat result=afterRemoval.clone();
 	for(int i=0; i<afterRemoval.rows; i++) {
 		for(int j=0; j<afterRemoval.cols; j++) {
@@ -188,7 +196,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 //! filter using close(Img) - Img
 Mat ShapeMorph::closeFilter(Mat src) {
 	KneeCurve kc;
-	Poly poly;
+	//Poly poly;
 	Mat img;
 	Mat element = getStructuringElement(MORPH_RECT,Size(17,17));
 	morphologyEx(src,img,MORPH_CLOSE,element);
@@ -284,8 +292,7 @@ Mat ShapeMorph::closeFilter(Mat src) {
 //! using origFilter
 vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat img1 = this->origFilter(src);
-	imgshow(img1);
-	Mat img2 = this->densityDetection(img1,0.999);
+	Mat img2 = this->densityDetection(img1,0.9);
 	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
 
 	//remove features clinging to image boundary
@@ -327,7 +334,6 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 		try {
 			morphologyEx(featureVec.at(idxVec.at(idxVec.size()-n)),result,MORPH_CLOSE,element);
 			matVec.push_back(result.clone());
-			//imgshow(matVec.at(matVec.size()-1));
 			//imwrite("img"+toString(n)+".png",matVec.at(matVec.size()-1));
 			n++;
 			if(matVec.size()>=featuresToHold) break;
@@ -1348,7 +1354,6 @@ Mat ShapeMorph::densityDetection(Mat src, double q) {
 	//calculate knee of curve for fx for filtering
 	KneeCurve kc;
 	int bestIdx = kc.kneeCurvePoint(fnVec);
-	//bestIdx = round(bestIdx*1.05);
 	//cout << "BestIdx: " << bestIdx << endl;
 	//fx threshold filtering
 	double fxThresh = fnVec.at(bestIdx);
@@ -1357,60 +1362,18 @@ Mat ShapeMorph::densityDetection(Mat src, double q) {
 	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
 	//	bestIdx = round(bestIdx*0.75);
 	//}
-	fxThresh = fnVec.at(bestIdx);
+	//fxThresh = fnVec.at(bestIdx);
 	//cout << "New BestIdx: " << bestIdx << endl;
 	//cout << "FxThresh: " << fxThresh << endl;
-	/*
-	row=0; col=0;
-	while(row<src.rows) {
-		while(col<src.cols) {
-			for(int i=row; i<(row+size.height); i++) {
-				for(int j=col; j<(col+size.width); j++) {
-					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-						int lc = src.at<uchar>(i,j);
-						if(lc>absDiscernThresh) {
-							density++;
-							avgDk += lc;
-							countDk++;
-						}
-					}
-				}
-			}
-			density /= size.area();
-			avgDk /= countDk;
-			if(countDk==0) avgDk = 0;
-			double fx = C * pow(density,alpha) * pow(avgDk,beta);
-			if(fx>fxThresh) {
-				for(int i=row; i<(row+size.height); i++) {
-					for(int j=col; j<(col+size.width); j++) {
-						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-							if(src.at<uchar>(i,j)>absDiscernThresh)
-								map.at<uchar>(i,j)=255;
-						}
-					}
-				}
-			}
-			avgDk=0;
-			density=0;
-			countDk=0;
-			//col+=size.width;
-			col++;
-		}
-		col=0;
-		//row+=size.height;
-		row++;
-	}
-	 */
-	//imgshow(map);
 
 	//connect nearest neighbors
 	double b = fxThresh;
 	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
-	cout << a << endl;
+	//cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	Size square(ceil(a),ceil(a));
-	a = round(a);
+	a = ceil(a);
 	while(row<src.rows) {
 		while(col<src.cols) {
 			int lc = src.at<uchar>(row,col);
