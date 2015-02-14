@@ -19,8 +19,12 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 
 class ShapeMorph {
+private:
+	bool debugMode=false;
 
 public:
+	void setDebugMode(bool mode);
+	bool isDebugModeOn();
 	enum {RECT=0,CIRCLE=1};
 	const double circleThresh = 0.60;
 	const double randomThresh = -0.40;

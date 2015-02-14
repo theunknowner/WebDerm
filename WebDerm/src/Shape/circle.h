@@ -14,9 +14,12 @@
 class Circle {
 public:
 	Mat findCircles(Mat &img);
-	vector<vector<Point> > findContourPoints(Mat &img);
-	Point getContourCenter(vector<vector<Point> > contours);
+	vector<vector<Point> > getContours(Mat img);
+	Point2f getContourCenter(vector<vector<Point> > contours);
 	double findRadiusFromContours(vector<vector<Point> > contours);
+	double getContourArea(vector<vector<Point> > contours);
+	double getContourPerimeter(vector<vector<Point> > contours);
+	double getRoundness(vector<vector<Point> > contours);
 
 	void generateCirclePoints(vector<Point> &points, double radius, double degree, int numberOfPoints);
 	void generateRandomPoints(vector<Point> &points, double radius, double spread, double degree, int numberOfPoints);

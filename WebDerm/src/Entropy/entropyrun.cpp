@@ -299,7 +299,8 @@ void Entropy::runCompareAllEntropy(String folder) {
 		deque<int> origPos;
 		FileData fd;
 		String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
-		String filepath, name;
+		String filepath, name, inputName;
+		inputName = getFileName(input,"-");
 		double resultsYSV, resultsT;
 		int countMatch=0, countSortOfMatch=0, flagMatch=0;
 		fd.getFilesFromDirectory(folder,files);
@@ -317,6 +318,9 @@ void Entropy::runCompareAllEntropy(String folder) {
 			//printf("%d) %s: %f | %f => %d\n",i,name.c_str(),resultsYSV, resultsT, flagMatch);
 		}
 		jaysort(resultVecYSV,origPos);
+		FILE *fp;
+		String filename = inputName+"-ListOfMatches.csv";
+		fp=fopen(filename.c_str(),"w");
 		for(unsigned int i=0; i<resultVecYSV.size(); i++) {
 			resultsYSV = resultVecYSV.at(i);
 			resultsT = resultVecT.at(origPos.at(i));
@@ -325,10 +329,6 @@ void Entropy::runCompareAllEntropy(String folder) {
 				countMatch++;
 				flagMatch=1;
 			}
-			//else if(resultsYSV>=0.86 && resultsT==0.0) {
-			//	countSortOfMatch++;
-			//	flagMatch=0;
-			//}
 			else if(resultsYSV>=0.75 && resultsT<=-1.0) {
 				countSortOfMatch++;
 				flagMatch=0;
@@ -341,6 +341,8 @@ void Entropy::runCompareAllEntropy(String folder) {
 				flagMatch=-1;
 			}
 			printf("%d) %s: %f | %f => %d\n",i,name.c_str(),resultsYSV, resultsT, flagMatch);
+			fprintf(fp,"%s,%f,%f,%d\n",name.c_str(),resultsYSV,resultsT,flagMatch);
 		}
+		fclose(fp);
 	}
 }

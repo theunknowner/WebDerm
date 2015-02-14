@@ -300,6 +300,7 @@ Mat Functions::imageROI(Mat input, Point begin, Point end) {
 	return dst;
 }
 
+//! rotates image counter-clockwise
 Mat Functions::rotateImage(const Mat& source, double angle)
 {
 	Point2f src_center(source.cols/2.0F, source.rows/2.0F);

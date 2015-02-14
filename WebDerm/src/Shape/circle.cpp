@@ -21,60 +21,55 @@ Mat Circle::findCircles(Mat & img) {
 	return output;
 }
 
-vector<vector<Point> > Circle::findContourPoints(Mat &img) {
+//! gets contour of boundary of image
+vector<vector<Point> > Circle::getContours(Mat img) {
 	Mat dst,img2;
 	vector<vector<Point> > contours;
-	vector<Vec4i> hierarchy;
 	GaussianBlur(img,img2,Size(3,3),0,0);
 	Canny(img2,dst,100,200,3);
-	findContours(dst,contours,hierarchy,CV_RETR_LIST,CV_CHAIN_APPROX_NONE,Point(0, 0));
+	findContours(dst,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_NONE);
 
 	return contours;
 }
 
-Point Circle::getContourCenter(vector<vector<Point> > contours) {
-	double dist=0, maxDist=0;
-	Point beginPt(contours.at(0).at(0).x,contours.at(0).at(0).y);
-	printf("beginPt: %d,%d\n",beginPt.x,beginPt.y);
-	Point pt, endPt;
-	for(unsigned int i=0; i<contours.size(); i++) {
-		for(unsigned int j=0; j<contours.at(i).size(); j++) {
-			pt = Point(contours.at(i).at(j).x,contours.at(i).at(j).y);
-			dist = sqrt(pow(beginPt.x-pt.x,2)+pow(beginPt.y-pt.y,2));
-			if(dist>maxDist) {
-				maxDist = dist;
-				endPt = pt;
-			}
-		}
+//! returns point of center in float format
+Point2f Circle::getContourCenter(vector<vector<Point> > contours) {
+	vector<Moments> mu(contours.size());
+	for(unsigned int i = 0; i < contours.size(); i++ ) {
+		mu[i] = moments( contours[i], false );
 	}
-	int centerX = (beginPt.x+endPt.x)/2;
-	int centerY = (beginPt.y+endPt.y)/2;
-	Point center = Point(centerX,centerY);
+	vector<Point2f> mc( contours.size() );
+	for(unsigned int i = 0; i < contours.size(); i++ ) {
+		mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 );
+	}
+	Point2f center = mc.at(0);
 	return center;
 }
 
 double Circle::findRadiusFromContours(vector<vector<Point> > contours) {
-	double dist=0, maxDist=0;
-	Point beginPt(contours.at(0).at(0).x,contours.at(0).at(0).y);
-	printf("beginPt: %d,%d\n",beginPt.x,beginPt.y);
-	Point pt, endPt;
-	for(unsigned int i=0; i<contours.size(); i++) {
-		for(unsigned int j=0; j<contours.at(i).size(); j++) {
-			pt = Point(contours.at(i).at(j).x,contours.at(i).at(j).y);
-			dist = sqrt(pow(beginPt.x-pt.x,2)+pow(beginPt.y-pt.y,2));
-			if(dist>maxDist) {
-				maxDist = dist;
-				endPt = pt;
-			}
-		}
-	}
-	printf("endPt: %d,%d\n",endPt.x,endPt.y);
-	double radius = maxDist/2;
+	double area = contourArea(contours.at(0));
+	double radius = sqrt(area/M_PI);
 	return radius;
 }
 
+double Circle::getContourArea(vector<vector<Point> > contours) {
+	double area = contourArea(contours.at(0));
+	return area;
+}
 
+double Circle::getContourPerimeter(vector<vector<Point> > contours) {
+	double perimeter = arcLength(contours.at(0),true);
+	return perimeter;
+}
 
+//! calculates roundness of contour
+//! the max value = 1 -> perfect circle
+double Circle::getRoundness(vector<vector<Point> > contours) {
+	double area = this->getContourArea(contours);
+	double perim = this->getContourPerimeter(contours);
+	double roundness = (4.0*M_PI*area)/pow(perim,2);
+	return roundness;
+}
 /*points are generated base on origin Point as (0,0)
  * So to display in an image, the points need to be offset to positive
  */

@@ -7,20 +7,44 @@
 
 #include "shapemorph.h"
 
+void ShapeMorph::setDebugMode(bool mode) {
+	this->debugMode = mode;
+}
+
+bool ShapeMorph::isDebugModeOn() {
+	return this->debugMode;
+}
+
 Mat ShapeMorph::prepareImage(Mat src) {
+	Functions fn;
+	Mat srcRight, srcTop, srcBottom;
+	flip(src,srcRight,1);
+	transpose(src,srcTop);
+	flip(srcTop,srcTop,0);
+	flip(srcTop,srcBottom,1);
 	int lightToDarkFlag = 0;
 	int darkToLightFlag = 0;
+	int leftFlag=0, rightFlag=0, topFlag=0, bottomFlag=0;
 	Size size(3,3);
-	int boundaryLeft = 2;
-	int boundaryRight = src.cols-boundaryLeft-1;
+	int boundaryLeft, boundaryRight;
 	double dkThresh = 0.22;
 	double darkToLiteThresh = 1.03;
 	double liteToDarkThresh = 0.97;
 	double totalDK=0, avgDK=0, dkRatio=0, cumulativeDK=0;
+	double totalDkRight=0, avgDkRight=0, dkRatioRight=0, cumulativeDkRight=0;
+	double totalDkTop=0, avgDkTop=0, dkRatioTop=0, cumulativeDkTop=0;
+	double totalDkBottom=0, avgDkBottom=0, dkRatioBottom=0, cumulativeDkBottom=0;
 	int row=0, col=0;
-	int countDK=0;
+	int countDK=0, countDkRight=0, countDkTop=0, countDkBottom=0;
 	Point begin;
 	Mat drkMat(src.rows,src.cols,CV_32F,Scalar(0));
+	Mat drkMatRight(src.rows,src.cols,CV_32F,Scalar(0));
+	Mat drkMatTop(src.rows,src.cols,CV_32F,Scalar(0));
+	Mat drkMatBottom(src.rows,src.cols,CV_32F,Scalar(0));
+	Mat map(src.size(),CV_8UC3,Scalar(0,0,0));
+	Mat mapRight(src.size(),CV_8UC3,Scalar(0,0,0));
+	Mat mapTop(src.size(),CV_8UC3,Scalar(0,0,0));
+	Mat mapBottom(src.size(),CV_8UC3,Scalar(0,0,0));
 	while(row<src.rows) {
 		while(col<src.cols) {
 			begin=Point(col-floor(size.width/2),row-floor(size.height/2));
@@ -28,39 +52,131 @@ Mat ShapeMorph::prepareImage(Mat src) {
 				for(int j=begin.x; j<(begin.x+size.width); j++) {
 					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
 						totalDK += src.at<uchar>(i,j);
+						totalDkRight += srcRight.at<uchar>(i,j);
+						totalDkTop += srcTop.at<uchar>(i,j);
+						totalDkBottom += srcBottom.at<uchar>(i,j);
 						countDK++;
+						countDkRight++;
+						countDkTop++;
+						countDkBottom++;
 					}
 				}
 			}
 			avgDK = totalDK/countDK;
+			avgDkRight = totalDkRight/countDkRight;
+			avgDkTop = totalDkTop/countDkTop;
+			avgDkBottom = totalDkBottom/countDkBottom;
 			if(countDK==0) avgDK=0;
+			if(countDkRight==0) avgDkRight=0;
+			if(countDkTop==0) avgDkTop=0;
+			if(countDkBottom==0) avgDkBottom=0;
 			drkMat.at<float>(row,col) = avgDK;
+			drkMatRight.at<float>(row,col) = avgDkRight;
+			drkMatTop.at<float>(row,col) = avgDkTop;
+			drkMatBottom.at<float>(row,col) = avgDkBottom;
+			if(row<15 || src.rows-row<=15) {
+				boundaryLeft=15;
+				boundaryRight = src.cols-boundaryLeft;
+			}
+			else {
+				boundaryLeft=2;
+				boundaryRight = src.cols-boundaryLeft;
+			}
 			if(col>=boundaryLeft && col<=boundaryRight) {
 				dkRatio = drkMat.at<float>(row,col)/drkMat.at<float>(row,col-1);
+				dkRatioRight = drkMatRight.at<float>(row,col)/drkMatRight.at<float>(row,col-1);
+				dkRatioTop = drkMatTop.at<float>(row,col)/drkMatTop.at<float>(row,col-1);
+				dkRatioBottom = drkMatBottom.at<float>(row,col)/drkMatBottom.at<float>(row,col-1);
 				cumulativeDK += dkRatio - 1.0;
+				cumulativeDkRight += dkRatioRight - 1.0;
+				cumulativeDkTop += dkRatioTop - 1.0;
+				cumulativeDkBottom += dkRatioBottom - 1.0;
 				//if(row==0) {
 				//	//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
 				//	printf("DK: %d,%d: %f,%f,%f,%f\n",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
 				//}
-				if(cumulativeDK>=dkThresh || dkRatio>=darkToLiteThresh) {
+				if(leftFlag==0 && (cumulativeDK>=dkThresh || dkRatio>=darkToLiteThresh)) {
 					darkToLightFlag++;
-					break;
+					leftFlag=1;
+					map.at<Vec3b>(row,col) = Vec3b(0,0,255);
 				}
-				if(cumulativeDK<-dkThresh || dkRatio<=liteToDarkThresh) {
+				if(leftFlag==0 && (cumulativeDK<-dkThresh || dkRatio<=liteToDarkThresh)) {
 					lightToDarkFlag++;
-					break;
+					leftFlag=1;
+					map.at<Vec3b>(row,col) = Vec3b(0,255,0);
 				}
+				if(rightFlag==0 && (cumulativeDkRight>=dkThresh || dkRatioRight>=darkToLiteThresh)) {
+					darkToLightFlag++;
+					rightFlag=1;
+					mapRight.at<Vec3b>(row,col) = Vec3b(0,0,255);
+				}
+				if(rightFlag==0 && (cumulativeDkRight<-dkThresh || dkRatioRight<=liteToDarkThresh)) {
+					lightToDarkFlag++;
+					rightFlag=1;
+					mapRight.at<Vec3b>(row,col) = Vec3b(0,255,0);
+				}
+				if(topFlag==0 && (cumulativeDkTop>=dkThresh || dkRatioTop>=darkToLiteThresh)) {
+					darkToLightFlag++;
+					topFlag=1;
+					mapTop.at<Vec3b>(row,col) = Vec3b(0,0,255);
+				}
+				if(topFlag==0 && (cumulativeDkTop<-dkThresh || dkRatioTop<=liteToDarkThresh)) {
+					lightToDarkFlag++;
+					topFlag=1;
+					mapTop.at<Vec3b>(row,col) = Vec3b(0,255,0);
+				}
+				if(bottomFlag==0 && (cumulativeDkBottom>=dkThresh || dkRatioBottom>=darkToLiteThresh)) {
+					darkToLightFlag++;
+					bottomFlag=1;
+					mapBottom.at<Vec3b>(row,col) = Vec3b(0,0,255);
+				}
+				if(bottomFlag==0 && (cumulativeDkBottom<-dkThresh || dkRatioBottom<=liteToDarkThresh)) {
+					lightToDarkFlag++;
+					bottomFlag=1;
+					mapBottom.at<Vec3b>(row,col) = Vec3b(0,255,0);
+				}
+
+				if(leftFlag==1 && rightFlag==1 && topFlag==1 && bottomFlag==1) break;
 			}
 			totalDK=0;
 			countDK=0;
+			totalDkRight=0;
+			countDkRight=0;
+			totalDkTop=0;
+			countDkTop=0;
+			totalDkBottom=0;
+			countDkBottom=0;
 			col++;
 		}
+		leftFlag=0;
+		rightFlag=0;
+		topFlag=0;
+		bottomFlag=0;
 		totalDK=0;
 		countDK=0;
+		totalDkRight=0;
+		countDkRight=0;
+		totalDkTop=0;
+		countDkTop=0;
+		totalDkBottom=0;
+		countDkBottom=0;
 		cumulativeDK=0;
+		cumulativeDkRight=0;
+		cumulativeDkTop=0;
+		cumulativeDkBottom=0;
 		col=0;
 		row++;
 	}
+	/*
+	imgshow(src);
+	imgshow(srcRight);
+	imgshow(srcTop);
+	imgshow(srcBottom);
+	imgshow(map);
+	imgshow(mapRight);
+	imgshow(mapTop);
+	imgshow(mapBottom);*/
+
 	Mat result;
 	//cout << "Dark2Lite: " << darkToLightFlag << endl;
 	//cout << "Lite2Dark: " << lightToDarkFlag << endl;
@@ -169,15 +285,9 @@ Mat ShapeMorph::origFilter(Mat src) {
 		sum += val;
 	}
 	sum = sqrt(sum);
-	//int intersect = poly.lineIntersect(yVec);
 	if(sum<2.5)
 		yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
-	/*else {
-		if(intersect!=-1) {
-			yVec.erase(yVec.begin(),yVec.begin()+intersect);
-			yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
-		}
-	}*/
+
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	thresh = yVec.at(bestIdx);
 	//cout << bestIdx << endl;
@@ -292,7 +402,9 @@ Mat ShapeMorph::closeFilter(Mat src) {
 //! using origFilter
 vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat img1 = this->origFilter(src);
+	imgshow(img1);
 	Mat img2 = this->densityDetection(img1,0.9);
+	imgshow(img2);
 	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
 
 	//remove features clinging to image boundary
@@ -309,7 +421,7 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 		double percentOfImage = (double)featurePixCount/imagePixCount;
 		//printf("%d/%d: %f, %f\n",count,total,percent,percentOfImage);
 		//imgshow(edges);
-		if(percent>=0.47 && percentOfImage<0.50) {
+		if(percent>=0.47 && percentOfImage<0.40) {
 			featureVec.erase(featureVec.begin()+m);
 		}
 		else
@@ -1458,7 +1570,7 @@ void ShapeMorph::combineFilterFeatures(vector<Mat> &featureVec) {
 
 vector<vector<Point> > ShapeMorph::findBoundary(Mat src) {
 	vector<vector<Point> > contour;
-	findContours(src, contour, RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	findContours(src, contour, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	return contour;
 }
 

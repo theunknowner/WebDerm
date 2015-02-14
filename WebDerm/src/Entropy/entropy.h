@@ -22,6 +22,7 @@
 class FileData;
 class Entropy {
 private:
+	bool debugMode=false;
 	double Y_HIGH;	//upper Y range boundary
 	double Y_LOW;	//lower Y range boudnary
 	double S_HIGH;
@@ -54,6 +55,8 @@ private:
 
 public:
 	Size entSize;
+	void setDebugMode(bool mode);
+	bool isDebugModeOn();
 
 	//entropy.cpp
 	void eyeFn(FileData &fd, Size ksize, String targetColor="",String targetShade="");

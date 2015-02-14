@@ -502,3 +502,11 @@ void Entropy::shapeFn(FileData &fd) {
 	if(shapeVec.at(0)==0 && shapeVec.at(1)==0)
 		this->shapeMetric.push_back(0.0);
 }
+
+void Entropy::setDebugMode(bool mode) {
+	this->debugMode = mode;
+}
+
+bool Entropy::isDebugModeOn() {
+	return this->debugMode;
+}

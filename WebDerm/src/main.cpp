@@ -51,7 +51,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria5.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -60,14 +60,13 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
-
-	/*
+/*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
 
 	imgshow(matVec.at(0));
 	imgshow(matVec2.at(0));
-/*
+
 	imwrite("img1.png",matVec.at(0));
 	imwrite("img2.png",matVec2.at(0));
 	TestML ml;
@@ -114,15 +113,7 @@ int main(int argc,char** argv)
 		if(n>idxVec.size()) break;
 	}
 	//imgshow(img4);
-	/*
-	deque<double> vec;
-	KneeCurve kc;
-	kc.loadVectorFile("/home/jason/git/WebDerm/WebDerm/data.csv",vec);
-	cout << kc.kneeCurvePoint(vec) << endl;
-/**/
-	//testAlgo1();
-	//testAlgo2();
-	//testAlgo3();
+*/
 /*
 	TestML ml;
 	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
@@ -171,7 +162,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-/*
+	/*
 	//TestML ml;
 	CvANN_MLP ann;
 	vector<Mat> sampleVec;
@@ -246,17 +237,18 @@ int main(int argc,char** argv)
 	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
 	cout << newPix << endl;
 	/**/
-/*
-	String name = "herpes_zoster3";
-	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
+
+	String name = "lph4";
+	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
+	//en.setDebugMode(true);
 	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	en.runCompareEntropyList(file,folder);
+	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
-	//en.runCompareAllEntropy(folder);
+	en.runCompareAllEntropy(folder);
 
 	/*
 	Entropy en;

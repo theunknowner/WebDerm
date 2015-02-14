@@ -62,6 +62,8 @@ void Entropy::releaseMemory() {
 
 double Entropy::fn_compareY(double y1, double y2, double weight) {
 	double val;
+	if(min(y1,y2)==0 && max(y1,y2)>0)
+		return 0;
 	if((y1>Y_HIGH && y2>Y_HIGH)) {
 		val = min(y1,y2)/max(y1,y2);
 		return val;
@@ -85,6 +87,8 @@ double Entropy::fn_compareY(double y1, double y2, double weight) {
 
 double Entropy::fn_compareS(double s1, double s2, double weight) {
 	double val;
+	if(min(s1,s2)==0 && max(s1,s2)>0)
+		return 0;
 	if((s1>S_HIGH && s2>S_HIGH)) {
 		val = min(s1,s2)/max(s1,s2);
 		return val;
@@ -108,6 +112,8 @@ double Entropy::fn_compareS(double s1, double s2, double weight) {
 
 double Entropy::fn_compareV(double v1, double v2, double weight) {
 	double val=0;
+	if(min(v1,v2)==0 && max(v1,v2)>0)
+		return 0;
 	if((v1<=V_HIGH && v2<=V_HIGH)) {
 		val = max(v1,v2)-min(v1,v2);
 		if(val<=V_DIST) {
@@ -215,7 +221,8 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 	vector<int> colorsHit(vec1.size(),0); //variable to mark colors not ignored
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		this->resetThreshVals();
-		if(colorNameVec.at(i)!="LowBrown" && colorNameVec.at(i)!="LowGreyBrown") {
+		String colorName = colorNameVec.at(i);
+		if(colorName!="LowBrown" && colorName!="LowGreyBrown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 				if(i==0 && j>=ysvSize) {
 					t1.at(j-ysvSize) = vec1.at(i).at(j);
@@ -234,6 +241,8 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 				Y1 *= (ysv1[1] / S_PERCEPTION);
 				Y2 *= (ysv2[1] / S_PERCEPTION);
 				Y_PERCEPTION /= (max(ysv1[1],ysv2[1])/S_PERCEPTION);
+				if(colorName.find("Dark")!=string::npos)
+					Y_PERCEPTION = 0.0;
 			}
 
 			if(Y1>Y_PERCEPTION || Y2>Y_PERCEPTION) {
@@ -264,7 +273,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 				avg /= 3.0;
 				resultVec.at(i) = avg;
 
-				//printf("%s : %f,%f,%f\n",colorNameVec.at(i).c_str(),valY,valS,valV);
+				printf("%s : %f,%f,%f\n",colorNameVec.at(i).c_str(),valY,valS,valV);
 
 				//Total of all the Y that are noticeable
 				total += max(ysv1[0],ysv2[0]);
@@ -321,8 +330,10 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 			ysv2[0] = vec2.at(i).at(0);
 			sum = colorSignif[i]/newTotal;
 			sum *= resultVec.at(i);
-			//printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 			results += sum;
+
+			if(this->debugMode)
+				printf("%s : %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],resultVec.at(i));
 		}
 	}
 	//cout << "Mine: " << results << endl;
