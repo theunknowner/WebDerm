@@ -402,9 +402,7 @@ Mat ShapeMorph::closeFilter(Mat src) {
 //! using origFilter
 vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat img1 = this->origFilter(src);
-	imgshow(img1);
 	Mat img2 = this->densityDetection(img1,0.9);
-	imgshow(img2);
 	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
 
 	//remove features clinging to image boundary

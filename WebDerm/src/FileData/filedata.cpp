@@ -296,6 +296,16 @@ void FileData::renameFiles(String directory, String oldname, String newname) {
 	files.shrink_to_fit();
 }
 
+bool FileData::isFileExist(String file) {
+	fstream fs(file.c_str());
+	if(fs.is_open()) {
+		fs.close();
+		return true;
+	}
+	fs.close();
+	return false;
+}
+
 void FileData::getMinMaxPts(String input, deque< deque<Point> > &pt) {
 	size_t posMins=0;
 	size_t posMaxs=0;

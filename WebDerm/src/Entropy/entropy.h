@@ -80,6 +80,7 @@ public:
 	void runCompareEntropyList(String fileList, String folder);
 	void runCompareEntropyList2(String fileList, String folder);
 	void runCompareAllEntropy(String folder);
+	void runCompareAllEntropy2(String folder);
 
 	//demo_entropy.cpp
 	void demo_runCompareEntropy();

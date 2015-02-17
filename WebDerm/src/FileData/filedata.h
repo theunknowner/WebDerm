@@ -72,6 +72,7 @@ public:
 	bool getFilesFromDirectory(String directory, deque<String> &files, int flag=0);
 	void deleteContainingName(String directory, String filename);
 	void renameFiles(String directory, String oldname, String newname);
+	bool isFileExist(String file);
 
 	void getMinMaxPts(String input, deque< deque<Point> > &pt);
 	void extractRule3Data(String filename, Point loc);

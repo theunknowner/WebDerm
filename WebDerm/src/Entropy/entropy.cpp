@@ -23,7 +23,7 @@ String combineShades(String shade) {
 	if(shade.find("Dark3")!=string::npos) return "Dark3";
 	if(shade.find("High")!=string::npos) return "High";
 	if(shade.find("Low")!=string::npos) return "Low";
-	if(shade.find("Light")!=string::npos) return "Light";
+	if(shade.find("Light")!=string::npos) return "Low";
 	return shade;
 }
 
@@ -74,9 +74,9 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
 							shade = combineShades(shade);
-							if(shade.find("Dark")==string::npos)
-								shade = "Low";
 							color = c.combineColors(color);
+							if(color=="Violet" || color =="Purple")
+								shade = "High";
 							if(fd.filename.find("acne")!=string::npos)  {
 								if(color=="Violet")  {
 									int index=-1;
@@ -427,7 +427,7 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 	for(unsigned int j=0; j<g_Shades2.size(); j++) {
 		for(unsigned int i=0; i<allColors.size(); i++) {
 			if(i==0 && j==0) {
-				if(j==0 || j==1 || j==3) {
+				if(j>=0 && j<=3) {
 					shadeColor = g_Shades2.at(j)+allColors.at(i);
 					fprintf(fp4,"%s,%f,%f,%f,",shadeColor.c_str(),this->totalPopulation.at(i).at(j),this->populationDensity.at(i).at(j),this->densityVariation.at(i).at(j));
 					for(unsigned int k=0; k<this->shapeMetric.size();k++) {
@@ -437,7 +437,7 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 				}
 			}
 			else {
-				if(j==0 || j==1 || j==3) {
+				if(j>=0 && j<=3) {
 					shadeColor = g_Shades2.at(j)+allColors.at(i);
 					fprintf(fp4,"%s,%f,%f,%f\n",shadeColor.c_str(),this->totalPopulation.at(i).at(j),this->populationDensity.at(i).at(j),this->densityVariation.at(i).at(j));
 				}

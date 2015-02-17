@@ -51,7 +51,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4.jpg",Size(140,140),0);
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria1.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -64,6 +64,7 @@ int main(int argc,char** argv)
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
 
+	imgshow(img);
 	imgshow(matVec.at(0));
 	imgshow(matVec2.at(0));
 
@@ -238,17 +239,18 @@ int main(int argc,char** argv)
 	cout << newPix << endl;
 	/**/
 
-	String name = "lph4";
-	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
+	String name = "lph16";
+	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	//en.setDebugMode(true);
+	en.setDebugMode(true);
 	//en.runCompareEntropy(name);
-	//en.runCompareEntropy2(name);
+	en.runCompareEntropy2(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
-	en.runCompareAllEntropy(folder);
+	//en.runCompareAllEntropy(folder);
+	//en.runCompareAllEntropy2(folder);
 
 	/*
 	Entropy en;
