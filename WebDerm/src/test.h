@@ -15,7 +15,6 @@
 #include "skin/Skin.h"
 #include "test/testfunctions.h"
 #include "Math/maths.h"
-#include "Contrast/contrast.h"
 #include "FileData/filedata.h"
 #include "Histogram/histogram.h"
 #include "Shades/shades.h"

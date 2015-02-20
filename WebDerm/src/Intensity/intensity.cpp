@@ -559,7 +559,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 				/** generate rule table **/
 				if(ruleNo.size()>0) {
 					char buffer[40];
-					sprintf(buffer,"(%d;%d)",j+1,i+1);
+					sprintf(buffer,"(%d;%d)",j,i);
 					String coord(buffer);
 					String ruleNum;
 					String oldPix = windowVec.at(i).at(j);

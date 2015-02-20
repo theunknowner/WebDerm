@@ -418,3 +418,40 @@ void Entropy::runCompareAllEntropy2(String folder) {
 		fclose(fp);
 	}
 }
+
+//test run function for test_compareEntropy2a
+void Entropy::test_runCompareEntropy2a(String targetName) {
+	String input;
+	deque<String> colorNameVec;
+	deque<deque<double> > vec1;
+	cout << "Enter filename: ";
+	cin >> input;
+	if(this->loadEntropyFiles(input,vec1,colorNameVec)) {
+		deque<String> files;
+		deque<deque<double> > vec2;
+		FileData fd;
+		String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
+		String filepath, name;
+		double results;
+		deque<double> resultVec;
+		deque<String> nameVec;
+		deque<int> origPos;
+		fd.getFilesFromDirectory(folder,files);
+		for(unsigned int i=0; i<files.size(); i++) {
+			filepath = folder+files.at(i);
+			name = getFileName(files.at(i),"-");
+			if(name==targetName || targetName=="") {
+				this->loadEntropyFiles(filepath,vec2,colorNameVec);
+				results = this->test_compareEntropy2a(vec1,vec2,colorNameVec);
+				resultVec.push_back(results);
+				nameVec.push_back(name);
+				vec2.clear();
+				vec2.shrink_to_fit();
+			}
+		}
+		jaysort(resultVec,origPos);
+		for(unsigned int i=0; i<resultVec.size(); i++) {
+			printf("%s: %f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i));
+		}
+	}
+}

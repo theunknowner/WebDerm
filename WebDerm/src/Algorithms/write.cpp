@@ -175,13 +175,15 @@ void writeSeq2File(double * arr, int length, String name) {
 	fclose(fp);
 }
 
-//! type = "int","float" so far
+//! type = "int","float","uchar"... so far
 void writeSeq2File(Mat src, String type, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
+			if(type=="uchar")
+				fprintf(fp,"%d,",src.at<uchar>(i,j));
 			if(type=="int")
 				fprintf(fp,"%d,",src.at<int>(i,j));
 			if(type=="float")

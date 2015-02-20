@@ -14,7 +14,6 @@
 #include "test/testfunctions.h"
 #include "scripts/scripts.h"
 #include "Math/maths.h"
-#include "Contrast/contrast.h"
 #include "FileData/filedata.h"
 #include "Histogram/histogram.h"
 #include "Shades/shades.h"
@@ -60,7 +59,7 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
-/*
+	/*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
 
@@ -216,37 +215,16 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-	/*
-	FileData fd;
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_5x5.csv",fd.windowVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_ShadeColors_5x5.csv",fd.colorVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/acne12_HSL_5x5.csv",fd.hslMat);
-	init_2D_Deque(fd.m_ContrastMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
-	init_2D_Deque(fd.minMaxHslMat,fd.windowVec.size(), fd.windowVec.at(0).size());
-	fd.pt = Point(111,14);
-	String newPix = c.getMainColor(fd.windowVec.at(fd.pt.y).at(fd.pt.x));
-	String newShade = sh.extractShade(fd.colorVec.at(fd.pt.y).at(fd.pt.x));
-	rule3(fd,newPix,newShade);
-	printf("HSL(%s)\n",fd.hslMat.at(fd.pt.y).at(fd.pt.x).c_str());
-	printf("Color: %s\n",fd.windowVec.at(fd.pt.y).at(fd.pt.x).c_str());
-	printf("%s\n",fd.hslPtMat.at(fd.pt.y).at(fd.pt.x).c_str());
-	printf("mCon: %s\n",fd.m_ContrastMat.at(fd.pt.y).at(fd.pt.x).c_str());
-	printf("dHSL: %s\n",fd.d_HslMat.at(fd.pt.y).at(fd.pt.x).c_str());
-	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
-	cout << newPix << endl;
-	/**/
 
-	String name = "lph16";
-	String file = "/home/jason/Desktop/workspace/False_Positive_Pairs.csv";
+	String name = "urticaria5";
+	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
 	en.setDebugMode(true);
 	//en.runCompareEntropy(name);
 	en.runCompareEntropy2(name);
+	//en.test_runCompareEntropy2a(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 	//en.runCompareAllEntropy(folder);

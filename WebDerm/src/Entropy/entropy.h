@@ -84,6 +84,11 @@ public:
 
 	//demo_entropy.cpp
 	void demo_runCompareEntropy();
+
+	//testing
+	double test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
+	void test_runCompareEntropy2a(String targetName);
+
 };
 
 #endif /* ENTROPY_H_ */

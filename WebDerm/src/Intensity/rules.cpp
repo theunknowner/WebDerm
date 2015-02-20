@@ -243,6 +243,14 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 					ruleNum = 3.1;
 				}
 			}
+			else if(HSL[1]<=78) {
+				if(fn.countLesser(4,deltaHSL_0[1][0],deltaHSL_45[1][0],deltaHSL_90[1][0],-10.0)>=2) {
+					if(color=="Brown") pix="BrownPink";
+					if(color=="BrownPink") pix = "Pink";
+					flag=true;
+					ruleNum = 3.12;
+				}
+			}
 		}
 		//in Pink/BrownPink
 		if(fn.countGreaterEqual(4,measuredContrast_0[1],measuredContrast_45[1],measuredContrast_90[1],-2.0)>=2 &&
@@ -276,6 +284,24 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 								ruleNum = 3.21;
 							}
 						}
+					}
+				}
+				else {
+					double ratioDeltaHSL0[3];
+					double ratioDeltaHSL45[3];
+					double ratioDeltaHSL90[3];
+					int ratioDeltaFlag[3];
+					for(int a=0; a<3; a++) {
+						ratioDeltaHSL0[a] = round(abs(deltaHSL_0[0][a]/unitThresh[a]));
+						ratioDeltaHSL45[a] = round(abs(deltaHSL_45[0][a]/unitThresh[a]));
+						ratioDeltaHSL90[a] = round(abs(deltaHSL_90[0][a]/unitThresh[a]));
+						ratioDeltaFlag[a] = fn.countEqual(4,ratioDeltaHSL0[a],ratioDeltaHSL45[a],ratioDeltaHSL90[a],0.);
+					}
+					if(fn.countGreaterEqual(4,ratioDeltaFlag[0],ratioDeltaFlag[1],ratioDeltaFlag[2],2.0)>=2){
+						if(color=="Brown") pix="BrownPink";
+						if(color=="BrownPink") pix = "Pink";
+						flag=true;
+						ruleNum = 3.22;
 					}
 				}
 			}
@@ -1220,7 +1246,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	if(ruleFlags.at(6)==1)
 		ruleNumVec.push_back(rule6(newPix,newShade));
 	//if(ruleFlags.at(9)==1)
-		//ruleNumVec.push_back(rule9(fd,newPix));
+	//ruleNumVec.push_back(rule9(fd,newPix));
 	if(ruleFlags.at(8)==1)
 		ruleNumVec.push_back(rule8(fd,newPix,loc));
 	if(ruleFlags.at(7)==1)
@@ -1242,4 +1268,33 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	shade = newShade;
 	pix = newPix;
 	return flag;
+}
+
+//function used for testing rules
+void testRules() {
+	FileData fd;
+	Color c;
+	Shades sh;
+	String file1 = "/home/jason/Desktop/Programs/Test_Output/vesicles2-5x5.csv";
+	String file2 = "/home/jason/Desktop/Programs/Test_Output/vesicles2-ShadeColors-5x5.csv";
+	String file3 = "/home/jason/Desktop/Programs/Test_Output/vesicles2-HSL-5x5.csv";
+	fd.loadFileMatrix(file1,fd.windowVec);
+	fd.loadFileMatrix(file2,fd.colorVec);
+	fd.loadFileMatrix(file3,fd.hslMat);
+	init_2D_Deque(fd.m_ContrastMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.d_HslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.hslPtMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.cumHslMat,fd.windowVec.size(),fd.windowVec.at(0).size());
+	init_2D_Deque(fd.minMaxHslMat,fd.windowVec.size(), fd.windowVec.at(0).size());
+	fd.pt = Point(39,54);
+	String newPix = c.getMainColor(fd.windowVec.at(fd.pt.y).at(fd.pt.x));
+	String newShade = sh.extractShade(fd.colorVec.at(fd.pt.y).at(fd.pt.x));
+	rule3(fd,newPix,newShade);
+	printf("HSL(%s)\n",fd.hslMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("Color: %s\n",fd.windowVec.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("%s\n",fd.hslPtMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("mCon: %s\n",fd.m_ContrastMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("dHSL: %s\n",fd.d_HslMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	printf("HSLs: %s\n",fd.minMaxHslMat.at(fd.pt.y).at(fd.pt.x).c_str());
+	cout << newPix << endl;
 }

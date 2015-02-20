@@ -187,7 +187,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 			if((minCol-1)>=0) minCol-=1;
 			if((maxCol+1)<width) maxCol+=1;
 			for(int a=minRow; a<=maxRow; a++)  {
-				for(int b=minCol; b<=maxCol; b++)	 {
+				for(int b=minCol; b<=maxCol; b++)	{
 					for(int c=0; c<innerHeight; c++) {
 						for(int d=0; d<innerWidth; d++) {
 							if(ratio[y1][x1][c][d]>min) {

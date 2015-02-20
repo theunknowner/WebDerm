@@ -241,8 +241,6 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 				//Y_PERCEPTION /= (max(ysv1[1],ysv2[1])/S_PERCEPTION);
 				//cout << colorName << ":" << Y2 << endl;
 				Y_PERCEPTION = 2.0;
-				if(colorName.find("Dark")!=string::npos)
-					Y_PERCEPTION = 0.0;
 			}
 
 			if(Y1>Y_PERCEPTION || Y2>Y_PERCEPTION) {
@@ -370,39 +368,32 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 	fill_n(dist,colorComponents,-1);
 	double sum=0, total=0, totalYSV[componentSize];
 	double ysv1[componentSize], ysv2[componentSize];
-	double ysvWeights[componentSize]; //weight of importance of YSV
-	fill_n(ysvWeights,componentSize,1.0);
+	Mat ysvWeights(componentSize,1,CV_32F,Scalar(1.0)); //weight of importance of YSV
 	int colorsHit[colorComponents];
-	double maxYSVDiff[componentSize];
-	fill_n(maxYSVDiff,colorComponents,0);
-	for(unsigned int i=0; i<vec1.size(); i++) {
-		for(unsigned int j=0; j<vec1.at(i).size(); j++) {
-			ysv1[j] = vec1.at(i).at(j);
-			ysv2[j] = vec2.at(i).at(j);
-			if(ysv1[j]>0 || ysv2[j]>0) {
-				double diff = abs(ysv1[j]-ysv2[j]);
-				maxYSVDiff[j] = max(diff,maxYSVDiff[j]);
-			}
-		}
-	}
+	fill_n(colorsHit,colorComponents,0);
+	double maxYSV = 196.0;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		String colorName = colorNameVec.at(i);
 		if(colorName!="LowBrown" && colorName!="LowGreyBrown" && colorName!="HighBrown" && colorName!="HighGreyBrown") {
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 				ysv1[j] = vec1.at(i).at(j);
 				ysv2[j] = vec2.at(i).at(j);
-				if(ysv1[j]>0 || ysv2[j]>0) {
-					totalYSV[j] = ysvWeights[j]*abs(ysv1[j]-ysv2[j])/maxYSVDiff[j];
-					//printf("(%f,%f,%f)",ysv1[j],ysv2[j],totalYSV[j]);
-					sum += totalYSV[j];
+				if(ysv1[0]>0 || ysv2[0]>0) {
+					if(j<componentSize) {
+						double val = abs(ysv1[j]-ysv2[j]);
+						if(j==0)
+							totalYSV[j] = ysvWeights.at<float>(j,0)*(val/maxYSV);
+						else
+							totalYSV[j] = ysvWeights.at<float>(j,0)*val;
+						//printf("(%f,%f,%f,%f,%f)",ysv1[j],ysv2[j],totalYSV[j],val,maxYSV);
+						sum += totalYSV[j];
+					}
 				}
 			}
 			if(ysv1[0]>0 || ysv2[0]>0) {
-				//printf("\n");
 				dist[i] = sum/3.0;
 				colorsHit[i] = 1;
-				//printf("%s: (%f),(%f),(%f)\n",colorName.c_str(),abs(ysv1[0]-ysv2[0])/maxYSVDiff[0],abs(ysv1[1]-ysv2[1])/maxYSVDiff[1],abs(ysv1[2]-ysv2[2])/maxYSVDiff[2]);
-				printf("%s,(%f,%f),(%f,%f),(%f,%f)\n",colorName.c_str(),ysv1[0],ysv2[0],ysv1[1],ysv2[1],ysv1[2],ysv2[2]);
+				printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],sum);
 			}
 		}
 		sum=0;
@@ -425,4 +416,58 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 	//cout << "Total:" << total << endl;
 	return avgDist;
 	//printf("Dr.Dube: %f\n",avgDist);
+}
+
+// test function for 2nd scheme of compareEntropy2
+double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec) {
+	int componentSize = 3;
+	int colorComponents = vec1.size();
+	double dist[colorComponents];
+	fill_n(dist,colorComponents,-1);
+	double sum=0, total=0, totalYSV[componentSize];
+	double ysv1[componentSize], ysv2[componentSize];
+	Mat ysvWeights(componentSize,1,CV_32F,Scalar(1.0)); //weight of importance of YSV
+	int colorsHit[colorComponents];
+	fill_n(colorsHit,colorComponents,0);
+	double maxYSV = 196.0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		String colorName = colorNameVec.at(i);
+		if(colorName!="LowBrown" && colorName!="LowGreyBrown" && colorName!="HighBrown" && colorName!="HighGreyBrown") {
+			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
+				ysv1[j] = vec1.at(i).at(j);
+				ysv2[j] = vec2.at(i).at(j);
+				if(ysv1[0]>0 || ysv2[0]>0) {
+					if(j<componentSize) {
+						double val = abs(ysv1[j]-ysv2[j]);
+						double maxVal = max(ysv1[j],ysv2[j]);
+						totalYSV[j] = ysvWeights.at<float>(j,0)*(val/maxVal);
+						if(maxVal==0) totalYSV[j] = 0;
+						//printf("(%f,%f,%f,%f,%f)",ysv1[j],ysv2[j],totalYSV[j],val,maxYSV);
+						sum += totalYSV[j];
+					}
+				}
+			}
+			if(ysv1[0]>0 || ysv2[0]>0) {
+				dist[i] = sum/3.0;
+				colorsHit[i] = 1;
+				printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],sum);
+			}
+		}
+		sum=0;
+	}
+	double avgDist=0;
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		if(colorsHit[i]==1) {
+			ysv1[0] = vec1.at(i).at(0);
+			ysv2[0] = vec2.at(i).at(0);
+			if(ysv1[0]>0 || ysv2[0]>0) {
+				sum = dist[i] * this->colorWeights2.at(i) * (max(ysv1[0],ysv2[0])/maxYSV);
+				avgDist +=sum;
+			}
+			if(this->debugMode)
+				printf("%s: %f [%f][%f](%f)\n",colorNameVec.at(i).c_str(),sum,ysv1[0],ysv2[0],dist[i]);
+		}
+	}
+	//printf("Dr.Dube: %f\n",avgDist);
+	return avgDist;
 }
