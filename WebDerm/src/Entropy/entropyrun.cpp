@@ -202,19 +202,15 @@ void Entropy::runCompareEntropyList(String fileList, String folder) {
 						resultsYSV = this->compareYSV(vec1,vec2,colorNameVec);
 						resultsT = this->compareT(vec1,vec2,colorNameVec);
 						resultsYSV = roundDecimal(resultsYSV,2);
-						if(resultsYSV>=0.75 && resultsT>=1.0) {
+						if(resultsYSV>=0.70 && resultsT>=1.0) {
 							countMatch++;
 							flagMatch=1;
 						}
-						//else if(resultsYSV>=0.86 && resultsT==0.0) {
-						//	countSortOfMatch++;
-						//	flagMatch=0;
-						//}
-						else if(resultsYSV>=0.75 && resultsT<=-1.0) {
+						else if(resultsYSV>=0.70 && resultsT==0.0) {
 							countSortOfMatch++;
 							flagMatch=0;
 						}
-						else if(resultsYSV<0.75 && resultsYSV>=0.60 && resultsT>=1.0) {
+						else if(resultsYSV<0.70 && resultsYSV>=0.60 && resultsT>=1.0) {
 							countSortOfMatch++;
 							flagMatch=0;
 						}
@@ -333,15 +329,15 @@ void Entropy::runCompareAllEntropy(String folder) {
 			resultsYSV = roundDecimal(resultsYSV,2);
 			resultsT = resultVecT.at(origPos.at(i));
 			name = nameVec.at(origPos.at(i));
-			if(resultsYSV>=0.75 && resultsT>=1.0) {
+			if(resultsYSV>=0.70 && resultsT>=1.0) {
 				countMatch++;
 				flagMatch=1;
 			}
-			else if(resultsYSV>=0.75 && resultsT<=-1.0) {
+			else if(resultsYSV>=0.70 && resultsT==0.0) {
 				countSortOfMatch++;
 				flagMatch=0;
 			}
-			else if(resultsYSV<0.75 && resultsYSV>=0.60 && resultsT>=1.0) {
+			else if(resultsYSV<0.70 && resultsYSV>=0.60 && resultsT>=1.0) {
 				countSortOfMatch++;
 				flagMatch=0;
 			}
@@ -453,5 +449,76 @@ void Entropy::test_runCompareEntropy2a(String targetName) {
 		for(unsigned int i=0; i<resultVec.size(); i++) {
 			printf("%s: %f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i));
 		}
+	}
+}
+
+void Entropy::test_runAllCompareEntropy2a(String folder) {
+	String input;
+	deque<deque<double> > vec1;
+	deque<String> colorNameVec;
+	cout << "Enter filename: ";
+	cin >> input;
+	if(this->loadEntropyFiles(input,vec1,colorNameVec)) {
+		deque<String> files;
+		deque<deque<double> > vec2;
+		deque<double> resultVecYSV;
+		deque<double> resultVecT;
+		deque<String> nameVec;
+		deque<int> origPos;
+		FileData fd;
+		String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
+		String filepath, name, inputName;
+		inputName = getFileName(input,"-");
+		double resultsYSV, resultsT;
+		int countMatch=0, countSortOfMatch=0, flagMatch=0;
+		fd.getFilesFromDirectory(folder,files);
+		for(unsigned int i=0; i<files.size(); i++) {
+			filepath = folder+files.at(i);
+			name = getFileName(files.at(i),"-");
+			this->loadEntropyFiles(filepath,vec2,colorNameVec);
+			resultsYSV = this->test_compareEntropy2a(vec1,vec2,colorNameVec);
+			resultsT = this->compareT(vec1,vec2,colorNameVec);
+			resultVecYSV.push_back(resultsYSV);
+			resultVecT.push_back(resultsT);
+			nameVec.push_back(name);
+			vec2.clear();
+			vec2.shrink_to_fit();
+			//printf("%d) %s: %f | %f => %d\n",i,name.c_str(),resultsYSV, resultsT, flagMatch);
+		}
+		jaysort(resultVecYSV,origPos);
+		FILE *fp;
+		String filename = inputName+"-ListOfMatchesBB.csv";
+		if(!fd.isFileExist(filename))
+			fp=fopen(filename.c_str(),"w");
+		else {
+			cout << "File exist! Overwrite? (y/n)" << endl;
+			cin >> input;
+			if(input=="y")
+				fp=fopen(filename.c_str(),"w");
+		}
+		for(unsigned int i=0; i<resultVecYSV.size(); i++) {
+			resultsYSV = resultVecYSV.at(i);
+			resultsYSV = roundDecimal(resultsYSV,2);
+			resultsT = resultVecT.at(origPos.at(i));
+			name = nameVec.at(origPos.at(i));
+			if(resultsYSV>=0.70 && resultsT>=1.0) {
+				countMatch++;
+				flagMatch=1;
+			}
+			else if(resultsYSV>=0.70 && resultsT==0.0) {
+				countSortOfMatch++;
+				flagMatch=0;
+			}
+			else if(resultsYSV<0.70 && resultsYSV>=0.60 && resultsT>=1.0) {
+				countSortOfMatch++;
+				flagMatch=0;
+			}
+			else {
+				flagMatch=-1;
+			}
+			printf("%d) %s: %f | %f => %d\n",i,name.c_str(),resultsYSV, resultsT, flagMatch);
+			fprintf(fp,"%s,%f,%f,%d\n",name.c_str(),resultsYSV,resultsT,flagMatch);
+		}
+		fclose(fp);
 	}
 }

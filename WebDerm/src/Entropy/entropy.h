@@ -15,6 +15,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Graph/graph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/transpose.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 
@@ -84,10 +85,12 @@ public:
 
 	//demo_entropy.cpp
 	void demo_runCompareEntropy();
+	void sortMatch(deque<double> &ysvVec, deque<double> &tVec, deque<int> &origPos);
 
 	//testing
 	double test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 	void test_runCompareEntropy2a(String targetName);
+	void test_runAllCompareEntropy2a(String folder);
 
 };
 

@@ -157,19 +157,19 @@ double Entropy::fn_compareT(deque<double> t1, deque<double> t2, double weight) {
 	return dist;*/
 	double interval = 0.33; //this interval is the scale interval for shapeMetric
 	unsigned int idx1=0, idx2=0;
-	double max1=t1.at(0), max2=t2.at(0);
+	double val1=t1.at(0), val2=t2.at(0);
 
-	double result=0.0;
-	if(max1==max2 && max(max1,max2)==0)
-		result = -1.0;
-	else if(max1==max2)
+	double result=-1.0;
+	if(val1==val2 && max(val1,val2)==0)
+		result = 0.0;
+	else if(val1==val2)
 		result = 1.0;
 	else {
-		double val = round((max(max1,max2)-min(max1,max2))/interval);
-		if(val<=1.0 && min(max1,max2)!=0)
+		double val = round((max(val1,val2)-min(val1,val2))/interval);
+		if(val<=1.0 && min(val1,val2)!=0)
 			result = 1.0;
 		else
-			result = 0.0;
+			result = -1.0;
 	}
 	return result;
 }
@@ -239,7 +239,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 				Y1 *= (ysv1[1] / S_PERCEPTION);
 				Y2 *= (ysv2[1] / S_PERCEPTION);
 				//Y_PERCEPTION /= (max(ysv1[1],ysv2[1])/S_PERCEPTION);
-				//cout << colorName << ":" << Y2 << endl;
+				//printf("%s: Y1: %f | Y2: %f\n",colorName.c_str(),Y1,Y2);
 				Y_PERCEPTION = 2.0;
 			}
 
@@ -308,6 +308,7 @@ double Entropy::compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec
 		if(colorsHit[i]==1) {
 			normWeights[i] = newColorWeights.at(i)/newWeightTotal;
 			normSignifWeight[i] = normWeights[i] * totalColorsHit;
+			//printf("%f = %f / %f\n",normWeights[i],newColorWeights.at(i),newWeightTotal);
 		}
 	}
 	double colorSignif[this->colorWeights.size()];
@@ -371,7 +372,7 @@ double Entropy::compareEntropy2(deque<deque<double> > vec1, deque<deque<double> 
 	Mat ysvWeights(componentSize,1,CV_32F,Scalar(1.0)); //weight of importance of YSV
 	int colorsHit[colorComponents];
 	fill_n(colorsHit,colorComponents,0);
-	double maxYSV = 196.0;
+	double maxYSV = 400.0;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		String colorName = colorNameVec.at(i);
 		if(colorName!="LowBrown" && colorName!="LowGreyBrown" && colorName!="HighBrown" && colorName!="HighGreyBrown") {
@@ -450,7 +451,7 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 			if(ysv1[0]>0 || ysv2[0]>0) {
 				dist[i] = sum/3.0;
 				colorsHit[i] = 1;
-				printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],sum);
+				//printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],sum);
 			}
 		}
 		sum=0;
@@ -462,6 +463,8 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 			ysv2[0] = vec2.at(i).at(0);
 			if(ysv1[0]>0 || ysv2[0]>0) {
 				sum = dist[i] * this->colorWeights2.at(i) * (max(ysv1[0],ysv2[0])/maxYSV);
+				//sum = dist[i] * (max(ysv1[0],ysv2[0])/maxYSV);
+				avgDist +=sum;
 				avgDist +=sum;
 			}
 			if(this->debugMode)

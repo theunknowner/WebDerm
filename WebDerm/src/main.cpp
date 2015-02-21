@@ -216,20 +216,21 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	String name = "urticaria5";
+	String name = "herpes12";
 	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
 	en.setDebugMode(true);
 	//en.runCompareEntropy(name);
-	en.runCompareEntropy2(name);
-	//en.test_runCompareEntropy2a(name);
+	//en.runCompareEntropy2(name);
+	en.test_runCompareEntropy2a(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
-
+	//en.test_runAllCompareEntropy2a(folder);
+	//en.demo_runCompareEntropy();
 	/*
 	Entropy en;
 	FileData fd;

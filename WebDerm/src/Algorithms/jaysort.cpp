@@ -31,12 +31,12 @@ void jaysort(deque<double> &vec, deque<int> &origPos) {
 					}
 				}
 				else {
-					if(val>=sortedVec.at(j) && val<sortedVec.at(j+1)) {
+					if(val>=sortedVec.at(j) && val<=sortedVec.at(j+1)) {
 						sortedVec.insert(sortedVec.begin()+j+1,val);
 						origPos.insert(origPos.begin()+j+1,i);
 						break;
 					}
-					if(val<=sortedVec.at(j)) {
+					else if(val<=sortedVec.at(j)) {
 						sortedVec.push_front(val);
 						origPos.push_front(i);
 						break;
@@ -140,4 +140,68 @@ void jaysort(Mat &src, Mat &pos) {
 	}
 	src = sortedMat;
 	pos = sortedPos;
+}
+
+void jaysort(deque<deque<double> > &vec, deque<int> &origPos, deque<int> sortKey) {
+	for(unsigned int k=0; k<sortKey.size(); k++) {
+		deque<deque<double> > sortedVec(vec.size(),deque<double>(0,0));
+		deque<int> pos;
+		int key = sortKey.at(k);
+		for(unsigned int i=0; i<vec.at(key).size(); i++) {
+			double val=vec.at(key).at(i);
+			if(sortedVec.at(key).size()==0) {
+				for(unsigned int m=0; m<vec.size(); m++) {
+					double val2 = vec.at(m).at(i);
+					sortedVec.at(m).push_back(val2);
+				}
+				pos.push_back(i);
+			}
+			else {
+				for(unsigned int j=0; j<sortedVec.at(key).size(); j++) {
+					if((sortedVec.at(key).size()-j)<=1) {
+						if(val>=sortedVec.at(key).at(j)) {
+							for(unsigned int m=0; m<vec.size(); m++) {
+								double val2 = vec.at(m).at(i);
+								sortedVec.at(m).push_back(val2);
+							}
+							pos.push_back(i);
+							break;
+						}
+						else {
+							for(unsigned int m=0; m<vec.size(); m++) {
+								double val2 = vec.at(m).at(i);
+								sortedVec.at(m).push_front(val2);
+							}
+							pos.push_front(i);
+							break;
+						}
+					}
+					else {
+						if(val>=sortedVec.at(key).at(j) && val<=sortedVec.at(key).at(j+1)) {
+							for(unsigned int m=0; m<vec.size(); m++) {
+								double val2 = vec.at(m).at(i);
+								sortedVec.at(m).insert(sortedVec.at(m).begin()+j+1,val2);
+							}
+							pos.insert(pos.begin()+j+1,i);
+							break;
+						}
+						else if(val<=sortedVec.at(key).at(j)) {
+							for(unsigned int m=0; m<vec.size(); m++) {
+								double val2 = vec.at(m).at(i);
+								sortedVec.at(m).push_front(val2);
+							}
+							pos.push_front(i);
+							break;
+						}
+					}
+				}
+			}
+		}
+		vec = sortedVec;
+		if(origPos.size()==0)
+			origPos = pos;
+		pos.clear();
+		sortedVec.clear();
+		sortedVec.shrink_to_fit();
+	}
 }
