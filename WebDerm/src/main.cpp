@@ -59,7 +59,21 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	img = runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
-	/*
+
+	deque<deque<String> > vec;
+	FileData fd;
+	fd.loadFileMatrix("/home/jason/Desktop/Matlab Files/img2.csv",vec);
+	Mat matImg(vec.size(), vec.at(0).size(),CV_8U,Scalar(0));
+	Mat src = imread("/home/jason/Desktop/Matlab Files/img3.png",0);
+	for(unsigned int i=0; i<vec.size(); i++) {
+		for(unsigned int j=0; j<vec.at(i).size(); j++) {
+			int val = atoi(vec.at(i).at(j).c_str());
+			matImg.at<uchar>(i,j) = val;
+		}
+	}
+
+	writeSeq2File(src,"uchar","img3");
+/*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
 
@@ -215,8 +229,8 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-
-	String name = "herpes12";
+/*
+	String name = "lph15";
 	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
@@ -230,7 +244,6 @@ int main(int argc,char** argv)
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
 	//en.test_runAllCompareEntropy2a(folder);
-	//en.demo_runCompareEntropy();
 	/*
 	Entropy en;
 	FileData fd;

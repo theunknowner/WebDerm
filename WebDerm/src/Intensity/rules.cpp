@@ -11,11 +11,107 @@ const int ruleCount = 11;
 vector<int> ruleFlags(ruleCount,1);
 
 /** general rule #1 - Shade Contrast with IndexChange**/
+double rule1(FileData &fd, String &newShade) {
+	bool flag=false;
+	double ruleNum=1.0;
+	Color c;
+	Shades sh;
+	int localScanSize = 10;
+	double indexChangeThresh = 2.25; //thresh for next shade level per indexChange
+	Point pt = fd.pt;
+	double ccCurr=0;
+	double deg0CC=0, deg45CC=0, deg90CC=0;
+	deque<double> deg0MinMaxVec;
+	deque<double> deg45MinMaxVec;
+	deque<double> deg90MinMaxVec;
+
+	if(pt.x>0 && pt.y>0) {
+		try {
+			ccCurr = fd.smoothIntensityVec.at(pt.y).at(pt.x);
+			int j=pt.x-1;
+			int x = j;
+			int endY = (pt.y-localScanSize);
+			//loops going outwards from start point(x,y)
+			for(int i=(pt.y-1); i>=endY; i--) {
+				if(x<0 && j<0 && i<0) break;
+				if(x>=0) {
+					deg0CC = fd.smoothIntensityVec.at(pt.y).at(x);
+					deg0MinMaxVec.push_back(deg0CC);
+				}
+				--x;
+				if(j>=0 && i>=0) {
+					deg45CC = fd.smoothIntensityVec.at(i).at(j);
+					deg45MinMaxVec.push_back(deg45CC);
+				}
+				--j;
+				if(i>=0) {
+					deg90CC = fd.smoothIntensityVec.at(i).at(pt.x);
+					deg90MinMaxVec.push_back(deg90CC);
+				}
+			}
+		} catch (const std::out_of_range &oor) {
+			printf("Rule 1 out of range!\n");
+			printf("smoothIntensityVec.Size: %lu\n",fd.smoothIntensityVec.size());
+			printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
+			exit(1);
+		}
+
+		int deg0Index=0, deg45Index=0, deg90Index=0;
+		double deg0Gradient=0, deg45Gradient=0, deg90Gradient=0;
+		deg0Gradient = ccCurr - deg0MinMaxVec.front();
+		deg45Gradient = ccCurr - deg45MinMaxVec.front();
+		deg90Gradient = ccCurr - deg90MinMaxVec.front();
+		if(deg0Gradient<=0)
+			deg0Index = distance(deg0MinMaxVec.begin(),max_element(deg0MinMaxVec.begin(),deg0MinMaxVec.end()));
+		else
+			deg0Index = distance(deg0MinMaxVec.begin(),min_element(deg0MinMaxVec.begin(),deg0MinMaxVec.end()));
+
+		if(deg45Gradient<=0)
+			deg45Index = distance(deg45MinMaxVec.begin(),max_element(deg45MinMaxVec.begin(),deg45MinMaxVec.end()));
+		else
+			deg45Index = distance(deg45MinMaxVec.begin(),min_element(deg45MinMaxVec.begin(),deg45MinMaxVec.end()));
+
+		if(deg90Gradient<=0)
+			deg90Index = distance(deg90MinMaxVec.begin(),max_element(deg90MinMaxVec.begin(),deg90MinMaxVec.end()));
+		else
+			deg90Index = distance(deg90MinMaxVec.begin(),min_element(deg90MinMaxVec.begin(),deg90MinMaxVec.end()));
+
+		try {
+			deg0CC = deg0MinMaxVec.at(deg0Index);
+			deg45CC = deg45MinMaxVec.at(deg45Index);
+			deg90CC = deg90MinMaxVec.at(deg90Index);
+		} catch(const std::out_of_range &oor) {
+			printf("Rule 1 out of range!\n");
+			printf("Point(%d,%d)\n",fd.pt.x,fd.pt.y);
+			printf("deg0MinMaxVec.size(): %lu; Index: %d\n",deg0MinMaxVec.size(),deg0Index);
+			printf("deg45MinMaxVec.size(): %lu; Index: %d\n",deg45MinMaxVec.size(),deg45Index);
+			printf("deg90MinMaxVec.size(): %lu; Index: %d\n",deg90MinMaxVec.size(),deg90Index);
+			exit(1);
+		}
+		double range = fd.maxIntensity - fd.minIntensity;
+		double newInterval = range/fd.totalShades;
+		double deg0IndexChange = myRound(ccCurr-deg0CC)/newInterval;
+		double deg45IndexChange = myRound(ccCurr-deg45CC)/newInterval;
+		double deg90IndexChange = myRound(ccCurr-deg90CC)/newInterval;
+		double indexChange = max(deg0IndexChange,max(deg45IndexChange,deg90IndexChange));
+		if(abs(indexChange)>=indexChangeThresh) {
+			int index = sh.getShadeIndex(newShade);
+			index += (indexChange/indexChangeThresh);
+			newShade = sh.getShade(index);
+			flag=true;
+		}
+	}
+	if(flag==true) return ruleNum;
+
+	return 0;
+}
+
+/** general rule #1 - Shade Contrast with IndexChange**/
 double rule1(double &indexChange, String &shade, String &newShade) {
 	Shades sh;
 	bool flag=false;
 	double ruleNum=1;
-	double indexChangeThresh = 2.25; // different than thresh for contrast of colors
+	double indexChangeThresh = 1.5; // different than thresh for contrast of colors
 	if(abs(indexChange)>=indexChangeThresh) {
 		int index = sh.getShadeIndex(shade);
 		index += (indexChange/indexChangeThresh);
@@ -1238,7 +1334,7 @@ bool specialRules(FileData &fd, String &pix, double &indexChange, String &shade,
 	deque<double> ruleNumVec;
 
 	if(ruleFlags.at(1)==1)
-		ruleNumVec.push_back(rule1(indexChange, shade, newShade));
+		ruleNumVec.push_back(rule1(fd, newShade));
 	if(ruleFlags.at(2)==1)
 		ruleNumVec.push_back(rule2(fd,newPix));
 	if(ruleFlags.at(3)==1)

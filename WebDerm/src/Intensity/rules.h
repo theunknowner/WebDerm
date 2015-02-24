@@ -15,6 +15,7 @@
 #include "intensity.h"
 
 class FileData;
+double rule1(FileData &fd, String &newShade);
 double rule3(FileData &fd, String &newPix, String &newShade);
 double rule5(FileData &fd, String &newPix, String &newShade);
 double rule5(FileData &fd);

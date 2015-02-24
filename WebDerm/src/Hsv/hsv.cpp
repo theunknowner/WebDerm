@@ -103,4 +103,3 @@ int * Hsv::hsv2rgb(double hue, double sat, double val) {
 	results[2] = (int)RGB[2];
 	return results;
 }
-

@@ -93,7 +93,7 @@ void Entropy::runEntropy() {
 		rgb.importThresholds();
 		sh.importThresholds();
 		this->importEntropyThresholds();
-		fd.ksize=Size(5,5);
+		fd.ksize=size;
 		this->entSize = entSize;
 		this->shapeFn(fd);
 		eyeFn(fd,entSize,"","");
@@ -471,6 +471,8 @@ void Entropy::test_runAllCompareEntropy2a(String folder) {
 		inputName = getFileName(input,"-");
 		double resultsYSV, resultsT;
 		int countMatch=0, countSortOfMatch=0, flagMatch=0;
+		String metricT_String="";
+		String matchString="";
 		fd.getFilesFromDirectory(folder,files);
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
@@ -501,23 +503,31 @@ void Entropy::test_runAllCompareEntropy2a(String folder) {
 			resultsYSV = roundDecimal(resultsYSV,2);
 			resultsT = resultVecT.at(origPos.at(i));
 			name = nameVec.at(origPos.at(i));
+			if(resultsT>=1.0) metricT_String = "Circle";
+			if(resultsT==0.0) metricT_String = "Varying Circle";
+			if(resultsT==-0.5) metricT_String = "Random";
+			if(resultsT<=-1.0) metricT_String = "Random/Circle";
 			if(resultsYSV>=0.70 && resultsT>=1.0) {
 				countMatch++;
 				flagMatch=1;
+				matchString="Match";
 			}
-			else if(resultsYSV>=0.70 && resultsT==0.0) {
+			else if(resultsYSV>=0.70 && resultsT==-0.5) {
 				countSortOfMatch++;
 				flagMatch=0;
+				matchString="Partial";
 			}
 			else if(resultsYSV<0.70 && resultsYSV>=0.60 && resultsT>=1.0) {
 				countSortOfMatch++;
 				flagMatch=0;
+				matchString="Partial";
 			}
 			else {
 				flagMatch=-1;
+				matchString="No_Match";
 			}
-			printf("%d) %s: %f | %f => %d\n",i,name.c_str(),resultsYSV, resultsT, flagMatch);
-			fprintf(fp,"%s,%f,%f,%d\n",name.c_str(),resultsYSV,resultsT,flagMatch);
+			printf("%d) %s: %f | %s => %s\n",i,name.c_str(),resultsYSV, metricT_String.c_str(), matchString.c_str());
+			fprintf(fp,"%s,%f,%s,%s\n",name.c_str(),resultsYSV,metricT_String.c_str(),matchString.c_str());
 		}
 		fclose(fp);
 	}

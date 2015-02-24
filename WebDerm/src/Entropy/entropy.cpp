@@ -212,7 +212,8 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 						ratioPtsList.at(c).at(d).push_back(Point(x1,y1));
 
 						cellCount.at(c).at(d)++;
-						totalPopulation.at(c).at(d) += smoothRatio[y1][x1][c][d];
+						if(ratio[y1][x1][c][d]>min)
+							totalPopulation.at(c).at(d) += ratio[y1][x1][c][d];
 						populationDensity.at(c).at(d) = ((cellCount.at(c).at(d)-1)*populationDensity.at(c).at(d)+smoothRatio[y1][x1][c][d])/cellCount.at(c).at(d);
 						/**to calc entropy of density**/
 						binNum = floor((smoothRatio[y1][x1][c][d]*100)/5); //should I round it?

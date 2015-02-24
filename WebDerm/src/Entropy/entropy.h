@@ -85,7 +85,7 @@ public:
 
 	//demo_entropy.cpp
 	void demo_runCompareEntropy();
-	void sortMatch(deque<double> &ysvVec, deque<double> &tVec, deque<int> &origPos);
+	void demo_showShape(String name);
 
 	//testing
 	double test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);

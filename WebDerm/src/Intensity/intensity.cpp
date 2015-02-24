@@ -515,7 +515,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 				fd.absRatioVec.push_back(roundDecimal(currRatio,2));
 				double h=0,s=0,l=0;
 				if(pix2!="Zero") {
-					fd.pt.x = j; fd.pt.y=i;
+					fd.pt = Point(j,i);
 					loc = j-(localIndexes.size()-index);
 					ratioLoc  = j-(localRatios.size()-localRatioIndex);
 					bool flag2 = specialRules(fd,pix,indexChange,shade,ratioLoc,loc,ruleNo);
