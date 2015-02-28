@@ -64,7 +64,7 @@ public:
 	int countEdgeTouching(Mat src, int edgeSize);
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 
-	vector<Mat> runShapeMorphTest(deque<String> &nameVec, deque<int> &labels);
+	void getShapeUsingColor(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */

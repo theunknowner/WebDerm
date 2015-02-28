@@ -28,6 +28,7 @@ class Poly {
 public:
 	vector<double> polyfit(const vector<double>& oX, const vector<double>& oY, int nDegree );
 	vector<double> polyval(const vector<double>& oCoeff, const vector<double>& oX );
+	vector<double> polyder(vector<double> &p);
 
 	int lineIntersect(vector<double> &vec);
 

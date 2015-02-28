@@ -7,6 +7,7 @@
 
 #include "poly.h"
 
+//! returns coeff in ascending power
 vector<double> Poly::polyfit(const vector<double>& oX, const vector<double>& oY, int nDegree ) {
 	using namespace boost::numeric::ublas;
 
@@ -78,6 +79,18 @@ vector<double> Poly::polyval( const vector<double>& oCoeff, const vector<double>
 	}
 
 	return oY;
+}
+
+//! returns derivative of polynomial
+vector<double> Poly::polyder(vector<double> &p) {
+	vector<double> pDeriv;
+	int nDegree = p.size()-1;
+	for(int i=0; i<=nDegree; i++) {
+		double val = p.at(i)*i;
+		if(val!=0)
+			pDeriv.push_back(val);
+	}
+	return pDeriv;
 }
 
 //! check if a line from start-end point intersects the curve

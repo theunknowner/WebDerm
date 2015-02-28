@@ -1513,50 +1513,6 @@ Mat ShapeMorph::densityDetection(Mat src, double q) {
 	return result;
 }
 
-vector<Mat> ShapeMorph::runShapeMorphTest(deque<String> &nameVec, deque<int> &labels) {
-	fstream fs("/home/jason/Desktop/workspace/Test_Images.csv");
-	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
-	vector<Mat> samplesVec;
-	if(fs.is_open()) {
-		String temp;
-		deque<String> vec;
-		while(getline(fs,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0)
-					nameVec.push_back(vec.at(i));
-				if(i==1)
-					labels.push_back(atoi(vec.at(i).c_str()));
-			}
-			vec.clear();
-		}
-		for(unsigned int i=0; i<nameVec.size(); i++) {
-			String file = folder + nameVec.at(i) + ".jpg";
-			Mat img = runResizeImage(file,Size(140,140),0);
-			Size size(3,3);
-			img = runColorNormalization(img);
-			cvtColor(img,img,CV_BGR2GRAY);
-			Mat img2 = this->prepareImage(img);
-			Mat result2 = this->gsReconUsingRmin2(img2);
-			Mat img3 = this->densityDetection(result2,0.999);
-			deque<Mat> featureVec = this->liquidFeatureExtraction(img3);
-			int largest=0, idx=0;
-			for(unsigned int i=0; i<featureVec.size(); i++) {
-				if(countNonZero(featureVec.at(i))>largest) {
-					largest = countNonZero(featureVec.at(i));
-					idx = i;
-				}
-			}
-			Mat img5 = this->dilation(featureVec.at(idx),Size(5,5));
-			samplesVec.push_back(img5);
-		}
-	}
-	else {
-		cout << "runShapeMorphTest() can't open file!" << endl;
-	}
-	return samplesVec;
-}
-
 //! combines and/or filters features
 void ShapeMorph::combineFilterFeatures(vector<Mat> &featureVec) {
 	vector<Mat> _featureVec = featureVec;
@@ -1619,4 +1575,52 @@ int ShapeMorph::countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize)
 	int totalEdgePix = topEdgePix+leftEdgePix+bottomEdgePix+rightEdgePix+
 			topLeftEdgePix+topRightEdgePix+bottomLeftEdgePix+bottomRightEdgePix;
 	return totalEdgePix;
+}
+
+void ShapeMorph::getShapeUsingColor(Mat src) {
+	Hsl hsl;
+	Poly poly;
+	vector<double> hVec;
+	vector<double> sVec;
+	vector<double> lVec;
+	vector<double> xVec(src.cols,0);
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			int r = src.at<Vec3b>(i,j)[2];
+			int g = src.at<Vec3b>(i,j)[1];
+			int b = src.at<Vec3b>(i,j)[0];
+			double *HSL = hsl.rgb2hsl(r,g,b);
+			double hVal = findDegreeDistance(HSL[0],0.0);
+			double sVal = HSL[1] * 100.0;
+			double lVal = HSL[2] * 100.0;
+			hVec.push_back(hVal);
+			sVec.push_back(sVal);
+			lVec.push_back(lVal);
+			xVec.at(j) = j+1;
+		}
+		vector<double> hFit = poly.polyfit(xVec,hVec,15);
+		vector<double> sFit = poly.polyfit(xVec,sVec,15);
+		vector<double> lFit = poly.polyfit(xVec,lVec,15);
+		vector<double> hDeriv = poly.polyder(hFit);
+		vector<double> sDeriv = poly.polyder(sFit);
+		vector<double> lDeriv = poly.polyder(lFit);
+		for(unsigned int j=0; j<xVec.size(); j++) {
+			double hTotal=0, sTotal=0, lTotal=0;
+			for(unsigned int k=0; k<hDeriv.size(); k++) {
+				hTotal += (hDeriv.at(k) * pow(xVec.at(j),k));
+				sTotal += (sDeriv.at(k) * pow(xVec.at(j),k));
+				lTotal += (lDeriv.at(k) * pow(xVec.at(j),k));
+			}
+			double hProd = hTotal*(1./6);
+			double sProd = sTotal*(1./5);
+			double lProd = lTotal*(1./4);
+			double totalProd = hTotal;
+			if(i==27) {
+				printf("X: %.f, hProd: %f, sProd: %f, lProd: %f, TotalProd: %f\n",xVec.at(j),hProd,sProd,lProd,totalProd);
+			}
+		}
+		hVec.clear();
+		sVec.clear();
+		lVec.clear();
+	}
 }

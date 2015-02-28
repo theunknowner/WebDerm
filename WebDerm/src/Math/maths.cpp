@@ -248,3 +248,9 @@ double eucDist(Point pt1, Point pt2) {
 	result = sqrt(result);
 	return result;
 }
+
+//returns the least distance between the two degrees
+double findDegreeDistance(double deg1, double deg2) {
+	double diff = fabs(deg1-deg2);
+	return min(360.0 - diff, diff);
+}

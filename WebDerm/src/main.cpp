@@ -49,8 +49,8 @@ int main(int argc,char** argv)
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
-	Mat img, img2,img3, img4, img5;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/urticaria1.jpg",Size(140,140),0);
+	Mat img, img2,img3, img4, img5, imgGray;
+	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp11.jpg",Size(140,140),0);
 	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
 	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
 	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -58,21 +58,8 @@ int main(int argc,char** argv)
 	ShapeMorph sm;
 	Size size(5,5);
 	img = runColorNormalization(img);
-	cvtColor(img,img,CV_BGR2GRAY);
+	cvtColor(img,imgGray,CV_BGR2GRAY);
 
-	deque<deque<String> > vec;
-	FileData fd;
-	fd.loadFileMatrix("/home/jason/Desktop/Matlab Files/img2.csv",vec);
-	Mat matImg(vec.size(), vec.at(0).size(),CV_8U,Scalar(0));
-	Mat src = imread("/home/jason/Desktop/Matlab Files/img3.png",0);
-	for(unsigned int i=0; i<vec.size(); i++) {
-		for(unsigned int j=0; j<vec.at(i).size(); j++) {
-			int val = atoi(vec.at(i).at(j).c_str());
-			matImg.at<uchar>(i,j) = val;
-		}
-	}
-
-	writeSeq2File(src,"uchar","img3");
 /*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
