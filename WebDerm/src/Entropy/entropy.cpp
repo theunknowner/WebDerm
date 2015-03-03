@@ -31,6 +31,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 	int height = fd.colorVec.size()/ksize.height;
 	int width = fd.colorVec.at(0).size()/ksize.width;
 	int innerHeight = allColors.size();
+
 	int innerWidth = g_Shades2.size();
 	vec = createDeque4D(height,width,innerHeight,innerWidth,0.);
 	vec2 = createDeque4D(height,width,innerHeight,innerWidth,0.);
@@ -167,17 +168,24 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 	}
 	deque< deque<int> > cellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	deque< deque<int> > targetCellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
-	int binSize = 21;
-	deque< deque<double> > totalBins(allColors.size(),deque<double>(g_Shades2.size(),0));
-	deque<deque<deque<deque<double> > > > densityBin(allColors.size(),deque<deque<deque<double> > >(g_Shades2.size(),deque<deque<double> >(binSize,deque<double>(1,-1))));
-	int binNum = 0;
 	deque<deque<deque<Point> > > ratioPtsList(allColors.size(), deque<deque<Point> >(g_Shades2.size(),deque<Point>(1,Point(-1,-1))));
-	deque<deque<deque<double> > > smoothRatioSingleList(allColors.size(), deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
+	deque<deque<deque<double> > > ratioSingleList(allColors.size(), deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
 	deque<deque<deque<deque<double> > > > smoothRatioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	deque<deque<deque<deque<double> > > > ratioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
 	int x1=0,y1=0,minRow=0,minCol=0;
 	double count=0, min=0.03;
 	double outlierThresh = 0.05;
+	for(int y=0; y<height; y++) {
+		for(int x=0; x<width; x++) {
+			for(int c=0; c<innerHeight; c++) {
+				for(int d=0; d<innerWidth; d++) {
+					if(ratio[y][x][c][d]>min) {
+						totalPopulation.at(c).at(d) += ratio[y][x][c][d];
+					}
+				}
+			}
+		}
+	}
 	while(y1<height) {
 		minRow=maxRow=y1;
 		if((minRow-1)>=0) minRow-=1;
@@ -202,28 +210,18 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 				for(int d=0; d<innerWidth; d++) {
 					smoothRatio[y1][x1][c][d] /=count;
 					if(ratio[y1][x1][c][d]>min) {
-						if(smoothRatioSingleList.at(c).at(d).size()>0) {
-							if(smoothRatioSingleList.at(c).at(d).at(0)==-1) {
-								smoothRatioSingleList.at(c).at(d).pop_front();
+						if(ratioSingleList.at(c).at(d).size()>0) {
+							if(ratioSingleList.at(c).at(d).at(0)==-1) {
+								ratioSingleList.at(c).at(d).pop_front();
 								ratioPtsList.at(c).at(d).pop_front();
 							}
 						}
-						smoothRatioSingleList.at(c).at(d).push_back(smoothRatio[y1][x1][c][d]);
+						ratioSingleList.at(c).at(d).push_back(ratio[y1][x1][c][d]);
 						ratioPtsList.at(c).at(d).push_back(Point(x1,y1));
 
 						cellCount.at(c).at(d)++;
 						if(ratio[y1][x1][c][d]>min)
-							totalPopulation.at(c).at(d) += ratio[y1][x1][c][d];
-						populationDensity.at(c).at(d) = ((cellCount.at(c).at(d)-1)*populationDensity.at(c).at(d)+smoothRatio[y1][x1][c][d])/cellCount.at(c).at(d);
-						/**to calc entropy of density**/
-						binNum = floor((smoothRatio[y1][x1][c][d]*100)/5); //should I round it?
-						if(densityBin.at(c).at(d).at(binNum).size()==1) {
-							if(densityBin.at(c).at(d).at(binNum).at(0)==-1) {
-								deque<double>().swap(densityBin.at(c).at(d).at(binNum));
-							}
-						}
-						densityBin.at(c).at(d).at(binNum).push_back(smoothRatio[y1][x1][c][d]);
-						++totalBins.at(c).at(d);
+							populationDensity.at(c).at(d) += (ratio[y1][x1][c][d] * ratio[y1][x1][c][d] / totalPopulation.at(c).at(d));
 						if(targetColor!="" && targetShade!="") {
 							int index = rgb.getColorIndex(targetColor);
 							int shadeIndex = sh.getShadeIndex2(targetShade);
@@ -256,34 +254,34 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 	deque<Point> sortedPtsList;
 	for(i=0; i<innerHeight; i++) {
 		for (j=0; j<innerWidth; j++) {
-			if(smoothRatioSingleList.at(i).at(j).size()>0) {
-				if(smoothRatioSingleList.at(i).at(j).at(0)!=-1) {
+			if(ratioSingleList.at(i).at(j).size()>0) {
+				if(ratioSingleList.at(i).at(j).at(0)!=-1) {
 					if(sortedList.size()==0) {
-						sortedList.push_back(smoothRatioSingleList.at(i).at(j).at(0));
+						sortedList.push_back(ratioSingleList.at(i).at(j).at(0));
 						sortedPtsList.push_back(ratioPtsList.at(i).at(j).at(0));
 					}
-					for(unsigned int d=1; d<smoothRatioSingleList.at(i).at(j).size(); d++) {
+					for(unsigned int d=1; d<ratioSingleList.at(i).at(j).size(); d++) {
 						for(unsigned int e=0; e<sortedList.size(); e++) {
 							if((sortedList.size()-e)<=1) {
-								if(smoothRatioSingleList.at(i).at(j).at(d)>=sortedList.at(e)) {
-									sortedList.push_back(smoothRatioSingleList.at(i).at(j).at(d));
+								if(ratioSingleList.at(i).at(j).at(d)>=sortedList.at(e)) {
+									sortedList.push_back(ratioSingleList.at(i).at(j).at(d));
 									sortedPtsList.push_back(ratioPtsList.at(i).at(j).at(d));
 									break;
 								}
 								else {
-									sortedList.push_front(smoothRatioSingleList.at(i).at(j).at(d));
+									sortedList.push_front(ratioSingleList.at(i).at(j).at(d));
 									sortedPtsList.push_front(ratioPtsList.at(i).at(j).at(d));
 									break;
 								}
 							}
 							else {
-								if(smoothRatioSingleList.at(i).at(j).at(d)>=sortedList.at(e) && smoothRatioSingleList.at(i).at(j).at(d)<=sortedList.at(e+1)) {
-									sortedList.insert(sortedList.begin()+e+1,smoothRatioSingleList.at(i).at(j).at(d));
+								if(ratioSingleList.at(i).at(j).at(d)>=sortedList.at(e) && ratioSingleList.at(i).at(j).at(d)<=sortedList.at(e+1)) {
+									sortedList.insert(sortedList.begin()+e+1,ratioSingleList.at(i).at(j).at(d));
 									sortedPtsList.insert(sortedPtsList.begin()+e+1,ratioPtsList.at(i).at(j).at(d));
 									break;
 								}
-								if(smoothRatioSingleList.at(i).at(j).at(d)<=sortedList.at(0)) {
-									sortedList.push_front(smoothRatioSingleList.at(i).at(j).at(d));
+								if(ratioSingleList.at(i).at(j).at(d)<=sortedList.at(0)) {
+									sortedList.push_front(ratioSingleList.at(i).at(j).at(d));
 									sortedPtsList.push_front(ratioPtsList.at(i).at(j).at(d));
 									break;
 								}
@@ -308,43 +306,23 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 			}
 		}//end for innerWidth
 	}//end for innerHeight
-	smoothRatioSingleList.clear();
-	smoothRatioSingleList.resize(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
-	x1=0,y1=0,minRow=0,minCol=0,maxRow=0,maxCol=0,count=0;
+	ratioSingleList.clear();
+	ratioSingleList.resize(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
+	x1=0;y1=0;minRow=0;minCol=0;maxRow=0;maxCol=0;
 	while(y1<height) {
-		minRow=maxRow=y1;
-		if((minRow-1)>=0) minRow-=1;
-		if((maxRow+1)<height) maxRow+=1;
 		while(x1<width) {
-			minCol=maxCol=x1;
-			if((minCol-1)>=0) minCol-=1;
-			if((maxCol+1)<width) maxCol+=1;
-			for(int a=minRow; a<=maxRow; a++)  {
-				for(int b=minCol; b<=maxCol; b++)	 {
-					for(int c=0; c<innerHeight; c++) {
-						for(int d=0; d<innerWidth; d++) {
-							if(ratioOutlierRm[y1][x1][c][d]>min) {
-								smoothRatioOutlierRm[y1][x1][c][d] += ratioOutlierRm[a][b][c][d];
-							}
-						}
-					}
-					++count;
-				}
-			}
 			for(int c=0; c<innerHeight; c++) {
 				for(int d=0; d<innerWidth; d++) {
-					smoothRatioOutlierRm[y1][x1][c][d] /=count;
 					if(ratioOutlierRm[y1][x1][c][d]>min) {
-						if(smoothRatioSingleList.at(c).at(d).size()>0) {
-							if(smoothRatioSingleList.at(c).at(d).at(0)==-1) {
-								smoothRatioSingleList.at(c).at(d).pop_front();
+						if(ratioSingleList.at(c).at(d).size()>0) {
+							if(ratioSingleList.at(c).at(d).at(0)==-1) {
+								ratioSingleList.at(c).at(d).pop_front();
 							}
 						}
-						smoothRatioSingleList.at(c).at(d).push_back(smoothRatioOutlierRm[y1][x1][c][d]);
+						ratioSingleList.at(c).at(d).push_back(ratioOutlierRm[y1][x1][c][d]);
 					}
 				}
 			}
-			count=0;
 			++x1;
 		}
 		x1=0;
@@ -352,9 +330,9 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 	}
 	for(int c=0; c<innerHeight; c++) {
 		for (int d=0; d<innerWidth; d++) {
-			if(smoothRatioSingleList.at(c).at(d).size()>0) {
-				if(smoothRatioSingleList.at(c).at(d).at(0)!=-1) {
-					densityVariation.at(c).at(d) = standardDev(smoothRatioSingleList.at(c).at(d));
+			if(ratioSingleList.at(c).at(d).size()>0) {
+				if(ratioSingleList.at(c).at(d).at(0)!=-1) {
+					densityVariation.at(c).at(d) = standardDev(ratioSingleList.at(c).at(d));
 				}
 			}
 		}
