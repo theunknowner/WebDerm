@@ -15,7 +15,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/GridDisplay/griddisplay.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 
 class ShapeMorph {
@@ -64,7 +63,11 @@ public:
 	int countEdgeTouching(Mat src, int edgeSize);
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 
-	void getShapeUsingColor(Mat src);
+	/** GetShapeUsingColor.cpp **/
+	int test_row, test_col, test_localScanSize;
+	bool enterFlag;
+	Mat getShapeUsingColor(Mat src);
+	Mat test_getShapeUsingColor(Mat src, int col=0, int row=0, int localScanSize=20, bool enterFlag=false);
 };
 
 #endif /* SHAPEMORPH_H_ */

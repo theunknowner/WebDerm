@@ -17,7 +17,7 @@ String testHysteresis(Mat &img, int row, int col, Size size)
 	int ind=0;
 	double dist=0;
 	double grayLevel=0;
-	double* HSL;
+	vector<double> HSL;
 	int hue=0;
 	double hslAvg[3]={0};
 	deque<double> hueWindow;
@@ -276,7 +276,7 @@ String testColorAtLoc(Mat &img, Point pt, double &h) {
 	int ind= -3;
 	double dist=0;
 	int hue=0;
-	double * HSL;
+	vector<double> HSL;
 	String pix;
 	r = img.at<Vec3b>(pt.y,pt.x)[2];
 	g = img.at<Vec3b>(pt.y,pt.x)[1];

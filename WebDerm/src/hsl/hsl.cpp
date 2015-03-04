@@ -89,12 +89,12 @@ double Hsl::minRGB(double red, double green, double blue)
 	}
 
 //converts rgb values to Hsl values
-	double *Hsl::rgb2hsl(double red, double green, double blue)
+	vector<double> Hsl::rgb2hsl(double red, double green, double blue)
 	{
 		double r,g,b;
 		double min, max;
 		double delta;
-		static double HSL[3];
+		vector<double> HSL(3,0);
 		r = red/255;
 		g = green/255;
 		b = blue/255;

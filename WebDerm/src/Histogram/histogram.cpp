@@ -143,7 +143,7 @@ void Histogram::hslHist2SpreadSheet(Mat &src, String name) {
 void Histogram::outputHistogramLuminance(Mat &src, String name) {
 	Hsl hsl;
 	int r,g,b;
-	double *HSL;
+	vector<double> HSL;
 	deque<int> lumVec(256,0);
 	int lum=0;
 	double lum2=0;
@@ -205,7 +205,7 @@ void Histogram::lightEqualizer(Mat src, Mat &dst) {
 	double idealLum = 65; //percentage integer
 	int r,g,b;
 	deque<int> lumVec(101,0);
-	double *HSL;
+	vector<double> HSL;
 	int *RGB;
 	int lum=0;
 	for(int i=0; i<src.rows; i++) {

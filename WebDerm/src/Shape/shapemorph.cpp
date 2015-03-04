@@ -1527,7 +1527,6 @@ vector<vector<Point> > ShapeMorph::findBoundary(Mat src) {
 	findContours(src, contour, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	return contour;
 }
-
 int ShapeMorph::countEdgeTouching(Mat src, int edgeSize) {
 	Mat _src = src.clone();
 	Mat topEdge = _src(Rect(edgeSize,0,src.cols-edgeSize*2,edgeSize));
@@ -1575,52 +1574,4 @@ int ShapeMorph::countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize)
 	int totalEdgePix = topEdgePix+leftEdgePix+bottomEdgePix+rightEdgePix+
 			topLeftEdgePix+topRightEdgePix+bottomLeftEdgePix+bottomRightEdgePix;
 	return totalEdgePix;
-}
-
-void ShapeMorph::getShapeUsingColor(Mat src) {
-	Hsl hsl;
-	Poly poly;
-	vector<double> hVec;
-	vector<double> sVec;
-	vector<double> lVec;
-	vector<double> xVec(src.cols,0);
-	for(int i=0; i<src.rows; i++) {
-		for(int j=0; j<src.cols; j++) {
-			int r = src.at<Vec3b>(i,j)[2];
-			int g = src.at<Vec3b>(i,j)[1];
-			int b = src.at<Vec3b>(i,j)[0];
-			double *HSL = hsl.rgb2hsl(r,g,b);
-			double hVal = findDegreeDistance(HSL[0],0.0);
-			double sVal = HSL[1] * 100.0;
-			double lVal = HSL[2] * 100.0;
-			hVec.push_back(hVal);
-			sVec.push_back(sVal);
-			lVec.push_back(lVal);
-			xVec.at(j) = j+1;
-		}
-		vector<double> hFit = poly.polyfit(xVec,hVec,15);
-		vector<double> sFit = poly.polyfit(xVec,sVec,15);
-		vector<double> lFit = poly.polyfit(xVec,lVec,15);
-		vector<double> hDeriv = poly.polyder(hFit);
-		vector<double> sDeriv = poly.polyder(sFit);
-		vector<double> lDeriv = poly.polyder(lFit);
-		for(unsigned int j=0; j<xVec.size(); j++) {
-			double hTotal=0, sTotal=0, lTotal=0;
-			for(unsigned int k=0; k<hDeriv.size(); k++) {
-				hTotal += (hDeriv.at(k) * pow(xVec.at(j),k));
-				sTotal += (sDeriv.at(k) * pow(xVec.at(j),k));
-				lTotal += (lDeriv.at(k) * pow(xVec.at(j),k));
-			}
-			double hProd = hTotal*(1./6);
-			double sProd = sTotal*(1./5);
-			double lProd = lTotal*(1./4);
-			double totalProd = hTotal;
-			if(i==27) {
-				printf("X: %.f, hProd: %f, sProd: %f, lProd: %f, TotalProd: %f\n",xVec.at(j),hProd,sProd,lProd,totalProd);
-			}
-		}
-		hVec.clear();
-		sVec.clear();
-		lVec.clear();
-	}
 }

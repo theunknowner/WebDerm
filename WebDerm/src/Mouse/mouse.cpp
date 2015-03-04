@@ -16,7 +16,7 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 	Mat img2 = (*img).clone();
 	Mat img3 = img3.zeros(Size(300,150),CV_8UC3);
 	String color;
-	double * HSL;
+	vector<double> HSL;
 	int h, s,l;
 	char coordText[25];
 	char rgbText[25];

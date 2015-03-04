@@ -25,7 +25,7 @@ public:
 	bool importHslThresholds();
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);
-	double *rgb2hsl(double red, double green, double blue);
+	vector<double> rgb2hsl(double red, double green, double blue);
 	int *hsl2rgb(double hue, double sat, double lum);
 	double getHue();
 	double getSat();

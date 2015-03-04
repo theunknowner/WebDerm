@@ -223,7 +223,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, Size size, String 
 		int shadeLevel;
 		double lumIncThresh = 0.05;
 		Mat img = img.zeros(Size(window.at(0).size(),window.size()),16);
-		double* HSL;
+		vector<double> HSL;
 		int *RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
@@ -304,7 +304,7 @@ Mat Color::changeImageBrightness(Mat &img, double amt, int type) {
 	Hsl hsl;
 	Mat img2 = img.clone();
 	int r,g,b;
-	double *HSL;
+	vector<double> HSL;
 	int *RGB;
 	for(int i=0; i<img2.rows; i++) {
 		for(int j=0; j<img2.cols; j++) {
@@ -337,7 +337,7 @@ Mat Color::changeImageSaturation(Mat img, double amt) {
 	Mat img2 = img.clone();
 	Hsl hsl;
 	int r,g,b;
-	double *HSL;
+	vector<double> HSL;
 	int *RGB;
 	for(int i=0; i<img2.rows; i++) {
 		for(int j=0; j<img2.cols; j++) {
@@ -583,8 +583,8 @@ int* Color::changeRgbRelLum(double r, double g, double b, double amt) {
 	RGB[0] += incR; RGB[1] += incG; RGB[2] += incB;
 	RGB[0] /= cR; RGB[1] /= cG; RGB[2] /= cB;
 
-	double *HSL = hsl.rgb2hsl(r,g,b);
-	double *HSL2 = hsl.rgb2hsl(RGB[0],RGB[1],RGB[2]);
+	vector<double> HSL = hsl.rgb2hsl(r,g,b);
+	vector<double> HSL2 = hsl.rgb2hsl(RGB[0],RGB[1],RGB[2]);
 	int *RGB2 = hsl.hsl2rgb(HSL[0],HSL[1],HSL2[2]);
 
 	results[0] = RGB2[0];
@@ -644,7 +644,7 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 		int shadeLevel;
 		double lumIncThresh = 0.05;
 		Mat img = img.zeros(Size(window.at(0).size(),window.size()),16);
-		double* HSL;
+		vector<double> HSL;
 		int *RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {

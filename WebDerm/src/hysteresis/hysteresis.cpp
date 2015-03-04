@@ -36,7 +36,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd)
 	double dist=0;
 	double grayLevel=0;
 	int b=0,g=0,r=0;
-	double* HSL;
+	vector<double> HSL;
 	int hue=0;
 	double h = 0, s = 0, l = 0;
 	double hslAvg[3]={0};
@@ -250,7 +250,7 @@ void hysteresis2(Mat img, Size size, String name, FileData &fd) {
 	Rgb rgb;
 	Hsl hsl;
 	int r,g,b;
-	double *HSL;
+	vector<double> HSL;
 	double h,s,l;
 	String pix;
 	String hslStr;
@@ -308,7 +308,7 @@ void hysteresis3(Mat img, Size size, String name, FileData &fd) {
 	double dist=0;
 	double grayLevel=0;
 	int b=0,g=0,r=0;
-	double* HSL;
+	vector<double> HSL;
 	int hue=0;
 	double hslAvg[3]={0};
 	int row=0, col=0, maxRow=0, maxCol=0;

@@ -32,7 +32,6 @@ int main(int argc,char** argv)
 {
 	//Entropy en;
 	//en.importEntropyThresholds();
-	//en.demo_runCompareEntropy();
 	//en.runAllEntropy();
 	//en.runEntropy();
 	//runRenameFiles();
@@ -50,16 +49,18 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp11.jpg",Size(140,140),0);
-	//img = runResizeImage("/home/jason/Desktop/Programs/Color Normalized/acne12-2.png",Size(140,140),0);
-	//img3 = runResizeImage("/home/jason/Desktop/Programs/Looks_Like/clp4jpg",Size(700,700),0);
-	//namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//namedWindow("img2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/lph4.jpg");
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
 	Size size(5,5);
-	img = runColorNormalization(img);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-
+	blur(img,img,size);
+	//imwrite("herpes3.png",img);
+	img3 = sm.getShapeUsingColor(img);
+	//sm.setDebugMode(true);
+	//img3 = sm.test_getShapeUsingColor(img,66,25);
+	imgshow(img3);
 /*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
@@ -231,19 +232,21 @@ int main(int argc,char** argv)
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
 	//en.test_runAllCompareEntropy2a(folder);
-	/*
+	/**/
+/*
 	Entropy en;
 	FileData fd;
-	fd.filename = "herpes13";
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd.filename+"_ShadeColors_5x5.csv",fd.colorVec);
-	fd.loadFileMatrix("/home/jason/Desktop/Programs/Output2/"+fd.filename+"_HSL_5x5.csv",fd.hslMat);
+	fd.filename = "lph15";
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/"+fd.filename+"-ShadeColors-5x5.csv",fd.colorVec);
+	fd.loadFileMatrix("/home/jason/Desktop/Programs/Test_Output/"+fd.filename+"-HSL-5x5.csv",fd.hslMat);
 	fd.ksize = Size(5,5);
 	Size entSize(10,10);
-	String targetColor = "Brown";
-	String targetShade = "Dark1";
+	String targetColor = "Grey";
+	String targetShade = "Low";
 	en.eyeFn(fd,entSize,targetColor,targetShade);
 	img3 = c.output2ImageTargetColor(fd.colorVec,fd.ksize,fd.filename,targetColor,targetShade);
 	img3 = en.showEyeFnSquares(img3,entSize,targetColor,targetShade);
+	imgshow(img3);
 	//Mouse::mouseOutputColor(img3,fd);
 /*
 	FileData fd2;

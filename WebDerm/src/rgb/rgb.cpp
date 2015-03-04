@@ -595,7 +595,7 @@ String Rgb::calcColor(int red, int green, int blue) {
 double Rgb::calcGrayLumLevel(double red, double green, double blue) {
 	Hsl hsl;
 	double grayLumLevel=0;
-	double *HSL = hsl.rgb2hsl(red,green,blue);
+	vector<double> HSL = hsl.rgb2hsl(red,green,blue);
 	double sat = roundDecimal(HSL[1],2) * 100;
 	double lum = roundDecimal(HSL[2],2) * 100;
 	//grayLevel = grayLUT.at(sat).at(lum);
@@ -610,7 +610,7 @@ double Rgb::calcGrayLumLevel(double red, double green, double blue) {
 double Rgb::calcColorLumLevel(double red, double green, double blue) {
 	Hsl hsl;
 	double colorLumLevel=0;
-	double* HSL = hsl.rgb2hsl(red,green,blue);
+	vector<double> HSL = hsl.rgb2hsl(red,green,blue);
 	double sat = roundDecimal(HSL[1],2) * 100;
 	double lum = roundDecimal(HSL[2],2) * 100;
 	double a=4;
