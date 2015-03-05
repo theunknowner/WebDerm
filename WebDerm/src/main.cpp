@@ -27,6 +27,7 @@
 #include "Algorithms/kneecurve.h"
 #include "GridDisplay/griddisplay.h"
 #include "Poly/poly.h"
+#include "Matlab/matlab.h"
 
 int main(int argc,char** argv)
 {
@@ -56,12 +57,115 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	blur(img,img,size);
+	FileData fd;
+	Matlab mb;
+	Poly poly;
+	int r,g,b;
+	vector<double> HSL;
+	Mat hvec(img.size(),CV_32F,Scalar(0));
+	Mat svec(img.size(),CV_32F,Scalar(0));
+	Mat lvec(img.size(),CV_32F,Scalar(0));
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			Vec3b RGB = img.at<Vec3b>(i,j);
+			HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
+			HSL[0] = HSL[0] - floor(HSL[0]/180.) * 360.;
+			HSL[1] = round(HSL[1] * 100.);
+			HSL[2] = round(HSL[2] * 100.);
+			hvec.at<float>(i,j) = HSL.at(0);
+			svec.at<float>(i,j) = HSL.at(1);
+			lvec.at<float>(i,j) = HSL.at(2);
+		}
+	}
+	Mat hVec2(hvec.size(),CV_32F,Scalar(0));
+	Mat sVec2(svec.size(),CV_32F,Scalar(0));
+	Mat lVec2(lvec.size(),CV_32F,Scalar(0));
+	for(int row=0; row<hvec.rows; row++) {
+		writeSeq2File(hvec.row(row),"float","hvec",true);
+		writeSeq2File(svec.row(row),"float","svec",true);
+		writeSeq2File(lvec.row(row),"float","lvec",true);
+		String command = "python /home/jason/git/WebDerm/WebDerm/poly.py";
+		system(command.c_str());
+		deque< deque<String> > hData;
+		deque< deque<String> > sData;
+		deque< deque<String> > lData;
+		vector<double> hfitval;
+		vector<double> sfitval;
+		vector<double> lfitval;
+		fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/hfitvals.csv",hData);
+		fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/sfitvals.csv",sData);
+		fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/lfitvals.csv",lData);
+		for(unsigned int i=0; i<hData.size(); i++) {
+			for(unsigned int j=0; j<hData.at(i).size(); j++) {
+				double val = atof(hData.at(i).at(j).c_str());
+				hfitval.push_back(val);
+				val = atof(sData.at(i).at(j).c_str());
+				sfitval.push_back(val);
+				val = atof(lData.at(i).at(j).c_str());
+				lfitval.push_back(val);
+			}
+		}
+		vector<double> xvec, xmaxH, xminH;
+		vector<double> xmaxS, xminS;
+		vector<double> xmaxL, xminL;
+		vector<int> imaxH, iminH;
+		vector<int> imaxS, iminS;
+		vector<int> imaxL, iminL;
+		for(unsigned int i=0; i<hfitval.size(); i++) {
+			xvec.push_back(i);
+		}
+		poly.findExtremas(hfitval,xmaxH,imaxH,xminH,iminH);
+		poly.findExtremas(sfitval,xmaxS,imaxS,xminS,iminS);
+		poly.findExtremas(lfitval,xmaxL,imaxL,xminL,iminL);
+		vector<double> hfitval2 = hfitval;
+		vector<double> sfitval2 = sfitval;
+		vector<double> lfitval2 = lfitval;
+		for(unsigned int i=0; i<imaxH.size(); i++) {
+			hfitval2.at(imaxH.at(i)) = hvec.at<float>(row,imaxH.at(i));
+		}
+		for(unsigned int i=0; i<iminH.size(); i++) {
+			hfitval2.at(iminH.at(i)) = hvec.at<float>(row,iminH.at(i));
+		}
+		for(unsigned int i=0; i<imaxS.size(); i++) {
+			sfitval2.at(imaxS.at(i)) = svec.at<float>(row,imaxS.at(i));
+		}
+		for(unsigned int i=0; i<iminS.size(); i++) {
+			sfitval2.at(iminS.at(i)) = svec.at<float>(row,iminS.at(i));
+		}
+		for(unsigned int i=0; i<imaxL.size(); i++) {
+			lfitval2.at(imaxL.at(i)) = lvec.at<float>(row,imaxL.at(i));
+		}
+		for(unsigned int i=0; i<iminL.size(); i++) {
+			lfitval2.at(iminL.at(i)) = lvec.at<float>(row,iminL.at(i));
+		}
+		for(int j=0; j<hVec2.cols; j++) {
+			hVec2.at<float>(row,j) = hfitval2.at(j);
+		}
+		for(int j=0; j<sVec2.cols; j++) {
+			sVec2.at<float>(row,j) = sfitval2.at(j);
+		}
+		for(int j=0; j<lVec2.cols; j++) {
+			lVec2.at<float>(row,j) = lfitval2.at(j);
+		}
+		hfitval.clear();
+		hfitval.shrink_to_fit();
+		hfitval2.clear();
+		hfitval2.shrink_to_fit();
+		xvec.clear();
+		xvec.shrink_to_fit();
+	}
+	Mat map = sm.getShapeUsingColor2(hVec2,sVec2,lVec2);
+	imgshow(map);
+	//writeSeq2File(hfitval2,"hfitval2");
+	/*writeSeq2File(hvec,"float","hvec");
+	writeSeq2File(svec,"float","svec");
+	writeSeq2File(lvec,"float","lvec");
 	//imwrite("herpes3.png",img);
-	img3 = sm.getShapeUsingColor(img);
+	//img3 = sm.getShapeUsingColor(img);
 	//sm.setDebugMode(true);
 	//img3 = sm.test_getShapeUsingColor(img,66,25);
-	imgshow(img3);
-/*
+	//imgshow(img3);
+	/*
 	vector<Mat> matVec = sm.lumFilter1(img);
 	vector<Mat> matVec2 = sm.lumFilter2(img);
 
@@ -115,8 +219,8 @@ int main(int argc,char** argv)
 		if(n>idxVec.size()) break;
 	}
 	//imgshow(img4);
-*/
-/*
+	 */
+	/*
 	TestML ml;
 	String samplesPath = "/home/jason/git/Samples/Samples/Training/Random/";
 	vector<double> labels(5,0);
@@ -138,7 +242,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-/*
+	/*
 	TestML ml;
 	vector<vector<double> > trainingData;
 	vector<vector<double> > trainingLabels;
@@ -217,7 +321,7 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-/*
+	/*
 	String name = "lph15";
 	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
@@ -233,7 +337,7 @@ int main(int argc,char** argv)
 	//en.runCompareAllEntropy2(folder);
 	//en.test_runAllCompareEntropy2a(folder);
 	/**/
-/*
+	/*
 	Entropy en;
 	FileData fd;
 	fd.filename = "lph15";

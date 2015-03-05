@@ -68,6 +68,7 @@ public:
 	bool enterFlag;
 	Mat getShapeUsingColor(Mat src);
 	Mat test_getShapeUsingColor(Mat src, int col=0, int row=0, int localScanSize=20, bool enterFlag=false);
+	Mat getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat);
 };
 
 #endif /* SHAPEMORPH_H_ */

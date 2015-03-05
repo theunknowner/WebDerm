@@ -101,6 +101,20 @@ void writeSeq2File(vector<double> &vec, String name) {
 	fclose(fp);
 }
 
+void writeSeq2File(vector<int> &vec, String name) {
+	String filename = name + ".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	if(vec.size()==0)
+		cout << name << " Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++) {
+			fprintf(fp,"%d\n",vec.at(i));
+		}
+	fclose(fp);
+}
+
 void writeSeq2File(deque<int> &vec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
@@ -176,20 +190,33 @@ void writeSeq2File(double * arr, int length, String name) {
 }
 
 //! type = "int","float","uchar"... so far
-void writeSeq2File(Mat src, String type, String name) {
+void writeSeq2File(Mat src, String type, String name, bool writeIndex) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
-			if(type=="uchar")
-				fprintf(fp,"%d,",src.at<uchar>(i,j));
-			if(type=="int")
-				fprintf(fp,"%d,",src.at<int>(i,j));
-			if(type=="float")
-				fprintf(fp,"%f,",src.at<float>(i,j));
+			if(type=="uchar") {
+				if(writeIndex)
+					fprintf(fp,"%d,%d\n",j+i*src.cols+1,src.at<uchar>(i,j));
+				else
+					fprintf(fp,"%d,",src.at<uchar>(i,j));
+			}
+			if(type=="int") {
+				if(writeIndex)
+					fprintf(fp,"%d,%d\n",j+i*src.cols+1,src.at<int>(i,j));
+				else
+					fprintf(fp,"%d,",src.at<int>(i,j));
+			}
+			if(type=="float") {
+				if(writeIndex)
+					fprintf(fp,"%d,%f\n",j+i*src.cols+1,src.at<float>(i,j));
+				else
+					fprintf(fp,"%f,",src.at<float>(i,j));
+			}
 		}
-		fprintf(fp,"\n");
+		if(!writeIndex)
+			fprintf(fp,"\n");
 	}
 	fclose(fp);
 }

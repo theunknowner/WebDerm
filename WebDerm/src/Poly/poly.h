@@ -21,8 +21,10 @@
 #include <stdexcept>
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-
+#include "/home/jason/git/WebDerm/WebDerm/src/Matlab/matlab.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "matrix.h"
+#include "givensQR.h"
 
 class Poly {
 public:
@@ -33,6 +35,8 @@ public:
 	int lineIntersect(vector<double> &vec);
 
 	void loadVectorFile(String path, vector<double> &vec);
+
+	void findExtremas(vector<double> vec, vector<double> &xmax, vector<int> &imax, vector<double> &xmin, vector<int> &imin);
 };
 
 #endif /* POLY_H_ */

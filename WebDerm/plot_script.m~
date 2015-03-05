@@ -6,6 +6,6 @@ plot(svec(row,1:length(svec)));
 hold on
 plot(sfitval,'r')
 figure
-plot(lvec(row,1:length(lvec)));
+plot(svec(row,1:length(svec)));
 hold on
 plot(lfitval,'r')

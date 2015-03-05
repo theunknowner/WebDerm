@@ -1,6 +1,8 @@
-hfit = polyfit(xvec,VarName1,21);
+row=85;
+vec = hfitval;
+hfit = polyfit(xvec,hvec(row,1:length(hvec)),17);
 hfitval = polyval(hfit,xvec);
-sfit = polyfit(xvec,VarName2,21);
+sfit = polyfit(xvec,svec(row,1:length(svec)),17);
 sfitval = polyval(sfit,xvec);
-lfit = polyfit(xvec,VarName3,21);
+lfit = polyfit(xvec,lvec(row,1:length(lvec)),17);
 lfitval = polyval(lfit,xvec);
