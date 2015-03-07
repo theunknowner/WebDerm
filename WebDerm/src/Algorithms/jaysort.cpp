@@ -9,6 +9,7 @@
 
 void jaysort(deque<double> &vec, deque<int> &origPos) {
 	deque<double> sortedVec;
+	origPos.clear();
 	double val=0;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		val=vec.at(i);

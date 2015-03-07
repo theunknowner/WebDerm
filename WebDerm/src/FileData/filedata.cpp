@@ -131,6 +131,7 @@ bool FileData::loadFileMatrix(String file_path) {
 	return false;
 }
 
+//loads file into a 2D string vector
 bool FileData::loadFileMatrix(String file_path, deque< deque<String> > &dataMat) {
 	fstream fs(file_path.c_str());
 	if(fs.is_open()) {

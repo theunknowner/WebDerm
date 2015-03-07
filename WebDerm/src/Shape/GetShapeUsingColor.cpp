@@ -203,8 +203,8 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 	int r,g,b;
 	double gradientDiff0, gradientDiff45, gradientDiff90;
 	double HslEntry[3];
-	double unitThresh[3] = {3.0,5.0,4.0};
-	const double unitRanges[3] = {14.0,15.0,11.0};
+	double unitThresh[3] = {3.0,3.0,3.0};
+	const double unitRanges[3] = {14.0,16.0,11.0};
 	const double enterThresh=2.0;
 	const double exitCumulativeThresh = 1.0;
 	const double offset = 3;
@@ -217,10 +217,10 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 		maxRow = this->test_row+1;
 		maxCol = this->test_col+1;
 	}
-	//deque<double> gradVec;
-	//maxCol = hMat.cols;
-	unitThresh[0] *= (this->hRange/unitRanges[2]);
-	unitThresh[1] *= (this->sRange/unitRanges[2]);
+	deque<double> gradVec;
+	deque<double> hDiffVec;
+	unitThresh[0] *= (this->hRange/unitRanges[0]);
+	unitThresh[1] *= (this->sRange/unitRanges[1]);
 	unitThresh[2] *= (this->lRange/unitRanges[2]);
 	for(int row= _row; row<maxRow; row++) {
 		for(int col=_col; col<maxCol; col++) {
@@ -237,25 +237,28 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 			int endY = row-localScanSize;
 			for(int i=y; i>=endY; i--) {
 				if(x<0 && j<0 && i<0) break;
-				if(x>=0 && noise.at<uchar>(row,x)!=0) {
+				if(x>=0 && map.at<uchar>(row,x)!=150 && noise.at<uchar>(row,x)!=0) {
 					HSL_0[0] = hMat.at<float>(row,x);
 					HSL_0[1] = sMat.at<float>(row,x);
 					HSL_0[2] = lMat.at<float>(row,x);
 					double hueDiff = (HSL[0]-HSL_0[0])/unitThresh[0];
-					double satDiff = (HSL[1]-HSL_0[1])/unitThresh[1];
+					double satDiff = (HSL_0[1]-HSL[1])/unitThresh[1];
 					double lumDiff = (HSL[2]-HSL_0[2])/unitThresh[2];
-					//hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
-					hueDiff = round(hueDiff);
+					hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+					//hueDiff = round(hueDiff);
 					satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
 					lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
-					gradientDiff0 = abs(hueDiff)+abs(satDiff)+abs(lumDiff);
+					gradientDiff0 = hueDiff+satDiff+lumDiff;
+					gradVec.push_back(gradientDiff0);
+					hDiffVec.push_back(hueDiff);
 					if(abs(gradientDiff0)>=abs(maxDiff0)) {
 						maxDiff0 = gradientDiff0;
 						maxPt0 = Point(x,row);
 					}
 				}
-				--x;
-				if(j>=0 && i>=0 && noise.at<uchar>(i,j)!=0) {
+				if(map.at<uchar>(row,x)!=150)
+					--x;
+				if(j>=0 && i>=0 && map.at<uchar>(i,j)!=150 && noise.at<uchar>(i,j)!=0) {
 					HSL_45[0] = hMat.at<float>(i,j);
 					HSL_45[1] = sMat.at<float>(i,j);
 					HSL_45[2] = lMat.at<float>(i,j);
@@ -272,8 +275,9 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 						maxPt45 = Point(j,i);
 					}
 				}
-				--j;
-				if(y>=0 && noise.at<uchar>(y,col)!=0) {
+				if(map.at<uchar>(i,j)!=150)
+					--j;
+				if(y>=0 && map.at<uchar>(y,col)!=150 && noise.at<uchar>(y,col)!=0) {
 					HSL_90[0] = hMat.at<float>(y,col);
 					HSL_90[1] = sMat.at<float>(y,col);
 					HSL_90[2] = lMat.at<float>(y,col);
@@ -290,32 +294,88 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 						maxPt90 = Point(col,y);
 					}
 				}
-				--y;
+				if(map.at<uchar>(y,col)!=150)
+					--y;
 			}// end for(int i)
 			if(enterFlag==false) {
 				if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1) {
+					upTheMtn = true;
+				}
+				if(fn.countLesserEqual(2,maxDiff0,-enterThresh)>=1) {
+					downTheMtn = true;
+				}
+				if(upTheMtn || downTheMtn) {
 					enterFlag = true;
 					HslEntry[0] = hMat.at<float>(maxPt0);
 					HslEntry[1] = sMat.at<float>(maxPt0);
 					HslEntry[2] = lMat.at<float>(maxPt0);
-					map.at<uchar>(row,col) = 255;
+					map.at<uchar>(row,col-offset) = 255;
 				}
 			}
 			else if(enterFlag==true) {
-				double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
-				double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
-				double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
-				//hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
-				//satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
-				//lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
-				hueDiff = round(hueDiff);
-				gradientDiff0 = abs(hueDiff)+abs(satDiff)+abs(lumDiff);
-				if(gradientDiff0<=exitCumulativeThresh) {
-					enterFlag = false;
-					map.at<uchar>(row,col) = 150;
+				if(downTheMtn) {
+					if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1) {
+						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
+						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
+						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
+						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+						gradientDiff0 = hueDiff+satDiff+lumDiff;
+						if(gradientDiff0>=-exitCumulativeThresh) {
+							enterFlag = false;
+							upTheMtn = downTheMtn = false;
+							map.at<uchar>(row,col) = 150;
+						}
+					}
+					else {
+						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
+						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
+						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
+						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+						gradientDiff0 = hueDiff+satDiff+lumDiff;
+						if(gradientDiff0>=-exitCumulativeThresh) {
+							enterFlag = false;
+							upTheMtn = downTheMtn = false;
+							map.at<uchar>(row,col) = 150;
+						}
+					}
 				}
+				else if(upTheMtn) {
+					if(fn.countLesserEqual(2,maxDiff0,-enterThresh)>=1) {
+						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
+						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
+						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
+						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+						gradientDiff0 = hueDiff+satDiff+lumDiff;
+						if(gradientDiff0<=exitCumulativeThresh) {
+							enterFlag = false;
+							upTheMtn = downTheMtn = false;
+							map.at<uchar>(row,col) = 150;
+						}
+					}
+					else {
+						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
+						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
+						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
+						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+						gradientDiff0 = hueDiff+satDiff+lumDiff;
+						if(gradientDiff0<=exitCumulativeThresh) {
+							enterFlag = false;
+							upTheMtn = downTheMtn = false;
+							map.at<uchar>(row,col) = 150;
+						}
+					}
+
+				}//end if(upTheMtn)
 			}//end if(enterFlag==true)
-			if(col==6 && row==45) {
+			if(col==52 && row==32) {
 				String mtn = upTheMtn==true ? "Up" : "N/A";
 				mtn = downTheMtn==true ? "Down" : mtn;
 				printf("HSL(%f,%f,%f)\n",HSL[0],HSL[1],HSL[2]);
@@ -328,14 +388,14 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 				printf("EnterFlag: %d\n",enterFlag);
 				printf("Hsl_Ranges: [%f,%f,%f]\n",hRange,sRange,lRange);
 				printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
-				//printf("Mtn: %s\n",mtn.c_str());
+				printf("Mtn: %s\n",mtn.c_str());
 			}
-			//gradVec.push_back(gradientDiff0);
 		} //end for(col)
 		enterFlag=false;
 		upTheMtn = downTheMtn = false;
 	}//end for(row)
-	//writeSeq2File(gradVec,"grad_vec");
+	writeSeq2File(gradVec,"grad_vec");
+	writeSeq2File(hDiffVec,"hDiffVec");
 	return map;
 }
 

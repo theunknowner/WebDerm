@@ -199,24 +199,28 @@ void writeSeq2File(Mat src, String type, String name, bool writeIndex) {
 			if(type=="uchar") {
 				if(writeIndex)
 					fprintf(fp,"%d,%d\n",j+i*src.cols+1,src.at<uchar>(i,j));
+				else if(j==src.cols-1)
+					fprintf(fp,"%d\n",src.at<uchar>(i,j));
 				else
 					fprintf(fp,"%d,",src.at<uchar>(i,j));
 			}
 			if(type=="int") {
 				if(writeIndex)
 					fprintf(fp,"%d,%d\n",j+i*src.cols+1,src.at<int>(i,j));
+				else if(j==src.cols-1)
+					fprintf(fp,"%d\n",src.at<int>(i,j));
 				else
 					fprintf(fp,"%d,",src.at<int>(i,j));
 			}
 			if(type=="float") {
 				if(writeIndex)
 					fprintf(fp,"%d,%f\n",j+i*src.cols+1,src.at<float>(i,j));
+				else if(j==src.cols-1)
+					fprintf(fp,"%f\n",src.at<float>(i,j));
 				else
 					fprintf(fp,"%f,",src.at<float>(i,j));
 			}
 		}
-		if(!writeIndex)
-			fprintf(fp,"\n");
 	}
 	fclose(fp);
 }

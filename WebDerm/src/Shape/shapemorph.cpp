@@ -15,7 +15,10 @@ bool ShapeMorph::isDebugModeOn() {
 	return this->debugMode;
 }
 
+//check to invert image
 Mat ShapeMorph::prepareImage(Mat src) {
+	if(src.type()!=CV_8U)
+		cvtColor(src,src,CV_BGR2GRAY);
 	Functions fn;
 	Mat srcRight, srcTop, srcBottom;
 	flip(src,srcRight,1);
@@ -1574,4 +1577,68 @@ int ShapeMorph::countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize)
 	int totalEdgePix = topEdgePix+leftEdgePix+bottomEdgePix+rightEdgePix+
 			topLeftEdgePix+topRightEdgePix+bottomLeftEdgePix+bottomRightEdgePix;
 	return totalEdgePix;
+}
+
+//returns map where noise is masked out
+Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
+	Poly poly;
+	KneeCurve kc;
+	vector<double> vec;
+	Mat darkestStuff(src.rows,src.cols,CV_8U,Scalar(255));
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			double lum = src.at<uchar>(i,j);
+			vec.push_back(lum);
+		}
+	}
+	vector<double> xVec;
+	sort(vec.begin(),vec.end());
+	for(unsigned int i=0; i<vec.size(); i++) {
+		xVec.push_back((double)i);
+	}
+	vector<double> p = poly.polyfit(xVec,vec,1);
+	vector<double> y1 = poly.polyval(p,xVec);
+	//MSE
+	double sum=0;
+	for(unsigned int i=0; i<y1.size(); i++) {
+		double val = (vec.at(i)-y1.at(i))/vec.at(i);
+		val = pow(val,2);
+		sum += val;
+	}
+	sum = sqrt(sum);
+	if(sum<2.5)
+		vec.erase(vec.begin(),vec.begin()+(vec.size()/2));
+	int index = kc.kneeCurvePoint(vec);
+	double thresh = vec.at(index);
+
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			double lum = src.at<uchar>(i,j);
+			if(lum<thresh)
+				darkestStuff.at<uchar>(i,j) = 0;
+		}
+	}
+	deque<Mat> islandsVec = this->liquidFeatureExtraction(darkestStuff,5.0);
+	Mat mapEdgeRemoval(src.rows, src.cols, CV_8U, Scalar(255));
+	for(unsigned int i=0; i<islandsVec.size(); i++) {
+		Mat edges(darkestStuff.size(),CV_8U,Scalar(0));
+		vector<vector<Point> > contour = this->findBoundary(islandsVec.at(i).clone());
+		drawContours(edges,contour,-1,Scalar(255));
+		int count = this->countEdgeTouching(edges,6,12);
+		int total = countNonZero(edges);
+		double percent = (double)count/total;
+		int featurePixCount = countNonZero(islandsVec.at(i));
+		double percentOfImage = (double)featurePixCount/darkestStuff.total();
+		if(percent>=0.47 && percentOfImage<0.10) {
+			for(int j=0; j<islandsVec.at(i).rows; j++) {
+				for(int k=0; k<islandsVec.at(i).cols; k++) {
+					int val = islandsVec.at(i).at<uchar>(j,k);
+					if(val==255)
+						mapEdgeRemoval.at<uchar>(j,k) = 0;
+				}
+			}
+		}
+	}
+
+	return mapEdgeRemoval;
 }

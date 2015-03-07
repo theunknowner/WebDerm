@@ -50,13 +50,50 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/lph4.jpg");
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/psoriasis19a.jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
+	KneeCurve kc;
 	Size size(5,5);
-	cvtColor(img,imgGray,CV_BGR2GRAY);
 	blur(img,img,size);
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+	Mat src = sm.prepareImage(imgGray);
+	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+	/*
+	deque<double> hueVec;
+	deque<double> satVec;
+	deque<double> lumVec;
+	deque<int> origPos;
+	vector<double> HSL;
+	for(int i=0; i<img3.rows; i++) {
+		for(int j=0; j<img3.cols; j++) {
+			Vec3b BGR = img3.at<Vec3b>(i,j);
+			HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+			if(mapOfNonNoise.at<uchar>(i,j)>0) {
+				HSL[0] = HSL[0] - floor(HSL[0]/180.) * 360.;
+				HSL[1] = round(HSL[1] * 100.);
+				HSL[2] = round(HSL[2] * 100.);
+				hueVec.push_back(HSL[0]);
+				satVec.push_back(HSL[1]);
+				lumVec.push_back(HSL[2]);
+			}
+		}
+	}
+	sort(hueVec.begin(),hueVec.end());
+	sort(satVec.begin(),satVec.end());
+	sort(lumVec.begin(),lumVec.end());
+	kc.removeOutliers(hueVec,0.005);
+	kc.removeOutliers(satVec,0.005);
+	kc.removeOutliers(lumVec,0.005);
+	printf("H_Min: %f, H_Max: %f\n",hueVec.front(), hueVec.back());
+	printf("H_Range: %f\n",hueVec.back()-hueVec.front());
+	printf("S_Min: %f, S_Max: %f\n",satVec.front(), satVec.back());
+	printf("S_Range: %f\n",satVec.back()-satVec.front());
+	printf("L_Min: %f, L_Max: %f\n",lumVec.front(), lumVec.back());
+	printf("L_Range: %f\n",lumVec.back()-lumVec.front());
+/**/
+
 	FileData fd;
 	Matlab mb;
 	Poly poly;
@@ -77,85 +114,113 @@ int main(int argc,char** argv)
 			lvec.at<float>(i,j) = HSL.at(2);
 		}
 	}
-	Mat hVec2(hvec.size(),CV_32F,Scalar(0));
-	Mat sVec2(svec.size(),CV_32F,Scalar(0));
-	Mat lVec2(lvec.size(),CV_32F,Scalar(0));
-	for(int row=0; row<hvec.rows; row++) {
-		writeSeq2File(hvec.row(row),"float","hvec",true);
-		writeSeq2File(svec.row(row),"float","svec",true);
-		writeSeq2File(lvec.row(row),"float","lvec",true);
-		String command = "python /home/jason/git/WebDerm/WebDerm/poly.py";
-		system(command.c_str());
-		deque< deque<String> > hData;
-		deque< deque<String> > sData;
-		deque< deque<String> > lData;
-		vector<double> hfitval;
-		vector<double> sfitval;
-		vector<double> lfitval;
-		fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/hfitvals.csv",hData);
-		fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/sfitvals.csv",sData);
-		fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/lfitvals.csv",lData);
-		for(unsigned int i=0; i<hData.size(); i++) {
-			for(unsigned int j=0; j<hData.at(i).size(); j++) {
-				double val = atof(hData.at(i).at(j).c_str());
-				hfitval.push_back(val);
-				val = atof(sData.at(i).at(j).c_str());
-				sfitval.push_back(val);
-				val = atof(lData.at(i).at(j).c_str());
-				lfitval.push_back(val);
-			}
+
+	writeSeq2File(hvec,"float","hvec");
+	writeSeq2File(svec,"float","svec");
+	writeSeq2File(lvec,"float","lvec");
+	String command = "python /home/jason/Desktop/workspace/Pyth/poly.py";
+	system(command.c_str());
+	/**/
+
+	deque<deque<String> > hData;
+	deque<deque<String> > sData;
+	deque<deque<String> > lData;
+	fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/hfitvals.csv",hData);
+	fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/sfitvals.csv",sData);
+	fd.loadFileMatrix("/home/jason/git/WebDerm/WebDerm/lfitvals.csv",lData);
+	vector<vector<double> > hfitvals(hData.size(),vector<double>(0,0));
+	vector<vector<double> > sfitvals(sData.size(),vector<double>(0,0));
+	vector<vector<double> > lfitvals(lData.size(),vector<double>(0,0));
+	Mat hMat(hvec.size(),CV_32F,Scalar(0));
+	Mat sMat(svec.size(),CV_32F,Scalar(0));
+	Mat lMat(lvec.size(),CV_32F,Scalar(0));
+	for(unsigned int i=0; i<hData.size(); i++) {
+		for(unsigned int j=0; j<hData.at(i).size(); j++) {
+			double val = atof(hData.at(i).at(j).c_str());
+			hMat.at<float>(i,j) = val;
+			val = atof(sData.at(i).at(j).c_str());
+			sMat.at<float>(i,j) = val;
+			val = atof(lData.at(i).at(j).c_str());
+			lMat.at<float>(i,j) = val;
 		}
-		vector<double> xvec, xmaxH, xminH;
-		vector<double> xmaxS, xminS;
-		vector<double> xmaxL, xminL;
-		vector<int> imaxH, iminH;
-		vector<int> imaxS, iminS;
-		vector<int> imaxL, iminL;
-		for(unsigned int i=0; i<hfitval.size(); i++) {
-			xvec.push_back(i);
-		}
-		poly.findExtremas(hfitval,xmaxH,imaxH,xminH,iminH);
-		poly.findExtremas(sfitval,xmaxS,imaxS,xminS,iminS);
-		poly.findExtremas(lfitval,xmaxL,imaxL,xminL,iminL);
-		vector<double> hfitval2 = hfitval;
-		vector<double> sfitval2 = sfitval;
-		vector<double> lfitval2 = lfitval;
-		for(unsigned int i=0; i<imaxH.size(); i++) {
-			hfitval2.at(imaxH.at(i)) = hvec.at<float>(row,imaxH.at(i));
-		}
-		for(unsigned int i=0; i<iminH.size(); i++) {
-			hfitval2.at(iminH.at(i)) = hvec.at<float>(row,iminH.at(i));
-		}
-		for(unsigned int i=0; i<imaxS.size(); i++) {
-			sfitval2.at(imaxS.at(i)) = svec.at<float>(row,imaxS.at(i));
-		}
-		for(unsigned int i=0; i<iminS.size(); i++) {
-			sfitval2.at(iminS.at(i)) = svec.at<float>(row,iminS.at(i));
-		}
-		for(unsigned int i=0; i<imaxL.size(); i++) {
-			lfitval2.at(imaxL.at(i)) = lvec.at<float>(row,imaxL.at(i));
-		}
-		for(unsigned int i=0; i<iminL.size(); i++) {
-			lfitval2.at(iminL.at(i)) = lvec.at<float>(row,iminL.at(i));
-		}
-		for(int j=0; j<hVec2.cols; j++) {
-			hVec2.at<float>(row,j) = hfitval2.at(j);
-		}
-		for(int j=0; j<sVec2.cols; j++) {
-			sVec2.at<float>(row,j) = sfitval2.at(j);
-		}
-		for(int j=0; j<lVec2.cols; j++) {
-			lVec2.at<float>(row,j) = lfitval2.at(j);
-		}
-		hfitval.clear();
-		hfitval.shrink_to_fit();
-		hfitval2.clear();
-		hfitval2.shrink_to_fit();
-		xvec.clear();
-		xvec.shrink_to_fit();
+		hMat.row(i).copyTo(hfitvals.at(i));
+		sMat.row(i).copyTo(sfitvals.at(i));
+		lMat.row(i).copyTo(lfitvals.at(i));
 	}
-	Mat map = sm.getShapeUsingColor2(hVec2,sVec2,lVec2);
-	imgshow(map);
+	vector<double> xvec, xmaxH, xminH;
+	vector<double> xmaxS, xminS;
+	vector<double> xmaxL, xminL;
+	vector<int> imaxH, iminH, imaxS, iminS, imaxL, iminL;
+	for(unsigned int i=0; i<hfitvals.at(0).size(); i++) {
+		xvec.push_back(i);
+	}
+	for(unsigned int i=0; i<hfitvals.size(); i++) {
+		poly.findExtremas(hfitvals.at(i),xmaxH,imaxH,xminH,iminH);
+		poly.findExtremas(sfitvals.at(i),xmaxS,imaxS,xminS,iminS);
+		poly.findExtremas(lfitvals.at(i),xmaxL,imaxL,xminL,iminL);
+		for(unsigned int j=0; j<imaxH.size(); j++) {
+			hMat.at<float>(i,imaxH.at(j)) = hvec.at<float>(i,imaxH.at(j));
+		}
+		for(unsigned int j=0; j<iminH.size(); j++) {
+			hMat.at<float>(i,iminH.at(j)) = hvec.at<float>(i,iminH.at(j));
+		}
+		for(unsigned int j=0; j<imaxS.size(); j++) {
+			sMat.at<float>(i,imaxS.at(j)) = svec.at<float>(i,imaxS.at(j));
+		}
+		for(unsigned int j=0; j<iminS.size(); j++) {
+			sMat.at<float>(i,iminS.at(j)) = svec.at<float>(i,iminS.at(j));
+		}
+		for(unsigned int j=0; j<imaxL.size(); j++) {
+			lMat.at<float>(i,imaxL.at(j)) = lvec.at<float>(i,imaxL.at(j));
+		}
+		for(unsigned int j=0; j<iminL.size(); j++) {
+			lMat.at<float>(i,iminL.at(j)) = lvec.at<float>(i,iminL.at(j));
+		}
+	}
+
+	deque<double> hueVals;
+	deque<double> satVals;
+	deque<double> lumVals;
+	double h,s,l;
+	for(int i=0;i<hMat.rows; i++) {
+		for(int j=0; j<hMat.cols; j++) {
+			h = hMat.at<float>(i,j) = round(hMat.at<float>(i,j));
+			s = sMat.at<float>(i,j) = round(sMat.at<float>(i,j));
+			l = lMat.at<float>(i,j) = round(lMat.at<float>(i,j));
+			hueVals.push_back(h);
+			satVals.push_back(s);
+			lumVals.push_back(l);
+		}
+	}
+	sort(hueVals.begin(),hueVals.end());
+	sort(satVals.begin(),satVals.end());
+	sort(lumVals.begin(),lumVals.end());
+	kc.removeOutliers(hueVals,0.005);
+	kc.removeOutliers(satVals,0.005);
+	kc.removeOutliers(lumVals,0.005);
+	double hRange = hueVals.back()-hueVals.front();
+	double sRange = satVals.back()-satVals.front();
+	double lRange = lumVals.back()-lumVals.front();
+	int row = 94;
+	deque<double> hDiffVec;
+	deque<double> sDiffVec;
+	deque<double> lDiffVec;
+	for(int j=0; j<hMat.cols; j++) {
+		double hDiff = hMat.at<float>(row,j);
+		double sDiff = sMat.at<float>(row,j);
+		double lDiff = lMat.at<float>(row,j);
+		hDiffVec.push_back(hDiff);
+		sDiffVec.push_back(sDiff);
+		lDiffVec.push_back(lDiff);
+	}
+	writeSeq2File(hDiffVec,"hDiffVec");
+	writeSeq2File(sDiffVec,"sDiffVec");
+	writeSeq2File(lDiffVec,"lDiffVec");
+	//sm.setDebugMode(true);
+	//sm.test_getShapeUsingColor(img,52,32,20,true);
+	//sm.setHslRanges(hRange,sRange,lRange);
+	//Mat map = sm.getShapeUsingColor2(hMat,sMat,lMat, mapOfNonNoise);
+	//imgshow(map);
 	//writeSeq2File(hfitval2,"hfitval2");
 	/*writeSeq2File(hvec,"float","hvec");
 	writeSeq2File(svec,"float","svec");

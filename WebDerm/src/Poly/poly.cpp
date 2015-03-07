@@ -129,6 +129,10 @@ void Poly::loadVectorFile(String path, vector<double> &vec) {
 
 void Poly::findExtremas(vector<double> vec, vector<double> &xmax, vector<int> &imax, vector<double> &xmin, vector<int> &imin) {
 	Matlab mb;
+	xmax.clear();
+	imax.clear();
+	xmin.clear();
+	imin.clear();
 	unsigned int numOfElem = vec.size();
 
 	//Check for NaNs - but isnan() is broken so assume vec is all numbers

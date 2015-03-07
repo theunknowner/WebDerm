@@ -62,13 +62,16 @@ public:
 	vector<vector<Point> > findBoundary(Mat src);
 	int countEdgeTouching(Mat src, int edgeSize);
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
+	Mat removeNoiseOnBoundary(Mat src);
 
 	/** GetShapeUsingColor.cpp **/
 	int test_row, test_col, test_localScanSize;
 	bool enterFlag;
+	double hRange, sRange, lRange;
 	Mat getShapeUsingColor(Mat src);
 	Mat test_getShapeUsingColor(Mat src, int col=0, int row=0, int localScanSize=20, bool enterFlag=false);
-	Mat getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat);
+	Mat getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise);
+	void setHslRanges(double hRange, double sRange, double lRange);
 };
 
 #endif /* SHAPEMORPH_H_ */

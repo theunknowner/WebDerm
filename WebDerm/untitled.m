@@ -1,2 +1,5 @@
-vec(imin) = hvec(row,imin);
-vec(imax) = hvec(row,imax);
+plot(hDiffVec)
+figure
+plot(sDiffVec)
+figure
+plot(lDiffVec) 

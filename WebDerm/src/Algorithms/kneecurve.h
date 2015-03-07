@@ -20,6 +20,7 @@ public:
 	double getMaxDist();
 	void removeOutliers(deque<double> &vec, double percent);
 	void removeOutliers(vector<double> &vec, double percent);
+	void removeOutliers(deque<int> &vec, double percent);
 
 	void loadVectorFile(String path, deque<double> &vec);
 };

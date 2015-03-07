@@ -126,6 +126,15 @@ void KneeCurve::removeOutliers(vector<double> &vec, double percent) {
 	}
 }
 
+void KneeCurve::removeOutliers(deque<int> &vec, double percent) {
+	sort(vec.begin(),vec.end());
+	int amt = round(vec.size() * percent);
+	for(int i=0; i<amt; i++) {
+		vec.pop_back();
+		vec.pop_front();
+	}
+}
+
 void KneeCurve::loadVectorFile(String path, deque<double> &vec) {
 	fstream fs(path.c_str());
 	if(fs.is_open()) {
