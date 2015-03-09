@@ -50,7 +50,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/psoriasis19a.jpg");
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/lph4.jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
@@ -60,39 +60,6 @@ int main(int argc,char** argv)
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	/*
-	deque<double> hueVec;
-	deque<double> satVec;
-	deque<double> lumVec;
-	deque<int> origPos;
-	vector<double> HSL;
-	for(int i=0; i<img3.rows; i++) {
-		for(int j=0; j<img3.cols; j++) {
-			Vec3b BGR = img3.at<Vec3b>(i,j);
-			HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
-			if(mapOfNonNoise.at<uchar>(i,j)>0) {
-				HSL[0] = HSL[0] - floor(HSL[0]/180.) * 360.;
-				HSL[1] = round(HSL[1] * 100.);
-				HSL[2] = round(HSL[2] * 100.);
-				hueVec.push_back(HSL[0]);
-				satVec.push_back(HSL[1]);
-				lumVec.push_back(HSL[2]);
-			}
-		}
-	}
-	sort(hueVec.begin(),hueVec.end());
-	sort(satVec.begin(),satVec.end());
-	sort(lumVec.begin(),lumVec.end());
-	kc.removeOutliers(hueVec,0.005);
-	kc.removeOutliers(satVec,0.005);
-	kc.removeOutliers(lumVec,0.005);
-	printf("H_Min: %f, H_Max: %f\n",hueVec.front(), hueVec.back());
-	printf("H_Range: %f\n",hueVec.back()-hueVec.front());
-	printf("S_Min: %f, S_Max: %f\n",satVec.front(), satVec.back());
-	printf("S_Range: %f\n",satVec.back()-satVec.front());
-	printf("L_Min: %f, L_Max: %f\n",lumVec.front(), lumVec.back());
-	printf("L_Range: %f\n",lumVec.back()-lumVec.front());
-/**/
 
 	FileData fd;
 	Matlab mb;
@@ -198,13 +165,12 @@ int main(int argc,char** argv)
 	kc.removeOutliers(hueVals,0.005);
 	kc.removeOutliers(satVals,0.005);
 	kc.removeOutliers(lumVals,0.005);
-	double hRange = hueVals.back()-hueVals.front();
-	double sRange = satVals.back()-satVals.front();
-	double lRange = lumVals.back()-lumVals.front();
-	int row = 94;
+/*
+	int row = 46;
 	deque<double> hDiffVec;
 	deque<double> sDiffVec;
 	deque<double> lDiffVec;
+	deque<double> hslDiffVec;
 	for(int j=0; j<hMat.cols; j++) {
 		double hDiff = hMat.at<float>(row,j);
 		double sDiff = sMat.at<float>(row,j);
@@ -213,13 +179,15 @@ int main(int argc,char** argv)
 		sDiffVec.push_back(sDiff);
 		lDiffVec.push_back(lDiff);
 	}
+/*
 	writeSeq2File(hDiffVec,"hDiffVec");
 	writeSeq2File(sDiffVec,"sDiffVec");
 	writeSeq2File(lDiffVec,"lDiffVec");
+	*/
 	//sm.setDebugMode(true);
-	//sm.test_getShapeUsingColor(img,52,32,20,true);
-	//sm.setHslRanges(hRange,sRange,lRange);
-	//Mat map = sm.getShapeUsingColor2(hMat,sMat,lMat, mapOfNonNoise);
+	//sm.test_getShapeUsingColor(img,90,92,40,true);
+	sm.setHslVals(hueVals,satVals,lumVals);
+	Mat map = sm.getShapeUsingColor2(hMat,sMat,lMat, mapOfNonNoise);
 	//imgshow(map);
 	//writeSeq2File(hfitval2,"hfitval2");
 	/*writeSeq2File(hvec,"float","hvec");

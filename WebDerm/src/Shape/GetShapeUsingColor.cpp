@@ -198,14 +198,16 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 	double HSL[3], HSL_0[3], HSL_45[3], HSL_90[3];
 	Functions fn;
 	Mat map(hMat.size(),CV_8U,Scalar(0));
+	Mat trueEnterExitMap(hMat.size(),CV_8U,Scalar(0));
 	int _row=0; int _col=0, maxRow=hMat.rows, maxCol=hMat.cols;
-	int localScanSize = 20;
+	int localScanSize = 40;
 	int r,g,b;
 	double gradientDiff0, gradientDiff45, gradientDiff90;
 	double HslEntry[3];
 	double unitThresh[3] = {3.0,3.0,3.0};
 	const double unitRanges[3] = {14.0,16.0,11.0};
-	const double enterThresh=2.0;
+	const double enterThresh=1.0;
+	const double exitThresh = 1.0;
 	const double exitCumulativeThresh = 1.0;
 	const double offset = 3;
 	bool enterFlag=false, upTheMtn=false, downTheMtn=false;
@@ -217,11 +219,13 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 		maxRow = this->test_row+1;
 		maxCol = this->test_col+1;
 	}
-	deque<double> gradVec;
-	deque<double> hDiffVec;
-	unitThresh[0] *= (this->hRange/unitRanges[0]);
-	unitThresh[1] *= (this->sRange/unitRanges[1]);
-	unitThresh[2] *= (this->lRange/unitRanges[2]);
+	double hRange = this->hueVals.back() - this->hueVals.front();
+	double sRange = this->satVals.back() - this->satVals.front();
+	double lRange = this->lumVals.back() - this->lumVals.front();
+	unitThresh[0] *= (hRange/unitRanges[0]);
+	unitThresh[1] *= (sRange/unitRanges[1]);
+	unitThresh[2] *= (lRange/unitRanges[2]);
+	deque<double> hslDiffVec;
 	for(int row= _row; row<maxRow; row++) {
 		for(int col=_col; col<maxCol; col++) {
 			HSL[0] = hMat.at<float>(row,col);
@@ -237,26 +241,24 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 			int endY = row-localScanSize;
 			for(int i=y; i>=endY; i--) {
 				if(x<0 && j<0 && i<0) break;
-				if(x>=0 && map.at<uchar>(row,x)!=150 && noise.at<uchar>(row,x)!=0) {
+				if(x>=0 && trueEnterExitMap.at<uchar>(row,x)!=150 && noise.at<uchar>(row,x)!=0) {
 					HSL_0[0] = hMat.at<float>(row,x);
 					HSL_0[1] = sMat.at<float>(row,x);
 					HSL_0[2] = lMat.at<float>(row,x);
 					double hueDiff = (HSL[0]-HSL_0[0])/unitThresh[0];
 					double satDiff = (HSL_0[1]-HSL[1])/unitThresh[1];
 					double lumDiff = (HSL[2]-HSL_0[2])/unitThresh[2];
-					hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+					//hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
 					//hueDiff = round(hueDiff);
-					satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
-					lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
-					gradientDiff0 = hueDiff+satDiff+lumDiff;
-					gradVec.push_back(gradientDiff0);
-					hDiffVec.push_back(hueDiff);
+					//satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+					//lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+					gradientDiff0 = abs(hueDiff)+abs(satDiff)+abs(lumDiff);
 					if(abs(gradientDiff0)>=abs(maxDiff0)) {
 						maxDiff0 = gradientDiff0;
 						maxPt0 = Point(x,row);
 					}
 				}
-				if(map.at<uchar>(row,x)!=150)
+				if(trueEnterExitMap.at<uchar>(row,x)!=150)
 					--x;
 				if(j>=0 && i>=0 && map.at<uchar>(i,j)!=150 && noise.at<uchar>(i,j)!=0) {
 					HSL_45[0] = hMat.at<float>(i,j);
@@ -265,10 +267,10 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 					double hueDiff = (HSL[0]-HSL_45[0])/unitThresh[0];
 					double satDiff = (HSL[1]-HSL_45[1])/unitThresh[1];
 					double lumDiff = (HSL[2]-HSL_45[2])/unitThresh[2];
-					//hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
-					hueDiff = round(hueDiff);
-					satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
-					lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+					hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+					//hueDiff = round(hueDiff);
+					//satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+					//lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
 					gradientDiff45 = abs(hueDiff)+abs(satDiff)+abs(lumDiff);
 					if(abs(gradientDiff45)>=abs(maxDiff45)) {
 						maxDiff45 = gradientDiff45;
@@ -297,95 +299,76 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 				if(map.at<uchar>(y,col)!=150)
 					--y;
 			}// end for(int i)
+			double hueHalf = (this->hueVals.back()+this->hueVals.front())/2.0;
 			if(enterFlag==false) {
 				if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1) {
 					upTheMtn = true;
 				}
+				/*else if(fn.countGreaterEqual(2,myRound(maxDiff0),enterThresh)>=1 && HSL[0]>=hueHalf) {
+					double h0 = hMat.at<float>(maxPt0);
+					if(h0<hueHalf)
+						upTheMtn = true;
+				}*/
 				if(fn.countLesserEqual(2,maxDiff0,-enterThresh)>=1) {
 					downTheMtn = true;
 				}
+				/*else if(fn.countLesserEqual(2,myRound(maxDiff0),-enterThresh)>=1 && HSL[0]<=hueHalf) {
+					downTheMtn = true;
+				}*/
 				if(upTheMtn || downTheMtn) {
 					enterFlag = true;
 					HslEntry[0] = hMat.at<float>(maxPt0);
 					HslEntry[1] = sMat.at<float>(maxPt0);
 					HslEntry[2] = lMat.at<float>(maxPt0);
 					map.at<uchar>(row,col-offset) = 255;
+					trueEnterExitMap.at<uchar>(row,col) = 255;
 				}
 			}
 			else if(enterFlag==true) {
 				if(downTheMtn) {
-					if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1) {
-						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
-						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
-						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
-						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
-						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
-						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
-						gradientDiff0 = hueDiff+satDiff+lumDiff;
-						if(gradientDiff0>=-exitCumulativeThresh) {
-							enterFlag = false;
-							upTheMtn = downTheMtn = false;
-							map.at<uchar>(row,col) = 150;
-						}
-					}
-					else {
-						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
-						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
-						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
-						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
-						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
-						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
-						gradientDiff0 = hueDiff+satDiff+lumDiff;
-						if(gradientDiff0>=-exitCumulativeThresh) {
-							enterFlag = false;
-							upTheMtn = downTheMtn = false;
-							map.at<uchar>(row,col) = 150;
-						}
+					double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
+					//double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
+					//double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
+					//hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+					//satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+					//lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+					//hueDiff = round(hueDiff);
+					gradientDiff0 = hueDiff;
+					if(fn.countGreaterEqual(2,maxDiff0,exitThresh)>=1 && gradientDiff0>=-exitCumulativeThresh) {
+						enterFlag = false;
+						upTheMtn = downTheMtn = false;
+						map.at<uchar>(row,col-offset) = 150;
+						trueEnterExitMap.at<uchar>(row,col) = 150;
 					}
 				}
 				else if(upTheMtn) {
-					if(fn.countLesserEqual(2,maxDiff0,-enterThresh)>=1) {
-						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
-						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
-						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
-						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
-						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
-						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
-						gradientDiff0 = hueDiff+satDiff+lumDiff;
-						if(gradientDiff0<=exitCumulativeThresh) {
-							enterFlag = false;
-							upTheMtn = downTheMtn = false;
-							map.at<uchar>(row,col) = 150;
-						}
+					double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
+					//double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
+					//double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
+					//hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
+					//satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
+					//lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
+					gradientDiff0 = hueDiff;
+					if(fn.countLesserEqual(2,maxDiff0,-exitThresh)>=1 && gradientDiff0<=exitCumulativeThresh) {
+						enterFlag = false;
+						upTheMtn = downTheMtn = false;
+						map.at<uchar>(row,col-offset) = 150;
+						trueEnterExitMap.at<uchar>(row,col) = 150;
 					}
-					else {
-						double hueDiff = (HSL[0]-HslEntry[0])/unitThresh[0];
-						double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
-						double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
-						hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
-						satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
-						lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
-						gradientDiff0 = hueDiff+satDiff+lumDiff;
-						if(gradientDiff0<=exitCumulativeThresh) {
-							enterFlag = false;
-							upTheMtn = downTheMtn = false;
-							map.at<uchar>(row,col) = 150;
-						}
-					}
-
 				}//end if(upTheMtn)
 			}//end if(enterFlag==true)
-			if(col==52 && row==32) {
+			if(col==86 && row==51) {
 				String mtn = upTheMtn==true ? "Up" : "N/A";
 				mtn = downTheMtn==true ? "Down" : mtn;
 				printf("HSL(%f,%f,%f)\n",HSL[0],HSL[1],HSL[2]);
 				printf("HslE(%f,%f,%f)\n",HslEntry[0],HslEntry[1],HslEntry[2]);
 				printf("HSL0(%f,%f,%f)\n",hMat.at<float>(maxPt0),sMat.at<float>(maxPt0),lMat.at<float>(maxPt0));
-				printf("HSL45(%f,%f,%f)\n",hMat.at<float>(maxPt45),sMat.at<float>(maxPt45),lMat.at<float>(maxPt45));
-				printf("HSL90(%f,%f,%f)\n",hMat.at<float>(maxPt90),sMat.at<float>(maxPt90),lMat.at<float>(maxPt90));
+				//printf("HSL45(%f,%f,%f)\n",hMat.at<float>(maxPt45),sMat.at<float>(maxPt45),lMat.at<float>(maxPt45));
+				//printf("HSL90(%f,%f,%f)\n",hMat.at<float>(maxPt90),sMat.at<float>(maxPt90),lMat.at<float>(maxPt90));
 				printf("MaxDiff0: %f, MaxDiff45: %f, MaxDiff90: %f\n",maxDiff0,maxDiff45,maxDiff90);
 				printf("MaxPt0: %d,%d, MaxPt45: %d,%d, MaxPt90: %d,%d\n",maxPt0.x,maxPt0.y,maxPt45.x,maxPt45.y,maxPt90.x,maxPt90.y);
 				printf("EnterFlag: %d\n",enterFlag);
+				printf("MinHue: %f,MaxHue: %f\n",this->hueVals.front(),this->hueVals.back());
 				printf("Hsl_Ranges: [%f,%f,%f]\n",hRange,sRange,lRange);
 				printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
 				printf("Mtn: %s\n",mtn.c_str());
@@ -394,14 +377,12 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 		enterFlag=false;
 		upTheMtn = downTheMtn = false;
 	}//end for(row)
-	writeSeq2File(gradVec,"grad_vec");
-	writeSeq2File(hDiffVec,"hDiffVec");
 	return map;
 }
 
 //set HSL ranges for function getShapeUsingColors() HSL unitThresh
-void ShapeMorph::setHslRanges(double hRange,double sRange, double lRange) {
-	this->hRange = hRange;
-	this->sRange = sRange;
-	this->lRange = lRange;
+void ShapeMorph::setHslVals(deque<double> hueVals, deque<double> satVals, deque<double> lumVals) {
+	this->hueVals = hueVals;
+	this->satVals = satVals;
+	this->lumVals = lumVals;
 }

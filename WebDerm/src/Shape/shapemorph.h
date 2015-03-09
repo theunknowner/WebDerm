@@ -67,11 +67,11 @@ public:
 	/** GetShapeUsingColor.cpp **/
 	int test_row, test_col, test_localScanSize;
 	bool enterFlag;
-	double hRange, sRange, lRange;
+	deque<double> hueVals, satVals, lumVals;
 	Mat getShapeUsingColor(Mat src);
 	Mat test_getShapeUsingColor(Mat src, int col=0, int row=0, int localScanSize=20, bool enterFlag=false);
 	Mat getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise);
-	void setHslRanges(double hRange, double sRange, double lRange);
+	void setHslVals(deque<double> hueVals, deque<double> satVals, deque<double> lumVals);
 };
 
 #endif /* SHAPEMORPH_H_ */
