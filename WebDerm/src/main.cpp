@@ -165,8 +165,8 @@ int main(int argc,char** argv)
 	kc.removeOutliers(hueVals,0.005);
 	kc.removeOutliers(satVals,0.005);
 	kc.removeOutliers(lumVals,0.005);
-/*
-	int row = 46;
+	/*
+	int row = 50;
 	deque<double> hDiffVec;
 	deque<double> sDiffVec;
 	deque<double> lDiffVec;
@@ -183,11 +183,59 @@ int main(int argc,char** argv)
 	writeSeq2File(hDiffVec,"hDiffVec");
 	writeSeq2File(sDiffVec,"sDiffVec");
 	writeSeq2File(lDiffVec,"lDiffVec");
-	*/
+	 */
 	//sm.setDebugMode(true);
 	//sm.test_getShapeUsingColor(img,90,92,40,true);
-	sm.setHslVals(hueVals,satVals,lumVals);
-	Mat map = sm.getShapeUsingColor2(hMat,sMat,lMat, mapOfNonNoise);
+	vector<double> maxHueVec;
+	vector<double> maxSatVec;
+	vector<double> maxLumVec;
+
+	for(int row=0; row<hMat.rows; row++) {
+		for(int col=0; col<hMat.cols; col++) {
+			vector<double> hueVec;
+			vector<double> satVec;
+			vector<double> lumVec;
+			double minMaxHue[2];
+			double minMaxSat[2];
+			double minMaxLum[2];
+			int j=col-1;
+			int x = j;
+			int y = row-1;
+			int endY = row-20;
+			for(int i=y; i>=endY; i--) {
+				if(x<0 && j<0 && i<0) break;
+				if(x>=0) {
+					double hue = hMat.at<float>(row,x);
+					double sat = sMat.at<float>(row,x);
+					double lum = lMat.at<float>(row,x);
+					hueVec.push_back(hue);
+					satVec.push_back(sat);
+					lumVec.push_back(lum);
+				}
+				--x;
+			}// end for(int i)
+			minMaxLoc(hueVec,&minMaxHue[0],&minMaxHue[1]);
+			minMaxLoc(satVec,&minMaxSat[0],&minMaxSat[1]);
+			minMaxLoc(lumVec,&minMaxLum[0],&minMaxLum[1]);
+			double hr = minMaxHue[1] - minMaxHue[0];
+			double sr = minMaxSat[1] - minMaxSat[0];
+			double lr = minMaxLum[1] - minMaxLum[0];
+			maxHueVec.push_back(hr);
+			maxSatVec.push_back(sr);
+			maxLumVec.push_back(lr);
+			if(hr==114)
+				cout << Point(col,row) << endl;
+		}
+	}
+	sort(maxHueVec.begin(),maxHueVec.end());
+	sort(maxSatVec.begin(),maxSatVec.end());
+	sort(maxLumVec.begin(),maxLumVec.end());
+	cout << maxHueVec.back() << endl;
+	cout << maxSatVec.back() << endl;
+	cout << maxLumVec.back() << endl;
+
+	//sm.setHslVals(hueVals,satVals,lumVals);
+	//Mat map = sm.getShapeUsingColor2(hMat,sMat,lMat, mapOfNonNoise);
 	//imgshow(map);
 	//writeSeq2File(hfitval2,"hfitval2");
 	/*writeSeq2File(hvec,"float","hvec");
