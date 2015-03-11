@@ -15,7 +15,7 @@
 double correlationDist(double * vec1, double * vec2);
 double cosineDist(double * vec1, double * vec2);
 double normalizeToRange(double value, int min, int max);
-double myRound(double value);
+double myRound(double value, double thresh=.7999999);
 double medianAbsDev(deque<double> &vec);
 double meanAbsDev(deque<double> &vec);
 double standardDevSort(deque<double> &vec);

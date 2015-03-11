@@ -50,7 +50,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/lph4.jpg");
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/tinea_corporis5.jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
@@ -87,7 +87,6 @@ int main(int argc,char** argv)
 	writeSeq2File(lvec,"float","lvec");
 	String command = "python /home/jason/Desktop/workspace/Pyth/poly.py";
 	system(command.c_str());
-	/**/
 
 	deque<deque<String> > hData;
 	deque<deque<String> > sData;
@@ -104,11 +103,11 @@ int main(int argc,char** argv)
 	for(unsigned int i=0; i<hData.size(); i++) {
 		for(unsigned int j=0; j<hData.at(i).size(); j++) {
 			double val = atof(hData.at(i).at(j).c_str());
-			hMat.at<float>(i,j) = val;
+			hMat.at<float>(i,j) = round(val);
 			val = atof(sData.at(i).at(j).c_str());
-			sMat.at<float>(i,j) = val;
+			sMat.at<float>(i,j) = round(val);
 			val = atof(lData.at(i).at(j).c_str());
-			lMat.at<float>(i,j) = val;
+			lMat.at<float>(i,j) = round(val);
 		}
 		hMat.row(i).copyTo(hfitvals.at(i));
 		sMat.row(i).copyTo(sfitvals.at(i));
@@ -144,27 +143,6 @@ int main(int argc,char** argv)
 			lMat.at<float>(i,iminL.at(j)) = lvec.at<float>(i,iminL.at(j));
 		}
 	}
-
-	deque<double> hueVals;
-	deque<double> satVals;
-	deque<double> lumVals;
-	double h,s,l;
-	for(int i=0;i<hMat.rows; i++) {
-		for(int j=0; j<hMat.cols; j++) {
-			h = hMat.at<float>(i,j) = round(hMat.at<float>(i,j));
-			s = sMat.at<float>(i,j) = round(sMat.at<float>(i,j));
-			l = lMat.at<float>(i,j) = round(lMat.at<float>(i,j));
-			hueVals.push_back(h);
-			satVals.push_back(s);
-			lumVals.push_back(l);
-		}
-	}
-	sort(hueVals.begin(),hueVals.end());
-	sort(satVals.begin(),satVals.end());
-	sort(lumVals.begin(),lumVals.end());
-	kc.removeOutliers(hueVals,0.005);
-	kc.removeOutliers(satVals,0.005);
-	kc.removeOutliers(lumVals,0.005);
 	/*
 	int row = 50;
 	deque<double> hDiffVec;
@@ -183,60 +161,12 @@ int main(int argc,char** argv)
 	writeSeq2File(hDiffVec,"hDiffVec");
 	writeSeq2File(sDiffVec,"sDiffVec");
 	writeSeq2File(lDiffVec,"lDiffVec");
-	 */
+*/
 	//sm.setDebugMode(true);
 	//sm.test_getShapeUsingColor(img,90,92,40,true);
-	vector<double> maxHueVec;
-	vector<double> maxSatVec;
-	vector<double> maxLumVec;
-
-	for(int row=0; row<hMat.rows; row++) {
-		for(int col=0; col<hMat.cols; col++) {
-			vector<double> hueVec;
-			vector<double> satVec;
-			vector<double> lumVec;
-			double minMaxHue[2];
-			double minMaxSat[2];
-			double minMaxLum[2];
-			int j=col-1;
-			int x = j;
-			int y = row-1;
-			int endY = row-20;
-			for(int i=y; i>=endY; i--) {
-				if(x<0 && j<0 && i<0) break;
-				if(x>=0) {
-					double hue = hMat.at<float>(row,x);
-					double sat = sMat.at<float>(row,x);
-					double lum = lMat.at<float>(row,x);
-					hueVec.push_back(hue);
-					satVec.push_back(sat);
-					lumVec.push_back(lum);
-				}
-				--x;
-			}// end for(int i)
-			minMaxLoc(hueVec,&minMaxHue[0],&minMaxHue[1]);
-			minMaxLoc(satVec,&minMaxSat[0],&minMaxSat[1]);
-			minMaxLoc(lumVec,&minMaxLum[0],&minMaxLum[1]);
-			double hr = minMaxHue[1] - minMaxHue[0];
-			double sr = minMaxSat[1] - minMaxSat[0];
-			double lr = minMaxLum[1] - minMaxLum[0];
-			maxHueVec.push_back(hr);
-			maxSatVec.push_back(sr);
-			maxLumVec.push_back(lr);
-			if(hr==114)
-				cout << Point(col,row) << endl;
-		}
-	}
-	sort(maxHueVec.begin(),maxHueVec.end());
-	sort(maxSatVec.begin(),maxSatVec.end());
-	sort(maxLumVec.begin(),maxLumVec.end());
-	cout << maxHueVec.back() << endl;
-	cout << maxSatVec.back() << endl;
-	cout << maxLumVec.back() << endl;
-
 	//sm.setHslVals(hueVals,satVals,lumVals);
-	//Mat map = sm.getShapeUsingColor2(hMat,sMat,lMat, mapOfNonNoise);
-	//imgshow(map);
+	Mat map = sm.getShapeUsingColor2(hMat,sMat,lMat, mapOfNonNoise);
+	imgshow(map);
 	//writeSeq2File(hfitval2,"hfitval2");
 	/*writeSeq2File(hvec,"float","hvec");
 	writeSeq2File(svec,"float","svec");

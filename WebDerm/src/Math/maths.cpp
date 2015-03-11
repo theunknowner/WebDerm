@@ -54,11 +54,11 @@ double normalizeToRange(double value, int min, int max) {
 	return result;
 }
 
-/** rounds 8 and above **/
-double myRound(double value) {
+/** rounds 8 and above (default) or custom round threshold**/
+double myRound(double value, double thresh) {
 	double result=trunc(value);
 	result=value-result;
-	if(abs(result)>0.7999999) {
+	if(abs(result)>thresh) {
 		result=round(value);
 	}
 	else result=trunc(value);
