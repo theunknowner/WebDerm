@@ -17,16 +17,6 @@ deque<deque<deque< deque<double> > > > gSmoothRatio;
 deque<deque<deque< deque<double> > > > gSmoothRatioRm;
 deque<deque<deque< deque<double> > > > gRatioRm;
 
-String combineShades(String shade) {
-	if(shade.find("Dark2")!=string::npos || shade.find("Dark1")!=string::npos)
-		return "Dark2";
-	if(shade.find("Dark3")!=string::npos) return "Dark3";
-	if(shade.find("High")!=string::npos) return "High";
-	if(shade.find("Low")!=string::npos) return "Low";
-	if(shade.find("Light")!=string::npos) return "Low";
-	return shade;
-}
-
 void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetShade) {
 	int height = fd.colorVec.size()/ksize.height;
 	int width = fd.colorVec.at(0).size()/ksize.width;
@@ -74,7 +64,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 							color = c.getMainColor(pix);
 							color = c.optimizeColor2(color);
 							/**temporary testing**/
-							shade = combineShades(shade);
+							shade = sh.combineShades(shade);
 							color = c.combineColors(color);
 							if(color=="Violet" || color =="Purple")
 								shade = "High";

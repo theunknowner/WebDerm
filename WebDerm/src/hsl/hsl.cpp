@@ -62,108 +62,108 @@ bool Hsl::importHslThresholds() {
 
 //gets the minimum between the rgb value
 double Hsl::minRGB(double red, double green, double blue)
+{
+	if(red<=green && red<=blue)
 	{
-		if(red<=green && red<=blue)
-		{
-			return red;
-		}
-		if(green<=blue && green<=red)
-		{
-			return green;
-		}
-		return blue;
+		return red;
 	}
+	if(green<=blue && green<=red)
+	{
+		return green;
+	}
+	return blue;
+}
 
 //get the max between tbe rgb value
-	double Hsl::maxRGB(double red, double green, double blue)
+double Hsl::maxRGB(double red, double green, double blue)
+{
+	if(red>=green && red>=blue)
 	{
-		if(red>=green && red>=blue)
-		{
-			return red;
-		}
-		if(green>=blue && green>=red)
-		{
-			return green;
-		}
-		return blue;
+		return red;
 	}
+	if(green>=blue && green>=red)
+	{
+		return green;
+	}
+	return blue;
+}
 
 //converts rgb values to Hsl values
-	vector<double> Hsl::rgb2hsl(double red, double green, double blue)
+vector<double> Hsl::rgb2hsl(double red, double green, double blue)
+{
+	double r,g,b;
+	double min, max;
+	double delta;
+	vector<double> HSL(3,0);
+	r = red/255;
+	g = green/255;
+	b = blue/255;
+	min = minRGB(r,g,b);
+	max = maxRGB(r,g,b);
+	L = (max+min)/2;
+	delta = max-min;
+	if(delta==0)
 	{
-		double r,g,b;
-		double min, max;
-		double delta;
-		vector<double> HSL(3,0);
-		r = red/255;
-		g = green/255;
-		b = blue/255;
-		min = minRGB(r,g,b);
-		max = maxRGB(r,g,b);
-		L = (max+min)/2;
-		delta = max-min;
-		if(delta==0)
+		H=0; S=0;
+	}
+	else
+	{
+		if(L>0.5)
 		{
-			H=0; S=0;
+			S = (max-min)/(2.0-max-min);
 		}
 		else
 		{
-			if(L>0.5)
-			{
-				S = (max-min)/(2.0-max-min);
-			}
-			else
-			{
-				S = (max-min)/(max+min);
-			}
-			if(max==r)
-			{
-				H = ((g-b)/delta);
-			}
-			else if(max==g)
-			{
-				H = ((b-r)/delta) + 2;
-			}
-			else
-			{
-				H = ((r-g)/delta) + 4;
-			}
-			H *= 60;
-			if(H<0) H+=360;
+			S = (max-min)/(max+min);
 		}
-		HSL[0] = round(H); HSL[1] = S; HSL[2] = L;
-		return HSL;
+		if(max==r)
+		{
+			H = ((g-b)/delta);
+		}
+		else if(max==g)
+		{
+			H = ((b-r)/delta) + 2;
+		}
+		else
+		{
+			H = ((r-g)/delta) + 4;
+		}
+		H *= 60;
+		if(H<0) H+=360;
 	}
+	HSL[0] = round(H); HSL[1] = S; HSL[2] = L;
+	return HSL;
+}
 
-	double Hsl::getHue()
-	{
-		H = round(H);
-		return H;
-	}
+double Hsl::getHue()
+{
+	H = round(H);
+	return H;
+}
 
-	double Hsl::getSat()
-	{
-		return S;
-	}
+double Hsl::getSat()
+{
+	return S;
+}
 
-	double Hsl::getLum()
-	{
-		return L;
-	}
+double Hsl::getLum()
+{
+	return L;
+}
 
-	double Hsl::calcLum(double red, double green, double blue)
-	{
-		double r,g,b;
-		double min, max;
-		double lum;
-		r = red/255;
-		g = green/255;
-		b = blue/255;
-		min = minRGB(r,g,b);
-		max = maxRGB(r,g,b);
-		lum = (max+min)/2;
-		return lum;
-	}
+double Hsl::calcLum(double red, double green, double blue)
+{
+	double r,g,b;
+	double min, max;
+	double lum;
+	r = red/255;
+	g = green/255;
+	b = blue/255;
+	min = minRGB(r,g,b);
+	max = maxRGB(r,g,b);
+	lum = (max+min)/2;
+	return lum;
+}
 
 //return the color of the Hsl values using Hsl colorspace
 String Hsl::getHslColor(double hue, double sat, double lum)
@@ -249,9 +249,9 @@ inline double hue2rgb(double var1, double var2, double vH) {
 }
 
 /** hue=0-360; sat=0-1; lum=0-1 **/
-int *Hsl::hsl2rgb(double hue, double sat, double lum) {
-	static double RGB[3];
-	static int results[3];
+vector<int> Hsl::hsl2rgb(double hue, double sat, double lum) {
+	double RGB[3];
+	vector<int> results(3,0);
 	if(sat==0) {
 		RGB[0] = round(lum * 255);
 		RGB[1] = round(lum * 255);

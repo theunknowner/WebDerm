@@ -73,7 +73,7 @@ public:
 	Mat getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise);
 	void setHslVals(deque<double> hueVals, deque<double> satVals, deque<double> lumVals);
 	double epoh(double sat, double lum);
-	Mat preprocessHue(Mat hMat, Mat sMat, Mat lMat);
+	Mat epohTheHue(Mat hMat, Mat sMat, Mat lMat);
 	void maxLocalHslRanges(Mat hMat, Mat sMat, Mat lMat, double &hr, double &sr, double &lr);
 };
 

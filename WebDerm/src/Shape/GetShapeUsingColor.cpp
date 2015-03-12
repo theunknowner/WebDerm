@@ -196,18 +196,19 @@ Mat ShapeMorph::test_getShapeUsingColor(Mat src, int col, int row, int localScan
 
 Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 	double hRange,sRange,lRange;
-	Mat	hc = this->preprocessHue(hMat, sMat, lMat);
+	Mat	hc = this->epohTheHue(hMat, sMat, lMat);
+	writeSeq2File(hc.row(107),"float","hc");
 	this->maxLocalHslRanges(hc,sMat,lMat,hRange,sRange,lRange);
 	double HSL[3], HSL_0[3], HSL_45[3], HSL_90[3];
 	Functions fn;
 	Mat map(hMat.size(),CV_8U,Scalar(0));
 	Mat trueEnterExitMap(hMat.size(),CV_8U,Scalar(0));
 	int _row=0; int _col=5, maxRow=hMat.rows, maxCol=hMat.cols;
-	int localScanSize = 40;
+	int localScanSize = 20;
 	double gradientDiff0, gradientDiff45, gradientDiff90;
 	double HslEntry[3];
-	double unitThresh[3] = {2.0,12.6,7.2};
-	const double unitRanges[3] = {4.4, 6.0, 13.0}; //base on TC5
+	double unitThresh[3] = {1.7,12.6,7.2};
+	const double unitRanges[3] = {3.03,4.0,6.0}; //base on TC5
 	const double enterThresh = 1;
 	const double exitCumulativeThresh = 1.0;
 	const double offset = 3;
@@ -275,7 +276,7 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 					//double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
 					//double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
 					gradientDiff0 = hueDiff;
-					if(fn.countGreaterEqual(2,round(maxDiff0),enterThresh)>=1) {
+					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1) {
 						enterFlag = false;
 						upTheMtn = downTheMtn = false;
 						map.at<uchar>(row,col) = 150;
@@ -290,7 +291,7 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 					//satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
 					//lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
 					gradientDiff0 = hueDiff;
-					if(fn.countLesserEqual(2,round(maxDiff0),-enterThresh)>=1) {
+					if(fn.countLesserEqual(2,(maxDiff0),-enterThresh)>=1) {
 						enterFlag = false;
 						upTheMtn = downTheMtn = false;
 						map.at<uchar>(row,col) = 150;
@@ -298,7 +299,7 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 					}
 				}//end if(upTheMtn)
 			}//end if(enterFlag==true)
-			if(col==58 && row==83) {
+			if(col==53 && row==113) {
 				String mtn = upTheMtn==true ? "Up" : "N/A";
 				mtn = downTheMtn==true ? "Down" : mtn;
 				printf("HSL(%f,%f,%f)%f\n",hMat.at<float>(row,col),sMat.at<float>(row,col),lMat.at<float>(row,col),HSL[0]);
@@ -313,7 +314,7 @@ Mat ShapeMorph::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 				printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
 				printf("Mtn: %s\n",mtn.c_str());
 			}
-			if(row==84)
+			if(row==114)
 				maxDiffVec.push_back(maxDiff0);
 		} //end for(col)
 		enterFlag=false;
@@ -342,7 +343,7 @@ double ShapeMorph::epoh(double sat, double lum) {
 	return result;
 }
 
-Mat ShapeMorph::preprocessHue(Mat hMat, Mat sMat, Mat lMat) {
+Mat ShapeMorph::epohTheHue(Mat hMat, Mat sMat, Mat lMat) {
 	Mat hc(hMat.size(),CV_32F, Scalar(0));
 	for(int i=0; i<hMat.rows; i++) {
 		for(int j=0; j<hMat.cols; j++) {
@@ -399,7 +400,7 @@ void ShapeMorph::maxLocalHslRanges(Mat hMat, Mat sMat, Mat lMat, double &hr, dou
 	sort(maxHueVec.begin(),maxHueVec.end());
 	sort(maxSatVec.begin(),maxSatVec.end());
 	sort(maxLumVec.begin(),maxLumVec.end());
-	hr = maxHueVec.back();
-	sr = maxSatVec.back();
-	lr = maxLumVec.back();
+	hr = roundDecimal(maxHueVec.back(),2);
+	sr = roundDecimal(maxSatVec.back(),2);
+	lr = roundDecimal(maxLumVec.back(),2);
 }

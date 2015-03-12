@@ -33,6 +33,9 @@ public:
 
 	int getShadeIndex2(String shade);
 	String getShade2(int index);
+
+	String combineShades(String shade);
+
 };
 
 #endif /* SHADES_H_ */

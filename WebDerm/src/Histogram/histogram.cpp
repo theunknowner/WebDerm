@@ -206,7 +206,7 @@ void Histogram::lightEqualizer(Mat src, Mat &dst) {
 	int r,g,b;
 	deque<int> lumVec(101,0);
 	vector<double> HSL;
-	int *RGB;
+	vector<int> RGB;
 	int lum=0;
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {

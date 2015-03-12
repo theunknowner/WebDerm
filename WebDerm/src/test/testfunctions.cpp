@@ -49,7 +49,7 @@ void Mat2Image(deque< deque<double> > &input, Mat &output) {
 Mat test_normalizeColors(Mat src) {
 	Hsl hsl;
 	vector<double> HSL;
-	int *RGB;
+	vector<int> RGB;
 	Mat dst = src.clone();
 	int r,g,b;
 	double normR, normG, normB;

@@ -12,9 +12,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Intensity/rules.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
-extern deque< deque<double> > normMeanThresh;
-extern deque< deque<double> > absMeanThresh;
-extern deque<String> rgbColors;
 extern deque<String> mainColors;
 extern deque<String> allColors;
 
@@ -31,9 +28,6 @@ public:
 	void outputRGBVals(FILE * fp, int red, int green, int blue, Point coord, double dist, String color, int ind);
 	bool checkAbsDist(double dist, double thresh);
 	String checkBlack(int r, int g, int b);
-	String pushColor(int red, int green, int blue);
-	String pushColor(int red, int green, int blue,double &dist, int &ind);
-	String pushColor(int red, int green, int blue, int &ind, double &dist);
 	double calcGrayLevel(int red, int green, int blue);
 	double calcColorLevel(double red, double green, double blue);
 	double getGrayLevel1(String color);

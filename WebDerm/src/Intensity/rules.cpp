@@ -714,9 +714,9 @@ double rule5(FileData &fd, String &newPix, String &newShade) {
 	double grayLevel = rgb.getGrayLevel1(newPix);
 	double colorLevel = rgb.getColorLevel(newPix);
 	double HSL[3];
-	int *RGB;
+	vector<int> RGB;
 	double nextHSL[3];
-	int *nextRGB;
+	vector<int> nextRGB;
 	const double H = 0.72;
 	const double enterDemarcThresh = -0.0046;
 	const double exitDemarcThresh = 0.005;

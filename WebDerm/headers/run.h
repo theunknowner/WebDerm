@@ -29,8 +29,6 @@ void runAllHysteresis();
 void runGetSkin();
 void runAllGetSkin();
 void getMouseInfo(Mat &img);
-void runMouseHysteresis();
-void runMouseHysteresis2();
 void runMouseColor();
 void runMouseOutputColor();
 void runRenameFiles();

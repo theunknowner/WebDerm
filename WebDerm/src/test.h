@@ -17,10 +17,13 @@
 #include "FileData/filedata.h"
 #include "Histogram/histogram.h"
 #include "Shades/shades.h"
+#include "Color/color.h"
 
-String testHysteresis(Mat &img, int row, int col, Size size);
-String testMouseHysteresis(Mat &img, int row, int col, Size size, deque<Vec3b> &vec, deque<String> &colorVec);
-void testColorIndex(Mat &img, int index);
-String testColorAtLoc(Mat &img, Point pt, double &hue);
+class Test {
+public:
+	vector<vector<String> > test_shadesOfColor(Mat src);
+	Mat test_hslAvgOfColor(Mat src);
+
+};
 
 #endif /* TEST_H_ */

@@ -10,6 +10,7 @@
 deque<String> g_Shades;
 deque< deque<double> > g_ShadeThresh;
 
+//! g_Shades2 is for combined shades
 deque<String> g_Shades2;
 deque< deque<double> > g_ShadeThresh2;
 
@@ -135,6 +136,7 @@ int Shades::shadeDifference(String shade1, String shade2) {
 	return diff;
 }
 
+//return index for g_Shades2
 int Shades::getShadeIndex2(String shade) {
 	unsigned int index=0;
 	int shadeCount = g_Shades2.size();
@@ -153,4 +155,15 @@ String Shades::getShade2(int index) {
 	if(ind<0) ind=0;
 	if(ind>(shadeCount-1)) ind=(shadeCount-1);
 	return g_Shades2.at(ind);
+}
+
+//custom function for combing shades that might look the same
+String Shades::combineShades(String shade) {
+	if(shade.find("Dark2")!=string::npos || shade.find("Dark1")!=string::npos)
+		return "Dark2";
+	if(shade.find("Dark3")!=string::npos) return "Dark3";
+	if(shade.find("High")!=string::npos) return "High";
+	if(shade.find("Low")!=string::npos) return "Low";
+	if(shade.find("Light")!=string::npos) return "Low";
+	return shade;
 }

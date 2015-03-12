@@ -138,7 +138,7 @@ String Color::reassignLevels(String color, double h, double s, double l) {
 	deque<String> colorVec;
 	String pix2;
 	extractColorFromString(color, colorVec);
-	int *RGB = hsl.hsl2rgb(h,s,l);
+	vector<int> RGB = hsl.hsl2rgb(h,s,l);
 	double grayLevel = rgb.calcGrayLevel(RGB[0],RGB[1],RGB[2]);
 	double colorLevel = rgb.calcColorLevel(RGB[0],RGB[1],RGB[2]);
 	double grayLumLevel = rgb.calcGrayLumLevel(RGB[0],RGB[1],RGB[2]);
@@ -224,7 +224,7 @@ void Color::output2ImageColor(deque< deque<String> > &window, Size size, String 
 		double lumIncThresh = 0.05;
 		Mat img = img.zeros(Size(window.at(0).size(),window.size()),16);
 		vector<double> HSL;
-		int *RGB;
+		vector<int> RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
@@ -305,7 +305,7 @@ Mat Color::changeImageBrightness(Mat &img, double amt, int type) {
 	Mat img2 = img.clone();
 	int r,g,b;
 	vector<double> HSL;
-	int *RGB;
+	vector<int> RGB;
 	for(int i=0; i<img2.rows; i++) {
 		for(int j=0; j<img2.cols; j++) {
 			r = img2.at<Vec3b>(i,j)[2];
@@ -338,7 +338,7 @@ Mat Color::changeImageSaturation(Mat img, double amt) {
 	Hsl hsl;
 	int r,g,b;
 	vector<double> HSL;
-	int *RGB;
+	vector<int> RGB;
 	for(int i=0; i<img2.rows; i++) {
 		for(int j=0; j<img2.cols; j++) {
 			r = img2.at<Vec3b>(i,j)[2];
@@ -532,7 +532,7 @@ void Color::avgImageLuminance(Mat &src) {
 	}
 	avgLum = roundDecimal(totalLum/countLum,2);
 	avgSat = roundDecimal(totalSat/countSat,2);
-	int *RGB;
+	vector<int> RGB;
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
 			r = src.at<Vec3b>(i,j)[2];
@@ -585,7 +585,7 @@ int* Color::changeRgbRelLum(double r, double g, double b, double amt) {
 
 	vector<double> HSL = hsl.rgb2hsl(r,g,b);
 	vector<double> HSL2 = hsl.rgb2hsl(RGB[0],RGB[1],RGB[2]);
-	int *RGB2 = hsl.hsl2rgb(HSL[0],HSL[1],HSL2[2]);
+	vector<int> RGB2 = hsl.hsl2rgb(HSL[0],HSL[1],HSL2[2]);
 
 	results[0] = RGB2[0];
 	results[1] = RGB2[1];
@@ -645,7 +645,7 @@ Mat Color::output2ImageTargetColor(deque< deque<String> > &window, Size size, St
 		double lumIncThresh = 0.05;
 		Mat img = img.zeros(Size(window.at(0).size(),window.size()),16);
 		vector<double> HSL;
-		int *RGB;
+		vector<int> RGB;
 		for(unsigned int i=0; i<window.size(); i++) {
 			for(unsigned int j=0; j<window.at(i).size(); j++) {
 				shade = extractShade(window.at(i).at(j));
