@@ -29,7 +29,7 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 	Rgb rgb;
 	Shades sh;
 	String color, shade;
-	int index=0;
+	int index=0, shadeIndex=0;
 	vector<double> HSL;
 	vector<vector<double> >hAvg(allColors.size(),vector<double>(g_Shades2.size(),0));
 	vector<vector<double> >sAvg(allColors.size(),vector<double>(g_Shades2.size(),0));
@@ -75,24 +75,64 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 				hAvg.at(i).at(j) /= colorCount.at(i).at(j);
 				sAvg.at(i).at(j) /= colorCount.at(i).at(j);
 				lAvg.at(i).at(j) /= colorCount.at(i).at(j);
+				//printf("%s%s: %d\n",g_Shades2.at(j).c_str(),allColors.at(i).c_str(),colorCount.at(i).at(j));
 			}
 		}
 	}
 	Mat result(src.size(),CV_8UC3,Scalar(0,0,0));
+	deque<String> colorSE;
+	deque<String> shadeSE;
+	unsigned int structElemSize = 3;
+	int sides = floor(structElemSize/2.0);
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
-			color = colorNames.at(i).at(j);
-			index = rgb.getColorIndex(color);
-			shade = shadeNames.at(i).at(j);
-			int shadeIndex = sh.getShadeIndex2(shade);
-			double h = round(hAvg.at(index).at(shadeIndex));
-			double s = roundDecimal(sAvg.at(index).at(shadeIndex),2);
-			double l = roundDecimal(lAvg.at(index).at(shadeIndex),2);
-			if(h<0) h = 360.0 + h;
-			vector<int> RGB = hsl.hsl2rgb(h,s,l);
-			result.at<Vec3b>(i,j)[2] = RGB.at(0);
-			result.at<Vec3b>(i,j)[1] = RGB.at(1);
-			result.at<Vec3b>(i,j)[0] = RGB.at(2);
+			vector<vector<int> > shadeColorCount(allColors.size(),vector<int>(g_Shades2.size(),0));
+			for(int k=j-sides; k<=j+sides; k++) {
+				if(k>=0 && k<src.cols) {
+					color = colorNames.at(i).at(k);
+					shade = shadeNames.at(i).at(k);
+					colorSE.push_back(color);
+					shadeSE.push_back(shade);
+				}
+			}
+			for(unsigned int k=0; k<colorSE.size(); k++) {
+				try {
+					int indColor = rgb.getColorIndex(colorSE.at(k));
+					int indShade = sh.getShadeIndex2(shadeSE.at(k));
+					shadeColorCount.at(indColor).at(indShade)++;
+					if(shadeColorCount.at(indColor).at(indShade)>=round(structElemSize/2.0)) {
+						color =	allColors.at(indColor);
+						shade = sh.getShade2(indShade);
+						break;
+					}
+				} catch (const std::out_of_range &oor) {
+					printf("Out of range #1!\n");
+					exit(1);
+				}
+			}
+			try {
+				index = rgb.getColorIndex(color);
+				shadeIndex = sh.getShadeIndex2(shade);
+				double h = round(hAvg.at(index).at(shadeIndex));
+				double s = roundDecimal(sAvg.at(index).at(shadeIndex),2);
+				double l = roundDecimal(lAvg.at(index).at(shadeIndex),2);
+				if(h<0) h = 360.0 + h;
+				vector<int> RGB = hsl.hsl2rgb(h,s,l);
+				result.at<Vec3b>(i,j)[2] = RGB.at(0);
+				result.at<Vec3b>(i,j)[1] = RGB.at(1);
+				result.at<Vec3b>(i,j)[0] = RGB.at(2);
+				colorNames.at(i).at(j) = color;
+				shadeNames.at(i).at(j) = shade;
+			} catch (const std::out_of_range &oor) {
+				printf("Out of Range #2!\n");
+				printf("Point: %d,%d\n",j,i);
+				printf("Color_Index: %d\n",index);
+				printf("Shade_Index: %d\n",shadeIndex);
+				printf("Color: %s\n",color.c_str());
+				exit(1);
+			}
+			colorSE.clear();
+			shadeSE.clear();
 		}
 	}
 	return result;

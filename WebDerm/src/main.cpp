@@ -63,7 +63,6 @@ int main(int argc,char** argv)
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Test test;
 	img = test.test_hslAvgOfColor(img);
-	//imwrite("lph4b.png",img);
 
 	FileData fd;
 	Matlab mb;
