@@ -29,6 +29,7 @@
 #include "Poly/poly.h"
 #include "Matlab/matlab.h"
 #include "test.h"
+#include "Shape/shapecolor.h"
 
 int main(int argc,char** argv)
 {
@@ -51,7 +52,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/lph4.jpg");
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/tinea_corporis5.jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
@@ -63,7 +64,7 @@ int main(int argc,char** argv)
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Test test;
 	img = test.test_hslAvgOfColor(img);
-
+	//imwrite("herpes12.png",img);
 	FileData fd;
 	Matlab mb;
 	Poly poly;
@@ -72,7 +73,6 @@ int main(int argc,char** argv)
 	Mat hvec(img.size(),CV_32F,Scalar(0));
 	Mat svec(img.size(),CV_32F,Scalar(0));
 	Mat lvec(img.size(),CV_32F,Scalar(0));
-	Mat hslMat(img.size(),CV_32F,Scalar(0));
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
 			Vec3b RGB = img.at<Vec3b>(i,j);
@@ -88,8 +88,9 @@ int main(int argc,char** argv)
 	//sm.setDebugMode(true);
 	//sm.test_getShapeUsingColor(img,90,92,40,true);
 	//sm.setHslVals(hueVals,satVals,lumVals);
-	Mat map = sm.getShapeUsingColor2(hvec,svec,lvec, mapOfNonNoise);
-	imgshow(map);
+	ShapeColor sc;
+	Mat map = sc.getShapeUsingColor2(hvec,svec,lvec, mapOfNonNoise);
+	//imgshow(map);
 	//writeSeq2File(hfitval2,"hfitval2");
 	/*writeSeq2File(hvec,"float","hvec");
 	writeSeq2File(svec,"float","svec");
