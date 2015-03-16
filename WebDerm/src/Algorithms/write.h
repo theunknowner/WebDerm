@@ -18,6 +18,7 @@ void writeSeq2File(deque< deque<int> > &vec, String name);
 void writeSeq2File(deque< deque<double> > &vec, String name);
 void writeSeq2File(deque<double> &vec, String name);
 void writeSeq2File(vector<double> &vec, String name);
+void writeSeq2File(vector<float> &vec, String name);
 void writeSeq2File(vector<int> &vec, String name);
 void writeSeq2File(deque<int> &vec, String name);
 void writeSeq2File(deque< deque<long double> > &vec, String name);

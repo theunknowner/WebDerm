@@ -12,7 +12,7 @@
 
 class Cie {
 public:
-	double deltaE76(vector<float> lch1, vector<float> lch2);
+	double deltaE76(vector<float> vec1, vector<float> vec2);
 	double deltaE2000(vector<float> lch1, vector<float> lch2);
 };
 

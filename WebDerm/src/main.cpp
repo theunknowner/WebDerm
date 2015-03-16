@@ -30,6 +30,8 @@
 #include "Matlab/matlab.h"
 #include "test.h"
 #include "Shape/shapecolor.h"
+#include "Colorspace/xyz.h"
+#include "Colorspace/cielab.h"
 
 int main(int argc,char** argv)
 {
@@ -52,11 +54,10 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/tinea_corporis5.jpg");
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/lph4.jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
-	KneeCurve kc;
 	Size size(5,5);
 	blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
@@ -65,32 +66,13 @@ int main(int argc,char** argv)
 	Test test;
 	img = test.test_hslAvgOfColor(img);
 	//imwrite("herpes12.png",img);
-	FileData fd;
-	Matlab mb;
-	Poly poly;
-	int r,g,b;
-	vector<double> HSL;
-	Mat hvec(img.size(),CV_32F,Scalar(0));
-	Mat svec(img.size(),CV_32F,Scalar(0));
-	Mat lvec(img.size(),CV_32F,Scalar(0));
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			Vec3b RGB = img.at<Vec3b>(i,j);
-			HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
-			HSL[0] = HSL[0] - floor(HSL[0]/180.) * 360.;
-			HSL[1] = round(HSL[1] * 100.);
-			HSL[2] = round(HSL[2] * 100.);
-			hvec.at<float>(i,j) = HSL.at(0);
-			svec.at<float>(i,j) = HSL.at(1);
-			lvec.at<float>(i,j) = HSL.at(2);
-		}
-	}
+
 	//sm.setDebugMode(true);
 	//sm.test_getShapeUsingColor(img,90,92,40,true);
 	//sm.setHslVals(hueVals,satVals,lumVals);
 	ShapeColor sc;
-	Mat map = sc.getShapeUsingColor2(hvec,svec,lvec, mapOfNonNoise);
-	//imgshow(map);
+	Mat map = sc.getShapeUsingColor2(img, mapOfNonNoise);
+	imgshow(map);
 	//writeSeq2File(hfitval2,"hfitval2");
 	/*writeSeq2File(hvec,"float","hvec");
 	writeSeq2File(svec,"float","svec");

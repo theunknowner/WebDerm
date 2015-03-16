@@ -14,7 +14,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src) {
 	int _row=0; int _col=0, maxRow=src.rows, maxCol=src.cols;
 	int localScanSize = 20;
 	int r,g,b;
-	vector<double> HSL, HSL_0, HSL_45, HSL_90;
+	vector<double> HSL, LAB_0, HSL_45, HSL_90;
 	double gradientDiff0, gradientDiff45, gradientDiff90;
 	vector<double> HslEntry;
 	const double unitThresh[3] = {6.0,5.0,4.0};
@@ -52,13 +52,13 @@ Mat ShapeColor::getShapeUsingColor(Mat src) {
 					r = src.at<Vec3b>(row,x)[2];
 					g = src.at<Vec3b>(row,x)[1];
 					b = src.at<Vec3b>(row,x)[0];
-					HSL_0 = hsl.rgb2hsl(r,g,b);
-					HSL_0[0] = (HSL_0[0] - floor(HSL_0[0]/180.) * 360.);
-					HSL_0[1] = round(HSL_0[1] * 100.0);
-					HSL_0[2] = round(HSL_0[2] * 100.0);
-					double hueDiff = (HSL[0]-HSL_0[0])/unitThresh[0];
-					double satDiff = (HSL[1]-HSL_0[1])/unitThresh[1];
-					double lumDiff = (HSL[2]-HSL_0[2])/unitThresh[2];
+					LAB_0 = hsl.rgb2hsl(r,g,b);
+					LAB_0[0] = (LAB_0[0] - floor(LAB_0[0]/180.) * 360.);
+					LAB_0[1] = round(LAB_0[1] * 100.0);
+					LAB_0[2] = round(LAB_0[2] * 100.0);
+					double hueDiff = (HSL[0]-LAB_0[0])/unitThresh[0];
+					double satDiff = (HSL[1]-LAB_0[1])/unitThresh[1];
+					double lumDiff = (HSL[2]-LAB_0[2])/unitThresh[2];
 					hueDiff = hueDiff>=0 ? floor(hueDiff) : ceil(hueDiff);
 					satDiff = satDiff>=0 ? floor(satDiff) : ceil(satDiff);
 					lumDiff = lumDiff>=0 ? floor(lumDiff) : ceil(lumDiff);
@@ -194,23 +194,49 @@ Mat ShapeColor::test_getShapeUsingColor(Mat src, int col, int row, int localScan
 	return Mat();
 }
 
-Mat ShapeColor::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
-	double hRange,sRange,lRange;
-	Mat	hc = this->epohTheHue(hMat, sMat, lMat);
-	//writeSeq2File(hc.row(60),"float","hc");
-	this->maxLocalHslRanges(hc,sMat,lMat,hRange,sRange,lRange);
-	double HSL[3], HSL_0[3], HSL_45[3], HSL_90[3];
+Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 	Functions fn;
-	Mat map(hMat.size(),CV_8U,Scalar(0));
-	int _row=0; int _col=5, maxRow=hMat.rows, maxCol=hMat.cols;
+	Xyz xyz;
+	CieLab lab;
+	Cie cie;
+	Hsl hsl;
+	vector<float> XYZ, LAB;
+	vector<double> HSL;
+	Mat Lvec(src.size(),CV_32F,Scalar(0));
+	Mat avec(src.size(),CV_32F,Scalar(0));
+	Mat bvec(src.size(),CV_32F,Scalar(0));
+
+	Mat hvec(src.size(),CV_32F,Scalar(0));
+	Mat svec(src.size(),CV_32F,Scalar(0));
+	Mat lvec(src.size(),CV_32F,Scalar(0));
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			Vec3b RGB = src.at<Vec3b>(i,j);
+			XYZ = xyz.rgb2xyz(RGB[2],RGB[1],RGB[0]);
+			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+			HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
+			Lvec.at<float>(i,j) = LAB.at(0);
+			avec.at<float>(i,j) = LAB.at(1);
+			bvec.at<float>(i,j) = LAB.at(2);
+
+			hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+			svec.at<float>(i,j) = round(HSL.at(1) * 100);
+			lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+		}
+	}
+	Mat hc = this->epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
+
+	double maxRange=0;
+	this->maxLocalRanges(Lvec,avec,bvec,maxRange);
+	vector<float> LAB_0(3,0);
+	double HC, HC_0;
+	vector<float> LabEntry(3,0);
+	Mat map(Lvec.size(),CV_8U,Scalar(0));
+	int _row=0; int _col=5, maxRow=Lvec.rows, maxCol=Lvec.cols;
 	int localScanSize = 20;
-	double gradientDiff0, gradientDiff45, gradientDiff90;
-	double HslEntry[3];
-	double unitThresh[3] = {1.4,12.6,7.2};
-	const double unitRanges[3] = {3.03,4.0,6.0}; //base on TC5
-	const double enterThresh = 1.4*.47;
-	const double enterThresh2 = enterThresh *0.8;
-	const double exitCumulativeThresh = 0.7*.47;
+	const double unitRange = 19.1431; //base on TC5
+	const double enterThresh = 9.0;
+	const double exitCumulativeThresh = 0.7*enterThresh;
 	int enterFlag=0, upTheMtn=0, downTheMtn=0;
 	if(this->debugMode) {
 		enterFlag = this->enterFlag;
@@ -220,17 +246,14 @@ Mat ShapeColor::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 		maxRow = this->test_row+1;
 		maxCol = this->test_col+1;
 	}
-	unitThresh[0] *= (hRange/unitRanges[0]);
-	unitThresh[1] *= (sRange/unitRanges[1]);
-	unitThresh[2] *= (lRange/unitRanges[2]);
-	deque<double> maxDiffVec;
 	for(int row= _row; row<maxRow; row++) {
 		Point enterExitPt(-1,-1); //reset after every column
 		for(int col=_col; col<maxCol; col++) {
-			HSL[0] = hc.at<float>(row,col);
-			HSL[1] = sMat.at<float>(row,col);
-			HSL[2] = lMat.at<float>(row,col);
-			double maxDiff0=0, maxDiff45=0, maxDiff90=0;
+			LAB[0] = Lvec.at<float>(row,col);
+			LAB[1] = avec.at<float>(row,col);
+			LAB[2] = bvec.at<float>(row,col);
+			HC = hc.at<float>(row,col);
+			double maxDiff0=0, direction=0;
 			Point maxPt0=Point(col,row);
 			Point maxPt45=Point(col,row);
 			Point maxPt90=Point(col,row);
@@ -241,82 +264,56 @@ Mat ShapeColor::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 			for(int i=y; i>=endY; i--) {
 				if(x<0 && j<0 && i<0) break;
 				if(x>=5 && x!= enterExitPt.x && noise.at<uchar>(row,x)!=0) {
-					HSL_0[0] = hc.at<float>(row,x);
-					HSL_0[1] = sMat.at<float>(row,x);
-					HSL_0[2] = lMat.at<float>(row,x);
-					double hueDiff = (HSL[0]-HSL_0[0]);
-					//double satDiff = (HSL[1]-HSL_0[1])/unitThresh[1];
-					//double lumDiff = (HSL[2]-HSL_0[2])/unitThresh[2];
-					gradientDiff0 = hueDiff;
-					if(abs(gradientDiff0)>=abs(maxDiff0)) {
-						maxDiff0 = gradientDiff0;
+					LAB_0[0] = Lvec.at<float>(row,x);
+					LAB_0[1] = avec.at<float>(row,x);
+					LAB_0[2] = bvec.at<float>(row,x);
+					HC_0 = hc.at<float>(row,x);
+					double dist = cie.deltaE76(LAB,LAB_0);
+					if(dist>=maxDiff0) {
+						maxDiff0 = dist;
 						maxPt0 = Point(x,row);
+						direction = HC - HC_0;
 					}
 				}
 				if(x!= enterExitPt.x)
 					--x;
 			}// end for(int i)
 			if(enterFlag==0) {
-				if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1)
-					upTheMtn = 1;
-				else if(fn.countGreaterEqual(2,(maxDiff0),enterThresh2)>=1)
-					upTheMtn = 2;
-				if(fn.countLesserEqual(2,maxDiff0,-enterThresh)>=1)
-					downTheMtn = 1;
-				else if(fn.countLesserEqual(2,(maxDiff0),-enterThresh2)>=1)
-					downTheMtn = 2;
-				if(upTheMtn==1 || downTheMtn==1) {
+				if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1) {
+					if(direction>0)
+						upTheMtn = 1;
+					else if(direction<0)
+						downTheMtn = 1;
+
 					enterFlag = 1;
-					HslEntry[0] = hc.at<float>(maxPt0);
+					LabEntry[0] = Lvec.at<float>(maxPt0);
+					LabEntry[1] = avec.at<float>(maxPt0);
+					LabEntry[2] = bvec.at<float>(maxPt0);
 					enterExitPt = Point(col-1,row);
-					//HslEntry[1] = sMat.at<float>(maxPt0);
-					//HslEntry[2] = lMat.at<float>(maxPt0);
 					map.at<uchar>(row,col) = 255;
-				}
-				else if(upTheMtn==2 || downTheMtn==2) {
-					enterFlag = 1;
-					HslEntry[0] = hc.at<float>(maxPt0);
-					enterExitPt = Point(col-1,row);
-					//HslEntry[1] = sMat.at<float>(maxPt0);
-					//HslEntry[2] = lMat.at<float>(maxPt0);
-					map.at<uchar>(row,col) = 200;
 				}
 			}
 			else if(enterFlag==1) {
 				if(downTheMtn) {
-					double hueDiff = (HSL[0]-HslEntry[0]);
-					//double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
-					//double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
-					gradientDiff0 = hueDiff;
-					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1 && gradientDiff0>=-exitCumulativeThresh) {
-						enterFlag = 0;
-						upTheMtn = downTheMtn = 0;
-						map.at<uchar>(row,col) = 150;
-						enterExitPt = Point(col-1,row);
-					}
-					else if(fn.countGreaterEqual(2,(maxDiff0),enterThresh2)>=1 && gradientDiff0>=-exitCumulativeThresh) {
-						enterFlag = 0;
-						upTheMtn = downTheMtn = 0;
-						map.at<uchar>(row,col) = 100;
-						enterExitPt = Point(col-1,row);
+					double dist = cie.deltaE76(LAB,LabEntry);
+					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1 && dist<=exitCumulativeThresh) {
+						if(direction>0) {
+							enterFlag = 0;
+							upTheMtn = downTheMtn = 0;
+							map.at<uchar>(row,col) = 150;
+							enterExitPt = Point(col-1,row);
+						}
 					}
 				}
 				else if(upTheMtn) {
-					double hueDiff = (HSL[0]-HslEntry[0]);
-					//double satDiff = (HSL[1]-HslEntry[1])/unitThresh[1];
-					//double lumDiff = (HSL[2]-HslEntry[2])/unitThresh[2];
-					gradientDiff0 = hueDiff;
-					if(fn.countLesserEqual(2,(maxDiff0),-enterThresh)>=1 && gradientDiff0<=exitCumulativeThresh) {
-						enterFlag = 0;
-						upTheMtn = downTheMtn = 0;
-						map.at<uchar>(row,col) = 150;
-						enterExitPt = Point(col-1,row);
-					}
-					else if(fn.countLesserEqual(2,(maxDiff0),-enterThresh2)>=1 && gradientDiff0<=exitCumulativeThresh) {
-						enterFlag = 0;
-						upTheMtn = downTheMtn = 0;
-						map.at<uchar>(row,col) = 100;
-						enterExitPt = Point(col-1,row);
+					double dist = cie.deltaE76(LAB,LabEntry);
+					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1 && dist<=exitCumulativeThresh) {
+						if(direction<0) {
+							enterFlag = 0;
+							upTheMtn = downTheMtn = 0;
+							map.at<uchar>(row,col) = 150;
+							enterExitPt = Point(col-1,row);
+						}
 					}
 				}//end if(upTheMtn)
 				if(enterFlag)
@@ -325,22 +322,22 @@ Mat ShapeColor::getShapeUsingColor2(Mat hMat, Mat sMat, Mat lMat, Mat noise) {
 			if(col==35 && row==60) {
 				String mtn = upTheMtn==1 ? "Up" : "N/A";
 				mtn = downTheMtn==1 ? "Down" : mtn;
-				printf("HSL(%f,%f,%f)%f\n",hMat.at<float>(row,col),sMat.at<float>(row,col),lMat.at<float>(row,col),HSL[0]);
-				printf("HslE(%f,%f,%f)\n",HslEntry[0],HslEntry[1],HslEntry[2]);
-				printf("HSL0(%f,%f,%f)%f\n",hMat.at<float>(maxPt0),sMat.at<float>(maxPt0),lMat.at<float>(maxPt0),hc.at<float>(maxPt0));
+				//printf("HSL(%f,%f,%f)%f\n",Lvec.at<float>(row,col),sMat.at<float>(row,col),lMat.at<float>(row,col),HSL[0]);
+				//printf("HslE(%f,%f,%f)\n",LabEntry[0],LabEntry[1],LabEntry[2]);
+				//printf("HSL0(%f,%f,%f)%f\n",hMat.at<float>(maxPt0),sMat.at<float>(maxPt0),lMat.at<float>(maxPt0),hc.at<float>(maxPt0));
 				//printf("HSL45(%f,%f,%f)\n",hMat.at<float>(maxPt45),sMat.at<float>(maxPt45),lMat.at<float>(maxPt45));
 				//printf("HSL90(%f,%f,%f)\n",hMat.at<float>(maxPt90),sMat.at<float>(maxPt90),lMat.at<float>(maxPt90));
-				printf("MaxDiff0: %f, MaxDiff45: %f, MaxDiff90: %f\n",maxDiff0,maxDiff45,maxDiff90);
+				printf("MaxDiff0: %f\n",maxDiff0);
 				printf("MaxPt0: %d,%d, MaxPt45: %d,%d, MaxPt90: %d,%d\n",maxPt0.x,maxPt0.y,maxPt45.x,maxPt45.y,maxPt90.x,maxPt90.y);
 				printf("EnterFlag: %d\n",enterFlag);
-				printf("Hsl_Ranges: [%f,%f,%f]\n",hRange,sRange,lRange);
-				printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
+				//printf("Hsl_Ranges: [%f,%f,%f]\n",hRange,sRange,lRange);
+				//printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
 				printf("Mtn: %s\n",mtn.c_str());
 			}
 		} //end for(col)
 		enterFlag=false;
 		upTheMtn = downTheMtn = false;
-	}//end for(row)*/
+	}//end for(row)
 	return map;
 }
 
@@ -371,26 +368,24 @@ Mat ShapeColor::epohTheHue(Mat hMat, Mat sMat, Mat lMat) {
 			double hue = hMat.at<float>(i,j);
 			double sat = sMat.at<float>(i,j);
 			double lum = lMat.at<float>(i,j);
-			hue = this->epoh(sat,lum);
+			hue *= this->epoh(sat,lum);
 			hc.at<float>(i,j) = roundDecimal(hue,2);
 		}
 	}
 	return hc;
 }
 
-void ShapeColor::maxLocalHslRanges(Mat hMat, Mat sMat, Mat lMat, double &hr, double &sr, double &lr) {
-	vector<double> maxHueVec;
-	vector<double> maxSatVec;
-	vector<double> maxLumVec;
-
-	for(int row=0; row<hMat.rows; row++) {
-		for(int col=0; col<hMat.cols; col++) {
-			vector<double> hueVec;
-			vector<double> satVec;
-			vector<double> lumVec;
-			double minMaxHue[2];
-			double minMaxSat[2];
-			double minMaxLum[2];
+void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, double &maxRange) {
+	Cie cie;
+	vector<float> maxRangeVec;
+	vector<float> LAB1(3,0);
+	vector<float> LAB2(3,0);
+	for(int row=0; row<mat1.rows; row++) {
+		for(int col=0; col<mat1.cols; col++) {
+			LAB1[0] = mat1.at<float>(row,col);
+			LAB1[1] = mat2.at<float>(row,col);
+			LAB1[2] = mat3.at<float>(row,col);
+			maxRange=0;
 			int j=col-1;
 			int x = j;
 			int y = row-1;
@@ -398,31 +393,20 @@ void ShapeColor::maxLocalHslRanges(Mat hMat, Mat sMat, Mat lMat, double &hr, dou
 			for(int i=y; i>=endY; i--) {
 				if(x<0) break;
 				if(x>=0) {
-					double hue = hMat.at<float>(row,x);
-					double sat = sMat.at<float>(row,x);
-					double lum = lMat.at<float>(row,x);
-					hueVec.push_back(hue);
-					satVec.push_back(sat);
-					lumVec.push_back(lum);
+					LAB2[0] = mat1.at<float>(row,x);
+					LAB2[1] = mat2.at<float>(row,x);
+					LAB2[2] = mat3.at<float>(row,x);
+					double dist = cie.deltaE76(LAB1,LAB2);
+					if(dist>=maxRange) {
+						maxRange = dist;
+					}
 				}
 				--x;
 			}// end for(int i)
-			minMaxLoc(hueVec,&minMaxHue[0],&minMaxHue[1]);
-			minMaxLoc(satVec,&minMaxSat[0],&minMaxSat[1]);
-			minMaxLoc(lumVec,&minMaxLum[0],&minMaxLum[1]);
-			double hRange = minMaxHue[1] - minMaxHue[0];
-			double sRange = minMaxSat[1] - minMaxSat[0];
-			double lRange = minMaxLum[1] - minMaxLum[0];
-			maxHueVec.push_back(hRange);
-			maxSatVec.push_back(sRange);
-			maxLumVec.push_back(lRange);
+			maxRangeVec.push_back(maxRange);
 		}
 	}
-	sort(maxHueVec.begin(),maxHueVec.end());
-	sort(maxSatVec.begin(),maxSatVec.end());
-	sort(maxLumVec.begin(),maxLumVec.end());
-	//writeSeq2File(maxHueVec,"maxhuevecHerpes1x20");
-	hr = roundDecimal(maxHueVec.back(),2);
-	sr = roundDecimal(maxSatVec.back(),2);
-	lr = roundDecimal(maxLumVec.back(),2);
+	sort(maxRangeVec.begin(),maxRangeVec.end());
+	//writeSeq2File(maxRangeVec,"maxrangevec");
+	maxRange = maxRangeVec.back();
 }

@@ -101,6 +101,20 @@ void writeSeq2File(vector<double> &vec, String name) {
 	fclose(fp);
 }
 
+void writeSeq2File(vector<float> &vec, String name) {
+	String filename = name + ".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	if(vec.size()==0)
+		cout << name << " Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++) {
+			fprintf(fp,"%f\n",vec.at(i));
+		}
+	fclose(fp);
+}
+
 void writeSeq2File(vector<int> &vec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
