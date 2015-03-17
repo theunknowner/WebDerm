@@ -43,5 +43,7 @@ public:
 	Mat correctGamma(Mat& img, double gamma);
 
 	Mat shadeCorrection(Mat img);
+
+	String majority(vector<String> strVec);
 };
 #endif /* COLOR_H_ */

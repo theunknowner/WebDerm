@@ -802,3 +802,17 @@ Mat Color::shadeCorrection(Mat img) {
 	product.release();
 	return img2;
 }
+
+String Color::majority(vector<String> strVec) {
+	std::unordered_map<String,int> major;
+	unsigned int majority = strVec.size()/2 + 1;
+	for(unsigned int i=0; i<strVec.size(); i++) {
+		if(major.find(strVec.at(i))==major.end())
+			major[strVec.at(i)] = 1;
+		else
+			major[strVec.at(i)]++;
+		if(major[strVec.at(i)]>=majority)
+			return strVec.at(i);
+	}
+	return "";
+}

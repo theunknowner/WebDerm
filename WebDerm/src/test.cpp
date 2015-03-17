@@ -80,8 +80,8 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 		}
 	}
 	Mat result(src.size(),CV_8UC3,Scalar(0,0,0));
-	deque<String> colorSE;
-	deque<String> shadeSE;
+	vector<String> colorSE;
+	vector<String> shadeSE;
 	unsigned int structElemSize = 3;
 	int sides = floor(structElemSize/2.0);
 	for(int i=0; i<src.rows; i++) {

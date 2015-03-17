@@ -198,6 +198,26 @@ deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, i
 	return deq;
 }
 
+//returns a 2D vector with 1st col='value' & 2nd col='frequency'
+vector<vector<float> > frequency(vector<float> vec) {
+	std::unordered_map<float,int> freq;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		if(freq.find(vec.at(i))==freq.end())
+			freq[vec.at(i)] = 1;
+		else
+			freq[vec.at(i)]++;
+	}
+	std::unordered_map<float,int>::iterator it;
+	vector<float> vals(2,0);
+	vector<vector<float> > freqVec;
+	for(it=freq.begin(); it!=freq.end(); it++) {
+		vals.at(0) = it->first;
+		vals.at(1) = (float)it->second;
+		freqVec.push_back(vals);
+	}
+	return freqVec;
+}
+
 /* return value up to Nth occurrence = first,second,third... of delimiter */
 double Functions::getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
 	double result=0;

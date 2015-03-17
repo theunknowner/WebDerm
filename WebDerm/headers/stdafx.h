@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <dirent.h>
+#include <unordered_map>
 
 #define BOOST_SYSTEM_NO_DEPRECATED
 #include "boost/filesystem/operations.hpp"

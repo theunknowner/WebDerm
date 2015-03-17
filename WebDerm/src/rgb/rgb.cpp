@@ -331,17 +331,13 @@ String Rgb::calcColor2(int red, int green, int blue) {
 }
 
 String Rgb::calcColor(int red, int green, int blue, double &dist, int &ind) {
-	Color c;
 	String pix;
 	pix = calcColor2(red,green,blue);
 	return pix;
 }
 
 String Rgb::calcColor(int red, int green, int blue) {
-	Color c;
 	String pix;
-	double dist=0;
-	int ind=0;
 	pix = calcColor2(red,green,blue);
 	return pix;
 }

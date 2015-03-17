@@ -44,6 +44,8 @@ void init_3D_Deque(deque< deque< deque<int> > > &vec, int cols, int rows, int de
 deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, double val=0);
 deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val=0);
 
+vector<vector<float> > frequency(vector<float> vec);
+
 class Functions {
 public:
 	double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence);
