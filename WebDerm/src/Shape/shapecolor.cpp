@@ -227,7 +227,7 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 	Mat hc = this->epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
 
 	double maxRange=0;
-	this->maxLocalRanges(Lvec,avec,bvec,maxRange);
+	this->maxLocalRanges(Lvec,avec,bvec,hc,noise,maxRange);
 
 	vector<float> LAB_0(3,0);
 	vector<float> LabEntry(3,0);
@@ -235,9 +235,9 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 	Point LabEntryPt;
 	Mat map(Lvec.size(),CV_8U,Scalar(0));
 	int _row=0; int _col=0, maxRow=Lvec.rows, maxCol=Lvec.cols;
-	int localScanSize = 20;
+	int localScanSize = 40;
 	const double unitRange = 19.1431; //base on TC5
-	const double enterThresh = 11.5;
+	const double enterThresh = 10.6;
 	const double exitCumulativeThresh = 0.7*enterThresh;
 	int enterFlag=0, upTheMtn=0, downTheMtn=0;
 	if(this->debugMode) {
@@ -257,8 +257,6 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 			HC = hc.at<float>(row,col);
 			double maxDiff0=0, direction=0;
 			Point maxPt0=Point(col,row);
-			Point maxPt45=Point(col,row);
-			Point maxPt90=Point(col,row);
 			int j=col-1;
 			int x = j;
 			int y = row-1;
@@ -322,7 +320,7 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 				if(enterFlag)
 					map.at<uchar>(row,col) = 255;
 			}//end if(enterFlag==true)
-			if(col==84 && row==59) {
+			if(col==16 && row==45) {
 				String mtn = upTheMtn==1 ? "Up" : "N/A";
 				mtn = downTheMtn==1 ? "Down" : mtn;
 				printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);
@@ -380,41 +378,87 @@ Mat ShapeColor::epohTheHue(Mat hMat, Mat sMat, Mat lMat) {
 	return hc;
 }
 
-void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, double &maxRange) {
+void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &maxRange) {
 	Cie cie;
 	vector<float> maxRangeVec;
 	vector<float> LAB1(3,0);
 	vector<float> LAB2(3,0);
+	Mat altitude(mat1.size(),CV_32F,Scalar(0));
+	Mat distMat(mat1.size(),CV_32F,Scalar(0));
+	double HC1=0, HC2=0;
 	for(int row=0; row<mat1.rows; row++) {
+		float sum=0;
 		for(int col=0; col<mat1.cols; col++) {
-			LAB1[0] = mat1.at<float>(row,col);
-			LAB1[1] = mat2.at<float>(row,col);
-			LAB1[2] = mat3.at<float>(row,col);
-			maxRange=0;
+			if(noiseMap.at<uchar>(row,col)>0) {
+				LAB2[0] = mat1.at<float>(row,col);
+				LAB2[1] = mat2.at<float>(row,col);
+				LAB2[2] = mat3.at<float>(row,col);
+				HC2 = hc.at<float>(row,col);
+				if(col==0) {
+					LAB1[0] = mat1.at<float>(row,col);
+					LAB1[1] = mat2.at<float>(row,col);
+					LAB1[2] = mat3.at<float>(row,col);
+					HC1 = hc.at<float>(row,col);
+				}
+				else {
+					LAB1[0] = mat1.at<float>(row,col-1);
+					LAB1[1] = mat2.at<float>(row,col-1);
+					LAB1[2] = mat3.at<float>(row,col-1);
+					HC1 = hc.at<float>(row,col-1);
+				}
+				double dist = cie.deltaE76(LAB1,LAB2);
+				double direction = HC2 - HC1;
+				distMat.at<float>(row,col) = dist;
+				if(direction<0)
+					sum += (-dist);
+				else
+					sum += dist;
+
+				altitude.at<float>(row,col) = sum;
+			}
+		}
+	}
+	double minMaxDist[2];
+	Point minMaxPt[2];
+	for(int row=0; row<altitude.rows; row++) {
+		for(int col=0; col<altitude.cols; col++) {
+			vector<float> distVec;
+			vector<Point> minMaxPtVec;
 			int j=col-1;
 			int x = j;
 			int y = row-1;
-			int endY = row-20;
+			int endY = row-40;
 			for(int i=y; i>=endY; i--) {
 				if(x<0) break;
 				if(x>=0) {
-					LAB2[0] = mat1.at<float>(row,x);
-					LAB2[1] = mat2.at<float>(row,x);
-					LAB2[2] = mat3.at<float>(row,x);
-					double dist = cie.deltaE76(LAB1,LAB2);
-					if(dist>=maxRange) {
-						maxRange = dist;
-					}
+					float dist = altitude.at<float>(row,x);
+					distVec.push_back(dist);
+					minMaxPtVec.push_back(Point(x,row));
 				}
 				--x;
 			}// end for(int i)
+			minMaxLoc(distVec,&minMaxDist[0],&minMaxDist[1],&minMaxPt[0],&minMaxPt[1]);
+			double maxRange = roundDecimal(minMaxDist[1] - minMaxDist[0],4);
+			if(roundDecimal(maxRange,1)==12.3) {
+				printf("Min: %f, Max:%f\n",minMaxDist[0],minMaxDist[1]);
+				printf("MinPt: (%d,%d), MaxPt: (%d,%d)\n",minMaxPtVec[minMaxPt[0].x].x,minMaxPtVec[minMaxPt[0].x].y,minMaxPtVec[minMaxPt[1].x].x,minMaxPtVec[minMaxPt[1].x].y);
+			}
 			maxRangeVec.push_back(maxRange);
 		}
 	}
 	sort(maxRangeVec.begin(),maxRangeVec.end());
-	//vector<vector<float> > freq = frequency(maxRangeVec);
+	vector<vector<float> > freq = frequency(maxRangeVec);
 	//writeSeq2File(freq,"freq");
-	//writeSeq2File(maxRangeVec,"maxrangevec");
-
-	maxRange = maxRangeVec.back();
+	//writeSeq2File(distMat,"float","distMat");
+	//writeSeq2File(altitude,"float","altitude");
+	writeSeq2File(maxRangeVec,"maxrangevec");
+	float sum=0, total=0;
+	for(unsigned int i=1; i<freq.size(); i++) {
+		float product = freq.at(i).at(0) * freq.at(i).at(1);
+		sum += product;
+		total += freq.at(i).at(1);
+	}
+	sum /= total;
+	maxRange = sum;
+	cout << maxRange<<endl;
 }

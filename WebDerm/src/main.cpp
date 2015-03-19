@@ -55,7 +55,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/vitiligo3.jpg");
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/lph4.jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
@@ -66,11 +66,11 @@ int main(int argc,char** argv)
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Test test;
 
-	img = test.test_hslAvgOfColor(img);
+	//img = test.test_hslAvgOfColor(img);
 	//imwrite("vitiligo3.png",img);
 	ShapeColor sc;
 	Mat map = sc.getShapeUsingColor2(img, mapOfNonNoise);
-	//imgshow(map);
+	imgshow(map);
 	//writeSeq2File(hfitval2,"hfitval2");
 	/*writeSeq2File(hvec,"float","hvec");
 	writeSeq2File(svec,"float","svec");

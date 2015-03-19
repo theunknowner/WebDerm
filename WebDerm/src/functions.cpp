@@ -200,14 +200,14 @@ deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, i
 
 //returns a 2D vector with 1st col='value' & 2nd col='frequency'
 vector<vector<float> > frequency(vector<float> vec) {
-	std::unordered_map<float,int> freq;
+	std::map<float,int> freq;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		if(freq.find(vec.at(i))==freq.end())
 			freq[vec.at(i)] = 1;
 		else
 			freq[vec.at(i)]++;
 	}
-	std::unordered_map<float,int>::iterator it;
+	std::map<float,int>::iterator it;
 	vector<float> vals(2,0);
 	vector<vector<float> > freqVec;
 	for(it=freq.begin(); it!=freq.end(); it++) {

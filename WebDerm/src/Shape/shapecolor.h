@@ -32,7 +32,7 @@ public:
 	double epoh(double sat, double lum);
 	Mat epohTheHue(Mat hMat, Mat sMat, Mat lMat);
 
-	void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, double &maxRange);
+	void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &maxRange);
 
 	void img2HSL(Mat src, Mat &hMat, Mat &sMat, Mat &lMat);
 	void img2XYZ(Mat src, Mat &xMat, Mat &yMat, Mat &zMat);

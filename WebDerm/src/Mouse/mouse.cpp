@@ -39,8 +39,8 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 		Vec3b rgbVec = img2.at<Vec3b>(y,x);
 		HSL = hsl.rgb2hsl(rgbVec[2],rgbVec[1],rgbVec[0]);
 		h = (int)HSL[0];
-		s = roundDecimal(HSL[1],2) * 100;
-		l = roundDecimal(HSL[2],2) * 100;
+		s = round(HSL[1] * 100);
+		l = round(HSL[2] * 100);
 		color = rgb.checkBlack(rgbVec[2],rgbVec[1],rgbVec[0]);
 		if(color=="OTHER")
 			color = rgb.calcColor(rgbVec[2],rgbVec[1],rgbVec[0]);
