@@ -51,8 +51,7 @@ bool Rgb::importColorThresholds()
 	String filename3 = folderName+"colors.csv";
 	fstream fsColors(filename2.c_str());
 	fstream fsColors2(filename3.c_str());
-	if(fsColors.is_open() && fsColors2.is_open())
-	{
+	if(fsColors.is_open() && fsColors2.is_open()) {
 		String temp;
 		deque<String> vec;
 		while(getline(fsColors,temp)) {

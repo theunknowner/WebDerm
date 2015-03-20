@@ -14,6 +14,8 @@
 
 double standardDev(deque<double> &input);
 double standardDev(deque<int> &input);
+double standardDev(vector<double> &input);
+double standardDev(vector<float> &input);
 double standardDev(Mat src);
 
 #endif /* STDDEV_H_ */

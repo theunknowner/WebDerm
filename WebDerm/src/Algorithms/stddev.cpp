@@ -41,6 +41,40 @@ double standardDev(deque<int> &input) {
 	return result;
 }
 
+double standardDev(vector<double> &input) {
+	double total=0;
+	double avg=0;
+	double var=0;
+	double result=0;
+	for(unsigned int i=0; i<input.size(); i++) {
+		total += input.at(i);
+	}
+	avg = total/input.size();
+	for(unsigned int i=0; i<input.size(); i++) {
+		var += pow(input.at(i)-avg,2);
+	}
+	var /= input.size();
+	result = sqrt(var);
+	return result;
+}
+
+double standardDev(vector<float> &input) {
+	double total=0;
+	double avg=0;
+	double var=0;
+	double result=0;
+	for(unsigned int i=0; i<input.size(); i++) {
+		total += input.at(i);
+	}
+	avg = total/input.size();
+	for(unsigned int i=0; i<input.size(); i++) {
+		var += pow(input.at(i)-avg,2);
+	}
+	var /= input.size();
+	result = sqrt(var);
+	return result;
+}
+
 double standardDev(Mat src) {
 	deque<int> input;
 	for(int i=0; i<src.rows; i++) {

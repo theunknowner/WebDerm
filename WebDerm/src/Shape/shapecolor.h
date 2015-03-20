@@ -14,6 +14,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
 
 class ShapeColor {
 private:
