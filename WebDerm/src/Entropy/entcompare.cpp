@@ -431,18 +431,25 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 	Mat ysvWeights(componentSize,1,CV_32F,Scalar(1.0)); //weight of importance of YSV
 	int colorsHit[colorComponents];
 	fill_n(colorsHit,colorComponents,0);
-	double maxYSV = 196.0;
-	for(unsigned int i=0; i<vec1.size(); i++) {
-		String colorName = colorNameVec.at(i);
-		if(colorName=="LowBrown" || colorName=="LowGreyBrown" || colorName=="HighBrown" || colorName=="HighGreyBrown") {
-			double yVal1 = vec1.at(i).at(0);
-			double yVal2 = vec2.at(i).at(0);
-			maxYSV -= max(yVal1,yVal2);
-		}
-	}
+	double maxYSV = 0, yTotal1=0, yTotal2=0;
+	// maxYSV = 196 - Y occupied by Brown
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		String colorName = colorNameVec.at(i);
 		if(colorName!="LowBrown" && colorName!="LowGreyBrown" && colorName!="HighBrown" && colorName!="HighGreyBrown") {
+			double yVal1 = vec1.at(i).at(0);
+			double yVal2 = vec2.at(i).at(0);
+			yTotal1 += yVal1;
+			yTotal2 += yVal2;
+		}
+	}
+	maxYSV = max(yTotal1,yTotal2);
+	for(unsigned int i=0; i<vec1.size(); i++) {
+		String colorName = colorNameVec.at(i);
+		if(colorName!="LowBrown" && colorName!="LowGreyBrown" && colorName!="HighBrown" && colorName!="HighGreyBrown") {
+			if(yTotal1>yTotal2)
+				vec2.at(i).at(0) *= (max(yTotal1,yTotal2)/min(yTotal1,yTotal2));
+			else if(yTotal2>yTotal1)
+				vec1.at(i).at(0) *= (max(yTotal1,yTotal2)/min(yTotal1,yTotal2));
 			for(unsigned int j=0; j<vec1.at(i).size(); j++) {
 				ysv1[j] = vec1.at(i).at(j);
 				ysv2[j] = vec2.at(i).at(j);

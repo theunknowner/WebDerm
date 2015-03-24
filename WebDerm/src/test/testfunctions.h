@@ -16,6 +16,8 @@
 void drawOutlineOnMouse(Mat &img);
 void Mat2Image(deque< deque<double> > &input, Mat &output);
 Mat test_normalizeColors(Mat src);
-Mat test_correctGamma(Mat &img, double gamma);
+double test_inverseGamma(int val);
+double test_Gamma(double val);
+double test_gray(int r, int g, int b);
 
 #endif /* TESTFUNCTIONS_H_ */

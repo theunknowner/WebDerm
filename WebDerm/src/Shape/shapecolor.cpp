@@ -236,7 +236,7 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 	Mat map(Lvec.size(),CV_8U,Scalar(0));
 	int _row=0; int _col=0, maxRow=Lvec.rows, maxCol=Lvec.cols;
 	int localScanSize = 20;
-	const double enterThresh = 12.78;
+	const double enterThresh = 18.7;
 	cout << maxRange << endl;
 	const double exitCumulativeThresh = 0.7*enterThresh;
 	int enterFlag=0, upDownTheMtn=0;
@@ -273,6 +273,12 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 						maxDiff0 = dist;
 						maxPt0 = Point(x,row);
 						direction = HC - HC_0;
+					}
+					//if(col==30 && row==83) {
+					//	printf("%d: %f\n",x,dist);
+					//}
+					if(toString(dist).find("8.8")!=string::npos) {
+						printf("(%d,%d) -> (%d,%d) : %f\n",x,row,col,row,dist);
 					}
 				}
 				if(x!= enterExitPt.x)
@@ -365,7 +371,7 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 				map.at<uchar>(minPt) = 100;
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
-			if(col==40 && row==59) {
+			if(col==84 && row==104) {
 				String mtn = upDownTheMtn==1 ? "Up" : "N/A";
 				mtn = upDownTheMtn==-1 ? "Down" : mtn;
 				printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);

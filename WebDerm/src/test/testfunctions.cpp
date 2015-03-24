@@ -75,16 +75,25 @@ Mat test_normalizeColors(Mat src) {
 	return dst;
 }
 
-Mat test_correctGamma( Mat& img, double gamma ) {
-	double inverse_gamma = 1.0 / gamma;
+double test_inverseGamma(int val) {
+	double c = val/255.0;
+	if ( c <= 0.04045 )
+		return c/12.92;
+	else
+		return pow(((c+0.055)/(1.055)),2.4);
+}
 
-	Mat lut_matrix(1, 256, CV_8UC1 );
-	uchar * ptr = lut_matrix.ptr();
-	for( int i = 0; i < 256; i++ )
-		ptr[i] = (int)( pow( (double) i / 255.0, inverse_gamma ) * 255.0 );
+double test_Gamma(double val) {
+	if(val<=0.0031308)
+		val *= 12.92;
+	else
+		val = 1.055*pow(val,1.0/2.4)-0.055;
+	return int(val*255+.5);
+}
 
-	Mat result;
-	LUT( img, lut_matrix, result );
-
-	return result;
+double test_gray(int r, int g, int b) {
+	const double rY = 0.212655;
+	const double gY = 0.715158;
+	const double bY = 0.072187;
+	return test_Gamma(rY*test_inverseGamma(r)+gY*test_inverseGamma(g)+bY*test_inverseGamma(b));
 }
