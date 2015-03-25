@@ -17,7 +17,7 @@ deque<deque<deque< deque<double> > > > gSmoothRatio;
 deque<deque<deque< deque<double> > > > gSmoothRatioRm;
 deque<deque<deque< deque<double> > > > gRatioRm;
 
-void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetShade) {
+void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String targetShade) {
 	int height = fd.colorVec.size()/ksize.height;
 	int width = fd.colorVec.at(0).size()/ksize.width;
 	int innerHeight = allColors.size();
@@ -44,6 +44,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 	double pTotal=0;
 	unsigned int row=0, col=0;
 	int i=0,j=0, maxRow=0, maxCol=0;
+	if(map.empty()) map = map.ones(fd.colorVec.size(),fd.colorVec.at(0).size(),CV_8U);
 	try {
 		while(row<=(fd.colorVec.size()-ksize.height)) {
 			while(col<=(fd.colorVec.at(row).size()-ksize.width)) {
@@ -58,74 +59,78 @@ void Entropy::eyeFn(FileData &fd, Size ksize,String targetColor,String targetSha
 
 				for(i=row; i<maxRow; i++) {
 					for(j=col; j<maxCol; j++) {
-						try {
-							pix = fd.colorVec.at(i).at(j);
-							shade = sh.extractShade(pix);
-							color = c.getMainColor(pix);
-							color = c.optimizeColor2(color);
-							/**temporary testing**/
-							shade = sh.combineShades(shade);
-							color = c.combineColors(color);
-							if(color=="Violet" || color =="Purple")
-								shade = "High";
-							if(fd.filename.find("acne")!=string::npos)  {
-								if(color=="Violet")  {
-									int index=-1;
-									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
-									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
-									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
-									hsl.getHslColor(h,s,l,index);
-									color = hsl.getHslColor(index+1);
-									//color = "BrownRed";
+						if(map.at<uchar>(i,j)>0) {
+							try {
+								pix = fd.colorVec.at(i).at(j);
+								shade = sh.extractShade(pix);
+								color = c.getMainColor(pix);
+								color = c.optimizeColor2(color);
+								/**temporary testing**/
+								if(shade=="Dark1" && color=="Grey")
+									color = "Black";
+								shade = sh.combineShades(shade);
+								color = c.combineColors(color);
+								if(color=="Violet" || color =="Purple")
+									shade = "High";
+								if(fd.filename.find("acne")!=string::npos)  {
+									if(color=="Violet")  {
+										int index=-1;
+										h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+										s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+										l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+										hsl.getHslColor(h,s,l,index);
+										color = hsl.getHslColor(index+1);
+										//color = "BrownRed";
+									}
 								}
-							}
-							if(fd.filename.find("psoriasis")!=string::npos)  {
-								if(color=="Violet")  {
-									int index=-1;
-									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
-									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
-									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
-									hsl.getHslColor(h,s,l,index);
-									color = hsl.getHslColor(index+1);
-									//color = "BrownRed";
+								if(fd.filename.find("psoriasis")!=string::npos)  {
+									if(color=="Violet")  {
+										int index=-1;
+										h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+										s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+										l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+										hsl.getHslColor(h,s,l,index);
+										color = hsl.getHslColor(index+1);
+										//color = "BrownRed";
+									}
 								}
-							}
-							if(fd.filename.find("herpes")!=string::npos)  {
-								if(color=="Violet")  {
-									int index=-1;
-									h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
-									s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
-									l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
-									hsl.getHslColor(h,s,l,index);
-									color = hsl.getHslColor(index+1);
-									//color = "BrownRed";
+								if(fd.filename.find("herpes")!=string::npos)  {
+									if(color=="Violet")  {
+										int index=-1;
+										h = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',1);
+										s = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',2);
+										l = fn.getDelimitedValuesFromString(fd.hslMat.at(i).at(j),';',3);
+										hsl.getHslColor(h,s,l,index);
+										color = hsl.getHslColor(index+1);
+										//color = "BrownRed";
+									}
 								}
+								if(fd.filename.find("herpes5")!=string::npos) {
+									if(color=="BrownOrange")
+										color = "BrownPink";
+								}
+								/************************************/
+								shadeIndex = sh.getShadeIndex2(shade);
+								if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
+									color = "Black";
+								else if(shade=="White" || color.find("White")!=string::npos)
+									color = "White";
+								colorIndex = rgb.getColorIndex(color);
+								if(color!="Zero" || colorIndex>=0)
+									++pShadeColor.at(colorIndex).at(shadeIndex);
 							}
-							if(fd.filename.find("herpes5")!=string::npos) {
-								if(color=="BrownOrange")
-									color = "BrownPink";
+							catch(const std::out_of_range& oor) {
+								printf("ColorVec.Size: %lu\n",fd.colorVec.size());
+								printf("HslMat.Size: %lu\n",fd.hslMat.size());
+								printf("Point(%d,%d)\n",j,i);
+								printf("Shade: %s\n",shade.c_str());
+								printf("ShadeIndex: %d\n",shadeIndex);
+								printf("Color: %s\n",color.c_str());
+								printf("ColorIndex: %d\n",colorIndex);
+								printf("pShadeColor.Size: %lu\n",pShadeColor.size());
+								printf("pShadeColor(%d,%d)\n",i,j);
+								exit(1);
 							}
-							/************************************/
-							shadeIndex = sh.getShadeIndex2(shade);
-							if(shade.find("Black")!=string::npos || color.find("Black")!=string::npos)
-								color = "Black";
-							else if(shade=="White" || color.find("White")!=string::npos)
-								color = "White";
-							colorIndex = rgb.getColorIndex(color);
-							if(color!="Zero" || colorIndex>=0)
-								++pShadeColor.at(colorIndex).at(shadeIndex);
-						}
-						catch(const std::out_of_range& oor) {
-							printf("ColorVec.Size: %lu\n",fd.colorVec.size());
-							printf("HslMat.Size: %lu\n",fd.hslMat.size());
-							printf("Point(%d,%d)\n",j,i);
-							printf("Shade: %s\n",shade.c_str());
-							printf("ShadeIndex: %d\n",shadeIndex);
-							printf("Color: %s\n",color.c_str());
-							printf("ColorIndex: %d\n",colorIndex);
-							printf("pShadeColor.Size: %lu\n",pShadeColor.size());
-							printf("pShadeColor(%d,%d)\n",i,j);
-							exit(1);
 						}
 					}
 				}

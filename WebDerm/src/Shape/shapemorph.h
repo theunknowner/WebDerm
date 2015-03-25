@@ -56,7 +56,7 @@ public:
 	vector<Mat> lumFilter1(Mat src);
 	vector<Mat> lumFilter2(Mat src);
 	Mat densityDetection(Mat src,double q);
-	Mat origFilter(Mat src);
+	Mat origFilter(Mat src, double shift=1.0);
 	Mat closeFilter(Mat src);
 	void combineFilterFeatures(vector<Mat> &featureVec);
 	vector<vector<Point> > findBoundary(Mat src);

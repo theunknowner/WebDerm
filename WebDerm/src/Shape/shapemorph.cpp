@@ -191,7 +191,7 @@ Mat ShapeMorph::prepareImage(Mat src) {
 }
 
 //! filter curve on original grayscale image
-Mat ShapeMorph::origFilter(Mat src) {
+Mat ShapeMorph::origFilter(Mat src, double shift) {
 	KneeCurve kc;
 	Poly poly;
 	Mat img = this->prepareImage(src);
@@ -292,6 +292,7 @@ Mat ShapeMorph::origFilter(Mat src) {
 		yVec.erase(yVec.begin(),yVec.begin()+(yVec.size()/2));
 
 	int bestIdx = kc.kneeCurvePoint(yVec);
+	bestIdx *= shift;
 	thresh = yVec.at(bestIdx);
 	//cout << bestIdx << endl;
 	//cout << thresh << endl;

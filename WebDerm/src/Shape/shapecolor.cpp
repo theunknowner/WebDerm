@@ -194,7 +194,7 @@ Mat ShapeColor::test_getShapeUsingColor(Mat src, int col, int row, int localScan
 	return Mat();
 }
 
-Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
+Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise, double shift) {
 	Functions fn;
 	Xyz xyz;
 	CieLab lab;
@@ -227,7 +227,7 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 	Mat hc = this->epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
 
 	double maxRange=0;
-	this->maxLocalRanges(Lvec,avec,bvec,hc,noise,maxRange);
+	this->maxLocalRanges(Lvec,avec,bvec,hc,noise,maxRange,shift);
 
 	vector<float> LAB_0(3,0);
 	vector<float> LabEntry(3,0);
@@ -236,8 +236,7 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 	Mat map(Lvec.size(),CV_8U,Scalar(0));
 	int _row=0; int _col=0, maxRow=Lvec.rows, maxCol=Lvec.cols;
 	int localScanSize = 20;
-	const double enterThresh = 18.7;
-	cout << maxRange << endl;
+	const double enterThresh = maxRange;
 	const double exitCumulativeThresh = 0.7*enterThresh;
 	int enterFlag=0, upDownTheMtn=0;
 	if(this->debugMode) {
@@ -273,12 +272,6 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 						maxDiff0 = dist;
 						maxPt0 = Point(x,row);
 						direction = HC - HC_0;
-					}
-					//if(col==30 && row==83) {
-					//	printf("%d: %f\n",x,dist);
-					//}
-					if(toString(dist).find("8.8")!=string::npos) {
-						printf("(%d,%d) -> (%d,%d) : %f\n",x,row,col,row,dist);
 					}
 				}
 				if(x!= enterExitPt.x)
@@ -371,23 +364,24 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise) {
 				map.at<uchar>(minPt) = 100;
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
-			if(col==84 && row==104) {
-				String mtn = upDownTheMtn==1 ? "Up" : "N/A";
-				mtn = upDownTheMtn==-1 ? "Down" : mtn;
-				printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);
-				printf("LAB(%f,%f,%f)\n",Lvec.at<float>(row,col),avec.at<float>(row,col),bvec.at<float>(row,col));
-				printf("LabE(%f,%f,%f)\n",LabEntry[0],LabEntry[1],LabEntry[2]);
-				printf("HSL0(%f,%f,%f)%f\n",hvec.at<float>(maxPt0),svec.at<float>(maxPt0),lvec.at<float>(maxPt0),HC_0);
-				printf("LAB0(%f,%f,%f)\n",Lvec.at<float>(maxPt0),avec.at<float>(maxPt0),bvec.at<float>(maxPt0));
-				printf("EnterThresh: %f, MaxDiff0: %f\n",enterThresh, maxDiff0);
-				printf("DistFromEntryThresh: %f, DistFromEntry: %f\n",exitCumulativeThresh,distFromEntry);
-				printf("MaxPt0: %d,%d\n",maxPt0.x,maxPt0.y);
-				printf("LabEntryPt: %d,%d\n",LabEntryPt.x,LabEntryPt.y);
-				printf("EnterFlag: %d\n",enterFlag);
-				//printf("Hsl_Ranges: [%f,%f,%f]\n",hRange,sRange,lRange);
-				//printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
-				printf("Mtn: %s\n",mtn.c_str());
-			}
+			if(this->debugMode)
+				if(col==84 && row==104) {
+					String mtn = upDownTheMtn==1 ? "Up" : "N/A";
+					mtn = upDownTheMtn==-1 ? "Down" : mtn;
+					printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);
+					printf("LAB(%f,%f,%f)\n",Lvec.at<float>(row,col),avec.at<float>(row,col),bvec.at<float>(row,col));
+					printf("LabE(%f,%f,%f)\n",LabEntry[0],LabEntry[1],LabEntry[2]);
+					printf("HSL0(%f,%f,%f)%f\n",hvec.at<float>(maxPt0),svec.at<float>(maxPt0),lvec.at<float>(maxPt0),HC_0);
+					printf("LAB0(%f,%f,%f)\n",Lvec.at<float>(maxPt0),avec.at<float>(maxPt0),bvec.at<float>(maxPt0));
+					printf("EnterThresh: %f, MaxDiff0: %f\n",enterThresh, maxDiff0);
+					printf("DistFromEntryThresh: %f, DistFromEntry: %f\n",exitCumulativeThresh,distFromEntry);
+					printf("MaxPt0: %d,%d\n",maxPt0.x,maxPt0.y);
+					printf("LabEntryPt: %d,%d\n",LabEntryPt.x,LabEntryPt.y);
+					printf("EnterFlag: %d\n",enterFlag);
+					//printf("Hsl_Ranges: [%f,%f,%f]\n",hRange,sRange,lRange);
+					//printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
+					printf("Mtn: %s\n",mtn.c_str());
+				}
 		} //end for(col)
 		enterFlag=false;
 		upDownTheMtn = 0;
@@ -429,7 +423,7 @@ Mat ShapeColor::epohTheHue(Mat hMat, Mat sMat, Mat lMat) {
 	return hc;
 }
 
-void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &maxRange) {
+void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &maxRange, double shift) {
 	Cie cie;
 	vector<double> maxRangeVec;
 	vector<float> LAB1(3,0);
@@ -492,9 +486,10 @@ void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseM
 	//maxRangeVec.erase(remove(maxRangeVec.begin(),maxRangeVec.end(),0),maxRangeVec.end());
 	KneeCurve kc;
 	int kneePt = kc.kneeCurvePoint(maxRangeVec);
+	kneePt *= shift;
 	maxRange = maxRangeVec.at(kneePt);
 	//writeSeq2File(freq,"freq");
 	//writeSeq2File(distMat,"float","distMat");
 	//writeSeq2File(altitude,"float","altitude");
-	writeSeq2File(maxRangeVec,"maxrangevec");
+	//writeSeq2File(maxRangeVec,"maxrangevec");
 }

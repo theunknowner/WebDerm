@@ -1026,7 +1026,10 @@ double rule6(String& newPix, String& newShade) {
 
 	if(newShade.find("Dark")!=string::npos) {
 		if(grayLevel>=90) {
-			pix = "Grey";
+			if(newShade.find("Dark1")!=string::npos)
+				pix = "Black";
+			else
+				pix = "Grey";
 			flag=true;
 		}
 	}

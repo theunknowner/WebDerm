@@ -31,6 +31,8 @@ void Entropy::runAllEntropy() {
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
+	ShapeMorph sm;
+	ShapeColor sc;
 	hsl.importHslThresholds();
 	rgb.importThresholds();
 	sh.importThresholds();
@@ -47,17 +49,25 @@ void Entropy::runAllEntropy() {
 			fd.filename = getFileName(files.at(i),"-");
 			cout << fd.filename << endl;
 			String file = "/home/jason/Desktop/Programs/Looks_Like/"+fd.filename+".jpg";
-			Mat regImg = runResizeImage(file,imgSize,0);
+			Mat regImg = imread(file);
 			Mat normImg = runColorNormalization(regImg);
-			Mat grayImg;
-			cvtColor(normImg,grayImg,CV_BGR2GRAY);
+			regImg = runResizeImage(normImg,imgSize);
+			Mat grayImg, blurImg, img;
+			blur(regImg,blurImg,size);
+			cvtColor(regImg,grayImg,CV_BGR2GRAY);
 			fd.setImage(grayImg);
 			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-ShadeColors-"+strSize+".csv",fd.colorVec);
 			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-HSL-"+strSize+".csv",fd.hslMat);
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
+				Mat src = sm.prepareImage(grayImg);
+				Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+				Mat map = sc.getShapeUsingColor2(regImg,mapOfNonNoise,0.65);
+				Mat dst = sm.origFilter(grayImg);
+				grayImg.copyTo(img,map);
+				grayImg.copyTo(img,dst);
 				this->shapeFn(fd);
-				this->eyeFn(fd,entSize,"","");
+				this->eyeFn(fd,entSize,img,"","");
 			}
 		}
 		img.release();
@@ -96,7 +106,7 @@ void Entropy::runEntropy() {
 		fd.ksize=size;
 		this->entSize = entSize;
 		this->shapeFn(fd);
-		eyeFn(fd,entSize,"","");
+		eyeFn(fd,entSize,Mat(),"","");
 		rgb.release_memory();
 		hsl.release_memory();
 		sh.release_memory();

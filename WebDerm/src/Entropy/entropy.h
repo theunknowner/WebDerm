@@ -18,6 +18,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/transpose.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
 
 
 class FileData;
@@ -60,7 +61,7 @@ public:
 	bool isDebugModeOn();
 
 	//entropy.cpp
-	void eyeFn(FileData &fd, Size ksize, String targetColor="",String targetShade="");
+	void eyeFn(FileData &fd, Size ksize, Mat map=Mat(),String targetColor="",String targetShade="");
 	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor, String targetShade);
 	void writeEntropyFile(String filename, FileData &fd);
 	void shapeFn(FileData &fd);

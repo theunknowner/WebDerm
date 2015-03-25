@@ -55,15 +55,24 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/herpes_zoster2.jpg");
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/melanoma5.jpg");
 	img = runColorNormalization(img);
-	img = runResizeImage(img,Size(70,70));
+	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
+	ShapeColor sc;
 	Size size(5,5);
 	blur(img,img,size);
-	//cvtColor(img,imgGray,CV_BGR2GRAY);
-	//Mat src = sm.prepareImage(imgGray);
-	//Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+/*
+	Mat src = sm.prepareImage(imgGray);
+	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
+	Mat dst = sm.origFilter(imgGray);
+	img.copyTo(img2,map);
+	img.copyTo(img2,dst);
+	imgshow(map);
+	imgshow(dst);
+	imgshow(img2);
 	/*
 	Test test;
 	img = test.test_hslAvgOfColor(img);
@@ -229,7 +238,7 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	String name = "melanoma8c";
+	String name = "lph7";
 	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;

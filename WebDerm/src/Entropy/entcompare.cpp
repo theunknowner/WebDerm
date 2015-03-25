@@ -443,6 +443,8 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 		}
 	}
 	maxYSV = max(yTotal1,yTotal2);
+	cout << yTotal1 << endl;
+	cout << yTotal2 << endl;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		String colorName = colorNameVec.at(i);
 		if(colorName!="LowBrown" && colorName!="LowGreyBrown" && colorName!="HighBrown" && colorName!="HighGreyBrown") {
@@ -459,15 +461,15 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 						double maxVal = max(ysv1[j],ysv2[j]);
 						totalYSV[j] = ysvWeights.at<float>(j,0)*(val/maxVal);
 						if(maxVal==0) totalYSV[j] = 0;
-						//printf("(%f,%f,%f,%f,%f)",ysv1[j],ysv2[j],totalYSV[j],val,maxYSV);
 						sum += totalYSV[j];
 					}
 				}
 			}
+			//printf("%s: (%f,%f,%f),%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],maxYSV);
 			if(ysv1[0]>0 || ysv2[0]>0) {
 				dist[i] = sum/3.0;
 				colorsHit[i] = 1;
-				printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],sum);
+				//printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],sum);
 			}
 		}
 		sum=0;
