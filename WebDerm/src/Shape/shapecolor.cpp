@@ -389,13 +389,6 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise, double shift) {
 	return map;
 }
 
-//set HSL ranges for function getShapeUsingColors() HSL unitThresh
-void ShapeColor::setHslVals(deque<double> hueVals, deque<double> satVals, deque<double> lumVals) {
-	this->hueVals = hueVals;
-	this->satVals = satVals;
-	this->lumVals = lumVals;
-}
-
 //! Expressive Power of Hue
 double ShapeColor::epoh(double sat, double lum) {
 	double result;
@@ -423,6 +416,7 @@ Mat ShapeColor::epohTheHue(Mat hMat, Mat sMat, Mat lMat) {
 	return hc;
 }
 
+//using delta Emax
 void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &maxRange, double shift) {
 	Cie cie;
 	vector<double> maxRangeVec;
@@ -492,4 +486,141 @@ void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseM
 	//writeSeq2File(distMat,"float","distMat");
 	//writeSeq2File(altitude,"float","altitude");
 	//writeSeq2File(maxRangeVec,"maxrangevec");
+}
+
+Mat ShapeColor::removeRunningLines(Mat input) {
+	Mat dst = input.clone();
+	const int thresh=7;
+	Size winSize(3,1);
+	int countStreak=0;
+	int winSizeIncr=0;
+	Mat window;
+	Size prevSize;
+	Point startPt(0,0), endPt(0,0);
+	int rowDecr=0, rowIncr=0;
+	namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	for(int row=0; row<=(dst.rows-winSize.height); row++) {
+		startPt.y = row;
+		for(int col=0; col<=(dst.cols-winSize.width); col++) {
+			window = dst(Rect(col,startPt.y,winSize.width,winSize.height+winSizeIncr));
+			prevSize = window.size();
+			//printf("Point(%d,%d)\n",col,row);
+			if(countNonZero(window)==window.total()) {
+				//expand upwards
+				if(row>0) {
+					bool sizeChanged = true;
+					while(sizeChanged) {
+						rowDecr++;
+						winSizeIncr++;
+						window = dst(Rect(col,row-rowDecr,winSize.width,winSize.height+winSizeIncr));
+						/*Mat test = input.clone();
+						rectangle(test,Rect(col,row-rowDecr,winSize.width,winSize.height+winSizeIncr),Scalar(150));
+						printf("****BEFORE1****\n");
+						printf("WinSizeIncr: %d\n",winSizeIncr);
+						printf("winSize: %dx%d\n",winSize.width, winSize.height+winSizeIncr);
+						printf("Begin:(%d,%d)\n",col,row-rowDecr);
+						imshow("img",test);
+						waitKey(0);*/
+						if(countNonZero(window)!=window.total()) {
+							rowDecr--;
+							winSizeIncr--;
+							window = dst(Rect(col,row-rowDecr,winSize.width,winSize.height+winSizeIncr));
+							sizeChanged=false;
+							if(countStreak==0)
+								startPt = Point(col,row-rowDecr);
+							/*Mat test = input.clone();
+							rectangle(test,Rect(col,row-rowDecr,winSize.width,winSize.height+winSizeIncr),Scalar(150));
+							printf("****AFTER1****\n");
+							printf("WinSizeIncr: %d\n",winSizeIncr);
+							printf("winSize: %dx%d\n",winSize.width, winSize.height+winSizeIncr);
+							printf("Begin:(%d,%d)\n",col,row-rowDecr);
+							printf("StartPt:(%d,%d)\n",startPt.x,startPt.y);
+							imshow("img",test);
+							waitKey(0);*/
+						}
+					}
+				}
+				//expand downwards
+				if(row<input.cols) {
+					bool sizeChanged = true;
+					while(sizeChanged) {
+						rowIncr++;
+						winSizeIncr++;
+						window = dst(Rect(col,startPt.y,winSize.width,winSize.height+winSizeIncr));
+						/*Mat test = input.clone();
+						rectangle(test,Rect(col,startPt.y,winSize.width,winSize.height+winSizeIncr),Scalar(150));
+						printf("****BEFORE2****\n");
+						printf("WinSizeIncr: %d\n",winSizeIncr);
+						printf("winSize: %dx%d\n",winSize.width, winSize.height+winSizeIncr);
+						printf("Begin:(%d,%d)\n",col,row-rowDecr);
+						imshow("img",test);
+						waitKey(0);*/
+						//printf("startPt(%d,%d)\n",startPt.x,startPt.y);
+						if(countNonZero(window)!=window.total()) {
+							rowIncr--;
+							winSizeIncr--;
+							endPt = Point(col,row+rowIncr);
+							window = dst(Rect(col,startPt.y,winSize.width,winSize.height+winSizeIncr));
+							sizeChanged=false;
+							/*Mat test = input.clone();
+							rectangle(test,Rect(col,startPt.y,winSize.width,winSize.height+winSizeIncr),Scalar(150));
+							printf("****AFTER2****\n");
+							printf("WinSizeIncr: %d\n",winSizeIncr);
+							printf("winSize: %dx%d\n",winSize.width, winSize.height+winSizeIncr);
+							printf("Begin:(%d,%d)\n",col,row-rowDecr);
+							imshow("img",test);
+							waitKey(0);*/
+						}
+					}
+				}
+				if(prevSize==window.size()) countStreak++;
+				else {
+					if(countStreak>thresh) {
+						for(int i=startPt.y; i<startPt.y+window.rows; i++) {
+							for(int j=startPt.x; j<col+window.cols; j++) {
+								if(dst.type()==CV_8U)
+									dst.at<uchar>(i,j) = 0;
+								if(dst.type()==CV_8UC3)
+									dst.at<Vec3b>(i,j) = Vec3b(0,0,0);
+							}
+						}
+					}
+					if(countStreak>0) {
+						winSizeIncr=0;
+						rowDecr=0;
+						rowIncr=0;
+						startPt = Point(col,row);
+					}
+					countStreak=0;
+				}
+			}
+			else {
+				if(countStreak>thresh) {
+					for(int i=startPt.y; i<startPt.y+window.rows; i++) {
+						for(int j=startPt.x; j<col+window.cols; j++) {
+							if(dst.type()==CV_8U)
+								dst.at<uchar>(i,j) = 0;
+							if(dst.type()==CV_8UC3)
+								dst.at<Vec3b>(i,j) = Vec3b(0,0,0);
+							//imshow("dst",dst);
+							//waitKey(0);
+						}
+					}
+				}
+				if(countStreak>0) {
+					winSizeIncr=0;
+					rowDecr=0;
+					rowIncr=0;
+					startPt = Point(col,row);
+				}
+				countStreak=0;
+			}
+			/*
+			printf("****FINAL****\n");
+			printf("(%d,%d): PrevSize: %dx%d, WindowSize: %dx%d\n",col,row,prevSize.width,prevSize.height,window.cols,window.rows);
+			printf("Streak: %d\n",countStreak);
+			 */
+		}
+	}
+	return dst;
 }
