@@ -230,7 +230,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 	currShadeIndex = sh.getShadeIndex(newShade);
 	int flag0=0, flag45=0, flag90=0;
 
-	if((color=="BrownPink" || color=="Brown") && HSL[0]<30 && pt.y>0) {
+	if((color=="BrownPink" || color=="Brown" || color=="BrownOrange") && HSL[0]<30 && pt.y>0) {
 		int j=pt.x-1;
 		int x = j;
 		int endY = (pt.y-localScanSize);
@@ -334,6 +334,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 			if(HSL[1]<=70) {
 				if(fn.countGreater(4,round(abs(deltaHSL_0[1][0]/unitThresh[0])),round(abs(deltaHSL_45[1][0]/unitThresh[0])),round(abs(deltaHSL_90[1][0]/unitThresh[0])),0.)>=2) {
 					if(color=="Brown") pix="BrownPink";
+					if(color=="BrownOrange") pix="BrownPink";
 					if(color=="BrownPink") pix = "Pink";
 					flag=true;
 					ruleNum = 3.1;
@@ -342,6 +343,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 			else if(HSL[1]<=78) {
 				if(fn.countLesser(4,deltaHSL_0[1][0],deltaHSL_45[1][0],deltaHSL_90[1][0],-10.0)>=2) {
 					if(color=="Brown") pix="BrownPink";
+					if(color=="BrownOrange") pix="BrownPink";
 					if(color=="BrownPink") pix = "Pink";
 					flag=true;
 					ruleNum = 3.12;
@@ -358,6 +360,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 					prevColor_90 = c.getMainColor(fd.colorVec.at(hslPt_90[1].y).at(hslPt_90[1].x));
 					if(fn.countEqual("4",prevColor_0.c_str(),prevColor_45.c_str(),prevColor_90.c_str(),"Pink")>=2) {
 						if(color=="Brown") pix="BrownPink";
+						if(color=="BrownOrange") pix="BrownPink";
 						if(color=="BrownPink") pix = "Pink";
 						flag=true;
 						ruleNum = 3.2;
@@ -375,6 +378,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 						if(fn.countEqual(4,flag0,flag45,flag90,1)>=2) {
 							if(fn.countLesserEqual(4,deltaHSL_0[1][0],deltaHSL_45[1][0],deltaHSL_90[1][0],-3.0)>=2) {
 								if(color=="Brown") pix="BrownPink";
+								if(color=="BrownOrange") pix="BrownPink";
 								if(color=="BrownPink") pix = "Pink";
 								flag=true;
 								ruleNum = 3.21;
@@ -395,6 +399,7 @@ double rule3(FileData &fd, String &newPix, String &newShade) {
 					}
 					if(fn.countGreaterEqual(4,ratioDeltaFlag[0],ratioDeltaFlag[1],ratioDeltaFlag[2],2.0)>=2){
 						if(color=="Brown") pix="BrownPink";
+						if(color=="BrownOrange") pix="BrownPink";
 						if(color=="BrownPink") pix = "Pink";
 						flag=true;
 						ruleNum = 3.22;

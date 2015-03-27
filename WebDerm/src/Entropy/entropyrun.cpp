@@ -52,12 +52,13 @@ void Entropy::runAllEntropy() {
 			Mat regImg = imread(file);
 			Mat normImg = runColorNormalization(regImg);
 			regImg = runResizeImage(normImg,imgSize);
-			Mat grayImg, blurImg, img;
+			Mat grayImg, blurImg, img, img2;
 			blur(regImg,blurImg,size);
 			cvtColor(regImg,grayImg,CV_BGR2GRAY);
 			fd.setImage(grayImg);
 			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-ShadeColors-"+strSize+".csv",fd.colorVec);
 			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-HSL-"+strSize+".csv",fd.hslMat);
+			Mat shadeColor = imread(full_path.string()+"/"+fd.filename+"-outputShades-5x5.png");
 			if(flag[0]==true && flag[1]==true) {
 				fd.ksize = size;
 				Mat src = sm.prepareImage(grayImg);
@@ -66,6 +67,9 @@ void Entropy::runAllEntropy() {
 				Mat dst = sm.origFilter(grayImg);
 				grayImg.copyTo(img,map);
 				grayImg.copyTo(img,dst);
+				shadeColor.copyTo(img2,map);
+				shadeColor.copyTo(img2,dst);
+				imwrite(fd.filename+"-Entropy-outputShades-5x5.png",img2);
 				this->shapeFn(fd);
 				this->eyeFn(fd,entSize,img,"","");
 			}

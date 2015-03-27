@@ -428,7 +428,7 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 	fill_n(dist,colorComponents,-1);
 	double sum=0, total=0, totalYSV[componentSize];
 	double ysv1[componentSize], ysv2[componentSize];
-	Mat ysvWeights(componentSize,1,CV_32F,Scalar(1.0)); //weight of importance of YSV
+	vector<float> ysvWeights = {1.0,1.0,1.0};
 	int colorsHit[colorComponents];
 	fill_n(colorsHit,colorComponents,0);
 	double maxYSV = 0, yTotal1=0, yTotal2=0;
@@ -443,8 +443,6 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 		}
 	}
 	maxYSV = max(yTotal1,yTotal2);
-	cout << yTotal1 << endl;
-	cout << yTotal2 << endl;
 	for(unsigned int i=0; i<vec1.size(); i++) {
 		String colorName = colorNameVec.at(i);
 		if(colorName!="LowBrown" && colorName!="LowGreyBrown" && colorName!="HighBrown" && colorName!="HighGreyBrown") {
@@ -459,17 +457,19 @@ double Entropy::test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<do
 					if(j<componentSize) {
 						double val = abs(ysv1[j]-ysv2[j]);
 						double maxVal = max(ysv1[j],ysv2[j]);
-						totalYSV[j] = ysvWeights.at<float>(j,0)*(val/maxVal);
+						totalYSV[j] = ysvWeights.at(j)*(val/maxVal);
 						if(maxVal==0) totalYSV[j] = 0;
 						sum += totalYSV[j];
 					}
 				}
 			}
-			//printf("%s: (%f,%f,%f),%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],maxYSV);
+			//if(this->debugMode)
+				//printf("%s: (%f,%f,%f),%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],maxYSV);
 			if(ysv1[0]>0 || ysv2[0]>0) {
 				dist[i] = sum/3.0;
 				colorsHit[i] = 1;
-				//printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],sum);
+				if(this->debugMode)
+					printf("%s: (%f),(%f),(%f),%f,%f\n",colorName.c_str(),totalYSV[0],totalYSV[1],totalYSV[2],dist[i],maxYSV);
 			}
 		}
 		sum=0;

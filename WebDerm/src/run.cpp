@@ -182,58 +182,6 @@ void runHysteresis()
 	}
 }
 
-void runAllHysteresis(String *filenames, int fileSize) {
-	Rgb rgb;
-	Hsl hsl;
-	Shades shade;
-	Color c;
-	String name;
-	Size size(2,2);
-	Mat img, img2, mask;
-	int s = 3;
-	bool flag[s];
-	flag[0]=rgb.importThresholds();
-	flag[1]=hsl.importHslThresholds();
-	flag[2]=shade.importThresholds();
-	for(int i=0; i<s; i++) {
-		if(flag[i]==false) {
-			flag[0] = false;
-			break;
-		}
-	}
-	if(flag[0]==true) {
-		for(int i=0; i<fileSize; i++) {
-			img = runResizeImage(filenames[i],Size(700,700),0);
-			getSkin(img, mask);
-			img.copyTo(img2, mask);
-			name = getFileName(filenames[i]);
-			FileData fd(filenames[i]);
-			fd.setImage(img2);
-			fd.ksize = size;
-			hysteresis(fd);
-			writeSeq2File(fd.windowVec,name);
-			writeSeq2File(fd.hslMat,name+"-HSL");
-			fd.writeFileMetaData();
-			c.output2ImageColor(fd.colorVec,size,name);
-			writeSeq2File(fd.absRatioMat,name+"-AbsoluteRatios");
-			writeSeq2File(fd.intensityVec,name+"-ColorIntensity");
-			writeSeq2File(fd.smoothIntensityVec,name+"-SmoothIntensity");
-			writeSeq2File(fd.colorVec,name+"-ShadeColors");
-			writeSeq2File(fd.rulesMat,name+"-RulesMat");
-			writeSeq2File(fd.m_ContrastMat,name+"-measuredContrast");
-			writeSeq2File(fd.d_HslMat,name+"-deltaHSL");
-			writeSeq2File(fd.hslPtMat,name+"-hslPts");
-			writeSeq2File(fd.cumHslMat,name+"-cumHSL");
-
-			//release images for next use
-			img.release(); img2.release(); mask.release();
-		}
-	}
-	rgb.release_memory();
-	hsl.release_memory();
-	shade.release_memory();
-}
-
 void runAllHysteresis() {
 	Rgb rgb;
 	Hsl hsl;

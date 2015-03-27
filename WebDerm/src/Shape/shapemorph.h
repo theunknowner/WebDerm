@@ -53,11 +53,11 @@ public:
 	Mat gsReconUsingRmin1(Mat src);
 	Mat gsReconUsingRmin2(Mat src);
 
-	vector<Mat> lumFilter1(Mat src);
-	vector<Mat> lumFilter2(Mat src);
+	vector<Mat> lumFilter1(Mat src, int featuresToHold=1);
+	vector<Mat> lumFilter2(Mat src, int featuresToHold=1);
 	Mat densityDetection(Mat src,double q);
 	Mat origFilter(Mat src, double shift=1.0);
-	Mat closeFilter(Mat src);
+	Mat closeFilter(Mat src, Size elementSize, double shift=1.0);
 	void combineFilterFeatures(vector<Mat> &featureVec);
 	vector<vector<Point> > findBoundary(Mat src);
 	int countEdgeTouching(Mat src, int edgeSize);

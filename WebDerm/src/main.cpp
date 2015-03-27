@@ -55,24 +55,24 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/melanoma5.jpg");
-	img = runColorNormalization(img);
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/vesicles9.jpg");
+	//img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
 	ShapeColor sc;
 	Size size(5,5);
-	blur(img,img,size);
+	//blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-/*
+
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
-	Mat dst = sm.origFilter(imgGray);
-	img.copyTo(img2,map);
-	img.copyTo(img2,dst);
+	Mat mask = sc.removeRunningLines(map,Size(3,1));
+	Mat dst = sc.filterKneePt(src);
+	//imgGray.copyTo(img2,mask);
 	imgshow(map);
+	imgshow(mask);
 	imgshow(dst);
-	imgshow(img2);
 	/*
 	Test test;
 	img = test.test_hslAvgOfColor(img);
@@ -81,14 +81,13 @@ int main(int argc,char** argv)
 	Mat map = sc.getShapeUsingColor2(img, mapOfNonNoise);
 	imgshow(map);
 	*/
-	/*
-	vector<Mat> matVec = sm.lumFilter1(img);
-	vector<Mat> matVec2 = sm.lumFilter2(img);
+/*
+	vector<Mat> matVec = sm.lumFilter1(imgGray);
+	vector<Mat> matVec2 = sm.lumFilter2(imgGray);
 
-	imgshow(img);
 	imgshow(matVec.at(0));
 	imgshow(matVec2.at(0));
-
+/*
 	imwrite("img1.png",matVec.at(0));
 	imwrite("img2.png",matVec2.at(0));
 	TestML ml;
@@ -237,21 +236,21 @@ int main(int argc,char** argv)
 		waitKey(0);
 	}
 /**/
-
-	String name = "lph7";
+/*
+	String name = "psoriasis18";
 	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	en.setDebugMode(true);
+	en.setDebugLevel(true);
 	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	//en.test_runCompareEntropy2a(name);
+	en.test_runCompareEntropy2a(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
-	en.test_runAllCompareEntropy2a(folder);
+	//en.test_runAllCompareEntropy2a(folder);
 	/**/
 	/*
 	Entropy en;

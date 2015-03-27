@@ -137,3 +137,15 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 	}
 	return result;
 }
+
+double test_average(Mat window) {
+	double sum=0;
+	for(int i=0; i<window.rows; i++) {
+		for(int j=0; j<window.cols; j++) {
+			double val = window.at<int>(i,j);
+			sum += val;
+		}
+	}
+	double avg = sum/window.total();
+	return avg;
+}

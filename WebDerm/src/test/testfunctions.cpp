@@ -83,7 +83,7 @@ double test_inverseGamma(int val) {
 		return pow(((c+0.055)/(1.055)),2.4);
 }
 
-double test_Gamma(double val) {
+int test_Gamma(double val) {
 	if(val<=0.0031308)
 		val *= 12.92;
 	else
@@ -91,7 +91,7 @@ double test_Gamma(double val) {
 	return int(val*255+.5);
 }
 
-double test_gray(int r, int g, int b) {
+int test_gray(int r, int g, int b) {
 	const double rY = 0.212655;
 	const double gY = 0.715158;
 	const double bY = 0.072187;

@@ -308,11 +308,11 @@ Mat ShapeMorph::origFilter(Mat src, double shift) {
 }
 
 //! filter using close(Img) - Img
-Mat ShapeMorph::closeFilter(Mat src) {
+Mat ShapeMorph::closeFilter(Mat src, Size elementSize, double shift) {
 	KneeCurve kc;
 	//Poly poly;
 	Mat img;
-	Mat element = getStructuringElement(MORPH_RECT,Size(17,17));
+	Mat element = getStructuringElement(MORPH_RECT,elementSize);
 	morphologyEx(src,img,MORPH_CLOSE,element);
 	Mat img2 = img - src;
 
@@ -391,6 +391,7 @@ Mat ShapeMorph::closeFilter(Mat src) {
 	}
 	kc.removeOutliers(yVec2,0.025);
 	bestIdx = kc.kneeCurvePoint(yVec2);
+	bestIdx *= shift;
 	thresh = yVec2.at(bestIdx);
 	Mat result=img3.clone();
 	for(int i=0; i<img3.rows; i++) {
@@ -404,7 +405,7 @@ Mat ShapeMorph::closeFilter(Mat src) {
 }
 
 //! using origFilter
-vector<Mat> ShapeMorph::lumFilter1(Mat src) {
+vector<Mat> ShapeMorph::lumFilter1(Mat src, int featuresToHold) {
 	Mat img1 = this->origFilter(src);
 	Mat img2 = this->densityDetection(img1,0.9);
 	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
@@ -442,7 +443,6 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	unsigned int featuresToHold = 1;
 	unsigned int n=1;
 	while(true) {
 		try {
@@ -465,8 +465,8 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src) {
 }
 
 //! using closeFilter
-vector<Mat> ShapeMorph::lumFilter2(Mat src) {
-	Mat img1 = this->closeFilter(src);
+vector<Mat> ShapeMorph::lumFilter2(Mat src, int featuresToHold) {
+	Mat img1 = this->closeFilter(src,Size(17,17));
 	Mat img2 = this->densityDetection(img1,0.9);
 	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
 	int countPix=0, idx=0;
@@ -481,7 +481,6 @@ vector<Mat> ShapeMorph::lumFilter2(Mat src) {
 	Mat result;
 	vector<Mat> matVec;
 	Mat element = getStructuringElement(MORPH_RECT,Size(3,3));
-	int featuresToHold = 1;
 	unsigned int n=1;
 	while(true) {
 		try {

@@ -146,3 +146,27 @@ void KneeCurve::loadVectorFile(String path, deque<double> &vec) {
 		fs.close();
 	}
 }
+
+//src = input; thresh=perceptible thresh; shift=kneePt shift percentage
+Mat KneeCurve::filterKneePt(Mat src, double thresh, double shift) {
+	vector<double> yVec1;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			double lum = src.at<uchar>(i,j);
+			if(lum>thresh)
+				yVec1.push_back(lum);
+		}
+	}
+	int bestIdx = this->kneeCurvePoint(yVec1);
+	bestIdx *= shift;
+	double threshFilter = yVec1.at(bestIdx);
+	Mat dst =src.clone();
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			double lum = src.at<uchar>(i,j);
+			if(lum<threshFilter)
+				dst.at<uchar>(i,j) = 0;
+		}
+	}
+	return dst;
+}

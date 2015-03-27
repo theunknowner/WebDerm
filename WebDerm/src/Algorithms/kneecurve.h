@@ -23,6 +23,8 @@ public:
 	void removeOutliers(deque<int> &vec, double percent);
 
 	void loadVectorFile(String path, deque<double> &vec);
+
+	Mat filterKneePt(Mat src, double thresh=0.0, double shift=1.0);
 };
 
 #endif /* KNEECURVE_H_ */
