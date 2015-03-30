@@ -15,6 +15,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
 class ShapeColor {
 private:
@@ -38,6 +39,9 @@ public:
 	Mat removeRunningLines(Mat input, Size size);
 
 	Mat filterKneePt(Mat src, double thresh=0.0, double shift=1.0);
+
+	Mat applyDiscreteShade(Mat input);
+
 };
 
 #endif /* SHAPECOLOR_H_ */

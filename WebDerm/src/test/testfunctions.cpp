@@ -97,3 +97,27 @@ int test_gray(int r, int g, int b) {
 	const double bY = 0.072187;
 	return test_Gamma(rY*test_inverseGamma(r)+gY*test_inverseGamma(g)+bY*test_inverseGamma(b));
 }
+
+Mat input, dst, gray, edges;
+int lowThreshold;
+int const max_lowThreshold = 200;
+int ratio = 1;
+int kernel_size = 3;
+String window_name = "Edge Map";
+void CannyThreshold(int, void*) {
+	/// Reduce noise with a kernel 3x3
+	blur(gray, edges, Size(3,3) );
+	/// Canny detector
+	Canny(edges, edges, lowThreshold, lowThreshold*ratio, kernel_size );
+
+	input.copyTo(dst,edges);
+	imshow(window_name,edges);
+}
+void test_CannyEdge(Mat src) {
+	input = src.clone();
+	cvtColor(src,gray,CV_BGR2GRAY);
+	namedWindow( window_name, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED );
+	createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold);
+	CannyThreshold(0,0);
+	waitKey(0);
+}

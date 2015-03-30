@@ -28,6 +28,7 @@ public:
 	int extractShadeLevel(String shade);
 	String extractShade(String pix);
 	String calcShade(double intensity);
+	String calcShade2(double intensity);
 	void release_memory();
 	int shadeDifference(String shade1, String shade2);
 

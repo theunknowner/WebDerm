@@ -116,6 +116,14 @@ String Shades::calcShade(double intensity) {
 	return "NONE";
 }
 
+String Shades::calcShade2(double intensity) {
+	for(unsigned int i=0; i<g_ShadeThresh2.size(); i++) {
+		if(intensity<g_ShadeThresh2.at(i).at(1) && intensity>=g_ShadeThresh2.at(i).at(0))
+			return g_Shades2.at(i);
+	}
+	return "NONE";
+}
+
 void Shades::release_memory() {
 	g_Shades.clear();
 	g_ShadeThresh.clear();

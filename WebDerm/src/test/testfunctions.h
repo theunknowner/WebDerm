@@ -20,4 +20,6 @@ double test_inverseGamma(int val);
 int test_Gamma(double val);
 int test_gray(int r, int g, int b);
 
+void test_CannyEdge(Mat src);
+
 #endif /* TESTFUNCTIONS_H_ */

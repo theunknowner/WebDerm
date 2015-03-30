@@ -23,8 +23,7 @@ class Test {
 public:
 	vector<vector<String> > test_shadesOfColor(Mat src);
 	Mat test_hslAvgOfColor(Mat src);
-
-	double test_average(Mat window);
 };
+
 
 #endif /* TEST_H_ */

@@ -500,6 +500,7 @@ void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseM
 Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 	Mat dst = input.clone();
 	const int thresh=11;
+	const int thickness = 5;
 	Size winSize = size;
 	int countStreak=0;
 	Mat window;
@@ -555,7 +556,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 								window = dst(Rect(col,row-rowDecr,winSize.width,winSize.height));
 
 								if(prevSize!=window.size()) {
-									if(countStreak>thresh) {
+									if(countStreak>thresh && window.rows<=thickness) {
 										for(int i=startPt.y; i<startPt.y+window.rows; i++) {
 											for(int j=startPt.x; j<col+window.cols; j++) {
 												if(dst.type()==CV_8U)
@@ -655,7 +656,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 				} // end if
 				if(prevSize==window.size()) countStreak++;
 				if(prevSize!=window.size() || col==(dst.cols-winSize.width)) {
-					if(countStreak>=thresh) {
+					if(countStreak>=thresh && window.rows<=thickness) {
 						for(int i=startPt.y; i<startPt.y+window.rows; i++) {
 							for(int j=startPt.x; j<col+window.cols; j++) {
 								if(dst.type()==CV_8U)
@@ -678,7 +679,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 				}
 			} // end if
 			else {
-				if(countStreak>=thresh) {
+				if(countStreak>=thresh && window.rows<=thickness) {
 					for(int i=startPt.y; i<startPt.y+window.rows; i++) {
 						for(int j=startPt.x; j<col+window.cols; j++) {
 							if(dst.type()==CV_8U)
@@ -714,6 +715,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 	return dst;
 }
 
+
 Mat ShapeColor::filterKneePt(Mat src, double thresh, double shift) {
 	KneeCurve kc;
 	vector<double> yVec1;
@@ -725,13 +727,9 @@ Mat ShapeColor::filterKneePt(Mat src, double thresh, double shift) {
 		}
 	}
 	int bestIdx = kc.kneeCurvePoint(yVec1);
-	cout << bestIdx << endl;
-	//writeSeq2File(yVec1,"yvec");
 	float percent = (float)bestIdx/yVec1.size();
-	if(percent<0.05 || percent>0.95)
+	if(percent<0.05 || percent>0.90)
 		bestIdx = 0.75 * yVec1.size();
-	cout << percent << endl;
-	cout << bestIdx << endl;
 	double threshFilter = yVec1.at(bestIdx);
 	Mat dst =src.clone();
 	for(int i=0; i<src.rows; i++) {
@@ -739,6 +737,29 @@ Mat ShapeColor::filterKneePt(Mat src, double thresh, double shift) {
 			double lum = src.at<uchar>(i,j);
 			if(lum<threshFilter)
 				dst.at<uchar>(i,j) = 0;
+		}
+	}
+	return dst;
+}
+
+//input is grayscale image
+Mat ShapeColor::applyDiscreteShade(Mat input) {
+	Mat dst(input.size(),CV_8U,Scalar(0));
+	Shades sh;
+	vector<String> discreteShade = {"Dark2","Dark3","High","Low","Light","White"};
+	vector<int> discreteVals = {10,51,102,153,204,255};
+	for(int row=0; row<input.rows; row++) {
+		for(int col=0; col<input.cols; col++) {
+			int val = input.at<uchar>(row,col);
+			if(val>0) {
+				String shade = sh.calcShade2(val);
+				for(unsigned int i=0; i<discreteShade.size(); i++) {
+					if(shade==discreteShade.at(i)) {
+						dst.at<uchar>(row,col) = discreteVals.at(i);
+						break;
+					}
+				}
+			}
 		}
 	}
 	return dst;

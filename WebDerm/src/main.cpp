@@ -32,7 +32,6 @@
 #include "Shape/shapecolor.h"
 #include "Colorspace/xyz.h"
 #include "Colorspace/cielab.h"
-#include <unordered_map>
 
 int main(int argc,char** argv)
 {
@@ -55,8 +54,9 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/vesicles9.jpg");
-	//img = runColorNormalization(img);
+	String name = "urticaria8";
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
 	ShapeColor sc;
@@ -67,20 +67,21 @@ int main(int argc,char** argv)
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
-	Mat mask = sc.removeRunningLines(map,Size(3,1));
-	Mat dst = sc.filterKneePt(src);
-	//imgGray.copyTo(img2,mask);
+	Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
+	Mat maskLC;
+	src.copyTo(maskLC,mapOfNonNoise);
+	maskLC = sc.filterKneePt(maskLC);
+	src.copyTo(maskLC,maskEmax);
+
+	img.copyTo(img2,maskLC);
+	cvtColor(img2,img3,CV_BGR2GRAY);
+	img4 = sc.applyDiscreteShade(img3);
 	imgshow(map);
-	imgshow(mask);
-	imgshow(dst);
-	/*
-	Test test;
-	img = test.test_hslAvgOfColor(img);
-	//imwrite("clp3.png",img);
-	ShapeColor sc;
-	Mat map = sc.getShapeUsingColor2(img, mapOfNonNoise);
-	imgshow(map);
-	*/
+	imgshow(maskEmax);
+	imgshow(img4);
+	imwrite(name+"-orig.png",img);
+	//imwrite(name+"-mask.png",maskLC);
+	imwrite(name+"-extract.png",img4);
 /*
 	vector<Mat> matVec = sm.lumFilter1(imgGray);
 	vector<Mat> matVec2 = sm.lumFilter2(imgGray);
