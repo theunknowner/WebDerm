@@ -29,7 +29,6 @@ public:
 	const double randomThresh = -0.40;
 	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
 	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));
-	Mat hysteresisGradient(Mat src);
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat origImg, Mat scaleImg);
 	Mat prepareImage(Mat src);
@@ -55,15 +54,14 @@ public:
 
 	vector<Mat> lumFilter1(Mat src, int featuresToHold=1);
 	vector<Mat> lumFilter2(Mat src, int featuresToHold=1);
-	Mat densityDetection(Mat src,double q);
+	Mat densityConnector(Mat src,double q);
 	Mat origFilter(Mat src, double shift=1.0);
 	Mat closeFilter(Mat src, Size elementSize, double shift=1.0);
-	void combineFilterFeatures(vector<Mat> &featureVec);
 	vector<vector<Point> > findBoundary(Mat src);
 	int countEdgeTouching(Mat src, int edgeSize);
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 	Mat removeNoiseOnBoundary(Mat src);
-
+	Mat haloTransform(Mat src);
 };
 
 #endif /* SHAPEMORPH_H_ */

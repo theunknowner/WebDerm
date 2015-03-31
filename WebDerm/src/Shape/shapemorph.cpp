@@ -407,7 +407,7 @@ Mat ShapeMorph::closeFilter(Mat src, Size elementSize, double shift) {
 //! using origFilter
 vector<Mat> ShapeMorph::lumFilter1(Mat src, int featuresToHold) {
 	Mat img1 = this->origFilter(src);
-	Mat img2 = this->densityDetection(img1,0.9);
+	Mat img2 = this->densityConnector(img1,0.9);
 	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
 
 	//remove features clinging to image boundary
@@ -467,7 +467,7 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src, int featuresToHold) {
 //! using closeFilter
 vector<Mat> ShapeMorph::lumFilter2(Mat src, int featuresToHold) {
 	Mat img1 = this->closeFilter(src,Size(17,17));
-	Mat img2 = this->densityDetection(img1,0.9);
+	Mat img2 = this->densityConnector(img1,0.9);
 	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
 	int countPix=0, idx=0;
 	deque<int> countVec;
@@ -548,110 +548,6 @@ Mat ShapeMorph::erosion(Mat src, Size size, Point anchor) {
 	Mat element = getStructuringElement(MORPH_RECT,size,anchor);
 	erode(src,results,element,anchor);
 	return results;
-}
-
-//custom hysteresis-gradient function
-Mat ShapeMorph::hysteresisGradient(Mat src) {
-	Mat result = Mat::zeros(src.rows, src.cols, CV_8U);
-	Mat map(src.rows, src.cols,CV_8U,Scalar(0));
-	const double H = 0.28;
-	const double enterDemarcThresh = 30;
-	const double exitDemarcThresh = -2;
-	const double elevationThresh = 20;
-	Point enterDemarcPos(-1,-1);
-	Point exitDemarcPos(-1,-1);
-	double cumulativeSP=0;
-	int demarcFlag=0;
-	int currentRelLum =0, nextRelLum=0;
-	double tempSlope=0, slope=0;
-	int step=0;
-	double minSlope=100;
-	Point minSlopePt, maxSlopePt;
-	Point pt;
-	Point myPt = Point(0,31); //for debugging use
-	for(int i=0; i<src.rows; i++) {
-		for(int j=0; j<src.cols; j++) {
-			pt = Point(j,i);
-			step = pt.x;
-			minSlope=100;
-			enterDemarcPos = Point(-1,-1);
-			exitDemarcPos = Point(-1,-1);
-			demarcFlag=0;
-			slope=0;
-			if(step<(src.cols-1)) {
-				while(step<(src.cols-1)) {
-					currentRelLum = src.at<uchar>(i,step);
-					nextRelLum = src.at<uchar>(i,step+1);
-					tempSlope = (nextRelLum - currentRelLum);
-					slope = (slope * H) + (tempSlope*(1.0-H));
-					if(slope<minSlope) {
-						minSlope = slope;
-						minSlopePt = Point(step,pt.y);
-					}
-					//printf() for debugging
-					/*
-					debug=true;
-					if(j==myPt.x && i==myPt.y) {
-						printf("(%d,%d) - Curr:%d, Temp:%f, Slope:%f\n",step,pt.y,currentRelLum,tempSlope,slope);
-					}
-					/**/
-					///////////////////////
-					step++;
-					if(slope>=enterDemarcThresh && demarcFlag==0) {
-						enterDemarcPos = Point(step,pt.y);
-						demarcFlag=1; //entering Dark shade
-						map.at<uchar>(enterDemarcPos) = 1;
-					}
-					if((slope<=exitDemarcThresh && tempSlope<0)) {
-						if(enterDemarcPos.x==-1 && enterDemarcPos.y==-1) {
-							enterDemarcPos = minSlopePt;
-							map.at<uchar>(enterDemarcPos) = 1;
-						}
-						exitDemarcPos = Point(step,pt.y);
-						demarcFlag=1;
-						map.at<uchar>(exitDemarcPos) = 2;
-						break;
-					}
-				}//end while loop
-				if(exitDemarcPos==Point(-1,-1) && demarcFlag==1) {
-					exitDemarcPos = Point(step,pt.y);
-					map.at<uchar>(exitDemarcPos) = 2;
-				}
-				//printf() for debugging
-				/*
-				debug=true;
-				if(j==myPt.x && i==myPt.y) {
-					currentRelLum = src.at<uchar>(pt.y,step);
-					//printf("(%d,%d) - Curr:%f, Flag: %d\n",step,fd.pt.y,currentRelLum,demarcFlag);
-					printf("(%d,%d) - Curr:%d,",step,pt.y,currentRelLum);
-					printf("Flag: %d\n",demarcFlag);
-					printf("%d,%d\n",pt.x,pt.y);
-					printf("enterDemarcPos - %d,%d\n",enterDemarcPos.x,enterDemarcPos.y);
-					printf("exitDemarcPos - %d,%d\n",exitDemarcPos.x,exitDemarcPos.y);
-				}
-				/**/
-				//////////////////////////
-				if(enterDemarcPos!=Point(-1,-1)) {
-					for(int k=j; k<exitDemarcPos.x; k++) {
-						if(k>=enterDemarcPos.x && pt.y>=enterDemarcPos.y) {
-							if(k<=exitDemarcPos.x && pt.y<=exitDemarcPos.y) {
-								//result.at<uchar>(i,k) = 255;
-								result.at<uchar>(i,k) = src.at<uchar>(i,k);
-							}
-							else {
-								enterDemarcPos = Point(-1,-1);
-								exitDemarcPos = Point(-1,-1);
-								demarcFlag=0;
-								slope=0;
-							}
-						}
-					}
-				}
-				j=step-1; //step-1 because j++ in next iteration
-			}// end if color
-		}//end for j
-	}//end for i
-	return map;
 }
 
 Mat ShapeMorph::getStructElem(Size size, int shape) {
@@ -1421,7 +1317,7 @@ Mat ShapeMorph::customFn2(Mat src) {
 	return map;
 }
 
-Mat ShapeMorph::densityDetection(Mat src, double q) {
+Mat ShapeMorph::densityConnector(Mat src, double q) {
 	//Mat map = src.clone();
 	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
 	Size size(5,5);
@@ -1514,15 +1410,6 @@ Mat ShapeMorph::densityDetection(Mat src, double q) {
 		row++;
 	}
 	return result;
-}
-
-//! combines and/or filters features
-void ShapeMorph::combineFilterFeatures(vector<Mat> &featureVec) {
-	vector<Mat> _featureVec = featureVec;
-	//int pixSize = countNonZero
-	//for(unsigned int i=0; i<_featureVec.size(); i++) {
-
-	//}
 }
 
 vector<vector<Point> > ShapeMorph::findBoundary(Mat src) {
@@ -1641,4 +1528,128 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 	}
 
 	return mapEdgeRemoval;
+}
+
+Mat ShapeMorph::haloTransform(Mat src) {
+	Mat tempResult(src.rows, src.cols, CV_32F, Scalar(0));
+	Mat results(src.rows, src.cols, CV_8U, Scalar(0));
+	Mat interPtsMap(src.rows,src.cols,CV_32S,Scalar(0));
+	deque<deque<Point> > interPts(src.rows*src.cols,deque<Point>(1,Point(-1,-1)));
+	deque<deque<double> > distVec(src.rows*src.cols,deque<double>(1,-1.0));
+	const double alpha = 0.75;
+	const double epsilon = 0.5;
+	double absDiscernThresh = 1.0;
+	const double cutoffThresh = 1.0;
+	int row=0, col=0;
+	double dist=0, cutoffDist=0;
+	double maxVal=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			int index = col + row*src.cols;
+			if(interPts.at(index).at(0)==Point(-1,-1))
+				interPts.at(index).pop_front();
+			if(distVec.at(index).at(0)==-1.0)
+				distVec.at(index).pop_front();
+			double dbl_Lc = sqrt((int)src.at<uchar>(row,col));
+			if(dbl_Lc>absDiscernThresh) {
+				tempResult.at<float>(row,col) = dbl_Lc;
+				double cutoffVal = cutoffThresh + 1.0;
+				while(cutoffVal>cutoffThresh) {
+					cutoffDist++;
+					cutoffVal = pow(alpha,cutoffDist) * pow(dbl_Lc,epsilon);
+					//if(col==102 && row==80) {
+					//	printf("LC: %f, Val: %f, Dist: %f\n",dbl_Lc,cutoffVal,cutoffDist);
+					//}
+				}
+				cutoffDist--;
+				for(int i=(row-cutoffDist); i<=(row+cutoffDist); i++) {
+					for(int j=(col-cutoffDist); j<=(col+cutoffDist); j++) {
+						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+							int index = j + i*src.cols;
+							dist = floor(eucDist(Point(j,i),Point(col,row)));
+							if(dist<=cutoffDist) {
+								interPts.at(index).push_back(Point(col,row));
+								distVec.at(index).push_back(dist);
+							}
+						}
+					}
+				}
+			}
+			cutoffDist=0;
+			col++;
+		}
+		col=0;
+		row++;
+	}
+	/*int index = 130 + 92 * src.cols;
+	for(int i=0; i<interPts.at(index).size(); i++) {
+		cout << interPts.at(index).at(i) << " - ";
+		cout << _src.at<float>(interPts.at(index).at(i)) << " - ";
+		cout << distVec.at(index).at(i) << endl;
+	}*/
+	//double val1 = tempResult.at<float>(80,102);
+	//double change = val1/tempResult.at<float>(128,20);
+	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
+	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
+	//printf("Change: %f\n",change );
+	int iter=1;
+	for(int n=0; n<iter; n++) {
+		for(int i=0; i<src.rows; i++) {
+			for(int j=0; j<src.cols; j++) {
+				int index = j + i*src.cols;
+				for(unsigned int k=0; k<interPts.at(index).size(); k++) {
+					if(interPts.at(index).size()>=2) {
+						double dbl_Lc = sqrt((int)src.at<uchar>(interPts.at(index).at(k)));
+						double val1 = pow(alpha,distVec.at(index).at(k)) * pow(dbl_Lc,epsilon);
+						val1 *=20.0; //same as iterating 20 times
+						dbl_Lc *=20.0;
+						val1 = tempResult.at<float>(i,j) + val1;
+						if(val1<0) val1=0;
+						tempResult.at<float>(i,j) = val1;
+						maxVal = max(val1,maxVal);
+						interPtsMap.at<int>(interPts.at(index).at(k))++;
+					}
+				}
+			}
+		}
+		//val1 = tempResult.at<float>(80,102);
+		//change = val1/tempResult.at<float>(128,20);
+		//printf("(102,80): %f, ",tempResult.at<float>(80,102));
+		//printf("(20,128): %f, ",tempResult.at<float>(128,20));
+		//printf("Change: %f\n",change );
+	}
+	//if point is a star and did not intersect -> penalize
+	for(int i=0; i<interPtsMap.rows; i++) {
+		for(int j=0; j<interPtsMap.cols; j++) {
+			double lc = (int)src.at<uchar>(i,j);
+			if(lc>absDiscernThresh) {
+				lc = sqrt(lc);
+				if(interPtsMap.at<int>(i,j)==0) {
+					double val = tempResult.at<float>(i,j) - (lc/2.);
+					if(val<0) val=0;
+					tempResult.at<float>(i,j) = val;
+				}
+			}
+		}
+	}
+	//double val1 = tempResult.at<float>(80,102);
+	//double change = val1/tempResult.at<float>(128,20);
+	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
+	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
+	//printf("Change: %f\n",change );
+	//nomalize tempResult to results from 0-255
+	//cout << maxVal << endl;
+	/*for(int i=0; i<tempResult.rows; i++) {
+		for(int j=0; j<tempResult.cols; j++) {
+			double val = tempResult.at<float>(i,j);
+			//if(val>0) val=255;
+			//if(val>255) val=255;
+			double normVal = (val-minVal)/(maxVal-minVal);
+			val = round(normVal*255.0);
+			results.at<uchar>(i,j) = val;
+		}
+	}*/
+	//imgshow(results);
+	return tempResult;
+	//return results;
 }
