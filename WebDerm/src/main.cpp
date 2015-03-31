@@ -54,7 +54,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "urticaria8";
+	String name = "acne3";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -72,16 +72,22 @@ int main(int argc,char** argv)
 	src.copyTo(maskLC,mapOfNonNoise);
 	maskLC = sc.filterKneePt(maskLC);
 	src.copyTo(maskLC,maskEmax);
-
-	img.copyTo(img2,maskLC);
-	cvtColor(img2,img3,CV_BGR2GRAY);
-	img4 = sc.applyDiscreteShade(img3);
-	imgshow(map);
-	imgshow(maskEmax);
+	img2 = maskLC * 255;
+	img2 = sm.densityConnector(img2,0.9999);
+	deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
+	img3 = sm.haloTransform(islands.at(0));
+	img3.convertTo(img3,CV_8U);
+	imgGray.copyTo(img4,img3);
+	img5 = sc.applyDiscreteShade(img4);
+	imgshow(img);
+	imgshow(img2);
+	imgshow(img3);
 	imgshow(img4);
-	imwrite(name+"-orig.png",img);
+	imgshow(img5);
+
+	//imwrite(name+"-orig.png",img);
 	//imwrite(name+"-mask.png",maskLC);
-	imwrite(name+"-extract.png",img4);
+	//imwrite(name+"-extract.png",img4);
 /*
 	vector<Mat> matVec = sm.lumFilter1(imgGray);
 	vector<Mat> matVec2 = sm.lumFilter2(imgGray);
@@ -290,29 +296,7 @@ int main(int argc,char** argv)
 	imshow(fd.filename+"_Squares",img3);
 	//imshow(fd2.filename+"_Squares2",img4);
 	waitKey(0);
-
-
-	Point pt1(7,41);
-	Point pt2(9,43);
-	//addNewColors(img2, pt1,pt2,"Gray", "Brown");
-	//addNewColors(img2, Point(344,274), Point(346,275),"Gray", "Violet");
-	//checkColorsFromList(img2,pt1,pt2);
-	//generateColorRegionTable(img, pt1,pt2);
-	//generateColorRegionTable(img2, Point(422,265), Size(3,3));
-/*
-	int col = 477;
-	int row = 407;
-	cout << "Result: " << testHysteresis(img2, row, col, Size(2,2)) << endl;
-	//cout << in.calcIntensity("Gray39Brown30");
-	//cout << con.calcContrast(0.50,0.555,"Gray90Brown61","Gray88Brown58") << endl;
-	//runNeuralNetworkTraining("data.csv");
-	//createDataFile("rgb.txt", "NN_Data1.csv");
-	//imwrite("img.png", img3);
-	//runLPH(img4);
-	//imshow("Img1", img3);
-	//imshow("Img2", img5);
-	//waitKey(0);
-/**/
+*/
 	return 0;
 }
 

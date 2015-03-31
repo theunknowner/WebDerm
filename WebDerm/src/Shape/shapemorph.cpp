@@ -472,6 +472,7 @@ vector<Mat> ShapeMorph::lumFilter2(Mat src, int featuresToHold) {
 	int countPix=0, idx=0;
 	deque<int> countVec;
 	deque<int> idxVec;
+	//sorts the features from largest to smallest
 	for(unsigned int i=0; i<featureVec.size(); i++) {
 		countPix = countNonZero(featureVec.at(i));
 		idx = i;
@@ -745,7 +746,8 @@ Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
 	return result;
 }
 
-deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh) {
+//thresh = discernible thresh; set sort = 1 largest -> smallest features
+deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	deque<deque<Point> > numFeatures;
 	deque<Point> ptVec;
@@ -828,6 +830,30 @@ deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh) {
 			}
 			featureVec.push_back(feature);
 		}
+	}
+	if(sort) {
+		int countPix, idx;
+		deque<int> countVec;
+		deque<int> idxVec;
+		deque<Mat> tempVec;
+		for(unsigned int i=0; i<featureVec.size(); i++) {
+			countPix = countNonZero(featureVec.at(i));
+			idx = i;
+			countVec.push_back(countPix);
+		}
+		jaysort(countVec,idxVec);
+		for(int i=idxVec.size()-1; i>=0; --i) {
+			try {
+			tempVec.push_back(featureVec.at(idxVec.at(i)));
+			} catch(const std::out_of_range &oor) {
+				printf("idxVec.size(): %lu\n",idxVec.size());
+				printf("featureVec.size(): %lu\n",featureVec.size());
+				printf("i:%d\n",i);
+				printf("idx:%d\n",idxVec.at(i));
+				exit(1);
+			}
+		}
+		featureVec = tempVec;
 	}
 	return featureVec;
 }
@@ -1417,29 +1443,6 @@ vector<vector<Point> > ShapeMorph::findBoundary(Mat src) {
 	findContours(src, contour, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	return contour;
 }
-int ShapeMorph::countEdgeTouching(Mat src, int edgeSize) {
-	Mat _src = src.clone();
-	Mat topEdge = _src(Rect(edgeSize,0,src.cols-edgeSize*2,edgeSize));
-	Mat bottomEdge = _src(Rect(edgeSize,src.rows-edgeSize,src.cols-edgeSize*2,edgeSize));
-	Mat leftEdge = _src(Rect(0,edgeSize,edgeSize,src.rows-edgeSize*2));
-	Mat rightEdge = _src(Rect(src.cols-edgeSize,edgeSize,edgeSize,src.rows-edgeSize*2));
-	Mat topLeftEdge = _src(Rect(0,0,edgeSize,edgeSize));
-	Mat topRightEdge = _src(Rect(src.cols-edgeSize,0,edgeSize,edgeSize));
-	Mat bottomLeftEdge = _src(Rect(0,src.rows-edgeSize,edgeSize,edgeSize));
-	Mat bottomRightEdge = _src(Rect(src.cols-edgeSize,src.rows-edgeSize,edgeSize,edgeSize));
-	//int totalPix = countNonZero(src);
-	int topEdgePix = countNonZero(topEdge);
-	int leftEdgePix = countNonZero(leftEdge);
-	int bottomEdgePix = countNonZero(bottomEdge);
-	int rightEdgePix = countNonZero(rightEdge);
-	int topLeftEdgePix = countNonZero(topLeftEdge);
-	int topRightEdgePix = countNonZero(topRightEdge);
-	int bottomLeftEdgePix = countNonZero(bottomLeftEdge);
-	int bottomRightEdgePix = countNonZero(bottomRightEdge);
-	int totalEdgePix = topEdgePix+leftEdgePix+bottomEdgePix+rightEdgePix+
-			topLeftEdgePix+topRightEdgePix+bottomLeftEdgePix+bottomRightEdgePix;
-	return totalEdgePix;
-}
 
 //! for edges & corners of different sizes
 int ShapeMorph::countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize) {
@@ -1516,7 +1519,7 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 		double percent = (double)count/total;
 		int featurePixCount = countNonZero(islandsVec.at(i));
 		double percentOfImage = (double)featurePixCount/darkestStuff.total();
-		if(percent>=0.47 && percentOfImage<0.10) {
+		if(percent>=0.47 && percentOfImage<0.15) {
 			for(int j=0; j<islandsVec.at(i).rows; j++) {
 				for(int k=0; k<islandsVec.at(i).cols; k++) {
 					int val = islandsVec.at(i).at<uchar>(j,k);
@@ -1530,14 +1533,15 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 	return mapEdgeRemoval;
 }
 
+//increase LC for nearby
 Mat ShapeMorph::haloTransform(Mat src) {
 	Mat tempResult(src.rows, src.cols, CV_32F, Scalar(0));
 	Mat results(src.rows, src.cols, CV_8U, Scalar(0));
 	Mat interPtsMap(src.rows,src.cols,CV_32S,Scalar(0));
 	deque<deque<Point> > interPts(src.rows*src.cols,deque<Point>(1,Point(-1,-1)));
 	deque<deque<double> > distVec(src.rows*src.cols,deque<double>(1,-1.0));
-	const double alpha = 0.75;
-	const double epsilon = 0.5;
+	const double alpha = 0.4;
+	const double epsilon = 1.0;
 	double absDiscernThresh = 1.0;
 	const double cutoffThresh = 1.0;
 	int row=0, col=0;
@@ -1557,9 +1561,6 @@ Mat ShapeMorph::haloTransform(Mat src) {
 				while(cutoffVal>cutoffThresh) {
 					cutoffDist++;
 					cutoffVal = pow(alpha,cutoffDist) * pow(dbl_Lc,epsilon);
-					//if(col==102 && row==80) {
-					//	printf("LC: %f, Val: %f, Dist: %f\n",dbl_Lc,cutoffVal,cutoffDist);
-					//}
 				}
 				cutoffDist--;
 				for(int i=(row-cutoffDist); i<=(row+cutoffDist); i++) {
@@ -1581,17 +1582,6 @@ Mat ShapeMorph::haloTransform(Mat src) {
 		col=0;
 		row++;
 	}
-	/*int index = 130 + 92 * src.cols;
-	for(int i=0; i<interPts.at(index).size(); i++) {
-		cout << interPts.at(index).at(i) << " - ";
-		cout << _src.at<float>(interPts.at(index).at(i)) << " - ";
-		cout << distVec.at(index).at(i) << endl;
-	}*/
-	//double val1 = tempResult.at<float>(80,102);
-	//double change = val1/tempResult.at<float>(128,20);
-	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
-	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
-	//printf("Change: %f\n",change );
 	int iter=1;
 	for(int n=0; n<iter; n++) {
 		for(int i=0; i<src.rows; i++) {
@@ -1601,8 +1591,8 @@ Mat ShapeMorph::haloTransform(Mat src) {
 					if(interPts.at(index).size()>=2) {
 						double dbl_Lc = sqrt((int)src.at<uchar>(interPts.at(index).at(k)));
 						double val1 = pow(alpha,distVec.at(index).at(k)) * pow(dbl_Lc,epsilon);
-						val1 *=20.0; //same as iterating 20 times
-						dbl_Lc *=20.0;
+						val1 *=2.0; //same as iterating 2 times
+						dbl_Lc *=2.0;
 						val1 = tempResult.at<float>(i,j) + val1;
 						if(val1<0) val1=0;
 						tempResult.at<float>(i,j) = val1;
@@ -1612,44 +1602,6 @@ Mat ShapeMorph::haloTransform(Mat src) {
 				}
 			}
 		}
-		//val1 = tempResult.at<float>(80,102);
-		//change = val1/tempResult.at<float>(128,20);
-		//printf("(102,80): %f, ",tempResult.at<float>(80,102));
-		//printf("(20,128): %f, ",tempResult.at<float>(128,20));
-		//printf("Change: %f\n",change );
 	}
-	//if point is a star and did not intersect -> penalize
-	for(int i=0; i<interPtsMap.rows; i++) {
-		for(int j=0; j<interPtsMap.cols; j++) {
-			double lc = (int)src.at<uchar>(i,j);
-			if(lc>absDiscernThresh) {
-				lc = sqrt(lc);
-				if(interPtsMap.at<int>(i,j)==0) {
-					double val = tempResult.at<float>(i,j) - (lc/2.);
-					if(val<0) val=0;
-					tempResult.at<float>(i,j) = val;
-				}
-			}
-		}
-	}
-	//double val1 = tempResult.at<float>(80,102);
-	//double change = val1/tempResult.at<float>(128,20);
-	//printf("(102,80): %f, ",tempResult.at<float>(80,102));
-	//printf("(20,128): %f, ",tempResult.at<float>(128,20));
-	//printf("Change: %f\n",change );
-	//nomalize tempResult to results from 0-255
-	//cout << maxVal << endl;
-	/*for(int i=0; i<tempResult.rows; i++) {
-		for(int j=0; j<tempResult.cols; j++) {
-			double val = tempResult.at<float>(i,j);
-			//if(val>0) val=255;
-			//if(val>255) val=255;
-			double normVal = (val-minVal)/(maxVal-minVal);
-			val = round(normVal*255.0);
-			results.at<uchar>(i,j) = val;
-		}
-	}*/
-	//imgshow(results);
 	return tempResult;
-	//return results;
 }

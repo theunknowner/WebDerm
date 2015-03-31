@@ -34,7 +34,7 @@ public:
 	Mat prepareImage(Mat src);
 	Mat custAnd(Mat origImg, Mat scaleImg, Mat map=Mat());
 	Mat grayscaleReconstruct(Mat src, Mat scaleImg);
-	deque<Mat> liquidFeatureExtraction(Mat src, double thresh=0);
+	deque<Mat> liquidFeatureExtraction(Mat src, double thresh=0, int sort=0);
 	vector<Mat> filterFeatures(vector<Mat> featureVec);
 
 	Mat connectImage(Mat src, Size size, double dist);
@@ -58,7 +58,6 @@ public:
 	Mat origFilter(Mat src, double shift=1.0);
 	Mat closeFilter(Mat src, Size elementSize, double shift=1.0);
 	vector<vector<Point> > findBoundary(Mat src);
-	int countEdgeTouching(Mat src, int edgeSize);
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 	Mat removeNoiseOnBoundary(Mat src);
 	Mat haloTransform(Mat src);

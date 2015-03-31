@@ -203,6 +203,7 @@ Mat ShapeColor::test_getShapeUsingColor(Mat src, int col, int row, int localScan
 	return Mat();
 }
 
+//get shape using color with deltaE
 Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise, double shift) {
 	Functions fn;
 	Xyz xyz;
@@ -497,6 +498,7 @@ void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseM
 	//writeSeq2File(maxRangeVec,"maxrangevec");
 }
 
+//removes lines that run across the image
 Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 	Mat dst = input.clone();
 	const int thresh=11;
@@ -715,7 +717,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 	return dst;
 }
 
-
+//filter LC using knee of curve
 Mat ShapeColor::filterKneePt(Mat src, double thresh, double shift) {
 	KneeCurve kc;
 	vector<double> yVec1;
