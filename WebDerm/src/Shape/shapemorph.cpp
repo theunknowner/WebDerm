@@ -196,68 +196,8 @@ Mat ShapeMorph::origFilter(Mat src, double shift) {
 	Poly poly;
 	Mat img = this->prepareImage(src);
 	//removing stuff on edge
-	vector<double> vec;
-	Mat darkestStuff(img.rows,img.cols,CV_8U,Scalar(255));
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			double lum = img.at<uchar>(i,j);
-			vec.push_back(lum);
-		}
-	}
-	vector<double> xVec;
-	sort(vec.begin(),vec.end());
-	for(unsigned int i=0; i<vec.size(); i++) {
-		xVec.push_back((double)i);
-	}
-	vector<double> p = poly.polyfit(xVec,vec,1);
-	vector<double> y1 = poly.polyval(p,xVec);
-	//MSE
-	double sum=0;
-	for(unsigned int i=0; i<y1.size(); i++) {
-		double val = (vec.at(i)-y1.at(i))/vec.at(i);
-		val = pow(val,2);
-		sum += val;
-	}
-	sum = sqrt(sum);
-	if(sum<2.5)
-		vec.erase(vec.begin(),vec.begin()+(vec.size()/2));
-	int index = kc.kneeCurvePoint(vec);
-	double thresh = vec.at(index);
+	Mat mapEdgeRemoval = this->removeNoiseOnBoundary(img);
 
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			double lum = img.at<uchar>(i,j);
-			if(lum<thresh)
-				darkestStuff.at<uchar>(i,j) = 0;
-		}
-	}
-	//imgshow(img);
-	//imgshow(darkestStuff);
-	darkestStuff = this->dilation(darkestStuff,Size(1,5));
-	//imgshow(darkestStuff);
-	//remove dark stuff clinging to image boundary
-	deque<Mat> islandsVec = this->liquidFeatureExtraction(darkestStuff,5.0);
-	Mat mapEdgeRemoval(img.rows, img.cols, CV_8U, Scalar(255));
-	for(unsigned int i=0; i<islandsVec.size(); i++) {
-		Mat edges(darkestStuff.size(),CV_8U,Scalar(0));
-		vector<vector<Point> > contour = this->findBoundary(islandsVec.at(i).clone());
-		drawContours(edges,contour,-1,Scalar(255));
-		int count = this->countEdgeTouching(edges,6,12);
-		int total = countNonZero(edges);
-		double percent = (double)count/total;
-		int featurePixCount = countNonZero(islandsVec.at(i));
-		double percentOfImage = (double)featurePixCount/darkestStuff.total();
-		//printf("%d/%d: %f, %f\n",count,total,percent,percentOfImage);
-		if(percent>=0.47 && percentOfImage<0.10) {
-			for(int j=0; j<islandsVec.at(i).rows; j++) {
-				for(int k=0; k<islandsVec.at(i).cols; k++) {
-					int val = islandsVec.at(i).at<uchar>(j,k);
-					if(val==255)
-						mapEdgeRemoval.at<uchar>(j,k) = 0;
-				}
-			}
-		}
-	}
 	// get lum values
 	Mat afterRemoval;
 	img.copyTo(afterRemoval,mapEdgeRemoval);
@@ -274,14 +214,14 @@ Mat ShapeMorph::origFilter(Mat src, double shift) {
 	//filter the remaining image after removal of noise and outliers
 	kc.removeOutliers(yVec,0.025);
 	//writeSeq2File(yVec,"yVec");
-	xVec.clear();
+	vector<double> xVec;
 	for(unsigned int i=0; i<yVec.size(); i++) {
 		xVec.push_back((double)i);
 	}
-	p = poly.polyfit(xVec,yVec,1);
-	y1 = poly.polyval(p,xVec);
+	vector<double> p = poly.polyfit(xVec,yVec,1);
+	vector<double> y1 = poly.polyval(p,xVec);
 	//MSE
-	sum=0;
+	double sum=0;
 	for(unsigned int i=0; i<y1.size(); i++) {
 		double val = (yVec.at(i)-y1.at(i))/yVec.at(i);
 		val = pow(val,2);
@@ -293,7 +233,7 @@ Mat ShapeMorph::origFilter(Mat src, double shift) {
 
 	int bestIdx = kc.kneeCurvePoint(yVec);
 	bestIdx *= shift;
-	thresh = yVec.at(bestIdx);
+	double thresh = yVec.at(bestIdx);
 	//cout << bestIdx << endl;
 	//cout << thresh << endl;
 	Mat result=afterRemoval.clone();

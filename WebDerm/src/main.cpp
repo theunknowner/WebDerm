@@ -32,6 +32,7 @@
 #include "Shape/shapecolor.h"
 #include "Colorspace/xyz.h"
 #include "Colorspace/cielab.h"
+#include "Create/createtrainingdata.h"
 
 int main(int argc,char** argv)
 {
@@ -54,8 +55,8 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "acne3";
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+	String name = "eczema1";
+	img = imread("/home/jason/Desktop/Programs/Training Data Pairs/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
@@ -79,15 +80,21 @@ int main(int argc,char** argv)
 	img3.convertTo(img3,CV_8U);
 	imgGray.copyTo(img4,img3);
 	img5 = sc.applyDiscreteShade(img4);
+
 	imgshow(img);
 	imgshow(img2);
 	imgshow(img3);
 	imgshow(img4);
 	imgshow(img5);
 
+	CreateTrainingData ctd;
+	img5 = ctd.maxDimensionCrop(img5);
+	img5 = runResizeImage(img5,Size(70,70));
+	ctd.mouseSelectSegment(img5,Size(35,35),name);
+
 	//imwrite(name+"-orig.png",img);
-	//imwrite(name+"-mask.png",maskLC);
 	//imwrite(name+"-extract.png",img4);
+	//imwrite(name+"-discrete.png",img5);
 /*
 	vector<Mat> matVec = sm.lumFilter1(imgGray);
 	vector<Mat> matVec2 = sm.lumFilter2(imgGray);
