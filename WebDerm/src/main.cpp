@@ -33,6 +33,7 @@
 #include "Colorspace/xyz.h"
 #include "Colorspace/cielab.h"
 #include "Create/createtrainingdata.h"
+#include "Draw/draw.h"
 
 int main(int argc,char** argv)
 {
@@ -55,8 +56,8 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "eczema1";
-	img = imread("/home/jason/Desktop/Programs/Training Data Pairs/"+name+".jpg");
+	String name = "custom14";
+	img = imread("/home/jason/Desktop/Programs/Training Data Pairs/"+name+".png");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
