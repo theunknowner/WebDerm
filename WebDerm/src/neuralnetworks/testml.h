@@ -14,20 +14,25 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
 class TestML {
+private:
+	Mat data;
+	Mat labels;
 public:
+	Mat getData();
+	Mat getLabels();
 	Mat layers;
 	void setLayerParams(Mat layers);
-	Mat prepareImage(Mat sample);
+	Mat prepareImage(Mat sample, Size size=Size(0,0));
 	Mat prepareMatSamples(vector<Mat> sampleVec);
 	void importCsvData(String file, vector<vector<double> > &data, vector<vector<double> > &labels);
 	void vecToMat(vector<vector<double> > &data, vector<vector<double> > &labels, Mat &mData, Mat &mLabels);
-	void importSamples(String folder, vector<Mat> &samples);
+	void importSamples(String folder, vector<Mat> &samples, Size size=Size(0,0));
 	void writeData(String path, Mat &dataSet, Mat &labels);
-	void convertImagesToData(String folder,vector<double> outputLabels);
+	void convertImagesToData(String folder,vector<double> outputLabels, Size size=Size(0,0));
 	void printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels);
 	Mat fixBinaryImage(Mat input);
 
-	Mat runANN(vector<Mat> matVec);
+	Mat runANN(String param, vector<Mat> sampleVec);
 };
 
 #endif /* TESTML_H_ */

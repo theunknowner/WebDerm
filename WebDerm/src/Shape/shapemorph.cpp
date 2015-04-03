@@ -345,6 +345,7 @@ Mat ShapeMorph::closeFilter(Mat src, Size elementSize, double shift) {
 }
 
 //! using origFilter
+//! returns islands/features into vector
 vector<Mat> ShapeMorph::lumFilter1(Mat src, int featuresToHold) {
 	Mat img1 = this->origFilter(src);
 	Mat img2 = this->densityConnector(img1,0.9);
@@ -405,6 +406,7 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src, int featuresToHold) {
 }
 
 //! using closeFilter
+//! returns islands/features into vector
 vector<Mat> ShapeMorph::lumFilter2(Mat src, int featuresToHold) {
 	Mat img1 = this->closeFilter(src,Size(17,17));
 	Mat img2 = this->densityConnector(img1,0.9);

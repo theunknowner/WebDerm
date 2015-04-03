@@ -428,8 +428,19 @@ void Entropy::shapeFn(FileData &fd) {
 	vector<Mat> matVec = sm.lumFilter1(img1);
 	vector<Mat> matVec2 = sm.lumFilter2(img1);
 	TestML ml;
-	Mat results = ml.runANN(matVec);
-	Mat results2 = ml.runANN(matVec2);
+	String param = "/home/jason/git/Samples/Samples/param.xml";
+	vector<Mat> sampleVec, sampleVec2;
+	//crops & fixes up the binary sample set
+	for(unsigned int i=0; i<matVec.size(); i++) {
+		Mat sample = ml.prepareImage(matVec.at(i));
+		Mat sample2 = ml.prepareImage(matVec2.at(i));
+		sampleVec.push_back(sample);
+		sampleVec2.push_back(sample2);
+		sample.release();
+		sample2.release();
+	}
+	Mat results = ml.runANN(param,sampleVec);
+	Mat results2 = ml.runANN(param,sampleVec);
 	//gets the index of the largest output for each sample
 	deque<int> largestOutputVec;
 	double max=results.at<float>(0,0);

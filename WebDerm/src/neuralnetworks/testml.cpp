@@ -7,23 +7,34 @@
 
 #include "testml.h"
 
+Mat TestML::getData() {
+	return this->data;
+}
+
+Mat TestML::getLabels() {
+	return this->labels;
+}
 void TestML::setLayerParams(Mat layers) {
 	this->layers = layers;
 }
 
-Mat TestML::prepareImage(Mat sample) {
+//crops and fixes binary sample data
+Mat TestML::prepareImage(Mat sample, Size size) {
 	Functions fn;
 	Mat img;
-	Size size(20,20);
+	Size _size = sample.size();
+	if(size.width>0 && size.height>0)
+		_size = size;
 	img = fn.cropImage(sample);
-	img = runResizeImage(img,size);
+	img = runResizeImage(img,_size);
 	img = this->fixBinaryImage(img);
 	img = fn.cropImage(img);
-	img = runResizeImage(img,size);
+	img = runResizeImage(img,_size);
 	img = this->fixBinaryImage(img);
 	return img;
 }
 
+//converts single Mat into sample Mat form
 Mat TestML::prepareMatSamples(vector<Mat> sampleVec) {
 	int rows = sampleVec.at(0).rows;
 	int cols = sampleVec.at(0).cols;
@@ -87,7 +98,7 @@ void TestML::vecToMat(vector<vector<double> > &data, vector<vector<double> > &la
 	}
 }
 
-void TestML::importSamples(String folder, vector<Mat> &samples) {
+void TestML::importSamples(String folder, vector<Mat> &samples, Size size) {
 	FileData fd;
 	deque<String> files;
 	String filename;
@@ -98,7 +109,7 @@ void TestML::importSamples(String folder, vector<Mat> &samples) {
 		filename = folder+files.at(i);
 		Mat img = imread(filename,0);
 		if(!img.empty()) {
-			img = this->prepareImage(img);
+			//img = this->prepareImage(img,size);
 			samples.push_back(img);
 		}
 	}
@@ -119,10 +130,10 @@ void TestML::writeData(String path, Mat &dataSet, Mat &labels) {
 	fclose(fp);
 }
 
-void TestML::convertImagesToData(String folder, vector<double> outputLabels) {
+void TestML::convertImagesToData(String folder, vector<double> outputLabels, Size size) {
 	vector<Mat> samples;
-	this->importSamples(folder,samples);
-	Mat data(samples.size(),400,CV_32F);
+	this->importSamples(folder,samples,size);
+	Mat data(samples.size(),samples.at(0).total(),CV_32F);
 	Mat labels(samples.size(),outputLabels.size(),CV_32F);
 	int x=0;
 	for(unsigned int i=0; i<samples.size(); i++) {
@@ -138,7 +149,8 @@ void TestML::convertImagesToData(String folder, vector<double> outputLabels) {
 			labels.at<float>(i,n) = outputLabels.at(n);
 		}
 	}
-	this->writeData(folder+"data_set.csv",data,labels);
+	this->data = data;
+	this->labels = labels;
 }
 
 void TestML::printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels) {
@@ -163,20 +175,14 @@ Mat TestML::fixBinaryImage(Mat input) {
 	}
 	return output;
 }
-Mat TestML::runANN(vector<Mat> matVec) {
+
+Mat TestML::runANN(String param, vector<Mat> sampleVec) {
 	CvANN_MLP ann;
-	ann.load("/home/jason/git/Samples/Samples/param.xml");
+	ann.load(param.c_str());
 	Mat layers = ann.get_layer_sizes();
 	this->setLayerParams(layers);
-	vector<Mat> sampleVec;
-	Mat sample;
-	for(unsigned int i=0; i<matVec.size(); i++) {
-		sample = this->prepareImage(matVec.at(i));
-		sampleVec.push_back(sample);
-		sample.release();
-	}
-	Mat results;
 	Mat sample_set = this->prepareMatSamples(sampleVec);
+	Mat results;
 	ann.predict(sample_set,results);
 	/*for(int i=0; i<results.rows; i++) {
 		printf("Sample: %d, ",i+1);
