@@ -56,7 +56,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "test1";
+	String name = "test2";
 	img = imread("/home/jason/Desktop/Programs/Training Data Pairs/"+name+".png");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -94,16 +94,16 @@ int main(int argc,char** argv)
 	imgshow(img4);
 	imgshow(img5);
 */
-
+/*
 	CreateTrainingData ctd;
-	Mat src1 = imread("/home/jason/Desktop/Programs/Training Samples/tinea_corporis1-Point(35,35).png",0);
-	Mat src2 = imread("/home/jason/Desktop/Programs/Training Samples/tinea_corporis1-Point(35,35).png",0);
+	Mat src1 = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test1-Point(35,0).png",0);
+	Mat src2 = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test2-Point(0,0).png",0);
 	Mat stitch = ctd.stitchData(src1,src2);
-	//String folder = "/home/jason/Desktop/Programs/Training Samples/";
-	//String file = "/home/jason/Desktop/Programs/Training Samples/custom12-Point(0,0).png";
+	String folder = "/home/jason/Desktop/Programs/Training Samples/";
+	String file = "/home/jason/Desktop/Programs/Training Samples/custom15-Point(35,35).png";
 
-	//vector<String> list = {"custom8-","custom9-","custom10-","custom11-","custom12-"};
-	//ctd.makeFalsePairs(folder, file, 379, list);
+	vector<String> list;
+	ctd.makeFalsePairs(folder, file, 450, list);
 /*
 	img5 = ctd.maxDimensionCrop(img5);
 	img5 = runResizeImage(img5,Size(70,70));
@@ -139,10 +139,10 @@ int main(int argc,char** argv)
 /**/
 
 	TestML ml;
-	String param = "/home/jason/Desktop/Programs/Training Samples/Test/param.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/Training Samples/Negative_Pairs/sample_1.png",0);
+	String param = "/home/jason/Desktop/Programs/Training Samples/Test Data/param.xml";
+	Mat sample = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test11.png",0);
 	vector<Mat> sampleVec;
-	sampleVec.push_back(stitch);
+	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	for(int i=0; i<results.rows; i++) {
 		printf("Sample %d: Results: ",i+1);
@@ -185,7 +185,7 @@ int main(int argc,char** argv)
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
 	cout << "Iterations: " << iter << endl;
-	CvFileStorage* storage = cvOpenFileStorage("/home/jason/Desktop/Programs/Training Samples/Test/param.xml", 0, CV_STORAGE_WRITE );
+	CvFileStorage* storage = cvOpenFileStorage("/home/jason/Desktop/Programs/Training Samples/Test Data/param.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
