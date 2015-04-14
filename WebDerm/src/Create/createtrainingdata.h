@@ -22,6 +22,7 @@ public:
 
 	Mat stitchData(Mat input1, Mat input2);
 	void generateStitchPairs(String inDir, String outDir);
+
 };
 
 #endif /* CREATETRAININGDATA_H_ */

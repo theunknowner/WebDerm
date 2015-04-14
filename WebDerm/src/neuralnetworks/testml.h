@@ -33,6 +33,8 @@ public:
 	Mat fixBinaryImage(Mat input);
 
 	Mat runANN(String param, vector<Mat> sampleVec);
+
+	Mat tempFixPrepareImg(Mat src);
 };
 
 #endif /* TESTML_H_ */

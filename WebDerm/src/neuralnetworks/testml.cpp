@@ -136,8 +136,10 @@ void TestML::convertImagesToData(String folder, vector<double> outputLabels, Siz
 	Mat data(samples.size(),samples.at(0).total(),CV_32F);
 	Mat labels(samples.size(),outputLabels.size(),CV_32F);
 	int x=0;
+
 	for(unsigned int i=0; i<samples.size(); i++) {
 		Mat samp = samples.at(i);
+		samp = this->tempFixPrepareImg(samp);
 		for(int j=0; j<samp.rows; j++) {
 			for(int k=0; k<samp.cols; k++) {
 				data.at<float>(i,x) = samp.at<uchar>(j,k);
@@ -189,4 +191,21 @@ Mat TestML::runANN(String param, vector<Mat> sampleVec) {
 		cout << results.row(i) << endl;
 	}*/
 	return results;
+}
+
+Mat TestML::tempFixPrepareImg(Mat src) {
+	Mat translatedImg = src.clone();
+	for(int i=0; i<translatedImg.rows; i++) {
+		for(int j=0; j<translatedImg.cols; j++) {
+			//10,51,102,153,204,255
+			int val = translatedImg.at<uchar>(i,j);
+			if(val==255) translatedImg.at<uchar>(i,j) = 5;
+			if(val==204) translatedImg.at<uchar>(i,j) = 4;
+			if(val==153) translatedImg.at<uchar>(i,j) = 3;
+			if(val==102) translatedImg.at<uchar>(i,j) = 2;
+			if(val==51) translatedImg.at<uchar>(i,j) = 1;
+			if(val==10) translatedImg.at<uchar>(i,j) = 0;
+		}
+	}
+	return translatedImg;
 }

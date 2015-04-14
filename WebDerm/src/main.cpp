@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-
+/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -65,7 +65,7 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-/*
+	/*
 	CreateTrainingData ctd;
 	String inDir = "/home/jason/Desktop/Programs/Training Samples/Non_Similiar_Pairs/";
 	String outDir = "/home/jason/Desktop/Programs/Training Samples/Negative_Pairs/";
@@ -86,33 +86,34 @@ int main(int argc,char** argv)
 	img3 = sm.haloTransform(islands.at(0));
 	img3.convertTo(img3,CV_8U);
 	imgGray.copyTo(img4,img3);
-	img5 = sc.applyDiscreteShade(img4);
+	//img5 = sc.applyDiscreteShade(img4);
 /*
 	imgshow(img);
 	imgshow(img2);
 	imgshow(img3);
 	imgshow(img4);
 	imgshow(img5);
-*/
+	 */
 /*
 	CreateTrainingData ctd;
 	Mat src1 = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test1-Point(35,0).png",0);
 	Mat src2 = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test2-Point(0,0).png",0);
-	Mat stitch = ctd.stitchData(src1,src2);
+	//Mat stitch = ctd.stitchData(src1,src2);
 	String folder = "/home/jason/Desktop/Programs/Training Samples/";
 	String file = "/home/jason/Desktop/Programs/Training Samples/custom15-Point(35,35).png";
 
-	vector<String> list;
-	ctd.makeFalsePairs(folder, file, 450, list);
-/*
-	img5 = ctd.maxDimensionCrop(img5);
+	//vector<String> list;
+	//ctd.makeFalsePairs(folder, file, 450, list);
+
+	img5 = ctd.maxDimensionCrop(img4);
 	img5 = runResizeImage(img5,Size(70,70));
+	img5 = sc.applyDiscreteShade(img5);
 	ctd.mouseSelectSegment(img5,Size(35,35),name);
 /**/
 /*
 	TestML ml;
-	String samplesPath = "/home/jason/Desktop/Programs/Training Samples/Positive_Pairs/";
-	String samplesPath2 = "/home/jason/Desktop/Programs/Training Samples/Negative_Pairs/";
+	String samplesPath = "/home/webderm/Files/Run/Positive_Pairs/";
+	String samplesPath2 = "/home/webderm/Files/Run/Negative_Pairs/";
 	vector<double> myLabels(1,0);
 	vector<double> myLabels2(1,0);
 	for(unsigned int i=0; i<myLabels.size(); i++) {
@@ -138,17 +139,36 @@ int main(int argc,char** argv)
 	//ml.writeData(samplesPath+"data_set.csv",data,labels);
 /**/
 
+	FileData fd;
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Training Samples/Positive_Pairs/";
+	fd.getFilesFromDirectory(folder,files);
 	TestML ml;
 	String param = "/home/jason/Desktop/Programs/Training Samples/Test Data/param.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test11.png",0);
+	//Mat sample = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test3.png",0);
 	vector<Mat> sampleVec;
-	sampleVec.push_back(sample);
-	Mat results = ml.runANN(param,sampleVec);
-	for(int i=0; i<results.rows; i++) {
-		printf("Sample %d: Results: ",i+1);
-		cout << results.row(i) << endl;
+	for(unsigned int i=0; i<files.size(); i++) {
+		Mat sample = imread(folder + files.at(i),0);
+		Mat translatedImg = ml.tempFixPrepareImg(sample);
+		sampleVec.push_back(translatedImg);
 	}
-/**/
+	Mat results = ml.runANN(param,sampleVec);
+	int count=0;
+	int realTotal=0;
+	for(int i=0; i<results.rows; i++) {
+		if(files.at(i).find("copy")==string::npos)
+			realTotal++;
+		if(results.at<float>(i,0)<0) {
+			if(files.at(i).find("copy")==string::npos) {
+				count++;
+				printf("%s: Results: ", files.at(i).c_str());
+				printf("[%f]\n",results.at<float>(i,0));
+			}
+		}
+	}
+	cout << count << endl;
+	cout << realTotal << endl;
+	/**/
 	/*
 	deque<String> files;
 	FileData fd;
@@ -174,22 +194,22 @@ int main(int argc,char** argv)
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 70;
+	int hiddenNodes = 140;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
 	layers.at<int>(2,0) = outputSize;
 	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
 
-	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001);
+	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 4000, 0.000001);
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
 	cout << "Iterations: " << iter << endl;
-	CvFileStorage* storage = cvOpenFileStorage("/home/jason/Desktop/Programs/Training Samples/Test Data/param.xml", 0, CV_STORAGE_WRITE );
+	CvFileStorage* storage = cvOpenFileStorage("/home/webderm/Files/Run/param.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-/*
+	/*
 	String name = "psoriasis18";
 	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
@@ -242,7 +262,7 @@ int main(int argc,char** argv)
 	imshow(fd.filename+"_Squares",img3);
 	//imshow(fd2.filename+"_Squares2",img4);
 	waitKey(0);
-*/
+	 */
 	return 0;
 }
 

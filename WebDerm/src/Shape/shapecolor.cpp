@@ -501,8 +501,8 @@ void ShapeColor::maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseM
 //removes lines that run across the image
 Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 	Mat dst = input.clone();
-	const int thresh=11;
-	const int thickness = 5;
+	const int thresh=11; // length of line
+	const int thickness = 5; // thickness of line
 	Size winSize = size;
 	int countStreak=0;
 	Mat window;
