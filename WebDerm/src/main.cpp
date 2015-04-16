@@ -56,7 +56,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "test2";
+	String name = "custom15";
 	img = imread("/home/jason/Desktop/Programs/Training Data Pairs/"+name+".png");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -96,15 +96,16 @@ int main(int argc,char** argv)
 	 */
 /*
 	CreateTrainingData ctd;
-	Mat src1 = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test1-Point(35,0).png",0);
-	Mat src2 = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test2-Point(0,0).png",0);
-	//Mat stitch = ctd.stitchData(src1,src2);
-	String folder = "/home/jason/Desktop/Programs/Training Samples/";
-	String file = "/home/jason/Desktop/Programs/Training Samples/custom15-Point(35,35).png";
+	Mat src1 = imread("/home/jason/Desktop/Programs/Training Samples/tinea_corporis4-Point(35,0).png",0);
+	Mat src2 = imread("/home/jason/Desktop/Programs/Training Samples/tinea_corporis11-Point(35,0).png",0);
+	Mat stitch = ctd.stitchData(src1,src2);
+	imwrite("test16.png",stitch);
+	//String folder = "/home/jason/Desktop/Programs/Training Samples/";
+	//String file = "/home/jason/Desktop/Programs/Training Samples/custom15-Point(35,35).png";
 
 	//vector<String> list;
 	//ctd.makeFalsePairs(folder, file, 450, list);
-
+/*
 	img5 = ctd.maxDimensionCrop(img4);
 	img5 = runResizeImage(img5,Size(70,70));
 	img5 = sc.applyDiscreteShade(img5);
@@ -138,21 +139,23 @@ int main(int argc,char** argv)
 	vconcat(labels1,labels2,labels);
 	//ml.writeData(samplesPath+"data_set.csv",data,labels);
 /**/
-
+/*
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Training Samples/Positive_Pairs/";
 	fd.getFilesFromDirectory(folder,files);
 	TestML ml;
 	String param = "/home/jason/Desktop/Programs/Training Samples/Test Data/param.xml";
-	//Mat sample = imread("/home/jason/Desktop/Programs/Training Samples/Test Data/test3.png",0);
+	Mat sample = imread("/home/jason/Desktop/Programs/Training Samples/Positive_Pairs/sample_116.png",0);
 	vector<Mat> sampleVec;
-	for(unsigned int i=0; i<files.size(); i++) {
-		Mat sample = imread(folder + files.at(i),0);
+	//for(unsigned int i=0; i<files.size(); i++) {
+		//Mat sample = imread(folder + files.at(i),0);
 		Mat translatedImg = ml.tempFixPrepareImg(sample);
 		sampleVec.push_back(translatedImg);
-	}
+	//}
 	Mat results = ml.runANN(param,sampleVec);
+	cout << results << endl;
+/*
 	int count=0;
 	int realTotal=0;
 	for(int i=0; i<results.rows; i++) {

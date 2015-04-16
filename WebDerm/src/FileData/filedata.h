@@ -80,6 +80,8 @@ public:
 	deque< deque<double> > stringVec2Double(deque< deque<String> > &vec);
 	Mat stringVec2Mat1D(deque<deque<String> > &vec);
 
+	void fixFileNumberSequence(String folder, String beginDelimit, int digits);
+
 };
 
 

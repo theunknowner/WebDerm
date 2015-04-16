@@ -429,3 +429,44 @@ Mat FileData::stringVec2Mat1D(deque<deque<String> > &vec) {
 	}
 	return results;
 }
+
+//! fixes the number-labels of sequential files
+//! digits = num of digits of the number-label sequence
+void FileData::fixFileNumberSequence(String folder, String beginDelimit, int digits) {
+	deque<String> files;
+	this->getFilesFromDirectory(folder,files);
+	size_t beginPos=0, endPos=0;
+	for(unsigned int i=0; i<files.size(); i++) {
+		beginPos = files.at(i).find(beginDelimit);
+		beginPos++;
+		for(unsigned int j=beginPos; j<files.at(i).length(); j++) {
+			if(isdigit(files.at(i).at(j))==0) {
+				endPos = j;
+				break;
+			}
+		}
+		String str = files.at(i).substr(beginPos,endPos-beginPos);
+		if(str.length()<digits) {
+			int num = atoi(str.c_str());
+			int numOfZero=digits;
+			for(int j=1; j<digits; j++) {
+				numOfZero--;
+				if(num<pow(10,j)) {
+					for(int k=0; k<numOfZero; k++) {
+						str = "0" + str;
+					}
+					break;
+				}
+			}
+			String newname = files.at(i);
+			newname.replace(beginPos,endPos-beginPos,str);
+			newname = folder + newname;
+			String oldname = folder + files.at(i);
+			rename(oldname.c_str(),newname.c_str());
+			printf("%s fixed!\n",newname.c_str());
+		}
+		else {
+			printf("%s has %d or more digits already!\n",files.at(i).c_str(),digits);
+		}
+	}
+}
