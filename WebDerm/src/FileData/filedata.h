@@ -81,7 +81,7 @@ public:
 	Mat stringVec2Mat1D(deque<deque<String> > &vec);
 
 	void fixFileNumberSequence(String folder, String beginDelimit, int digits);
-
+	String getFileSequenceNum(String name, String beginDelimit, size_t &beginPos);
 };
 
 

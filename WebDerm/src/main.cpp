@@ -96,12 +96,12 @@ int main(int argc,char** argv)
 	 */
 /*
 	CreateTrainingData ctd;
-	Mat src1 = imread("/home/jason/Desktop/Programs/Training Samples/tinea_corporis4-Point(35,0).png",0);
-	Mat src2 = imread("/home/jason/Desktop/Programs/Training Samples/tinea_corporis11-Point(35,0).png",0);
+	Mat src1 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis4-Point(35,0).png",0);
+	Mat src2 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis11-Point(35,0).png",0);
 	Mat stitch = ctd.stitchData(src1,src2);
 	imwrite("test16.png",stitch);
-	//String folder = "/home/jason/Desktop/Programs/Training Samples/";
-	//String file = "/home/jason/Desktop/Programs/Training Samples/custom15-Point(35,35).png";
+	//String folder = "/home/jason/Desktop/Programs/Training_Samples/";
+	//String file = "/home/jason/Desktop/Programs/Training_Samples/custom15-Point(35,35).png";
 
 	//vector<String> list;
 	//ctd.makeFalsePairs(folder, file, 450, list);
@@ -115,22 +115,27 @@ int main(int argc,char** argv)
 	TestML ml;
 	String samplesPath = "/home/webderm/Files/Run/Positive_Pairs/";
 	String samplesPath2 = "/home/webderm/Files/Run/Negative_Pairs/";
-	vector<double> myLabels(1,0);
-	vector<double> myLabels2(1,0);
-	for(unsigned int i=0; i<myLabels.size(); i++) {
-		if(i==0) {
-			myLabels.at(i)=1;
-			myLabels2.at(i)=-1;
-		}
-		else {
-			myLabels.at(i)=-1;
-			myLabels2.at(i)=1;
-		}
+	String labelPath = "/home/webderm/Files/Run/Positive-Training-Labels.csv";
+	String labelPath2 = "/home/webderm/Files/Run/Negative-Training-Labels.csv";
+	deque<deque<String> > dataMat1;
+	deque<deque<String> > dataMat2;
+	FileData fd;
+	fd.loadFileMatrix(labelPath,dataMat1);
+	fd.loadFileMatrix(labelPath2,dataMat2);
+	Mat positiveLabels(dataMat1.size(),1,CV_32F,Scalar(0));
+	Mat negativeLabels(dataMat2.size(),1,CV_32F,Scalar(0));
+	for(unsigned int i=0; i<dataMat1.size(); i++) {
+		float val = atof(dataMat1.at(i).at(1).c_str());
+		positiveLabels.at<float>(i,0) = val;
 	}
-	ml.convertImagesToData(samplesPath,myLabels);
+	for(unsigned int i=0; i<dataMat2.size(); i++) {
+		float val = atof(dataMat2.at(i).at(1).c_str());
+		negativeLabels.at<float>(i,0) = val;
+	}
+	ml.convertImagesToData(samplesPath,positiveLabels);
 	Mat data1 = ml.getData();
 	Mat labels1 = ml.getLabels();
-	ml.convertImagesToData(samplesPath2,myLabels2);
+	ml.convertImagesToData(samplesPath2,negativeLabels);
 	Mat data2 = ml.getData();
 	Mat labels2 = ml.getLabels();
 
@@ -139,17 +144,18 @@ int main(int argc,char** argv)
 	vconcat(labels1,labels2,labels);
 	//ml.writeData(samplesPath+"data_set.csv",data,labels);
 /**/
-/*
+
 	FileData fd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training Samples/Positive_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Positive_Pairs/";
 	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
 	TestML ml;
-	String param = "/home/jason/Desktop/Programs/Training Samples/Test Data/param.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/Training Samples/Positive_Pairs/sample_116.png",0);
+	String param = "/home/jason/Desktop/Programs/Training_Samples/Test Data/param70.xml";
+	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Test Data/sample_0053.png",0);
 	vector<Mat> sampleVec;
 	//for(unsigned int i=0; i<files.size(); i++) {
-		//Mat sample = imread(folder + files.at(i),0);
+	//	Mat sample = imread(folder + files.at(i),0);
 		Mat translatedImg = ml.tempFixPrepareImg(sample);
 		sampleVec.push_back(translatedImg);
 	//}
@@ -197,7 +203,7 @@ int main(int argc,char** argv)
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 140;
+	int hiddenNodes = 70;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
@@ -208,7 +214,7 @@ int main(int argc,char** argv)
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
 	cout << "Iterations: " << iter << endl;
-	CvFileStorage* storage = cvOpenFileStorage("/home/webderm/Files/Run/param.xml", 0, CV_STORAGE_WRITE );
+	CvFileStorage* storage = cvOpenFileStorage("/home/webderm/Files/Run/param70.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/

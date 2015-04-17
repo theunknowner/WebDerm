@@ -130,29 +130,37 @@ void TestML::writeData(String path, Mat &dataSet, Mat &labels) {
 	fclose(fp);
 }
 
-void TestML::convertImagesToData(String folder, vector<double> outputLabels, Size size) {
+void TestML::convertImagesToData(String folder, Mat outputLabels, Size size) {
 	vector<Mat> samples;
 	this->importSamples(folder,samples,size);
-	Mat data(samples.size(),samples.at(0).total(),CV_32F);
-	Mat labels(samples.size(),outputLabels.size(),CV_32F);
-	int x=0;
+	if(samples.size()==outputLabels.rows) {
+		Mat data(samples.size(),samples.at(0).total(),CV_32F);
+		Mat labels(samples.size(),outputLabels.cols,CV_32F);
+		int x=0;
 
-	for(unsigned int i=0; i<samples.size(); i++) {
-		Mat samp = samples.at(i);
-		samp = this->tempFixPrepareImg(samp);
-		for(int j=0; j<samp.rows; j++) {
-			for(int k=0; k<samp.cols; k++) {
-				data.at<float>(i,x) = samp.at<uchar>(j,k);
-				x++;
+		for(unsigned int i=0; i<samples.size(); i++) {
+			Mat samp = samples.at(i);
+			samp = this->tempFixPrepareImg(samp);
+			for(int j=0; j<samp.rows; j++) {
+				for(int k=0; k<samp.cols; k++) {
+					data.at<float>(i,x) = samp.at<uchar>(j,k);
+					x++;
+				}
+			}
+			x=0;
+			for(unsigned int n=0; n<outputLabels.cols; n++) {
+				labels.at<float>(i,n) = outputLabels.at<float>(i,n);
 			}
 		}
-		x=0;
-		for(unsigned int n=0; n<outputLabels.size(); n++) {
-			labels.at<float>(i,n) = outputLabels.at(n);
-		}
+		this->data = data;
+		this->labels = labels;
 	}
-	this->data = data;
-	this->labels = labels;
+	else {
+		cout << "Sample size =/= Label size!" << endl;
+		cout << "Sample Size: " << samples.size() << endl;
+		cout << "Label Size: " << outputLabels.rows << endl;
+		exit(1);
+	}
 }
 
 void TestML::printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels) {

@@ -438,7 +438,7 @@ void FileData::fixFileNumberSequence(String folder, String beginDelimit, int dig
 	size_t beginPos=0, endPos=0;
 	for(unsigned int i=0; i<files.size(); i++) {
 		beginPos = files.at(i).find(beginDelimit);
-		beginPos++;
+		beginPos+=beginDelimit.length();
 		for(unsigned int j=beginPos; j<files.at(i).length(); j++) {
 			if(isdigit(files.at(i).at(j))==0) {
 				endPos = j;
@@ -469,4 +469,19 @@ void FileData::fixFileNumberSequence(String folder, String beginDelimit, int dig
 			printf("%s has %d or more digits already!\n",files.at(i).c_str(),digits);
 		}
 	}
+}
+
+String FileData::getFileSequenceNum(String name, String beginDelimit, size_t &beginPos) {
+	size_t begin = name.find(beginDelimit);
+	size_t end=begin;
+	begin += beginDelimit.length();
+	for(unsigned int i=begin;  i<name.length(); i++) {
+		if(isdigit(name.at(i))==0) {
+			end = i;
+			break;
+		}
+	}
+	String str = name.substr(begin,end-begin);
+	beginPos = begin;
+	return str;
 }

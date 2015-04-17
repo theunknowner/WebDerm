@@ -28,7 +28,7 @@ public:
 	void vecToMat(vector<vector<double> > &data, vector<vector<double> > &labels, Mat &mData, Mat &mLabels);
 	void importSamples(String folder, vector<Mat> &samples, Size size=Size(0,0));
 	void writeData(String path, Mat &dataSet, Mat &labels);
-	void convertImagesToData(String folder,vector<double> outputLabels, Size size=Size(0,0));
+	void convertImagesToData(String folder,Mat outputLabels, Size size=Size(0,0));
 	void printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels);
 	Mat fixBinaryImage(Mat input);
 
