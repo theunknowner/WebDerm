@@ -218,6 +218,20 @@ vector<vector<float> > frequency(vector<float> vec) {
 	return freqVec;
 }
 
+float majority(vector<float> vec) {
+	vector<vector<float> > freq = frequency(vec);
+	float max=0.0;
+	int index=0;
+	for(auto i=0; i<freq.size(); i++) {
+		float num = freq.at(i).at(1);
+		if(num>max) {
+			max = num;
+			index = i;
+		}
+	}
+	return freq.at(index).at(0);
+}
+
 /* return value up to Nth occurrence = first,second,third... of delimiter */
 double Functions::getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
 	double result=0;
@@ -328,6 +342,82 @@ Mat Functions::rotateImage(const Mat& source, double angle)
 	Mat dst;
 	warpAffine(source, dst, rot_mat, source.size());
 	return dst;
+}
+
+//! shift image in a xy-axis direction
+//! +y shifts up, -y shift down, +x shifts right, -x shift left
+Mat Functions::shiftImage(Mat input, int x, int y, int keepBkGnd) {
+	Mat result = Mat::zeros(input.size(),input.type());
+	Mat temp;
+	if(keepBkGnd==1 && input.type()==CV_8U) {
+		vector<float> freq;
+		int val = input.at<uchar>(0,0);
+		freq.push_back((float)val);
+		val = input.at<uchar>(0,input.rows-1);
+		freq.push_back((float)val);
+		val = input.at<uchar>(input.cols-1,0);
+		freq.push_back((float)val);
+		val = input.at<uchar>(input.cols-1,input.rows-1);
+		freq.push_back((float)val);
+		float most = majority(freq);
+		result = (int)most;
+	}
+
+	if(x==0 && y==0) return input;
+
+	//shift down
+	if(y<0 && x==0) {
+		int dY = abs(y);
+		temp = input(Rect(0,0,input.cols,input.rows-dY));
+		temp.copyTo(result(Rect(0,dY,temp.cols,temp.rows)));
+	}
+	//shift up
+	else if(y>0 && x==0) {
+		int dY = abs(y);
+		temp = input(Rect(0,dY,input.cols,input.rows-dY));
+		temp.copyTo(result(Rect(0,0,temp.cols,temp.rows)));
+	}
+	//shift left
+	else if(x<0 && y==0) {
+		int dX = abs(x);
+		temp = input(Rect(dX,0,input.cols-dX,input.rows));
+		temp.copyTo(result(Rect(0,0,temp.cols,temp.rows)));
+	}
+	//shift right
+	else if(x>0 && y==0) {
+		int dX = abs(x);
+		temp = input(Rect(0,0,input.cols-dX,input.rows));
+		temp.copyTo(result(Rect(dX,0,temp.cols,temp.rows)));
+	}
+	//shift upright
+	else if(y>0 && x>0) {
+		int dX = abs(x);
+		int dY = abs(y);
+		temp = input(Rect(0,dY,input.cols-dX,input.rows-dY));
+		temp.copyTo(result(Rect(dX,0,temp.cols,temp.rows)));
+	}
+	//shift downleft
+	else if(y<0 && x<0) {
+		int dX = abs(x);
+		int dY = abs(y);
+		temp = input(Rect(dX,0,input.cols-dX,input.rows-dY));
+		temp.copyTo(result(Rect(0,dY,temp.cols,temp.rows)));
+	}
+	//shift upleft
+	else if(y>0 && x<0) {
+		int dX = abs(x);
+		int dY = abs(y);
+		temp = input(Rect(dX,dY,input.cols-dX,input.rows-dY));
+		temp.copyTo(result(Rect(0,0,temp.cols,temp.rows)));
+	}
+	//shift downright
+	else if(y<0 && x>0) {
+		int dX = abs(x);
+		int dY = abs(y);
+		temp = input(Rect(0,0,input.cols-dX,input.rows-dY));
+		temp.copyTo(result(Rect(dX,dY,temp.cols,temp.rows)));
+	}
+	return result;
 }
 
 Mat Functions::fillEdges2(Mat img)

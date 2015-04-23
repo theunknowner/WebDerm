@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-/*
+	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -71,7 +71,7 @@ int main(int argc,char** argv)
 	String outDir = "/home/jason/Desktop/Programs/Training Samples/Negative_Pairs/";
 	ctd.generateStitchPairs(inDir,outDir);
 /**/
-/*
+	/*
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
@@ -94,7 +94,7 @@ int main(int argc,char** argv)
 	imgshow(img4);
 	imgshow(img5);
 	 */
-/*
+	/*
 	CreateTrainingData ctd;
 	Mat src1 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis4-Point(35,0).png",0);
 	Mat src2 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis11-Point(35,0).png",0);
@@ -105,13 +105,13 @@ int main(int argc,char** argv)
 
 	//vector<String> list;
 	//ctd.makeFalsePairs(folder, file, 450, list);
-/*
+
 	img5 = ctd.maxDimensionCrop(img4);
 	img5 = runResizeImage(img5,Size(70,70));
 	img5 = sc.applyDiscreteShade(img5);
 	ctd.mouseSelectSegment(img5,Size(35,35),name);
 /**/
-/*
+	/*
 	TestML ml;
 	String samplesPath = "/home/webderm/Files/Run/Positive_Pairs/";
 	String samplesPath2 = "/home/webderm/Files/Run/Negative_Pairs/";
@@ -147,27 +147,30 @@ int main(int argc,char** argv)
 
 	FileData fd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Positive_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Negative_Pairs/";
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	TestML ml;
 	String param = "/home/jason/Desktop/Programs/Training_Samples/Test Data/param70.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Test Data/sample_0053.png",0);
+	//Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/test6.png",0);
 	vector<Mat> sampleVec;
-	//for(unsigned int i=0; i<files.size(); i++) {
-	//	Mat sample = imread(folder + files.at(i),0);
-		Mat translatedImg = ml.tempFixPrepareImg(sample);
-		sampleVec.push_back(translatedImg);
-	//}
+	for(unsigned int i=0; i<files.size(); i++) {
+		Mat sample = imread(folder + files.at(i),0);
+
+		//////// Translates Image to 0-5 ///////
+		//sample = ml.tempFixPrepareImg(sample);
+
+		sampleVec.push_back(sample);
+	}
 	Mat results = ml.runANN(param,sampleVec);
-	cout << results << endl;
-/*
+	//cout << results << endl;
+
 	int count=0;
 	int realTotal=0;
 	for(int i=0; i<results.rows; i++) {
 		if(files.at(i).find("copy")==string::npos)
 			realTotal++;
-		if(results.at<float>(i,0)<0) {
+		if(results.at<float>(i,0)>0) {
 			if(files.at(i).find("copy")==string::npos) {
 				count++;
 				printf("%s: Results: ", files.at(i).c_str());
@@ -190,7 +193,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-/*
+	/*
 	//TestML ml;
 	//vector<vector<double> > trainingData;
 	//vector<vector<double> > trainingLabels;

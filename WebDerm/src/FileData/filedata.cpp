@@ -448,16 +448,11 @@ void FileData::fixFileNumberSequence(String folder, String beginDelimit, int dig
 		String str = files.at(i).substr(beginPos,endPos-beginPos);
 		if(str.length()<digits) {
 			int num = atoi(str.c_str());
-			int numOfZero=digits;
-			for(int j=1; j<digits; j++) {
-				numOfZero--;
-				if(num<pow(10,j)) {
-					for(int k=0; k<numOfZero; k++) {
-						str = "0" + str;
-					}
-					break;
-				}
+			int numOfZero=digits - str.length();
+			for(int k=0; k<numOfZero; k++) {
+				str = "0" + str;
 			}
+
 			String newname = files.at(i);
 			newname.replace(beginPos,endPos-beginPos,str);
 			newname = folder + newname;

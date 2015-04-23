@@ -19,5 +19,13 @@
 
 void script1();
 void script2();
+void script3();
+void script4();
+void script5();
+void script6();
+void script7();
+void script8();
+void script9();
+void script10();
 
 #endif /* SCRIPTS_H_ */

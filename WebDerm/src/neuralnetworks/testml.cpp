@@ -140,7 +140,7 @@ void TestML::convertImagesToData(String folder, Mat outputLabels, Size size) {
 
 		for(unsigned int i=0; i<samples.size(); i++) {
 			Mat samp = samples.at(i);
-			samp = this->tempFixPrepareImg(samp);
+			//samp = this->tempFixPrepareImg(samp);
 			for(int j=0; j<samp.rows; j++) {
 				for(int k=0; k<samp.cols; k++) {
 					data.at<float>(i,x) = samp.at<uchar>(j,k);
@@ -207,12 +207,12 @@ Mat TestML::tempFixPrepareImg(Mat src) {
 		for(int j=0; j<translatedImg.cols; j++) {
 			//10,51,102,153,204,255
 			int val = translatedImg.at<uchar>(i,j);
-			if(val==255) translatedImg.at<uchar>(i,j) = 5;
-			if(val==204) translatedImg.at<uchar>(i,j) = 4;
-			if(val==153) translatedImg.at<uchar>(i,j) = 3;
-			if(val==102) translatedImg.at<uchar>(i,j) = 2;
-			if(val==51) translatedImg.at<uchar>(i,j) = 1;
-			if(val==10) translatedImg.at<uchar>(i,j) = 0;
+			if(val==255) translatedImg.at<uchar>(i,j) = 5; //white
+			if(val==204) translatedImg.at<uchar>(i,j) = 4; //light
+			if(val==153) translatedImg.at<uchar>(i,j) = 3; //low
+			if(val==102) translatedImg.at<uchar>(i,j) = 2; //high
+			if(val==51) translatedImg.at<uchar>(i,j) = 1; //dark
+			//if(val==0) translatedImg.at<uchar>(i,j) = 0; //black
 		}
 	}
 	return translatedImg;

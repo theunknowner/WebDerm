@@ -749,7 +749,7 @@ Mat ShapeColor::applyDiscreteShade(Mat input) {
 	Mat dst(input.size(),CV_8U,Scalar(0));
 	Shades sh;
 	vector<String> discreteShade = {"Dark2","Dark3","High","Low","Light","White"};
-	vector<int> discreteVals = {10,51,102,153,204,255};
+	vector<int> discreteVals = {0,51,102,153,204,255};
 	for(int row=0; row<input.rows; row++) {
 		for(int col=0; col<input.cols; col++) {
 			int val = input.at<uchar>(row,col);

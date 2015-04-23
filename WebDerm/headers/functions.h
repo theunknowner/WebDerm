@@ -45,6 +45,7 @@ deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3
 deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val=0);
 
 vector<vector<float> > frequency(vector<float> vec);
+float majority(vector<float> vec);
 
 class Functions {
 public:
@@ -54,6 +55,7 @@ public:
 	Mat cropImage(Mat input);
 	Mat imageROI(Mat input, Point begin, Point end);
 	Mat rotateImage(const Mat& source, double angle);
+	Mat shiftImage(Mat input, int x, int y, int keepBkGnd=0);
 	Mat fillEdges2(Mat img);
 	Mat fillEdges3(Mat img);
 	Mat kMeansClustering(Mat &src);
