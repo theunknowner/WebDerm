@@ -216,7 +216,7 @@ int FileData::listFiles(String directory) {
 	return 0;
 }
 
-//set flag to 1 to include files from subfolders
+//!set flag to 1 to include files from subfolders
 bool FileData::getFilesFromDirectory(String directory, deque<String> &files, int flag) {
 	String filepath;
 	fs::path full_path( fs::initial_path<fs::path>() );
@@ -479,4 +479,22 @@ String FileData::getFileSequenceNum(String name, String beginDelimit, size_t &be
 	String str = name.substr(begin,end-begin);
 	beginPos = begin;
 	return str;
+}
+
+void FileData::reorderFileSequence(String folder) {
+	deque<String> files;
+	this->getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	size_t pos=0;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		String filename = files.at(i);
+		String seqStr = this->getFileSequenceNum(files.at(i),"_",pos);
+		int seq = atoi(seqStr.c_str());
+		if(seq!=(i+1)) {
+			filename.replace(pos,seqStr.length(),toString(i+1));
+			String newname = folder + filename;
+			rename(name.c_str(),newname.c_str());
+		}
+	}
 }

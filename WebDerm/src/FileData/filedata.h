@@ -82,6 +82,7 @@ public:
 
 	void fixFileNumberSequence(String folder, String beginDelimit, int digits);
 	String getFileSequenceNum(String name, String beginDelimit, size_t &beginPos);
+	void reorderFileSequence(String folder);
 };
 
 

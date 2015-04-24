@@ -13,7 +13,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/skin/Skin.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/scripts/scripts.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
 

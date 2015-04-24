@@ -12,7 +12,7 @@
 #include "Hsv/hsv.h"
 #include "skin/Skin.h"
 #include "test/testfunctions.h"
-#include "scripts/scripts.h"
+#include "MyScripts/myscripts.h"
 #include "Math/maths.h"
 #include "FileData/filedata.h"
 #include "Histogram/histogram.h"
@@ -111,7 +111,7 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(img5);
 	ctd.mouseSelectSegment(img5,Size(35,35),name);
 /**/
-	/*
+/*
 	TestML ml;
 	String samplesPath = "/home/webderm/Files/Run/Positive_Pairs/";
 	String samplesPath2 = "/home/webderm/Files/Run/Negative_Pairs/";
@@ -147,24 +147,24 @@ int main(int argc,char** argv)
 
 	FileData fd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Negative_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Negative_Pairs/";
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	TestML ml;
-	String param = "/home/jason/Desktop/Programs/Training_Samples/Test Data/param70.xml";
-	//Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/test6.png",0);
+	String param = "/home/jason/Desktop/Programs/Training_Samples/Test Data/param50.xml";
+	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/test20.png",0);
 	vector<Mat> sampleVec;
-	for(unsigned int i=0; i<files.size(); i++) {
-		Mat sample = imread(folder + files.at(i),0);
+	//for(unsigned int i=0; i<files.size(); i++) {
+		//Mat sample = imread(folder + files.at(i),0);
 
-		//////// Translates Image to 0-5 ///////
-		//sample = ml.tempFixPrepareImg(sample);
+		//////// Translates Images ///////
+		sample = ml.tempFixPrepareImg(sample);
 
 		sampleVec.push_back(sample);
-	}
+	//}
 	Mat results = ml.runANN(param,sampleVec);
-	//cout << results << endl;
-
+	cout << results << endl;
+/*
 	int count=0;
 	int realTotal=0;
 	for(int i=0; i<results.rows; i++) {
@@ -193,7 +193,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-	/*
+/*
 	//TestML ml;
 	//vector<vector<double> > trainingData;
 	//vector<vector<double> > trainingLabels;
@@ -206,7 +206,7 @@ int main(int argc,char** argv)
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 70;
+	int hiddenNodes = 50;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
@@ -217,7 +217,7 @@ int main(int argc,char** argv)
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
 	cout << "Iterations: " << iter << endl;
-	CvFileStorage* storage = cvOpenFileStorage("/home/webderm/Files/Run/param70.xml", 0, CV_STORAGE_WRITE );
+	CvFileStorage* storage = cvOpenFileStorage("/home/webderm/Files/Run/param50.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/

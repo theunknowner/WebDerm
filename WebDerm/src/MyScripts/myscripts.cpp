@@ -1,36 +1,35 @@
 /*
- * scripts.cpp
+ * myscripts.cpp
  *
- *  Created on: Feb 21, 2014
+ *  Created on: Apr 24, 2015
  *      Author: jason
  */
 
-#include "scripts.h"
+#include "myscripts.h"
 
 void script1() {
 	CreateTrainingData ctd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Positive_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Data/";
+	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
-	int fileLabel= 116;
-	for(unsigned int i=0; i<files.size(); i++) {
-		String name = folder+files.at(i);
+	int fileLabel= 4249;
+	for(unsigned int i=0; i<6; i++) {
+		String name = folder + files.at(i);
 		String filename = files.at(i);
-		Mat img = imread(name,0);
-		Mat src1 = img(Rect(0,0,35,35));
-		Mat src2 = img(Rect(35,0,35,35));
-		Mat stitch = ctd.stitchData(src2,src1);
-		size_t beginPos=0;
-		String seqStr = fd.getFileSequenceNum(filename,"_",beginPos);
-		int seq = atoi(seqStr.c_str());
-		String seqStrNext = toString(seq+fileLabel);
-		if((seq+fileLabel)<1000)
-			seqStrNext = "0" + seqStrNext;
-		filename.replace(beginPos,seqStr.length(),seqStrNext.c_str());
-		String newname = "/home/jason/Desktop/Programs/Training_Samples/Test/" + filename;
-		imwrite(newname,stitch);
+		Mat src1 = imread(name,0);
+		for(unsigned int j=6; j<34;j++) {
+			name = folder + files.at(j);
+			Mat src2 = imread(name,0);
+			if(i!=j) {
+				Mat stitch = ctd.stitchData(src1,src2);
+				name = out + "pos_" + toString(fileLabel) + ".png";
+				fileLabel++;
+				imwrite(name,stitch);
+			}
+		}
 	}
 }
 
@@ -38,7 +37,7 @@ void script1() {
 void script2() {
 	FileData fd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Negative_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Positive_Pairs/";
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	FILE * fp;
@@ -173,13 +172,8 @@ void script7() {
 			flip(src1,src1,1);
 			//flip(src2,src2,1);
 			Mat stitch = ctd.stitchData(src1,src2);
-			if(files.at(i).find("copy")==string::npos) {
-				name = out + "neg_" + toString(seq+count) + ".png";
-			}
-			else {
-				filename.replace(pos,seqStr.length(),toString(seq+count));
-				name = out + filename;
-			}
+			filename.replace(pos,seqStr.length(),toString(seq+count));
+			name = out + filename;
 			imwrite(name,stitch);
 		}
 	}
@@ -197,7 +191,7 @@ void script8() {
 	sort(files.begin(),files.end());
 	size_t pos=0;
 	int count = 577;
-	for(auto i=0; i<files.size(); i++) {
+	for(unsigned i=0; i<files.size(); i++) {
 		String name = folder + files.at(i);
 		String filename = files.at(i);
 		if(filename.find("copy")==string::npos) {
@@ -212,14 +206,8 @@ void script8() {
 					if(a!=0 || b!=0) {
 						shifted2 = fn.shiftImage(src2,a,b,1);
 						Mat stitch = ctd.stitchData(src1,shifted2);
-						if(files.at(i).find("copy")==string::npos) {
-							name = out + "pos_" + toString(count) + ".png";
-							count++;
-						}
-						else {
-							filename.replace(pos,seqStr.length(),toString(count));
-							name = out + filename;
-						}
+						filename.replace(pos,seqStr.length(),toString(count));
+						name = out + filename;
 						imwrite(name,stitch);
 					}
 				}
@@ -262,7 +250,8 @@ void script9() {
 					}
 				}
 			}
-			name = out + "pos_" + toString(count) + ".png";
+			filename.replace(pos,seqStr.length(),toString(count));
+			name = out + filename;
 			imwrite(name,img);
 			count++;
 		}
@@ -301,9 +290,121 @@ void script10() {
 			float most = majority(freq);
 			src1 = (int) most;
 			img = ctd.stitchData(src1,src2);
-			name = out + "neg_" + toString(count) + ".png";
+
+			filename.replace(pos,seqStr.length(),toString(count));
+			name = out + filename;
 			imwrite(name,img);
 			count++;
+		}
+	}
+}
+
+//!copy files from one folder to another
+void script11() {
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Negative_Pairs/";
+	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Data/Negative_Pairs/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.begin());
+	for(unsigned i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		String filename = files.at(i);
+		if(filename.find("copy")==string::npos) {
+			Mat img = imread(name,0);
+			name = out + filename;
+			imwrite(name,img);
+		}
+	}
+}
+
+void script12() {
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Data/Negative_Pairs/";
+	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	for(unsigned i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		Mat img = imread(name,0);
+		vector<float> freq;
+		int val = img.at<uchar>(0,0);
+		freq.push_back((float)val);
+		val = img.at<uchar>(img.rows-1,0);
+		freq.push_back((float)val);
+		val = img.at<uchar>(0,img.cols-1);
+		freq.push_back((float)val);
+		val = img.at<uchar>(img.rows-1,img.cols-1);
+		freq.push_back((float)val);
+		float most = majority(freq);
+		for(int row=0; row<img.rows; row++) {
+			for(int col=0; col<img.cols; col++) {
+				if(img.at<uchar>(row,col)==(int)most) {
+					img.at<uchar>(row,col) = 0;
+				}
+				else {
+					img.at<uchar>(row,col) = 255;
+				}
+			}
+		}
+		name = out + files.at(i);
+		imwrite(name,img);
+	}
+}
+
+void script13() {
+	Functions fn;
+	CreateTrainingData ctd;
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Positive_Pairs/";
+	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	size_t pos = 0;
+	int count = 3186;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		String filename = files.at(i);
+		String seqStr = fd.getFileSequenceNum(filename,"_",pos);
+		int seq = atoi(seqStr.c_str());
+		if(seq>=1 && seq<=1062) {
+			Mat img = imread(name,0);
+			Mat src1 = img(Rect(0,0,35,35));
+			Mat src2 = img(Rect(35,0,35,35));
+			Mat blank(src1.size(),CV_8U,Scalar(0));
+			src1 = fn.rotateImage(src1,90.0);
+			src2 = fn.rotateImage(src2,90.0);
+			img = ctd.stitchData(src1,src2);
+
+			filename.replace(pos,seqStr.length(),toString(seq+count));
+			name = out + filename;
+			imwrite(name,img);
+		}
+	}
+}
+
+void script14() {
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Negative_Pairs/";
+	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Data/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		String filename = files.at(i);
+		Mat img = imread(name,0);
+		Mat src1 = img(Rect(0,0,35,35));
+		Mat src2 = img(Rect(35,0,35,35));
+		Mat blank(src1.size(),CV_8U,Scalar(0));
+		name = out + filename;
+		if(countNonZero(src1)==countNonZero(blank)) {
+			imwrite(name,src2);
+		}
+		else {
+			imwrite(name,src1);
 		}
 	}
 }

@@ -1,12 +1,12 @@
 /*
- * scripts.h
+ * myscripts.h
  *
- *  Created on: Feb 21, 2014
+ *  Created on: Apr 24, 2015
  *      Author: jason
  */
 
-#ifndef SCRIPTS_H_
-#define SCRIPTS_H_
+#ifndef MYSCRIPTS_H_
+#define MYSCRIPTS_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
@@ -27,5 +27,9 @@ void script7();
 void script8();
 void script9();
 void script10();
+void script11();
+void script12();
+void script13();
+void script14();
 
-#endif /* SCRIPTS_H_ */
+#endif /* MYSCRIPTS_H_ */

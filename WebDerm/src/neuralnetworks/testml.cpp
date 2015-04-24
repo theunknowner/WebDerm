@@ -43,7 +43,13 @@ Mat TestML::prepareMatSamples(vector<Mat> sampleVec) {
 		for(unsigned int i=0; i<sampleVec.size(); i++) {
 			for(int j=0; j<rows; j++) {
 				for(int k=0; k<cols; k++) {
-					sampleSet.at<float>(i,k+j*cols) = sampleVec.at(i).at<uchar>(j,k);
+					Mat samp = sampleVec.at(i);
+					if(samp.type()==CV_8U)
+						sampleSet.at<float>(i,k+j*cols) = samp.at<uchar>(j,k);
+					if(samp.type()==CV_32S)
+						sampleSet.at<float>(i,k+j*cols) = samp.at<int>(j,k);
+					if(samp.type()==CV_32F)
+						sampleSet.at<float>(i,k+j*cols) = samp.at<float>(j,k);
 				}
 			}
 		}
@@ -140,10 +146,15 @@ void TestML::convertImagesToData(String folder, Mat outputLabels, Size size) {
 
 		for(unsigned int i=0; i<samples.size(); i++) {
 			Mat samp = samples.at(i);
-			//samp = this->tempFixPrepareImg(samp);
+			samp = this->tempFixPrepareImg(samp);
 			for(int j=0; j<samp.rows; j++) {
 				for(int k=0; k<samp.cols; k++) {
-					data.at<float>(i,x) = samp.at<uchar>(j,k);
+					if(samp.type()==CV_8U)
+						data.at<float>(i,x) = samp.at<uchar>(j,k);
+					else if(samp.type()==CV_32S)
+						data.at<float>(i,x) = samp.at<int>(j,k);
+					if(samp.type()==CV_32F)
+						data.at<float>(i,x) = samp.at<float>(j,k);
 					x++;
 				}
 			}
@@ -202,17 +213,18 @@ Mat TestML::runANN(String param, vector<Mat> sampleVec) {
 }
 
 Mat TestML::tempFixPrepareImg(Mat src) {
-	Mat translatedImg = src.clone();
+	//Mat translatedImg = src.clone();
+	Mat translatedImg(src.size(),CV_32S,Scalar(0));
 	for(int i=0; i<translatedImg.rows; i++) {
 		for(int j=0; j<translatedImg.cols; j++) {
 			//10,51,102,153,204,255
-			int val = translatedImg.at<uchar>(i,j);
-			if(val==255) translatedImg.at<uchar>(i,j) = 5; //white
-			if(val==204) translatedImg.at<uchar>(i,j) = 4; //light
-			if(val==153) translatedImg.at<uchar>(i,j) = 3; //low
-			if(val==102) translatedImg.at<uchar>(i,j) = 2; //high
-			if(val==51) translatedImg.at<uchar>(i,j) = 1; //dark
-			//if(val==0) translatedImg.at<uchar>(i,j) = 0; //black
+			int val = src.at<uchar>(i,j);
+			if(val==255) translatedImg.at<int>(i,j) = 1; //white
+			//if(val==204) translatedImg.at<uchar>(i,j) = 4; //light
+			//if(val==153) translatedImg.at<uchar>(i,j) = 3; //low
+			//if(val==102) translatedImg.at<uchar>(i,j) = 2; //high
+			//if(val==51) translatedImg.at<uchar>(i,j) = 1; //dark
+			if(val==0) translatedImg.at<int>(i,j) = -1; //black
 		}
 	}
 	return translatedImg;
