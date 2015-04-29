@@ -25,12 +25,10 @@ Mat TestML::prepareImage(Mat sample, Size size) {
 	Size _size = sample.size();
 	if(size.width>0 && size.height>0)
 		_size = size;
+	sample = this->convertToBinary(sample);
 	img = fn.cropImage(sample);
 	img = runResizeImage(img,_size);
-	img = this->fixBinaryImage(img);
-	img = fn.cropImage(img);
-	img = runResizeImage(img,_size);
-	img = this->fixBinaryImage(img);
+	img = this->convertToBinary(img,0,1,0,255);
 	return img;
 }
 
@@ -111,13 +109,54 @@ void TestML::importSamples(String folder, vector<Mat> &samples, Size size) {
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	for(unsigned int i=0; i<files.size(); i++) {
-		String name = getFileName(files.at(i),"(");
 		filename = folder+files.at(i);
 		Mat img = imread(filename,0);
 		if(!img.empty()) {
-			//img = this->prepareImage(img,size);
+			if(size!=Size(0,0))
+				img = this->prepareImage(img,size);
 			samples.push_back(img);
 		}
+	}
+}
+
+void TestML::importLabels(String path,vector<Mat> &labels) {
+	fstream fs(path);
+	if(fs.is_open()) {
+		String file;
+		fstream fs2;
+		while(getline(fs,file)) {
+			fs2.open(file);
+			if(fs2.is_open()) {
+				String temp;
+				deque<String> vec;
+				vector<float> fVec;
+				while(getline(fs2,temp)) {
+					getSubstr(temp,',',vec);
+					//starts at 1 to skip filename in first column
+					for(unsigned int i=1; i<vec.size(); i++) {
+						fVec.push_back(atof(vec.at(i).c_str()));
+					}
+					Mat mLabels(1,fVec.size(),CV_32F,Scalar(0));
+					for(unsigned int j=0; j<fVec.size(); j++) {
+						mLabels.at<float>(0,j) = fVec.at(j);
+					}
+					labels.push_back(mLabels.clone());
+					mLabels.release();
+					vec.clear();
+					fVec.clear();
+				}
+				fs2.close();
+			}
+			else {
+				printf("Cannot open %s\n",file.c_str());
+				exit(1);
+			}
+		}
+		fs.close();
+	}
+	else {
+		printf("Cannot open %s\n",path.c_str());
+		exit(1);
 	}
 }
 
@@ -146,7 +185,7 @@ void TestML::convertImagesToData(String folder, Mat outputLabels, Size size) {
 
 		for(unsigned int i=0; i<samples.size(); i++) {
 			Mat samp = samples.at(i);
-			samp = this->tempFixPrepareImg(samp);
+			//samp = this->tempFixPrepareImg(samp);
 			for(int j=0; j<samp.rows; j++) {
 				for(int k=0; k<samp.cols; k++) {
 					if(samp.type()==CV_8U)
@@ -184,17 +223,17 @@ void TestML::printData(vector<vector<Point> > &trainingData, vector<vector<doubl
 	}
 }
 
-Mat TestML::fixBinaryImage(Mat input) {
-	Mat output = input.clone();
-	for(int i=0; i<output.rows; i++) {
-		for(int j=0; j<output.cols; j++) {
-			if(output.at<uchar>(i,j)>40)
-				output.at<uchar>(i,j) = 255;
-			else
-				output.at<uchar>(i,j) = 0;
+//!converts min & max to 0's & 1's
+Mat TestML::convertToBinary(Mat input, int min, int max, int newMin, int newMax) {
+	Mat result = input.clone();
+	for(int i=0; i<input.rows; i++) {
+		for(int j=0; j<input.cols; j++) {
+			int val = input.at<uchar>(i,j);
+			if(val==min) result.at<uchar>(i,j) = newMin;
+			else if(val==max) result.at<uchar>(i,j) = newMax;
 		}
 	}
-	return output;
+	return result;
 }
 
 Mat TestML::runANN(String param, vector<Mat> sampleVec) {
@@ -228,4 +267,55 @@ Mat TestML::tempFixPrepareImg(Mat src) {
 		}
 	}
 	return translatedImg;
+}
+
+//reads csv file containing path to files/folders
+void TestML::importTrainingData(String samplePath, String labelsPath, Size size) {
+	fstream fs(samplePath);
+	if(fs.is_open()) {
+		String folder;
+		vector<Mat> samples;
+		vector<Mat> labels;
+		while(getline(fs,folder)) {
+			this->importSamples(folder,samples,size);
+		}
+		this->importLabels(labelsPath,labels);
+		if(samples.size()==labels.size()) {
+			Mat mData(samples.size(),samples.at(0).total(),CV_32F,Scalar(0));
+			Mat mLabels(labels.size(),labels.at(0).cols,CV_32F,Scalar(0));
+			int x=0;
+			for(unsigned int i=0; i<samples.size(); i++) {
+				Mat samp = samples.at(i);
+				Mat lbl = labels.at(i);
+				//samp = this->tempFixPrepareImg(samp);
+				for(int j=0; j<samp.rows; j++) {
+					for(int k=0; k<samp.cols; k++) {
+						if(samp.type()==CV_8U)
+							mData.at<float>(i,x) = samp.at<uchar>(j,k);
+						else if(samp.type()==CV_32S)
+							mData.at<float>(i,x) = samp.at<int>(j,k);
+						if(samp.type()==CV_32F)
+							mData.at<float>(i,x) = samp.at<float>(j,k);
+						x++;
+					}
+				}
+				x=0;
+				for(int n=0; n<lbl.cols; n++) {
+					mLabels.at<float>(i,n) = lbl.at<float>(0,n);
+				}
+			}
+			this->data = mData;
+			this->labels = mLabels;
+
+		}
+		else {
+			printf("TestML::importTrainingData() error!\n");
+			printf("Sample size != Label size\n");
+			printf("Sample size: %lu\n",samples.size());
+			printf("Label size: %lu\n",labels.size());
+			fs.close();
+			exit(1);
+		}
+		fs.close();
+	}
 }

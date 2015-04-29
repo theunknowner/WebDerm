@@ -37,7 +37,7 @@ void script1() {
 void script2() {
 	FileData fd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Positive_Pairs/";
+	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Donut-Incomplete/";
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	FILE * fp;
@@ -54,22 +54,22 @@ void script3() {
 	CreateTrainingData ctd;
 	FileData fd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Negative_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Positive_Pairs/";
 	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
-	int count = 736;
+	int count = 1571;
 	for(unsigned int i=0; i<files.size(); i++) {
 		int flag=0;
 		size_t pos=0;
 		String seqStr = fd.getFileSequenceNum(files.at(i),"_",pos);
 		int seq = atoi(seqStr.c_str());
-		if(seq>=97 && seq<=503) {
+		if(seq>=4418 && seq<=4642) {
 			String file = folder + files.at(i);
 			Mat img = imread(file,0);
 			Mat src1 = img(Rect(0,0,35,35));
 			Mat src2 = img(Rect(35,0,35,35));
-			//Mat blank(src1.size(),CV_8U,Scalar(0));
+			Mat blank(src1.size(),CV_8U,Scalar(0));
 			/*int v = img.at<uchar>(0,0);
 			for(int row=0; row<img.rows; row++) {
 				for(int col=0; col<img.cols; col++) {
@@ -84,7 +84,7 @@ void script3() {
 				if(flag==1) break;
 			}*/
 			if(flag==0) {
-				img = ctd.stitchData(src2,src1);
+				img = ctd.stitchData(blank,src1);
 				String newname = out + "neg_" + toString(count) + ".png";
 				imwrite(newname,img);
 				count++;
@@ -128,22 +128,31 @@ void script5() {
 void script6() {
 	CreateTrainingData ctd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Test/";
-	String out = "/home/jason/Desktop/Programs/Training_Samples/Test/Positive_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Data/";
+	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
-	int count=1;
+	size_t pos=0;
+	int count=4418;
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = folder + files.at(i);
-		Mat src1 = imread(name,0);
-		for(unsigned int j=0; j<files.size(); j++) {
-			name = folder + files.at(j);
-			Mat src2 = imread(name,0);
-			Mat stitch = ctd.stitchData(src1,src2);
-			name = out + "pos_" + toString(count) + ".png";
-			imwrite(name,stitch);
-			count++;
+		String seqStr = fd.getFileSequenceNum(files.at(i),"_",pos);
+		int seq = atoi(seqStr.c_str());
+		if(seq>=1112 && seq<=1126) {
+			Mat src1 = imread(name,0);
+			for(unsigned int j=0; j<files.size(); j++) {
+				name = folder + files.at(j);
+				seqStr = fd.getFileSequenceNum(files.at(j),"_",pos);
+				seq = atoi(seqStr.c_str());
+				if(seq>=1112 && seq<=1126) {
+					Mat src2 = imread(name,0);
+					Mat stitch = ctd.stitchData(src1,src2);
+					name = out + "pos_" + toString(count) + ".png";
+					imwrite(name,stitch);
+					count++;
+				}
+			}
 		}
 	}
 }
@@ -262,19 +271,19 @@ void script9() {
 void script10() {
 	CreateTrainingData ctd;
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Positive_Pairs/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Positive_Pairs/";
 	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
-	int count = 282;
+	int count = 1121;
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = folder+files.at(i);
 		String filename = files.at(i);
 		size_t pos=0;
 		String seqStr = fd.getFileSequenceNum(files.at(i),"_",pos);
 		int seq = atoi(seqStr.c_str());
-		if(seq>=1331 && seq<=1552) {
+		if(seq>=4418 && seq<=4642) {
 			Mat img = imread(name,0);
 			Mat src1 = img(Rect(0,0,35,35));
 			Mat src2 = img(Rect(35,0,35,35));
@@ -405,6 +414,102 @@ void script14() {
 		}
 		else {
 			imwrite(name,src1);
+		}
+	}
+}
+
+void script15() {
+	Functions fn;
+	CreateTrainingData ctd;
+	deque<String> files;
+	String folder = "/home/webderm/Files/Run/Data/";
+	String out = "/home/webderm/Files/Run/Positive_Pairs/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	vector<Mat> matVec;
+	int count=1;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		String filename = files.at(i);
+		Mat img = imread(name,0);
+		Mat src1 = img(Rect(0,0,35,35));
+		Mat src2 = img(Rect(35,0,35,35));
+		for(double d=0.0; d<=9.0; d+=3.0) {
+			Mat rot = fn.rotateImage(src1,d);
+			rot = fn.fixBinaryImage(rot);
+			for(int x=-5; x<=5; x+=2) {
+				for(int y=-5; y<=5; y+=2) {
+					Mat shift = fn.shiftImage(rot,x,y);
+					for(double d2=0.0; d2<=9.0; d2+=3.0) {
+						Mat rot2 = fn.rotateImage(src2,d2);
+						rot2 = fn.fixBinaryImage(rot2);
+						for(int x2=-5; x2<=5; x2+=2) {
+							for(int y2=-5; y2<=5; y2+=2) {
+								Mat shift2 = fn.shiftImage(rot2,x2,y2);
+								Mat stitch = ctd.stitchData(shift,shift2);
+								name = out + "pos_" + toString(count) + ".png";
+								imwrite(name,stitch);
+								printf("%s written\n",name.c_str());
+								count++;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void script16() {
+	Functions fn;
+	CreateTrainingData ctd;
+	deque<String> files;
+	String folder = "/home/webderm/Files/Run/Data/";
+	String out = "/home/webderm/Files/Run/Negative_Pairs/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	vector<Mat> matVec;
+	int count=1;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		String filename = files.at(i);
+		Mat img = imread(name,0);
+		Mat src1 = img(Rect(0,0,35,35));
+		Mat src2 = img(Rect(35,0,35,35));
+		Mat blank(src1.size(),CV_8U,Scalar(0));
+		for(double d=0.0; d<360.0; d+=3.0) {
+			if(d<=9.0 || d>=351.0) {
+				Mat rot = fn.rotateImage(src1,d);
+				rot = fn.fixBinaryImage(rot);
+				for(int x=-5; x<=5; x+=2) {
+					for(int y=-5; y<=5; y+=2) {
+						Mat shift = fn.shiftImage(rot,x,y);
+						Mat stitch1 = ctd.stitchData(shift,blank);
+						name = out + "neg_" + toString(count) + ".png";
+						imwrite(name,stitch1);
+						printf("%s written\n",name.c_str());
+						count++;
+					}
+				}
+			}
+		}
+		for(double d2=0.0; d2<360.0; d2+=3.0) {
+			if(d2<=9.0 || d2>=351.0) {
+				Mat rot2 = fn.rotateImage(src2,d2);
+				rot2 = fn.fixBinaryImage(rot2);
+				for(int x2=-5; x2<=5; x2+=2) {
+					for(int y2=-5; y2<=5; y2+=2) {
+						Mat shift2 = fn.shiftImage(rot2,x2,y2);
+						Mat stitch = ctd.stitchData(blank,shift2);
+						name = out + "neg_" + toString(count) + ".png";
+						imwrite(name,stitch);
+						printf("%s written\n",name.c_str());
+						count++;
+					}
+				}
+			}
 		}
 	}
 }

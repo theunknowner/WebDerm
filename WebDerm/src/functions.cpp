@@ -420,6 +420,19 @@ Mat Functions::shiftImage(Mat input, int x, int y, int keepBkGnd) {
 	return result;
 }
 
+Mat Functions::fixBinaryImage(Mat input) {
+	Mat output = input.clone();
+	for(int i=0; i<output.rows; i++) {
+		for(int j=0; j<output.cols; j++) {
+			if(output.at<uchar>(i,j)>40)
+				output.at<uchar>(i,j) = 255;
+			else
+				output.at<uchar>(i,j) = 0;
+		}
+	}
+	return output;
+}
+
 Mat Functions::fillEdges2(Mat img)
 {
 	Mat img2 = img.clone();

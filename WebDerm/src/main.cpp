@@ -56,8 +56,8 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "custom15";
-	img = imread("/home/jason/Desktop/Programs/Training Data Pairs/"+name+".png");
+	String name = "vitiligo2";
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
@@ -65,13 +65,7 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-	/*
-	CreateTrainingData ctd;
-	String inDir = "/home/jason/Desktop/Programs/Training Samples/Non_Similiar_Pairs/";
-	String outDir = "/home/jason/Desktop/Programs/Training Samples/Negative_Pairs/";
-	ctd.generateStitchPairs(inDir,outDir);
-/**/
-	/*
+
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
@@ -86,20 +80,21 @@ int main(int argc,char** argv)
 	img3 = sm.haloTransform(islands.at(0));
 	img3.convertTo(img3,CV_8U);
 	imgGray.copyTo(img4,img3);
-	//img5 = sc.applyDiscreteShade(img4);
+	img5 = sc.applyDiscreteShade(img4);
+
+	//imgshow(img);
+	//imgshow(img2);
+	//imgshow(img3);
+	//imgshow(img4);
+	//imgshow(img5);
+	//imwrite(name+".png",img5);
+
 /*
-	imgshow(img);
-	imgshow(img2);
-	imgshow(img3);
-	imgshow(img4);
-	imgshow(img5);
-	 */
-	/*
 	CreateTrainingData ctd;
-	Mat src1 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis4-Point(35,0).png",0);
-	Mat src2 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis11-Point(35,0).png",0);
-	Mat stitch = ctd.stitchData(src1,src2);
-	imwrite("test16.png",stitch);
+	//Mat src1 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis4-Point(35,0).png",0);
+	//Mat src2 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis11-Point(35,0).png",0);
+	//Mat stitch = ctd.stitchData(src1,src2);
+	//imwrite("test16.png",stitch);
 	//String folder = "/home/jason/Desktop/Programs/Training_Samples/";
 	//String file = "/home/jason/Desktop/Programs/Training_Samples/custom15-Point(35,35).png";
 
@@ -111,7 +106,15 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(img5);
 	ctd.mouseSelectSegment(img5,Size(35,35),name);
 /**/
+	script16();
 /*
+	TestML ml;
+	String path1 = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
+	String path2 = "/home/jason/git/Samples/Samples/Training/labels_path.csv";
+	ml.importTrainingData(path1,path2,Size(20,20));
+	Mat data = ml.getData();
+	Mat labels = ml.getLabels();
+	/*
 	TestML ml;
 	String samplesPath = "/home/webderm/Files/Run/Positive_Pairs/";
 	String samplesPath2 = "/home/webderm/Files/Run/Negative_Pairs/";
@@ -144,7 +147,7 @@ int main(int argc,char** argv)
 	vconcat(labels1,labels2,labels);
 	//ml.writeData(samplesPath+"data_set.csv",data,labels);
 /**/
-
+/*
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Negative_Pairs/";
@@ -152,13 +155,15 @@ int main(int argc,char** argv)
 	sort(files.begin(),files.end());
 	TestML ml;
 	String param = "/home/jason/Desktop/Programs/Training_Samples/Test Data/param50.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/test20.png",0);
+	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/test72.png",0);
+	//sample = ml.prepareImage(sample,Size(20,20));
 	vector<Mat> sampleVec;
+
 	//for(unsigned int i=0; i<files.size(); i++) {
 		//Mat sample = imread(folder + files.at(i),0);
 
 		//////// Translates Images ///////
-		sample = ml.tempFixPrepareImg(sample);
+		//sample = ml.tempFixPrepareImg(sample);
 
 		sampleVec.push_back(sample);
 	//}
@@ -206,7 +211,7 @@ int main(int argc,char** argv)
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 50;
+	int hiddenNodes = 20;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
@@ -217,7 +222,7 @@ int main(int argc,char** argv)
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
 	cout << "Iterations: " << iter << endl;
-	CvFileStorage* storage = cvOpenFileStorage("/home/webderm/Files/Run/param50.xml", 0, CV_STORAGE_WRITE );
+	CvFileStorage* storage = cvOpenFileStorage("/home/jason/git/Samples/Samples/param.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
@@ -268,13 +273,6 @@ int main(int argc,char** argv)
 	img4 = en.showEyeFnSquares(img4,entSize,targetColor2,targetShade2);
 	//Mouse::mouseOutputColor(img4,fd2);
 /**/
-	/*
-	namedWindow(fd.filename+"_Squares",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	//namedWindow(fd2.filename+"_Squares2",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	imshow(fd.filename+"_Squares",img3);
-	//imshow(fd2.filename+"_Squares2",img4);
-	waitKey(0);
-	 */
 	return 0;
 }
 

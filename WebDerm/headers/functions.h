@@ -56,6 +56,7 @@ public:
 	Mat imageROI(Mat input, Point begin, Point end);
 	Mat rotateImage(const Mat& source, double angle);
 	Mat shiftImage(Mat input, int x, int y, int keepBkGnd=0);
+	Mat fixBinaryImage(Mat input);
 	Mat fillEdges2(Mat img);
 	Mat fillEdges3(Mat img);
 	Mat kMeansClustering(Mat &src);
