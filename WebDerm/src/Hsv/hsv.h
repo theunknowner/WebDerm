@@ -8,7 +8,7 @@
 #ifndef HSV_H_
 #define HSV_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 class Hsv {
 public:

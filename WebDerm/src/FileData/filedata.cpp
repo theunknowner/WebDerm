@@ -6,6 +6,8 @@
  */
 
 #include "filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 FileData::FileData(String file_path) {
 	setFilePath(file_path);

@@ -8,14 +8,10 @@
 #ifndef HYSTERESIS_H_INCLUDED
 #define HYSTERESIS_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Intensity/intensity.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-
 class FileData;
+
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+
 void hysteresis(FileData &fd);
 void hysteresis(Mat img, Size size, String name, FileData &fd);
 void hysteresis2(Mat img, Size size, String name, FileData &fd);

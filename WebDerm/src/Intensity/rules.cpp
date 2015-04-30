@@ -6,6 +6,13 @@
  */
 
 #include "rules.h"
+#include "intensity.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
 const int ruleCount = 11;
 vector<int> ruleFlags(ruleCount,1);

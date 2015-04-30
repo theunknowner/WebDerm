@@ -8,13 +8,7 @@
 #ifndef RUN_H_INCLUDED
 #define RUN_H_INCLUDED
 
-#include "functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/skin/Skin.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
+#include "global.h"
 
 void runBlurImage();
 void runResizeImage();

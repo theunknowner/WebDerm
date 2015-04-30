@@ -6,6 +6,13 @@
  */
 
 #include "shapecolor.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/CIE/cie.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
 void ShapeColor::setDebugLevel(int level) {
 	this->debugLevel = level;

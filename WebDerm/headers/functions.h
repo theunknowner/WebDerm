@@ -7,7 +7,6 @@
 #ifndef FUNCTIONS_H_INCLUDED
 #define FUNCTIONS_H_INCLUDED
 
-#include "functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
@@ -32,6 +31,8 @@ double roundDecimal(double num, int places);
 String decimal2hex(int num);
 void imfill(Mat &img);
 void imgshow(Mat src, int flag=0);
+void getSubstr(String str, char delimiter, deque<String> &vec);
+String getFileName(String filename,String end="");
 
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val="0");
 void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val=0);

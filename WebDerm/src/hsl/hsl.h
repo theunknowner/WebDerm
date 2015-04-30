@@ -8,7 +8,7 @@
 #ifndef HSL_H
 #define HSL_H
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 extern deque<String> hslColors;
 extern deque< deque<int> > hueThresh;

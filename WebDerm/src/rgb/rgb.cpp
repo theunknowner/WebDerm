@@ -6,6 +6,10 @@
  */
 
 #include "rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Intensity/rules.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 deque<String> mainColors;
 deque<String> allColors;

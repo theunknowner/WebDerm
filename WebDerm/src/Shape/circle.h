@@ -9,7 +9,6 @@
 #define CIRCLE_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 class Circle {
 public:

@@ -6,6 +6,12 @@
  */
 
 #include "entropy.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 
 void Entropy::runAllEntropy() {
 	String filepath;
@@ -69,7 +75,7 @@ void Entropy::runAllEntropy() {
 				grayImg.copyTo(img,dst);
 				shadeColor.copyTo(img2,map);
 				shadeColor.copyTo(img2,dst);
-				imwrite(fd.filename+"-Entropy-outputShades-5x5.png",img2);
+				//imwrite(fd.filename+"-Entropy-outputShades-5x5.png",img2);
 				this->shapeFn(fd);
 				this->eyeFn(fd,entSize,img,"","");
 			}
@@ -110,7 +116,7 @@ void Entropy::runEntropy() {
 		fd.ksize=size;
 		this->entSize = entSize;
 		this->shapeFn(fd);
-		eyeFn(fd,entSize,Mat(),"","");
+		this->eyeFn(fd,entSize,Mat(),"","");
 		rgb.release_memory();
 		hsl.release_memory();
 		sh.release_memory();

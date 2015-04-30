@@ -6,6 +6,7 @@
  */
 
 #include "median.h"
+#include "quicksort.h"
 
 double medianSorted(deque<double> &vec) {
 	unsigned int size = vec.size();

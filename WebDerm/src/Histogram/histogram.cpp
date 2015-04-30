@@ -1,5 +1,9 @@
 
 #include "histogram.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+
 
 Mat Histogram::calcHistogram(Mat src) {
 	/// Separate the image in 3 places ( B, G and R )

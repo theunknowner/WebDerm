@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	/*
+
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -56,7 +56,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "vitiligo2";
+	String name = "tinea_corporis8a";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -79,8 +79,9 @@ int main(int argc,char** argv)
 	deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
 	img3 = sm.haloTransform(islands.at(0));
 	img3.convertTo(img3,CV_8U);
-	imgGray.copyTo(img4,img3);
-	img5 = sc.applyDiscreteShade(img4);
+	img3 *= 255;
+	//imgGray.copyTo(img4,img3);
+	//img5 = sc.applyDiscreteShade(img4);
 
 	//imgshow(img);
 	//imgshow(img2);
@@ -106,7 +107,6 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(img5);
 	ctd.mouseSelectSegment(img5,Size(35,35),name);
 /**/
-	script16();
 /*
 	TestML ml;
 	String path1 = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
@@ -147,16 +147,17 @@ int main(int argc,char** argv)
 	vconcat(labels1,labels2,labels);
 	//ml.writeData(samplesPath+"data_set.csv",data,labels);
 /**/
+
 /*
-	FileData fd;
+	//FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Negative_Pairs/";
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	TestML ml;
-	String param = "/home/jason/Desktop/Programs/Training_Samples/Test Data/param50.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/test72.png",0);
-	//sample = ml.prepareImage(sample,Size(20,20));
+	String param = "/home/jason/git/Samples/Samples/param.xml";
+	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/test74.png",0);
+	sample = ml.prepareImage(img3,Size(20,20));
 	vector<Mat> sampleVec;
 
 	//for(unsigned int i=0; i<files.size(); i++) {
@@ -169,6 +170,7 @@ int main(int argc,char** argv)
 	//}
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
+	imgshow(img3);
 /*
 	int count=0;
 	int realTotal=0;

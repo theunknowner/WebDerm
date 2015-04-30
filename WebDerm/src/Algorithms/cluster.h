@@ -9,8 +9,6 @@
 #define CLUSTER_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "jaysort.h"
 
 class Cluster {
 private:

@@ -6,6 +6,7 @@
  */
 
 #include "shape.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 void Shape::importPoints(String file, vector<vector<Point> > &points) {
 	fstream fs(file.c_str());

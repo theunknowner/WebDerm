@@ -6,6 +6,7 @@
  */
 
 #include "griddisplay.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 void GridDisplay::setGridVec(deque<deque<double> > gridVec) {
 	this->setGridSize(Size(gridVec.at(0).size(),gridVec.size()));

@@ -76,6 +76,56 @@ void imgshow(Mat src, int flag) {
 	num++;
 }
 
+//generic getSubstr function
+void getSubstr(String str, char delimiter, deque<String> &vec)
+{
+	String temp;
+	int j=0;
+	for(unsigned int i=0; i<str.size(); i++)
+	{
+		if(str[i]==delimiter)
+		{
+			temp = str.substr(j,(i-j));
+			vec.push_back(temp.c_str());
+			j=i+1;
+		}
+		if(i==(str.size()-1))
+		{
+			temp = str.substr(j,str.size()-j);
+			if(temp!="")
+				vec.push_back(temp.c_str());
+			j=0;
+		}
+	}
+}
+
+//gets image filename from filepath
+String getFileName(String filename, String end)
+{
+	char delimit1 = '/';
+	char delimit2 = '.';
+	String name;
+	int pos=0;
+	int pos2=0;
+	for(unsigned int i=0; i<filename.size(); i++)
+	{
+		if(filename[i]==delimit1)
+		{
+			pos=i+1;
+		}
+		if(filename[i]==delimit2)
+		{
+			pos2=i;
+		}
+	}
+	name = filename.substr(pos,pos2-pos);
+	if(end!="") {
+		pos = name.find(end);
+		name = name.substr(0,pos);
+	}
+	return name;
+}
+
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
 	deque<String> tempVec;
 	vec.clear();

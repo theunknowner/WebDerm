@@ -6,6 +6,16 @@
  */
 
 #include "entropy.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
 deque<deque< deque< deque<double> > > > vec;
 deque<deque< deque< deque<double> > > > vec2;
@@ -21,7 +31,6 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 	int height = fd.colorVec.size()/ksize.height;
 	int width = fd.colorVec.at(0).size()/ksize.width;
 	int innerHeight = allColors.size();
-
 	int innerWidth = g_Shades2.size();
 	vec = createDeque4D(height,width,innerHeight,innerWidth,0.);
 	vec2 = createDeque4D(height,width,innerHeight,innerWidth,0.);
@@ -432,15 +441,15 @@ void Entropy::shapeFn(FileData &fd) {
 	vector<Mat> sampleVec, sampleVec2;
 	//crops & fixes up the binary sample set
 	for(unsigned int i=0; i<matVec.size(); i++) {
-		Mat sample = ml.prepareImage(matVec.at(i));
-		Mat sample2 = ml.prepareImage(matVec2.at(i));
+		Mat sample = ml.prepareImage(matVec.at(i),Size(20,20));
+		Mat sample2 = ml.prepareImage(matVec2.at(i),Size(20,20));
 		sampleVec.push_back(sample);
 		sampleVec2.push_back(sample2);
 		sample.release();
 		sample2.release();
 	}
 	Mat results = ml.runANN(param,sampleVec);
-	Mat results2 = ml.runANN(param,sampleVec);
+	Mat results2 = ml.runANN(param,sampleVec2);
 	//gets the index of the largest output for each sample
 	deque<int> largestOutputVec;
 	double max=results.at<float>(0,0);
@@ -486,6 +495,50 @@ void Entropy::shapeFn(FileData &fd) {
 		this->shapeMetric.push_back(0.33);
 	if(shapeVec.at(0)==0 && shapeVec.at(1)==0)
 		this->shapeMetric.push_back(0.0);
+}
+
+void Entropy::shapeFn2(FileData &fd) {
+	ShapeMorph sm;
+	ShapeColor sc;
+	Mat img = fd.getImage();
+	Mat imgGray;
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+	Mat src = sm.prepareImage(imgGray);
+	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
+	Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
+	Mat maskLC;
+	src.copyTo(maskLC,mapOfNonNoise);
+	maskLC = sc.filterKneePt(maskLC);
+	src.copyTo(maskLC,maskEmax);
+	Mat img2 = maskLC * 255;
+	img2 = sm.densityConnector(img2,0.9999);
+	deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
+	Mat img3 = sm.haloTransform(islands.at(0));
+	img3.convertTo(img3,CV_8U);
+	img3 *= 255;
+	TestML ml;
+	String param = "/home/jason/git/Samples/Samples/param.xml";
+	vector<Mat> sampleVec;
+	Mat results = ml.runANN(param,sampleVec);
+	//gets the index of the largest output for each sample
+	double max=results.at<float>(0,0);
+	int idx=0;
+	for(int i=0; i<results.rows; i++) {
+		for(int j=0; j<results.cols; j++) {
+			try {
+				if(results.at<float>(i,j)>max) {
+					max = results.at<float>(i,j);
+					idx = j;
+				}
+			}
+			catch(const std::out_of_range &oor) {
+				printf("Catch #1: Entropy::shapeFn() out of range!\n");
+				exit(1);
+			}
+		}
+	}
+	//var idx holds the largest shape
 }
 
 void Entropy::setDebugMode(bool mode) {

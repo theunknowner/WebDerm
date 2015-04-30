@@ -54,7 +54,8 @@ Mat TestML::prepareMatSamples(vector<Mat> sampleVec) {
 		return sampleSet;
 	}
 	else {
-		cout << "prepareMatSamples: input size != rows*cols" << endl;
+		printf("TestML::prepareMatSamples() error!\n");
+		cout << "input size != rows*cols" << endl;
 		return Mat();
 	}
 }

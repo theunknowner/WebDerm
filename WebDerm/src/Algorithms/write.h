@@ -8,9 +8,6 @@
 #ifndef WRITE_H_
 #define WRITE_H_
 
-
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 void writeSeq2File(deque< deque<String> > &vec, String name);

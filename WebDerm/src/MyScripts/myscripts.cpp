@@ -37,7 +37,7 @@ void script1() {
 void script2() {
 	FileData fd;
 	deque<String> files;
-	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Donut-Incomplete/";
+	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental2/Negative_Pairs/";
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	FILE * fp;
@@ -471,14 +471,13 @@ void script16() {
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	vector<Mat> matVec;
-	int count=1;
+	int count=1513;
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = folder + files.at(i);
 		String filename = files.at(i);
 		Mat img = imread(name,0);
 		Mat src1 = img(Rect(0,0,35,35));
 		Mat src2 = img(Rect(35,0,35,35));
-		Mat blank(src1.size(),CV_8U,Scalar(0));
 		for(double d=0.0; d<360.0; d+=3.0) {
 			if(d<=9.0 || d>=351.0) {
 				Mat rot = fn.rotateImage(src1,d);
@@ -486,25 +485,9 @@ void script16() {
 				for(int x=-5; x<=5; x+=2) {
 					for(int y=-5; y<=5; y+=2) {
 						Mat shift = fn.shiftImage(rot,x,y);
-						Mat stitch1 = ctd.stitchData(shift,blank);
+						Mat stitch1 = ctd.stitchData(shift,src2);
 						name = out + "neg_" + toString(count) + ".png";
 						imwrite(name,stitch1);
-						printf("%s written\n",name.c_str());
-						count++;
-					}
-				}
-			}
-		}
-		for(double d2=0.0; d2<360.0; d2+=3.0) {
-			if(d2<=9.0 || d2>=351.0) {
-				Mat rot2 = fn.rotateImage(src2,d2);
-				rot2 = fn.fixBinaryImage(rot2);
-				for(int x2=-5; x2<=5; x2+=2) {
-					for(int y2=-5; y2<=5; y2+=2) {
-						Mat shift2 = fn.shiftImage(rot2,x2,y2);
-						Mat stitch = ctd.stitchData(blank,shift2);
-						name = out + "neg_" + toString(count) + ".png";
-						imwrite(name,stitch);
 						printf("%s written\n",name.c_str());
 						count++;
 					}

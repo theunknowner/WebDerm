@@ -6,6 +6,9 @@
  */
 
 #include "maths.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/mean.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"
 
 double correlationDist(double * vec1, double * vec2)
 {

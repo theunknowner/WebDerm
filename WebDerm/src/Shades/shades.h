@@ -8,7 +8,6 @@
 #ifndef SHADES_H_INCLUDED
 #define SHADES_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"

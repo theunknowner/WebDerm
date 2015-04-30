@@ -8,13 +8,10 @@
 #ifndef RULES_H_INCLUDED
 #define RULES_H_INCLUDED
 
-
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "intensity.h"
-
 class FileData;
+
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+
 double rule1(FileData &fd, String &newShade);
 double rule3(FileData &fd, String &newPix, String &newShade);
 double rule5(FileData &fd, String &newPix, String &newShade);

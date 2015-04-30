@@ -6,6 +6,16 @@
  */
 
 #include "intensity.h"
+#include "rules.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/table.h"
 
 //String shadeArr[] = {"Dark1","Dark2","High1","High2","Low1","Low2","Low3","Light1","Light2","Light3","White"};
 

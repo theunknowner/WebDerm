@@ -8,20 +8,10 @@
 #ifndef ENTROPY_H_
 #define ENTROPY_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Graph/graph.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/transpose.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
-
-
 class FileData;
+
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+
 class Entropy {
 private:
 	bool debugMode=false;
@@ -65,6 +55,7 @@ public:
 	Mat showEyeFnSquares(Mat img, Size ksize, String targetColor, String targetShade);
 	void writeEntropyFile(String filename, FileData &fd);
 	void shapeFn(FileData &fd);
+	void shapeFn2(FileData &fd);
 
 	//entcompare.cpp
 	bool importEntropyThresholds();

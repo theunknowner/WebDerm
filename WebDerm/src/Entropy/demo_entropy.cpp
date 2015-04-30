@@ -6,6 +6,10 @@
  */
 
 #include "entropy.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 
 void Entropy::demo_runCompareEntropy() {
 	String input, inputName, name;

@@ -6,6 +6,15 @@
  */
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/skin/Skin.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
 
 void runBlurImage() {
 	String filename;

@@ -6,6 +6,7 @@
  */
 
 #include "entropy.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 void Entropy::resetThreshVals() {
 	Y_HIGH = 49.0;

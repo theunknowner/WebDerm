@@ -1,4 +1,10 @@
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+
+
+#include "color.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Hsv/hsv.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
 //check if color1 contains color2
 bool Color::containsColor(String color1, String color2)

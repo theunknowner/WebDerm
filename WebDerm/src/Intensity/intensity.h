@@ -8,18 +8,10 @@
 #ifndef INTENSITY_H_
 #define INTENSITY_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions2.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/table.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
-#include "rules.h"
-
 class FileData;
+
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+
 class Intensity {
 private:
 	int global_flag;
