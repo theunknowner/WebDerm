@@ -9,7 +9,6 @@
 #define SHAPEML_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/stdafx.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 class ShapeML {
 private:

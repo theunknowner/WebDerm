@@ -9,7 +9,6 @@
 #define MLEARN_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include <opencv2/ml/ml.hpp>
 
 class MLearn {
 public:

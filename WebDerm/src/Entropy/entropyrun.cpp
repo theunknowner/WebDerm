@@ -6,6 +6,9 @@
  */
 
 #include "entropy.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
@@ -48,6 +51,7 @@ void Entropy::runAllEntropy() {
 	String strSize = toString(size.width)+"x"+toString(size.height);
 	bool flag[2] = {false};
 	this->entSize = entSize;
+	sort(files.begin(),files.end());
 	for(unsigned int i=0; i<files.size(); i++) {
 		Mat img = imread(files.at(i));
 		if(img.data) {
@@ -69,15 +73,23 @@ void Entropy::runAllEntropy() {
 				fd.ksize = size;
 				Mat src = sm.prepareImage(grayImg);
 				Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-				Mat map = sc.getShapeUsingColor2(regImg,mapOfNonNoise,0.65);
-				Mat dst = sm.origFilter(grayImg);
-				grayImg.copyTo(img,map);
-				grayImg.copyTo(img,dst);
-				shadeColor.copyTo(img2,map);
-				shadeColor.copyTo(img2,dst);
-				//imwrite(fd.filename+"-Entropy-outputShades-5x5.png",img2);
+				Mat map = sc.getShapeUsingColor2(regImg,mapOfNonNoise);
+				Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
+				Mat maskLC;
+				src.copyTo(maskLC,mapOfNonNoise);
+				maskLC = sc.filterKneePt(maskLC);
+				src.copyTo(maskLC,maskEmax);
+				Mat img2 = maskLC * 255;
+				img2 = sm.densityConnector(img2,0.9999);
+				//deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
+				Mat img3 = sm.haloTransform(img2);
+				img3.convertTo(img3,CV_8U);
+				Mat img4 = img3 * 255;
+				Mat img5;
+				shadeColor.copyTo(img5,img4);
+				imwrite(fd.filename+"-Entropy-outputShades-5x5.png",img5);
 				this->shapeFn(fd);
-				this->eyeFn(fd,entSize,img,"","");
+				this->eyeFn(fd,entSize,img4,"","");
 			}
 		}
 		img.release();
@@ -472,12 +484,17 @@ void Entropy::test_runCompareEntropy2a(String targetName) {
 	}
 }
 
-void Entropy::test_runAllCompareEntropy2a(String folder) {
+void Entropy::test_runAllCompareEntropy2a(String folder, String file) {
 	String input;
 	deque<deque<double> > vec1;
 	deque<String> colorNameVec;
-	cout << "Enter filename: ";
-	cin >> input;
+	if(file=="") {
+		cout << "Enter filename: ";
+		cin >> input;
+	}
+	else {
+		input = file;
+	}
 	if(this->loadEntropyFiles(input,vec1,colorNameVec)) {
 		deque<String> files;
 		deque<deque<double> > vec2;
@@ -486,7 +503,6 @@ void Entropy::test_runAllCompareEntropy2a(String folder) {
 		deque<String> nameVec;
 		deque<int> origPos;
 		FileData fd;
-		String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 		String filepath, name, inputName;
 		inputName = getFileName(input,"-");
 		double resultsYSV, resultsT;
@@ -510,14 +526,15 @@ void Entropy::test_runAllCompareEntropy2a(String folder) {
 		jaysort(resultVecYSV,origPos);
 		FILE *fp;
 		String filename = inputName+"-ListOfMatchesBB.csv";
-		if(!fd.isFileExist(filename))
+
+		//if(!fd.isFileExist(filename))
 			fp=fopen(filename.c_str(),"w");
-		else {
+		/*else {
 			cout << "File exist! Overwrite? (y/n)" << endl;
 			cin >> input;
 			if(input=="y")
 				fp=fopen(filename.c_str(),"w");
-		}
+		}*/
 		for(unsigned int i=0; i<resultVecYSV.size(); i++) {
 			resultsYSV = resultVecYSV.at(i);
 			resultsYSV = roundDecimal(resultsYSV,2);
@@ -547,8 +564,10 @@ void Entropy::test_runAllCompareEntropy2a(String folder) {
 				matchString="No_Match";
 			}
 			printf("%d) %s: %f | %s => %s\n",i,name.c_str(),resultsYSV, metricT_String.c_str(), matchString.c_str());
-			fprintf(fp,"%s,%f,%s,%s\n",name.c_str(),resultsYSV,metricT_String.c_str(),matchString.c_str());
+			if(fp!=NULL)
+				fprintf(fp,"%s,%f,%s,%s\n",name.c_str(),resultsYSV,metricT_String.c_str(),matchString.c_str());
 		}
-		fclose(fp);
+		if(fp!=NULL)
+			fclose(fp);
 	}
 }

@@ -6,6 +6,9 @@
  */
 
 #include "testfunctions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hysteresis/hysteresis.h"
 
 void drawOutlineOnMouseEvent(int evt, int x, int y, int flags, void* param)
 {

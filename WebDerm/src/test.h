@@ -8,16 +8,8 @@
 #ifndef TEST_H_INCLUDED
 #define TEST_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
-#include "rgb/rgb.h"
-#include "hsl/hsl.h"
-#include "skin/Skin.h"
-#include "test/testfunctions.h"
-#include "Math/maths.h"
-#include "FileData/filedata.h"
-#include "Histogram/histogram.h"
-#include "Shades/shades.h"
-#include "Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+
 
 class Test {
 public:

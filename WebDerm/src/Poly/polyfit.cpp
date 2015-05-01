@@ -1,5 +1,8 @@
 
 #include "poly.h"
+#include "matrix.h"
+#include "givensQR.h"
+
 /*
 		Finds the coefficients of a polynomial p(x) of degree n that fits the data,
 		p(x(i)) to y(i), in a least squares sense. The result p is a row vector of

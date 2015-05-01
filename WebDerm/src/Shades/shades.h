@@ -8,9 +8,7 @@
 #ifndef SHADES_H_INCLUDED
 #define SHADES_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 extern deque<String> g_Shades;
 extern deque< deque<double> > g_ShadeThresh;

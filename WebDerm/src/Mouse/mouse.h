@@ -8,10 +8,10 @@
 #ifndef MOUSE_H_
 #define MOUSE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-
 class FileData;
+
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+
 class Mouse {
 
 public:

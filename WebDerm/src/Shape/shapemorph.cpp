@@ -6,6 +6,13 @@
  */
 
 #include "shapemorph.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 
 void ShapeMorph::setDebugMode(bool mode) {
 	this->debugMode = mode;

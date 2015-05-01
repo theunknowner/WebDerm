@@ -6,6 +6,7 @@
  */
 
 #include "shapeml.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 ShapeML::~ShapeML() {
 	this->releaseMemory();

@@ -6,6 +6,13 @@
  */
 
 #include "myscripts.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Create/createtrainingdata.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
 
 void script1() {
 	CreateTrainingData ctd;

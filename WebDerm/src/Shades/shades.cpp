@@ -6,6 +6,9 @@
  */
 
 #include "shades.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
 deque<String> g_Shades;
 deque< deque<double> > g_ShadeThresh;

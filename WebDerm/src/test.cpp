@@ -6,6 +6,17 @@
  */
 
 #include "test.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "rgb/rgb.h"
+#include "hsl/hsl.h"
+#include "skin/Skin.h"
+#include "test/testfunctions.h"
+#include "Math/maths.h"
+#include "FileData/filedata.h"
+#include "Histogram/histogram.h"
+#include "Shades/shades.h"
+#include "Color/color.h"
 
 vector<vector<String> > Test::test_shadesOfColor(Mat src) {
 	vector<vector<String> > shadeMat(src.rows,vector<String>(src.cols,""));

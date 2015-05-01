@@ -6,6 +6,9 @@
  */
 
 #include "testml.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
 Mat TestML::getData() {
 	return this->data;

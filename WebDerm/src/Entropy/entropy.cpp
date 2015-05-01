@@ -9,6 +9,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/stddev.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
@@ -184,6 +185,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 			for(int c=0; c<innerHeight; c++) {
 				for(int d=0; d<innerWidth; d++) {
 					if(ratio[y][x][c][d]>min) {
+						/* totalPopulation (Y) = sum of density (Si) */
 						totalPopulation.at(c).at(d) += ratio[y][x][c][d];
 					}
 				}
@@ -224,6 +226,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 						ratioPtsList.at(c).at(d).push_back(Point(x1,y1));
 
 						cellCount.at(c).at(d)++;
+						/* density(S) = sum( (Si^2) / Y ) */
 						if(ratio[y1][x1][c][d]>min)
 							populationDensity.at(c).at(d) += (ratio[y1][x1][c][d] * ratio[y1][x1][c][d] / totalPopulation.at(c).at(d));
 						if(targetColor!="" && targetShade!="") {
@@ -428,7 +431,9 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 		}
 	}
 	cout << "Done!" << endl;
-	fclose(fp4);
+	if(fp4!=NULL)
+		fclose(fp4);
+
 }
 
 void Entropy::shapeFn(FileData &fd) {

@@ -7,14 +7,7 @@
 #ifndef FUNCTIONS_H_INCLUDED
 #define FUNCTIONS_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/mean.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/stddev.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 template< class T, size_t N >
 std::size_t length(const T (&)[N] )

@@ -7,6 +7,8 @@
 
 #include "Skin.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
 /* Fills in holes in the image */
 

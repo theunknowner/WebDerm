@@ -82,7 +82,7 @@ public:
 	//testing
 	double test_compareEntropy2a(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 	void test_runCompareEntropy2a(String targetName);
-	void test_runAllCompareEntropy2a(String folder);
+	void test_runAllCompareEntropy2a(String folder, String file="");
 
 };
 

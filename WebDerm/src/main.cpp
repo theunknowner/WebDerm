@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-
+/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -56,7 +56,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "tinea_corporis8a";
+	String name = "vitiligo2";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -79,11 +79,13 @@ int main(int argc,char** argv)
 	deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
 	img3 = sm.haloTransform(islands.at(0));
 	img3.convertTo(img3,CV_8U);
-	img3 *= 255;
-	//imgGray.copyTo(img4,img3);
+	img4 = img3 * 255;
+	imgGray.copyTo(img5,img4);
 	//img5 = sc.applyDiscreteShade(img4);
 
-	//imgshow(img);
+	imgshow(img);
+	imgshow(map);
+	imgshow(maskLC);
 	//imgshow(img2);
 	//imgshow(img3);
 	//imgshow(img4);
@@ -107,7 +109,7 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(img5);
 	ctd.mouseSelectSegment(img5,Size(35,35),name);
 /**/
-/*
+	/*
 	TestML ml;
 	String path1 = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
 	String path2 = "/home/jason/git/Samples/Samples/Training/labels_path.csv";
@@ -148,7 +150,7 @@ int main(int argc,char** argv)
 	//ml.writeData(samplesPath+"data_set.csv",data,labels);
 /**/
 
-/*
+	/*
 	//FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Negative_Pairs/";
@@ -200,7 +202,7 @@ int main(int argc,char** argv)
 		rename(oldname.c_str(),newname.c_str());
 	}
 /**/
-/*
+	/*
 	//TestML ml;
 	//vector<vector<double> > trainingData;
 	//vector<vector<double> > trainingLabels;
@@ -228,13 +230,13 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-	/*
-	String name = "psoriasis18";
-	String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
+
+	String name = "acne14";
+	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	en.setDebugLevel(true);
+	en.setDebugMode(true);
 	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
 	en.test_runCompareEntropy2a(name);
@@ -243,6 +245,7 @@ int main(int argc,char** argv)
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
 	//en.test_runAllCompareEntropy2a(folder);
+
 	/**/
 	/*
 	Entropy en;

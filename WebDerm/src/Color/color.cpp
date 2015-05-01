@@ -3,6 +3,7 @@
 #include "color.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Hsv/hsv.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 

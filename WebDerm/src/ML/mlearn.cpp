@@ -6,6 +6,7 @@
  */
 
 #include "mlearn.h"
+#include <opencv2/ml/ml.hpp>
 
 bool plotSupportVectors=true;
 int numTrainingPoints=200;

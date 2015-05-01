@@ -21,10 +21,7 @@
 #include <stdexcept>
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Matlab/matlab.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "matrix.h"
-#include "givensQR.h"
+
 
 class Poly {
 public:

@@ -9,9 +9,6 @@
 #define TESTML_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/stdafx.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
 class TestML {
 private:

@@ -6,6 +6,7 @@
  */
 
 #include "entropy.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
