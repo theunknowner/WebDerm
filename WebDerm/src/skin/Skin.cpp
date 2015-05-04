@@ -48,7 +48,7 @@ void getSkinUsingCorrelation(Mat &img, Mat &mask)
 			g = img.at<Vec3b>(row,col)[1];
 			r = img.at<Vec3b>(row,col)[2];
 			double vec1[3] = {(double)r,(double)g,(double)b};
-			dist = correlationDist(vec1,vec2);
+			dist = MyMath::correlationDist(vec1,vec2);
 			if(dist<thresh) {
 				mask.at<uchar>(row,col) = 255;
 			}

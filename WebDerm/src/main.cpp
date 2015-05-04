@@ -6,6 +6,7 @@
  */
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "rgb/rgb.h"
 #include "test.h"
 #include "hsl/hsl.h"
@@ -34,6 +35,7 @@
 #include "Colorspace/cielab.h"
 #include "Create/createtrainingdata.h"
 #include "Draw/draw.h"
+#include "Color/color.h"
 
 int main(int argc,char** argv)
 {
@@ -46,7 +48,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-/*
+
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -56,7 +58,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "vitiligo2";
+	String name = "acne_excoriee2";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -72,24 +74,25 @@ int main(int argc,char** argv)
 	Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
 	Mat maskLC;
 	src.copyTo(maskLC,mapOfNonNoise);
-	maskLC = sc.filterKneePt(maskLC);
+	//maskLC = sc.filterKneePt(maskLC);
+	maskLC = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
 	src.copyTo(maskLC,maskEmax);
 	img2 = maskLC * 255;
 	img2 = sm.densityConnector(img2,0.9999);
-	deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
-	img3 = sm.haloTransform(islands.at(0));
+	//deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
+	img3 = sm.haloTransform(img2);
 	img3.convertTo(img3,CV_8U);
-	img4 = img3 * 255;
+	img4 = (img3 - 5) * 255;
 	imgGray.copyTo(img5,img4);
 	//img5 = sc.applyDiscreteShade(img4);
 
 	imgshow(img);
 	imgshow(map);
 	imgshow(maskLC);
-	//imgshow(img2);
-	//imgshow(img3);
-	//imgshow(img4);
-	//imgshow(img5);
+	imgshow(img2);
+	imgshow(img3);
+	imgshow(img4);
+	imgshow(img5);
 	//imwrite(name+".png",img5);
 
 /*
@@ -230,8 +233,8 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-
-	String name = "acne14";
+/*
+	String name = "acne_excoriee2";
 	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;

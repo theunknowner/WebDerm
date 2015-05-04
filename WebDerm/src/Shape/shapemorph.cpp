@@ -920,7 +920,7 @@ Mat ShapeMorph::connectImage(Mat src, Size size, double dist) {
 			}
 			for(unsigned int i=0; i<ptVec.size(); i++) {
 				for(unsigned int j=i; j<ptVec.size(); j++) {
-					if(eucDist(ptVec.at(i),ptVec.at(j))<dist) {
+					if(MyMath::eucDist(ptVec.at(i),ptVec.at(j))<dist) {
 						line(results,ptVec.at(i),ptVec.at(j),Scalar(255));
 					}
 				}
@@ -941,7 +941,7 @@ Mat ShapeMorph::detectHeat(Mat src, Size size) {
 	Point origin(floor(size.width/2),floor(size.height/2));
 	for(int i=0; i<kernel.rows; i++) {
 		for(int j=0; j<kernel.cols; j++) {
-			double dist = eucDist(Point(i,j),origin);
+			double dist = MyMath::eucDist(Point(i,j),origin);
 			double weight = 1.0 - (dist*sensitivity);
 			kernel.at<float>(i,j) = weight;
 		}
@@ -1516,7 +1516,7 @@ Mat ShapeMorph::haloTransform(Mat src) {
 					for(int j=(col-cutoffDist); j<=(col+cutoffDist); j++) {
 						if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
 							int index = j + i*src.cols;
-							dist = floor(eucDist(Point(j,i),Point(col,row)));
+							dist = floor(MyMath::eucDist(Point(j,i),Point(col,row)));
 							if(dist<=cutoffDist) {
 								interPts.at(index).push_back(Point(col,row));
 								distVec.at(index).push_back(dist);

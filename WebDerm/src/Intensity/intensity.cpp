@@ -512,7 +512,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 					else index--;
 					if(index<0) index=0;
 					shade = fd.shadeVec.at(i).at(j);
-					indexChange = myRound((ccCurr-localCC)/(newInterval));
+					indexChange = MyMath::myRound((ccCurr-localCC)/(newInterval));
 					shadeIndex = localIndex + (int)indexChange;
 					ccPrev=ccCurr;
 					prevRatio = currRatio;

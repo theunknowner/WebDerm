@@ -99,9 +99,9 @@ double rule1(FileData &fd, String &newShade) {
 		}
 		double range = fd.maxIntensity - fd.minIntensity;
 		double newInterval = range/fd.totalShades;
-		double deg0IndexChange = myRound(ccCurr-deg0CC)/newInterval;
-		double deg45IndexChange = myRound(ccCurr-deg45CC)/newInterval;
-		double deg90IndexChange = myRound(ccCurr-deg90CC)/newInterval;
+		double deg0IndexChange = MyMath::myRound(ccCurr-deg0CC)/newInterval;
+		double deg45IndexChange = MyMath::myRound(ccCurr-deg45CC)/newInterval;
+		double deg90IndexChange = MyMath::myRound(ccCurr-deg90CC)/newInterval;
 		double indexChange = max(deg0IndexChange,max(deg45IndexChange,deg90IndexChange));
 		if(abs(indexChange)>=indexChangeThresh) {
 			int index = sh.getShadeIndex(newShade);

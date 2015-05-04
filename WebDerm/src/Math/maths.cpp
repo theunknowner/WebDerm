@@ -10,6 +10,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/mean.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"
 
+namespace MyMath {
 double correlationDist(double * vec1, double * vec2)
 {
 	int size=3;
@@ -255,5 +256,7 @@ double eucDist(Point pt1, Point pt2) {
 //returns the least distance between the two degrees
 double findDegreeDistance(double deg1, double deg2) {
 	double diff = fabs(deg1-deg2);
-	return min(360.0 - diff, diff);
+	return std::min(360.0 - diff, diff);
+}
+
 }

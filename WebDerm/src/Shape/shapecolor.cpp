@@ -12,6 +12,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
 void ShapeColor::setDebugLevel(int level) {
@@ -264,7 +265,7 @@ Mat ShapeColor::getShapeUsingColor2(Mat src, Mat noise, double shift) {
 		maxRow = this->test_row+1;
 		maxCol = this->test_col+1;
 	}
-	for(int row= _row; row<maxRow; row++) {
+	for(int row=_row; row<maxRow; row++) {
 		Point enterExitPt(-1,-1); //reset after every column
 		for(int col=_col; col<maxCol; col++) {
 			LAB[0] = Lvec.at<float>(row,col);
@@ -737,9 +738,12 @@ Mat ShapeColor::filterKneePt(Mat src, double thresh, double shift) {
 	}
 	int bestIdx = kc.kneeCurvePoint(yVec1);
 	float percent = (float)bestIdx/yVec1.size();
+
 	if(percent<0.05 || percent>0.90)
 		bestIdx = 0.75 * yVec1.size();
 	double threshFilter = yVec1.at(bestIdx);
+
+	printf("New BestIdx: %d\n",bestIdx);
 	Mat dst =src.clone();
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
@@ -772,4 +776,163 @@ Mat ShapeColor::applyDiscreteShade(Mat input) {
 		}
 	}
 	return dst;
+}
+
+Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
+	int MAX_RANGE=0; // THEE THRESHOLD
+	vector<int> maxRangeVec;
+	int scanSize=20;
+	int lum1, lum0;
+	double minMaxDist[2];
+	Point minMaxPt[2];
+	/* gets the max local ranges of the luminances */
+	for(int row=0; row<input.rows; row++) {
+		for(int col=0; col<input.cols; col++) {
+			vector<int> distVec;
+			for(int j=col; j<col+scanSize; j++) {
+				if(noiseMap.at<uchar>(row,j)>0) {
+					if(j<0 || j>=input.cols) break;
+					if(j>=0 && j<input.cols) {
+						lum1 = input.at<uchar>(row,j);
+						if(j==0)
+							lum0 = input.at<uchar>(row,j);
+						else
+							lum0 = input.at<uchar>(row,j-1);
+
+						int dist = abs(lum1 - lum0);
+						distVec.push_back(dist);
+					}
+				}
+			}
+			minMaxLoc(distVec,&minMaxDist[0],&minMaxDist[1],&minMaxPt[0],&minMaxPt[1]);
+			int _maxRange = minMaxDist[1] - minMaxDist[0];
+			maxRangeVec.push_back(_maxRange);
+		}
+	}
+	sort(maxRangeVec.begin(),maxRangeVec.end());
+	//maxRangeVec.erase(remove(maxRangeVec.begin(),maxRangeVec.end(),0),maxRangeVec.end());
+	KneeCurve kc;
+	int kneePt = kc.kneeCurvePoint(maxRangeVec);
+	kneePt *= shift;
+	MAX_RANGE = maxRangeVec.at(kneePt);
+	/* end getting local max ranges */
+
+	Functions fn;
+	//vector<float> LAB_0(3,0);
+	int lumEntry;
+	int distFromEntry=0;
+	Point lumEntryPt;
+	Mat map(input.size(),CV_8U,Scalar(0));
+	int localScanSize = 20;
+	const double enterThresh = MAX_RANGE;
+	const double exitCumulativeThresh = 0.7*enterThresh;
+	int enterFlag=0, upDownTheMtn=0;
+	for(int row=0; row<input.rows; row++) {
+		Point enterExitPt(-1,-1); //reset after every column
+		for(int col=0; col<input.cols; col++) {
+			lum1 = input.at<uchar>(row,col);
+			double maxDiff0=0, direction=0;
+			Point maxPt0=Point(col,row);
+			int j=col-1;
+			int x = j;
+			int y = row-1;
+			int endY = row-localScanSize;
+			for(int i=y; i>=endY; i--) {
+				if(x<0 && j<0 && i<0) break;
+				if(x>=0 && x!= enterExitPt.x && noiseMap.at<uchar>(row,x)!=0) {
+					lum0 = input.at<uchar>(row,x);
+					int dist = abs(lum1 - lum0);
+					if(dist>=maxDiff0) {
+						maxDiff0 = dist;
+						maxPt0 = Point(x,row);
+						direction = lum1 - lum0;
+					}
+				}
+				if(x!= enterExitPt.x)
+					--x;
+			}// end for(int i)
+			if(enterFlag==0) {
+				if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1) {
+					if(direction>0)
+						upDownTheMtn = 1;
+					else if(direction<0)
+						upDownTheMtn = -1;
+
+					enterFlag = 1;
+					lumEntry = input.at<uchar>(maxPt0);
+					lumEntryPt = maxPt0;
+					enterExitPt = Point(col-1,row);
+					map.at<uchar>(row,col) = 255;
+				}
+			}
+			else if(enterFlag==1) {
+				if(upDownTheMtn==-1) {
+					distFromEntry = abs(lum1 - lumEntry);
+					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1 && distFromEntry<=exitCumulativeThresh) {
+						if(direction>0) {
+							enterFlag = 0;
+							upDownTheMtn = 0;
+							map.at<uchar>(row,col) = 150;
+							enterExitPt = Point(col-1,row);
+						}
+					}
+				}
+				else if(upDownTheMtn==1) {
+					distFromEntry = abs(lum1 - lumEntry);
+					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1 && distFromEntry<=exitCumulativeThresh) {
+						if(direction<0) {
+							enterFlag = 0;
+							upDownTheMtn = 0;
+							map.at<uchar>(row,col) = 150;
+							enterExitPt = Point(col-1,row);
+						}
+					}
+				}//end if(upTheMtn)
+				if(enterFlag)
+					map.at<uchar>(row,col) = 255;
+			}//end if(enterFlag==true)
+			if(col==input.cols-1 && enterFlag==1) {
+				lum1 = input.at<uchar>(enterExitPt); //enterExitPt or LabEntryPt
+				lum0 = input.at<uchar>(lumEntryPt);
+				direction = lum1 - lum0;
+				upDownTheMtn = 0;
+				if(direction>0) upDownTheMtn = 1;
+				else if(direction<0) upDownTheMtn = -1;
+				double min=1000;
+				Point minPt(enterExitPt);
+				for(int k=enterExitPt.x+2; k<input.cols; k++) {
+					map.at<uchar>(row,k) = 0;
+					lum0 = input.at<uchar>(row,k);
+					int dist = abs(lum1 - lum0);
+					direction = lum0 - lum1;
+					if(upDownTheMtn==1) {
+						if(direction<0) {
+							if(dist<=min) {
+								min = dist;
+								minPt = Point(k,row);
+							}
+						}
+					}
+					if(upDownTheMtn==-1) {
+						if(direction>0) {
+							if(dist<=min) {
+								min = dist;
+								minPt = Point(k,row);
+							}
+						}
+					}
+				}
+				for(int k=enterExitPt.x+2; k<minPt.x; k++) {
+					map.at<uchar>(row,k) = 255;
+				}
+				enterFlag = 0;
+				upDownTheMtn = 0;
+				map.at<uchar>(minPt) = 100;
+				enterExitPt = Point(minPt.x-1,minPt.y);
+			}
+		} //end for(col)
+		enterFlag=false;
+		upDownTheMtn = 0;
+	}//end for(row)
+	return map;
 }

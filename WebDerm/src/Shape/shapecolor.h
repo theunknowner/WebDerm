@@ -35,6 +35,8 @@ public:
 
 	Mat applyDiscreteShade(Mat input);
 
+	Mat getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift=1.0);
+
 };
 
 #endif /* SHAPECOLOR_H_ */
