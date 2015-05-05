@@ -778,6 +778,7 @@ Mat ShapeColor::applyDiscreteShade(Mat input) {
 	return dst;
 }
 
+//! 255=enter, 150=exit
 Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 	int MAX_RANGE=0; // THEE THRESHOLD
 	vector<int> maxRangeVec;
@@ -794,13 +795,7 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 					if(j<0 || j>=input.cols) break;
 					if(j>=0 && j<input.cols) {
 						lum1 = input.at<uchar>(row,j);
-						if(j==0)
-							lum0 = input.at<uchar>(row,j);
-						else
-							lum0 = input.at<uchar>(row,j-1);
-
-						int dist = abs(lum1 - lum0);
-						distVec.push_back(dist);
+						distVec.push_back(lum1);
 					}
 				}
 			}
@@ -818,16 +813,15 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 	/* end getting local max ranges */
 
 	Functions fn;
-	//vector<float> LAB_0(3,0);
-	int lumEntry;
-	int distFromEntry=0;
-	Point lumEntryPt;
 	Mat map(input.size(),CV_8U,Scalar(0));
 	int localScanSize = 20;
-	const double enterThresh = MAX_RANGE;
+	const double enterThresh = (double)MAX_RANGE;
 	const double exitCumulativeThresh = 0.7*enterThresh;
 	int enterFlag=0, upDownTheMtn=0;
 	for(int row=0; row<input.rows; row++) {
+		int lumEntry=0;
+		Point lumEntryPt(-1,-1);
+		int distFromEntry=0;
 		Point enterExitPt(-1,-1); //reset after every column
 		for(int col=0; col<input.cols; col++) {
 			lum1 = input.at<uchar>(row,col);
@@ -851,8 +845,10 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 				if(x!= enterExitPt.x)
 					--x;
 			}// end for(int i)
+
+			/* ENTERING */
 			if(enterFlag==0) {
-				if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1) {
+				if(fn.countGreaterEqual(2,maxDiff0,enterThresh)>=1 && direction>0) {
 					if(direction>0)
 						upDownTheMtn = 1;
 					else if(direction<0)
@@ -865,6 +861,7 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 					map.at<uchar>(row,col) = 255;
 				}
 			}
+			/* EXITING */
 			else if(enterFlag==1) {
 				if(upDownTheMtn==-1) {
 					distFromEntry = abs(lum1 - lumEntry);
@@ -892,7 +889,7 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 					map.at<uchar>(row,col) = 255;
 			}//end if(enterFlag==true)
 			if(col==input.cols-1 && enterFlag==1) {
-				lum1 = input.at<uchar>(enterExitPt); //enterExitPt or LabEntryPt
+				lum1 = input.at<uchar>(enterExitPt); //enterExitPt or LumEntryPt
 				lum0 = input.at<uchar>(lumEntryPt);
 				direction = lum1 - lum0;
 				upDownTheMtn = 0;
@@ -930,6 +927,23 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 				map.at<uchar>(minPt) = 100;
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
+			if(this->debugLevel>0)
+				if(col==73 && row==46) {
+					String mtn = upDownTheMtn==1 ? "Up" : "N/A";
+					mtn = upDownTheMtn==-1 ? "Down" : mtn;
+					printf("Lum1: %d\n",input.at<uchar>(row,col));
+					printf("LumEntry: %d\n",lumEntry);
+					printf("Lum0: %d\n",input.at<uchar>(maxPt0));
+					printf("EnterThresh: %f, MaxDiff0: %f\n",enterThresh, maxDiff0);
+					printf("DistFromEntryThresh: %f, DistFromEntry: %d\n",exitCumulativeThresh,distFromEntry);
+					printf("MaxPt0(%d,%d)\n",maxPt0.x,maxPt0.y);
+					printf("LumEntryPt(%d,%d)\n",lumEntryPt.x,lumEntryPt.y);
+					printf("EnterExitPt(%d,%d)\n",enterExitPt.x,enterExitPt.y);
+					printf("EnterFlag: %d\n",enterFlag);
+					//printf("Hsl_Ranges: [%f,%f,%f]\n",hRange,sRange,lRange);
+					//printf("UnitThresh: [%f,%f,%f]\n",unitThresh[0],unitThresh[1],unitThresh[2]);
+					printf("Mtn: %s\n",mtn.c_str());
+				}
 		} //end for(col)
 		enterFlag=false;
 		upDownTheMtn = 0;

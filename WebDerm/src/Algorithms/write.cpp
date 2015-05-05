@@ -226,6 +226,7 @@ void writeSeq2File(double * arr, int length, String name) {
 }
 
 //! type = "int","float","uchar"... so far
+//! if writeIndex=true then it
 void writeSeq2File(Mat src, String type, String name, bool writeIndex) {
 	String filename = name + ".csv";
 	FILE * fp;

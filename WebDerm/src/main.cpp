@@ -36,6 +36,7 @@
 #include "Create/createtrainingdata.h"
 #include "Draw/draw.h"
 #include "Color/color.h"
+#include "Algorithms/write.h"
 
 int main(int argc,char** argv)
 {
@@ -58,7 +59,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "acne_excoriee2";
+	String name = "herpes3";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -70,29 +71,29 @@ int main(int argc,char** argv)
 
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
-	Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
+	//Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
+	//Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
 	Mat maskLC;
-	src.copyTo(maskLC,mapOfNonNoise);
+	//src.copyTo(maskLC,mapOfNonNoise);
 	//maskLC = sc.filterKneePt(maskLC);
+	sc.setDebugLevel(1);
 	maskLC = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
-	src.copyTo(maskLC,maskEmax);
-	img2 = maskLC * 255;
-	img2 = sm.densityConnector(img2,0.9999);
+	//src.copyTo(maskLC,maskEmax);
+	//img2 = maskLC * 255;
+	//img2 = sm.densityConnector(img2,0.9999);
 	//deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
-	img3 = sm.haloTransform(img2);
-	img3.convertTo(img3,CV_8U);
-	img4 = (img3 - 5) * 255;
-	imgGray.copyTo(img5,img4);
+	//img3 = sm.haloTransform(img2);
+	//img3.convertTo(img3,CV_8U);
+	//img4 = (img3 - 5) * 255;
+	//imgGray.copyTo(img5,img4);
 	//img5 = sc.applyDiscreteShade(img4);
-
-	imgshow(img);
-	imgshow(map);
+	//imgshow(src);
+	//imgshow(map);
 	imgshow(maskLC);
-	imgshow(img2);
-	imgshow(img3);
-	imgshow(img4);
-	imgshow(img5);
+	//imgshow(img2);
+	//imgshow(img3);
+	//imgshow(img4);
+	//imgshow(img5);
 	//imwrite(name+".png",img5);
 
 /*
