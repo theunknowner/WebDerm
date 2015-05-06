@@ -1,4 +1,5 @@
 photo7b,0.000000,Random/Circle,No_Match
+herpes1,0.000000,Random/Circle,No_Match
 annular_psoriasis1,0.000000,Random/Circle,No_Match
 photo6a,0.000000,Varying Circle,No_Match
 erythrodermic_psoriasis2,0.000000,Circle,No_Match
@@ -35,11 +36,13 @@ herpes12,0.000000,Random/Circle,No_Match
 clp5,0.000000,Random/Circle,No_Match
 tinea_corporis7a,0.000000,Circle,No_Match
 tinea_corporis7b,0.000000,Circle,No_Match
+annular_psoriasis3,0.000000,Circle,No_Match
 melanoma6,0.000000,Random/Circle,No_Match
 photo4a,0.000000,Random/Circle,No_Match
 vesicles9,0.000000,Varying Circle,No_Match
 melanoma2,0.000000,Varying Circle,No_Match
 psoriasis20a,0.000000,Varying Circle,No_Match
+eczema5,0.000000,Random/Circle,No_Match
 lph15,0.000000,Circle,No_Match
 melanoma5,0.000000,Varying Circle,No_Match
 lph1,0.000000,Random/Circle,No_Match
@@ -58,61 +61,58 @@ tinea_corporis13a,0.000000,Circle,No_Match
 vitiligo2,0.000000,Random/Circle,No_Match
 psoriasis19a,0.000000,Circle,No_Match
 psoriasis23,0.000000,Random/Circle,No_Match
-eczema5,0.010000,Random/Circle,No_Match
-eczema6,0.030000,Random/Circle,No_Match
-annular_psoriasis3,0.050000,Circle,No_Match
-psoriasis6,0.050000,Circle,No_Match
-melanoma4,0.070000,Circle,No_Match
+psoriasis6,0.000000,Circle,No_Match
+herpes6,0.010000,Circle,No_Match
+eczema6,0.010000,Random/Circle,No_Match
+melanoma4,0.030000,Circle,No_Match
+psoriasis18,0.050000,Random/Circle,No_Match
+erythrodermic_psoriasis1,0.070000,Random/Circle,No_Match
 eczema3,0.070000,Varying Circle,No_Match
-herpes1,0.080000,Random/Circle,No_Match
-acne12,0.090000,Random/Circle,No_Match
-herpes6,0.090000,Circle,No_Match
-erythrodermic_psoriasis1,0.100000,Random/Circle,No_Match
-herpes13,0.100000,Random/Circle,No_Match
-herpes10,0.100000,Random/Circle,No_Match
-psoriasis18,0.110000,Random/Circle,No_Match
-eczema4,0.120000,Random/Circle,No_Match
-urticaria2,0.150000,Circle,No_Match
-acne_vulgaris2,0.150000,Random/Circle,No_Match
-acne1,0.170000,Random/Circle,No_Match
-tinea_corporis10,0.180000,Varying Circle,No_Match
-acne_vulgaris1,0.180000,Varying Circle,No_Match
-acne_excoriee2,0.190000,Circle,No_Match
-acne_vulgaris5,0.190000,Random/Circle,No_Match
-acne2,0.210000,Random/Circle,No_Match
-vesicles25,0.220000,Varying Circle,No_Match
-vesicles2,0.220000,Random/Circle,No_Match
-urticaria1,0.220000,Circle,No_Match
-acne11,0.230000,Random/Circle,No_Match
-tinea_corporis5,0.230000,Circle,No_Match
-tinea_corporis9,0.240000,Varying Circle,No_Match
-acne_excoriee1,0.270000,Circle,No_Match
-psoriasis21b,0.270000,Random/Circle,No_Match
-acne14,0.280000,Random/Circle,No_Match
-vesicles18,0.290000,Circle,No_Match
-herpes3,0.320000,Random/Circle,No_Match
-acne_fulminans2,0.350000,Random/Circle,No_Match
-herpes_zoster1,0.360000,Random/Circle,No_Match
-urticaria5,0.360000,Circle,No_Match
-psoriasis2,0.360000,Random/Circle,No_Match
-psoriasis22,0.370000,Varying Circle,No_Match
-acne3,0.370000,Random/Circle,No_Match
-tinea_corporis8b,0.380000,Circle,No_Match
-tinea_corporis8a,0.380000,Circle,No_Match
-acne_vulgaris3,0.390000,Random/Circle,No_Match
-urticaria8,0.410000,Random/Circle,No_Match
-acne13,0.410000,Varying Circle,No_Match
-herpes_simplex1,0.430000,Circle,No_Match
-tinea_corporis3,0.440000,Circle,No_Match
-psoriasis21a,0.460000,Random/Circle,No_Match
-urticaria7,0.480000,Random/Circle,No_Match
-herpes11,0.490000,Varying Circle,No_Match
-herpes_zoster2,0.490000,Random/Circle,No_Match
-psoriasis1,0.520000,Varying Circle,No_Match
-acne_vulgaris4,0.520000,Varying Circle,No_Match
+herpes13,0.070000,Random/Circle,No_Match
+herpes10,0.080000,Random/Circle,No_Match
+urticaria2,0.080000,Circle,No_Match
+acne12,0.080000,Random/Circle,No_Match
+eczema4,0.080000,Random/Circle,No_Match
+acne_excoriee2,0.090000,Circle,No_Match
+acne_vulgaris5,0.130000,Random/Circle,No_Match
+acne_vulgaris2,0.140000,Random/Circle,No_Match
+acne1,0.140000,Random/Circle,No_Match
+acne2,0.140000,Random/Circle,No_Match
+acne_vulgaris1,0.160000,Varying Circle,No_Match
+tinea_corporis10,0.170000,Varying Circle,No_Match
+vesicles25,0.180000,Varying Circle,No_Match
+vesicles2,0.190000,Random/Circle,No_Match
+urticaria1,0.200000,Circle,No_Match
+tinea_corporis5,0.220000,Circle,No_Match
+acne11,0.220000,Random/Circle,No_Match
+tinea_corporis9,0.230000,Varying Circle,No_Match
+psoriasis21b,0.250000,Random/Circle,No_Match
+vesicles18,0.250000,Circle,No_Match
+acne_excoriee1,0.260000,Circle,No_Match
+acne14,0.270000,Random/Circle,No_Match
+herpes3,0.290000,Random/Circle,No_Match
+acne_fulminans2,0.290000,Random/Circle,No_Match
+urticaria5,0.300000,Circle,No_Match
+psoriasis2,0.300000,Random/Circle,No_Match
+herpes_zoster1,0.310000,Random/Circle,No_Match
+tinea_corporis8b,0.340000,Circle,No_Match
+urticaria8,0.340000,Random/Circle,No_Match
+acne3,0.350000,Random/Circle,No_Match
+tinea_corporis8a,0.350000,Circle,No_Match
+psoriasis22,0.350000,Varying Circle,No_Match
+acne_vulgaris3,0.380000,Random/Circle,No_Match
+herpes_simplex1,0.400000,Circle,No_Match
+acne13,0.400000,Varying Circle,No_Match
+tinea_corporis3,0.410000,Circle,No_Match
+psoriasis21a,0.450000,Random/Circle,No_Match
+urticaria7,0.450000,Random/Circle,No_Match
+herpes11,0.470000,Varying Circle,No_Match
+psoriasis1,0.490000,Varying Circle,No_Match
+acne_vulgaris4,0.500000,Varying Circle,No_Match
+herpes_zoster2,0.500000,Random/Circle,No_Match
 tinea_corporis6,0.580000,Circle,No_Match
-psoriasis10,0.600000,Random/Circle,No_Match
+psoriasis10,0.610000,Random/Circle,No_Match
 tinea_corporis4,0.650000,Circle,Partial
 psoriasis16,0.670000,Random/Circle,No_Match
-herpes_zoster3,0.750000,Random/Circle,No_Match
+herpes_zoster3,0.730000,Random/Circle,No_Match
 tinea_corporis13b,1.000000,Circle,Match

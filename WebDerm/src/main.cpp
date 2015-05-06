@@ -59,7 +59,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "tinea_corporis5";
+	String name = "herpes_zoster3";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -68,32 +68,32 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-
+/*
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	//Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
+	//Mat map = sc.getShapeUsingColor(img,mapOfNonNoise);
 	//Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
 	Mat maskLC;
 	//src.copyTo(maskLC,mapOfNonNoise);
 	//maskLC = sc.filterKneePt(maskLC);
-	sc.setDebugLevel(1);
-	maskLC = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
-	//src.copyTo(maskLC,maskEmax);
+	//sc.setDebugLevel(1);
+	Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
+	//src.copyTo(maskLC,maskLC2);
 	//img2 = maskLC * 255;
-	//img2 = sm.densityConnector(img2,0.9999);
+	img2 = sm.densityConnector(maskLC2,0.9999);
 	//deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
-	//img3 = sm.haloTransform(img2);
-	//img3.convertTo(img3,CV_8U);
-	//img4 = (img3 - 5) * 255;
-	//imgGray.copyTo(img5,img4);
+	img3 = sm.haloTransform(img2);
+	img3.convertTo(img3,CV_8U);
+	img4 = (img3 - 5) * 255;
+	img.copyTo(img5,img4);
 	//img5 = sc.applyDiscreteShade(img4);
 	//imgshow(src);
 	//imgshow(map);
-	imgshow(maskLC);
-	//imgshow(img2);
-	//imgshow(img3);
-	//imgshow(img4);
-	//imgshow(img5);
+	imgshow(maskLC2);
+	imgshow(img2);
+	imgshow(img3);
+	imgshow(img4);
+	imgshow(img5);
 	//imwrite(name+".png",img5);
 
 /*
@@ -235,19 +235,25 @@ int main(int argc,char** argv)
 	cvReleaseFileStorage(&storage);
 /**/
 /*
-	String name = "acne_excoriee2";
+	//String name = "acne_excoriee2";
 	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
-	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
+	String folder = "/home/jason/Desktop/Programs/TestYSV_Output_Old/";
 	Entropy en;
 	en.importEntropyThresholds();
 	en.setDebugMode(true);
 	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	en.test_runCompareEntropy2a(name);
+	//en.test_runCompareEntropy2a(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
+	String list = "/home/jason/Desktop/workspace/list.csv";
+	fstream fs(list);
+	while(getline(fs,list)) {
+		String file = folder + list + "-5x5-YSV-Combined10x10.csv";
+		en.test_runAllCompareEntropy2a(folder,file);
+	}
 	//en.test_runAllCompareEntropy2a(folder);
 
 	/**/

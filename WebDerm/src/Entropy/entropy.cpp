@@ -510,7 +510,7 @@ void Entropy::shapeFn2(FileData &fd) {
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	Mat map = sc.getShapeUsingColor2(img,mapOfNonNoise);
+	Mat map = sc.getShapeUsingColor(img,mapOfNonNoise);
 	Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
 	Mat maskLC;
 	src.copyTo(maskLC,mapOfNonNoise);

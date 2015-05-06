@@ -94,16 +94,6 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 					lumEntryPt = maxPt0;
 					enterExitPt = Point(col-1,row);
 					map.at<uchar>(row,col) = 255;
-
-					/** DEBUG INFO **/
-					if(col==74 && row==65) {
-						printf("/** DEBUG INFO **/\n");
-						printf("(%d,%d)\n",col,row);
-						printf("LumEntry: %d\n",lumEntry);
-						printf("maxPt0(%d,%d)\n",maxPt0.x,maxPt0.y);
-						printf("enterExitPt(%d,%d)\n",enterExitPt.x,enterExitPt.y);
-						printf("/** END DEBUG INFO **/\n");
-					}
 				}
 			}
 			/* EXITING */

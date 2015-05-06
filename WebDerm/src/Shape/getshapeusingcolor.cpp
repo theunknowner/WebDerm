@@ -13,8 +13,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-
 
 //! Expressive Power of Hue
 double epoh(double &sat, double &lum) {

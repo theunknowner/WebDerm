@@ -110,9 +110,9 @@ vitiligo2,0.000000,Random/Circle,No_Match
 acne_fulminans2,0.000000,Random/Circle,No_Match
 psoriasis19a,0.000000,Circle,No_Match
 psoriasis23,0.000000,Random/Circle,No_Match
-melanoma4,0.080000,Circle,No_Match
-lph4,0.130000,Random/Circle,No_Match
-vesicles9,0.130000,Varying Circle,No_Match
-lph7,0.300000,Random/Circle,No_Match
+melanoma4,0.030000,Circle,No_Match
+lph4,0.060000,Random/Circle,No_Match
+vesicles9,0.120000,Varying Circle,No_Match
+lph7,0.270000,Random/Circle,No_Match
 tinea_corporis12,0.580000,Circle,No_Match
 tinea_corporis11,1.000000,Circle,Match
