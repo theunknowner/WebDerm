@@ -59,7 +59,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "herpes_zoster3";
+	String name = "urticaria8";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -68,6 +68,10 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
+	int row=124;
+	String str = "_row(" + toString(row) + ")";
+	writeSeq2File(imgGray.row(row),"uchar",name+str);
+	imwrite(name+"_gray.png",imgGray);
 /*
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
@@ -235,25 +239,25 @@ int main(int argc,char** argv)
 	cvReleaseFileStorage(&storage);
 /**/
 /*
-	//String name = "acne_excoriee2";
+	name = "psoriasis21a";
 	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
-	String folder = "/home/jason/Desktop/Programs/TestYSV_Output_Old/";
+	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
 	en.setDebugMode(true);
 	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	//en.test_runCompareEntropy2a(name);
+	en.test_runCompareEntropy2a(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
-	String list = "/home/jason/Desktop/workspace/list.csv";
+	/*String list = "/home/jason/Desktop/workspace/list.csv";
 	fstream fs(list);
 	while(getline(fs,list)) {
 		String file = folder + list + "-5x5-YSV-Combined10x10.csv";
 		en.test_runAllCompareEntropy2a(folder,file);
-	}
+	}*/
 	//en.test_runAllCompareEntropy2a(folder);
 
 	/**/
