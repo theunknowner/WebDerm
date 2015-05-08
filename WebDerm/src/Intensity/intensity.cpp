@@ -15,7 +15,6 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/table.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
 
@@ -591,7 +590,10 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 					strVec1.push_back(ruleNum);
 					strVec1.push_back(coord);
 					strVec1.push_back(name);
-					generateTable(fp,strVec1);
+					for(unsigned int i=0; i<strVec1.size(); i++) {
+						fprintf(fp,"%s,",strVec1.at(i).c_str());
+					}
+					fprintf(fp,"\n");
 					strVec1.clear();
 					rulesRow.push_back(ruleNum);
 				}

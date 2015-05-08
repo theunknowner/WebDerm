@@ -57,10 +57,14 @@ public:
 	void shapeFn(FileData &fd);
 	void shapeFn2(FileData &fd);
 
-	//entcompare.cpp
+	/* import_thresold.cpp */
 	bool importEntropyThresholds();
 	void releaseMemory();
+
+	/* load_entropy_files.cpp */
 	bool loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, deque<String> &colorNameVec);
+
+	//entcompare.cpp
 	double compareYSV(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 	double compareT(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);
 	double compareEntropy2(deque<deque<double> > vec1, deque<deque<double> > vec2, deque<String> &colorNameVec);

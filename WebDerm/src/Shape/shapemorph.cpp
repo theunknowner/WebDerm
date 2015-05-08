@@ -26,7 +26,6 @@ bool ShapeMorph::isDebugModeOn() {
 Mat ShapeMorph::prepareImage(Mat src) {
 	if(src.type()!=CV_8U)
 		cvtColor(src,src,CV_BGR2GRAY);
-	Functions fn;
 	Mat srcRight, srcTop, srcBottom;
 	flip(src,srcRight,1);
 	transpose(src,srcTop);
@@ -61,14 +60,24 @@ Mat ShapeMorph::prepareImage(Mat src) {
 			for(int i=begin.y; i<(begin.y+size.height); i++) {
 				for(int j=begin.x; j<(begin.x+size.width); j++) {
 					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
-						totalDK += src.at<uchar>(i,j);
-						totalDkRight += srcRight.at<uchar>(i,j);
-						totalDkTop += srcTop.at<uchar>(i,j);
-						totalDkBottom += srcBottom.at<uchar>(i,j);
-						countDK++;
-						countDkRight++;
-						countDkTop++;
-						countDkBottom++;
+						try {
+							totalDK += src.at<uchar>(i,j);
+							totalDkRight += srcRight.at<uchar>(i,j);
+							totalDkTop += srcTop.at<uchar>(i,j);
+							totalDkBottom += srcBottom.at<uchar>(i,j);
+							countDK++;
+							countDkRight++;
+							countDkTop++;
+							countDkBottom++;
+						} catch (const std::out_of_range &oor) {
+							printf("ShapeMorph::prepareImage() out of range!\n");
+							printf("src.size(): %dx%d\n",src.rows,src.cols);
+							printf("srcRight.size(): %dx%d\n",srcRight.rows,srcRight.cols);
+							printf("srcTop.size(): %dx%d\n",srcTop.rows,srcTop.cols);
+							printf("srcBottom.size(): %dx%d\n",srcBottom.rows,srcBottom.cols);
+							printf("Point(%d,%d)\n",j,i);
+							exit(1);
+						}
 					}
 				}
 			}
@@ -101,10 +110,6 @@ Mat ShapeMorph::prepareImage(Mat src) {
 				cumulativeDkRight += dkRatioRight - 1.0;
 				cumulativeDkTop += dkRatioTop - 1.0;
 				cumulativeDkBottom += dkRatioBottom - 1.0;
-				//if(row==0) {
-				//	//printf("DK: %d,%d: %.f, %d, %f\n",col,row,totalDK,countDK,avgDK);
-				//	printf("DK: %d,%d: %f,%f,%f,%f\n",col,row,drkMat.at<float>(row,col-1),drkMat.at<float>(row,col),dkRatio,cumulativeDK);
-				//}
 				if(leftFlag==0 && (cumulativeDK>=dkThresh || dkRatio>=darkToLiteThresh)) {
 					darkToLightFlag++;
 					leftFlag=1;
@@ -1294,6 +1299,11 @@ Mat ShapeMorph::customFn2(Mat src) {
 
 Mat ShapeMorph::densityConnector(Mat src, double q) {
 	//Mat map = src.clone();
+	if(src.empty()) {
+		printf("ShapeMorph::densityConnector() src is empty\n");
+		printf("src.size: %dx%d\n",src.rows,src.cols);
+		exit(1);
+	}
 	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
 	Size size(5,5);
 	const double C=1.0;

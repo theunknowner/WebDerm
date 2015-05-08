@@ -57,41 +57,33 @@ void Entropy::runAllEntropy() {
 		if(img.data) {
 			FileData fd;
 			fd.filename = getFileName(files.at(i),"-");
-			if(fd.filename!="photo7b") {
-				cout << fd.filename << endl;
-				String file = "/home/jason/Desktop/Programs/Looks_Like/"+fd.filename+".jpg";
-				Mat regImg = imread(file);
-				Mat normImg = runColorNormalization(regImg);
-				regImg = runResizeImage(normImg,imgSize);
-				Mat grayImg, blurImg, img, img2;
-				blur(regImg,blurImg,size);
-				cvtColor(regImg,grayImg,CV_BGR2GRAY);
-				fd.setImage(grayImg);
-				flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-ShadeColors-"+strSize+".csv",fd.colorVec);
-				flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-HSL-"+strSize+".csv",fd.hslMat);
-				Mat shadeColor = imread(full_path.string()+"/"+fd.filename+"-outputShades-5x5.png");
-				if(flag[0]==true && flag[1]==true) {
-					fd.ksize = size;
-					Mat src = sm.prepareImage(grayImg);
-					Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-					Mat map = sc.getShapeUsingColor(regImg,mapOfNonNoise);
-					Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
-					Mat maskLC;
-					src.copyTo(maskLC,mapOfNonNoise);
-					maskLC = sc.filterKneePt(maskLC);
-					src.copyTo(maskLC,maskEmax);
-					Mat img2 = maskLC * 255;
-					img2 = sm.densityConnector(img2,0.9999);
-					//deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
-					Mat img3 = sm.haloTransform(img2);
-					img3.convertTo(img3,CV_8U);
-					Mat img4 = (img3 - 5) * 255;
-					Mat img5;
-					shadeColor.copyTo(img5,img4);
-					imwrite(fd.filename+"-Entropy-outputShades-5x5.png",img5);
-					this->shapeFn(fd);
-					this->eyeFn(fd,entSize,img4,"","");
-				}
+			cout << fd.filename << endl;
+			String file = "/home/jason/Desktop/Programs/Looks_Like/"+fd.filename+".jpg";
+			Mat regImg = imread(file);
+			Mat normImg = runColorNormalization(regImg);
+			regImg = runResizeImage(normImg,imgSize);
+			Mat grayImg, blurImg, img, img2;
+			blur(regImg,blurImg,size);
+			cvtColor(regImg,grayImg,CV_BGR2GRAY);
+			fd.setImage(grayImg);
+			flag[0]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-ShadeColors-"+strSize+".csv",fd.colorVec);
+			flag[1]=fd.loadFileMatrix(full_path.string()+"/"+fd.filename+"-HSL-"+strSize+".csv",fd.hslMat);
+			Mat shadeColor = imread(full_path.string()+"/"+fd.filename+"-outputShades-5x5.png");
+
+			if(flag[0]==true && flag[1]==true) {
+				fd.ksize = size;
+				Mat src = sm.prepareImage(grayImg);
+				Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+				Mat maskLC = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
+				Mat img2 = sm.densityConnector(maskLC,0.9999);
+				Mat img3 = sm.haloTransform(img2);
+				img3.convertTo(img3,CV_8U);
+				Mat img4 = (img3 - 5) * 255;
+				Mat img5;
+				shadeColor.copyTo(img5,img4);
+				imwrite(fd.filename+"-Entropy-outputShades-5x5.png",img5);
+				this->shapeFn(fd);
+				this->eyeFn(fd,entSize,img4,"","");
 			}
 		}
 	}
@@ -469,14 +461,15 @@ void Entropy::test_runCompareEntropy2a(String targetName) {
 		for(unsigned int i=0; i<files.size(); i++) {
 			filepath = folder+files.at(i);
 			name = getFileName(files.at(i),"-");
-			if(name==targetName || targetName=="") {
-				this->loadEntropyFiles(filepath,vec2,colorNameVec);
-				results = this->test_compareEntropy2a(vec1,vec2,colorNameVec);
-				resultVec.push_back(results);
-				nameVec.push_back(name);
-				vec2.clear();
-				vec2.shrink_to_fit();
-			}
+			if(files.at(i).find("20x20")!=string::npos)
+				if(name==targetName || targetName=="") {
+					this->loadEntropyFiles(filepath,vec2,colorNameVec);
+					results = this->test_compareEntropy2a(vec1,vec2,colorNameVec);
+					resultVec.push_back(results);
+					nameVec.push_back(name);
+					vec2.clear();
+					vec2.shrink_to_fit();
+				}
 		}
 		jaysort(resultVec,origPos);
 		for(unsigned int i=0; i<resultVec.size(); i++) {

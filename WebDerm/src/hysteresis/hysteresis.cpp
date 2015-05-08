@@ -53,7 +53,7 @@ void hysteresis(Mat img, Size size, String name, FileData &fd) {
 	}
 	Intensity in;
 	in.calcMainColorMatrix(fd.getImage(), fd.windowVec, fd.hslMat, fd.filename, fd);
-	rule5(fd);
+	//rule5(fd);
 	cout << "Done!" << endl;
 	colorWindow.clear();
 	colorWindow.shrink_to_fit();

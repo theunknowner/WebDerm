@@ -59,7 +59,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "urticaria8";
+	String name = "tinea_corporis4";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -68,16 +68,21 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-	int row=124;
-	String str = "_row(" + toString(row) + ")";
+	int row=79;
+	String str = "_row[" + toString(row) + "]";
 	writeSeq2File(imgGray.row(row),"uchar",name+str);
-	imwrite(name+"_gray.png",imgGray);
+	String folder = "/home/jason/git/WebDerm/WebDerm/";
+	String py_file = "python /home/jason/Desktop/workspace/Pyth/poly_arg.py ";
+	String py_arg = folder+name+str+".csv ";
+	String out_arg = folder+name+str+"_polyfit.csv";
+	py_file += py_arg + out_arg;
+	system(py_file.c_str());
 /*
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	//Mat map = sc.getShapeUsingColor(img,mapOfNonNoise);
 	//Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
-	Mat maskLC;
+	//Mat maskLC;
 	//src.copyTo(maskLC,mapOfNonNoise);
 	//maskLC = sc.filterKneePt(maskLC);
 	//sc.setDebugLevel(1);
@@ -239,25 +244,25 @@ int main(int argc,char** argv)
 	cvReleaseFileStorage(&storage);
 /**/
 /*
-	name = "psoriasis21a";
+	String name = "vesicles25";
 	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
-	en.setDebugMode(true);
+	//en.setDebugMode(true);
 	//en.runCompareEntropy(name);
 	//en.runCompareEntropy2(name);
-	en.test_runCompareEntropy2a(name);
+	//en.test_runCompareEntropy2a(name);
 	//en.runCompareEntropyList(file,folder);
 	//en.runCompareEntropyList2(file,folder);
 	//en.runCompareAllEntropy(folder);
 	//en.runCompareAllEntropy2(folder);
-	/*String list = "/home/jason/Desktop/workspace/list.csv";
+	String list = "/home/jason/Desktop/workspace/list.csv";
 	fstream fs(list);
 	while(getline(fs,list)) {
 		String file = folder + list + "-5x5-YSV-Combined10x10.csv";
 		en.test_runAllCompareEntropy2a(folder,file);
-	}*/
+	}
 	//en.test_runAllCompareEntropy2a(folder);
 
 	/**/

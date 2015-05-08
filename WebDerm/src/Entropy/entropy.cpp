@@ -171,6 +171,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 		printf("colorVec(%d,%d)\n",col,row);
 		exit(1);
 	}
+
 	deque< deque<int> > cellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	deque< deque<int> > targetCellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
 	deque<deque<deque<Point> > > ratioPtsList(allColors.size(), deque<deque<Point> >(g_Shades2.size(),deque<Point>(1,Point(-1,-1))));
