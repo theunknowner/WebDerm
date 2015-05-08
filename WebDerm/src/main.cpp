@@ -49,7 +49,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-
+/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -59,7 +59,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "tinea_corporis4";
+	String name = "lph4";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -68,7 +68,7 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-	int row=79;
+	int row=37;
 	String str = "_row[" + toString(row) + "]";
 	writeSeq2File(imgGray.row(row),"uchar",name+str);
 	String folder = "/home/jason/git/WebDerm/WebDerm/";
@@ -243,10 +243,10 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-/*
+
 	String name = "vesicles25";
 	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
-	String folder = "/home/jason/Desktop/Programs/TestYSV_Output/";
+	String folder = "/home/jason/Desktop/Programs/Demo/YSV_Output/";
 	Entropy en;
 	en.importEntropyThresholds();
 	//en.setDebugMode(true);
