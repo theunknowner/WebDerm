@@ -49,7 +49,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-/*
+
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -59,7 +59,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "lph4";
+	String name = "vesicles9";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -67,17 +67,61 @@ int main(int argc,char** argv)
 	ShapeColor sc;
 	Size size(5,5);
 	//blur(img,img,size);
-	cvtColor(img,imgGray,CV_BGR2GRAY);
-	int row=37;
-	String str = "_row[" + toString(row) + "]";
-	writeSeq2File(imgGray.row(row),"uchar",name+str);
-	String folder = "/home/jason/git/WebDerm/WebDerm/";
-	String py_file = "python /home/jason/Desktop/workspace/Pyth/poly_arg.py ";
-	String py_arg = folder+name+str+".csv ";
-	String out_arg = folder+name+str+"_polyfit.csv";
-	py_file += py_arg + out_arg;
-	system(py_file.c_str());
+	Mat hsvMat = Skin::getSkinUsingHist(img);
+	cout << hsvMat.depth() << endl;
 /*
+	FileData fd;
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		name = getFileName(name);
+		img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+		img = runColorNormalization(img);
+		img = runResizeImage(img,Size(140,140));
+		cvtColor(img,imgGray,CV_BGR2GRAY);
+		Mat src = sm.prepareImage(imgGray);
+		Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+		Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
+		Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
+		maskE.copyTo(maskLC2,maskE);
+		img2 = sm.densityConnector(maskLC2,0.9999);
+		img3 = sm.haloTransform(img2);
+		img3.convertTo(img3,CV_8U);
+		img4 = (img3 - 5) * 255;
+		imgGray.copyTo(img5,img4);
+		img5 = sc.applyDiscreteShade(img5);
+		cv::namedWindow(name+"_Orig",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+		cv::namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+		imshow(name+"_Orig",imgGray);
+		imshow(name,img5);
+		waitKey(0);
+		cv::destroyAllWindows();
+		img5.release();
+	}
+	*/
+/*
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+	Mat src = sm.prepareImage(imgGray);
+	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+	Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
+	Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
+	maskE.copyTo(maskLC2,maskE);
+	//imgshow(maskLC2);
+	img2 = sm.densityConnector(maskLC2,0.9999);
+	img3 = sm.haloTransform(img2);
+	img3.convertTo(img3,CV_8U);
+	img4 = (img3 - 5) * 255;
+	imgGray.copyTo(img5,img4);
+	img5 = sc.applyDiscreteShade(img5);
+	cv::namedWindow(name+"_Orig",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	cv::namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	imshow(name+"_Orig",imgGray);
+	imshow(name,img5);
+	waitKey(0);
+	cv::destroyAllWindows();
+	/*
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	//Mat map = sc.getShapeUsingColor(img,mapOfNonNoise);
@@ -95,17 +139,13 @@ int main(int argc,char** argv)
 	img3.convertTo(img3,CV_8U);
 	img4 = (img3 - 5) * 255;
 	img.copyTo(img5,img4);
-	//img5 = sc.applyDiscreteShade(img4);
+	 */
+	//img5 = sc.applyDiscreteShade(imgGray);
 	//imgshow(src);
-	//imgshow(map);
-	imgshow(maskLC2);
-	imgshow(img2);
-	imgshow(img3);
-	imgshow(img4);
-	imgshow(img5);
-	//imwrite(name+".png",img5);
+	//imgshow(imgGray);
+	//imgshow(img5);
 
-/*
+	/*
 	CreateTrainingData ctd;
 	//Mat src1 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis4-Point(35,0).png",0);
 	//Mat src2 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis11-Point(35,0).png",0);
@@ -243,7 +283,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-
+	/*
 	String name = "vesicles25";
 	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";
 	String folder = "/home/jason/Desktop/Programs/Demo/YSV_Output/";

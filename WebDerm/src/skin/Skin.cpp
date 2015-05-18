@@ -10,8 +10,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
+namespace Skin {
 /* Fills in holes in the image */
-
 void getSkinUsingThresh(Mat &img, Mat &mask)
 {
 	mask = mask.zeros(img.rows,img.cols,CV_8U);
@@ -68,3 +68,11 @@ void getSkin(Mat &img, Mat &mask)
 	}
 
 }
+
+Mat getSkinUsingHist(Mat &img) {
+	Mat hsvMat;
+	cvtColor(img,hsvMat,CV_BGR2HSV);
+	return hsvMat;
+}
+
+} // end namespace

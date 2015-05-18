@@ -273,7 +273,7 @@ void runGetSkin()
 	cin >> input;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
-	getSkin(img, mask);
+	Skin::getSkin(img, mask);
 	img.copyTo(img2, mask);
 	if(input=="y")
 	{
@@ -298,7 +298,7 @@ void runAllGetSkin() {
 		for(unsigned int i=0; i<files.size(); i++) {
 			full_path = folder+files.at(i);
 			img = runResizeImage(full_path,Size(700,700),0);
-			getSkin(img, mask);
+			Skin::getSkin(img, mask);
 			img.copyTo(img2, mask);
 			if(input=="y")
 			{
@@ -329,7 +329,7 @@ void runMouseColor() {
 	img = runResizeImage(filename,Size(700,700),0);
 	cout << "Get skin? (y/n) ";
 	cin >> input;
-	if(input=="y") getSkin(img, mask);
+	if(input=="y") Skin::getSkin(img, mask);
 	img.copyTo(img2, mask);
 	Mouse m;
 	m.mouseColor(img2, name);

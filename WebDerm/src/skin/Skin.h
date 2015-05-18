@@ -10,8 +10,11 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
-void getSkin(Mat &img, Mat &mask);
-void getSkinUsingThresh(Mat &img, Mat &mask);
-void getSkinUsingCorrelation(Mat &img, Mat &mask);
+namespace Skin {
+	void getSkin(Mat &img, Mat &mask);
+	void getSkinUsingThresh(Mat &img, Mat &mask);
+	void getSkinUsingCorrelation(Mat &img, Mat &mask);
+	Mat getSkinUsingHist(Mat &img);
+};
 
 #endif /* SKIN_H_ */
