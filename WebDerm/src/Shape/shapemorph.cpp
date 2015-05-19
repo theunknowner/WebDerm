@@ -11,7 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 
 void ShapeMorph::setDebugMode(bool mode) {
@@ -798,7 +798,7 @@ deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort)
 		jaysort(countVec,idxVec);
 		for(int i=idxVec.size()-1; i>=0; --i) {
 			try {
-			tempVec.push_back(featureVec.at(idxVec.at(i)));
+				tempVec.push_back(featureVec.at(idxVec.at(i)));
 			} catch(const std::out_of_range &oor) {
 				printf("idxVec.size(): %lu\n",idxVec.size());
 				printf("featureVec.size(): %lu\n",featureVec.size());
@@ -1344,22 +1344,22 @@ Mat ShapeMorph::densityConnector(Mat src, double q) {
 		row++;
 	}
 
-	//writeSeq2File(fnVec,"fnVec");
 	//calculate knee of curve for fx for filtering
 	KneeCurve kc;
-	int bestIdx = kc.kneeCurvePoint(fnVec);
-	//cout << "BestIdx: " << bestIdx << endl;
-	//fx threshold filtering
-	double fxThresh = fnVec.at(bestIdx);
-	//double percent = 1.0 - ((double)bestIdx/fnVec.size());
-	//if(percent<0.15) {
-	//bestIdx = round(fnVec.size()*(1.0-percent*3.5));
-	//	bestIdx = round(bestIdx*0.75);
-	//}
-	//fxThresh = fnVec.at(bestIdx);
-	//cout << "New BestIdx: " << bestIdx << endl;
-	//cout << "FxThresh: " << fxThresh << endl;
-
+	int bestIdx;
+	double fxThresh;
+	if(fnVec.size()>0) {
+		try {
+			bestIdx = kc.kneeCurvePoint(fnVec);
+			//fx threshold filtering
+			fxThresh = fnVec.at(bestIdx);
+		} catch(const std::out_of_range &oor) {
+			printf("ShapeMorph::densityConnector() out of range!\n");
+			printf("fnVec.size: %lu\n",fnVec.size());
+			printf("BestIdx: %d\n",bestIdx);
+			exit(1);
+		}
+	}
 	//connect nearest neighbors
 	double b = fxThresh;
 	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);

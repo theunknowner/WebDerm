@@ -644,7 +644,7 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 void Intensity::writeMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
 		deque< deque<String> > &hslMat,String name, FileData &fd) {
 	fd.colorVec = calcMainColorMatrix(img, windowVec, hslMat, name, fd);
-	writeSeq2File(fd.colorVec,name+"_ShadeColors");
+	Write::writeSeq2File(fd.colorVec,name+"_ShadeColors");
 }
 
 void Intensity::writeMainColorMatrix(FileData &fd) {

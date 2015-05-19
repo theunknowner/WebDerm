@@ -7,12 +7,11 @@
 
 #include "shapecolor.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/CIE/cie.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
 
 //! Expressive Power of Hue
 double epoh(double &sat, double &lum) {
@@ -105,7 +104,12 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 	//maxRangeVec.erase(remove(maxRangeVec.begin(),maxRangeVec.end(),0),maxRangeVec.end());
 	KneeCurve kc;
 	int kneePt = kc.kneeCurvePoint(maxRangeVec);
-	kneePt *= shift;
+	float percent = (float)kneePt/maxRangeVec.size();
+	if(percent<0.05)
+		kneePt = 0.25 * maxRangeVec.size();
+	if(percent<0.05 || percent>0.90)
+		kneePt = 0.75 * maxRangeVec.size();
+	//kneePt *= shift;
 	maxRange = maxRangeVec.at(kneePt);
 	//writeSeq2File(freq,"freq");
 	//writeSeq2File(distMat,"float","distMat");
@@ -278,7 +282,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
 			if(this->debugLevel>0)
-				if(col==84 && row==104) {
+				if(col==62 && row==32) {
 					String mtn = upDownTheMtn==1 ? "Up" : "N/A";
 					mtn = upDownTheMtn==-1 ? "Down" : mtn;
 					printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);

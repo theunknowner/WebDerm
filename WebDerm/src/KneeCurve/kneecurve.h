@@ -13,6 +13,7 @@
 class KneeCurve {
 	double maxDist;
 	int bestIdx;
+
 public:
 	int kneeCurvePoint(deque<double> &vec);
 	int kneeCurvePoint(vector<double> &vec);
@@ -25,6 +26,9 @@ public:
 	void loadVectorFile(String path, deque<double> &vec);
 
 	Mat filterKneePt(Mat src, double thresh=0.0, double shift=1.0);
+
+	/* save_graph.cpp */
+	void save_graph(String out, vector<double> &vec);
 };
 
 #endif /* KNEECURVE_H_ */

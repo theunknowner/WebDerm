@@ -10,6 +10,7 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
+namespace Write {
 void writeSeq2File(deque< deque<String> > &vec, String name);
 void writeSeq2File(deque< deque<int> > &vec, String name);
 void writeSeq2File(deque< deque<double> > &vec, String name);
@@ -24,5 +25,6 @@ void writeSeq2File(deque<Point> &ptVec, String name);
 void writeSeq2File(deque<Point2f> &ptVec, String name);
 void writeSeq2File(Mat src, String type, String name, bool writeIndex=false);
 bool doesFileExist(String filename);
+}
 
 #endif /* WRITE_H_ */

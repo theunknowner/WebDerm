@@ -7,6 +7,7 @@
 
 #include "write.h"
 
+namespace Write {
 void writeSeq2File(deque< deque<String> > &vec, String name)
 {
 	String filename = name + ".csv";
@@ -270,3 +271,5 @@ bool doesFileExist(String filename) {
 	}
 	return false;
 }
+
+}// end namespace

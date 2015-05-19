@@ -7,7 +7,7 @@
 
 #include "shapecolor.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
 
 //! gets the local max ranges and return the knee as threshold
 double local_max_range(Mat &input, Mat &noiseMap, float &shift) {

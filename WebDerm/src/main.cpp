@@ -25,7 +25,7 @@
 #include "neuralnetworks/testml.h"
 #include "Shape/shapemorph.h"
 #include "Algorithms/cluster.h"
-#include "Algorithms/kneecurve.h"
+#include "KneeCurve/kneecurve.h"
 #include "GridDisplay/griddisplay.h"
 #include "Poly/poly.h"
 #include "Matlab/matlab.h"
@@ -59,17 +59,16 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "vesicles9";
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
-	img = runColorNormalization(img);
-	img = runResizeImage(img,Size(140,140));
+	String name = "clp3";
+	//img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+	//img = runColorNormalization(img);
+	//img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
 	ShapeColor sc;
 	Size size(5,5);
 	//blur(img,img,size);
-	Mat hsvMat = Skin::getSkinUsingHist(img);
-	cout << hsvMat.depth() << endl;
-/*
+	//cvtColor(img,imgGray,CV_BGR2GRAY);
+
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
@@ -80,10 +79,31 @@ int main(int argc,char** argv)
 		img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 		img = runColorNormalization(img);
 		img = runResizeImage(img,Size(140,140));
+
 		cvtColor(img,imgGray,CV_BGR2GRAY);
 		Mat src = sm.prepareImage(imgGray);
 		Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 		Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
+		Mat img_flip, mapOfNonNoise_flip;
+		cv::flip(img,img_flip,1);
+		cv::flip(mapOfNonNoise,mapOfNonNoise_flip,1);
+		Mat maskE_flip = sc.getShapeUsingColor(img_flip,mapOfNonNoise_flip);
+		cv::flip(maskE_flip,maskE_flip,1);
+		maskE_flip.copyTo(maskE,maskE_flip);
+		Mat nnConnect = sm.densityConnector(maskE,0.9999);
+		Mat transform = sm.haloTransform(nnConnect);
+		transform.convertTo(transform,CV_8U);
+		maskE = (transform - 5) * 255;
+		Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
+		Mat nnConnect2 = sm.densityConnector(maskLC2,0.9999);
+		Mat transform2 = sm.haloTransform(nnConnect2);
+		transform2.convertTo(transform2,CV_8U);
+		maskLC2 = (transform2 - 5) * 255;
+		maskLC2.copyTo(maskE,maskLC2);
+		img.copyTo(img5,maskE);
+		imwrite(name+"_union3.png",img5);
+		img5.release();
+		/*
 		Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
 		maskE.copyTo(maskLC2,maskE);
 		img2 = sm.densityConnector(maskLC2,0.9999);
@@ -92,20 +112,23 @@ int main(int argc,char** argv)
 		img4 = (img3 - 5) * 255;
 		imgGray.copyTo(img5,img4);
 		img5 = sc.applyDiscreteShade(img5);
-		cv::namedWindow(name+"_Orig",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-		cv::namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-		imshow(name+"_Orig",imgGray);
-		imshow(name,img5);
-		waitKey(0);
-		cv::destroyAllWindows();
+		//cv::namedWindow(name+"_Orig",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+		//cv::namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+		//imshow(name+"_Orig",imgGray);
+		//imshow(name,img5);
+		//waitKey(0);
+		//cv::destroyAllWindows();
 		img5.release();
+		 */
 	}
-	*/
-/*
+
+	/*
+	sc.setDebugLevel(1);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
+	/*
 	Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
 	maskE.copyTo(maskLC2,maskE);
 	//imgshow(maskLC2);

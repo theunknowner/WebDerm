@@ -7,7 +7,7 @@
 
 #include "shapecolor.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/kneecurve.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
 void ShapeColor::setDebugLevel(int level) {
