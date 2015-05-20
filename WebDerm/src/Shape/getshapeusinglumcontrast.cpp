@@ -162,7 +162,7 @@ Mat ShapeColor::getShapeUsingLumContrast(Mat input, Mat noiseMap, float shift) {
 				map.at<uchar>(minPt) = 100;
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
-			if(this->debugLevel>0)
+			if(this->debugLevel==1)
 				if(col==104 && row==65) {
 					String mtn = upDownTheMtn==1 ? "Up" : "N/A";
 					mtn = upDownTheMtn==-1 ? "Down" : mtn;

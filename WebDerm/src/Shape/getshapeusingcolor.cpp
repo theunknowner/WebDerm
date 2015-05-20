@@ -49,6 +49,8 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 	Mat altitude(mat1.size(),CV_32F,Scalar(0));
 	Mat distMat(mat1.size(),CV_32F,Scalar(0));
 	double HC1=0, HC2=0;
+	int scanSize = 20;
+	int moveSize = 10;
 	for(int row=0; row<mat1.rows; row++) {
 		float sum=0;
 		for(int col=0; col<mat1.cols; col++) {
@@ -84,10 +86,10 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 	double minMaxDist[2];
 	Point minMaxPt[2];
 	for(int row=0; row<altitude.rows; row++) {
-		for(int col=0; col<altitude.cols; col++) {
+		for(int col=0; col<altitude.cols; col+=moveSize) {
 			vector<float> distVec;
 			vector<Point> minMaxPtVec;
-			for(int x = col; x<col+20; x++) {
+			for(int x = col; x<col+scanSize; x++) {
 				if(x<0 || x>=altitude.cols) break;
 				if(x>=0 && x<altitude.cols) {
 					float dist = altitude.at<float>(row,x);
@@ -103,14 +105,19 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 	sort(maxRangeVec.begin(),maxRangeVec.end());
 	//maxRangeVec.erase(remove(maxRangeVec.begin(),maxRangeVec.end(),0),maxRangeVec.end());
 	KneeCurve kc;
+	kc.removeOutliers(maxRangeVec,0.025);
 	int kneePt = kc.kneeCurvePoint(maxRangeVec);
-	float percent = (float)kneePt/maxRangeVec.size();
-	if(percent<0.05)
+	float percent = roundDecimal((float)kneePt/maxRangeVec.size(),2);
+	printf("KneePt: %d\n",kneePt);
+	printf("Percent: %f\n",percent);
+	if(percent<=0.05)
 		kneePt = 0.25 * maxRangeVec.size();
-	if(percent<0.05 || percent>0.90)
+	if(percent>=0.8999999)
 		kneePt = 0.75 * maxRangeVec.size();
 	//kneePt *= shift;
 	maxRange = maxRangeVec.at(kneePt);
+	printf("KneePt: %d\n",kneePt);
+	printf("Thresh: %f\n",maxRange);
 	//writeSeq2File(freq,"freq");
 	//writeSeq2File(distMat,"float","distMat");
 	//writeSeq2File(altitude,"float","altitude");
@@ -160,7 +167,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 	Mat map(Lvec.size(),CV_8U,Scalar(0));
 	int _row=0; int _col=0, maxRow=Lvec.rows, maxCol=Lvec.cols;
 	int localScanSize = 20;
-	const double enterThresh = maxRange;
+	const double enterThresh = 0.65 * maxRange;
 	const double exitCumulativeThresh = 0.7*enterThresh;
 	int enterFlag=0, upDownTheMtn=0;
 
@@ -282,7 +289,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
 			if(this->debugLevel>0)
-				if(col==62 && row==32) {
+				if(col==45 && row==42) {
 					String mtn = upDownTheMtn==1 ? "Up" : "N/A";
 					mtn = upDownTheMtn==-1 ? "Down" : mtn;
 					printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);

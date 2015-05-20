@@ -53,7 +53,9 @@ public:
 	vector<vector<Point> > findBoundary(Mat src);
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 	Mat removeNoiseOnBoundary(Mat src);
-	Mat haloTransform(Mat src);
+
+	/* halo_transform.cpp */
+	Mat haloTransform(Mat src, int iterations=1);
 };
 
 #endif /* SHAPEMORPH_H_ */

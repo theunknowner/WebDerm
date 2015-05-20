@@ -31,7 +31,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 	Size prevSize;
 	Point startPt(0,0), endPt(0,0);
 	int rowDecr=0, rowIncr=0;
-	if(this->debugLevel==1)
+	if(this->debugLevel==2)
 		namedWindow("img",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	for(int row=0; row<=(dst.rows-winSize.height); row++) {
 		startPt.y = row;
@@ -39,7 +39,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 			window = dst(Rect(col,startPt.y,winSize.width,winSize.height));
 			if(countNonZero(window)==window.total()) {
 				/****DEBUG OUTPUT INFO ****/
-				if(this->debugLevel==1) {
+				if(this->debugLevel==2) {
 					Mat test = input.clone();
 					rectangle(test,Rect(col,startPt.y,winSize.width,winSize.height),Scalar(150));
 					printf("****BEFORE0****\n");
@@ -61,7 +61,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 								window = dst(Rect(col,row-rowDecr,winSize.width,winSize.height));
 
 								/****DEBUG OUTPUT INFO ****/
-								if(this->debugLevel==1) {
+								if(this->debugLevel==2) {
 									Mat test = input.clone();
 									rectangle(test,Rect(col,row-rowDecr,winSize.width,winSize.height),Scalar(150));
 									printf("****BEFORE1****\n");
@@ -86,7 +86,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 												if(dst.type()==CV_8U)
 													dst.at<uchar>(i,j) = 0;
 												/****DEBUG OUTPUT INFO ****/
-												if(this->debugLevel==1) {
+												if(this->debugLevel==2) {
 													imshow("dst",dst);
 													waitKey(0);
 												} // end debug output
@@ -99,7 +99,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 									startPt = Point(col,row-rowDecr);
 
 								/****DEBUG OUTPUT INFO ****/
-								if(this->debugLevel==1) {
+								if(this->debugLevel==2) {
 									Mat test = input.clone();
 									rectangle(test,Rect(col,row-rowDecr,winSize.width,winSize.height),Scalar(150));
 									printf("****AFTER1****\n");
@@ -132,7 +132,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 								window = dst(Rect(col,startPt.y,winSize.width,winSize.height));
 
 								/****DEBUG OUTPUT INFO ****/
-								if(this->debugLevel==1) {
+								if(this->debugLevel==2) {
 									Mat test = input.clone();
 									rectangle(test,Rect(col,startPt.y,winSize.width,winSize.height),Scalar(150));
 									printf("****BEFORE2****\n");
@@ -153,7 +153,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 								window = dst(Rect(col,startPt.y,winSize.width,winSize.height));
 
 								/****DEBUG OUTPUT INFO ****/
-								if(this->debugLevel==1) {
+								if(this->debugLevel==2) {
 									Mat test = input.clone();
 									rectangle(test,Rect(col,startPt.y,winSize.width,winSize.height),Scalar(150));
 									printf("****AFTER2****\n");
@@ -186,7 +186,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 								if(dst.type()==CV_8U)
 									dst.at<uchar>(i,j) = 0;
 								/****DEBUG OUTPUT INFO ****/
-								if(this->debugLevel==1) {
+								if(this->debugLevel==2) {
 									imshow("dst",dst);
 									waitKey(0);
 								} // end debug output
@@ -211,7 +211,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 							if(dst.type()==CV_8UC3)
 								dst.at<Vec3b>(i,j) = Vec3b(0,0,0);
 							/****DEBUG OUTPUT INFO ****/
-							if(this->debugLevel==1) {
+							if(this->debugLevel==2) {
 								imshow("dst",dst);
 								waitKey(0);
 							} // end debug output
@@ -227,7 +227,7 @@ Mat ShapeColor::removeRunningLines(Mat input, Size size) {
 			}
 
 			/****DEBUG OUTPUT INFO ****/
-			if(this->debugLevel==1) {
+			if(this->debugLevel==2) {
 				printf("****FINAL****\n");
 				printf("Point(%d,%d)\n",col,row);
 				printf("PrevSize: %dx%d, WindowSize: %dx%d\n",prevSize.width,prevSize.height,window.cols,window.rows);

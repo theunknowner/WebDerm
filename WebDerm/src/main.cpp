@@ -59,16 +59,16 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "clp3";
-	//img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
-	//img = runColorNormalization(img);
-	//img = runResizeImage(img,Size(140,140));
+	String name = "psoriasis1";
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
 	ShapeColor sc;
 	Size size(5,5);
 	//blur(img,img,size);
 	//cvtColor(img,imgGray,CV_BGR2GRAY);
-
+	/*
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
@@ -101,9 +101,10 @@ int main(int argc,char** argv)
 		maskLC2 = (transform2 - 5) * 255;
 		maskLC2.copyTo(maskE,maskLC2);
 		img.copyTo(img5,maskE);
-		imwrite(name+"_union3.png",img5);
+		//imwrite(name+"_union3.png",img5);
 		img5.release();
-		/*
+	 */
+	/*
 		Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
 		maskE.copyTo(maskLC2,maskE);
 		img2 = sm.densityConnector(maskLC2,0.9999);
@@ -119,54 +120,52 @@ int main(int argc,char** argv)
 		//waitKey(0);
 		//cv::destroyAllWindows();
 		img5.release();
-		 */
-	}
 
-	/*
+	}
+	 */
 	sc.setDebugLevel(1);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
-	/*
+
+	Mat test;
+	img.copyTo(test,maskE);
+	imgshow(test);
+
+	//maskE = sc.removeRunningLines(maskE,Size(3,1));
+
+	/*Mat img_flip, map_flip,test;
+	cv::flip(img,img_flip,1);
+	cv::flip(mapOfNonNoise,map_flip,1);
+	Mat maskE_flip = sc.getShapeUsingColor(img_flip,map_flip);
+	img_flip.copyTo(test,maskE_flip);
+	cv::flip(test,test,1);
+	imgshow(test);
+*/
 	Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
-	maskE.copyTo(maskLC2,maskE);
-	//imgshow(maskLC2);
-	img2 = sm.densityConnector(maskLC2,0.9999);
-	img3 = sm.haloTransform(img2);
-	img3.convertTo(img3,CV_8U);
-	img4 = (img3 - 5) * 255;
-	imgGray.copyTo(img5,img4);
-	img5 = sc.applyDiscreteShade(img5);
-	cv::namedWindow(name+"_Orig",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	cv::namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	imshow(name+"_Orig",imgGray);
-	imshow(name,img5);
-	waitKey(0);
-	cv::destroyAllWindows();
-	/*
-	Mat src = sm.prepareImage(imgGray);
-	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	//Mat map = sc.getShapeUsingColor(img,mapOfNonNoise);
-	//Mat maskEmax = sc.removeRunningLines(map,Size(3,1));
-	//Mat maskLC;
-	//src.copyTo(maskLC,mapOfNonNoise);
-	//maskLC = sc.filterKneePt(maskLC);
-	//sc.setDebugLevel(1);
-	Mat maskLC2 = sc.getShapeUsingLumContrast(src,mapOfNonNoise);
-	//src.copyTo(maskLC,maskLC2);
-	//img2 = maskLC * 255;
-	img2 = sm.densityConnector(maskLC2,0.9999);
-	//deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
-	img3 = sm.haloTransform(img2);
-	img3.convertTo(img3,CV_8U);
-	img4 = (img3 - 5) * 255;
-	img.copyTo(img5,img4);
-	 */
+	maskLC2 = sc.removeRunningLines(maskLC2,Size(3,1));
+	maskLC2.copyTo(maskE,maskLC2);
+	Mat nnConnect2 = sm.densityConnector(maskE,0.9999);
+	Mat transform2 = sm.haloTransform(nnConnect2,2);
+	transform2.convertTo(transform2,CV_8U);
+	maskE = (transform2 - 5) * 255;
+	img.copyTo(img5,maskE);
+
+	Mat lcFilterMat = sc.filterKneePt(src);
+	Mat lcFilterNoNoise;
+	lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);
+	Mat lcDenseConnect = sm.densityConnector(lcFilterNoNoise,0.9999);
+	Mat lcHaloTrans = sm.haloTransform(lcDenseConnect,2);
+	lcHaloTrans.convertTo(lcHaloTrans,CV_8U);
+	img.copyTo(img2,lcHaloTrans);
+	img5.copyTo(img3,img5);
+	img2.copyTo(img3,img2);
+	imgshow(img5);
+	//imgshow(img2);
+	//imgshow(img3);
+
 	//img5 = sc.applyDiscreteShade(imgGray);
-	//imgshow(src);
-	//imgshow(imgGray);
-	//imgshow(img5);
 
 	/*
 	CreateTrainingData ctd;
