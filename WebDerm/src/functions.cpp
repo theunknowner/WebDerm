@@ -73,15 +73,17 @@ void imfill(Mat &img)
 }
 
 //flag=0: keep window, flag=1: destroy window
-void imgshow(Mat src, int flag) {
+void imgshow(Mat src, int flag, String name) {
 	static int num=1;
-	String name = "img" + toString(num);
+	if(name=="") {
+		name = "img" + toString(num);
+		num++;
+	}
 	namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(name,src);
 	waitKey(0);
 	if(flag==1)
 		destroyAllWindows();
-	num++;
 }
 
 //generic getSubstr function

@@ -12,6 +12,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
 //! Expressive Power of Hue
 double epoh(double &sat, double &lum) {
@@ -108,16 +109,13 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 	kc.removeOutliers(maxRangeVec,0.025);
 	int kneePt = kc.kneeCurvePoint(maxRangeVec);
 	float percent = roundDecimal((float)kneePt/maxRangeVec.size(),2);
-	printf("KneePt: %d\n",kneePt);
-	printf("Percent: %f\n",percent);
 	if(percent<=0.05)
 		kneePt = 0.25 * maxRangeVec.size();
 	if(percent>=0.8999999)
 		kneePt = 0.75 * maxRangeVec.size();
 	//kneePt *= shift;
 	maxRange = maxRangeVec.at(kneePt);
-	printf("KneePt: %d\n",kneePt);
-	printf("Thresh: %f\n",maxRange);
+	maxRange = MyMath::average(maxRangeVec);
 	//writeSeq2File(freq,"freq");
 	//writeSeq2File(distMat,"float","distMat");
 	//writeSeq2File(altitude,"float","altitude");
@@ -289,7 +287,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
 			if(this->debugLevel>0)
-				if(col==45 && row==42) {
+				if(col==5 && row==95) {
 					String mtn = upDownTheMtn==1 ? "Up" : "N/A";
 					mtn = upDownTheMtn==-1 ? "Down" : mtn;
 					printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);

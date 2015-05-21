@@ -21,7 +21,6 @@ namespace MyMath {
 	double standardDevNoSort(deque<double> &vec);
 	int max(int argNum, ...);
 	double max(double numArr[], int length);
-	double average(deque<double> &vec);
 	double forecast(double input, deque<double> &yArr, deque<double> &xArr);
 	double max(deque<double> vec);
 	double min(deque<double> vec);
@@ -30,6 +29,12 @@ namespace MyMath {
 	double euclideanDist(int *vec1, int *vec2);
 	double eucDist(Point pt1, Point pt2);
 	double findDegreeDistance(double deg1, double deg2);
+
+	/* average.cpp */
+	double average(deque<double> &vec);
+	double average(vector<double> &vec);
+	double average(deque<int> &vec);
+	double average(vector<int> &vec);
 }
 
 #endif /* MATHS_H_ */

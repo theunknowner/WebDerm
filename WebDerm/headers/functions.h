@@ -23,7 +23,7 @@ String toString(bool val);
 double roundDecimal(double num, int places);
 String decimal2hex(int num);
 void imfill(Mat &img);
-void imgshow(Mat src, int flag=0);
+void imgshow(Mat src, int flag=0, String name="");
 void getSubstr(String str, char delimiter, deque<String> &vec);
 String getFileName(String filename,String end="");
 

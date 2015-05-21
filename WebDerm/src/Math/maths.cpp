@@ -146,15 +146,6 @@ double max(double numArr[], int length) {
 	return largest;
 }
 
-double average(deque<double> &vec) {
-	double result=0;
-	for(unsigned int i=0; i<vec.size(); i++) {
-		result += vec.at(i);
-	}
-	result /= vec.size();
-	return result;
-}
-
 /** yArr and xArr has to be same size **/
 double forecast(double input, deque<double> &yArr, deque<double> &xArr) {
 	double results=0;

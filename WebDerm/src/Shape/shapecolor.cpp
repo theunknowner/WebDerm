@@ -251,9 +251,11 @@ Mat ShapeColor::filterKneePt(Mat src, double thresh, double shift) {
 		}
 	}
 	int bestIdx = kc.kneeCurvePoint(yVec1);
-	float percent = (float)bestIdx/yVec1.size();
+	float percent = roundDecimal((float)bestIdx/yVec1.size(),2);
 
-	if(percent<0.05 || percent>0.90)
+	if(percent<=0.05)
+		bestIdx = 0.25 * yVec1.size();
+	if(percent>=0.8999999)
 		bestIdx = 0.75 * yVec1.size();
 	double threshFilter = yVec1.at(bestIdx);
 
