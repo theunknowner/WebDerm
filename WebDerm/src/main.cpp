@@ -59,7 +59,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "vitiligo2";
+	String name = "acne_excoriee2";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -108,22 +108,22 @@ int main(int argc,char** argv)
 	}
 */
 
-	//sc.setDebugLevel(1);
+	sc.setDebugLevel(1);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	//Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
-	//img.copyTo(img2,maskE);
-	//imgshow(img2);
-	/*
+	Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
+	img.copyTo(img2,maskE);
+	imgshow(img2);
+/*
 	//maskE = sc.removeRunningLines(maskE,Size(3,1));
 	Mat nnConnect2 = sm.densityConnector(maskE,0.9999);
 	Mat transform2 = sm.haloTransform(nnConnect2,2);
 	transform2.convertTo(transform2,CV_8U);
 	maskE = (transform2 - 5) * 255;
 	img.copyTo(img5,maskE);
-*/
 
+/*
 	Mat lcFilterMat = sc.filterKneePt(src);
 	Mat lcFilterNoNoise;
 	lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);

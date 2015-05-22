@@ -13,6 +13,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 
 //! Expressive Power of Hue
 double epoh(double &sat, double &lum) {
@@ -41,8 +42,9 @@ Mat epohTheHue(Mat &hMat, Mat &sMat, Mat &lMat) {
 	return hc;
 }
 
-//using delta Emax
-void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &maxRange, double shift) {
+//! using delta Emax
+//! find the max deltaE distances between adjacent pixels in a 1x20 window
+void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &maxRange, Mat &_altitude) {
 	Cie cie;
 	vector<double> maxRangeVec;
 	vector<float> LAB1(3,0);
@@ -50,8 +52,9 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 	Mat altitude(mat1.size(),CV_32F,Scalar(0));
 	Mat distMat(mat1.size(),CV_32F,Scalar(0));
 	double HC1=0, HC2=0;
-	int scanSize = 20;
-	int moveSize = 10;
+	int scanSize = 20; // window size
+	int moveSize = 1;// units/cols to move per iteration
+	double h=0.1;
 	for(int row=0; row<mat1.rows; row++) {
 		float sum=0;
 		for(int col=0; col<mat1.cols; col++) {
@@ -75,12 +78,12 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 				double dist = cie.deltaE76(LAB1,LAB2);
 				double direction = HC2 - HC1;
 				distMat.at<float>(row,col) = dist;
-				if(direction<0)
-					sum += (-dist);
-				else
-					sum += dist;
+				//if(direction<0)
+				//	dist = (-dist);
 
-				altitude.at<float>(row,col) = sum;
+				sum += dist;
+				//sum = h * dist + (1.0-h) * sum; // hysteresis formula
+				altitude.at<float>(row,col) = sum; //assigns a 1D value to the 3D LAB values
 			}
 		}
 	}
@@ -93,33 +96,53 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 			for(int x = col; x<col+scanSize; x++) {
 				if(x<0 || x>=altitude.cols) break;
 				if(x>=0 && x<altitude.cols) {
-					float dist = altitude.at<float>(row,x);
-					distVec.push_back(dist);
+					float alt = altitude.at<float>(row,x);
+					distVec.push_back(alt);
 					minMaxPtVec.push_back(Point(x,row));
 				}
 			}
 			minMaxLoc(distVec,&minMaxDist[0],&minMaxDist[1],&minMaxPt[0],&minMaxPt[1]);
-			double maxRange = roundDecimal(minMaxDist[1] - minMaxDist[0],4);
-			maxRangeVec.push_back(maxRange);
+			double maxDist = roundDecimal(minMaxDist[1] - minMaxDist[0],4);
+			maxRangeVec.push_back(maxDist);
 		}
 	}
 	sort(maxRangeVec.begin(),maxRangeVec.end());
 	//maxRangeVec.erase(remove(maxRangeVec.begin(),maxRangeVec.end(),0),maxRangeVec.end());
 	KneeCurve kc;
-	kc.removeOutliers(maxRangeVec,0.025);
+	//kc.removeOutliers(maxRangeVec,0.025);
 	int kneePt = kc.kneeCurvePoint(maxRangeVec);
-	float percent = roundDecimal((float)kneePt/maxRangeVec.size(),2);
+	/*float percent = roundDecimal((float)kneePt/maxRangeVec.size(),2);
 	if(percent<=0.05)
 		kneePt = 0.25 * maxRangeVec.size();
 	if(percent>=0.8999999)
 		kneePt = 0.75 * maxRangeVec.size();
-	//kneePt *= shift;
+		*/
 	maxRange = maxRangeVec.at(kneePt);
-	maxRange = MyMath::average(maxRangeVec);
+	_altitude = altitude;
 	//writeSeq2File(freq,"freq");
-	//writeSeq2File(distMat,"float","distMat");
-	//writeSeq2File(altitude,"float","altitude");
+	Write::writeSeq2File(distMat,"float","distMat");
+	Write::writeSeq2File(altitude,"float","altitude_sum");
+	kc.save_graph("acne_excoriee2",maxRangeVec);
 	//writeSeq2File(maxRangeVec,"maxrangevec");
+	for(int row=0; row<_altitude.rows; row++) {
+		for(int col=0; col<_altitude.cols; col+=moveSize) {
+			vector<float> distVec;
+			vector<Point> minMaxPtVec;
+			for(int x = col; x<col+scanSize; x++) {
+				if(x<0 || x>=_altitude.cols) break;
+				if(x>=0 && x<_altitude.cols) {
+					float alt = _altitude.at<float>(row,x);
+					distVec.push_back(alt);
+					minMaxPtVec.push_back(Point(x,row));
+				}
+			}
+			minMaxLoc(distVec,&minMaxDist[0],&minMaxDist[1],&minMaxPt[0],&minMaxPt[1]);
+			double maxDist = roundDecimal(minMaxDist[1] - minMaxDist[0],4);
+			if(maxDist<maxRange) {
+				_altitude.at<float>(row,col) = maxDist;
+			}
+		}
+	}
 }
 
 //get shape using color with deltaE
@@ -156,25 +179,25 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 	Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
 
 	double maxRange=0;
-	maxLocalRanges(Lvec,avec,bvec,hc,noise,maxRange,shift);
+	Mat altitude;
+	maxLocalRanges(Lvec,avec,bvec,hc,noise,maxRange,altitude);
 
-	vector<float> LAB_0(3,0);
-	vector<float> LabEntry(3,0);
+	double alt, alt_0, altEntry;
+	//vector<float> LAB_0(3,0);
+	//vector<float> LabEntry(3,0);
 	double HC, HC_0, distFromEntry=0;
 	Point LabEntryPt;
 	Mat map(Lvec.size(),CV_8U,Scalar(0));
-	int _row=0; int _col=0, maxRow=Lvec.rows, maxCol=Lvec.cols;
+	int _row=0; int _col=0, maxRow=altitude.rows, maxCol=altitude.cols;
 	int localScanSize = 20;
-	const double enterThresh = 0.65 * maxRange;
+	const double enterThresh = maxRange;
 	const double exitCumulativeThresh = 0.7*enterThresh;
 	int enterFlag=0, upDownTheMtn=0;
 
 	for(int row=_row; row<maxRow; row++) {
 		Point enterExitPt(-1,-1); //reset after every column
 		for(int col=_col; col<maxCol; col++) {
-			LAB[0] = Lvec.at<float>(row,col);
-			LAB[1] = avec.at<float>(row,col);
-			LAB[2] = bvec.at<float>(row,col);
+			alt = altitude.at<float>(row,col);
 			HC = hc.at<float>(row,col);
 			double maxDiff0=0, direction=0;
 			Point maxPt0=Point(col,row);
@@ -185,11 +208,9 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 			for(int i=y; i>=endY; i--) {
 				if(x<0 && j<0 && i<0) break;
 				if(x>=0 && x!= enterExitPt.x && noise.at<uchar>(row,x)!=0) {
-					LAB_0[0] = Lvec.at<float>(row,x);
-					LAB_0[1] = avec.at<float>(row,x);
-					LAB_0[2] = bvec.at<float>(row,x);
+					alt_0 = altitude.at<float>(row,x);
 					HC_0 = hc.at<float>(row,x);
-					double dist = cie.deltaE76(LAB,LAB_0);
+					double dist = alt - alt_0;
 					if(dist>=maxDiff0) {
 						maxDiff0 = dist;
 						maxPt0 = Point(x,row);
@@ -207,9 +228,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 						upDownTheMtn = -1;
 
 					enterFlag = 1;
-					LabEntry[0] = Lvec.at<float>(maxPt0);
-					LabEntry[1] = avec.at<float>(maxPt0);
-					LabEntry[2] = bvec.at<float>(maxPt0);
+					altEntry = altitude.at<float>(maxPt0);
 					LabEntryPt = maxPt0;
 					enterExitPt = Point(col-1,row);
 					map.at<uchar>(row,col) = 255;
@@ -217,7 +236,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 			}
 			else if(enterFlag==1) {
 				if(upDownTheMtn==-1) {
-					distFromEntry = cie.deltaE76(LAB,LabEntry);
+					distFromEntry = alt - altEntry;
 					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1 && distFromEntry<=exitCumulativeThresh) {
 						if(direction>0) {
 							enterFlag = 0;
@@ -228,7 +247,7 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 					}
 				}
 				else if(upDownTheMtn==1) {
-					distFromEntry = cie.deltaE76(LAB,LabEntry);
+					distFromEntry = alt - altEntry;
 					if(fn.countGreaterEqual(2,(maxDiff0),enterThresh)>=1 && distFromEntry<=exitCumulativeThresh) {
 						if(direction<0) {
 							enterFlag = 0;
@@ -255,11 +274,9 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 				Point minPt(enterExitPt);
 				for(int k=enterExitPt.x+2; k<src.cols; k++) {
 					map.at<uchar>(row,k) = 0;
-					LAB_0[0] = Lvec.at<float>(row,k);
-					LAB_0[1] = avec.at<float>(row,k);
-					LAB_0[2] = bvec.at<float>(row,k);
+					alt_0 = altitude.at<float>(row,k);
 					HC_0 = hc.at<float>(row,k);
-					double dist = cie.deltaE76(LAB,LAB_0);
+					double dist = alt - alt_0;
 					direction = HC_0 - HC;
 					if(upDownTheMtn==1) {
 						if(direction<0) {
@@ -287,12 +304,12 @@ Mat ShapeColor::getShapeUsingColor(Mat src, Mat noise, double shift) {
 				enterExitPt = Point(minPt.x-1,minPt.y);
 			}
 			if(this->debugLevel>0)
-				if(col==5 && row==95) {
+				if(col==20 && row==30) {
 					String mtn = upDownTheMtn==1 ? "Up" : "N/A";
 					mtn = upDownTheMtn==-1 ? "Down" : mtn;
 					printf("HSL(%f,%f,%f)%f\n",hvec.at<float>(row,col),svec.at<float>(row,col),lvec.at<float>(row,col),HC);
 					printf("LAB(%f,%f,%f)\n",Lvec.at<float>(row,col),avec.at<float>(row,col),bvec.at<float>(row,col));
-					printf("LabE(%f,%f,%f)\n",LabEntry[0],LabEntry[1],LabEntry[2]);
+					//printf("LabE(%f,%f,%f)\n",LabEntry[0],LabEntry[1],LabEntry[2]);
 					printf("HSL0(%f,%f,%f)%f\n",hvec.at<float>(maxPt0),svec.at<float>(maxPt0),lvec.at<float>(maxPt0),HC_0);
 					printf("LAB0(%f,%f,%f)\n",Lvec.at<float>(maxPt0),avec.at<float>(maxPt0),bvec.at<float>(maxPt0));
 					printf("EnterThresh: %f, MaxDiff0: %f\n",enterThresh, maxDiff0);
