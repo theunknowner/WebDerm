@@ -110,7 +110,7 @@ void writeSeq2File(vector<vector<float> > &vec, String name)
 	fclose(fp);
 }
 
-void writeSeq2File(vector<double> &vec, String name) {
+void writeSeq2File(vector<double> &vec, String name, String delimit) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -119,7 +119,10 @@ void writeSeq2File(vector<double> &vec, String name) {
 
 	else
 		for(unsigned int i=0; i<vec.size(); i++) {
-			fprintf(fp,"%f\n",vec.at(i));
+			if(i<vec.size()-1 && delimit==",")
+				fprintf(fp,"%f,", vec.at(i));
+			else
+				fprintf(fp,"%f\n", vec.at(i));
 		}
 	fclose(fp);
 }

@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <cstdarg>
 #include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
 #include <dirent.h>
 #include <unordered_map>

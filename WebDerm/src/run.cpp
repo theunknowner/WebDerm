@@ -221,10 +221,12 @@ void runAllHysteresis() {
 	}
 	if(flag[0]==true) {
 		boost::timer time;
+		int file_count=0;
 		for(unsigned int i=0; i<files.size(); i++) {
 			full_path = folder+files.at(i);
 			img = imread(full_path);
 			if(img.data) {
+				file_count++;
 				img = runColorNormalization(img);
 				img = runResizeImage(img,Size(140,140));
 				name = getFileName(full_path);
@@ -256,6 +258,7 @@ void runAllHysteresis() {
 				minutes = minutes%60;
 			}
 		}
+		printf("Total Files Processed: %d\n",file_count);
 		printf("Time Elapsed: %dh:%dm:%ds\n",hours,minutes,seconds);
 	}
 	rgb.release_memory();

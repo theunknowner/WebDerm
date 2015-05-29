@@ -120,9 +120,6 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 	maxRange = maxRangeVec.at(kneePt);
 	_altitude = altitude;
 	//writeSeq2File(freq,"freq");
-	Write::writeSeq2File(distMat,"float","distMat");
-	Write::writeSeq2File(altitude,"float","altitude_sum");
-	kc.save_graph("acne_excoriee2",maxRangeVec);
 	//writeSeq2File(maxRangeVec,"maxrangevec");
 	for(int row=0; row<_altitude.rows; row++) {
 		for(int col=0; col<_altitude.cols; col+=moveSize) {

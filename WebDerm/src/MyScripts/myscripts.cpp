@@ -8,12 +8,19 @@
 #include "myscripts.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Create/createtrainingdata.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/CIE/cie.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
+namespace Scripts {
 void script1() {
 	CreateTrainingData ctd;
 	deque<String> files;
@@ -502,4 +509,90 @@ void script16() {
 			}
 		}
 	}
+}
+
+//! Expressive Power of Hue
+double epoh(double &sat, double &lum) {
+	double result;
+	if(lum<=50) {
+		result = (sat/100.) * (lum/50.);
+	}
+	else {
+		result = (sat/100.) * (100-lum)/50;
+	}
+	return result;
+}
+
+//using Minkowski distance
+Mat epohTheHue(Mat &hMat, Mat &sMat, Mat &lMat) {
+	Mat hc(hMat.size(),CV_32F, Scalar(0));
+	for(int i=0; i<hMat.rows; i++) {
+		for(int j=0; j<hMat.cols; j++) {
+			double hue = hMat.at<float>(i,j);
+			double sat = sMat.at<float>(i,j);
+			double lum = lMat.at<float>(i,j);
+			hue *= epoh(sat,lum);
+			hc.at<float>(i,j) = roundDecimal(hue,2);
+		}
+	}
+	return hc;
+}
+
+void script17() {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	Mat img, img2,img3, img4, img5, imgGray;
+	String name = "tinea_corporis4";
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
+
+	int row=79;
+	Xyz xyz;
+	CieLab lab;
+	Cie cie;
+	vector<float> XYZ, XYZ0, LAB, LAB0;
+	vector<double> deltaE, HSL;
+	Mat hvec(img.size(),CV_32F,Scalar(0));
+	Mat svec(img.size(),CV_32F,Scalar(0));
+	Mat lvec(img.size(),CV_32F,Scalar(0));
+	double HC, HC0;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+			hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+			svec.at<float>(i,j) = round(HSL.at(1) * 100);
+			lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+		}
+	}
+	Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
+	for(int j=1; j<img.row(row).cols; j++) {
+		Vec3b BGR = img.at<Vec3b>(row,j);
+		Vec3b BGR0 = img.at<Vec3b>(row,j-1);
+		XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+		LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+		XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+		LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+		HC = hc.at<float>(row,j);
+		HC0 = hc.at<float>(row,j-1);
+		int direction = HC - HC0;
+		double dE = cie.deltaE76(LAB,LAB0);
+		if(direction<0)
+			dE = -dE;
+		deltaE.push_back(dE);
+	}
+	String str = "_row[" + toString(row) + "]";
+	Write::writeSeq2File(deltaE,name+str,",");
+	String folder = "/home/jason/git/WebDerm/WebDerm/";
+	String py_file = "python /home/jason/Desktop/workspace/Pyth/poly_arg.py ";
+	String py_arg = folder+name+str+".csv ";
+	String out_arg = folder+name+str+"_polyfit.csv";
+	py_file += py_arg + out_arg;
+	system(py_file.c_str());
+}
 }

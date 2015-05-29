@@ -8,6 +8,7 @@
 #ifndef MYSCRIPTS_H_
 #define MYSCRIPTS_H_
 
+namespace Scripts {
 void script1();
 void script2();
 void script3();
@@ -24,5 +25,6 @@ void script13();
 void script14();
 void script15();
 void script16();
-
+void script17();
+}
 #endif /* MYSCRIPTS_H_ */
