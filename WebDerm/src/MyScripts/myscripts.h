@@ -8,6 +8,8 @@
 #ifndef MYSCRIPTS_H_
 #define MYSCRIPTS_H_
 
+#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+
 namespace Scripts {
 void script1();
 void script2();
@@ -26,5 +28,6 @@ void script14();
 void script15();
 void script16();
 void script17();
+void script18();
 }
 #endif /* MYSCRIPTS_H_ */

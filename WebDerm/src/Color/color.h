@@ -10,8 +10,8 @@ public:
 	bool containsColor(String argNum, ...);
 	bool containsAllColor(String argNum, ...);
 	int containsMainColor(String color, String mColor);
-	bool isSameColor(String color1, String color2);
 	void extractColorFromString(String color, deque<String> &vecColor);
+	bool isSameColor(String color1, String color2);
 	int countColors(String color);
 	String reassignLevels(String color, int r, int g, int b);
 	String reassignLevels(String color, double h, double s, double l);

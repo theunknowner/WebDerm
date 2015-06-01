@@ -49,7 +49,7 @@ bool Color::containsAllColor(String argNum, ...) {
 	return true;
 }
 
-//returns the amount of time pixels contain main color
+//returns the amount of time color contains main color
 int Color::containsMainColor(String color, String mColor)
 {
 	int count=0;
@@ -60,6 +60,14 @@ int Color::containsMainColor(String color, String mColor)
 		pos += mColor.length();
 	}
 	return count;
+}
+
+void Color::extractColorFromString(String color, deque<String> &vecColor) {
+	for(unsigned int i=0; i<mainColors.size(); i++) {
+		if(containsMainColor(color,mainColors.at(i))) {
+			vecColor.push_back(mainColors.at(i));
+		}
+	}
 }
 
 bool Color::isSameColor(String color1, String color2)
@@ -86,14 +94,6 @@ bool Color::isSameColor(String color1, String color2)
 	return false;
 }
 
-void Color::extractColorFromString(String color, deque<String> &vecColor) {
-	for(unsigned int i=0; i<mainColors.size(); i++) {
-		if(containsMainColor(color,mainColors.at(i))) {
-			vecColor.push_back(mainColors.at(i));
-		}
-	}
-}
-
 String Color::extractShade(String pix) {
 	Shades sh;
 	int shadeCount = sh.getShadeCount();
@@ -108,6 +108,7 @@ String Color::extractShade(String pix) {
 	}
 	return shade;
 }
+
 //returns the amount of different colors in the string
 int Color::countColors(String color) {
 	int count=0;
