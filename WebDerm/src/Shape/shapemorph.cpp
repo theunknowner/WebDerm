@@ -361,7 +361,7 @@ Mat ShapeMorph::closeFilter(Mat src, Size elementSize, double shift) {
 vector<Mat> ShapeMorph::lumFilter1(Mat src, int featuresToHold) {
 	Mat img1 = this->origFilter(src);
 	Mat img2 = this->densityConnector(img1,0.9);
-	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
+	vector<Mat> featureVec = this->liquidFeatureExtraction(img2);
 
 	//remove features clinging to image boundary
 	unsigned int m=0;
@@ -422,7 +422,7 @@ vector<Mat> ShapeMorph::lumFilter1(Mat src, int featuresToHold) {
 vector<Mat> ShapeMorph::lumFilter2(Mat src, int featuresToHold) {
 	Mat img1 = this->closeFilter(src,Size(17,17));
 	Mat img2 = this->densityConnector(img1,0.9);
-	deque<Mat> featureVec = this->liquidFeatureExtraction(img2);
+	vector<Mat> featureVec = this->liquidFeatureExtraction(img2);
 	int countPix=0, idx=0;
 	deque<int> countVec;
 	deque<int> idxVec;
@@ -700,8 +700,8 @@ Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
 	return result;
 }
 
-//thresh = discernible thresh; set sort = 1 largest -> smallest features
-deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort) {
+//thresh = discernible thresh; set sort = -1;1 -> Descending;Ascending
+vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	deque<deque<Point> > numFeatures;
 	deque<Point> ptVec;
@@ -775,7 +775,7 @@ deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort)
 	}//end while row
 
 	int numOfPtsThresh = 10;
-	deque<Mat> featureVec;
+	vector<Mat> featureVec;
 	for(unsigned int i=0; i<numFeatures.size(); i++) {
 		Mat feature(src.rows, src.cols, CV_8U,Scalar(0));
 		if(numFeatures.at(i).size()>=numOfPtsThresh) {
@@ -785,11 +785,11 @@ deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort)
 			featureVec.push_back(feature);
 		}
 	}
-	if(sort) {
+	if(sort==1) {
 		int countPix, idx;
 		deque<int> countVec;
 		deque<int> idxVec;
-		deque<Mat> tempVec;
+		vector<Mat> tempVec;
 		for(unsigned int i=0; i<featureVec.size(); i++) {
 			countPix = countNonZero(featureVec.at(i));
 			idx = i;
@@ -797,6 +797,30 @@ deque<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort)
 		}
 		jaysort(countVec,idxVec);
 		for(int i=idxVec.size()-1; i>=0; --i) {
+			try {
+				tempVec.push_back(featureVec.at(idxVec.at(i)));
+			} catch(const std::out_of_range &oor) {
+				printf("idxVec.size(): %lu\n",idxVec.size());
+				printf("featureVec.size(): %lu\n",featureVec.size());
+				printf("i:%d\n",i);
+				printf("idx:%d\n",idxVec.at(i));
+				exit(1);
+			}
+		}
+		featureVec = tempVec;
+	}
+	if(sort==-1) {
+		int countPix, idx;
+		deque<int> countVec;
+		deque<int> idxVec;
+		vector<Mat> tempVec;
+		for(unsigned int i=0; i<featureVec.size(); i++) {
+			countPix = countNonZero(featureVec.at(i));
+			idx = i;
+			countVec.push_back(countPix);
+		}
+		jaysort(countVec,idxVec);
+		for(unsigned int i=0; i<idxVec.size(); i++) {
 			try {
 				tempVec.push_back(featureVec.at(idxVec.at(i)));
 			} catch(const std::out_of_range &oor) {
@@ -1467,7 +1491,7 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 				darkestStuff.at<uchar>(i,j) = 0;
 		}
 	}
-	deque<Mat> islandsVec = this->liquidFeatureExtraction(darkestStuff,5.0);
+	vector<Mat> islandsVec = this->liquidFeatureExtraction(darkestStuff,5.0);
 	Mat mapEdgeRemoval(src.rows, src.cols, CV_8U, Scalar(255));
 	for(unsigned int i=0; i<islandsVec.size(); i++) {
 		Mat edges(darkestStuff.size(),CV_8U,Scalar(0));

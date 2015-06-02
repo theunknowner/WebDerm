@@ -519,7 +519,7 @@ void Entropy::shapeFn2(FileData &fd) {
 	src.copyTo(maskLC,maskEmax);
 	Mat img2 = maskLC * 255;
 	img2 = sm.densityConnector(img2,0.9999);
-	deque<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
+	vector<Mat> islands = sm.liquidFeatureExtraction(img2,0.0,1);
 	Mat img3 = sm.haloTransform(islands.at(0));
 	img3.convertTo(img3,CV_8U);
 	img3 *= 255;

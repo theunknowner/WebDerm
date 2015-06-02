@@ -24,6 +24,8 @@ public:
 	Mat kmeansClusterGeneric(Mat src, double maxVal=0);
 	void writeClusterData(Mat src, String name, int type);
 	Mat colorClusters(Mat src, Mat centers, Mat labels, deque<Point> ptVec);
+
+	double kmeansCluster(vector<double> data_vec, int clusters=0);
 };
 
 #endif /* CLUSTER_H_ */

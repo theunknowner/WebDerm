@@ -32,7 +32,7 @@ int KneeCurve::kneeCurvePoint(deque<double> &vec) {
 	}
 	Mat scalarProduct;
 	multiply(vecFromFirst,lastPtNormRep,scalarProduct);
-	Mat vecFromFirstParallel = scalarProduct.col(0) * lastPtNorm;
+	Mat vecFromFirstParallel = scalarProduct.col(1) * lastPtNorm;
 	Mat vecToLine = vecFromFirst - vecFromFirstParallel;
 	Mat vecToLinePow;
 	pow(vecToLine,2,vecToLinePow);
@@ -59,7 +59,7 @@ int KneeCurve::kneeCurvePoint(deque<double> &vec) {
 //! pass by reference so the original gets sorted
 int KneeCurve::kneeCurvePoint(vector<double> &vec) {
 	sort(vec.begin(),vec.end());
-	Mat vecFromFirst(vec.size(),2,CV_32F,Scalar(0));
+	Mat vecFromFirst(vec.size(),2,CV_32F,Scalar(0)); //basically vec with X coords
 	Mat firstPt(1,2,CV_32F,Scalar(0));
 	Mat lastPt(1,2,CV_32F,Scalar(0));
 	Mat firstPtPow,lastPtPow;
@@ -67,20 +67,23 @@ int KneeCurve::kneeCurvePoint(vector<double> &vec) {
 	firstPt.at<float>(0,1) = vec.at(0);
 	lastPt.at<float>(0,0) = (vec.size()-1) - firstPt.at<float>(0,0);
 	lastPt.at<float>(0,1) = vec.at(vec.size()-1) - firstPt.at<float>(0,1);
-	for(unsigned int i=0; i<vec.size(); i++) {
-		vecFromFirst.at<float>(i,0) = i - firstPt.at<float>(0,0);
-		vecFromFirst.at<float>(i,1) = vec.at(i) - firstPt.at<float>(0,1);
-	}
-	pow(lastPt,2,lastPtPow);
+	cout << "First Pt" << firstPt << endl;
+	cout << "Last Pt" << lastPt << endl;
+
+	pow(lastPt,2.0,lastPtPow);
 	double sqrtSum = sqrt(sum(lastPtPow).val[0]);
 	Mat lastPtNorm = lastPt / sqrtSum;
 	Mat lastPtNormRep(0,0,CV_32F,Scalar(0));
 	while(lastPtNormRep.rows!=vec.size()) {
 		lastPtNormRep.push_back(lastPtNorm.row(0));
 	}
+	for(unsigned int i=0; i<vec.size(); i++) {
+		vecFromFirst.at<float>(i,0) = i - firstPt.at<float>(0,0);
+		vecFromFirst.at<float>(i,1) = vec.at(i) - firstPt.at<float>(0,1);
+	}
 	Mat scalarProduct;
 	multiply(vecFromFirst,lastPtNormRep,scalarProduct);
-	Mat vecFromFirstParallel = scalarProduct.col(0) * lastPtNorm;
+	Mat vecFromFirstParallel = scalarProduct.col(1) * lastPtNorm;
 	Mat vecToLine = vecFromFirst - vecFromFirstParallel;
 	Mat vecToLinePow;
 	pow(vecToLine,2,vecToLinePow);
@@ -88,6 +91,7 @@ int KneeCurve::kneeCurvePoint(vector<double> &vec) {
 	for(int i=0; i<vecToLinePow.rows; i++) {
 		for(int j=0; j<vecToLinePow.cols; j++) {
 			sumMat.at<float>(i,0) += vecToLinePow.at<float>(i,j);
+
 		}
 	}
 	Mat distMat;
@@ -128,7 +132,7 @@ int KneeCurve::kneeCurvePoint(vector<int> &vec) {
 	}
 	Mat scalarProduct;
 	multiply(vecFromFirst,lastPtNormRep,scalarProduct);
-	Mat vecFromFirstParallel = scalarProduct.col(0) * lastPtNorm;
+	Mat vecFromFirstParallel = scalarProduct.col(1) * lastPtNorm;
 	Mat vecToLine = vecFromFirst - vecFromFirstParallel;
 	Mat vecToLinePow;
 	pow(vecToLine,2,vecToLinePow);

@@ -61,7 +61,7 @@ Mat Cluster::kmeansClusterGeneric(Mat src, double maxVal) {
 	Mat labels;
 	int attempts = 5;
 	Mat centers;
-	printf("Min Val: %d, Max Val: %d, Range: %d\n",sampleData.at(0),sampleData.at(sampleData.size()-1),dataRange);
+	printf("Min Val: %d, Max Val: %d, Range: %d\n",sampleData.front(),sampleData.back(),dataRange);
 	cout << "Initial clusters: " << clusterCount << endl;
 	cout << "Input size: " << dataVec.size() <<"/" << src.total() << endl;
 	cout << "Unique Samples: " << maxVal << endl;
@@ -157,4 +157,60 @@ Mat Cluster::colorClusters(Mat src, Mat centers, Mat labels, deque<Point>  ptVec
 		results.at<Vec3b>(ptVec.at(i)) = colorVec.at(idx);
 	}
 	return results;
+}
+
+double Cluster::kmeansCluster(vector<double> data_vec, int clusters) {
+	if(clusters==0) clusters = 3;
+	sort(data_vec.begin(),data_vec.end());
+	Mat samples(data_vec.size(),1,CV_32F,Scalar(0));
+	for(int i=0; i<samples.rows; i++) {
+		samples.at<float>(i,0) = data_vec.at(i);
+	}
+
+	double dataRange = data_vec.back() - data_vec.front();
+	int clusterCount = clusters;
+	int attempts = 5;
+	Mat labels;
+	Mat centers;
+	printf("Min Val: %f, Max Val: %f, Range: %f\n",data_vec.front(),data_vec.back(),dataRange);
+	cout << "Initial clusters: " << clusterCount << endl;
+	cout << "Input size: " << data_vec.size() << endl;
+	kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
+	deque<double> centerCountPercent(clusterCount,0);
+	deque<int> centerCount(clusterCount,0);
+	deque<deque<double> > ranges(clusterCount,deque<double>(2,0.0));
+	for(unsigned int i=0; i<ranges.size(); i++) {
+		for(unsigned int j=0; j<ranges.at(i).size(); j++) {
+			if(j==0) {
+				ranges.at(i).at(j) = data_vec.back();
+			}
+			else if(j==1) {
+				ranges.at(i).at(j) = 0;
+			}
+		}
+	}
+	Mat origPos;
+	jaysort(centers,origPos);
+	for(int i=0; i<labels.rows; i++) {
+		int idx = labels.at<int>(i,0);
+		for(int j=0; j<origPos.rows; j++) {
+			if(idx==origPos.at<int>(j,0)) {
+				idx = j;
+				labels.at<int>(i,0) = idx;
+				break;
+			}
+		}
+		centerCount.at(idx)++;
+		if(data_vec.at(i)>ranges.at(idx).at(1)) {
+			ranges.at(idx).at(1) = data_vec.at(i);
+		}
+		if(data_vec.at(i)<ranges.at(idx).at(0)) {
+			ranges.at(idx).at(0) = data_vec.at(i);
+		}
+	}
+	for(int i=0; i<centers.rows; i++) {
+		printf("%f - %d - Min: %f, Max: %f\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
+	}
+
+	return 0.;
 }
