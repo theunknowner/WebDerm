@@ -67,8 +67,6 @@ int KneeCurve::kneeCurvePoint(vector<double> &vec) {
 	firstPt.at<float>(0,1) = vec.at(0);
 	lastPt.at<float>(0,0) = (vec.size()-1) - firstPt.at<float>(0,0);
 	lastPt.at<float>(0,1) = vec.at(vec.size()-1) - firstPt.at<float>(0,1);
-	cout << "First Pt" << firstPt << endl;
-	cout << "Last Pt" << lastPt << endl;
 
 	pow(lastPt,2.0,lastPtPow);
 	double sqrtSum = sqrt(sum(lastPtPow).val[0]);

@@ -12,20 +12,29 @@
 
 class Cluster {
 private:
-	int dataRange;
+	double dataRange;
 	int clusterCount;
 	deque<int> dataVec; //holds all sample data
 	deque<int> uniqueSamples; //count of each unique sample
 	deque<int> sampleData; //unique samples being considered, usually when count>0
+
+	Mat samples;
+	deque<int> centerCount;
+	deque<deque<double> > ranges;
+	Mat labels, centers;
 public:
-	Mat centers;
 	enum {UCHAR,INT,FLOAT,DOUBLE};
 
 	Mat kmeansClusterGeneric(Mat src, double maxVal=0);
 	void writeClusterData(Mat src, String name, int type);
 	Mat colorClusters(Mat src, Mat centers, Mat labels, deque<Point> ptVec);
 
-	double kmeansCluster(vector<double> data_vec, int clusters=0);
+	Mat kmeansCluster(vector<double> data_vec, int clusters=0);
+	int getNumOfClusters();
+	int getCenterCount(int clusterNum);
+	double getMin(int clusterNum);
+	double getMax(int clusterNum);
+	void printInfo();
 };
 
 #endif /* CLUSTER_H_ */

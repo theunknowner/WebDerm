@@ -50,8 +50,9 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	Scripts::script20();
-/*
+
+	Scripts::script22();
+	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -61,7 +62,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "urticaria8";
+	String name = "herpes_zoster3";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -70,31 +71,8 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	//cvtColor(img,imgGray,CV_BGR2GRAY);
-	Xyz xyz;
-	CieLab lab;
-	Cie cie;
-	vector<float> XYZ, XYZ0, LAB, LAB0;
-	vector<double> deltaE;
-	int row=124;
-	for(int j=1; j<img.row(row).cols; j++) {
-		Vec3b BGR = img.at<Vec3b>(row,j);
-		Vec3b BGR0 = img.at<Vec3b>(row,j-1);
-		XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
-		LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
-		XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
-		LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
-		double dE = cie.deltaE76(LAB,LAB0);
-		deltaE.push_back(dE);
-	}
-	String str = "_row[" + toString(row) + "]";
-	Write::writeSeq2File(deltaE,name+str,",");
-	String folder = "/home/jason/git/WebDerm/WebDerm/";
-	String py_file = "python /home/jason/Desktop/workspace/Pyth/poly_arg.py ";
-	String py_arg = folder+name+str+".csv ";
-	String out_arg = folder+name+str+"_polyfit.csv";
-	py_file += py_arg + out_arg;
-	system(py_file.c_str());
-/*
+
+
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
@@ -117,7 +95,7 @@ int main(int argc,char** argv)
 		transform.convertTo(transform,CV_8U);
 		maskE = (transform - 5) * 255;
 */
-	/*
+/*
 		Mat lcFilterMat = sc.filterKneePt(src);
 		Mat lcFilterNoNoise;
 		lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);
@@ -137,15 +115,14 @@ int main(int argc,char** argv)
 		img2.release();
 		img4.release();
 	}
-
 /*
-	sc.setDebugLevel(1);
+	//sc.setDebugLevel(1);
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
-	img.copyTo(img2,maskE);
-	imgshow(img2);
+	//Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
+	//img.copyTo(img2,maskE);
+	//imgshow(img2);
 /*
 	//maskE = sc.removeRunningLines(maskE,Size(3,1));
 	Mat nnConnect2 = sm.densityConnector(maskE,0.9999);
@@ -153,7 +130,7 @@ int main(int argc,char** argv)
 	transform2.convertTo(transform2,CV_8U);
 	maskE = (transform2 - 5) * 255;
 	img.copyTo(img5,maskE);
-
+*/
 /*
 	Mat lcFilterMat = sc.filterKneePt(src);
 	Mat lcFilterNoNoise;
@@ -162,15 +139,16 @@ int main(int argc,char** argv)
 	Mat lcHaloTrans = sm.haloTransform(lcDenseConnect,2);
 	lcHaloTrans.convertTo(lcHaloTrans,CV_8U);
 	img.copyTo(img2,lcHaloTrans);
-	img5.copyTo(img3,img5);
-	img2.copyTo(img3,img2);
-	//imgshow(img5);
+	//img5.copyTo(img3,img5);
+	//img2.copyTo(img3,img2);
+	imgshow(lcFilterMat);
 	imgshow(src);
 	imgshow(img2);
 	//imgshow(img2);
 	//imgshow(img3);
 
-	//img5 = sc.applyDiscreteShade(imgGray);
+	img5 = sc.applyDiscreteShade(imgGray);
+	imgshow(img5);
 
 	/*
 	CreateTrainingData ctd;

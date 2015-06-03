@@ -159,58 +159,111 @@ Mat Cluster::colorClusters(Mat src, Mat centers, Mat labels, deque<Point>  ptVec
 	return results;
 }
 
-double Cluster::kmeansCluster(vector<double> data_vec, int clusters) {
+//returns the centers in Mat form
+Mat Cluster::kmeansCluster(vector<double> data_vec, int clusters) {
 	if(clusters==0) clusters = 3;
+	this->samples = Mat::zeros(data_vec.size(),1,CV_32F);
 	sort(data_vec.begin(),data_vec.end());
-	Mat samples(data_vec.size(),1,CV_32F,Scalar(0));
 	for(int i=0; i<samples.rows; i++) {
 		samples.at<float>(i,0) = data_vec.at(i);
 	}
+	//cv::sort(samples,samples,CV_SORT_EVERY_COLUMN+CV_SORT_ASCENDING);
 
-	double dataRange = data_vec.back() - data_vec.front();
-	int clusterCount = clusters;
+	this->dataRange = data_vec.back() - data_vec.front();
+	this->clusterCount = clusters;
 	int attempts = 5;
-	Mat labels;
-	Mat centers;
-	printf("Min Val: %f, Max Val: %f, Range: %f\n",data_vec.front(),data_vec.back(),dataRange);
-	cout << "Initial clusters: " << clusterCount << endl;
-	cout << "Input size: " << data_vec.size() << endl;
-	kmeans(samples,clusterCount,labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
-	deque<double> centerCountPercent(clusterCount,0);
-	deque<int> centerCount(clusterCount,0);
-	deque<deque<double> > ranges(clusterCount,deque<double>(2,0.0));
-	for(unsigned int i=0; i<ranges.size(); i++) {
-		for(unsigned int j=0; j<ranges.at(i).size(); j++) {
+	kmeans(this->samples,this->clusterCount,this->labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, this->centers);
+
+	this->centerCount.resize(clusterCount,0);
+	this->ranges.resize(clusterCount,deque<double>(2,0.0));
+	for(unsigned int i=0; i<this->ranges.size(); i++) {
+		for(unsigned int j=0; j<this->ranges.at(i).size(); j++) {
 			if(j==0) {
-				ranges.at(i).at(j) = data_vec.back();
+				this->ranges.at(i).at(j) = data_vec.back();
 			}
 			else if(j==1) {
-				ranges.at(i).at(j) = 0;
+				this->ranges.at(i).at(j) = 0;
 			}
 		}
 	}
 	Mat origPos;
-	jaysort(centers,origPos);
-	for(int i=0; i<labels.rows; i++) {
-		int idx = labels.at<int>(i,0);
+	jaysort(this->centers,origPos);
+	for(int i=0; i<this->labels.rows; i++) {
+		int idx = this->labels.at<int>(i,0);
 		for(int j=0; j<origPos.rows; j++) {
 			if(idx==origPos.at<int>(j,0)) {
 				idx = j;
-				labels.at<int>(i,0) = idx;
+				this->labels.at<int>(i,0) = idx;
 				break;
 			}
 		}
-		centerCount.at(idx)++;
-		if(data_vec.at(i)>ranges.at(idx).at(1)) {
-			ranges.at(idx).at(1) = data_vec.at(i);
+		this->centerCount.at(idx)++;
+		if(data_vec.at(i)>this->ranges.at(idx).at(1)) {
+			this->ranges.at(idx).at(1) = data_vec.at(i);
 		}
 		if(data_vec.at(i)<ranges.at(idx).at(0)) {
-			ranges.at(idx).at(0) = data_vec.at(i);
+			this->ranges.at(idx).at(0) = data_vec.at(i);
 		}
 	}
-	for(int i=0; i<centers.rows; i++) {
-		printf("%f - %d - Min: %f, Max: %f\n",centers.at<float>(i,0),centerCount.at(i),ranges.at(i).at(0),ranges.at(i).at(1));
-	}
 
-	return 0.;
+	return this->centers;
+}
+
+//! returns the number of points in the specified cluster
+int Cluster::getCenterCount(int clusterNum) {
+	int count = 0;
+	try {
+		count = this->centerCount.at(clusterNum);
+	}
+	catch(const std::out_of_range &oor) {
+		printf("Cluster::getCenterCount() out of range!\n");
+		printf("Input: %d\n",clusterNum);
+		printf("Num. of clusters: %d\n",this->centers.rows);
+		exit(1);
+	}
+	return count;
+}
+
+//! returns the number of clusters
+int Cluster::getNumOfClusters() {
+	return this->centers.rows;
+}
+
+//!returns the min of specified cluster
+double Cluster::getMin(int clusterNum) {
+	double min = 0;
+	try {
+		min = this->ranges.at(clusterNum).at(0);
+	}
+	catch(const std::out_of_range &oor) {
+		printf("Cluster::getMin() out of range!\n");
+		printf("Input: %d\n",clusterNum);
+		printf("Num. of clusters: %d\n",this->centers.rows);
+		exit(1);
+	}
+	return min;
+}
+
+//! returns the max of specified cluster
+double Cluster::getMax(int clusterNum) {
+	double max = 0;
+	try {
+		max = this->ranges.at(clusterNum).at(0);
+	}
+	catch(const std::out_of_range &oor) {
+		printf("Cluster::getMax() out of range!\n");
+		printf("Input: %d\n",clusterNum);
+		printf("Num. of clusters: %d\n",this->centers.rows);
+		exit(1);
+	}
+	return max;
+}
+
+void Cluster::printInfo() {
+	printf("Min Val: %f, Max Val: %f, Range: %f\n",this->samples.at<float>(0,0),this->samples.at<float>(samples.rows-1,0),this->dataRange);
+	cout << "Initial clusters: " << this->clusterCount << endl;
+	cout << "Input size: " << this->samples.rows << endl;
+	for(int i=0; i<this->centers.rows; i++) {
+		printf("%f - %d - Min: %f, Max: %f\n",this->centers.at<float>(i,0),this->centerCount.at(i),this->ranges.at(i).at(0),this->ranges.at(i).at(1));
+	}
 }

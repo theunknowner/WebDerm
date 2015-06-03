@@ -31,5 +31,9 @@ void script17();
 void script18();
 void script19();
 void script20();
+void script21();
+void script22();
+void script23();
+
 }
 #endif /* MYSCRIPTS_H_ */
