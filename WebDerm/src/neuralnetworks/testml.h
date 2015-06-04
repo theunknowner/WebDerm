@@ -28,7 +28,7 @@ public:
 	void writeData(String path, Mat &dataSet, Mat &labels);
 	void convertImagesToData(String folder,Mat outputLabels, Size size=Size(0,0));
 	void printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels);
-	Mat convertToBinary(Mat input, int min=0, int max=255, int newMin=0, int newMax=1);
+	Mat convertToBinary(Mat input, int min=0, int max=255, int newMin=0, int newMax=255);
 
 	Mat runANN(String param, vector<Mat> sampleVec);
 

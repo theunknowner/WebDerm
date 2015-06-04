@@ -28,6 +28,7 @@ public:
 	String checkBlack(int r, int g, int b);
 	double calcGrayLevel(int red, int green, int blue);
 	double calcColorLevel(double red, double green, double blue);
+	double calcGrayLumLevel(double red, double green, double blue);
 	double getGrayLevel1(String color);
 	double getGrayLevel2(String color);
 	double getColorLevel(String color, String mainColor);
@@ -39,7 +40,6 @@ public:
 	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	String calcColor(int red, int green, int blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
-	double calcGrayLumLevel(double red, double green, double blue);
 	double calcColorLumLevel(double red, double green, double blue);
 };
 

@@ -51,8 +51,6 @@ int main(int argc,char** argv)
 	//runMouseColor();
 	//runResizeAllImages();
 
-	Scripts::script22();
-	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -62,7 +60,7 @@ int main(int argc,char** argv)
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "herpes_zoster3";
+	String name = "lph4";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -71,8 +69,7 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	//cvtColor(img,imgGray,CV_BGR2GRAY);
-
-
+/*
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
@@ -149,125 +146,30 @@ int main(int argc,char** argv)
 
 	img5 = sc.applyDiscreteShade(imgGray);
 	imgshow(img5);
+*/
+	//Scripts::script_createTrainingLabels();
 
-	/*
-	CreateTrainingData ctd;
-	//Mat src1 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis4-Point(35,0).png",0);
-	//Mat src2 = imread("/home/jason/Desktop/Programs/Training_Samples/tinea_corporis11-Point(35,0).png",0);
-	//Mat stitch = ctd.stitchData(src1,src2);
-	//imwrite("test16.png",stitch);
-	//String folder = "/home/jason/Desktop/Programs/Training_Samples/";
-	//String file = "/home/jason/Desktop/Programs/Training_Samples/custom15-Point(35,35).png";
 
-	//vector<String> list;
-	//ctd.makeFalsePairs(folder, file, 450, list);
+	TestML ml;
+	String param = "/home/jason/git/Samples/Samples/param.xml";
+	Mat sample = imread("/home/jason/Desktop/Programs/ShadeShape/lph4_shadeShape_1.png",0);
+	sample *= 255;
+	imgshow(sample);
+	sample = ml.prepareImage(sample,Size(20,20));
+	imgshow(sample);
+	vector<Mat> sampleVec;
 
-	img5 = ctd.maxDimensionCrop(img4);
-	img5 = runResizeImage(img5,Size(70,70));
-	img5 = sc.applyDiscreteShade(img5);
-	ctd.mouseSelectSegment(img5,Size(35,35),name);
+	sampleVec.push_back(sample);
+	Mat results = ml.runANN(param,sampleVec);
+	cout << results << endl;
 /**/
-	/*
+/*
 	TestML ml;
 	String path1 = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
 	String path2 = "/home/jason/git/Samples/Samples/Training/labels_path.csv";
 	ml.importTrainingData(path1,path2,Size(20,20));
 	Mat data = ml.getData();
 	Mat labels = ml.getLabels();
-	/*
-	TestML ml;
-	String samplesPath = "/home/webderm/Files/Run/Positive_Pairs/";
-	String samplesPath2 = "/home/webderm/Files/Run/Negative_Pairs/";
-	String labelPath = "/home/webderm/Files/Run/Positive-Training-Labels.csv";
-	String labelPath2 = "/home/webderm/Files/Run/Negative-Training-Labels.csv";
-	deque<deque<String> > dataMat1;
-	deque<deque<String> > dataMat2;
-	FileData fd;
-	fd.loadFileMatrix(labelPath,dataMat1);
-	fd.loadFileMatrix(labelPath2,dataMat2);
-	Mat positiveLabels(dataMat1.size(),1,CV_32F,Scalar(0));
-	Mat negativeLabels(dataMat2.size(),1,CV_32F,Scalar(0));
-	for(unsigned int i=0; i<dataMat1.size(); i++) {
-		float val = atof(dataMat1.at(i).at(1).c_str());
-		positiveLabels.at<float>(i,0) = val;
-	}
-	for(unsigned int i=0; i<dataMat2.size(); i++) {
-		float val = atof(dataMat2.at(i).at(1).c_str());
-		negativeLabels.at<float>(i,0) = val;
-	}
-	ml.convertImagesToData(samplesPath,positiveLabels);
-	Mat data1 = ml.getData();
-	Mat labels1 = ml.getLabels();
-	ml.convertImagesToData(samplesPath2,negativeLabels);
-	Mat data2 = ml.getData();
-	Mat labels2 = ml.getLabels();
-
-	Mat data, labels;
-	vconcat(data1,data2,data);
-	vconcat(labels1,labels2,labels);
-	//ml.writeData(samplesPath+"data_set.csv",data,labels);
-/**/
-
-	/*
-	//FileData fd;
-	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Negative_Pairs/";
-	fd.getFilesFromDirectory(folder,files);
-	sort(files.begin(),files.end());
-	TestML ml;
-	String param = "/home/jason/git/Samples/Samples/param.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/test74.png",0);
-	sample = ml.prepareImage(img3,Size(20,20));
-	vector<Mat> sampleVec;
-
-	//for(unsigned int i=0; i<files.size(); i++) {
-		//Mat sample = imread(folder + files.at(i),0);
-
-		//////// Translates Images ///////
-		//sample = ml.tempFixPrepareImg(sample);
-
-		sampleVec.push_back(sample);
-	//}
-	Mat results = ml.runANN(param,sampleVec);
-	cout << results << endl;
-	imgshow(img3);
-/*
-	int count=0;
-	int realTotal=0;
-	for(int i=0; i<results.rows; i++) {
-		if(files.at(i).find("copy")==string::npos)
-			realTotal++;
-		if(results.at<float>(i,0)>0) {
-			if(files.at(i).find("copy")==string::npos) {
-				count++;
-				printf("%s: Results: ", files.at(i).c_str());
-				printf("[%f]\n",results.at<float>(i,0));
-			}
-		}
-	}
-	cout << count << endl;
-	cout << realTotal << endl;
-	/**/
-	/*
-	deque<String> files;
-	FileData fd;
-	String folder = "/home/jason/git/Samples/Samples/Training/Circles/";
-	fd.getFilesFromDirectory(folder,files);
-	for(unsigned int i=0; i<files.size(); i++) {
-		String oldname = folder+files.at(i);
-		String newname = folder+"random(0"+toString(i+1)+").png";
-		cout << newname << endl;
-		rename(oldname.c_str(),newname.c_str());
-	}
-/**/
-	/*
-	//TestML ml;
-	//vector<vector<double> > trainingData;
-	//vector<vector<double> > trainingLabels;
-	//ml.importCsvData("/home/jason/git/Samples/Samples/training_set.csv",trainingData,trainingLabels);
-	//Mat training_set(sampleSize,inputSize,CV_32F);
-	//Mat training_labels(sampleSize,outputSize,CV_32F);
-	//ml.vecToMat(trainingData,trainingLabels,training_set,training_labels);
 	Mat training_set = data;
 	Mat training_labels = labels;
 	int sampleSize = training_set.rows;
