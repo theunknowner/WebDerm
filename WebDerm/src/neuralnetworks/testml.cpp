@@ -30,8 +30,6 @@ Mat TestML::prepareImage(Mat sample, Size size) {
 		_size = size;
 	sample = this->convertToBinary(sample,0,255,0,1);
 	img = fn.cropImage(sample);
-	//Mat img2 = img * 255;
-	//imgshow(img2);
 	img = runResizeImage(img,_size);
 	img = this->convertToBinary(img,0,1,0,255);
 	return img;
