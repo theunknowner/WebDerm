@@ -7,6 +7,7 @@
 
 #include "shadeshape.h"
 #include "shapemorph.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 vector<Mat> ShadeShape::extractShadeShape(Mat src) {
 	ShapeMorph sm;
@@ -40,3 +41,39 @@ vector<Mat> ShadeShape::extractShadeShape(Mat src) {
 	return shadeShapeVec;
 }
 
+vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
+	Size size(3,3);
+	vector<Point> ptsVec;
+
+	for(int row=0; row<src.rows; row++) {
+		for(int col=0; col<src.cols; col++) {
+			int count=0;
+			int units=0;
+			if(src.at<uchar>(row,col)>0) {
+				for(int i=row-floor(size.height/2); i<row+floor(size.height/2); i++) {
+					for(int j=col-floor(size.width/2); j<col+floor(size.width/2); j++) {
+						if(i>=0 && i<src.rows && j>=0 && j<src.cols) {
+							if(i!=row && j!=col) {
+								units++;
+								if(src.at<uchar>(i,j)>0)
+									count++;
+							}
+						}
+					}
+				}
+				if(count<=floor(units*0.75)) {
+					ptsVec.push_back(Point(col,row));
+				}
+			}
+		}
+	}
+	Mat results = src.clone();
+	for(unsigned int i=0; i<ptsVec.size(); i++) {
+		results.at<uchar>(ptsVec.at(i)) = 0;
+	}
+	imgshow(src);
+	imgshow(results);
+	ShapeMorph sm;
+	vector<Mat> isolatedFeatures = sm.liquidFeatureExtraction(results);
+	return isolatedFeatures;
+}

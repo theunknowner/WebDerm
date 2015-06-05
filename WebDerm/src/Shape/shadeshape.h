@@ -15,6 +15,7 @@ private:
 	vector<String> shadeShapeProperty;
 public:
 	vector<Mat> extractShadeShape(Mat src);
+	vector<Mat> isolateConnectedFeatures(Mat src);
 
 	void setShadeShapeProperty(int shadeLevel, int islandNum, int shapeNum);
 };
