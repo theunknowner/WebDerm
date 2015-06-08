@@ -52,10 +52,10 @@ int main(int argc,char** argv)
 	//runMouseColor();
 	//runResizeAllImages();
 
-	Mat img = imread("/home/jason/Desktop/Programs/ShadeShape/acne_vulgaris4_shadeShape_4.png",0);
-	ShadeShape ss;
-	ss.isolateConnectedFeatures(img);
-	/*
+	//Mat img = imread("/home/jason/Desktop/Programs/ShadeShape/acne_vulgaris4_shadeShape_4.png",0);
+	//ShadeShape ss;
+	//ss.isolateConnectedFeatures(img);
+
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -154,10 +154,10 @@ int main(int argc,char** argv)
 */
 	//Scripts::script_createTrainingLabels();
 
-/*
+
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	Mat sample = imread("/home/jason/Desktop/Programs/ShadeShape/lph4_shadeShape_1.png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/cloud_test1.png",0);
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(20,20));

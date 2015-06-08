@@ -1627,16 +1627,16 @@ void script24() {
 //! Create Training Labels
 void script_createTrainingLabels() {
 	TestML ml;
-	String samplePath = "/home/jason/git/Samples/Samples/Training/Strip/";
+	String samplePath = "/home/jason/git/Samples/Samples/Training/Clouds/";
 	String labelPath = "/home/jason/git/Samples/Samples/Training/Labels/";
 	FileData fd;
 	deque<String> files;
 	fd.getFilesFromDirectory(samplePath,files);
 	sort(files.begin(),files.end());
-	String out = labelPath+"set6.csv";
+	String out = labelPath+"set7.csv";
 
-	int sets = 6; //number of differnt shapes/classes
-	int positiveSet = 5; //sset that is labeled positive
+	int sets = 7; //number of differnt shapes/classes
+	int positiveSet = 6; //set that is labeled positive
 
 	FILE * fp;
 	fp = fopen(out.c_str(),"w");

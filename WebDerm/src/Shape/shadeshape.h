@@ -13,6 +13,9 @@
 class ShadeShape {
 private:
 	vector<String> shadeShapeProperty;
+	bool isBridgeWeak(Mat &src, int x, int y);
+	bool isOnTheEdge(Mat &src, int x, int y);
+	bool isUnitBridged(Mat &src, int x, int y);
 public:
 	vector<Mat> extractShadeShape(Mat src);
 	vector<Mat> isolateConnectedFeatures(Mat src);
