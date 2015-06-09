@@ -55,7 +55,7 @@ int main(int argc,char** argv)
 	//Mat img = imread("/home/jason/Desktop/Programs/ShadeShape/acne_vulgaris4_shadeShape_4.png",0);
 	//ShadeShape ss;
 	//ss.isolateConnectedFeatures(img);
-
+	/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -152,12 +152,10 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(imgGray);
 	imgshow(img5);
 */
-	//Scripts::script_createTrainingLabels();
-
 
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/cloud_test1.png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/donut_test1.png",0);
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(20,20));
@@ -168,6 +166,8 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
+	//Scripts::script_createTrainingLabels();
+	//Scripts::script_createAllTrainingLabels();
 /*
 	TestML ml;
 	String path1 = "/home/jason/git/Samples/Samples/Training/samples_path.csv";

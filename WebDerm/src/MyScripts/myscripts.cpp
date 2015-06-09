@@ -1626,17 +1626,17 @@ void script24() {
 
 //! Create Training Labels
 void script_createTrainingLabels() {
-	TestML ml;
-	String samplePath = "/home/jason/git/Samples/Samples/Training/Clouds/";
+	String folderSetName = "Circles-Donut-Incomplete";
+	int sets = 7; //number of differnt shapes/classes
+	int positiveSet = 4; //set that is labeled positive
+
+	String samplePath = "/home/jason/git/Samples/Samples/Training/"+folderSetName+"/";
 	String labelPath = "/home/jason/git/Samples/Samples/Training/Labels/";
 	FileData fd;
 	deque<String> files;
 	fd.getFilesFromDirectory(samplePath,files);
 	sort(files.begin(),files.end());
-	String out = labelPath+"set7.csv";
-
-	int sets = 7; //number of differnt shapes/classes
-	int positiveSet = 6; //set that is labeled positive
+	String out = labelPath+folderSetName+".csv";
 
 	FILE * fp;
 	fp = fopen(out.c_str(),"w");
@@ -1646,7 +1646,7 @@ void script_createTrainingLabels() {
 		filename = getFileName(filename);
 		fprintf(fp,"%s,",filename.c_str());
 		for(int j=0; j<sets; j++) {
-			if(j==positiveSet) label = 1;
+			if(j==positiveSet-1) label = 1;
 			else label = -1;
 			if(j<(sets-1))
 				fprintf(fp,"%d,",label);
@@ -1655,5 +1655,48 @@ void script_createTrainingLabels() {
 		}
 	}
 }
+
+//! Create All Training Labels
+void script_createAllTrainingLabels() {
+	TestML ml;
+
+	String samplePath = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
+	String labelPath = "/home/jason/git/Samples/Samples/Training/Labels/";
+	fstream fs(samplePath);
+	if(fs.is_open()) {
+		String path;
+		deque<String> vec;
+		while(getline(fs,path)) {
+			vec.push_back(path);
+		}
+		int sets = vec.size();
+		for(unsigned int i=0; i<vec.size(); i++) {
+			String folderSetName = getFolderName(vec.at(i));
+			FileData fd;
+			deque<String> files;
+			fd.getFilesFromDirectory(vec.at(i),files);
+			sort(files.begin(), files.end());
+			String out = labelPath+folderSetName+".csv";
+
+			FILE * fp;
+			fp = fopen(out.c_str(),"w");
+			int label = -1;
+			for(unsigned int n=0; n<files.size(); n++) {
+				String filename = vec.at(i)+files.at(n);
+				filename = getFileName(filename);
+				fprintf(fp,"%s,",filename.c_str());
+				for(int j=0; j<sets; j++) {
+					if(j==i) label = 1;
+					else label = -1;
+					if(j<(sets-1))
+						fprintf(fp,"%d,",label);
+					else
+						fprintf(fp,"%d\n",label);
+				}
+			}
+		}
+	}
+}
+
 
 }// end namespace
