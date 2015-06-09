@@ -136,6 +136,23 @@ String getFileName(String filename, String end)
 	return name;
 }
 
+String getFolderName(String path) {
+	char delimit1 = '/';
+	int pos=0;
+	if(path.back()=='/') {
+		path = path.substr(0,path.length()-1);
+	}
+	for(int i=path.size(); i>=0; i--) {
+		if(path[i]==delimit1) {
+			pos=i+1;
+			break;
+		}
+	}
+	String name = path.substr(pos,path.length()-pos);
+
+	return name;
+}
+
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
 	deque<String> tempVec;
 	vec.clear();

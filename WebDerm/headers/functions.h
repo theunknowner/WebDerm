@@ -26,6 +26,7 @@ void imfill(Mat &img);
 void imgshow(Mat src, int flag=0, String name="");
 void getSubstr(String str, char delimiter, deque<String> &vec);
 String getFileName(String filename,String end="");
+String getFolderName(String path);
 
 void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val="0");
 void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val=0);
