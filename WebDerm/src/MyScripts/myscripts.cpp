@@ -1698,5 +1698,36 @@ void script_createAllTrainingLabels() {
 	}
 }
 
+void script_checkAllTestData() {
+	String folder = "/home/jason/Desktop/workspace/Test_Islands/";
+	deque<String> files;
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	String out = folder+"results.csv";
+	ofstream ofs;
+	ofs.open(out);
+	TestML ml;
+	String param = "/home/jason/git/Samples/Samples/param.xml";
+	vector<Mat> sampleVec;
+	vector<String> nameVec;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String filename = folder+files.at(i);
+		Mat sample = imread(filename,0);
+		if(!sample.empty()) {
+			sample *= 255;
+			sample = ml.prepareImage(sample,Size(20,20));
+			sampleVec.push_back(sample);
+			filename = getFileName(filename);
+			nameVec.push_back(filename);
+		}
+	}
+	Mat results = ml.runANN(param,sampleVec);
+	for(int i=0; i<results.rows; i++) {
+		if(ofs.is_open())
+			ofs << nameVec.at(i) << "," << results.row(i) << endl;
+	}
+	ofs.close();
+}
 
 }// end namespace

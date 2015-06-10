@@ -38,6 +38,7 @@ void script24();
 
 void script_createTrainingLabels();
 void script_createAllTrainingLabels();
+void script_checkAllTestData();
 
 }
 #endif /* MYSCRIPTS_H_ */

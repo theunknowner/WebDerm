@@ -152,10 +152,26 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(imgGray);
 	imgshow(img5);
 */
-
+	Scripts::script_checkAllTestData();
+	/*
+	FileData fd;
+	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Disc-Incomplete/";
+	fd.fixFileNumberSequence(folder,"(",3);
+/*
+	deque<String> files;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	String name = "circle_disc_incomp(";
+	for(unsigned int i=0; i<files.size(); i++) {
+		String filename = folder+files.at(i);
+		String newFilename = folder+name+toString(i+1)+").png";
+		rename(filename.c_str(),newFilename.c_str());
+	}
+/**/
+/*
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/donut_test1.png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/random_test4.png",0);
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(20,20));
