@@ -29,15 +29,21 @@ void onMouseCheckColor(int event, int x, int y, int flags, void* param) {
 	char gl[25];
 	char cl[25];
 	char rl[25];
+	char pc[25];
 	double graylevel=0, colorlevel=0;
 	int relLum=0;
 	if(img2.type()==0) {
 		relLum = img2.at<uchar>(y,x);
+		int pixCount = countNonZero(img2);
 		sprintf(coordText, "(%d,%d)", x, y);
 		sprintf(rl,"RelLum: %d",relLum);
-		putText(img3, coordText, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
-		putText(img3, rl, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		sprintf(pc,"TotalPixels: %d",pixCount);
+		//putText(img3, coordText, Point(5,15), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
+		//putText(img3, rl, Point(5,30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0));
         //imshow("Info",img3);
+		char text[100];
+		sprintf(text,"%s | %s | %s",coordText, rl, pc);
+		displayStatusBar(filename,text,0);
 	}
 	else {
 		Vec3b rgbVec = img2.at<Vec3b>(y,x);
