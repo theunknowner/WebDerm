@@ -33,7 +33,7 @@ vector<Mat> ShadeShape::extractShadeShape(Mat src) {
 				}
 				vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape);
 				for(unsigned int k=0; k<littleIslands.size(); k++) {
-					if(countNonZero(littleIslands.at(k))>50)
+					if(countNonZero(littleIslands.at(k))>10)
 						shadeShapeVec.push_back(littleIslands.at(k));
 				}
 			}

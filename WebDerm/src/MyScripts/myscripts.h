@@ -39,6 +39,7 @@ void script24();
 void script_createTrainingLabels();
 void script_createAllTrainingLabels();
 void script_checkAllTestData();
+void script_checkHitRatioTestData();
 
 }
 #endif /* MYSCRIPTS_H_ */

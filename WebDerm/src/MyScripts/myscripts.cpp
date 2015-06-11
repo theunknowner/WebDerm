@@ -1444,6 +1444,7 @@ void script23() {
 
 }
 
+//! extract shadeShape
 void script24() {
 	Rgb rgb;
 	Hsl hsl;
@@ -1694,7 +1695,9 @@ void script_createAllTrainingLabels() {
 						fprintf(fp,"%d\n",label);
 				}
 			}
+			fclose(fp);
 		}
+		fs.close();
 	}
 }
 
@@ -1727,6 +1730,75 @@ void script_checkAllTestData() {
 		if(ofs.is_open())
 			ofs << nameVec.at(i) << "," << results.row(i) << endl;
 	}
+	ofs.close();
+}
+
+void script_checkHitRatioTestData() {
+	String folder = "/home/jason/Desktop/workspace/TestNN/";
+	String file = folder+"result_labels.csv";
+	ifstream ifs(file);
+	vector<int> myLabelVec;
+	if(ifs.is_open()) {
+		String temp;
+		deque<String> vec;
+		while(getline(ifs,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==1)
+					myLabelVec.push_back(atoi(vec.at(i).c_str()));
+			}
+			vec.clear();
+		}
+		ifs.close();
+	}
+
+	deque<String> files;
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
+	String out = folder+"results.csv";
+	ofstream ofs(out);
+	ofs << "Name, 0,1,2,3,4,5,6, Result, MyLabel, Y/N" << endl;
+	TestML ml;
+	String param = "/home/jason/git/Samples/Samples/param.xml";
+	vector<Mat> sampleVec;
+	vector<String> nameVec;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String filename = folder+files.at(i);
+		Mat sample = imread(filename,0);
+		if(!sample.empty()) {
+			sample *= 255;
+			sample = ml.prepareImage(sample,Size(20,20));
+			sampleVec.push_back(sample);
+			filename = getFileName(filename);
+			nameVec.push_back(filename);
+		}
+	}
+	Mat results = ml.runANN(param,sampleVec);
+	int hitCount = 0;
+	for(int i=0; i<results.rows; i++) {
+		if(ofs.is_open())
+			ofs << nameVec.at(i) << "," << results.row(i) << ",";
+		float max = -2.0;
+		int labelNum = -1;
+		for(int j=0; j<results.cols; j++) {
+			if(results.at<float>(i,j)>max) {
+				max = results.at<float>(i,j);
+				labelNum = j;
+			}
+		}
+		if(max<0) labelNum = 4;
+		ofs << labelNum << "," << myLabelVec.at(i )<< ",";
+
+		if(labelNum==myLabelVec.at(i)) {
+			hitCount++;
+			ofs << "Y" << endl;
+		}
+		else
+			ofs << "N" << endl;
+	}
+	float ratio = (float)hitCount/results.rows;
+	ofs << "Hit Ratio: ," << ratio << endl;
 	ofs.close();
 }
 

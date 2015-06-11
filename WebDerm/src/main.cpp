@@ -39,6 +39,7 @@
 #include "Algorithms/write.h"
 #include "CIE/cie.h"
 #include "Shape/shadeshape.h"
+#include "Mouse/mouse.h"
 
 int main(int argc,char** argv)
 {
@@ -51,11 +52,8 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-
-	//Mat img = imread("/home/jason/Desktop/Programs/ShadeShape/acne_vulgaris4_shadeShape_4.png",0);
-	//ShadeShape ss;
-	//ss.isolateConnectedFeatures(img);
-	/*
+	Scripts::script24();
+/*
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -74,6 +72,7 @@ int main(int argc,char** argv)
 	Size size(5,5);
 	//blur(img,img,size);
 	//cvtColor(img,imgGray,CV_BGR2GRAY);
+
 /*
 	FileData fd;
 	deque<String> files;
@@ -152,7 +151,8 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(imgGray);
 	imgshow(img5);
 */
-	Scripts::script_checkAllTestData();
+	//Scripts::script_checkAllTestData();
+	//Scripts::script_checkHitRatioTestData();
 	/*
 	FileData fd;
 	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Disc-Incomplete/";
