@@ -10,38 +10,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
-vector<Mat> ShadeShape::extractShadeShape(Mat src) {
-	ShapeMorph sm;
-	vector<Mat> features = sm.liquidFeatureExtraction(src);
-	vector<Mat> shadeShapeVec;
-	for(unsigned int i=0; i<features.size(); i++) {
-		vector<vector<Point> > ptsVec(256,vector<Point>(0,Point(-1,-1)));
-		Mat island = features.at(i);
-		for(int row=0; row<island.rows; row++) {
-			for(int col=0; col<island.cols; col++) {
-				int val = island.at<uchar>(row,col);
-				if(val>0) {
-					ptsVec.at(val).push_back(Point(col,row));
-				}
-			}
-		}
-		for(unsigned int j=0; j<ptsVec.size(); j++) {
-			Mat shadeShape(src.size(),CV_8U,Scalar(0));
-			if(ptsVec.at(j).size()>0) {
-				for(unsigned int k=0; k<ptsVec.at(j).size(); k++) {
-					shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
-				}
-				vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape);
-				for(unsigned int k=0; k<littleIslands.size(); k++) {
-					if(countNonZero(littleIslands.at(k))>10)
-						shadeShapeVec.push_back(littleIslands.at(k));
-				}
-			}
-		}
-	}
-	return shadeShapeVec;
-}
-
+/******************** PRIVATE FUNCTIONS **********************/
 bool ShadeShape::isOnTheEdge(Mat &src, int x, int y) {
 	Size size(3,3);
 	int beginCol = x - floor(size.width/2);
@@ -150,6 +119,67 @@ bool ShadeShape::isBridgeWeak(Mat &src, int x, int y) {
 
 	return false;
 }
+
+vector<Mat> ShadeShape::extractFeatures(Mat src) {
+	ShapeMorph sm;
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(src);
+	return featureVec;
+}
+
+void ShadeShape::storeFeature(Features feature) {
+	this->featureVec.push_back(feature);
+}
+
+/******************** PUBLIC FUNCTIONS *********************/
+void ShadeShape::extract(Mat src) {
+	vector<Mat> featureVec = this->extractFeatures(src);
+	for(unsigned int i=0; i<featureVec.size(); i++)  {
+		Features feature(featureVec.at(i));
+		this->storeFeature(feature);
+	}
+	this->numOfFeats = this->featureVec.size();
+}
+
+vector<Mat> ShadeShape::extractShadeShape(Mat src) {
+	ShapeMorph sm;
+	vector<Mat> features = sm.liquidFeatureExtraction(src);
+	vector<Mat> shadeShapeVec;
+	for(unsigned int i=0; i<features.size(); i++) {
+		vector<vector<Point> > ptsVec(256,vector<Point>(0,Point(-1,-1)));
+		Mat island = features.at(i);
+		for(int row=0; row<island.rows; row++) {
+			for(int col=0; col<island.cols; col++) {
+				int val = island.at<uchar>(row,col);
+				if(val>0) {
+					ptsVec.at(val).push_back(Point(col,row));
+				}
+			}
+		}
+		for(unsigned int j=0; j<ptsVec.size(); j++) {
+			Mat shadeShape(src.size(),CV_8U,Scalar(0));
+			if(ptsVec.at(j).size()>0) {
+				for(unsigned int k=0; k<ptsVec.at(j).size(); k++) {
+					shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
+				}
+				vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape);
+				for(unsigned int k=0; k<littleIslands.size(); k++) {
+					if(countNonZero(littleIslands.at(k))>10)
+						shadeShapeVec.push_back(littleIslands.at(k));
+				}
+			}
+		}
+	}
+	return shadeShapeVec;
+}
+
+Features ShadeShape::feature(int featNum) {
+	return this->featureVec.at(featNum);
+}
+
+int ShadeShape::numOfFeatures() {
+	return this->numOfFeats;
+}
+
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
 	Size size(3,3);
 	vector<Point> ptsVec;

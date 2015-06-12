@@ -9,18 +9,28 @@
 #define SHADESHAPE_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "features.h"
+
+class Features;
 
 class ShadeShape {
 private:
-	vector<String> shadeShapeProperty;
+	vector<Features> featureVec;
+	int numOfFeats;
+
 	bool isBridgeWeak(Mat &src, int x, int y);
 	bool isOnTheEdge(Mat &src, int x, int y);
 	bool isUnitBridged(Mat &src, int x, int y);
-public:
-	vector<Mat> extractShadeShape(Mat src);
-	vector<Mat> isolateConnectedFeatures(Mat src);
+	vector<Mat> extractFeatures(Mat src);
+	void storeFeature(Features feature);
 
-	void setShadeShapeProperty(int shadeLevel, int islandNum, int shapeNum);
+public:
+	void extract(Mat src);
+	vector<Mat> extractShadeShape(Mat src);
+	Features feature(int featNum);
+	int numOfFeatures();
+
+	vector<Mat> isolateConnectedFeatures(Mat src);
 };
 
 #endif /* SHADESHAPE_H_ */
