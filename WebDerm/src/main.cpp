@@ -52,7 +52,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	Scripts::script24();
+	Scripts::script1();
 /*
 	Rgb rgb;
 	Hsl hsl;
@@ -69,8 +69,8 @@ int main(int argc,char** argv)
 	img = runResizeImage(img,Size(140,140));
 	ShapeMorph sm;
 	ShapeColor sc;
-	Size size(5,5);
-	//blur(img,img,size);
+	Size numOfFeatures(5,5);
+	//blur(img,img,numOfFeatures);
 	//cvtColor(img,imgGray,CV_BGR2GRAY);
 
 /*
@@ -79,13 +79,13 @@ int main(int argc,char** argv)
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
 	String out = "/home/jason/Desktop/Programs/Discrete/";
 	fd.getFilesFromDirectory(folder,files);
-	for(unsigned int i=0; i<files.size(); i++) {
+	for(unsigned int i=0; i<files.numOfFeatures(); i++) {
 		String name = folder + files.at(i);
 		name = getFileName(name);
 		img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 		img = runColorNormalization(img);
 		img = runResizeImage(img,Size(140,140));
-		//blur(img,img,size);
+		//blur(img,img,numOfFeatures);
 
 		cvtColor(img,imgGray,CV_BGR2GRAY);
 		Mat src = sm.prepareImage(imgGray);
@@ -151,6 +151,7 @@ int main(int argc,char** argv)
 	img5 = sc.applyDiscreteShade(imgGray);
 	imgshow(img5);
 */
+	//Scripts::script25();
 	//Scripts::script_checkAllTestData();
 	//Scripts::script_checkHitRatioTestData();
 	/*
@@ -162,7 +163,7 @@ int main(int argc,char** argv)
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
 	String name = "circle_disc_incomp(";
-	for(unsigned int i=0; i<files.size(); i++) {
+	for(unsigned int i=0; i<files.numOfFeatures(); i++) {
 		String filename = folder+files.at(i);
 		String newFilename = folder+name+toString(i+1)+").png";
 		rename(filename.c_str(),newFilename.c_str());

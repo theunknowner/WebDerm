@@ -29,28 +29,21 @@
 
 namespace Scripts {
 void script1() {
-	CreateTrainingData ctd;
+	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
+	String out = "/home/jason/Desktop/Programs/Color Normalized Non Blur 5x5/";
 	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Data/";
-	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
-	sort(files.begin(),files.end());
-	int fileLabel= 4249;
-	for(unsigned int i=0; i<6; i++) {
-		String name = folder + files.at(i);
-		String filename = files.at(i);
-		Mat src1 = imread(name,0);
-		for(unsigned int j=6; j<34;j++) {
-			name = folder + files.at(j);
-			Mat src2 = imread(name,0);
-			if(i!=j) {
-				Mat stitch = ctd.stitchData(src1,src2);
-				name = out + "pos_" + toString(fileLabel) + ".png";
-				fileLabel++;
-				imwrite(name,stitch);
-			}
-		}
+	Mat imgGray;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String filename = folder+files.at(i);
+		Mat img = imread(filename);
+		img = runColorNormalization(img);
+		img = runResizeImage(img,Size(140,140));
+		cvtColor(img,imgGray,CV_BGR2GRAY);
+		filename = getFileName(filename);
+		imwrite(out+filename+".png",img);
+		imwrite(out+filename+"_Gray.png",imgGray);
 	}
 }
 
@@ -1625,6 +1618,363 @@ void script24() {
 	}
 }
 
+void script25() {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	Poly poly;
+	KneeCurve kc;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	Mat img, img2,img3, img4, img5, imgGray;
+	String name = "lph7";
+	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
+	Xyz xyz;
+	CieLab lab;
+	Cie cie;
+	vector<float> XYZ, XYZ0, LAB, LAB0;
+	vector<double> deltaE, HSL;
+	Mat hvec(img.size(),CV_32F,Scalar(0));
+	Mat svec(img.size(),CV_32F,Scalar(0));
+	Mat lvec(img.size(),CV_32F,Scalar(0));
+	double HC, HC0;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+			hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+			svec.at<float>(i,j) = round(HSL.at(1) * 100);
+			lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+		}
+	}
+	Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
+
+	vector<double> pulldown;
+	vector<double> imgRowSlope;
+	vector<double> imgRowAvg;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=1; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+			HC = hc.at<float>(i,j);
+			HC0 = hc.at<float>(i,j-1);
+			int direction = HC - HC0;
+			double dE = cie.deltaE76(LAB,LAB0);
+			if(direction<0)
+				dE = -dE;
+			deltaE.push_back(dE);
+		}
+
+		vector<double> oX;
+		for(unsigned int i=0; i<deltaE.size(); i++) {
+			oX.push_back(i);
+		}
+		vector<double> coeffs = poly.polyfit(oX,deltaE,1);
+		vector<double> oVals = poly.polyval(coeffs,oX);
+		double slope = (oVals.back() - oVals.front()) / oVals.size();
+		double avg = (oVals.front() + oVals.back()) / 2;
+		double pd=0;
+		for(unsigned int j=0; j<deltaE.size(); j++) {
+			if(slope<0.07) {
+				if(avg>=0)
+					pd = deltaE.at(j) - avg;
+				else
+					pd = deltaE.at(j) + avg;
+			}
+			else {
+				pd = deltaE.at(j);
+			}
+			pulldown.push_back(abs(pd));
+		}
+
+		imgRowSlope.push_back(slope);
+		imgRowAvg.push_back(avg);
+		deltaE.clear();
+	}//end row
+
+	Cluster clst;
+	clst.kmeansCluster(pulldown,3);
+
+	double thresh = clst.getMin(clst.getNumOfClusters()-1);
+	Mat map(img.size(),CV_8U, Scalar(0));
+	for(int i=0; i<img.rows; i++) {
+		for(int j=1; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+			HC = hc.at<float>(i,j);
+			HC0 = hc.at<float>(i,j-1);
+			int direction = HC - HC0;
+			double dE = cie.deltaE76(LAB,LAB0);
+			if(direction<0)
+				dE = -dE;
+			if(imgRowSlope.at(i)<0.07) {
+				if(imgRowAvg.at(i)>=0)
+					dE -= imgRowAvg.at(i);
+				else
+					dE += imgRowAvg.at(i);
+
+			}
+			if(abs(dE)>=thresh) {
+				map.at<uchar>(i,j) = 255;
+			}
+		}
+	}
+	ShapeMorph sm;
+	Mat map2 = sm.densityConnector(map,0.9999);
+	Mat map3 = sm.haloTransform(map2,2);
+	map3.convertTo(map3,CV_8U);
+	map3 = (map3 - 5) * 255;
+	vector<Mat> islands = sm.liquidFeatureExtraction(map3,0,-1);
+	vector<int> areas;
+	for(unsigned int i=0; i<islands.size(); i++) {
+		int count = countNonZero(islands.at(i));
+		areas.push_back(count);
+	}
+	int bestIdx = kc.kneeCurvePoint(areas);
+	islands.erase(islands.begin(),islands.begin()+bestIdx);
+	Mat unionMap;
+	for(unsigned int i=0; i<islands.size(); i++) {
+		//imgshow(islands.at(i));
+		islands.at(i).copyTo(unionMap,islands.at(i));
+	}
+
+	ShapeColor sc;
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+	Mat src = sm.prepareImage(imgGray);
+	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+	Mat lcFilterMat = sc.filterKneePt(src);
+	Mat lcFilterNoNoise;
+	lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);
+	Mat lcDenseConnect = sm.densityConnector(lcFilterNoNoise,0.9999);
+	Mat lcHaloTrans = sm.haloTransform(lcDenseConnect,2);
+	lcHaloTrans.convertTo(lcHaloTrans,CV_8U);
+	lcHaloTrans = (lcHaloTrans - 5) * 255;
+	vector<Mat> islandsLC = sm.liquidFeatureExtraction(lcHaloTrans,0,-1);
+	vector<int> areasLC;
+	for(unsigned int i=0; i<islandsLC.size(); i++) {
+		int count = countNonZero(islandsLC.at(i));
+		areasLC.push_back(count);
+	}
+	bestIdx = kc.kneeCurvePoint(areasLC);
+	islandsLC.erase(islandsLC.begin(),islandsLC.begin()+bestIdx);
+	Mat unionMapLC;
+	for(unsigned int i=0; i<islandsLC.size(); i++) {
+		//imgshow(islands.at(i));
+		islandsLC.at(i).copyTo(unionMapLC,islandsLC.at(i));
+	}
+
+	Mat maskFinal;
+	unionMapLC.copyTo(maskFinal,unionMapLC);
+	unionMap.copyTo(maskFinal,unionMap);
+	img.copyTo(img2,maskFinal);
+	img3 = sc.applyDiscreteShade(imgGray);
+	img3.copyTo(img4,maskFinal);
+
+	ShadeShape ss;
+	ss.extract(img4);
+	for(int i=0; i<ss.numOfFeatures(); i++) {
+		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
+			printf("%s_%d.%d: %d\n",name.c_str(),i+1,j+1,ss.feature(i).island(j).shade());
+		}
+	}
+
+}
+
+//! extract shadeShape
+void script26() {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	Poly poly;
+	KneeCurve kc;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	Mat img, img2,img3, img4, img5, imgGray;
+	FileData fd;
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
+	String out = "/home/jason/Desktop/Programs/ShadeShape/";
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		name = getFileName(name);
+		img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+		img = runColorNormalization(img);
+		img = runResizeImage(img,Size(140,140));
+		Xyz xyz;
+		CieLab lab;
+		Cie cie;
+		vector<float> XYZ, XYZ0, LAB, LAB0;
+		vector<double> deltaE, HSL;
+		Mat hvec(img.size(),CV_32F,Scalar(0));
+		Mat svec(img.size(),CV_32F,Scalar(0));
+		Mat lvec(img.size(),CV_32F,Scalar(0));
+		double HC, HC0;
+		for(int i=0; i<img.rows; i++) {
+			for(int j=0; j<img.cols; j++) {
+				Vec3b BGR = img.at<Vec3b>(i,j);
+				HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+				hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+				svec.at<float>(i,j) = round(HSL.at(1) * 100);
+				lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+			}
+		}
+		Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
+
+		vector<double> pulldown;
+		vector<double> imgRowSlope;
+		vector<double> imgRowAvg;
+		for(int i=0; i<img.rows; i++) {
+			for(int j=1; j<img.cols; j++) {
+				Vec3b BGR = img.at<Vec3b>(i,j);
+				Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				HC = hc.at<float>(i,j);
+				HC0 = hc.at<float>(i,j-1);
+				int direction = HC - HC0;
+				double dE = cie.deltaE76(LAB,LAB0);
+				if(direction<0)
+					dE = -dE;
+				deltaE.push_back(dE);
+			}
+
+			vector<double> oX;
+			for(unsigned int i=0; i<deltaE.size(); i++) {
+				oX.push_back(i);
+			}
+			vector<double> coeffs = poly.polyfit(oX,deltaE,1);
+			vector<double> oVals = poly.polyval(coeffs,oX);
+			double slope = (oVals.back() - oVals.front()) / oVals.size();
+			double avg = (oVals.front() + oVals.back()) / 2;
+			double pd=0;
+			for(unsigned int j=0; j<deltaE.size(); j++) {
+				if(slope<0.07) {
+					if(avg>=0)
+						pd = deltaE.at(j) - avg;
+					else
+						pd = deltaE.at(j) + avg;
+				}
+				else {
+					pd = deltaE.at(j);
+				}
+				pulldown.push_back(abs(pd));
+			}
+
+			imgRowSlope.push_back(slope);
+			imgRowAvg.push_back(avg);
+			deltaE.clear();
+		}//end row
+
+		Cluster clst;
+		clst.kmeansCluster(pulldown,3);
+
+		double thresh = clst.getMin(clst.getNumOfClusters()-1);
+		Mat map(img.size(),CV_8U, Scalar(0));
+		for(int i=0; i<img.rows; i++) {
+			for(int j=1; j<img.cols; j++) {
+				Vec3b BGR = img.at<Vec3b>(i,j);
+				Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				HC = hc.at<float>(i,j);
+				HC0 = hc.at<float>(i,j-1);
+				int direction = HC - HC0;
+				double dE = cie.deltaE76(LAB,LAB0);
+				if(direction<0)
+					dE = -dE;
+				if(imgRowSlope.at(i)<0.07) {
+					if(imgRowAvg.at(i)>=0)
+						dE -= imgRowAvg.at(i);
+					else
+						dE += imgRowAvg.at(i);
+
+				}
+				if(abs(dE)>=thresh) {
+					map.at<uchar>(i,j) = 255;
+				}
+			}
+		}
+		ShapeMorph sm;
+		Mat map2 = sm.densityConnector(map,0.9999);
+		Mat map3 = sm.haloTransform(map2,2);
+		map3.convertTo(map3,CV_8U);
+		map3 = (map3 - 5) * 255;
+		vector<Mat> islands = sm.liquidFeatureExtraction(map3,0,-1);
+		vector<int> areas;
+		for(unsigned int i=0; i<islands.size(); i++) {
+			int count = countNonZero(islands.at(i));
+			areas.push_back(count);
+		}
+		int bestIdx = kc.kneeCurvePoint(areas);
+		islands.erase(islands.begin(),islands.begin()+bestIdx);
+		Mat unionMap;
+		for(unsigned int i=0; i<islands.size(); i++) {
+			//imgshow(islands.at(i));
+			islands.at(i).copyTo(unionMap,islands.at(i));
+		}
+
+		ShapeColor sc;
+		cvtColor(img,imgGray,CV_BGR2GRAY);
+		Mat src = sm.prepareImage(imgGray);
+		Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+		Mat lcFilterMat = sc.filterKneePt(src);
+		Mat lcFilterNoNoise;
+		lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);
+		Mat lcDenseConnect = sm.densityConnector(lcFilterNoNoise,0.9999);
+		Mat lcHaloTrans = sm.haloTransform(lcDenseConnect,2);
+		lcHaloTrans.convertTo(lcHaloTrans,CV_8U);
+		lcHaloTrans = (lcHaloTrans - 5) * 255;
+		vector<Mat> islandsLC = sm.liquidFeatureExtraction(lcHaloTrans,0,-1);
+		vector<int> areasLC;
+		for(unsigned int i=0; i<islandsLC.size(); i++) {
+			int count = countNonZero(islandsLC.at(i));
+			areasLC.push_back(count);
+		}
+		bestIdx = kc.kneeCurvePoint(areasLC);
+		islandsLC.erase(islandsLC.begin(),islandsLC.begin()+bestIdx);
+		Mat unionMapLC;
+		for(unsigned int i=0; i<islandsLC.size(); i++) {
+			//imgshow(islands.at(i));
+			islandsLC.at(i).copyTo(unionMapLC,islandsLC.at(i));
+		}
+
+		Mat maskFinal;
+		unionMapLC.copyTo(maskFinal,unionMapLC);
+		unionMap.copyTo(maskFinal,unionMap);
+		img.copyTo(img2,maskFinal);
+		img3 = sc.applyDiscreteShade(imgGray);
+		img3.copyTo(img4,maskFinal);
+
+		ShadeShape ss;
+		ss.extract(img4);
+		for(int i=0; i<ss.numOfFeatures(); i++) {
+			for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
+				String outName = out+name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+".png";
+				imwrite(outName,ss.feature(i).island(j).image());
+			}
+		}
+		img2.release();
+		img4.release();
+	}
+}
+
 //! Create Training Labels
 void script_createTrainingLabels() {
 	String folderSetName = "Circles-Donut-Incomplete";
@@ -1718,11 +2068,12 @@ void script_checkAllTestData() {
 		String filename = folder+files.at(i);
 		Mat sample = imread(filename,0);
 		if(!sample.empty()) {
+			filename = getFileName(filename);
+			nameVec.push_back(filename);
+			printf("%s: %d\n",filename.c_str(),countNonZero(sample));
 			sample *= 255;
 			sample = ml.prepareImage(sample,Size(20,20));
 			sampleVec.push_back(sample);
-			filename = getFileName(filename);
-			nameVec.push_back(filename);
 		}
 	}
 	Mat results = ml.runANN(param,sampleVec);
