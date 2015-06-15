@@ -248,7 +248,7 @@ double Cluster::getMin(int clusterNum) {
 double Cluster::getMax(int clusterNum) {
 	double max = 0;
 	try {
-		max = this->ranges.at(clusterNum).at(0);
+		max = this->ranges.at(clusterNum).at(1);
 	}
 	catch(const std::out_of_range &oor) {
 		printf("Cluster::getMax() out of range!\n");
