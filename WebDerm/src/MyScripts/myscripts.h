@@ -38,6 +38,7 @@ void script24();
 void script25();
 void script26();
 void script27();
+void script28();
 
 void script_createTrainingLabels();
 void script_createAllTrainingLabels();

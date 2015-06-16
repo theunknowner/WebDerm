@@ -22,7 +22,10 @@ public:
 	void setDebugColRow(int col, int row);
 	Mat removeRunningLines(Mat input, Size size);
 	Mat filterKneePt(Mat src, double thresh=0.0, double shift=1.0);
+
+	/* applydiscreteshade.cpp */
 	Mat applyDiscreteShade(Mat input);
+	Mat applyDiscreteShade(Mat input, int minVal, int maxVal, int intervals);
 
 	/* getshapeusingcolor.cpp */
 	Mat getShapeUsingColor(Mat src, Mat noise, double shift=1.0);

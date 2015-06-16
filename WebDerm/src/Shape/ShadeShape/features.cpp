@@ -6,7 +6,7 @@
  */
 
 #include "features.h"
-#include "shapemorph.h";
+#include "../shapemorph.h";
 
 /************ PRIVATE FUNCTIONS ****************/
 
@@ -58,6 +58,18 @@ Features::Features(Mat featureImg) {
 }
 Islands Features::island(int islNum) {
 	return this->islandVec.at(islNum);
+}
+
+void Features::extract(Mat featureImg) {
+	int thresh=10;
+	this->featureImg = featureImg;
+	this->featArea = countNonZero(featureImg);
+	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);
+	for(unsigned int i=0; i<littleIslands.size(); i++) {
+		Islands island(littleIslands.at(i));
+		this->storeIsland(island);
+	}
+	this->numOfIsls = this->islandVec.size();
 }
 
 Mat Features::image() {

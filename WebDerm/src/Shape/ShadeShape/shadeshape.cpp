@@ -6,7 +6,7 @@
  */
 
 #include "shadeshape.h"
-#include "shapemorph.h"
+#include "../shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 

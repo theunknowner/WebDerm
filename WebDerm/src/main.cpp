@@ -21,7 +21,6 @@
 #include "Entropy/entropy.h"
 #include "Shape/circle.h"
 #include "Shape/shape.h"
-#include "neuralnetworks/shapeml.h"
 #include "neuralnetworks/testml.h"
 #include "Shape/shapemorph.h"
 #include "Algorithms/cluster.h"
@@ -38,8 +37,9 @@
 #include "Color/color.h"
 #include "Algorithms/write.h"
 #include "CIE/cie.h"
-#include "Shape/shadeshape.h"
+#include "Shape/ShadeShape/shadeshape.h"
 #include "Mouse/mouse.h"
+#include "Shape/ShapeMatch/shapematch.h"
 
 int main(int argc,char** argv)
 {
@@ -52,7 +52,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	Scripts::script27();
+	Scripts::script23();
 /*
 	Rgb rgb;
 	Hsl hsl;
