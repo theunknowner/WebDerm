@@ -1451,7 +1451,8 @@ void script24() {
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
-	String out = "/home/jason/Desktop/Programs/ShadeShape/";
+	String out = "/home/jason/Desktop/Programs/LC/";
+	String out2 = "/home/jason/Desktop/Programs/DeltaE/";
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = folder + files.at(i);
@@ -1602,19 +1603,17 @@ void script24() {
 		}
 
 		Mat maskFinal;
-		unionMapLC.copyTo(maskFinal,unionMapLC);
-		unionMap.copyTo(maskFinal,unionMap);
-		img.copyTo(img2,maskFinal);
-		img3 = sc.applyDiscreteShade(imgGray);
-		img3.copyTo(img4,maskFinal);
+		//unionMapLC.copyTo(maskFinal,unionMapLC);
+		//unionMap.copyTo(maskFinal,unionMap);
+		img.copyTo(img2,unionMapLC);
+		img.copyTo(img3,unionMap);
 
-		ShadeShape ss;
-		vector<Mat> shadeShapeVec = ss.extractShadeShape(img4);
-		for(unsigned int i=0; i<shadeShapeVec.size(); i++) {
-			imwrite(out+name+"_shadeShape_"+toString(i+1)+".png",shadeShapeVec.at(i));
-		}
+		String outName1 = out+name+".png";
+		String outName2 = out2+name+".png";
+		imwrite(outName1,img2);
+		imwrite(outName2,img3);
 		img2.release();
-		img4.release();
+		img3.release();
 	}
 }
 
