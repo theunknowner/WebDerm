@@ -14,6 +14,8 @@ class TestML {
 private:
 	Mat data;
 	Mat labels;
+	String shapeNames[7] = {"Comp_Disc","Incomp_Disc","Comp_Donut","Incomp_Donut",
+			"Default","Strip","Blotch"};
 public:
 	Mat getData();
 	Mat getLabels();
@@ -35,6 +37,8 @@ public:
 	Mat tempFixPrepareImg(Mat src);
 
 	void importTrainingData(String samplePath, String labelPath, Size size=Size(0,0));
+
+	String getShapeName(int num);
 };
 
 #endif /* TESTML_H_ */

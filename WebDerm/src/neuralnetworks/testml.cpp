@@ -324,3 +324,7 @@ void TestML::importTrainingData(String samplePath, String labelsPath, Size size)
 		fs.close();
 	}
 }
+
+String TestML::getShapeName(int num) {
+	return this->shapeNames[num];
+}

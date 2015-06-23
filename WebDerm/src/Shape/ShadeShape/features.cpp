@@ -7,6 +7,7 @@
 
 #include "features.h"
 #include "../shapemorph.h";
+#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 
 /************ PRIVATE FUNCTIONS ****************/
 
@@ -42,6 +43,31 @@ void Features::storeIsland(Islands island) {
 	this->islandVec.push_back(island);
 }
 
+void Features::determineFeatureShape(Mat featureImg) {
+	TestML ml;
+	String param = "/home/jason/git/Samples/Samples/param.xml";
+	vector<Mat> sampleVec;
+	Mat sample = featureImg.clone();
+	sample *= 255;
+	sample = ml.prepareImage(sample,Size(20,20));
+	sampleVec.push_back(sample);
+	Mat results = ml.runANN(param,sampleVec);
+	this->NN_Results = results;
+	for(int i=0; i<results.rows; i++) {
+		float max = -2.0;
+		int labelNum = -1;
+		for(int j=0; j<results.cols; j++) {
+			if(results.at<float>(i,j)>max) {
+				max = results.at<float>(i,j);
+				labelNum = j;
+			}
+		}
+		if(max<0) labelNum = 4;
+		String shapeName = ml.getShapeName(labelNum);
+		this->featShape = labelNum;
+		this->featShapeName = shapeName;
+	}
+}
 
 /************ PUBLIC FUNCTIONS *******************/
 
@@ -55,7 +81,9 @@ Features::Features(Mat featureImg) {
 		this->storeIsland(island);
 	}
 	this->numOfIsls = this->islandVec.size();
+	this->determineFeatureShape(featureImg);
 }
+
 Islands Features::island(int islNum) {
 	return this->islandVec.at(islNum);
 }
@@ -83,3 +111,16 @@ int Features::area() {
 int Features::numOfIslands() {
 	return this->numOfIsls;
 }
+
+int Features::shape() {
+	return this->featShape;
+}
+
+String Features::shape_name() {
+	return this->featShapeName;
+}
+
+Mat Features::nn_results() {
+	return this->NN_Results;
+}
+

@@ -14,12 +14,20 @@ class Islands {
 private:
 	int islArea;
 	int islShadeLevel;
+	int islShape;
+	String islShapeName;
 	Mat islandImg;
+	Mat NN_Results;
+
+	void determineIslandShape(Mat islandImg);
 public:
 	Islands(Mat islandImg);
 	int area();
 	int shade();
 	Mat image();
+	int shape();
+	String shape_name();
+	Mat nn_results();
 };
 
 #endif /* ISLANDS_H_ */

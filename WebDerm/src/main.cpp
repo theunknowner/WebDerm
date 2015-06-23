@@ -52,7 +52,8 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	Scripts::script24();
+	//Scripts::script27();
+	Scripts::script30();
 /*
 	Rgb rgb;
 	Hsl hsl;
