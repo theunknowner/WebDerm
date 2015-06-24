@@ -13,6 +13,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 
 void ShapeMorph::setDebugMode(bool mode) {
 	this->debugMode = mode;
@@ -1483,7 +1484,6 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 		vec.erase(vec.begin(),vec.begin()+(vec.size()/2));
 	int index = kc.kneeCurvePoint(vec);
 	double thresh = vec.at(index);
-
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
 			double lum = src.at<uchar>(i,j);

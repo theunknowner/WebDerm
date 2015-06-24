@@ -8,6 +8,7 @@
 #include "features.h"
 #include "../shapemorph.h";
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 /************ PRIVATE FUNCTIONS ****************/
 
