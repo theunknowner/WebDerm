@@ -21,6 +21,7 @@ private:
 
 	void determineIslandShape(Mat islandImg);
 public:
+	Islands();
 	Islands(Mat islandImg);
 	int area();
 	int shade();

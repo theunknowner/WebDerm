@@ -14,7 +14,8 @@
 class ShadeShape;
 class ShapeMatch {
 private:
-	vector<float> prop_bins;
+	vector<vector<float> > prop_bins;
+	void areaSort(ShadeShape &ss);
 public:
 	float match(ShadeShape upSS, ShadeShape dbSS);
 };

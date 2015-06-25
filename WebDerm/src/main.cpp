@@ -52,7 +52,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	Scripts::script28a();
+	//Scripts::script28a();
 	//Scripts::script27();
 	//Scripts::script30();
 /*

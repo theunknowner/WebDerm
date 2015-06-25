@@ -2154,6 +2154,61 @@ void script_checkHitRatioTestData() {
 	ofs.close();
 }
 
+int getPeakPos(vector<double> &data_vec) {
+	vector<double> densityVec;
+	for(int i=0; i<8; i++) {
+		Cluster clst2;
+		clst2.kmeansCluster(data_vec,i+1);
+		int totalPts=0;
+		double totalDensity = 0.0;
+		for(int j=0; j<clst2.getNumOfClusters(); j++) {
+			totalPts += clst2.getCenterCount(j);
+		}
+		for(int j=0; j<clst2.getNumOfClusters(); j++) {
+			int numPts = clst2.getCenterCount(j);
+			double minVal = clst2.getMin(j);
+			double maxVal = clst2.getMax(j);
+			double density = numPts/(maxVal-minVal);
+			totalDensity += ((double)numPts/totalPts) * density;
+		}
+		//printf("# of clsts: %d, Density: %f\n",i+1,totalDensity);
+		densityVec.push_back(totalDensity);
+	}
+	vector<double> changeVec;
+	double change = -1.0;
+	for(unsigned int i=0; i<densityVec.size(); i++) {
+		if(i>0) {
+			change = densityVec.at(i)/densityVec.at(i-1);
+			changeVec.push_back(change);
+			printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
+		}
+		else {
+			printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
+			changeVec.push_back(change);
+		}
+	}
+	int changeCount = 0;
+	int peakPos = 1;
+	for(unsigned int i=0; i<changeVec.size(); i++) {
+		double change = changeVec.at(i);
+		if(change<=1.13 && change>=0) changeCount++;
+		else changeCount = 0;
+		printf("%d: %f, %d\n",i+1,change,changeCount);
+		if(changeCount>=2) {
+			peakPos = i-2;
+			peakPos++;
+			break;
+		}
+	}
+	if(peakPos==1) {
+		vector<double>::iterator it = max_element(changeVec.begin(),changeVec.end());
+		peakPos = (it - changeVec.begin())+1;
+		peakPos++;
+	}
+	if(peakPos>4) peakPos = 4;
+	return peakPos;
+}
+
 //! extract shadeShape
 void script27() {
 	Rgb rgb;
@@ -2166,7 +2221,7 @@ void script27() {
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	String out = "/home/jason/Desktop/Programs/ShadeShape/";
-	String name = "tinea_corporis8a";
+	String name = "tinea_corporis8b";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -2325,46 +2380,10 @@ void script27() {
 				data_vec.push_back(val);
 		}
 	}
-	//kc.removeOutliers(data_vec,0.025);
-	vector<double> densityVec;
-	for(int i=0; i<10; i++) {
-		Cluster clst2;
-		clst2.kmeansCluster(data_vec,i+1);
-		int totalPts=0;
-		double totalDensity = 0.0;
-		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			totalPts += clst2.getCenterCount(j);
-		}
-		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			int numPts = clst2.getCenterCount(j);
-			double minVal = clst2.getMin(j);
-			double maxVal = clst2.getMax(j);
-			double density = numPts/(maxVal-minVal);
-			totalDensity += ((double)numPts/totalPts) * density;
-		}
-		//printf("# of clsts: %d, Density: %f\n",i+1,totalDensity);
-		densityVec.push_back(totalDensity);
-	}
-	vector<double> changeVec;
-	double change=0.0;
-	for(unsigned int i=0; i<densityVec.size(); i++) {
-		if(i>0) {
-			change = densityVec.at(i)/densityVec.at(i-1);
-			changeVec.push_back(change);
-			//printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
-		}
-		else {
-			//printf("%d) Density: %f\n",i+1,densityVec.at(i));
-			changeVec.push_back(0.0);
-		}
-
-	}
-	vector<double>::iterator it = max_element(changeVec.begin(),changeVec.end());
-	int peakPos = (it - changeVec.begin())+1;
-	if(peakPos>3) peakPos = 3;
+	int peakPos = getPeakPos(data_vec);
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
-	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos+1);
+	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 	ShadeShape ss;
 	ss.extract(img3);
@@ -2390,7 +2409,7 @@ void script28a() {
 	Mat img, img2,img3, img4, img5, imgGray;
 	FileData fd;
 	deque<String> files;
-	String name = "melanoma8a";
+	String name = "tinea_corporis8b";
 	String out = "/home/jason/Desktop/Programs/Discrete_New/";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
@@ -2547,52 +2566,16 @@ void script28a() {
 			double val = img2.at<uchar>(i,j);
 			if(val>0)
 				data_vec.push_back(val);
-			if(val==1)
-				printf("%d,%d\n",j,i);
 		}
 	}
-	//kc.removeOutliers(data_vec,0.025);
-	vector<double> densityVec;
-	for(int i=0; i<10; i++) {
-		Cluster clst2;
-		clst2.kmeansCluster(data_vec,i+1);
-		int totalPts=0;
-		double totalDensity = 0.0;
-		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			totalPts += clst2.getCenterCount(j);
-		}
-		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			int numPts = clst2.getCenterCount(j);
-			double minVal = clst2.getMin(j);
-			double maxVal = clst2.getMax(j);
-			double density = numPts/(maxVal-minVal);
-			totalDensity += ((double)numPts/totalPts) * density;
-		}
-		//printf("# of clsts: %d, Density: %f\n",i+1,totalDensity);
-		densityVec.push_back(totalDensity);
-	}
-	vector<double> changeVec;
-	double change=0.0;
-	for(unsigned int i=0; i<densityVec.size(); i++) {
-		if(i>0) {
-			change = densityVec.at(i)/densityVec.at(i-1);
-			changeVec.push_back(change);
-			printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
-		}
-		else {
-			printf("%d) Density: %f\n",i+1,densityVec.at(i));
-			changeVec.push_back(0.0);
-		}
-	}
-	vector<double>::iterator it = max_element(changeVec.begin(),changeVec.end());
-	int peakPos = (it - changeVec.begin())+1;
-	if(peakPos>3) peakPos = 3;
+
+	int peakPos = getPeakPos(data_vec);
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
-	//printf("PeakPpos: %d\n",peakPos);
+	printf("PeakPos: %d\n",peakPos);
 	//printf("MinVal: %d\n",minVal);
 	//printf("MaxVal: %d\n",maxVal);
-	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos+1);
+	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 	String outName = out+name+"_discrete.png";
 	img.copyTo(img4,maskFinal);
@@ -2777,43 +2760,7 @@ void script28b() {
 					data_vec.push_back(val);
 			}
 		}
-		//kc.removeOutliers(data_vec,0.025);
-		vector<double> densityVec;
-		for(int i=0; i<10; i++) {
-			Cluster clst2;
-			clst2.kmeansCluster(data_vec,i+1);
-			int totalPts=0;
-			double totalDensity = 0.0;
-			for(int j=0; j<clst2.getNumOfClusters(); j++) {
-				totalPts += clst2.getCenterCount(j);
-			}
-			for(int j=0; j<clst2.getNumOfClusters(); j++) {
-				int numPts = clst2.getCenterCount(j);
-				double minVal = clst2.getMin(j);
-				double maxVal = clst2.getMax(j);
-				double density = numPts/(maxVal-minVal);
-				totalDensity += ((double)numPts/totalPts) * density;
-			}
-			//printf("# of clsts: %d, Density: %f\n",i+1,totalDensity);
-			densityVec.push_back(totalDensity);
-		}
-		vector<double> changeVec;
-		double change=0.0;
-		for(unsigned int i=0; i<densityVec.size(); i++) {
-			if(i>0) {
-				change = densityVec.at(i)/densityVec.at(i-1);
-				changeVec.push_back(change);
-				//printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
-			}
-			else {
-				//printf("%d) Density: %f\n",i+1,densityVec.at(i));
-				changeVec.push_back(0.0);
-			}
-
-		}
-		vector<double>::iterator it = max_element(changeVec.begin(),changeVec.end());
-		int peakPos = (it - changeVec.begin())+1;
-		if(peakPos>3) peakPos = 3;
+		int peakPos = getPeakPos(data_vec);
 		int minVal = *min_element(data_vec.begin(),data_vec.end());
 		int maxVal = *max_element(data_vec.begin(),data_vec.end());
 		img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos+1);
@@ -3015,43 +2962,7 @@ void script29() {
 					data_vec.push_back(val);
 			}
 		}
-		//kc.removeOutliers(data_vec,0.025);
-		vector<double> densityVec;
-		for(int i=0; i<10; i++) {
-			Cluster clst2;
-			clst2.kmeansCluster(data_vec,i+1);
-			int totalPts=0;
-			double totalDensity = 0.0;
-			for(int j=0; j<clst2.getNumOfClusters(); j++) {
-				totalPts += clst2.getCenterCount(j);
-			}
-			for(int j=0; j<clst2.getNumOfClusters(); j++) {
-				int numPts = clst2.getCenterCount(j);
-				double minVal = clst2.getMin(j);
-				double maxVal = clst2.getMax(j);
-				double density = numPts/(maxVal-minVal);
-				totalDensity += ((double)numPts/totalPts) * density;
-			}
-			//printf("# of clsts: %d, Density: %f\n",i+1,totalDensity);
-			densityVec.push_back(totalDensity);
-		}
-		vector<double> changeVec;
-		double change=0.0;
-		for(unsigned int i=0; i<densityVec.size(); i++) {
-			if(i>0) {
-				change = densityVec.at(i)/densityVec.at(i-1);
-				changeVec.push_back(change);
-				//printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
-			}
-			else {
-				//printf("%d) Density: %f\n",i+1,densityVec.at(i));
-				changeVec.push_back(0.0);
-			}
-
-		}
-		vector<double>::iterator it = max_element(changeVec.begin(),changeVec.end());
-		int peakPos = (it - changeVec.begin())+1;
-		if(peakPos>3) peakPos = 3;
+		int peakPos = getPeakPos(data_vec);
 		int minVal = *min_element(data_vec.begin(),data_vec.end());
 		int maxVal = *max_element(data_vec.begin(),data_vec.end());
 		img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos+1);
@@ -3269,46 +3180,10 @@ void script30() {
 				data_vec.push_back(val);
 		}
 	}
-	//kc.removeOutliers(data_vec,0.025);
-	vector<double> densityVec;
-	for(int i=0; i<10; i++) {
-		Cluster clst2;
-		clst2.kmeansCluster(data_vec,i+1);
-		int totalPts=0;
-		double totalDensity = 0.0;
-		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			totalPts += clst2.getCenterCount(j);
-		}
-		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			int numPts = clst2.getCenterCount(j);
-			double minVal = clst2.getMin(j);
-			double maxVal = clst2.getMax(j);
-			double density = numPts/(maxVal-minVal);
-			totalDensity += ((double)numPts/totalPts) * density;
-		}
-		//printf("# of clsts: %d, Density: %f\n",i+1,totalDensity);
-		densityVec.push_back(totalDensity);
-	}
-	vector<double> changeVec;
-	double change=0.0;
-	for(unsigned int i=0; i<densityVec.size(); i++) {
-		if(i>0) {
-			change = densityVec.at(i)/densityVec.at(i-1);
-			changeVec.push_back(change);
-			//printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
-		}
-		else {
-			//printf("%d) Density: %f\n",i+1,densityVec.at(i));
-			changeVec.push_back(0.0);
-		}
-
-	}
-	vector<double>::iterator it = max_element(changeVec.begin(),changeVec.end());
-	int peakPos = (it - changeVec.begin())+1;
-	if(peakPos>3) peakPos = 3;
+	int peakPos = getPeakPos(data_vec);
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
-	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos+1);
+	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 	ShadeShape ss;
 	ss.extract(img3);

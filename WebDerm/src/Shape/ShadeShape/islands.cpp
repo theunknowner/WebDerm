@@ -40,6 +40,8 @@ void Islands::determineIslandShape(Mat islandImg) {
 
 /*************** PUBLIC FUNCTIONS ******************/
 
+Islands::Islands(){}
+
 Islands::Islands(Mat islandImg) {
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
