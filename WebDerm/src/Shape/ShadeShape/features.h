@@ -15,6 +15,8 @@ class Islands;
 class Features {
 private:
 	vector<Islands> islandVec;
+	vector<int> shadeVec;
+	vector<vector<Islands> > islVecShade;
 	Mat featureImg;
 	int featArea;
 	int numOfIsls;
@@ -25,6 +27,8 @@ private:
 	vector<Mat> extractIslands(Mat featureImg, int thresh);
 	void storeIsland(Islands island);
 	void determineFeatureShape(Mat featureImg);
+	void getShadesOfIslands();
+	void groupShadesOfIslands();
 public:
 	Features(Mat featureImg);
 	Islands island(int islNum);
@@ -35,6 +39,9 @@ public:
 	int shape();
 	String shape_name();
 	Mat nn_results();
+	int numOfShades();
+	int shade(int num);
+	vector<Islands> islandsOfShade(int num);
 };
 
 #endif /* FEATURES_H_ */

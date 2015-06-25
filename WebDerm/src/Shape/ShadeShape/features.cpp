@@ -70,6 +70,25 @@ void Features::determineFeatureShape(Mat featureImg) {
 	}
 }
 
+void Features::getShadesOfIslands() {
+	int maxVal = *max_element(this->featureImg.begin<uchar>(),this->featureImg.end<uchar>());
+	vector<int> shadeVec(maxVal+1,0);
+	for(int i=0; i<this->numOfIslands(); i++) {
+		shadeVec.at(this->island(i).shade())++;
+	}
+	for(unsigned int i=0; i<shadeVec.size(); i++) {
+		if(shadeVec.at(i)>0)
+			this->shadeVec.push_back(shadeVec.at(i));
+	}
+}
+
+void Features::groupShadesOfIslands() {
+	this->islVecShade.resize(this->numOfShades(),vector<Islands>(0,Islands()));
+	for(int i=0; i<this->numOfIslands(); i++) {
+
+	}
+}
+
 /************ PUBLIC FUNCTIONS *******************/
 
 Features::Features(Mat featureImg) {
@@ -83,6 +102,7 @@ Features::Features(Mat featureImg) {
 	}
 	this->numOfIsls = this->islandVec.size();
 	this->determineFeatureShape(featureImg);
+	this->getShadesOfIslands();
 }
 
 Islands Features::island(int islNum) {
@@ -125,3 +145,14 @@ Mat Features::nn_results() {
 	return this->NN_Results;
 }
 
+int Features::numOfShades() {
+	return this->shadeVec.size();
+}
+
+int Features::shade(int num) {
+	return this->shadeVec.at(num);
+}
+
+vector<Islands> Features::islandsOfShade(int num) {
+	return this->islVecShade.at(num);
+}
