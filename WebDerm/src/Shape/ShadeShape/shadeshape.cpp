@@ -130,7 +130,25 @@ void ShadeShape::storeFeature(Features feature) {
 	this->featureVec.push_back(feature);
 }
 
+//! gets the unique shade values of the islands and stores them in a vector
+void ShadeShape::getShadesOfFeatures(Mat src) {
+	int maxVal = *max_element(src.begin<uchar>(),src.end<uchar>());
+	vector<int> shadeVec(maxVal+1,0);
+	for(int i=0; i<this->numOfFeatures(); i++) {
+		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
+			shadeVec.at(this->feature(i).island(j).shade())++;
+		}
+	}
+	for(unsigned int i=0; i<shadeVec.size(); i++) {
+		if(shadeVec.at(i)>0) {
+			this->shadeVec.push_back(i);
+		}
+	}
+}
+
 /******************** PUBLIC FUNCTIONS *********************/
+
+//! extracts the features from the image
 void ShadeShape::extract(Mat src) {
 	vector<Mat> featureVec = this->extractFeatures(src);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
@@ -138,8 +156,11 @@ void ShadeShape::extract(Mat src) {
 		this->storeFeature(feature);
 	}
 	this->numOfFeats = this->featureVec.size();
+	this->getShadesOfFeatures(src);
+	this->ssArea = countNonZero(src);
 }
 
+//! extracts the feature image and returns them in a vector
 vector<Mat> ShadeShape::extractShadeShape(Mat src) {
 	ShapeMorph sm;
 	vector<Mat> features = sm.liquidFeatureExtraction(src);
@@ -172,12 +193,28 @@ vector<Mat> ShadeShape::extractShadeShape(Mat src) {
 	return shadeShapeVec;
 }
 
+//! returns feature of [index]
 Features ShadeShape::feature(int featNum) {
 	return this->featureVec.at(featNum);
 }
 
+//! returns number of features in image
 int ShadeShape::numOfFeatures() {
 	return this->numOfFeats;
+}
+
+//! returns shade value of [index]
+int ShadeShape::shade(int num) {
+	return this->shadeVec.at(num);
+}
+
+//! returns numbers of shades
+int ShadeShape::numOfShades() {
+	return this->shadeVec.size();
+}
+
+int ShadeShape::area() {
+	return this->ssArea;
 }
 
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {

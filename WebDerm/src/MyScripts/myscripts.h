@@ -9,7 +9,9 @@
 #define MYSCRIPTS_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/ShadeShape/shadeshape.h"
 
+class ShadeShape;
 namespace Scripts {
 void script1();
 void script2();
@@ -42,6 +44,7 @@ void script28a();
 void script28b();
 void script29();
 void script30();
+ShadeShape script31(String filename);
 
 void script_createTrainingLabels();
 void script_createAllTrainingLabels();

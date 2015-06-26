@@ -28,7 +28,7 @@ private:
 	void storeIsland(Islands island);
 	void determineFeatureShape(Mat featureImg);
 	void getShadesOfIslands();
-	void groupShadesOfIslands();
+	void groupIslandsByShade();
 public:
 	Features(Mat featureImg);
 	Islands island(int islNum);
@@ -41,7 +41,7 @@ public:
 	Mat nn_results();
 	int numOfShades();
 	int shade(int num);
-	vector<Islands> islandsOfShade(int num);
+	//vector<Islands> islandsOfShade(int num);
 };
 
 #endif /* FEATURES_H_ */

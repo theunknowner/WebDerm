@@ -54,7 +54,13 @@ int main(int argc,char** argv)
 	//runResizeAllImages();
 	//Scripts::script28a();
 	//Scripts::script27();
-	//Scripts::script30();
+	Scripts::script30();
+	/*theRNG().state = INIT_SEED_VALUE;
+	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
+	theRNG().state = INIT_SEED_VALUE;
+	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
+	ShapeMatch smatch;
+	smatch.match(ss1,ss2);*/
 /*
 	Rgb rgb;
 	Hsl hsl;

@@ -12,6 +12,7 @@
 
 /************ PRIVATE FUNCTIONS ****************/
 
+//! extracts islands from feature
 vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 	ShapeMorph sm;
 	vector<Mat> islandVec;
@@ -40,10 +41,12 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 	return islandVec;
 }
 
+//! store extracted island into vector
 void Features::storeIsland(Islands island) {
 	this->islandVec.push_back(island);
 }
 
+//! determines the shape of feature using shape neural network
 void Features::determineFeatureShape(Mat featureImg) {
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
@@ -70,6 +73,7 @@ void Features::determineFeatureShape(Mat featureImg) {
 	}
 }
 
+//! gets the unique shade values of the islands and stores them in a vector
 void Features::getShadesOfIslands() {
 	int maxVal = *max_element(this->featureImg.begin<uchar>(),this->featureImg.end<uchar>());
 	vector<int> shadeVec(maxVal+1,0);
@@ -77,15 +81,22 @@ void Features::getShadesOfIslands() {
 		shadeVec.at(this->island(i).shade())++;
 	}
 	for(unsigned int i=0; i<shadeVec.size(); i++) {
-		if(shadeVec.at(i)>0)
-			this->shadeVec.push_back(shadeVec.at(i));
+		if(shadeVec.at(i)>0) {
+			this->shadeVec.push_back(i);
+		}
 	}
 }
 
-void Features::groupShadesOfIslands() {
+//! groups islands of same shade to together in a vector
+void Features::groupIslandsByShade() {
 	this->islVecShade.resize(this->numOfShades(),vector<Islands>(0,Islands()));
-	for(int i=0; i<this->numOfIslands(); i++) {
-
+	for(int i=0; i<this->numOfShades(); i++) {
+		int shadeVal = this->shade(i);
+		for(int j=0; j<this->numOfIslands(); j++) {
+			int shadeVal2 = this->island(j).shade();
+			if(shadeVal2==shadeVal)
+				this->islVecShade.at(i).push_back(this->island(j));
+		}
 	}
 }
 
@@ -103,12 +114,16 @@ Features::Features(Mat featureImg) {
 	this->numOfIsls = this->islandVec.size();
 	this->determineFeatureShape(featureImg);
 	this->getShadesOfIslands();
+	//this->groupIslandsByShade();
 }
 
+//! returns the island of island(index)
 Islands Features::island(int islNum) {
 	return this->islandVec.at(islNum);
 }
 
+//! extracts the islands from the feature
+//! islands with area less than <thresh> is ignored
 void Features::extract(Mat featureImg) {
 	int thresh=10;
 	this->featureImg = featureImg;
@@ -121,38 +136,48 @@ void Features::extract(Mat featureImg) {
 	this->numOfIsls = this->islandVec.size();
 }
 
+//!returns Mat type image of feature
 Mat Features::image() {
 	return this->featureImg;
 }
 
+//! returns area/number of pixels of feature
 int Features::area() {
 	return this->featArea;
 }
 
+//! returns number of islands the feature contains
 int Features::numOfIslands() {
 	return this->numOfIsls;
 }
 
+//! returns index of feature shape
 int Features::shape() {
 	return this->featShape;
 }
 
+//! returns name of the shape of feature
 String Features::shape_name() {
 	return this->featShapeName;
 }
 
+//! outputs shape neural network results
 Mat Features::nn_results() {
 	return this->NN_Results;
 }
 
+//! returns number of unique shades the feature contains
 int Features::numOfShades() {
 	return this->shadeVec.size();
 }
 
+//! gets the value of shade(index)
 int Features::shade(int num) {
 	return this->shadeVec.at(num);
 }
 
+/*
+//! gets the vector of islands that is shade(index)
 vector<Islands> Features::islandsOfShade(int num) {
 	return this->islVecShade.at(num);
-}
+}*/

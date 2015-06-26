@@ -10,6 +10,7 @@
 
 /************ PRIVATE FUNCTIONS ******************/
 
+//! determines shape of island using shape neural network
 void Islands::determineIslandShape(Mat islandImg) {
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
@@ -49,26 +50,32 @@ Islands::Islands(Mat islandImg) {
 	this->determineIslandShape(islandImg);
 }
 
+//! returns area/number of pixels of island
 int Islands::area() {
 	return this->islArea;
 }
 
+//! returns shade of island
 int Islands::shade() {
 	return this->islShadeLevel;
 }
 
+//! returns Mat type image of island
 Mat Islands::image() {
 	return this->islandImg;
 }
 
+//! returns index of shape of the island
 int Islands::shape() {
 	return this->islShape;
 }
 
+//! returns name of shape of the island
 String Islands::shape_name() {
 	return this->islShapeName;
 }
 
+//! outputs shape neural network results
 Mat Islands::nn_results() {
 	return this->NN_Results;
 }
