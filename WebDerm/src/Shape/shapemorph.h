@@ -27,7 +27,7 @@ public:
 	Mat prepareImage(Mat src);
 	Mat custAnd(Mat origImg, Mat scaleImg, Mat map=Mat());
 	Mat grayscaleReconstruct(Mat src, Mat scaleImg);
-	vector<Mat> liquidFeatureExtraction(Mat src, double thresh=0, int sort=0);
+	vector<Mat> liquidFeatureExtraction(Mat src, double lcThresh=0, int sort=0, int numOfPtsThresh=10);
 	vector<Mat> filterFeatures(vector<Mat> featureVec);
 
 	Mat connectImage(Mat src, Size size, double dist);

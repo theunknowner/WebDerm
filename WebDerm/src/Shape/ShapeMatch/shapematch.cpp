@@ -78,7 +78,11 @@ vector<vector<String> > ShapeMatch::createLabels(vector<vector<Islands> > &islan
 			int shape = islandVec.at(i).at(j).shape();
 			int n=0;
 			while(1) {
-				label = "s"+toString(i)+"_shape"+toString(shape)+"_"+toString(n);
+				if(n<10) {
+					label = "s"+toString(i)+"_shape"+toString(shape)+"_0"+toString(n);
+				}
+				else
+					label = "s"+toString(i)+"_shape"+toString(shape)+"_"+toString(n);
 				if(map.find(label)==map.end()) {
 					map[label] = 1;
 					labels.at(i).push_back(label);

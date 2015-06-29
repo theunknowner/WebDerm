@@ -1630,7 +1630,7 @@ void script25() {
 	hsl.importHslThresholds();
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "tinea_corporis8a";
+	String name = "herpes_zoster3";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	String out = "/home/jason/Desktop/Programs/ShadeShape/";
 	img = runColorNormalization(img);
@@ -2155,7 +2155,7 @@ void script_checkHitRatioTestData() {
 	ofs.close();
 }
 
-int getPeakPos(vector<double> &data_vec) {
+int getPeakClusters(vector<double> &data_vec) {
 	vector<double> densityVec;
 	for(int i=0; i<8; i++) {
 		Cluster clst2;
@@ -2181,10 +2181,10 @@ int getPeakPos(vector<double> &data_vec) {
 		if(i>0) {
 			change = densityVec.at(i)/densityVec.at(i-1);
 			changeVec.push_back(change);
-			printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
+			//printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
 		}
 		else {
-			printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
+			//printf("%d) Density: %f, Change: %f\n",i+1,densityVec.at(i),change);
 			changeVec.push_back(change);
 		}
 	}
@@ -2194,7 +2194,7 @@ int getPeakPos(vector<double> &data_vec) {
 		double change = changeVec.at(i);
 		if(change<=1.13 && change>=0) changeCount++;
 		else changeCount = 0;
-		printf("%d: %f, %d\n",i+1,change,changeCount);
+		//printf("%d: %f, %d\n",i+1,change,changeCount);
 		if(changeCount>=2) {
 			peakPos = i-2;
 			peakPos++;
@@ -2206,7 +2206,7 @@ int getPeakPos(vector<double> &data_vec) {
 		peakPos = (it - changeVec.begin())+1;
 		peakPos++;
 	}
-	if(peakPos>4) peakPos = 4;
+	peakPos = min(peakPos+1,4);
 	return peakPos;
 }
 
@@ -2222,7 +2222,7 @@ void script27() {
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	String out = "/home/jason/Desktop/Programs/ShadeShape/";
-	String name = "tinea_corporis8b";
+	String name = "acne_vulgaris4";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -2381,7 +2381,7 @@ void script27() {
 				data_vec.push_back(val);
 		}
 	}
-	int peakPos = getPeakPos(data_vec);
+	int peakPos = getPeakClusters(data_vec);
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
@@ -2410,7 +2410,7 @@ void script28a() {
 	Mat img, img2,img3, img4, img5, imgGray;
 	FileData fd;
 	deque<String> files;
-	String name = "tinea_corporis8b";
+	String name = "herpes_zoster2";
 	String out = "/home/jason/Desktop/Programs/Discrete_New/";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
@@ -2570,7 +2570,7 @@ void script28a() {
 		}
 	}
 
-	int peakPos = getPeakPos(data_vec);
+	int peakPos = getPeakClusters(data_vec);
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
 	printf("PeakPos: %d\n",peakPos);
@@ -2761,15 +2761,16 @@ void script28b() {
 					data_vec.push_back(val);
 			}
 		}
-		int peakPos = getPeakPos(data_vec);
+		int peakPos = getPeakClusters(data_vec);
 		int minVal = *min_element(data_vec.begin(),data_vec.end());
 		int maxVal = *max_element(data_vec.begin(),data_vec.end());
-		img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos+1);
+		img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 		String outName = out+name+"_discrete.png";
 		img.copyTo(img4,maskFinal);
 		imwrite(out+name+".png",img4);
 		imwrite(outName,img3);
+		printf("%s written; PeakPos: %d\n",name.c_str(),peakPos);
 		/*
 		ShadeShape ss;
 		ss.extract(img3);
@@ -2963,7 +2964,7 @@ void script29() {
 					data_vec.push_back(val);
 			}
 		}
-		int peakPos = getPeakPos(data_vec);
+		int peakPos = getPeakClusters(data_vec);
 		int minVal = *min_element(data_vec.begin(),data_vec.end());
 		int maxVal = *max_element(data_vec.begin(),data_vec.end());
 		img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos+1);
@@ -3022,7 +3023,7 @@ void script30() {
 	fprintf(fp,"Name,Shade,Shape\n");
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	String name = "tinea_corporis8b";
+	String name = "acne_vulgaris4";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -3181,7 +3182,7 @@ void script30() {
 				data_vec.push_back(val);
 		}
 	}
-	int peakPos = getPeakPos(data_vec);
+	int peakPos = getPeakClusters(data_vec);
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
@@ -3195,14 +3196,14 @@ void script30() {
 			int shape = ss.feature(i).island(j).shape();
 			String shapeName = ss.feature(i).island(j).shape_name();
 			fprintf(fp,"%s,%d,%d,%s\n",outName.c_str(),shade,shape,shapeName.c_str());
-			//cout << outName << endl;
-			//cout << ss.feature(i).island(j).nn_results() << endl;
+			cout << outName << endl;
+			cout << ss.feature(i).island(j).nn_results() << endl;
 		}
 	}
 
 	ShapeMatch smatch;
 	smatch.test(ss);
-	smatch.showIslands();
+	//smatch.showIslands();
 }
 
 ShadeShape script31(String filename) {
@@ -3374,14 +3375,14 @@ ShadeShape script31(String filename) {
 				data_vec.push_back(val);
 		}
 	}
-	int peakPos = getPeakPos(data_vec);
+	int peakPos = getPeakClusters(data_vec);
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
+	printf("PeakPos: %d\n",peakPos);
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 	ShadeShape ss;
 	ss.extract(img3);
-
 	return ss;
 }
 

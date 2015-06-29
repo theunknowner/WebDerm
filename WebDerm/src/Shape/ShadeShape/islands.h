@@ -29,6 +29,7 @@ public:
 	int shape();
 	String shape_name();
 	Mat nn_results();
+	void set_shape(int num);
 };
 
 #endif /* ISLANDS_H_ */

@@ -11,6 +11,5 @@
 
 extern String path;
 extern bool debug;
-extern size_t INIT_SEED_VALUE;
 
 #endif

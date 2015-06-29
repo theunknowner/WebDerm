@@ -161,6 +161,8 @@ Mat Cluster::colorClusters(Mat src, Mat centers, Mat labels, deque<Point>  ptVec
 
 //returns the centers in Mat form
 Mat Cluster::kmeansCluster(vector<double> data_vec, int clusters) {
+	static unsigned int defaultSeed = theRNG().state;
+	theRNG().state = defaultSeed;
 	if(clusters==0) clusters = 3;
 	this->samples = Mat::zeros(data_vec.size(),1,CV_32F);
 	sort(data_vec.begin(),data_vec.end());

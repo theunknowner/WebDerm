@@ -31,10 +31,9 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 			for(unsigned int k=0; k<ptsVec.at(j).size(); k++) {
 				shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
 			}
-			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape);
+			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
 			for(unsigned int k=0; k<littleIslands.size(); k++) {
-				if(countNonZero(littleIslands.at(k))>thresh)
-					islandVec.push_back(littleIslands.at(k));
+				islandVec.push_back(littleIslands.at(k));
 			}
 		}
 	}

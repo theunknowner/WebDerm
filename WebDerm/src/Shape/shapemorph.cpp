@@ -702,7 +702,7 @@ Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
 }
 
 //thresh = discernible thresh; set sort = -1;1 -> Descending;Ascending
-vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort) {
+vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double lcThresh, int sort,int numOfPtsThresh) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	deque<deque<Point> > numFeatures;
 	deque<Point> ptVec;
@@ -722,42 +722,42 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort
 					Point downLeft(temp.at(0).x-1,temp.at(0).y+1);
 					Point downRight(temp.at(0).x+1,temp.at(0).y+1);
 					if(up.y>=0) {
-						if(map.at<uchar>(up)==0 && src.at<uchar>(up)>thresh) {
+						if(map.at<uchar>(up)==0 && src.at<uchar>(up)>lcThresh) {
 							ptVec.push_back(up);
 							map.at<uchar>(up)=255;
 							temp.push_back(up);
 						}
 					}
 					if(left.x>=0) {
-						if(map.at<uchar>(left)==0 && src.at<uchar>(left)>thresh) {
+						if(map.at<uchar>(left)==0 && src.at<uchar>(left)>lcThresh) {
 							ptVec.push_back(left);
 							map.at<uchar>(left)=255;
 							temp.push_back(left);
 						}
 					}
 					if(right.x<src.cols) {
-						if(map.at<uchar>(right)==0 && src.at<uchar>(right)>thresh) {
+						if(map.at<uchar>(right)==0 && src.at<uchar>(right)>lcThresh) {
 							ptVec.push_back(right);
 							map.at<uchar>(right)=255;
 							temp.push_back(right);
 						}
 					}
 					if(down.y<src.rows) {
-						if(map.at<uchar>(down)==0 && src.at<uchar>(down)>thresh) {
+						if(map.at<uchar>(down)==0 && src.at<uchar>(down)>lcThresh) {
 							ptVec.push_back(down);
 							map.at<uchar>(down)=255;
 							temp.push_back(down);
 						}
 					}
 					if(down.y<src.rows && left.x>=0) {
-						if(map.at<uchar>(downLeft)==0 && src.at<uchar>(downLeft)>thresh) {
+						if(map.at<uchar>(downLeft)==0 && src.at<uchar>(downLeft)>lcThresh) {
 							ptVec.push_back(downLeft);
 							map.at<uchar>(downLeft)=255;
 							temp.push_back(downLeft);
 						}
 					}
 					if(down.y<src.rows && right.x<src.cols) {
-						if(map.at<uchar>(downRight)==0 && src.at<uchar>(downRight)>thresh) {
+						if(map.at<uchar>(downRight)==0 && src.at<uchar>(downRight)>lcThresh) {
 							ptVec.push_back(downRight);
 							map.at<uchar>(downRight)=255;
 							temp.push_back(downRight);
@@ -775,7 +775,6 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double thresh, int sort
 		row++;
 	}//end while row
 
-	int numOfPtsThresh = 10;
 	vector<Mat> featureVec;
 	for(unsigned int i=0; i<numFeatures.size(); i++) {
 		Mat feature(src.rows, src.cols, CV_8U,Scalar(0));

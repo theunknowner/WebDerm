@@ -79,3 +79,7 @@ String Islands::shape_name() {
 Mat Islands::nn_results() {
 	return this->NN_Results;
 }
+
+void Islands::set_shape(int num) {
+	this->islShape = num;
+}

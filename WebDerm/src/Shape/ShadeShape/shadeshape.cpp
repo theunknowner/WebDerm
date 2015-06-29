@@ -122,7 +122,7 @@ bool ShadeShape::isBridgeWeak(Mat &src, int x, int y) {
 
 vector<Mat> ShadeShape::extractFeatures(Mat src) {
 	ShapeMorph sm;
-	vector<Mat> featureVec = sm.liquidFeatureExtraction(src);
+	vector<Mat> featureVec = sm.liquidFeatureExtraction(src,0,0,0);
 	return featureVec;
 }
 

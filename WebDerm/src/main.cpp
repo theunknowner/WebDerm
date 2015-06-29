@@ -52,15 +52,15 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
+	//Scripts::script25();
 	//Scripts::script28a();
 	//Scripts::script27();
-	Scripts::script30();
-	/*theRNG().state = INIT_SEED_VALUE;
-	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
-	theRNG().state = INIT_SEED_VALUE;
-	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
+	//Scripts::script30();
+
+	ShadeShape ss1 = Scripts::script31("acne_vulgaris4");
+	ShadeShape ss2 = Scripts::script31("herpes_zoster2");
 	ShapeMatch smatch;
-	smatch.match(ss1,ss2);*/
+	cout << smatch.match(ss1,ss2) << endl;
 /*
 	Rgb rgb;
 	Hsl hsl;
