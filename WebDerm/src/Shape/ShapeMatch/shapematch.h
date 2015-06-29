@@ -21,6 +21,10 @@ private:
 	vector<vector<Islands> > groupIslandsByShade(ShadeShape &ss);
 	void sortIslandsByArea(vector<vector<Islands> > &islandVec);
 	void sortIslandsByShape(vector<vector<Islands> > &islandVec);
+	vector<vector<String> > createLabels(vector<vector<Islands> > &islandVec);
+	std::map<String,float> createPropAreaMap(vector<vector<Islands> > &islandVec, float totalArea);
+	void fillPropAreaMapGaps(std::map<String,float> &upMap, std::map<String,float> &dbMap);
+	float dotProduct(std::map<String,float> &upMap, std::map<String,float> &dbMap);
 
 	vector<String> shapeNames = {"Strip","Default","Blotch","Incomp_Disc",
 			"Comp_Disc","Incomp_Donut","Comp_Donut"};
