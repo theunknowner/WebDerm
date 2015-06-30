@@ -40,6 +40,7 @@
 #include "Shape/ShadeShape/shadeshape.h"
 #include "Mouse/mouse.h"
 #include "Shape/ShapeMatch/shapematch.h"
+#include "Algorithms/jaysort.h"
 
 int main(int argc,char** argv)
 {
@@ -57,10 +58,10 @@ int main(int argc,char** argv)
 	//Scripts::script27();
 	//Scripts::script30();
 
-	ShadeShape ss1 = Scripts::script31("acne_vulgaris4");
-	ShadeShape ss2 = Scripts::script31("herpes_zoster2");
+	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
+	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
 	ShapeMatch smatch;
-	cout << smatch.match(ss1,ss2) << endl;
+	smatch.match(ss1,ss2);
 /*
 	Rgb rgb;
 	Hsl hsl;

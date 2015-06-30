@@ -309,6 +309,21 @@ float majority(vector<float> vec) {
 	return freq.at(index).at(0);
 }
 
+namespace Func {
+
+//! adds specified digit to front of num
+//! default [length]=1 returns just the num
+String addDigitsForLabel(int num, String digit, int length) {
+	String label = toString(num);
+	length -= label.length();
+	for(int i=0; i<length; i++) {
+		label = digit+label;
+	}
+	return label;
+}
+
+} //end namespace
+
 /* return value up to Nth occurrence = first,second,third... of delimiter */
 double Functions::getDelimitedValuesFromString(String inputString, char delimiter, int occurrence) {
 	double result=0;

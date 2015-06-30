@@ -217,6 +217,10 @@ int ShadeShape::area() {
 	return this->ssArea;
 }
 
+vector<int> ShadeShape::get_shades() {
+	return this->shadeVec;
+}
+
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
 	Size size(3,3);
 	vector<Point> ptsVec;

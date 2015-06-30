@@ -83,3 +83,7 @@ Mat Islands::nn_results() {
 void Islands::set_shape(int num) {
 	this->islShape = num;
 }
+
+void Islands::set_shape_name(String name) {
+	this->islShapeName = name;
+}

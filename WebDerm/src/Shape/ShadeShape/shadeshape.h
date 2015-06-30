@@ -35,6 +35,7 @@ public:
 	int shade(int num);
 	int numOfShades();
 	int area();
+	vector<int> get_shades();
 
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };

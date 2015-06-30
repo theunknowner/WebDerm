@@ -3186,6 +3186,7 @@ void script30() {
 	int minVal = *min_element(data_vec.begin(),data_vec.end());
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
+	printf("PeakPos: %d\n",peakPos);
 
 	ShadeShape ss;
 	ss.extract(img3);
@@ -3196,8 +3197,8 @@ void script30() {
 			int shape = ss.feature(i).island(j).shape();
 			String shapeName = ss.feature(i).island(j).shape_name();
 			fprintf(fp,"%s,%d,%d,%s\n",outName.c_str(),shade,shape,shapeName.c_str());
-			cout << outName << endl;
-			cout << ss.feature(i).island(j).nn_results() << endl;
+			//cout << outName << endl;
+			//cout << ss.feature(i).island(j).nn_results() << endl;
 		}
 	}
 

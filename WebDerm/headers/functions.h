@@ -42,6 +42,10 @@ deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, i
 vector<vector<float> > frequency(vector<float> vec);
 float majority(vector<float> vec);
 
+namespace Func {
+	String addDigitsForLabel(int num, String digit, int length=1);
+}
+
 class Functions {
 public:
 	double getDelimitedValuesFromString(String inputString, char delimiter, int occurrence);
