@@ -40,6 +40,7 @@
 #include "Mouse/mouse.h"
 #include "ShadeShape/ShadeShapeMatch/shadeshapematch.h"
 #include "Algorithms/jaysort.h"
+#include "ShadeShape/ShadeMatch/shadematch.h"
 
 int main(int argc,char** argv)
 {
@@ -55,16 +56,18 @@ int main(int argc,char** argv)
 	//Scripts::script25();
 	//Scripts::script28a();
 	//Scripts::script27();
-	//Scripts::script30();
+	Scripts::script30();
+	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test2.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
+	*/
 /*
 	ShadeShape ss1 = Scripts::script31("melanoma8b");
 	ShadeShape ss2 = Scripts::script31("melanoma8c");
-	ShapeMatch smatch;
-	smatch.match(ss1,ss2);
+	ShadeShapeMatch ssm;
+	ssm.match(ss1,ss2);
 /*
 	Rgb rgb;
 	Hsl hsl;
