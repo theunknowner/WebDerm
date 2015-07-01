@@ -12,10 +12,11 @@
 #include "../shadeshape.h"
 #include "../islands.h"
 #include "../ShapeMatch/shapematch.h"
+#include "../ShadeMatch/shadematch.h"
 
 class ShadeShape;
 class Islands;
-class ShadeShapeMatch : public ShapeMatch {
+class ShadeShapeMatch : public ShapeMatch, public ShadeMatch {
 private:
 	vector<vector<vector<Islands> > > upIslandVec;
 	vector<vector<vector<Islands> > > dbIslandVec;

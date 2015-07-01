@@ -7,9 +7,10 @@
 
 #include "shadeshapematch.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "../ShapeMatch/shapematch.h"
-#include "../shadeshape.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "../ShapeMatch/shapematch.h"
+#include "../ShadeMatch/shadematch.h"
+#include "../shadeshape.h"
 
 /******************* PRIVATE FUNCTIONS ******************/
 
@@ -87,8 +88,8 @@ vector<vector<vector<String> > > ShadeShapeMatch::createKeyLabels(vector<vector<
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
-				label = "s"+toString(j)+"_shape"+toString(i)+"_";
-				//label = "shape"+toString(i)+"_s"+toString(j)+"_";
+				//label = "s"+toString(j)+"_shape"+toString(i)+"_";
+				label = "shape"+toString(i)+"_s"+toString(j)+"_";
 				label += Func::addDigitsForLabel(k,"0",3);
 				if(map.find(label)==map.end()) {
 					map[label] = 1;
@@ -166,6 +167,7 @@ float ShadeShapeMatch::dotProduct(std::map<String,float> &upMap, std::map<String
 
 void ShadeShapeMatch::test(ShadeShape &ss) {
 	ShapeMatch smatch;
+	ShadeMatch shadematch;
 	float totalArea = ss.area();
 	vector<vector<vector<Islands> > > islandVec = this->groupIslandsByShape(ss);
 	this->sortIslandsByArea(islandVec);
@@ -176,18 +178,12 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	}
 	cout << "------------------" << endl;
 	vector<vector<vector<Islands> > > islandVec2 = islandVec;
-	bool flag = smatch.shape_translation(islandVec2,6);
-	if(flag) {
-		this->sortIslandsByArea(islandVec2);
-		map = this->createPropAreaMap(islandVec2,totalArea);
-		for(it=map.begin(); it!=map.end(); it++) {
-			cout << it->first << ": " << it->second << endl;
-		}
-	}
+	shadematch.shade_translation(islandVec2,totalArea);
 }
 
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	ShapeMatch smatch;
+	ShadeMatch shadematch;
 	float upTotalArea = upSS.area();
 	float dbTotalArea = dbSS.area();
 	this->upIslandVec = this->groupIslandsByShape(upSS);
