@@ -6,7 +6,7 @@
  */
 
 #include "features.h"
-#include "../shapemorph.h";
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
@@ -33,7 +33,8 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 			}
 			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
 			for(unsigned int k=0; k<littleIslands.size(); k++) {
-				islandVec.push_back(littleIslands.at(k));
+				if(countNonZero(littleIslands.at(k))>thresh)
+					islandVec.push_back(littleIslands.at(k));
 			}
 		}
 	}
@@ -102,7 +103,7 @@ void Features::groupIslandsByShade() {
 /************ PUBLIC FUNCTIONS *******************/
 
 Features::Features(Mat featureImg) {
-	int thresh=10;
+	int thresh=0;
 	this->featureImg = featureImg;
 	this->featArea = countNonZero(featureImg);
 	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);

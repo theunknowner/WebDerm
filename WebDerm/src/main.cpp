@@ -20,7 +20,6 @@
 #include "Shades/shades.h"
 #include "Entropy/entropy.h"
 #include "Shape/circle.h"
-#include "Shape/shape.h"
 #include "neuralnetworks/testml.h"
 #include "Shape/shapemorph.h"
 #include "Algorithms/cluster.h"
@@ -37,9 +36,9 @@
 #include "Color/color.h"
 #include "Algorithms/write.h"
 #include "CIE/cie.h"
-#include "Shape/ShadeShape/shadeshape.h"
+#include "ShadeShape/shadeshape.h"
 #include "Mouse/mouse.h"
-#include "Shape/ShapeMatch/shapematch.h"
+#include "ShadeShape/ShadeShapeMatch/shadeshapematch.h"
 #include "Algorithms/jaysort.h"
 
 int main(int argc,char** argv)
@@ -57,9 +56,13 @@ int main(int argc,char** argv)
 	//Scripts::script28a();
 	//Scripts::script27();
 	//Scripts::script30();
-
-	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
-	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test2.png");
+	ShadeShapeMatch ssm;
+	ssm.match(ss1,ss2);
+/*
+	ShadeShape ss1 = Scripts::script31("melanoma8b");
+	ShadeShape ss2 = Scripts::script31("melanoma8c");
 	ShapeMatch smatch;
 	smatch.match(ss1,ss2);
 /*

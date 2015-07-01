@@ -6,7 +6,7 @@
  */
 
 #include "shadeshape.h"
-#include "../shapemorph.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
@@ -158,39 +158,6 @@ void ShadeShape::extract(Mat src) {
 	this->numOfFeats = this->featureVec.size();
 	this->getShadesOfFeatures(src);
 	this->ssArea = countNonZero(src);
-}
-
-//! extracts the feature image and returns them in a vector
-vector<Mat> ShadeShape::extractShadeShape(Mat src) {
-	ShapeMorph sm;
-	vector<Mat> features = sm.liquidFeatureExtraction(src);
-	vector<Mat> shadeShapeVec;
-	for(unsigned int i=0; i<features.size(); i++) {
-		vector<vector<Point> > ptsVec(256,vector<Point>(0,Point(-1,-1)));
-		Mat island = features.at(i);
-		for(int row=0; row<island.rows; row++) {
-			for(int col=0; col<island.cols; col++) {
-				int val = island.at<uchar>(row,col);
-				if(val>0) {
-					ptsVec.at(val).push_back(Point(col,row));
-				}
-			}
-		}
-		for(unsigned int j=0; j<ptsVec.size(); j++) {
-			Mat shadeShape(src.size(),CV_8U,Scalar(0));
-			if(ptsVec.at(j).size()>0) {
-				for(unsigned int k=0; k<ptsVec.at(j).size(); k++) {
-					shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
-				}
-				vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape);
-				for(unsigned int k=0; k<littleIslands.size(); k++) {
-					if(countNonZero(littleIslands.at(k))>10)
-						shadeShapeVec.push_back(littleIslands.at(k));
-				}
-			}
-		}
-	}
-	return shadeShapeVec;
 }
 
 //! returns feature of [index]

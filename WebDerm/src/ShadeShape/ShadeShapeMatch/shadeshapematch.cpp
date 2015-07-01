@@ -1,28 +1,26 @@
 /*
- * shapematch.cpp
+ * shadeshapematch.cpp
  *
- *  Created on: Jun 16, 2015
+ *  Created on: Jul 1, 2015
  *      Author: jason
  */
 
-#include "shapematch.h"
+#include "shadeshapematch.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "../ShadeShape/shadeshape.h"
-#include "../ShadeShape/islands.h"
+#include "../ShapeMatch/shapematch.h"
+#include "../shadeshape.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-
 
 /******************* PRIVATE FUNCTIONS ******************/
 
 //! groups the islands of a feature by shade then shape
-vector<vector<vector<Islands> > > ShapeMatch::groupIslandsByShade(ShadeShape &ss) {
-	unsigned int shapeSize = this->shapeNames.size();
+vector<vector<vector<Islands> > > ShadeShapeMatch::groupIslandsByShade(ShadeShape &ss) {
+	int shapeSize = this->numOfShapes();
 	vector<vector<vector<Islands> > > islandVec(ss.numOfShades(),vector<vector<Islands> >(shapeSize,vector<Islands>(0,Islands())));
 	for(int i=0; i<ss.numOfShades(); i++) {
 		int shadeVal = ss.shade(i);
 		for(unsigned int j=0; j<shapeSize; j++) {
-			String shape = this->shapeNames.at(j);
+			String shape =this->shapeName(j);
 			for(int m=0; m<ss.numOfFeatures(); m++) {
 				for(int n=0; n<ss.feature(m).numOfIslands(); n++) {
 					int shadeVal2 = ss.feature(m).island(n).shade();
@@ -38,11 +36,11 @@ vector<vector<vector<Islands> > > ShapeMatch::groupIslandsByShade(ShadeShape &ss
 }
 
 //! groups the islands of a feature by shape then shade
-vector<vector<vector<Islands> > > ShapeMatch::groupIslandsByShape(ShadeShape &ss) {
-	unsigned int shapeSize = this->shapeNames.size();
+vector<vector<vector<Islands> > > ShadeShapeMatch::groupIslandsByShape(ShadeShape &ss) {
+	int shapeSize = this->numOfShapes();
 	vector<vector<vector<Islands> > > islandVec(shapeSize,vector<vector<Islands> >(ss.numOfShades(),vector<Islands>(0,Islands())));
 	for(unsigned int i=0; i<shapeSize; i++) {
-		String shape = this->shapeNames.at(i);
+		String shape = this->shapeName(i);
 		for(int j=0; j<ss.numOfShades(); j++) {
 			int shadeVal = ss.shade(j);
 			for(int m=0; m<ss.numOfFeatures(); m++) {
@@ -61,7 +59,7 @@ vector<vector<vector<Islands> > > ShapeMatch::groupIslandsByShape(ShadeShape &ss
 }
 
 //! sorts the islands by area from largest to smallest
-void ShapeMatch::sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec) {
+void ShadeShapeMatch::sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec) {
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			vector<int> areaVec;
@@ -82,16 +80,16 @@ void ShapeMatch::sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec)
 
 //! create key labels for map
 //! assume islands are group by shape first
-vector<vector<vector<String> > > ShapeMatch::createLabels(vector<vector<vector<Islands> > > &islandVec) {
+vector<vector<vector<String> > > ShadeShapeMatch::createKeyLabels(vector<vector<vector<Islands> > > &islandVec) {
 	std::unordered_map<String,int> map;
 	String label;
 	vector<vector<vector<String> > > labels(islandVec.size(),vector<vector<String> >(islandVec.at(0).size(),vector<String>(0,"")));
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
-				//label = "s"+toString(i)+"_shape"+toString(shape)+"_";
-				label = "shape"+toString(i)+"_s"+toString(j)+"_";
-				label += Func::addDigitsForLabel(k,"0",2);
+				label = "s"+toString(j)+"_shape"+toString(i)+"_";
+				//label = "shape"+toString(i)+"_s"+toString(j)+"_";
+				label += Func::addDigitsForLabel(k,"0",3);
 				if(map.find(label)==map.end()) {
 					map[label] = 1;
 					labels.at(i).at(j).push_back(label);
@@ -104,9 +102,9 @@ vector<vector<vector<String> > > ShapeMatch::createLabels(vector<vector<vector<I
 }
 
 //! create map using labels and proportional area
-map<String,float> ShapeMatch::createPropAreaMap(vector<vector<vector<Islands> > > &islandVec,float totalArea) {
+map<String,float> ShadeShapeMatch::createPropAreaMap(vector<vector<vector<Islands> > > &islandVec,float totalArea) {
 	map<String,float> map;
-	vector<vector<vector<String> > > labels = this->createLabels(islandVec);
+	vector<vector<vector<String> > > labels = this->createKeyLabels(islandVec);
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
@@ -128,7 +126,7 @@ map<String,float> ShapeMatch::createPropAreaMap(vector<vector<vector<Islands> > 
 }
 
 //! compare two maps and fill in missing data for each map
-void ShapeMatch::fillPropAreaMapGaps(std::map<String,float> &upMap, std::map<String,float> &dbMap) {
+void ShadeShapeMatch::fillPropAreaMapGaps(std::map<String,float> &upMap, std::map<String,float> &dbMap) {
 	std::map<String, float>::iterator it;
 	for(it=upMap.begin(); it!=upMap.end(); it++) {
 		String label = it->first;
@@ -145,7 +143,7 @@ void ShapeMatch::fillPropAreaMapGaps(std::map<String,float> &upMap, std::map<Str
 }
 
 //! dot product using holder's inequality
-float ShapeMatch::dotProduct(std::map<String,float> &upMap, std::map<String,float> &dbMap) {
+float ShadeShapeMatch::dotProduct(std::map<String,float> &upMap, std::map<String,float> &dbMap) {
 	if(upMap.size()!=dbMap.size()) {
 		cout << "ShapeMatch::dotProduct(): upMap && dbMap not same size!!!" << endl;
 		exit(1);
@@ -164,59 +162,32 @@ float ShapeMatch::dotProduct(std::map<String,float> &upMap, std::map<String,floa
 	return results;
 }
 
-// shifts specified shape to the left
-void ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum) {
-	vector<vector<vector<Islands> > > newIslandVec = islandVec;
-	vector<int> areaVec;
-	if(shapeNum==4)
-		cout << islandVec.at(shapeNum).size() << endl;
-	if(islandVec.at(shapeNum).size()>0) {
-		for(unsigned int j=0; j<islandVec.at(shapeNum).size(); j++) {
-			if(islandVec.at(shapeNum).at(j).size()>0) {
-				int area = islandVec.at(shapeNum).at(j).front().area();
-				areaVec.push_back(area);
-			}
-			else
-				areaVec.push_back(0);
-		}
-		vector<int>::iterator it = max_element(areaVec.begin(),areaVec.end());
-		int max_pos = it - areaVec.begin();
-		int new_shape = shapeNum-1;
-
-		//printf("shape%d: %d | NewShape: %d\n",shapeNum,max_pos,new_shape);
-		newIslandVec.at(new_shape).at(max_pos).push_back(islandVec.at(shapeNum).at(max_pos).front());
-		newIslandVec.at(shapeNum).at(max_pos).erase(newIslandVec.at(shapeNum).at(max_pos).begin());
-		islandVec = newIslandVec;
-	}
-}
-
 /******************* PUBLIC FUNCTIONS ******************/
 
-void ShapeMatch::test(ShadeShape &ss) {
+void ShadeShapeMatch::test(ShadeShape &ss) {
+	ShapeMatch smatch;
 	float totalArea = ss.area();
-	this->upIslandVec = this->groupIslandsByShape(ss);
-	this->sortIslandsByArea(this->upIslandVec);
-	std::map<String,float> map = this->createPropAreaMap(this->upIslandVec,totalArea);
+	vector<vector<vector<Islands> > > islandVec = this->groupIslandsByShape(ss);
+	this->sortIslandsByArea(islandVec);
+	std::map<String,float> map = this->createPropAreaMap(islandVec,totalArea);
 	std::map<String,float>::iterator it;
 	for(it=map.begin(); it!=map.end(); it++) {
 		cout << it->first << ": " << it->second << endl;
 	}
 	cout << "------------------" << endl;
-	vector<vector<vector<Islands> > > islandVec = this->upIslandVec;
-	this->shape_translation(this->upIslandVec,2);
-	map = this->createPropAreaMap(islandVec,totalArea);
-	for(it=map.begin(); it!=map.end(); it++) {
-		cout << it->first << ": " << it->second << endl;
-	}
-	this->sortIslandsByArea(islandVec);
-	cout << "------------------" << endl;
-	map = this->createPropAreaMap(islandVec,totalArea);
-	for(it=map.begin(); it!=map.end(); it++) {
-		cout << it->first << ": " << it->second << endl;
+	vector<vector<vector<Islands> > > islandVec2 = islandVec;
+	bool flag = smatch.shape_translation(islandVec2,6);
+	if(flag) {
+		this->sortIslandsByArea(islandVec2);
+		map = this->createPropAreaMap(islandVec2,totalArea);
+		for(it=map.begin(); it!=map.end(); it++) {
+			cout << it->first << ": " << it->second << endl;
+		}
 	}
 }
 
-float ShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
+float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
+	ShapeMatch smatch;
 	float upTotalArea = upSS.area();
 	float dbTotalArea = dbSS.area();
 	this->upIslandVec = this->groupIslandsByShape(upSS);
@@ -243,7 +214,7 @@ float ShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	for(unsigned int i=0; i<this->upIslandVec.size(); i++) {
 		islandVec = this->upIslandVec;
 		if(i==2 || i==3 || i==4 || i==6) { // shape num
-			shape_translation(islandVec,i);
+			smatch.shape_translation(islandVec,i);
 			this->sortIslandsByArea(islandVec);
 			upMap = this->createPropAreaMap(islandVec,upTotalArea);
 			dbMap = this->createPropAreaMap(this->dbIslandVec,dbTotalArea);
@@ -262,30 +233,4 @@ float ShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		printf("Results %d: %f\n",i+1,results);
 	}
 	return 0.0;
-}
-
-void ShapeMatch::showIslands() {
-	for(unsigned int i=0; i<this->upIslandVec.size(); i++) {
-		for(unsigned int j=0; j<this->upIslandVec.at(i).size(); j++) {
-			for(unsigned int k=0; k<this->upIslandVec.at(i).at(j).size(); k++) {
-				Mat img = this->upIslandVec.at(i).at(j).at(k).image();
-				printf("Shade %d: ",i);
-				cout << this->upIslandVec.at(i).at(j).at(k).shape_name() << endl;
-				//imgshow(this->upIslandVec.at(i).at(j).image(),1);
-			}
-		}
-	}
-}
-
-void ShapeMatch::printIslandAreas() {
-	for(unsigned int i=0; i<this->upIslandVec.size(); i++) {
-		printf("s%d: ",i);
-		for(unsigned int j=0; j<this->upIslandVec.at(i).size(); j++) {
-			for(unsigned int k=0; k<this->upIslandVec.at(i).at(j).size(); k++) {
-				int area = this->upIslandVec.at(i).at(j).at(k).area();
-				printf("%d, ",area);
-			}
-		}
-		cout << endl;
-	}
 }

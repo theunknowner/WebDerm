@@ -24,9 +24,10 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/ShadeShape/shadeshape.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/shadeshape.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/ShapeMatch/shapematch.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShapeMatch/shapematch.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShadeShapeMatch/shadeshapematch.h"
 
 namespace Scripts {
 void script1() {
@@ -48,20 +49,39 @@ void script1() {
 	}
 }
 
-//! generate names of training data files
-void script2() {
-	FileData fd;
-	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental2/Negative_Pairs/";
-	fd.getFilesFromDirectory(folder,files);
-	sort(files.begin(),files.end());
-	FILE * fp;
-	fp = fopen("pos.csv","w");
-	for(unsigned int i=0; i<files.size(); i++) {
-		String name = getFileName(files.at(i));
-		fprintf(fp,"%s\n",name.c_str());
+// test ShapeMatch::shape_translation()
+ShadeShape script2(String name) {
+	Mat img = imread(name,0);
+	img = runResizeImage(img,Size(140,140));
+	vector<double> data_vec;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			double val = img.at<uchar>(i,j);
+			if(val>0)
+				data_vec.push_back(val);
+		}
 	}
-	fclose(fp);
+	int peakPos = getPeakClusters(data_vec);
+	int minVal = *min_element(data_vec.begin(),data_vec.end());
+	int maxVal = *max_element(data_vec.begin(),data_vec.end());
+	printf("PeakPos: %d\n",peakPos);
+	ShapeColor sc;
+	Mat img2 = sc.applyDiscreteShade(img,minVal,maxVal,peakPos);
+
+	ShadeShape ss;
+	ss.extract(img2);
+	/*for(int i=0; i<ss.numOfFeatures(); i++) {
+		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
+			//imgshow(ss.feature(i).island(j).image());
+			if(ss.feature(i).island(j).area()>5) {
+				int area = ss.feature(i).island(j).area();
+				String shapename = ss.feature(i).island(j).shape_name();
+				int shade = ss.feature(i).island(j).shade();
+				printf("%d.%d: Area:%d, Shape:%s, Shade:%d\n",i+1,j+1,area,shapename.c_str(),shade);
+			}
+		}
+	}*/
+	return ss;
 }
 
 //! create/modify stitches
@@ -1433,10 +1453,7 @@ void script23() {
 	img3.copyTo(img4,maskFinal);
 
 	ShadeShape ss;
-	vector<Mat> shadeShapeVec = ss.extractShadeShape(img4);
-	for(unsigned int i=0; i<shadeShapeVec.size(); i++) {
-		imgshow(shadeShapeVec.at(i));
-	}
+	ss.extract(img4);
 
 }
 
@@ -3023,7 +3040,7 @@ void script30() {
 	fprintf(fp,"Name,Shade,Shape\n");
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	String name = "acne_vulgaris4";
+	String name = "tinea_corporis8a";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -3202,8 +3219,8 @@ void script30() {
 		}
 	}
 
-	ShapeMatch smatch;
-	smatch.test(ss);
+	ShadeShapeMatch ssm;
+	ssm.test(ss);
 	//smatch.showIslands();
 }
 

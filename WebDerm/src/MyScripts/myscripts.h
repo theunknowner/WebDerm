@@ -9,12 +9,14 @@
 #define MYSCRIPTS_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/ShadeShape/shadeshape.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/shadeshape.h"
 
 class ShadeShape;
 namespace Scripts {
+int getPeakClusters(vector<double> &data_vec);
+
 void script1();
-void script2();
+ShadeShape script2(String name);
 void script3();
 void script4();
 void script5();

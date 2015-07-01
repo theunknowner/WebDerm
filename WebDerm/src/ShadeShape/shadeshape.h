@@ -29,7 +29,6 @@ private:
 
 public:
 	void extract(Mat src);
-	vector<Mat> extractShadeShape(Mat src);
 	Features feature(int featNum);
 	int numOfFeatures();
 	int shade(int num);
