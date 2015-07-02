@@ -15,11 +15,13 @@
 class ShadeShape;
 class Islands;
 class ShadeMatch {
-private:
-	const int SHIFT_RIGHT = 1;
-	const int SHIFT_LEFT = -1;
+protected:
+	int maxNumOfShades;
+	enum {SHIFT_NONE=0, SHIFT_LEFT, SHIFT_RIGHT};
+	vector<String> SHIFT = {"SHIFT_NONE","SHIFT_LEFT","SHIFT_RIGHT"};
+
 public:
-	bool shade_translation(vector<vector<vector<Islands> > > &islandVec, float totalArea);
+	bool shade_translation(vector<vector<vector<Islands> > > &islandVec, float thresh, int shiftType, int shiftAmt=1);
 };
 
 #endif /* SHADEMATCH_H_ */

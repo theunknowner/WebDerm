@@ -14,41 +14,50 @@
 
 /*************** PUBLIC FUNCTIONS ********************/
 
-bool ShadeMatch::shade_translation(vector<vector<vector<Islands> > > &islandVec, float totalArea) {
-	float thresh = totalArea / 3.0;
-	vector<vector<vector<Islands> > > newIslandVec = islandVec;
-	vector<vector<int> > indexVec2d;
-	vector<int> areaVec;
-	vector<int> indexVec;
-	for(unsigned int i=0; i<islandVec.size(); i++) {
-		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
-			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
-				int area = islandVec.at(i).at(j).at(k).area();
-				areaVec.push_back(area);
-				indexVec.push_back(i);
-				indexVec.push_back(j);
-				indexVec.push_back(k);
-				indexVec2d.push_back(indexVec);
-				indexVec.clear();
+bool ShadeMatch::shade_translation(vector<vector<vector<Islands> > > &islandVec, float thresh, int shiftType, int shiftAmt) {
+	if(SHIFT[shiftType]!="SHIFT_NONE") {
+		vector<vector<int> > indexVec2d;
+		vector<int> areaVec;
+		vector<int> origPos;
+		vector<int> indexVec;
+		for(unsigned int i=0; i<islandVec.size(); i++) {
+			for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
+				for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
+					int area = islandVec.at(i).at(j).at(k).area();
+					areaVec.push_back(area);
+					indexVec.push_back(i);
+					indexVec.push_back(j);
+					indexVec.push_back(k);
+					indexVec2d.push_back(indexVec);
+					indexVec.clear();
+				}
 			}
 		}
-	}
-	vector<int> origPos;
-	jaysort(areaVec,origPos);
-	int sum = 0;
-	for(int i=areaVec.size()-1; i>=0; i--) {
-		int pos = origPos.at(i);
-		int shape = indexVec2d.at(pos).at(0);
-		int shade = indexVec2d.at(pos).at(1);
-		int idx = indexVec2d.at(pos).at(2);
-		int shade_shift = min(shade-1,0);
-		newIslandVec.at(shape).at(shade_shift).push_back(islandVec.at(shape).at(shade).at(idx));
-		newIslandVec.at(shape).at(shade).erase(newIslandVec.at(shape).at(shade).begin()+idx);
+		jaysort(areaVec,origPos);
+		vector<vector<vector<Islands> > > newIslandVec = islandVec;
+		int sum = 0;
+		int shade_shift=0;
+		for(int i=areaVec.size()-1; i>=0; i--) {
+			int pos = origPos.at(i);
+			int shape = indexVec2d.at(pos).at(0);
+			int shade = indexVec2d.at(pos).at(1);
+			int idx = indexVec2d.at(pos).at(2);
+			if(SHIFT[shiftType] == "SHIFT_LEFT")
+				shade_shift = max(shade-shiftAmt,0);
+			if(SHIFT[shiftType] == "SHIFT_RIGHT")
+				shade_shift = min(shade+shiftAmt,this->maxNumOfShades-1);
 
-		sum += areaVec.at(i);
-		if(sum>thresh) break;
+			if(shade_shift!=shade) {
+				newIslandVec.at(shape).at(shade_shift).push_back(islandVec.at(shape).at(shade).at(idx));
+				newIslandVec.at(shape).at(shade).erase(newIslandVec.at(shape).at(shade).begin()+idx);
+			}
 
-		printf("shape%d_s%d_%d: %d\n",indexVec2d.at(pos).at(0),indexVec2d.at(pos).at(1),indexVec2d.at(pos).at(2),areaVec.at(i));
+			//printf("shape%d_s%d_%d: %d\n",shape,shade,idx,areaVec.at(i));
+			//printf("Shade %d: NewShade %d\n",shade,shade_shift);
+			sum += areaVec.at(i);
+			if(sum>thresh) break;
+		}
+		islandVec = newIslandVec;
 	}
-	return false;
+	return true;
 }
