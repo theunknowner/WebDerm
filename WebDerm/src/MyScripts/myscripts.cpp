@@ -86,46 +86,34 @@ ShadeShape script2(String name) {
 
 //! create/modify stitches
 void script3() {
-	CreateTrainingData ctd;
-	FileData fd;
-	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Simple/Positive_Pairs/";
-	String out = "/home/jason/Desktop/Programs/Training_Samples/Experimental/Test/";
-	fd.getFilesFromDirectory(folder,files);
-	sort(files.begin(),files.end());
-	int count = 1571;
-	for(unsigned int i=0; i<files.size(); i++) {
-		int flag=0;
-		size_t pos=0;
-		String seqStr = fd.getFileSequenceNum(files.at(i),"_",pos);
-		int seq = atoi(seqStr.c_str());
-		if(seq>=4418 && seq<=4642) {
-			String file = folder + files.at(i);
-			Mat img = imread(file,0);
-			Mat src1 = img(Rect(0,0,35,35));
-			Mat src2 = img(Rect(35,0,35,35));
-			Mat blank(src1.size(),CV_8U,Scalar(0));
-			/*int v = img.at<uchar>(0,0);
-			for(int row=0; row<img.rows; row++) {
-				for(int col=0; col<img.cols; col++) {
-					int val = img.at<uchar>(row,col);
-					if(val==v)
-						img.at<uchar>(row,col) = 0;
-					if(val==10 && v!=10) {
-						flag=1;
-						break;
-					}
-				}
-				if(flag==1) break;
-			}*/
-			if(flag==0) {
-				img = ctd.stitchData(blank,src1);
-				String newname = out + "neg_" + toString(count) + ".png";
-				imwrite(newname,img);
-				count++;
-			}
+	Mat src = imread("/home/jason/Desktop/Programs/Color Normalized Non Blur 5x5/clp5.png");
+	Mat samples(src.rows * src.cols, 3, CV_32F);
+	for( int y = 0; y < src.rows; y++ )
+		for( int x = 0; x < src.cols; x++ )
+			for( int z = 0; z < 3; z++)
+				samples.at<float>(y + x*src.rows, z) = src.at<Vec3b>(y,x)[z];
+
+
+	int clusterCount = 15;
+	Mat labels;
+	int attempts = 5;
+	Mat centers;
+	kmeans(samples, clusterCount, labels, TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers );
+
+
+	Mat new_image( src.size(), src.type() );
+	for( int y = 0; y < src.rows; y++ )
+		for( int x = 0; x < src.cols; x++ )
+		{
+			int cluster_idx = labels.at<int>(y + x*src.rows,0);
+			new_image.at<Vec3b>(y,x)[0] = centers.at<float>(cluster_idx, 0);
+			new_image.at<Vec3b>(y,x)[1] = centers.at<float>(cluster_idx, 1);
+			new_image.at<Vec3b>(y,x)[2] = centers.at<float>(cluster_idx, 2);
 		}
-	}
+	Mat grayImg;
+	cvtColor(new_image,grayImg,CV_BGR2GRAY);
+	imgshow(new_image);
+	imgshow(grayImg);
 }
 
 //! swap the training data
@@ -2173,6 +2161,10 @@ void script_checkHitRatioTestData() {
 }
 
 int getPeakClusters(vector<double> &data_vec) {
+	float changeThresh = 1.13;
+	int changeCountThresh = 3;
+	int maxShades = 5;
+	int error = 1;
 	vector<double> densityVec;
 	for(int i=0; i<8; i++) {
 		Cluster clst2;
@@ -2209,10 +2201,10 @@ int getPeakClusters(vector<double> &data_vec) {
 	int peakPos = 1;
 	for(unsigned int i=0; i<changeVec.size(); i++) {
 		double change = changeVec.at(i);
-		if(change<=1.13 && change>=0) changeCount++;
+		if(change<=changeThresh && change>=0) changeCount++;
 		else changeCount = 0;
 		//printf("%d: %f, %d\n",i+1,change,changeCount);
-		if(changeCount>=2) {
+		if(changeCount>=changeCountThresh) {
 			peakPos = i-2;
 			peakPos++;
 			break;
@@ -2223,7 +2215,7 @@ int getPeakClusters(vector<double> &data_vec) {
 		peakPos = (it - changeVec.begin())+1;
 		peakPos++;
 	}
-	peakPos = min(peakPos+1,4);
+	peakPos = min(peakPos+error,maxShades);
 	return peakPos;
 }
 
@@ -2239,7 +2231,7 @@ void script27() {
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	String out = "/home/jason/Desktop/Programs/ShadeShape/";
-	String name = "acne_vulgaris4";
+	String name = "clp5";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -2408,7 +2400,10 @@ void script27() {
 	for(int i=0; i<ss.numOfFeatures(); i++) {
 		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
 			//printf("%s_%d.%d: Area: %d, Shade: %d\n",name.c_str(),i+1,j+1,ss.feature(i).island(j).area(),ss.feature(i).island(j).shade());
-			String outName = out+name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+".png";
+			int x = ss.feature(i).island(j).coordinate().x;
+			int y = ss.feature(i).island(j).coordinate().y;
+			String coord = "["+toString(x)+","+toString(y)+"]";
+			String outName = out+name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+coord+".png";
 			imwrite(outName,ss.feature(i).island(j).image());
 		}
 	}
@@ -2427,7 +2422,7 @@ void script28a() {
 	Mat img, img2,img3, img4, img5, imgGray;
 	FileData fd;
 	deque<String> files;
-	String name = "herpes_zoster2";
+	String name = "clp5";
 	String out = "/home/jason/Desktop/Programs/Discrete_New/";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
@@ -3040,7 +3035,7 @@ void script30() {
 	fprintf(fp,"Name,Shade,Shape\n");
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	String name = "tinea_corporis8a";
+	String name = "clp5";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -3209,11 +3204,14 @@ void script30() {
 	ss.extract(img3);
 	for(int i=0; i<ss.numOfFeatures(); i++) {
 		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
-			String outName = name+"_shadeShape_"+toString(i+1)+"."+toString(j+1);
+			int x = ss.feature(i).island(j).coordinate().x;
+			int y = ss.feature(i).island(j).coordinate().y;
+			String coord = "["+toString(x)+"."+toString(y)+"]";
+			String outName = name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+coord+".png";
 			int shade = ss.feature(i).island(j).shade();
 			int shape = ss.feature(i).island(j).shape();
 			String shapeName = ss.feature(i).island(j).shape_name();
-			fprintf(fp,"%s,%d,%d,%s\n",outName.c_str(),shade,shape,shapeName.c_str());
+			//fprintf(fp,"%s,%d,%d,%s\n",outName.c_str(),shade,shape,shapeName.c_str());
 			//cout << outName << endl;
 			//cout << ss.feature(i).island(j).nn_results() << endl;
 		}
@@ -3221,7 +3219,6 @@ void script30() {
 
 	ShadeShapeMatch ssm;
 	ssm.test(ss);
-	//smatch.showIslands();
 }
 
 ShadeShape script31(String filename) {

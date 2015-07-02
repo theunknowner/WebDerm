@@ -53,19 +53,19 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	//Scripts::script25();
-	//Scripts::script28a();
+	//Scripts::script3();
+	//Scripts::script28b();
 	//Scripts::script27();
-	Scripts::script30();
+	//Scripts::script30();
 	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
 	*/
-/*
-	ShadeShape ss1 = Scripts::script31("melanoma8b");
-	ShadeShape ss2 = Scripts::script31("melanoma8c");
+
+	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
+	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
 /*

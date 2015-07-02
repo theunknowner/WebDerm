@@ -18,8 +18,10 @@ private:
 	String islShapeName;
 	Mat islandImg;
 	Mat NN_Results;
+	Point islPt;
 
-	void determineIslandShape(Mat islandImg);
+	void determineIslandShape(Mat &islandImg);
+	void getIslandStartPt(Mat &islandImg);
 public:
 	Islands();
 	Islands(Mat islandImg);
@@ -31,6 +33,7 @@ public:
 	Mat nn_results();
 	void set_shape(int num);
 	void set_shape_name(String name);
+	Point coordinate();
 };
 
 #endif /* ISLANDS_H_ */

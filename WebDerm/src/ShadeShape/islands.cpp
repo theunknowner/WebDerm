@@ -11,7 +11,7 @@
 /************ PRIVATE FUNCTIONS ******************/
 
 //! determines shape of island using shape neural network
-void Islands::determineIslandShape(Mat islandImg) {
+void Islands::determineIslandShape(Mat &islandImg) {
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
 	vector<Mat> sampleVec;
@@ -38,6 +38,11 @@ void Islands::determineIslandShape(Mat islandImg) {
 	}
 }
 
+void Islands::getIslandStartPt(Mat &islandImg) {
+	Mat nonZeroPts;
+	cv::findNonZero(islandImg,nonZeroPts);
+	this->islPt = nonZeroPts.at<Point>(0);
+}
 
 /*************** PUBLIC FUNCTIONS ******************/
 
@@ -47,6 +52,7 @@ Islands::Islands(Mat islandImg) {
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
 	this->islandImg = islandImg;
+	this->getIslandStartPt(islandImg);
 	this->determineIslandShape(islandImg);
 }
 
@@ -86,4 +92,8 @@ void Islands::set_shape(int num) {
 
 void Islands::set_shape_name(String name) {
 	this->islShapeName = name;
+}
+
+Point Islands::coordinate() {
+	return this->islPt;
 }
