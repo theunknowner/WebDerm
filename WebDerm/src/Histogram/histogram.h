@@ -11,6 +11,7 @@ public:
 	void hslHist2SpreadSheet(Mat &src, String name);
 	void outputHistogramLuminance(Mat &src, String name);
 	void outputHistogramRelativeLuminance(Mat &src, String name);
+	void outputHistogramGrayScale(Mat &src, String name);
 	void lightEqualizer(Mat src, Mat &dst);
 };
 

@@ -203,6 +203,26 @@ void Histogram::outputHistogramRelativeLuminance(Mat &src, String name) {
 	}
 }
 
+void Histogram::outputHistogramGrayScale(Mat &src, String name) {
+	Mat _src = src.clone();
+	if(_src.type()!=0)
+		cvtColor(_src,_src,CV_BGR2GRAY);
+	String filename = path+name+"_Histogram.csv";
+	FILE *fp;
+	fp = fopen(filename.c_str(),"w");
+	vector<int> lumVec(256,0);
+	for(int i=0; i<_src.rows; i++) {
+		for(int j=0; j<_src.cols; j++) {
+			int val = _src.at<uchar>(i,j);
+			lumVec.at(val)++;
+		}
+	}
+	for(unsigned int i=0; i<lumVec.size(); i++) {
+		fprintf(fp,"%d,%d\n",i,lumVec.at(i));
+	}
+	fclose(fp);
+}
+
 void Histogram::lightEqualizer(Mat src, Mat &dst) {
 	dst = src.clone();
 	Hsl hsl;
