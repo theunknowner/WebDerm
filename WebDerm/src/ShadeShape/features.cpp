@@ -31,6 +31,8 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 			for(unsigned int k=0; k<ptsVec.at(j).size(); k++) {
 				shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
 			}
+			// helps connect islands that should be together
+			shadeShape = sm.densityConnector(shadeShape,0.9999);
 			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
 			for(unsigned int k=0; k<littleIslands.size(); k++) {
 				if(countNonZero(littleIslands.at(k))>thresh)
@@ -78,7 +80,14 @@ void Features::getShadesOfIslands() {
 	int maxVal = *max_element(this->featureImg.begin<uchar>(),this->featureImg.end<uchar>());
 	vector<int> shadeVec(maxVal+1,0);
 	for(int i=0; i<this->numOfIslands(); i++) {
-		shadeVec.at(this->island(i).shade())++;
+		try {
+			shadeVec.at(this->island(i).shade())++;
+		} catch (const std::out_of_range &oor) {
+			printf("MaxVal: %d\n",maxVal);
+			printf("ShadeVec.size(): %lu\n",shadeVec.size());
+			printf("Island: %d, Shade: %d\n",i,this->island(i).shade());
+			exit(1);
+		}
 	}
 	for(unsigned int i=0; i<shadeVec.size(); i++) {
 		if(shadeVec.at(i)>0) {
@@ -120,20 +129,6 @@ Features::Features(Mat featureImg) {
 //! returns the island of island(index)
 Islands Features::island(int islNum) {
 	return this->islandVec.at(islNum);
-}
-
-//! extracts the islands from the feature
-//! islands with area less than <thresh> is ignored
-void Features::extract(Mat featureImg) {
-	int thresh=10;
-	this->featureImg = featureImg;
-	this->featArea = countNonZero(featureImg);
-	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);
-	for(unsigned int i=0; i<littleIslands.size(); i++) {
-		Islands island(littleIslands.at(i));
-		this->storeIsland(island);
-	}
-	this->numOfIsls = this->islandVec.size();
 }
 
 //!returns Mat type image of feature

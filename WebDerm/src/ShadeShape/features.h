@@ -32,7 +32,6 @@ private:
 public:
 	Features(Mat featureImg);
 	Islands island(int islNum);
-	void extract(Mat featureImg);
 	Mat image();
 	int area();
 	int numOfIslands();
