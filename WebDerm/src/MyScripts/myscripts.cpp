@@ -67,7 +67,6 @@ ShadeShape script2(String name) {
 	printf("PeakPos: %d\n",peakPos);
 	ShapeColor sc;
 	Mat img2 = sc.applyDiscreteShade(img,minVal,maxVal,peakPos);
-
 	ShadeShape ss;
 	ss.extract(img2);
 	/*for(int i=0; i<ss.numOfFeatures(); i++) {
@@ -2156,7 +2155,7 @@ void script_checkHitRatioTestData() {
 			ofs << "N" << endl;
 	}
 	float ratio = (float)hitCount/results.rows;
-	ofs << "Hit Ratio: ," << ratio << endl;
+	ofs << "Hit Ratio: ," << ratio << "," << hitCount << "/" << results.rows << endl;
 	ofs.close();
 }
 
@@ -2220,7 +2219,7 @@ int getPeakClusters(vector<double> &data_vec) {
 }
 
 //! extract shadeShape
-void script27() {
+void script27(String name) {
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
@@ -2231,7 +2230,6 @@ void script27() {
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	String out = "/home/jason/Desktop/Programs/ShadeShape/";
-	String name = "clp5";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -3020,7 +3018,7 @@ void script29() {
 	}
 }
 
-void script30() {
+void script30(String name) {
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
@@ -3035,7 +3033,6 @@ void script30() {
 	fprintf(fp,"Name,Shade,Shape\n");
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	String name = "clp5";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -3211,14 +3208,14 @@ void script30() {
 			int shade = ss.feature(i).island(j).shade();
 			int shape = ss.feature(i).island(j).shape();
 			String shapeName = ss.feature(i).island(j).shape_name();
-			//fprintf(fp,"%s,%d,%d,%s\n",outName.c_str(),shade,shape,shapeName.c_str());
-			//cout << outName << endl;
-			//cout << ss.feature(i).island(j).nn_results() << endl;
+			fprintf(fp,"%s,%d,%d,%s\n",outName.c_str(),shade,shape,shapeName.c_str());
+			cout << outName << endl;
+			cout << ss.feature(i).island(j).nn_results() << endl;
 		}
 	}
 
-	ShadeShapeMatch ssm;
-	ssm.test(ss);
+	//ShadeShapeMatch ssm;
+	//ssm.test(ss);
 }
 
 ShadeShape script31(String filename) {

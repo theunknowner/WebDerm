@@ -176,36 +176,6 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 		cout << it->first << ": " << it->second << endl;
 	}
 	cout << "------------------" << endl;
-	vector<vector<vector<Islands> > > islandVec2;
-	vector<vector<vector<Islands> > > islandVec3;
-	vector<vector<vector<Islands> > > islandVecTemp;
-	float thresh = totalArea * 0.60;
-	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
-		islandVec2 = islandVec;
-		this->shade_translation(islandVec2,thresh,shadeShift);
-		for(unsigned int shapeShift=0; shapeShift<ShapeMatch::SHIFT.size(); shapeShift++) {
-			islandVec3 = islandVec2;
-			for(unsigned int shapeNum=0; shapeNum<islandVec3.size(); shapeNum++) {
-				islandVecTemp = islandVec3;
-				if(ShapeMatch::SHIFT.at(shapeShift)!="SHIFT_NONE") {
-					if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_LEFT") {
-						if(shapeNum==2 || shapeNum==3 || shapeNum==4 || shapeNum==6) {
-							printf("ShadeShift: %d, ShapeShift: %d, ShapeNum: %d\n",shadeShift,shapeShift,shapeNum);
-							this->shape_translation(islandVecTemp,shapeNum,shapeShift);
-						}
-					}
-					if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_RIGHT") {
-						if(shapeNum==1 || shapeNum==2 || shapeNum==3 || shapeNum==5) {
-							printf("ShadeShift: %d, ShapeShift: %d, ShapeNum: %d\n",shadeShift,shapeShift,shapeNum);
-							this->shape_translation(islandVecTemp,shapeNum,shapeShift);
-						}
-					}
-					//this->sortIslandsByArea(islandVecTemp);
-					//map = this->createPropAreaMap(islandVecTemp,totalArea);
-				}
-			}
-		}
-	}
 }
 
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
@@ -231,33 +201,59 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		this->shade_translation(islandVec2,thresh,shadeShift);
 		for(unsigned int shapeShift=0; shapeShift<ShapeMatch::SHIFT.size(); shapeShift++) {
 			islandVec3 = islandVec2;
-			for(unsigned int shapeNum=0; shapeNum<islandVec3.size(); shapeNum++) {
-				islandVecTemp = islandVec3;
-				if(ShapeMatch::SHIFT.at(shapeShift)!="SHIFT_NONE") {
+			if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_NONE") {
+				this->sortIslandsByArea(islandVec3);
+				upMap = this->createPropAreaMap(islandVec3,upTotalArea);
+				dbMap = this->createPropAreaMap(this->dbIslandVec,dbTotalArea);
+				this->fillPropAreaMapGaps(upMap,dbMap);
+				if(ShadeMatch::SHIFT.at(shadeShift)=="SHIFT_NONE" && ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_NONE") {
+					std::map<String,float>::iterator itUP;
+					std::map<String,float>::iterator itDB;
+					for(itUP=upMap.begin(),itDB=dbMap.begin();itUP!=upMap.end(),itDB!=dbMap.end(); itUP++, itDB++) {
+						printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second,itDB->first.c_str(),itDB->second);
+					}
+				}
+				float results = this->dotProduct(upMap,dbMap);
+				resultVec.push_back(results);
+				printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+				printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
+				printf("ShapeNum: NULL, ");
+				printf("Results: %f\n",results);
+			}
+			else {
+				for(unsigned int shapeNum=0; shapeNum<islandVec3.size(); shapeNum++) {
+					islandVecTemp = islandVec3;
+					bool flag = false;
 					if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_LEFT") {
 						if(shapeNum==2 || shapeNum==3 || shapeNum==4 || shapeNum==6) {
 							//printf("ShadeShift: %d, ShapeShift: %d, ShapeNum: %d\n",shadeShift,shapeShift,shapeNum);
-							this->shape_translation(islandVecTemp,shapeNum,shapeShift);
+							flag =  this->shape_translation(islandVecTemp,shapeNum,shapeShift);
 						}
 					}
 					if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_RIGHT") {
 						if(shapeNum==1 || shapeNum==2 || shapeNum==3 || shapeNum==5) {
 							//printf("ShadeShift: %d, ShapeShift: %d, ShapeNum: %d\n",shadeShift,shapeShift,shapeNum);
-							this->shape_translation(islandVecTemp,shapeNum,shapeShift);
+							flag = this->shape_translation(islandVecTemp,shapeNum,shapeShift);
 						}
 					}
-					this->sortIslandsByArea(islandVecTemp);
-					upMap = this->createPropAreaMap(islandVecTemp,upTotalArea);
-					dbMap = this->createPropAreaMap(this->dbIslandVec,dbTotalArea);
-					this->fillPropAreaMapGaps(upMap,dbMap);
+					if(flag==true) {
+						this->sortIslandsByArea(islandVecTemp);
+						upMap = this->createPropAreaMap(islandVecTemp,upTotalArea);
+						dbMap = this->createPropAreaMap(this->dbIslandVec,dbTotalArea);
+						this->fillPropAreaMapGaps(upMap,dbMap);
 
-					float results = this->dotProduct(upMap,dbMap);
-					resultVec.push_back(results);
-				}
+						float results = this->dotProduct(upMap,dbMap);
+						resultVec.push_back(results);
+						printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+						printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
+						printf("ShapeNum: %d, ", shapeNum);
+						printf("Results: %f\n",results);
+					}
+				}//end for loop shapeNum
 			}
 		}
 	}
-
+	/*
 	cout << "-----------------------------" << endl;
 	for(unsigned int i=0; i<resultVec.size(); i++) {
 		float results = resultVec.at(i);
@@ -265,5 +261,6 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 			results *= pow(2,-1); // may change
 		printf("Results %d: %f\n",i+1,results);
 	}
+	 */
 	return 0.0;
 }

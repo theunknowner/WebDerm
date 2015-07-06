@@ -41,11 +41,11 @@ void script23();
 void script24();
 void script25();
 void script26();
-void script27();
+void script27(String name);
 void script28a();
 void script28b();
 void script29();
-void script30();
+void script30(String name);
 ShadeShape script31(String filename);
 
 void script_createTrainingLabels();

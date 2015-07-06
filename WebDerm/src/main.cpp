@@ -55,15 +55,19 @@ int main(int argc,char** argv)
 	//runResizeAllImages();
 	//Scripts::script3();
 	//Scripts::script28b();
-	//Scripts::script27();
-	//Scripts::script30();
+/*
+	String name = "melanoma3";
+	Scripts::script27(name);
+	Scripts::script30(name);
+*/
 	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test3.png");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
-	*/
+	//ssm.test(ss1);
 
+	/*
 	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
 	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
 	ShadeShapeMatch ssm;
