@@ -1328,6 +1328,7 @@ Mat ShapeMorph::densityConnector(Mat src, double q) {
 		printf("src.size: %dx%d\n",src.rows,src.cols);
 		exit(1);
 	}
+	int lineVal = *max_element(src.begin<uchar>(),src.end<uchar>());
 	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
 	Size size(5,5);
 	const double C=1.0;
@@ -1406,7 +1407,7 @@ Mat ShapeMorph::densityConnector(Mat src, double q) {
 							double dist = abs(j-col) + abs(i-row);
 							if(dist<=a && lc>absDiscernThresh) {
 								if(Point(j,i)!=Point(col,row)) {
-									line(result,Point(j,i),Point(col,row),Scalar(255),1);
+									line(result,Point(j,i),Point(col,row),Scalar(lineVal),1);
 								}
 							}
 						}
