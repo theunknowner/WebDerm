@@ -7,6 +7,9 @@
 
 #include "stddev.h"
 
+namespace Algos {
+
+//! population standard deviation
 double standardDev(deque<double> &input) {
 	double total=0;
 	double avg=0;
@@ -24,6 +27,7 @@ double standardDev(deque<double> &input) {
 	return result;
 }
 
+//! population standard deviation
 double standardDev(deque<int> &input) {
 	double total=0;
 	double avg=0;
@@ -41,6 +45,7 @@ double standardDev(deque<int> &input) {
 	return result;
 }
 
+//! population standard deviation
 double standardDev(vector<double> &input) {
 	double total=0;
 	double avg=0;
@@ -58,6 +63,7 @@ double standardDev(vector<double> &input) {
 	return result;
 }
 
+//! population standard deviation
 double standardDev(vector<float> &input) {
 	double total=0;
 	double avg=0;
@@ -75,6 +81,7 @@ double standardDev(vector<float> &input) {
 	return result;
 }
 
+//! population standard deviation
 double standardDev(Mat src) {
 	deque<int> input;
 	for(int i=0; i<src.rows; i++) {
@@ -85,5 +92,7 @@ double standardDev(Mat src) {
 		}
 	}
 	return standardDev(input);
+}
+
 }
 

@@ -21,7 +21,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/cluster.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Cluster/cluster.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/shadeshape.h"
@@ -83,9 +83,8 @@ ShadeShape script2(String name) {
 	return ss;
 }
 
-//! create/modify stitches
 void script3() {
-	Mat src = imread("/home/jason/Desktop/Programs/Color Normalized Non Blur 5x5/clp5.png");
+	Mat src = imread("/home/jason/Desktop/Programs/Discrete_New/clp5.png");
 	Mat samples(src.rows * src.cols, 3, CV_32F);
 	for( int y = 0; y < src.rows; y++ )
 		for( int x = 0; x < src.cols; x++ )
@@ -93,13 +92,13 @@ void script3() {
 				samples.at<float>(y + x*src.rows, z) = src.at<Vec3b>(y,x)[z];
 
 
-	int clusterCount = 15;
+	int clusterCount = 10;
 	Mat labels;
 	int attempts = 5;
 	Mat centers;
 	kmeans(samples, clusterCount, labels, TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers );
 
-
+	cout << centers << endl;
 	Mat new_image( src.size(), src.type() );
 	for( int y = 0; y < src.rows; y++ )
 		for( int x = 0; x < src.cols; x++ )
@@ -115,34 +114,62 @@ void script3() {
 	imgshow(grayImg);
 }
 
-//! swap the training data
 void script4() {
-	CreateTrainingData ctd;
-	String out = "/home/jason/Desktop/Programs/Training_Samples/Test/Negative_Pairs/";
-	Mat img = imread("/home/jason/Desktop/Programs/Training_Samples/Candidates/pos_can_9.png",0);
-	Mat src1 = img(Rect(0,0,35,35));
-	Mat src2 = img(Rect(35,0,35,35));
-	img = ctd.stitchData(src2,src1);
-	String name = out + "sample_742.png";
-	imwrite(name,img);
+	FileData fd;
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
+	String out = "/home/jason/Desktop/Programs/Skin_Cluster/";
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		name = getFileName(name);
+		Mat src = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+		src = runColorNormalization(src);
+		src = runResizeImage(src,Size(140,140));
+		Mat samples(src.rows * src.cols, 3, CV_32F);
+		for( int y = 0; y < src.rows; y++ )
+			for( int x = 0; x < src.cols; x++ )
+				for( int z = 0; z < 3; z++)
+					samples.at<float>(y + x*src.rows, z) = src.at<Vec3b>(y,x)[z];
+
+
+		int clusterCount = 10;
+		Mat labels;
+		int attempts = 5;
+		Mat centers;
+		kmeans(samples, clusterCount, labels, TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers );
+
+		Mat new_image( src.size(), src.type() );
+		for( int y = 0; y < src.rows; y++ ) {
+			for( int x = 0; x < src.cols; x++ ) {
+				int cluster_idx = labels.at<int>(y + x*src.rows,0);
+				new_image.at<Vec3b>(y,x)[0] = centers.at<float>(cluster_idx, 0);
+				new_image.at<Vec3b>(y,x)[1] = centers.at<float>(cluster_idx, 1);
+				new_image.at<Vec3b>(y,x)[2] = centers.at<float>(cluster_idx, 2);
+			}
+		}
+		imwrite(out+name+"_skin_cluster.png",new_image);
+	}
 }
 
-//! get half of stitch
 void script5() {
-	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Training_Samples/Test/Negative_Pairs/";
-	String out = "/home/jason/Desktop/Programs/Training_Samples/Test/";
 	FileData fd;
+	deque<String> files;
+	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
+	String out = "/home/jason/Desktop/Programs/Skin_Cluster/";
 	fd.getFilesFromDirectory(folder,files);
-	sort(files.begin(),files.end());
-	for(unsigned int i=0; i<12; i++) {
-		String name = folder+files.at(i);
-		String filename = files.at(i);
-		Mat img = imread(name,0);
-		Mat src1 = img(Rect(0,0,35,35));
-		Mat src2 = img(Rect(35,0,35,35));
-		name = out + "half_" + toString(i+1) + ".png";
-		imwrite(name,src2);
+	Mat ycrcb, dst;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		name = getFileName(name);
+		Mat src = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+		src = runColorNormalization(src);
+		src = runResizeImage(src,Size(140,140));
+		cvtColor(src,ycrcb,CV_BGR2YCrCb);
+		inRange(ycrcb,Scalar(0,133,77), Scalar(255,173,127),dst);
+		Mat result;
+		src.copyTo(result,dst);
+		imwrite(out+name+".png",result);
 	}
 }
 
@@ -2164,23 +2191,27 @@ int getPeakClusters(vector<double> &data_vec) {
 	int changeCountThresh = 3;
 	int maxShades = 5;
 	int error = 1;
+	int maxClusters = 8;
 	vector<double> densityVec;
-	for(int i=0; i<8; i++) {
+	for(int i=0; i<maxClusters; i++) {
 		Cluster clst2;
 		clst2.kmeansCluster(data_vec,i+1);
 		int totalPts=0;
 		double totalDensity = 0.0;
 		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			totalPts += clst2.getCenterCount(j);
+			totalPts += clst2.getSizeOfCluster(j);
 		}
 		for(int j=0; j<clst2.getNumOfClusters(); j++) {
-			int numPts = clst2.getCenterCount(j);
+			int numPts = clst2.getSizeOfCluster(j);
 			double minVal = clst2.getMin(j);
 			double maxVal = clst2.getMax(j);
 			double density = numPts/(maxVal-minVal);
 			totalDensity += ((double)numPts/totalPts) * density;
+			double center = clst2.getCenter(j);
+			//printf("Clst: %d, Center: %.0f, Min: %.0f, Max: %.0f, Range: %.0f, Size: %d, Density: %f\n",j+1,center,minVal,maxVal,maxVal-minVal,numPts,density);
+
 		}
-		//printf("# of clsts: %d, Density: %f\n",i+1,totalDensity);
+		//cout << "-------------------------------------------" << endl;
 		densityVec.push_back(totalDensity);
 	}
 	vector<double> changeVec;
@@ -2203,7 +2234,7 @@ int getPeakClusters(vector<double> &data_vec) {
 		if(change<=changeThresh && change>=0) changeCount++;
 		else changeCount = 0;
 		//printf("%d: %f, %d\n",i+1,change,changeCount);
-		if(changeCount>=changeCountThresh) {
+		if(changeCount>=changeCountThresh || i==(maxClusters-1)) {
 			peakPos = i-2;
 			peakPos++;
 			break;
@@ -3187,8 +3218,9 @@ void script30(String name) {
 	for(int i=0; i<img2.rows; i++) {
 		for(int j=0; j<img2.cols; j++) {
 			double val = img2.at<uchar>(i,j);
-			if(val>0)
+			if(val>0) {
 				data_vec.push_back(val);
+			}
 		}
 	}
 	int peakPos = getPeakClusters(data_vec);

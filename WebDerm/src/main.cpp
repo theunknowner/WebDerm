@@ -22,7 +22,7 @@
 #include "Shape/circle.h"
 #include "neuralnetworks/testml.h"
 #include "Shape/shapemorph.h"
-#include "Algorithms/cluster.h"
+#include "Cluster/cluster.h"
 #include "KneeCurve/kneecurve.h"
 #include "GridDisplay/griddisplay.h"
 #include "Poly/poly.h"
@@ -56,10 +56,10 @@ int main(int argc,char** argv)
 	//Scripts::script3();
 	//Scripts::script28b();
 /*
-	String name = "melanoma3";
+	String name = "lph7";
 	Scripts::script27(name);
 	Scripts::script30(name);
-*/
+
 	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test3.png");
@@ -72,107 +72,10 @@ int main(int argc,char** argv)
 	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
-/*
-	Rgb rgb;
-	Hsl hsl;
-	Color c;
-	Functions fn;
-	Shades sh;
-	rgb.importThresholds();
-	hsl.importHslThresholds();
-	sh.importThresholds();
-	Mat img, img2,img3, img4, img5, imgGray;
-	String name = "lph4";
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
-	img = runColorNormalization(img);
-	img = runResizeImage(img,Size(140,140));
-	ShapeMorph sm;
-	ShapeColor sc;
-	Size numOfFeatures(5,5);
-	//blur(img,img,numOfFeatures);
-	//cvtColor(img,imgGray,CV_BGR2GRAY);
-
-/*
-	FileData fd;
-	deque<String> files;
-	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
-	String out = "/home/jason/Desktop/Programs/Discrete/";
-	fd.getFilesFromDirectory(folder,files);
-	for(unsigned int i=0; i<files.numOfFeatures(); i++) {
-		String name = folder + files.at(i);
-		name = getFileName(name);
-		img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
-		img = runColorNormalization(img);
-		img = runResizeImage(img,Size(140,140));
-		//blur(img,img,numOfFeatures);
-
-		cvtColor(img,imgGray,CV_BGR2GRAY);
-		Mat src = sm.prepareImage(imgGray);
-		Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-		/*Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
-		Mat nnConnect = sm.densityConnector(maskE,0.9999);
-		Mat transform = sm.haloTransform(nnConnect);
-		transform.convertTo(transform,CV_8U);
-		maskE = (transform - 5) * 255;
-*/
-/*
-		Mat lcFilterMat = sc.filterKneePt(src);
-		Mat lcFilterNoNoise;
-		lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);
-		Mat lcDenseConnect = sm.densityConnector(lcFilterNoNoise,0.9999);
-		Mat lcHaloTrans = sm.haloTransform(lcDenseConnect,2);
-		lcHaloTrans.convertTo(lcHaloTrans,CV_8U);
-		lcHaloTrans = (lcHaloTrans - 5) * 255;
-		img.copyTo(img2,lcHaloTrans);
-		//img.copyTo(img3,maskE);
-		//img2.copyTo(img3,img2);
-		//imgshow(img2);
-		//imgshow(img3,1,name);
-		img3 = sc.applyDiscreteShade(imgGray);
-		img3.copyTo(img4,lcHaloTrans);
-		imwrite(out+name+".png",img2);
-		imwrite(out+name+"_discrete.png",img4);
-		img2.release();
-		img4.release();
-	}
-/*
-	//sc.setDebugLevel(1);
-	cvtColor(img,imgGray,CV_BGR2GRAY);
-	Mat src = sm.prepareImage(imgGray);
-	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
-	//Mat maskE = sc.getShapeUsingColor(img,mapOfNonNoise);
-	//img.copyTo(img2,maskE);
-	//imgshow(img2);
-/*
-	//maskE = sc.removeRunningLines(maskE,Size(3,1));
-	Mat nnConnect2 = sm.densityConnector(maskE,0.9999);
-	Mat transform2 = sm.haloTransform(nnConnect2,2);
-	transform2.convertTo(transform2,CV_8U);
-	maskE = (transform2 - 5) * 255;
-	img.copyTo(img5,maskE);
-*/
-/*
-	Mat lcFilterMat = sc.filterKneePt(src);
-	Mat lcFilterNoNoise;
-	lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);
-	Mat lcDenseConnect = sm.densityConnector(lcFilterNoNoise,0.9999);
-	Mat lcHaloTrans = sm.haloTransform(lcDenseConnect,2);
-	lcHaloTrans.convertTo(lcHaloTrans,CV_8U);
-	img.copyTo(img2,lcHaloTrans);
-	//img5.copyTo(img3,img5);
-	//img2.copyTo(img3,img2);
-	imgshow(lcFilterMat);
-	imgshow(src);
-	imgshow(img2);
-	//imgshow(img2);
-	//imgshow(img3);
-
-	img5 = sc.applyDiscreteShade(imgGray);
-	imgshow(img5);
-*/
+/**/
 	//Scripts::script25();
 	//Scripts::script_checkAllTestData();
-	//Scripts::script_checkHitRatioTestData();
+	Scripts::script_checkHitRatioTestData();
 	/*
 	FileData fd;
 	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Disc-Incomplete/";

@@ -7,7 +7,7 @@
 
 #include "cluster.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 
 /* returns mask using kmeans clustering,
  * set maxVal>0 for custom max value of samples
@@ -212,7 +212,7 @@ Mat Cluster::kmeansCluster(vector<double> data_vec, int clusters) {
 }
 
 //! returns the number of points in the specified cluster
-int Cluster::getCenterCount(int clusterNum) {
+int Cluster::getSizeOfCluster(int clusterNum) {
 	int count = 0;
 	try {
 		count = this->centerCount.at(clusterNum);
@@ -259,6 +259,10 @@ double Cluster::getMax(int clusterNum) {
 		exit(1);
 	}
 	return max;
+}
+
+double Cluster::getCenter(int clusterNum) {
+	return this->centers.at<float>(clusterNum,0);
 }
 
 void Cluster::printInfo() {

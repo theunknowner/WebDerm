@@ -340,7 +340,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 		for (int d=0; d<innerWidth; d++) {
 			if(ratioSingleList.at(c).at(d).size()>0) {
 				if(ratioSingleList.at(c).at(d).at(0)!=-1) {
-					densityVariation.at(c).at(d) = standardDev(ratioSingleList.at(c).at(d));
+					densityVariation.at(c).at(d) = Algos::standardDev(ratioSingleList.at(c).at(d));
 				}
 			}
 		}

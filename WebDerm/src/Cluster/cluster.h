@@ -31,10 +31,14 @@ public:
 
 	Mat kmeansCluster(vector<double> data_vec, int clusters=0);
 	int getNumOfClusters();
-	int getCenterCount(int clusterNum);
+	int getSizeOfCluster(int clusterNum);
 	double getMin(int clusterNum);
 	double getMax(int clusterNum);
+	double getCenter(int clusterNum);
 	void printInfo();
+
+	/** whiten.cpp **/
+	vector<double> whiten(vector<double> &data_vec);
 };
 
 #endif /* CLUSTER_H_ */
