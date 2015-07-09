@@ -28,6 +28,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShapeMatch/shapematch.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShadeShapeMatch/shadeshapematch.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
 
 namespace Scripts {
 void script1() {
@@ -544,33 +545,6 @@ void script16() {
 			}
 		}
 	}
-}
-
-//! Expressive Power of Hue
-double epoh(double &sat, double &lum) {
-	double result;
-	if(lum<=50) {
-		result = (sat/100.) * (lum/50.);
-	}
-	else {
-		result = (sat/100.) * (100-lum)/50;
-	}
-	return result;
-}
-
-//using Minkowski distance
-Mat epohTheHue(Mat &hMat, Mat &sMat, Mat &lMat) {
-	Mat hc(hMat.size(),CV_32F, Scalar(0));
-	for(int i=0; i<hMat.rows; i++) {
-		for(int j=0; j<hMat.cols; j++) {
-			double hue = hMat.at<float>(i,j);
-			double sat = sMat.at<float>(i,j);
-			double lum = lMat.at<float>(i,j);
-			hue *= epoh(sat,lum);
-			hc.at<float>(i,j) = roundDecimal(hue,2);
-		}
-	}
-	return hc;
 }
 
 void script17() {
@@ -2632,9 +2606,6 @@ void script28b() {
 	Shades sh;
 	Poly poly;
 	KneeCurve kc;
-	rgb.importThresholds();
-	hsl.importHslThresholds();
-	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	FileData fd;
 	deque<String> files;

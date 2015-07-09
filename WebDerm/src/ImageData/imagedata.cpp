@@ -7,19 +7,12 @@
 
 #include "imagedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "pixeldata.h"
 
 /************************* PRIVATE FUNCTIONS *****************************/
 
-//! determines pixel color and levels
-String ImageData::determinePixelColor(int &r, int &g, int &b) {
-	Rgb rgb;
-	String pix = rgb.checkBlack(r,g,b);
-	if(pix=="OTHER") {
-		pix = rgb.calcColor(r,g,b);
-	}
-	return pix;
+void ImageData::storePixelData(PixelData pd, int row, int col) {
+	this->pixelVec.at(row).at(col) = pd;
 }
 
 /*************************** PUBLIC FUNCTIONS *************************/
@@ -28,24 +21,24 @@ String ImageData::determinePixelColor(int &r, int &g, int &b) {
 void ImageData::extract(Mat image, String name) {
 	this->imgName = name;
 	this->matImage = image.clone();
+	this->imgSize = image.size();
+	this->imgRows = image.rows;
+	this->imgCols = image.cols;
+	this->pixelVec.resize(image.rows,vector<PixelData>(image.cols,PixelData()));
 	this->dataVec.resize(image.rows,vector<String>(image.cols,""));
 	this->hslVec.resize(image.rows,vector<String>(image.cols,""));
-	int r,g,b;
-	vector<double> HSL;
+	double h,s,l;
 	String pix, hslStr;
-	Hsl hsl;
 	for(int i=0; i<image.rows; i++) {
 		for(int j=0; j<image.cols; j++) {
-			r = image.at<Vec3b>(i,j)[2];
-			g = image.at<Vec3b>(i,j)[1];
-			b = image.at<Vec3b>(i,j)[0];
-			pix = this->determinePixelColor(r,g,b);
-			this->dataVec.at(i).at(j) = pix;
+			PixelData pixData(image.at<Vec3b>(i,j));
+			this->storePixelData(pixData,i,j);
+			this->dataVec.at(i).at(j) = pixData.color();
 
-			HSL = hsl.rgb2hsl(r,g,b);
-			HSL[1] = roundDecimal(HSL[1],2);
-			HSL[2] = roundDecimal(HSL[2],2);
-			hslStr = toString(HSL[0])+";"+toString(HSL[1])+";"+toString(HSL[2]);
+			h = pixData.hsl()[0];
+			s = pixData.hsl()[1];
+			l = pixData.hsl()[2];
+			hslStr = toString(h)+";"+toString(s)+";"+toString(l);
 			this->hslVec.at(i).at(j) = hslStr;
 		}
 	}
@@ -61,8 +54,16 @@ String ImageData::path() {
 }
 
 //! return's size of image
-Size ImageData::image_size() {
+Size ImageData::size() {
 	return this->imgSize;
+}
+
+int ImageData::rows() {
+	return this->imgRows;
+}
+
+int ImageData::cols() {
+	return this->imgCols;
 }
 
 //! returns mat type image
@@ -75,11 +76,12 @@ vector<vector<String> > ImageData::data_matrix() {
 	return this->dataVec;
 }
 
+//! returns the image's hsl data for each pixel in 2S string
 vector<vector<String> > ImageData::hsl_matrix() {
 	return this->hslVec;
 }
 
-//! returns PixelData object at (row,col)
-PixelData ImageData::at(int row, int col) {
+//! returns PixelData object pixel (row,col)
+PixelData ImageData::pixel(int row, int col) {
 	return this->pixelVec.at(row).at(col);
 }

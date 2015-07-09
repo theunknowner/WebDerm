@@ -151,8 +151,8 @@ double rule2(FileData &fd, String &newPix) {
 	double grayLevel = rgb.getGrayLevel1(newPix);
 	double colorLevel = rgb.getColorLevel(newPix);
 	try {
-		fSat = (sat-satThresh.at(index).at(1));
-		fSat /= (satThresh.at(index).at(1)-satThresh.at(index).at(0));
+		fSat = (sat-Hsl::satThresh.at(index).at(1));
+		fSat /= (Hsl::satThresh.at(index).at(1)-Hsl::satThresh.at(index).at(0));
 		fSat *= pThreshMove;
 	} catch(const std::out_of_range& oor) {
 		printf("Rule2: Index Out of bounds!\n");
@@ -162,7 +162,7 @@ double rule2(FileData &fd, String &newPix) {
 	}
 	try {
 		if((index-1)>=0)
-			grey = hslColors.at(index-1);
+			grey = Hsl::hslColors.at(index-1);
 	} catch(const std::out_of_range& oor) {
 		printf("Rule2: Index Out of bounds!\n");
 		printf("Index{%d} out of bounds!\n",index-1);
@@ -172,7 +172,7 @@ double rule2(FileData &fd, String &newPix) {
 	}
 	if(!c.containsColor(toString(5),color.c_str(),"Grey","White","Black","Zero")) {
 		if(grey=="Grey") {
-			fSat2 = sat - satThresh.at(index-1).at(1);
+			fSat2 = sat - Hsl::satThresh.at(index-1).at(1);
 			if(fSat<(-1) || fSat2<=0.02) {
 				newPix = toString(grayLevel)+"Grey" + color+ toString(colorLevel);
 				flag=true;

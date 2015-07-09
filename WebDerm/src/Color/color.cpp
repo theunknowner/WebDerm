@@ -63,9 +63,9 @@ int Color::containsMainColor(String color, String mColor)
 }
 
 void Color::extractColorFromString(String color, deque<String> &vecColor) {
-	for(unsigned int i=0; i<mainColors.size(); i++) {
-		if(containsMainColor(color,mainColors.at(i))) {
-			vecColor.push_back(mainColors.at(i));
+	for(unsigned int i=0; i<Rgb::mainColors.size(); i++) {
+		if(containsMainColor(color,Rgb::mainColors.at(i))) {
+			vecColor.push_back(Rgb::mainColors.at(i));
 		}
 	}
 }
@@ -112,8 +112,8 @@ String Color::extractShade(String pix) {
 //returns the amount of different colors in the string
 int Color::countColors(String color) {
 	int count=0;
-	for(unsigned int i=0; i<mainColors.size(); i++) {
-		if(color.find(mainColors.at(i))!=string::npos) {
+	for(unsigned int i=0; i<Rgb::mainColors.size(); i++) {
+		if(color.find(Rgb::mainColors.at(i))!=string::npos) {
 			++count;
 		}
 	}
@@ -165,9 +165,9 @@ String Color::getMainColor(String color) {
 	String pix="";
 	int flag=0;
 	try {
-		for(unsigned int i=0; i<mainColors.size(); i++) {
-			if(color.find(mainColors.at(i))!=string::npos && mainColors.at(i)!="Gray") {
-				pix += mainColors.at(i);
+		for(unsigned int i=0; i<Rgb::mainColors.size(); i++) {
+			if(color.find(Rgb::mainColors.at(i))!=string::npos && Rgb::mainColors.at(i)!="Gray") {
+				pix += Rgb::mainColors.at(i);
 				flag=1;
 			}
 		}
@@ -395,9 +395,9 @@ String Color::optimizeColor(String pix) {
 	if(countColors(color)>2) {
 		if(color!="GreyBrownPink" && color!="GreyPinkViolet")  {
 			color.clear();
-			for(unsigned int i=0; i<mainColors.size(); i++) {
-				if(pix.find(mainColors.at(i))!=string::npos) {
-					color += mainColors.at(i);
+			for(unsigned int i=0; i<Rgb::mainColors.size(); i++) {
+				if(pix.find(Rgb::mainColors.at(i))!=string::npos) {
+					color += Rgb::mainColors.at(i);
 					count++;
 				}
 				if(count==2)
@@ -421,9 +421,9 @@ String Color::optimizeColor2(String pix) {
 	if(countColors(color)>2) {
 		if(color!="GreyBrownPink" && color!="GreyPinkViolet")  {
 			color.clear();
-			for(unsigned int i=0; i<mainColors.size(); i++) {
-				if(pix.find(mainColors.at(i))!=string::npos) {
-					color += mainColors.at(i);
+			for(unsigned int i=0; i<Rgb::mainColors.size(); i++) {
+				if(pix.find(Rgb::mainColors.at(i))!=string::npos) {
+					color += Rgb::mainColors.at(i);
 					count++;
 				}
 				if(count==2)

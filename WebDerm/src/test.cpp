@@ -42,10 +42,10 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 	String color, shade;
 	int index=0, shadeIndex=0;
 	vector<double> HSL;
-	vector<vector<double> >hAvg(allColors.size(),vector<double>(g_Shades2.size(),0));
-	vector<vector<double> >sAvg(allColors.size(),vector<double>(g_Shades2.size(),0));
-	vector<vector<double> >lAvg(allColors.size(),vector<double>(g_Shades2.size(),0));
-	vector<vector<int> > colorCount(allColors.size(),vector<int>(g_Shades2.size(),0));
+	vector<vector<double> >hAvg(Rgb::allColors.size(),vector<double>(Shades::g_Shades2.size(),0));
+	vector<vector<double> >sAvg(Rgb::allColors.size(),vector<double>(Shades::g_Shades2.size(),0));
+	vector<vector<double> >lAvg(Rgb::allColors.size(),vector<double>(Shades::g_Shades2.size(),0));
+	vector<vector<int> > colorCount(Rgb::allColors.size(),vector<int>(Shades::g_Shades2.size(),0));
 	vector<vector<String> > colorNames(src.rows,vector<String>(src.cols,""));
 	vector<vector<String> > shadeNames(src.rows,vector<String>(src.cols,""));
 	for(int i=0; i<src.rows; i++) {
@@ -86,7 +86,7 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 				hAvg.at(i).at(j) /= colorCount.at(i).at(j);
 				sAvg.at(i).at(j) /= colorCount.at(i).at(j);
 				lAvg.at(i).at(j) /= colorCount.at(i).at(j);
-				//printf("%s%s: %d\n",g_Shades2.at(j).c_str(),allColors.at(i).c_str(),colorCount.at(i).at(j));
+				//printf("%s%s: %d\n",Shades::g_Shades2.at(j).c_str(),Rgb::allColors.at(i).c_str(),colorCount.at(i).at(j));
 			}
 		}
 	}
@@ -97,7 +97,7 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 	int sides = floor(structElemSize/2.0);
 	for(int i=0; i<src.rows; i++) {
 		for(int j=0; j<src.cols; j++) {
-			vector<vector<int> > shadeColorCount(allColors.size(),vector<int>(g_Shades2.size(),0));
+			vector<vector<int> > shadeColorCount(Rgb::allColors.size(),vector<int>(Shades::g_Shades2.size(),0));
 			for(int k=j-sides; k<=j+sides; k++) {
 				if(k>=0 && k<src.cols) {
 					color = colorNames.at(i).at(k);
@@ -112,7 +112,7 @@ Mat Test::test_hslAvgOfColor(Mat src) {
 					int indShade = sh.getShadeIndex2(shadeSE.at(k));
 					shadeColorCount.at(indColor).at(indShade)++;
 					if(shadeColorCount.at(indColor).at(indShade)>=round(structElemSize/2.0)) {
-						color =	allColors.at(indColor);
+						color =	Rgb::allColors.at(indColor);
 						shade = sh.getShade2(indShade);
 						break;
 					}

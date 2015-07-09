@@ -10,58 +10,67 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
-deque<String> g_Shades;
-deque< deque<double> > g_ShadeThresh;
+deque<String> Shades::g_Shades;
+deque< deque<double> > Shades::g_ShadeThresh;
 
 //! g_Shades2 is for combined shades
-deque<String> g_Shades2;
-deque< deque<double> > g_ShadeThresh2;
+deque<String> Shades::g_Shades2;
+deque< deque<double> > Shades::g_ShadeThresh2;
+bool Shades::THRESH_IMPORTED = false;
+
+Shades::Shades() {
+	if(!this->THRESH_IMPORTED)
+		this->THRESH_IMPORTED = this->importThresholds();
+}
 
 bool Shades::importThresholds() {
-	String folderName = "Thresholds/";
-	String filename = folderName+"shade-thresholds.csv";
-	String filename2 = folderName+"shade-thresholds2.csv";
-	fstream fsThresh(filename.c_str());
-	fstream fsThresh2(filename2.c_str());
-	if(fsThresh.is_open() && fsThresh2.is_open()) {
-		String temp;
-		deque<String> vec;
-		deque<double> thresh;
-		getline(fsThresh,temp);
-		while(getline(fsThresh,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0) {
-					g_Shades.push_back(vec.at(i));
+	if(!this->THRESH_IMPORTED) {
+		String folderName = "Thresholds/";
+		String filename = folderName+"shade-thresholds.csv";
+		String filename2 = folderName+"shade-thresholds2.csv";
+		fstream fsThresh(filename.c_str());
+		fstream fsThresh2(filename2.c_str());
+		if(fsThresh.is_open() && fsThresh2.is_open()) {
+			String temp;
+			deque<String> vec;
+			deque<double> thresh;
+			getline(fsThresh,temp);
+			while(getline(fsThresh,temp)) {
+				getSubstr(temp,',',vec);
+				for(unsigned int i=0; i<vec.size(); i++) {
+					if(i==0) {
+						g_Shades.push_back(vec.at(i));
+					}
+					if(i>=1 && i<=2)
+						thresh.push_back(atof(vec.at(i).c_str()));
 				}
-				if(i>=1 && i<=2)
-					thresh.push_back(atof(vec.at(i).c_str()));
+				g_ShadeThresh.push_back(thresh);
+				thresh.clear(); vec.clear();
 			}
-			g_ShadeThresh.push_back(thresh);
-			thresh.clear(); vec.clear();
-		}
-		getline(fsThresh2,temp);
-		while(getline(fsThresh2,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0) {
-					g_Shades2.push_back(vec.at(i));
+			getline(fsThresh2,temp);
+			while(getline(fsThresh2,temp)) {
+				getSubstr(temp,',',vec);
+				for(unsigned int i=0; i<vec.size(); i++) {
+					if(i==0) {
+						g_Shades2.push_back(vec.at(i));
+					}
+					if(i>=1 && i<=2)
+						thresh.push_back(atof(vec.at(i).c_str()));
 				}
-				if(i>=1 && i<=2)
-					thresh.push_back(atof(vec.at(i).c_str()));
+				g_ShadeThresh2.push_back(thresh);
+				thresh.clear(); vec.clear();
 			}
-			g_ShadeThresh2.push_back(thresh);
-			thresh.clear(); vec.clear();
+			fsThresh.close();
+			fsThresh2.close();
+			deque<double>().swap(thresh);
+			return true;
 		}
-		fsThresh.close();
-		fsThresh2.close();
-		deque<double>().swap(thresh);
-		return true;
+		else {
+			cout << "Importing Shade Thresholds Failed!" << endl;
+			return false;
+		}
 	}
-	else {
-		cout << "Importing Shade Thresholds Failed!" << endl;
-		return false;
-	}
+	return true;
 }
 
 int Shades::getShadeCount() {
@@ -96,8 +105,8 @@ int Shades::getShadeIndex(String shade) {
 }
 
 String Shades::extractShade(String pix) {
-   int shadeCount = getShadeCount();
-    //int shadeCount = sh.getShadeCount();
+	int shadeCount = getShadeCount();
+	//int shadeCount = sh.getShadeCount();
 	String shade = "";
 	if(pix=="Zero") return pix;
 	if(pix.find("White")!=string::npos) return "White";

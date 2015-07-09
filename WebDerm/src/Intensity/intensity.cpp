@@ -22,7 +22,7 @@
 
 Intensity::Intensity() {
 	global_flag=0;
-	shadeCount=g_Shades.size();
+	shadeCount=Shades::g_Shades.size();
 	minIntensity = 0;
 	maxIntensity = 255;
 	range=0;
@@ -72,18 +72,18 @@ double Intensity::calcIntensity(String pix) {
 	Rgb rgb;
 	Color c;
 	String color;
-	double colorLevel[mainColors.size()];
-	double colorIntensity[mainColors.size()];
-	fill_n(colorLevel,mainColors.size(),0);
-	fill_n(colorIntensity,mainColors.size(),0);
+	double colorLevel[Rgb::mainColors.size()];
+	double colorIntensity[Rgb::mainColors.size()];
+	fill_n(colorLevel,Rgb::mainColors.size(),0);
+	fill_n(colorIntensity,Rgb::mainColors.size(),0);
 	double totalLevel=0;
 	double totalColorIntensity=0;
 	deque<int> index;
 	deque<double> vec,vec2;
 	color = c.getMainColor(pix);
-	for(unsigned int i=0; i<mainColors.size(); i++)	{
-		if(color.find(mainColors.at(i))!=string::npos) {
-			colorLevel[i] = rgb.getColorLevel(pix,mainColors.at(i));
+	for(unsigned int i=0; i<Rgb::mainColors.size(); i++)	{
+		if(color.find(Rgb::mainColors.at(i))!=string::npos) {
+			colorLevel[i] = rgb.getColorLevel(pix,Rgb::mainColors.at(i));
 			colorLevel[i] = 100 - colorLevel[i];
 			index.push_back(i);
 			totalLevel+=colorLevel[i];
@@ -105,21 +105,21 @@ double Intensity::calcIntensity(String pix) {
 //assigns min/max shades to an image. Only runs once per image.
 void Intensity::setMinMaxShades() {
 	double min,max;
-	for(unsigned int i=0; i<g_ShadeThresh.size(); i++) {
+	for(unsigned int i=0; i<Shades::g_ShadeThresh.size(); i++) {
 		try {
-			min = g_ShadeThresh.at(i).at(0);
-			max = g_ShadeThresh.at(i).at(1);
+			min = Shades::g_ShadeThresh.at(i).at(0);
+			max = Shades::g_ShadeThresh.at(i).at(1);
 			if(minIntensity>=min && minIntensity<max)
-				oldMinShade = g_Shades.at(i);
+				oldMinShade = Shades::g_Shades.at(i);
 			if(maxIntensity>=min && maxIntensity<max)
-				oldMaxShade = g_Shades.at(i);
-			if(maxIntensity>=g_ShadeThresh.at(g_ShadeThresh.size()-1).at(1))
-				oldMaxShade = g_Shades.at(g_Shades.size()-1);
+				oldMaxShade = Shades::g_Shades.at(i);
+			if(maxIntensity>=Shades::g_ShadeThresh.at(Shades::g_ShadeThresh.size()-1).at(1))
+				oldMaxShade = Shades::g_Shades.at(Shades::g_Shades.size()-1);
 			if(oldMinShade!=status && oldMaxShade!=status) break;
 		}
 		catch (const std::out_of_range &oor) {
 			printf("Intensity::setMinMaxShades() out of range!\n");
-			printf("g_ShadeThresh.Size: %lu\n",g_ShadeThresh.size());
+			printf("Shades::g_ShadeThresh.Size: %lu\n",Shades::g_ShadeThresh.size());
 			exit(1);
 		}
 	}

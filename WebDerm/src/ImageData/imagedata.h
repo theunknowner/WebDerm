@@ -14,24 +14,29 @@
 class PixelData;
 class ImageData {
 private:
-	String determinePixelColor(int &r, int &g, int &b);
+	void storePixelData(PixelData pd, int row, int col);
+
 protected:
 	vector<vector<PixelData> > pixelVec;
 	String file_path;
 	vector<vector<String> > dataVec;
 	vector<vector<String> > hslVec;
 	Size imgSize;
+	int imgRows, imgCols;
 	Mat matImage;
 	String imgName;
+
 public:
-	void extract(Mat image, String name);
+	void extract(Mat image, String name="");
 	String name();
 	String path();
-	Size image_size();
+	Size size();
+	int rows();
+	int cols();
 	Mat image();
 	vector<vector<String> > data_matrix();
 	vector<vector<String> > hsl_matrix();
-	PixelData at(int row, int col);
+	PixelData pixel(int row, int col);
 };
 
 #endif /* IMAGEDATA_H_ */

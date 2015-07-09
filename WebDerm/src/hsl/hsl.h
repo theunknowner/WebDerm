@@ -10,18 +10,18 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
-extern deque<String> hslColors;
-extern deque< deque<int> > hueThresh;
-extern deque< deque<double> > satThresh;
-extern deque< deque<double> > lumThresh;
-
 class Hsl
 {
 private:
-	bool THRESH_IMPORTED;
+
 public:
-	bool isThreshImported();
-	void setThreshImported(bool flag);
+	static deque<String> hslColors;
+	static deque< deque<int> > hueThresh;
+	static deque< deque<double> > satThresh;
+	static deque< deque<double> > lumThresh;
+	static bool THRESH_IMPORTED;
+
+	Hsl();
 	bool importHslThresholds();
 	double minRGB(double red, double green, double blue);
 	double maxRGB(double red, double green, double blue);

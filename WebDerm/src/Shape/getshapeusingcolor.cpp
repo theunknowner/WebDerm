@@ -14,33 +14,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-
-//! Expressive Power of Hue
-double epoh(double &sat, double &lum) {
-	double result;
-	if(lum<=50) {
-		result = (sat/100.) * (lum/50.);
-	}
-	else {
-		result = (sat/100.) * (100-lum)/50;
-	}
-	return result;
-}
-
-//using Minkowski distance
-Mat epohTheHue(Mat &hMat, Mat &sMat, Mat &lMat) {
-	Mat hc(hMat.size(),CV_32F, Scalar(0));
-	for(int i=0; i<hMat.rows; i++) {
-		for(int j=0; j<hMat.cols; j++) {
-			double hue = hMat.at<float>(i,j);
-			double sat = sMat.at<float>(i,j);
-			double lum = lMat.at<float>(i,j);
-			hue *= epoh(sat,lum);
-			hc.at<float>(i,j) = roundDecimal(hue,2);
-		}
-	}
-	return hc;
-}
+#include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
 
 //! using delta Emax
 //! find the max deltaE distances between adjacent pixels in a 1x20 window

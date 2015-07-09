@@ -6,6 +6,7 @@
 
 class Color {
 public:
+	int row, col;
 	bool containsColor(String color1, String color2);
 	bool containsColor(String argNum, ...);
 	bool containsAllColor(String argNum, ...);

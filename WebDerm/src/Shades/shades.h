@@ -10,14 +10,16 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
-extern deque<String> g_Shades;
-extern deque< deque<double> > g_ShadeThresh;
-
-extern deque<String> g_Shades2;
-extern deque< deque<double> > g_ShadeThresh2;
-
 class Shades {
 public:
+	static deque<String> g_Shades;
+	static deque< deque<double> > g_ShadeThresh;
+
+	static deque<String> g_Shades2;
+	static deque< deque<double> > g_ShadeThresh2;
+	static bool THRESH_IMPORTED;
+
+	Shades();
 	bool importThresholds();
 	int getShadeCount();
 	String getShade(int index);

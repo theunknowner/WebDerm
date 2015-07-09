@@ -11,20 +11,27 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 class PixelData {
+private:
+	String determinePixelColor(int &r, int &g, int &b);
+
 protected:
+	Vec3b rgbVec;
+	Vec3f hslVec;
 	int grayLumLevel;
 	int grayLevel;
 	int colorLevel;
 	String pixColor;
-	int pixShade;
-	String pixShadeName;
+	String pixShade;
 public:
+	PixelData();
+	PixelData(Vec3b pix);
 	int gray_lum_level();
 	int gray_level();
 	int color_level();
 	String color();
-	int shade();
-	String shade_name();
+	String& shade();
+	Vec3b rgb();
+	Vec3f hsl();
 };
 
 #endif /* PIXELDATA_H_ */

@@ -9,55 +9,54 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 double H, S, L;
-deque<String> hslColors;
-deque< deque<int> > hueThresh;
-deque< deque<double> > satThresh;
-deque< deque<double> > lumThresh;
-deque<int> hueTableNum;
+deque<String> Hsl::hslColors;
+deque< deque<int> > Hsl::hueThresh;
+deque< deque<double> > Hsl::satThresh;
+deque< deque<double> > Hsl::lumThresh;
+bool Hsl::THRESH_IMPORTED = false;
 
-bool Hsl::isThreshImported() {
-	return THRESH_IMPORTED;
-}
-
-void Hsl::setThreshImported(bool flag) {
-	THRESH_IMPORTED = flag;
+Hsl::Hsl() {
+	if(!this->THRESH_IMPORTED)
+		this->THRESH_IMPORTED = this->importHslThresholds();
 }
 
 //import main HSL thresholds
 bool Hsl::importHslThresholds() {
-	String foldername = "Thresholds/";
-	String filename = foldername+"hslcolor-thresholds2.csv";
-	fstream fsThresh(filename.c_str());
-	if(!fsThresh.is_open()) {
-		cerr << "Importing HslColors and Thresholds Failed!" << endl;
-		return false;
-	}
-	String temp;
-	deque<String> vec;
-	deque<int> thresh;
-	deque<double> thresh2;
-	deque<double> thresh3;
-	getline(fsThresh,temp);
-	while(getline(fsThresh,temp)) {
-		getSubstr(temp,',',vec);
-		for(unsigned int i=0; i<vec.size(); i++) {
-			if(i==0) hslColors.push_back(vec.at(i));
-			if(i>=1 && i<=2) thresh.push_back(atof(vec.at(i).c_str()));
-			if(i>=3 && i<=4) thresh2.push_back(atof(vec.at(i).c_str()));
-			if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
+	if(!this->THRESH_IMPORTED) {
+		String foldername = "Thresholds/";
+		String filename = foldername+"hslcolor-thresholds2.csv";
+		fstream fsThresh(filename.c_str());
+		if(!fsThresh.is_open()) {
+			cerr << "Importing HslColors and Thresholds Failed!" << endl;
+			return false;
 		}
-		hueThresh.push_back(thresh);
-		satThresh.push_back(thresh2);
-		lumThresh.push_back(thresh3);
-		vec.clear(); thresh.clear(); thresh2.clear(); thresh3.clear();
+		String temp;
+		deque<String> vec;
+		deque<int> thresh;
+		deque<double> thresh2;
+		deque<double> thresh3;
+		getline(fsThresh,temp);
+		while(getline(fsThresh,temp)) {
+			getSubstr(temp,',',vec);
+			for(unsigned int i=0; i<vec.size(); i++) {
+				if(i==0) hslColors.push_back(vec.at(i));
+				if(i>=1 && i<=2) thresh.push_back(atof(vec.at(i).c_str()));
+				if(i>=3 && i<=4) thresh2.push_back(atof(vec.at(i).c_str()));
+				if(i>=5 && i<=6) thresh3.push_back(atof(vec.at(i).c_str()));
+			}
+			hueThresh.push_back(thresh);
+			satThresh.push_back(thresh2);
+			lumThresh.push_back(thresh3);
+			vec.clear(); thresh.clear(); thresh2.clear(); thresh3.clear();
+		}
+		fsThresh.close();
+		deque<String>().swap(vec);
+		deque<int>().swap(thresh);
+		deque<double>().swap(thresh2);
+		deque<double>().swap(thresh3);
+		String().swap(temp);
+		return true;
 	}
-	fsThresh.close();
-	deque<String>().swap(vec);
-	deque<int>().swap(thresh);
-	deque<double>().swap(thresh2);
-	deque<double>().swap(thresh3);
-	String().swap(temp);
-	setThreshImported(true);
 	return true;
 }
 

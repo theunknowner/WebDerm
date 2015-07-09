@@ -10,15 +10,16 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
-extern deque<String> mainColors;
-extern deque<String> allColors;
-
 class Rgb
 {
 public:
+	static deque<String> mainColors;
+	static deque<String> allColors;
+	static bool THRESH_IMPORTED;
+
+	Rgb();
 	int getMainColorIndex(String color);
 	int getColorIndex(String color);
-	bool importColorThresholds();
 	bool importThresholds();
 	double normEucDist(double red, double green, double blue, deque<double> &vec);
 	double absEucDist(double red, double green, double blue, deque<double> &vec);
@@ -40,7 +41,6 @@ public:
 	String calcColor(int red, int green, int blue, double &dist, int &ind);
 	String calcColor(int red, int green, int blue);
 	double calcPerceivedBrightness(double red, double green, double blue);
-	double calcColorLumLevel(double red, double green, double blue);
 };
 
 

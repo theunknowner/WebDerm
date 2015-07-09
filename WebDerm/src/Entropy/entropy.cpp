@@ -31,13 +31,13 @@ deque<deque<deque< deque<double> > > > gRatioRm;
 void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String targetShade) {
 	int height = fd.colorVec.size()/ksize.height;
 	int width = fd.colorVec.at(0).size()/ksize.width;
-	int innerHeight = allColors.size();
-	int innerWidth = g_Shades2.size();
+	int innerHeight = Rgb::allColors.size();
+	int innerWidth = Shades::g_Shades2.size();
 	vec = createDeque4D(height,width,innerHeight,innerWidth,0.);
 	vec2 = createDeque4D(height,width,innerHeight,innerWidth,0.);
 	gTargetCellCount = createDeque4D(height,width,innerHeight,innerWidth,0);
-	deque<deque<deque<deque<double> > > > ratio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
-	deque<deque<deque<deque<double> > > > smoothRatio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
+	deque<deque<deque<deque<double> > > > ratio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0))));
+	deque<deque<deque<deque<double> > > > smoothRatio(height,deque<deque<deque<double> > >(width,deque<deque<double> >(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0))));
 	Rgb rgb;
 	Hsl hsl;
 	Color c;
@@ -47,10 +47,10 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 	double h,s,l;
 	int shadeIndex,colorIndex;
 	int cellSize = ksize.height*ksize.width;
-	deque< deque<double> > pShadeColor(allColors.size(),deque<double>(g_Shades2.size(),0));
-	this->totalPopulation.resize(allColors.size(),deque<double>(g_Shades2.size(),0));
-	this->populationDensity.resize(allColors.size(),deque<double>(g_Shades2.size(),0));
-	this->densityVariation.resize(allColors.size(),deque<double>(g_Shades2.size(),0));
+	deque< deque<double> > pShadeColor(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0));
+	this->totalPopulation.resize(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0));
+	this->populationDensity.resize(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0));
+	this->densityVariation.resize(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0));
 	double pTotal=0;
 	unsigned int row=0, col=0;
 	int i=0,j=0, maxRow=0, maxCol=0;
@@ -130,6 +130,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 									++pShadeColor.at(colorIndex).at(shadeIndex);
 							}
 							catch(const std::out_of_range& oor) {
+								printf("Entropy::eyeFn() out of range 1!\n");
 								printf("ColorVec.Size: %lu\n",fd.colorVec.size());
 								printf("HslMat.Size: %lu\n",fd.hslMat.size());
 								printf("Point(%d,%d)\n",j,i);
@@ -138,14 +139,14 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 								printf("Color: %s\n",color.c_str());
 								printf("ColorIndex: %d\n",colorIndex);
 								printf("pShadeColor.Size: %lu\n",pShadeColor.size());
-								printf("pShadeColor(%d,%d)\n",i,j);
+								printf("pShadeColor(%d,%d)\n",j,i);
 								exit(1);
 							}
 						}
 					}
 				}
-				for(unsigned int colorRow=0; colorRow<allColors.size(); colorRow++) {
-					for(unsigned int shadeCol=0; shadeCol<g_Shades2.size(); shadeCol++) {
+				for(unsigned int colorRow=0; colorRow<Rgb::allColors.size(); colorRow++) {
+					for(unsigned int shadeCol=0; shadeCol<Shades::g_Shades2.size(); shadeCol++) {
 						try {
 							pTotal = pShadeColor.at(colorRow).at(shadeCol)/cellSize;
 							ratio[row/ksize.height][col/ksize.width][colorRow][shadeCol] = pTotal;
@@ -160,7 +161,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 				}
 				col+=ksize.width;
 				pShadeColor.clear();
-				pShadeColor.resize(allColors.size(),deque<double>(g_Shades2.size(),0));
+				pShadeColor.resize(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0));
 			}
 			row += ksize.height;
 			col=0;
@@ -172,12 +173,12 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 		exit(1);
 	}
 
-	deque< deque<int> > cellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
-	deque< deque<int> > targetCellCount(allColors.size(),deque<int>(g_Shades2.size(),0));
-	deque<deque<deque<Point> > > ratioPtsList(allColors.size(), deque<deque<Point> >(g_Shades2.size(),deque<Point>(1,Point(-1,-1))));
-	deque<deque<deque<double> > > ratioSingleList(allColors.size(), deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
-	deque<deque<deque<deque<double> > > > smoothRatioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
-	deque<deque<deque<deque<double> > > > ratioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(allColors.size(),deque<double>(g_Shades2.size(),0))));
+	deque< deque<int> > cellCount(Rgb::allColors.size(),deque<int>(Shades::g_Shades2.size(),0));
+	deque< deque<int> > targetCellCount(Rgb::allColors.size(),deque<int>(Shades::g_Shades2.size(),0));
+	deque<deque<deque<Point> > > ratioPtsList(Rgb::allColors.size(), deque<deque<Point> >(Shades::g_Shades2.size(),deque<Point>(1,Point(-1,-1))));
+	deque<deque<deque<double> > > ratioSingleList(Rgb::allColors.size(), deque<deque<double> >(Shades::g_Shades2.size(),deque<double>(1,-1)));
+	deque<deque<deque<deque<double> > > > smoothRatioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0))));
+	deque<deque<deque<deque<double> > > > ratioOutlierRm(height,deque<deque<deque<double> > >(width,deque<deque<double> >(Rgb::allColors.size(),deque<double>(Shades::g_Shades2.size(),0))));
 	int x1=0,y1=0,minRow=0,minCol=0;
 	double count=0, min=0.03;
 	double outlierThresh = 0.05;
@@ -315,7 +316,7 @@ void Entropy::eyeFn(FileData &fd, Size ksize, Mat map, String targetColor,String
 		}//end for innerWidth
 	}//end for innerHeight
 	ratioSingleList.clear();
-	ratioSingleList.resize(allColors.size(),deque<deque<double> >(g_Shades2.size(),deque<double>(1,-1)));
+	ratioSingleList.resize(Rgb::allColors.size(),deque<deque<double> >(Shades::g_Shades2.size(),deque<double>(1,-1)));
 	x1=0;y1=0;minRow=0;minCol=0;maxRow=0;maxCol=0;
 	while(y1<height) {
 		while(x1<width) {
@@ -411,11 +412,11 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 	FILE * fp4;
 	fp4 = fopen(filename4.c_str(),"w");
 	fprintf(fp4,",Y,S,V,T\n");
-	for(unsigned int j=0; j<g_Shades2.size(); j++) {
-		for(unsigned int i=0; i<allColors.size(); i++) {
+	for(unsigned int j=0; j<Shades::g_Shades2.size(); j++) {
+		for(unsigned int i=0; i<Rgb::allColors.size(); i++) {
 			if(i==0 && j==0) {
 				if(j>=0 && j<=3) {
-					shadeColor = g_Shades2.at(j)+allColors.at(i);
+					shadeColor = Shades::g_Shades2.at(j)+Rgb::allColors.at(i);
 					fprintf(fp4,"%s,%f,%f,%f,",shadeColor.c_str(),this->totalPopulation.at(i).at(j),this->populationDensity.at(i).at(j),this->densityVariation.at(i).at(j));
 					for(unsigned int k=0; k<this->shapeMetric.size();k++) {
 						fprintf(fp4,"%f,",this->shapeMetric.at(k));
@@ -425,7 +426,7 @@ void Entropy::writeEntropyFile(String filename, FileData &fd) {
 			}
 			else {
 				if(j>=0 && j<=3) {
-					shadeColor = g_Shades2.at(j)+allColors.at(i);
+					shadeColor = Shades::g_Shades2.at(j)+Rgb::allColors.at(i);
 					fprintf(fp4,"%s,%f,%f,%f\n",shadeColor.c_str(),this->totalPopulation.at(i).at(j),this->populationDensity.at(i).at(j),this->densityVariation.at(i).at(j));
 				}
 			}

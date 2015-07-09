@@ -10,8 +10,14 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
-deque<String> mainColors;
-deque<String> allColors;
+deque<String> Rgb::mainColors;
+deque<String> Rgb::allColors;
+bool Rgb::THRESH_IMPORTED = false;
+
+Rgb::Rgb() {
+	if(!this->THRESH_IMPORTED)
+		this->THRESH_IMPORTED = this->importThresholds();
+}
 
 int Rgb::getMainColorIndex(String color) {
 	for(unsigned int i=0; i<mainColors.size(); i++) {
@@ -37,50 +43,40 @@ int Rgb::getColorIndex(String color) {
 }
 
 bool Rgb::importThresholds() {
-	int size=1;
-	bool flag[size];
-	flag[0] = importColorThresholds();
-	for(int i=0; i<size; i++)
-		if(flag[i]!=true)
+	if(!this->THRESH_IMPORTED) {
+		String folderName = "Thresholds/";
+		String filename2 = folderName+"main_colors.csv";
+		String filename3 = folderName+"colors.csv";
+		fstream fsColors(filename2.c_str());
+		fstream fsColors2(filename3.c_str());
+		if(fsColors.is_open() && fsColors2.is_open()) {
+			String temp;
+			deque<String> vec;
+			while(getline(fsColors,temp)) {
+				getSubstr(temp,',',vec);
+				for(unsigned int i=0; i<vec.size(); i++) {
+					if(i==0) mainColors.push_back(vec.at(i));
+				}
+				vec.clear();
+			}
+			while(getline(fsColors2,temp)) {
+				getSubstr(temp,',',vec);
+				for(unsigned int i=0; i<vec.size(); i++) {
+					if(i==0) allColors.push_back(vec.at(i));
+				}
+				vec.clear();
+			}
+			fsColors.close(); fsColors2.close();
+			deque<String>().swap(vec);
+			String().swap(temp);
+			return true;
+		}
+		else {
+			cout << "Importing Colors and Thresholds Failed!" << endl;
 			return false;
-
+		}
+	}
 	return true;
-}
-//imports RGB colorspace thresholds
-bool Rgb::importColorThresholds()
-{
-	String folderName = "Thresholds/";
-	String filename2 = folderName+"main_colors.csv";
-	String filename3 = folderName+"colors.csv";
-	fstream fsColors(filename2.c_str());
-	fstream fsColors2(filename3.c_str());
-	if(fsColors.is_open() && fsColors2.is_open()) {
-		String temp;
-		deque<String> vec;
-		while(getline(fsColors,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0) mainColors.push_back(vec.at(i));
-			}
-			vec.clear();
-		}
-		while(getline(fsColors2,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i==0) allColors.push_back(vec.at(i));
-			}
-			vec.clear();
-		}
-		fsColors.close(); fsColors2.close();
-		deque<String>().swap(vec);
-		String().swap(temp);
-		return true;
-	}
-	else
-	{
-		cout << "Importing Colors and Thresholds Failed!" << endl;
-		return false;
-	}
 }
 
 //calculate the Euclidean Distance betweeen normalized Rgb input and colors(vec).
@@ -314,14 +310,14 @@ String Rgb::calcColor2(int red, int green, int blue) {
 	double grayLevel = calcGrayLevel(red,green,blue);
 	double colorLevel = calcColorLevel(red,green,blue);
 	double grayLumLevel = calcGrayLumLevel(red,green,blue);
-	for(unsigned int i=0; i<hueThresh.size(); i++) {
+	for(unsigned int i=0; i<Hsl::hueThresh.size(); i++) {
 		try {
-			if(hue>=hueThresh.at(i).at(0) && hue<=hueThresh.at(i).at(1)) {
-				if(sat>=satThresh.at(i).at(0) && sat<satThresh.at(i).at(1)) {
-					if(lum>=lumThresh.at(i).at(0) && lum<lumThresh.at(i).at(1)) {
-						pix = hslColors.at(i);
+			if(hue>=Hsl::hueThresh.at(i).at(0) && hue<=Hsl::hueThresh.at(i).at(1)) {
+				if(sat>=Hsl::satThresh.at(i).at(0) && sat<Hsl::satThresh.at(i).at(1)) {
+					if(lum>=Hsl::lumThresh.at(i).at(0) && lum<Hsl::lumThresh.at(i).at(1)) {
+						pix = Hsl::hslColors.at(i);
 						if(grayLevel==0) {
-							pix = hslColors.at(i) + toString(colorLevel);
+							pix = Hsl::hslColors.at(i) + toString(colorLevel);
 						}
 						else {
 							if(pix=="Black" || pix=="White")
@@ -329,9 +325,9 @@ String Rgb::calcColor2(int red, int green, int blue) {
 							else if(pix=="Grey")
 								pix += toString(colorLevel);
 							else
-								pix = "Gray" + toString(grayLumLevel) + hslColors.at(i) + toString(colorLevel);
+								pix = "Gray" + toString(grayLumLevel) + Hsl::hslColors.at(i) + toString(colorLevel);
 						}
-						if(c.countColors(hslColors.at(i))>=2)
+						if(c.countColors(Hsl::hslColors.at(i))>=2)
 							pix = c.reassignLevels(pix,red,green,blue);
 						return toString(grayLevel) + pix;
 					}
@@ -339,7 +335,7 @@ String Rgb::calcColor2(int red, int green, int blue) {
 			}
 		} catch (const std::out_of_range &oor) {
 			printf("rgb::calcColor2() out of range!\n");
-			printf("hueThresh.Size: %lu", hueThresh.size());
+			printf("Hsl::hueThresh.Size: %lu", Hsl::hueThresh.size());
 			exit(1);
 		}
 	}
@@ -356,18 +352,6 @@ String Rgb::calcColor(int red, int green, int blue) {
 	String pix;
 	pix = calcColor2(red,green,blue);
 	return pix;
-}
-
-double Rgb::calcColorLumLevel(double red, double green, double blue) {
-	Hsl hsl;
-	double colorLumLevel=0;
-	vector<double> HSL = hsl.rgb2hsl(red,green,blue);
-	double sat = roundDecimal(HSL[1],2) * 100;
-	double lum = roundDecimal(HSL[2],2) * 100;
-	double a=4;
-	double temp = a * (1.0-(sat/100));
-	colorLumLevel = (100-lum) * 1/(temp+1);
-	return round(colorLumLevel);
 }
 
 
