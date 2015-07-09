@@ -25,16 +25,17 @@ String decimal2hex(int num);
 void imfill(Mat &img);
 void imgshow(Mat src, int flag=0, String name="");
 void getSubstr(String str, char delimiter, deque<String> &vec);
+void getSubstr(String str, char delimiter, vector<String> &vec);
 String getFileName(String filename,String end="");
 String getFolderName(String path);
 
-void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val="0");
-void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val=0);
-void init_2D_Deque(deque< deque<int> > &vec, int cols, int rows, int val=0);
+void init_2D_Deque(deque< deque<String> > &vec, int rows, int cols, String val="0");
+void init_2D_Deque(deque< deque<double> > &vec, int rows, int cols, double val=0);
+void init_2D_Deque(deque< deque<int> > &vec, int rows, int cols, int val=0);
 
-void init_3D_Deque(deque< deque< deque<String> > > &vec, int cols, int rows, int dep, String val="0");
-void init_3D_Deque(deque< deque< deque<double> > > &vec, int cols, int rows, int dep, double val=0);
-void init_3D_Deque(deque< deque< deque<int> > > &vec, int cols, int rows, int dep, int val=0);
+void init_3D_Deque(deque< deque< deque<String> > > &vec, int rows, int cols, int dep, String val="0");
+void init_3D_Deque(deque< deque< deque<double> > > &vec, int rows, int cols, int dep, double val=0);
+void init_3D_Deque(deque< deque< deque<int> > > &vec, int rows, int cols, int dep, int val=0);
 
 deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, double val=0);
 deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val=0);

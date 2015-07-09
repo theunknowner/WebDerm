@@ -623,7 +623,7 @@ void script17() {
 		deltaE.push_back(dE);
 	}
 	String str = "_row[" + toString(row) + "]";
-	Write::writeSeq2File(deltaE,name+str,",");
+	Write::writeToCsv(deltaE,name+str,",");
 	String folder = "/home/jason/git/WebDerm/WebDerm/";
 	String py_file = "python /home/jason/Desktop/workspace/Pyth/poly_arg.py ";
 	String py_arg = folder+name+str+".csv ";
@@ -2119,7 +2119,7 @@ void script_checkAllTestData() {
 
 void script_checkHitRatioTestData() {
 	String folder = "/home/jason/Desktop/workspace/TestNN/";
-	String file = folder+"result_labels.csv";
+	String file = folder+"my_labels.csv";
 	ifstream ifs(file);
 	vector<int> myLabelVec;
 	if(ifs.is_open()) {
@@ -3060,7 +3060,8 @@ void script30(String name) {
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	FILE * fp;
-	fp = fopen("/home/jason/Desktop/workspace/island-list.csv","w");
+	String list = "/home/jason/Desktop/workspace/"+name+"_island-list.csv";
+	fp = fopen(list.c_str(),"w");
 	fprintf(fp,"Name,Shade,Shape\n");
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
@@ -3236,7 +3237,7 @@ void script30(String name) {
 			int x = ss.feature(i).island(j).coordinate().x;
 			int y = ss.feature(i).island(j).coordinate().y;
 			String coord = "["+toString(x)+"."+toString(y)+"]";
-			String outName = name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+coord+".png";
+			String outName = name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+coord;
 			int shade = ss.feature(i).island(j).shade();
 			int shape = ss.feature(i).island(j).shape();
 			String shapeName = ss.feature(i).island(j).shape_name();
@@ -3245,7 +3246,7 @@ void script30(String name) {
 			cout << ss.feature(i).island(j).nn_results() << endl;
 		}
 	}
-
+	fclose(fp);
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss);
 }

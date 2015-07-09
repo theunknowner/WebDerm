@@ -40,6 +40,7 @@
 #include "Mouse/mouse.h"
 #include "ShadeShape/ShadeShapeMatch/shadeshapematch.h"
 #include "Algorithms/jaysort.h"
+#include "Algorithms/read.h"
 #include "ShadeShape/ShadeMatch/shadematch.h"
 
 int main(int argc,char** argv)
@@ -56,8 +57,8 @@ int main(int argc,char** argv)
 	//Scripts::script3();
 	//Scripts::script28b();
 /*
-	String name = "lph7";
-	Scripts::script27(name);
+	String name = "melanoma9";
+	//Scripts::script27(name);
 	Scripts::script30(name);
 
 	/*
@@ -91,7 +92,7 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-/*
+	/*
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
 	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/random_test4.png",0);
@@ -105,9 +106,9 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-	//Scripts::script_createTrainingLabels();
-	//Scripts::script_createAllTrainingLabels();
 /*
+	Scripts::script_createAllTrainingLabels();
+	sleep(3);
 	TestML ml;
 	String path1 = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
 	String path2 = "/home/jason/git/Samples/Samples/Training/labels_path.csv";

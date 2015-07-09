@@ -61,7 +61,7 @@ int Islands::area() {
 	return this->islArea;
 }
 
-//! returns shade of island
+//! returns shade(luminance) of island
 int Islands::shade() {
 	return this->islShadeLevel;
 }

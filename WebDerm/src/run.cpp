@@ -161,11 +161,11 @@ void runHysteresis()
 
 			cout << "Writing Files..." << flush;
 			String strSize = toString(size.width)+"x"+toString(size.height);
-			Write::writeSeq2File(fd.windowVec,name+"-"+strSize);
-			Write::writeSeq2File(fd.hslMat,name+"-HSL-"+strSize);
+			Write::writeToCsv(fd.windowVec,name+"-"+strSize);
+			Write::writeToCsv(fd.hslMat,name+"-HSL-"+strSize);
 
 			c.output2ImageColor(fd.colorVec,size,name);
-			Write::writeSeq2File(fd.colorVec,name+"-ShadeColors-"+strSize);
+			Write::writeToCsv(fd.colorVec,name+"-ShadeColors-"+strSize);
 			cout << "Done!" << endl;
 
 			int hours=0, minutes=0, seconds=0;
@@ -237,11 +237,11 @@ void runAllHysteresis() {
 
 				cout << "Writing Files..." << flush;
 				String strSize = toString(size.width)+"x"+toString(size.height);
-				Write::writeSeq2File(fd.windowVec,name+"-"+strSize);
-				Write::writeSeq2File(fd.hslMat,name+"-HSL-"+strSize);
+				Write::writeToCsv(fd.windowVec,name+"-"+strSize);
+				Write::writeToCsv(fd.hslMat,name+"-HSL-"+strSize);
 				//fd.writeFileMetaData();
 				c.output2ImageColor(fd.colorVec,size,name);
-				Write::writeSeq2File(fd.colorVec,name+"-ShadeColors-"+strSize);
+				Write::writeToCsv(fd.colorVec,name+"-ShadeColors-"+strSize);
 				cout << "Done!" << endl;
 
 				//release images for next use

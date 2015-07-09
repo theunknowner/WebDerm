@@ -89,6 +89,33 @@ void imgshow(Mat src, int flag, String name) {
 //generic getSubstr function
 void getSubstr(String str, char delimiter, deque<String> &vec)
 {
+	if(vec.size()>0) vec.clear();
+
+	String temp;
+	int j=0;
+	for(unsigned int i=0; i<str.size(); i++)
+	{
+		if(str[i]==delimiter)
+		{
+			temp = str.substr(j,(i-j));
+			vec.push_back(temp.c_str());
+			j=i+1;
+		}
+		if(i==(str.size()-1))
+		{
+			temp = str.substr(j,str.size()-j);
+			if(temp!="")
+				vec.push_back(temp.c_str());
+			j=0;
+		}
+	}
+}
+
+//generic getSubstr function
+void getSubstr(String str, char delimiter, vector<String> &vec)
+{
+	if(vec.size()>0) vec.clear();
+
 	String temp;
 	int j=0;
 	for(unsigned int i=0; i<str.size(); i++)
@@ -153,53 +180,20 @@ String getFolderName(String path) {
 	return name;
 }
 
-void init_2D_Deque(deque< deque<String> > &vec, int cols, int rows, String val) {
-	deque<String> tempVec;
-	vec.clear();
-	deque< deque<String> >().swap(vec);
-	for(int i=0; i<rows; i++) {
-		for(int j=0; j<cols; j++) {
-			tempVec.push_back(val);
-		}
-		vec.push_back(tempVec);
-		tempVec.clear();
-	}
-	tempVec.clear();
-	deque<String>().swap(tempVec);
+void init_2D_Deque(deque< deque<String> > &vec, int rows, int cols, String val) {
+	vec.resize(rows,deque<String>(cols,val));
 }
 
 
-void init_2D_Deque(deque< deque<double> > &vec, int cols, int rows, double val) {
-	deque<double> tempVec;
-	vec.clear();
-	deque< deque<double> >().swap(vec);
-	for(int i=0; i<rows; i++) {
-		for(int j=0; j<cols; j++) {
-			tempVec.push_back(val);
-		}
-		vec.push_back(tempVec);
-		tempVec.clear();
-	}
-	tempVec.clear();
-	deque<double>().swap(tempVec);
+void init_2D_Deque(deque< deque<double> > &vec, int rows, int cols, double val) {
+	vec.resize(rows,deque<double>(cols,val));
 }
 
-void init_2D_Deque(deque< deque<int> > &vec, int cols, int rows, int val) {
-	deque<int> tempVec;
-	vec.clear();
-	deque< deque<int> >().swap(vec);
-	for(int i=0; i<rows; i++) {
-		for(int j=0; j<cols; j++) {
-			tempVec.push_back(val);
-		}
-		vec.push_back(tempVec);
-		tempVec.clear();
-	}
-	tempVec.clear();
-	deque<int>().swap(tempVec);
+void init_2D_Deque(deque< deque<int> > &vec, int rows, int cols, int val) {
+	vec.resize(rows,deque<int>(cols,val));
 }
 
-void init_3D_Deque(deque< deque< deque<String> > > &vec, int cols, int rows, int dep, String val) {
+void init_3D_Deque(deque< deque< deque<String> > > &vec, int rows, int cols, int dep, String val) {
 	deque<String> tempVec;
 	deque< deque<String> > tempVec2;
 	vec.clear();
@@ -221,7 +215,7 @@ void init_3D_Deque(deque< deque< deque<String> > > &vec, int cols, int rows, int
 	deque< deque<String> >().swap(tempVec2);
 }
 
-void init_3D_Deque(deque< deque< deque<double> > > &vec, int cols, int rows, int dep, double val) {
+void init_3D_Deque(deque< deque< deque<double> > > &vec, int rows, int cols, int dep, double val) {
 	deque<double> tempVec;
 	deque< deque<double> > tempVec2;
 	vec.clear();
@@ -243,7 +237,7 @@ void init_3D_Deque(deque< deque< deque<double> > > &vec, int cols, int rows, int
 	deque< deque<double> >().swap(tempVec2);
 }
 
-void init_3D_Deque(deque< deque< deque<int> > > &vec, int cols, int rows, int dep, int val) {
+void init_3D_Deque(deque< deque< deque<int> > > &vec, int rows, int cols, int dep, int val) {
 	deque<int> tempVec;
 	deque< deque<int> > tempVec2;
 	vec.clear();

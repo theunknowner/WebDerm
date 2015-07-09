@@ -102,15 +102,6 @@ double Intensity::calcIntensity(String pix) {
 	return totalColorIntensity;
 }
 
-double Intensity::sigmoidFn(double intensity) {
-	double x=intensity;
-	const int a=1,b=1,c=22028;
-	const double k=5;
-	double result=0;
-	result = (a*exp(k*x)-(a*exp(-k*x))+(2*b*x)+c);
-	return result;
-}
-
 //assigns min/max shades to an image. Only runs once per image.
 void Intensity::setMinMaxShades() {
 	double min,max;
@@ -639,14 +630,4 @@ deque< deque<String> > Intensity::calcMainColorMatrix(Mat img, deque< deque<Stri
 	//writeSeq2File(shadeVec2,"shadeVec");
 
 	return fd.colorVec;
-}
-
-void Intensity::writeMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
-		deque< deque<String> > &hslMat,String name, FileData &fd) {
-	fd.colorVec = calcMainColorMatrix(img, windowVec, hslMat, name, fd);
-	Write::writeSeq2File(fd.colorVec,name+"_ShadeColors");
-}
-
-void Intensity::writeMainColorMatrix(FileData &fd) {
-	writeMainColorMatrix(fd.getImage(), fd.windowVec, fd.hslMat, fd.filename, fd);
 }

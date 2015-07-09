@@ -41,7 +41,6 @@ public:
 	String getNewMinShade();
 	String getNewMaxShade();
 	double calcIntensity(String pix);
-	double sigmoidFn(double intensity);
 	void setMinMaxShades();
 	void setMinMax(deque< deque<double> > &input);
 	String calcShadeExcludingOutliers(double inten);
@@ -50,11 +49,7 @@ public:
 	deque< deque<double> > calcSmoothedIntensityMatrix(deque< deque<double> > &intensityVec);
 	deque< deque<String> > calcMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
 									deque< deque<String> > &hslMat,String name, FileData &fd);
-	void writeMainColorMatrix(Mat img, deque< deque<String> > &windowVec,
-							deque< deque<String> > &hslMat,String name, FileData &fd);
-	void writeMainColorMatrix(FileData &fd);
 
-	void test_cases();
 };
 
 #endif /* INTENSITY_H_ */

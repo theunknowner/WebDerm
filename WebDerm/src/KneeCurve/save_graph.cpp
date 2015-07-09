@@ -9,5 +9,5 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 
 void KneeCurve::save_graph(String out, vector<double> &vec) {
-	Write::writeSeq2File(vec,out);
+	Write::writeToCsv(vec,out);
 }

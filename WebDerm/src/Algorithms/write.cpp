@@ -8,7 +8,7 @@
 #include "write.h"
 
 namespace Write {
-void writeSeq2File(deque< deque<String> > &vec, String name)
+void writeToCsv(deque< deque<String> > &vec, String name)
 {
 	String filename = name + ".csv";
 	FILE * fp;
@@ -30,7 +30,7 @@ void writeSeq2File(deque< deque<String> > &vec, String name)
 	fclose(fp);
 }
 
-void writeSeq2File(deque< deque<int> > &vec, String name)
+void writeToCsv(deque< deque<int> > &vec, String name)
 {
 	String filename = name + ".csv";
 	FILE * fp;
@@ -52,7 +52,7 @@ void writeSeq2File(deque< deque<int> > &vec, String name)
 	fclose(fp);
 }
 
-void writeSeq2File(deque< deque<double> > &vec, String name)
+void writeToCsv(deque< deque<double> > &vec, String name)
 {
 	String filename = name + ".csv";
 	FILE * fp;
@@ -74,7 +74,7 @@ void writeSeq2File(deque< deque<double> > &vec, String name)
 	fclose(fp);
 }
 
-void writeSeq2File(deque<double> &vec, String name) {
+void writeToCsv(deque<double> &vec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -88,7 +88,7 @@ void writeSeq2File(deque<double> &vec, String name) {
 	fclose(fp);
 }
 
-void writeSeq2File(vector<vector<float> > &vec, String name)
+void writeToCsv(vector<vector<float> > &vec, String name)
 {
 	String filename = name + ".csv";
 	FILE * fp;
@@ -110,7 +110,7 @@ void writeSeq2File(vector<vector<float> > &vec, String name)
 	fclose(fp);
 }
 
-void writeSeq2File(vector<double> &vec, String name, String delimit) {
+void writeToCsv(vector<double> &vec, String name, String delimit) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -127,7 +127,7 @@ void writeSeq2File(vector<double> &vec, String name, String delimit) {
 	fclose(fp);
 }
 
-void writeSeq2File(vector<float> &vec, String name) {
+void writeToCsv(vector<float> &vec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -141,7 +141,7 @@ void writeSeq2File(vector<float> &vec, String name) {
 	fclose(fp);
 }
 
-void writeSeq2File(vector<int> &vec, String name) {
+void writeToCsv(vector<int> &vec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -155,7 +155,21 @@ void writeSeq2File(vector<int> &vec, String name) {
 	fclose(fp);
 }
 
-void writeSeq2File(deque<int> &vec, String name) {
+void writeToCsv(vector<String> &vec, String name) {
+	String filename = name + ".csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	if(vec.size()==0)
+		cout << name << " Write Sequence to File failed!" << endl;
+
+	else
+		for(unsigned int i=0; i<vec.size(); i++) {
+			fprintf(fp,"%s\n",vec.at(i).c_str());
+		}
+	fclose(fp);
+}
+
+void writeToCsv(deque<int> &vec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -169,7 +183,7 @@ void writeSeq2File(deque<int> &vec, String name) {
 	fclose(fp);
 }
 
-void writeSeq2File(deque< deque<long double> > &vec, String name)
+void writeToCsv(deque< deque<long double> > &vec, String name)
 {
 	String filename = name + ".csv";
 	FILE * fp;
@@ -191,7 +205,7 @@ void writeSeq2File(deque< deque<long double> > &vec, String name)
 	fclose(fp);
 }
 
-void writeSeq2File(deque<Point> &ptVec, String name) {
+void writeToCsv(deque<Point> &ptVec, String name) {
 	String filename = name + ".txt";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -205,7 +219,7 @@ void writeSeq2File(deque<Point> &ptVec, String name) {
 	fclose(fp);
 }
 
-void writeSeq2File(deque<Point2f> &ptVec, String name) {
+void writeToCsv(deque<Point2f> &ptVec, String name) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
@@ -231,7 +245,7 @@ void writeSeq2File(double * arr, int length, String name) {
 
 //! type = "int","float","uchar"... so far
 //! if writeIndex=true then it writes the index in first column
-void writeSeq2File(Mat src, String type, String name, bool writeIndex) {
+void writeToCsv(Mat src, String type, String name, bool writeIndex) {
 	String filename = name + ".csv";
 	FILE * fp;
 	fp = fopen(filename.c_str(),"w");
