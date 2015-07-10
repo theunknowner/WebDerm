@@ -161,7 +161,7 @@ void ShadeShape::extract(Mat src) {
 }
 
 //! returns feature of [index]
-Features ShadeShape::feature(int featNum) {
+Features& ShadeShape::feature(int featNum) {
 	return this->featureVec.at(featNum);
 }
 

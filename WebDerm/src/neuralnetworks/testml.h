@@ -15,26 +15,22 @@ private:
 	Mat data;
 	Mat labels;
 	vector<String> shapeNames = {"Comp_Disc","Incomp_Disc","Comp_Donut","Incomp_Donut",
-			"Default","Strip","Blotch"};
+			"Default","Strip","Blotch","Excavated"};
+	static bool THRESH_IMPORTED;
 public:
+	TestML();
 	Mat getData();
 	Mat getLabels();
 	Mat layers;
 	void setLayerParams(Mat layers);
 	Mat prepareImage(Mat sample, Size size=Size(0,0));
 	Mat prepareMatSamples(vector<Mat> sampleVec);
-	void importCsvData(String file, vector<vector<double> > &data, vector<vector<double> > &labels);
-	void vecToMat(vector<vector<double> > &data, vector<vector<double> > &labels, Mat &mData, Mat &mLabels);
 	void importSamples(String folder, vector<Mat> &samples, Size size=Size(0,0));
 	void importLabels(String folder, vector<Mat> &labels);
-	void writeData(String path, Mat &dataSet, Mat &labels);
 	void convertImagesToData(String folder,Mat outputLabels, Size size=Size(0,0));
-	void printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels);
 	Mat convertToBinary(Mat input, int min=0, int max=255, int newMin=0, int newMax=255);
 
 	Mat runANN(String param, vector<Mat> sampleVec);
-
-	Mat tempFixPrepareImg(Mat src);
 
 	void importTrainingData(String samplePath, String labelPath, Size size=Size(0,0));
 

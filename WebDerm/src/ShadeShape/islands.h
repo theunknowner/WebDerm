@@ -11,7 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 class Islands {
-private:
+public:
 	int islArea;
 	int islShadeLevel;
 	int islShape;
@@ -28,11 +28,9 @@ public:
 	int area();
 	int shade();
 	Mat image();
-	int shape();
-	String shape_name();
+	int& shape();
+	String& shape_name();
 	Mat nn_results();
-	void set_shape(int num);
-	void set_shape_name(String name);
 	Point coordinate();
 };
 

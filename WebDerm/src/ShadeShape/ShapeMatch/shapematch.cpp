@@ -80,3 +80,10 @@ int ShapeMatch::numOfShapes() {
 String ShapeMatch::shapeName(int num) {
 	return this->shapeNames.at(num);
 }
+
+//! assigns an island a new shape
+//! does not re-sort by area
+void ShapeMatch::moveShape(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shadeNum, int islNum, int newShape) {
+	islandVec.at(newShape).at(shadeNum).push_back(islandVec.at(shapeNum).at(shadeNum).at(islNum));
+	islandVec.at(shapeNum).at(shadeNum).erase(islandVec.at(shapeNum).at(shadeNum).begin()+islNum);
+}

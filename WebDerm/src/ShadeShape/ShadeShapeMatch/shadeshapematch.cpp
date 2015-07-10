@@ -50,7 +50,7 @@ vector<vector<vector<Islands> > > ShadeShapeMatch::groupIslandsByShape(ShadeShap
 					String shape2 = ss.feature(m).island(n).shape_name();
 					if(shadeVal2==shadeVal && shape==shape2) {
 						islandVec.at(i).at(j).push_back(ss.feature(m).island(n));
-						islandVec.at(i).at(j).back().set_shape(i);
+						islandVec.at(i).at(j).back().shape() = i;
 					}
 				}
 			}
@@ -262,5 +262,6 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		printf("Results %d: %f\n",i+1,results);
 	}
 	 */
+
 	return 0.0;
 }

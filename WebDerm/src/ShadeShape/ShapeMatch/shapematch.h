@@ -18,7 +18,7 @@ class ShapeMatch {
 protected:
 	enum {SHIFT_NONE=0, SHIFT_LEFT, SHIFT_RIGHT};
 	vector<String> SHIFT = {"SHIFT_NONE","SHIFT_LEFT","SHIFT_RIGHT"};
-	vector<String> shapeNames = {"Strip","Default","Blotch","Incomp_Disc",
+	vector<String> shapeNames = {"Strip","Excavated","Default","Blotch","Incomp_Disc",
 			"Comp_Disc","Incomp_Donut","Comp_Donut"};
 public:
 	bool shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shiftType);
@@ -26,6 +26,7 @@ public:
 	void printIslandAreas(vector<vector<vector<Islands> > > &islandVec);
 	int numOfShapes();
 	String shapeName(int num);
+	void moveShape(vector<vector<vector<Islands> > > &islandVec,int shapeNum, int shadeNum, int islNum, int newShape);
 };
 
 #endif /* SHAPEMATCH_H_ */

@@ -72,26 +72,18 @@ Mat Islands::image() {
 }
 
 //! returns index of shape of the island
-int Islands::shape() {
+int& Islands::shape() {
 	return this->islShape;
 }
 
 //! returns name of shape of the island
-String Islands::shape_name() {
+String& Islands::shape_name() {
 	return this->islShapeName;
 }
 
 //! outputs shape neural network results
 Mat Islands::nn_results() {
 	return this->NN_Results;
-}
-
-void Islands::set_shape(int num) {
-	this->islShape = num;
-}
-
-void Islands::set_shape_name(String name) {
-	this->islShapeName = name;
 }
 
 Point Islands::coordinate() {

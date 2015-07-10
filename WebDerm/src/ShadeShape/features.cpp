@@ -127,7 +127,7 @@ Features::Features(Mat featureImg) {
 }
 
 //! returns the island of island(index)
-Islands Features::island(int islNum) {
+Islands& Features::island(int islNum) {
 	return this->islandVec.at(islNum);
 }
 

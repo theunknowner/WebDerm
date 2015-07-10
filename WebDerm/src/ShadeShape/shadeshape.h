@@ -29,7 +29,7 @@ private:
 
 public:
 	void extract(Mat src);
-	Features feature(int featNum);
+	Features& feature(int featNum);
 	int numOfFeatures();
 	int shade(int num);
 	int numOfShades();

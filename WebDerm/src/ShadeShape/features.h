@@ -31,7 +31,7 @@ private:
 	void groupIslandsByShade();
 public:
 	Features(Mat featureImg);
-	Islands island(int islNum);
+	Islands& island(int islNum);
 	Mat image();
 	int area();
 	int numOfIslands();

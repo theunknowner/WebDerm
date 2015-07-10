@@ -57,6 +57,7 @@ int main(int argc,char** argv)
 	//runResizeAllImages();
 	//Scripts::script3();
 	//Scripts::script28b();
+/*
 	Mat img = imread("/home/jason/Desktop/Programs/Images/melanoma7.jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -103,17 +104,16 @@ int main(int argc,char** argv)
 	String name = "melanoma9";
 	//Scripts::script27(name);
 	Scripts::script30(name);
-
-	/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test1.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test3.png");
+*/
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test11.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test12.png");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
 	//ssm.test(ss1);
-
-	/*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
-	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
+/**/
+/*
+	ShadeShape ss1 = Scripts::script31("acne_vulgaris4");
+	ShadeShape ss2 = Scripts::script31("herpes_zoster2");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
 /**/
@@ -135,10 +135,10 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-	/*
+/*
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
-	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/random_test4.png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/test10.png",0);
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(20,20));
@@ -149,7 +149,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-	/*
+/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;

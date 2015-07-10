@@ -115,6 +115,7 @@ void script3() {
 	imgshow(grayImg);
 }
 
+//! cluster hue to detect skin
 void script4() {
 	FileData fd;
 	deque<String> files;
@@ -2161,11 +2162,16 @@ void script_checkHitRatioTestData() {
 }
 
 int getPeakClusters(vector<double> &data_vec) {
+	std::unordered_map<int,int> map;
+	for(unsigned int i=0; i<data_vec.size(); i++) {
+		if(map.find(data_vec.at(i))==map.end())
+			map[data_vec.at(i)] = 1;
+	}
 	float changeThresh = 1.13;
 	int changeCountThresh = 3;
 	int maxShades = 5;
-	int error = 1;
-	int maxClusters = 8;
+	int error = 2;
+	int maxClusters = min(8,(int)map.size());
 	vector<double> densityVec;
 	for(int i=0; i<maxClusters; i++) {
 		Cluster clst2;
@@ -2180,6 +2186,7 @@ int getPeakClusters(vector<double> &data_vec) {
 			double minVal = clst2.getMin(j);
 			double maxVal = clst2.getMax(j);
 			double density = numPts/(maxVal-minVal);
+			if(std::isinf(density)) density = 1000.0;
 			totalDensity += ((double)numPts/totalPts) * density;
 			double center = clst2.getCenter(j);
 			//printf("Clst: %d, Center: %.0f, Min: %.0f, Max: %.0f, Range: %.0f, Size: %d, Density: %f\n",j+1,center,minVal,maxVal,maxVal-minVal,numPts,density);
@@ -2209,7 +2216,7 @@ int getPeakClusters(vector<double> &data_vec) {
 		else changeCount = 0;
 		//printf("%d: %f, %d\n",i+1,change,changeCount);
 		if(changeCount>=changeCountThresh || i==(maxClusters-1)) {
-			peakPos = i-2;
+			peakPos = max((int)(i-changeCountThresh),0);
 			peakPos++;
 			break;
 		}
@@ -2217,7 +2224,6 @@ int getPeakClusters(vector<double> &data_vec) {
 	if(peakPos==1) {
 		vector<double>::iterator it = max_element(changeVec.begin(),changeVec.end());
 		peakPos = (it - changeVec.begin())+1;
-		peakPos++;
 	}
 	peakPos = min(peakPos+error,maxShades);
 	return peakPos;

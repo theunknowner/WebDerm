@@ -18,6 +18,7 @@ class ShadeShape;
 class Islands;
 class ShadeShapeMatch : public ShapeMatch, public ShadeMatch {
 private:
+	//[shape][shade][idx]
 	vector<vector<vector<Islands> > > upIslandVec;
 	vector<vector<vector<Islands> > > dbIslandVec;
 	vector<vector<vector<Islands> > > groupIslandsByShade(ShadeShape &ss);

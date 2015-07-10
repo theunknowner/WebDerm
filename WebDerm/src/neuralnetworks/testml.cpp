@@ -10,6 +10,12 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
+bool TestML::THRESH_IMPORTED = false;
+
+TestML::TestML() {
+
+}
+
 Mat TestML::getData() {
 	return this->data;
 }
@@ -61,49 +67,6 @@ Mat TestML::prepareMatSamples(vector<Mat> sampleVec) {
 		printf("TestML::prepareMatSamples() error!\n");
 		cout << "input size != rows*cols" << endl;
 		return Mat();
-	}
-}
-
-void TestML::importCsvData(String file, vector<vector<double> > &data, vector<vector<double> > &labels) {
-	fstream fs(file.c_str());
-	if(fs.is_open()) {
-		String temp;
-		deque<String> vec;
-		vector<double> pts;
-		vector<double> lbl;
-		size_t pos=0;
-		int x,y;
-		while(getline(fs,temp)) {
-			getSubstr(temp,',',vec);
-			for(unsigned int i=0; i<vec.size(); i++) {
-				if(i<400) {
-					pts.push_back(atof(vec.at(i).c_str()));
-				}
-				else {
-					lbl.push_back(atof(vec.at(i).c_str()));
-				}
-			}
-			data.push_back(pts);
-			labels.push_back(lbl);
-			vec.clear();
-			pts.clear();
-			lbl.clear();
-		}
-		fs.close();
-	}
-	else {
-		cout << "Import training data failed!" << endl;
-	}
-}
-
-void TestML::vecToMat(vector<vector<double> > &data, vector<vector<double> > &labels, Mat &mData, Mat &mLabels) {
-	for(unsigned int i=0; i<data.size(); i++) {
-		for(unsigned int j=0; j<data.at(i).size(); j++) {
-			mData.at<float>(i,j) = data.at(i).at(j);
-		}
-		for(unsigned int k=0; k<labels.at(0).size(); k++) {
-			mLabels.at<float>(i,k) = labels.at(i).at(k);
-		}
 	}
 }
 
@@ -165,21 +128,6 @@ void TestML::importLabels(String path,vector<Mat> &labels) {
 	}
 }
 
-void TestML::writeData(String path, Mat &dataSet, Mat &labels) {
-	FILE * fp;
-	fp = fopen(path.c_str(),"w");
-	for(int i=0; i<dataSet.rows; i++) {
-		for(int j=0; j<dataSet.cols; j++) {
-			fprintf(fp,"%.f,",dataSet.at<float>(i,j));
-		}
-		for(int k=0; k<labels.cols; k++) {
-			fprintf(fp,"%.f,",labels.at<float>(i,k));
-		}
-		fprintf(fp,"\n");
-	}
-	fclose(fp);
-}
-
 void TestML::convertImagesToData(String folder, Mat outputLabels, Size size) {
 	vector<Mat> samples;
 	this->importSamples(folder,samples,size);
@@ -218,16 +166,6 @@ void TestML::convertImagesToData(String folder, Mat outputLabels, Size size) {
 	}
 }
 
-void TestML::printData(vector<vector<Point> > &trainingData, vector<vector<double> > &labels) {
-	for(unsigned int i=0; i<trainingData.size(); i++) {
-		printf("%d:",i);
-		for(unsigned int j=0; j<trainingData.at(i).size(); j++) {
-			printf("(%d,%d)",trainingData.at(i).at(j).x,trainingData.at(i).at(j).y);
-		}
-		printf(" - %.f,%.f\n",labels.at(i).at(0),labels.at(i).at(1));
-	}
-}
-
 //!converts min & max to 0's & 1's
 Mat TestML::convertToBinary(Mat input, int min, int max, int newMin, int newMax) {
 	Mat result = input.clone();
@@ -256,25 +194,8 @@ Mat TestML::runANN(String param, vector<Mat> sampleVec) {
 	return results;
 }
 
-Mat TestML::tempFixPrepareImg(Mat src) {
-	//Mat translatedImg = src.clone();
-	Mat translatedImg(src.size(),CV_32S,Scalar(0));
-	for(int i=0; i<translatedImg.rows; i++) {
-		for(int j=0; j<translatedImg.cols; j++) {
-			//10,51,102,153,204,255
-			int val = src.at<uchar>(i,j);
-			if(val==255) translatedImg.at<int>(i,j) = 1; //white
-			//if(val==204) translatedImg.at<uchar>(i,j) = 4; //light
-			//if(val==153) translatedImg.at<uchar>(i,j) = 3; //low
-			//if(val==102) translatedImg.at<uchar>(i,j) = 2; //high
-			//if(val==51) translatedImg.at<uchar>(i,j) = 1; //dark
-			if(val==0) translatedImg.at<int>(i,j) = -1; //black
-		}
-	}
-	return translatedImg;
-}
-
-//reads csv file containing path to files/folders
+//! reads csv file containing path to files/folders
+//! used for importing training data to train ANN
 void TestML::importTrainingData(String samplePath, String labelsPath, Size size) {
 	fstream fs(samplePath);
 	if(fs.is_open()) {
