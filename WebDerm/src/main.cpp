@@ -58,60 +58,17 @@ int main(int argc,char** argv)
 	//Scripts::script3();
 	//Scripts::script28b();
 /*
-	Mat img = imread("/home/jason/Desktop/Programs/Images/melanoma7.jpg");
-	img = runColorNormalization(img);
-	img = runResizeImage(img,Size(140,140));
-	Mat img2;
-	cvtColor(img,img2,CV_BGR2GRAY);
-	//imwrite("psoriasis11_Gray.png",img2);
-	ImageData id;
-	id.extract(img);
-	vector<double> hueVec;
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			double hue = id.pixel(i,j).hsl()[0];
-			//hue = hue - floor(hue/180.) * 360;
-			hueVec.push_back(hue);
-		}
-	}
-	Cluster clst;
-	clst.kmeansCluster(hueVec,3);
-	clst.printInfo();
-	int clstNum=0;
-	double maxHue = 0;
-	for(int i=0; i<clst.getNumOfClusters(); i++) {
-		double cntHue = clst.getCenter(i);
-		double hue = cntHue - floor(cntHue/180.) * 360;
-		if(hue>maxHue && hue<60.0) {
-			maxHue = hue;
-			clstNum = i;
-		}
-	}
-	cout << "clstNum: " << clstNum << endl;
-	cout << "maxHue: " << maxHue << endl;
-	double minVal = clst.getMin(clstNum);
-	double maxVal = clst.getMax(clstNum);
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			double hue = id.pixel(i,j).hsl()[0];
-			double lum = id.pixel(i,j).hsl()[2];
-			if(hue>=minVal && hue<=maxVal && hue<60.0 && lum>0.40)
-				img.at<Vec3b>(i,j) = Vec3b(0,0,0);
-		}
-	}
-	imgshow(img);
-	/*
-	String name = "melanoma9";
-	//Scripts::script27(name);
+	String name = "melanoma7";
+	Scripts::script27(name);
 	Scripts::script30(name);
-*/
+	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test11.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test12.png");
 	ShadeShapeMatch ssm;
 	ssm.match(ss1,ss2);
 	//ssm.test(ss1);
 /**/
-/*
+	/*
 	ShadeShape ss1 = Scripts::script31("acne_vulgaris4");
 	ShadeShape ss2 = Scripts::script31("herpes_zoster2");
 	ShadeShapeMatch ssm;
@@ -119,7 +76,8 @@ int main(int argc,char** argv)
 /**/
 	//Scripts::script25();
 	//Scripts::script_checkAllTestData();
-	//Scripts::script_checkHitRatioTestData();
+	//Scripts::script_createTestDataList();
+	Scripts::script_checkHitRatioTestData();
 	/*
 	FileData fd;
 	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Disc-Incomplete/";
@@ -135,7 +93,7 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-/*
+	/*
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
 	Mat sample = imread("/home/jason/Desktop/workspace/test10.png",0);

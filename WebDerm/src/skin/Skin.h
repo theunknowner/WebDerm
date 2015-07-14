@@ -9,12 +9,15 @@
 #define SKIN_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
+class ImageData;
 namespace Skin {
 	void getSkin(Mat &img, Mat &mask);
 	void getSkinUsingThresh(Mat &img, Mat &mask);
 	void getSkinUsingCorrelation(Mat &img, Mat &mask);
-	Mat getSkinUsingHist(Mat &img);
+
+	Mat getSkinUsingKmeans(ImageData &id);
 };
 
 #endif /* SKIN_H_ */

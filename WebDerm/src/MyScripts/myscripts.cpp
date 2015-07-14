@@ -2092,6 +2092,22 @@ void script_checkAllTestData() {
 	ofs.close();
 }
 
+void script_createTestDataList() {
+	String folder = "/home/jason/Desktop/workspace/TestNN/";
+	deque<String> files;
+	FILE * fp;
+	String out = folder+"my_labels.csv";
+	fp = fopen(out.c_str(),"w");
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(), files.end());
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		name = getFileName(name);
+		fprintf(fp,"%s\n",name.c_str());
+	}
+	fclose(fp);
+}
 void script_checkHitRatioTestData() {
 	String folder = "/home/jason/Desktop/workspace/TestNN/";
 	String file = folder+"my_labels.csv";
@@ -2117,7 +2133,7 @@ void script_checkHitRatioTestData() {
 	sort(files.begin(),files.end());
 	String out = folder+"results.csv";
 	ofstream ofs(out);
-	ofs << "Name, 0,1,2,3,4,5,6, Result, MyLabel, Y/N" << endl;
+	ofs << "Name, 0,1,2,3,4,5,6,7, Result, MyLabel, Y/N" << endl;
 	TestML ml;
 	String param = "/home/jason/git/Samples/Samples/param.xml";
 	vector<Mat> sampleVec;

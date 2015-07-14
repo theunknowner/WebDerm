@@ -9,6 +9,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Cluster/cluster.h"
 
 namespace Skin {
 /* Fills in holes in the image */
@@ -69,10 +71,41 @@ void getSkin(Mat &img, Mat &mask)
 
 }
 
-Mat getSkinUsingHist(Mat &img) {
-	Mat hsvMat;
-	cvtColor(img,hsvMat,CV_BGR2HSV);
-	return hsvMat;
+Mat getSkinUsingKmeans(ImageData &id) {
+	vector<double> hueVec;
+	for(int i=0; i<id.rows(); i++) {
+		for(int j=0; j<id.cols(); j++) {
+			double hue = id.pixel(i,j).hsl()[0];
+			hueVec.push_back(hue);
+		}
+	}
+	Cluster clst;
+	clst.kmeansCluster(hueVec,3);
+	int clstNum=0;
+	double maxHue = 0;
+	for(int i=0; i<clst.getNumOfClusters(); i++) {
+		double cntHue = clst.getCenter(i);
+		double hue = cntHue - floor(cntHue/180.) * 360;
+		if(hue>maxHue && hue<60.0) {
+			maxHue = hue;
+			clstNum = i;
+		}
+	}
+	//cout << "clstNum: " << clstNum << endl;
+	//cout << "maxHue: " << maxHue << endl;
+	double minVal = clst.getMin(clstNum);
+	double maxVal = clst.getMax(clstNum);
+	Mat result = id.image();
+	for(int i=0; i<id.rows(); i++) {
+		for(int j=0; j<id.cols(); j++) {
+			double hue = id.pixel(i,j).hsl()[0];
+			double lum = id.pixel(i,j).hsl()[2];
+			if(hue>=minVal && hue<=maxVal && hue<60.0 && lum>0.40)
+				result.at<Vec3b>(i,j) = Vec3b(0,0,0);
+		}
+	}
+	//imgshow(result);
+	return result;
 }
 
 } // end namespace
