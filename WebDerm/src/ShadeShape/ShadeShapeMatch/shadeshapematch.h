@@ -30,6 +30,7 @@ private:
 	float dotProduct(std::map<String,float> &upMap, std::map<String,float> &dbMap);
 public:
 	void test(ShadeShape &ss);
+	void test_match(ShadeShape upSS, ShadeShape dbSS);
 	float match(ShadeShape upSS, ShadeShape dbSS);
 };
 

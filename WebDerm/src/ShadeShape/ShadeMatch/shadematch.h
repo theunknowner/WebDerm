@@ -22,6 +22,8 @@ protected:
 
 public:
 	bool shade_translation(vector<vector<vector<Islands> > > &islandVec, float thresh, int shiftType, int shiftAmt=1);
+	bool shade_translation(vector<vector<vector<Islands> > > &islandVec, int shiftType, int shittAmt=1);
+
 };
 
 #endif /* SHADEMATCH_H_ */

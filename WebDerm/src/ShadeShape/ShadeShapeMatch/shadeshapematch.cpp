@@ -178,6 +178,77 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	cout << "------------------" << endl;
 }
 
+void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
+	ShapeMatch smatch;
+	ShadeMatch shadematch;
+	this->maxNumOfShades = max(upSS.numOfShades(),dbSS.numOfShades());
+	float upTotalArea = upSS.area();
+	float dbTotalArea = dbSS.area();
+	this->upIslandVec = this->groupIslandsByShape(upSS);
+	this->dbIslandVec = this->groupIslandsByShape(dbSS);
+	this->sortIslandsByArea(this->dbIslandVec);
+	this->sortIslandsByArea(this->upIslandVec);
+	std::map<String,float> upMap, upMapFilled, dbMapFilled;
+	std::map<String,float> dbMap = this->createPropAreaMap(this->dbIslandVec,dbTotalArea);
+
+	vector<float> resultVec;
+	vector<vector<vector<Islands> > > islandVec2;
+	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
+		islandVec2 = this->upIslandVec;
+		if(shadeShift==0) {
+			this->shade_translation(islandVec2,shadeShift);
+			this->sortIslandsByArea(islandVec2);
+			upMap = this->createPropAreaMap(islandVec2,upTotalArea);
+			upMapFilled = upMap;
+			dbMapFilled = dbMap;
+			this->fillPropAreaMapGaps(upMapFilled,dbMapFilled);
+			float results = this->dotProduct(upMapFilled,dbMapFilled);
+			resultVec.push_back(results);
+
+			std::map<String,float>::iterator itUP;
+			std::map<String,float>::iterator itDB;
+			for(itUP=upMapFilled.begin(),itDB=dbMapFilled.begin();itUP!=upMapFilled.end(),itDB!=dbMapFilled.end(); itUP++, itDB++) {
+				printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second,itDB->first.c_str(),itDB->second);
+			}
+			printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+			printf("Results: %f\n",results);
+		}
+		else {
+			while(this->shade_translation(islandVec2,shadeShift)) {
+				//this->sortIslandsByArea(islandVec2);
+				upMap = this->createPropAreaMap(islandVec2,upTotalArea);
+				upMapFilled = upMap;
+				dbMapFilled = dbMap;
+				this->fillPropAreaMapGaps(upMapFilled,dbMapFilled);
+				float results = this->dotProduct(upMapFilled,dbMapFilled);
+				if(ShadeMatch::SHIFT.at(shadeShift)=="SHIFT_LEFT") {
+					std::map<String,float>::iterator itUP;
+					std::map<String,float>::iterator itDB;
+					for(itUP=upMapFilled.begin(),itDB=dbMapFilled.begin();itUP!=upMapFilled.end(),itDB!=dbMapFilled.end(); itUP++, itDB++) {
+						printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second,itDB->first.c_str(),itDB->second);
+					}
+				}
+				printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+				printf("Results: %f\n",results);
+				if(results>resultVec.back())
+					resultVec.push_back(results);
+				else
+					break;
+			}
+		}
+	}
+	/*
+	cout << "-----------------------------" << endl;
+	for(unsigned int i=0; i<resultVec.size(); i++) {
+		float results = resultVec.at(i);
+		if(i>0)
+			results *= pow(2,-1); // may change
+		printf("Results %d: %f\n",i+1,results);
+	}
+	 */
+
+}
+
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	ShapeMatch smatch;
 	ShadeMatch shadematch;
