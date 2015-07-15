@@ -9,10 +9,15 @@
 #include "../shadeshape.h"
 #include "../islands.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 /*************** PRIVATE FUNCTIONS *******************/
 
 /*************** PUBLIC FUNCTIONS ********************/
+
+void ShadeMatch::setMaxNumOfShades(int num) {
+	this->maxNumOfShades = num;
+}
 
 bool ShadeMatch::shade_translation(vector<vector<vector<Islands> > > &islandVec, float thresh, int shiftType, int shiftAmt) {
 	if(SHIFT[shiftType]!="SHIFT_NONE") {
@@ -120,3 +125,66 @@ bool ShadeMatch::shade_translation(vector<vector<vector<Islands> > > &islandVec,
 	}
 	return false;
 }
+
+bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) {
+	if(SHIFT[shiftType]=="SHIFT_NONE")
+		return false;
+
+	static int prevShiftType = -1;
+	static vector<int> areaVec;
+	static vector<int> origPos;
+	static vector<int> indexVec;
+	static vector<vector<int> > indexVec2d;
+	if(prevShiftType != shiftType) {
+		areaVec.clear();
+		origPos.clear();
+		indexVec.clear();
+		indexVec2d.clear();
+	}
+	if(prevShiftType!=shiftType) {
+		for(int i=0; i<ss.numOfFeatures(); i++) {
+			for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
+				int area = ss.feature(i).island(j).area();
+				areaVec.push_back(area);
+				indexVec.push_back(i);
+				indexVec.push_back(j);
+				indexVec2d.push_back(indexVec);
+				indexVec.clear();
+			}
+		}
+		jaysort(areaVec,origPos);
+	}
+	int shiftedIndex=0;
+	static int index = 1;
+	if(prevShiftType != shiftType)	index = 1;
+	printf("prevShift: %d, currShift: %d\n",prevShiftType,shiftType);
+	prevShiftType = shiftType;
+	printf("index: %d\n",index);
+	int n =areaVec.size()-index;
+	index++;
+	if(n>=0) {
+		int pos = origPos.at(n);
+		int featNum = indexVec2d.at(pos).at(0);
+		int islNum = indexVec2d.at(pos).at(1);
+		int shade = ss.feature(featNum).island(islNum).shade();
+		int shadeInd = ss.getIndexOfShade(shade);
+		if(SHIFT[shiftType] == "SHIFT_LEFT")
+			shiftedIndex = max(shadeInd-shiftAmt,0);
+		if(SHIFT[shiftType] == "SHIFT_RIGHT")
+			shiftedIndex = min(shadeInd+shiftAmt,this->maxNumOfShades-1);
+
+		int newShade = ss.shade(shiftedIndex);
+		Mat shiftedImg(ss.image().size(),ss.image().type(),Scalar(0));
+		for(int i=0; i<ss.numOfFeatures(); i++) {
+			for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
+				if(i==featNum && j==islNum)
+					ss.feature(i).island(j).set_island_shade(newShade);
+				ss.feature(i).island(j).image().copyTo(shiftedImg,ss.feature(i).island(j).image());
+			}
+		}
+		ss.image() = shiftedImg;
+		return true;
+	}
+	return false;
+}
+

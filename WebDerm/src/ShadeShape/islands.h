@@ -26,12 +26,13 @@ public:
 	Islands();
 	Islands(Mat islandImg);
 	int area();
-	int shade();
+	int& shade();
 	Mat image();
 	int& shape();
 	String& shape_name();
 	Mat nn_results();
 	Point coordinate();
+	void set_island_shade(int shade);
 };
 
 #endif /* ISLANDS_H_ */

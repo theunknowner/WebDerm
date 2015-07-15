@@ -194,9 +194,9 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	vector<float> resultVec;
 	vector<vector<vector<Islands> > > islandVec2;
 	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
-		islandVec2 = this->upIslandVec;
+		ShadeShape newUpSS = upSS;
 		if(shadeShift==0) {
-			this->shade_translation(islandVec2,shadeShift);
+			islandVec2 = this->groupIslandsByShape(newUpSS);
 			this->sortIslandsByArea(islandVec2);
 			upMap = this->createPropAreaMap(islandVec2,upTotalArea);
 			upMapFilled = upMap;
@@ -214,14 +214,17 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 			printf("Results: %f\n",results);
 		}
 		else {
-			while(this->shade_translation(islandVec2,shadeShift)) {
-				//this->sortIslandsByArea(islandVec2);
+			while(this->shade_translation(newUpSS,shadeShift)) {
+				ShadeShape matchSS;
+				matchSS.extract(newUpSS.image());
+				islandVec2 = this->groupIslandsByShape(matchSS);
+				this->sortIslandsByArea(islandVec2);
 				upMap = this->createPropAreaMap(islandVec2,upTotalArea);
 				upMapFilled = upMap;
 				dbMapFilled = dbMap;
 				this->fillPropAreaMapGaps(upMapFilled,dbMapFilled);
 				float results = this->dotProduct(upMapFilled,dbMapFilled);
-				if(ShadeMatch::SHIFT.at(shadeShift)=="SHIFT_LEFT") {
+				if(ShadeMatch::SHIFT.at(shadeShift)!="SHIFT_NONE") {
 					std::map<String,float>::iterator itUP;
 					std::map<String,float>::iterator itDB;
 					for(itUP=upMapFilled.begin(),itDB=dbMapFilled.begin();itUP!=upMapFilled.end(),itDB!=dbMapFilled.end(); itUP++, itDB++) {
@@ -252,7 +255,7 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	ShapeMatch smatch;
 	ShadeMatch shadematch;
-	this->maxNumOfShades = max(upSS.numOfShades(),dbSS.numOfShades());
+	this->setMaxNumOfShades(max(upSS.numOfShades(),dbSS.numOfShades()));
 	float upTotalArea = upSS.area();
 	float dbTotalArea = dbSS.area();
 	this->upIslandVec = this->groupIslandsByShape(upSS);

@@ -150,6 +150,7 @@ void ShadeShape::getShadesOfFeatures(Mat src) {
 
 //! extracts the features from the image
 void ShadeShape::extract(Mat src) {
+	this->img = src.clone();
 	vector<Mat> featureVec = this->extractFeatures(src);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
 		Features feature(featureVec.at(i));
@@ -180,12 +181,32 @@ int ShadeShape::numOfShades() {
 	return this->shadeVec.size();
 }
 
+int ShadeShape::getIndexOfShade(int shade) {
+	int index = std::find(this->shadeVec.begin(),this->shadeVec.end(),shade) - this->shadeVec.begin();
+	return index;
+}
+
 int ShadeShape::area() {
 	return this->ssArea;
 }
 
+Mat& ShadeShape::image() {
+	return this->img;
+}
+
 vector<int> ShadeShape::get_shades() {
 	return this->shadeVec;
+}
+
+void ShadeShape::release() {
+	for(int i=0; i<this->numOfFeatures(); i++) {
+		this->feature(i).release();
+	}
+	this->featureVec.clear();
+	this->featureVec.shrink_to_fit();
+	this->shadeVec.clear();
+	this->shadeVec.shrink_to_fit();
+	this->img.release();
 }
 
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {

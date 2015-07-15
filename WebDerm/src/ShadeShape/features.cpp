@@ -96,19 +96,6 @@ void Features::getShadesOfIslands() {
 	}
 }
 
-//! groups islands of same shade to together in a vector
-void Features::groupIslandsByShade() {
-	this->islVecShade.resize(this->numOfShades(),vector<Islands>(0,Islands()));
-	for(int i=0; i<this->numOfShades(); i++) {
-		int shadeVal = this->shade(i);
-		for(int j=0; j<this->numOfIslands(); j++) {
-			int shadeVal2 = this->island(j).shade();
-			if(shadeVal2==shadeVal)
-				this->islVecShade.at(i).push_back(this->island(j));
-		}
-	}
-}
-
 /************ PUBLIC FUNCTIONS *******************/
 
 Features::Features(Mat featureImg) {
@@ -171,6 +158,10 @@ int Features::shade(int num) {
 	return this->shadeVec.at(num);
 }
 
+void Features::release() {
+	this->islandVec.clear();
+	this->islandVec.shrink_to_fit();
+}
 /*
 //! gets the vector of islands that is shade(index)
 vector<Islands> Features::islandsOfShade(int num) {

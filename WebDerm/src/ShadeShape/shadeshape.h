@@ -19,6 +19,7 @@ private:
 	vector<int> shadeVec;
 	int numOfFeats;
 	int ssArea;
+	Mat img;
 
 	bool isBridgeWeak(Mat &src, int x, int y);
 	bool isOnTheEdge(Mat &src, int x, int y);
@@ -33,8 +34,11 @@ public:
 	int numOfFeatures();
 	int shade(int num);
 	int numOfShades();
+	int getIndexOfShade(int shade);
 	int area();
+	Mat& image();
 	vector<int> get_shades();
+	void release();
 
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };

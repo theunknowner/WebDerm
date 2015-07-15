@@ -62,7 +62,8 @@ int Islands::area() {
 }
 
 //! returns shade(luminance) of island
-int Islands::shade() {
+//! does not change original shade of island
+int& Islands::shade() {
 	return this->islShadeLevel;
 }
 
@@ -88,4 +89,15 @@ Mat Islands::nn_results() {
 
 Point Islands::coordinate() {
 	return this->islPt;
+}
+
+//! changes the original image shade/luminance value
+void Islands::set_island_shade(int shade) {
+	for(int i=0; i<this->islandImg.rows; i++) {
+		for(int j=0; j<this->islandImg.cols; j++) {
+			if(this->islandImg.at<uchar>(i,j)>0)
+				this->islandImg.at<uchar>(i,j) = shade;
+		}
+	}
+	this->islShadeLevel = shade;
 }

@@ -16,7 +16,6 @@ class Features {
 private:
 	vector<Islands> islandVec;
 	vector<int> shadeVec;
-	vector<vector<Islands> > islVecShade;
 	Mat featureImg;
 	int featArea;
 	int numOfIsls;
@@ -28,7 +27,6 @@ private:
 	void storeIsland(Islands island);
 	void determineFeatureShape(Mat featureImg);
 	void getShadesOfIslands();
-	void groupIslandsByShade();
 public:
 	Features(Mat featureImg);
 	Islands& island(int islNum);
@@ -40,6 +38,7 @@ public:
 	Mat nn_results();
 	int numOfShades();
 	int shade(int num);
+	void release();
 	//vector<Islands> islandsOfShade(int num);
 };
 

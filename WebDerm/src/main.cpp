@@ -56,19 +56,19 @@ int main(int argc,char** argv)
 	//runMouseColor();
 	//runResizeAllImages();
 	//Scripts::script3();
-/*
+	/*
 	String name = "melanoma7";
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
 
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test4.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test5.png");
 	ShadeShapeMatch ssm;
 	ssm.test_match(ss1,ss2);
 	//ssm.test(ss1);
 /**/
-/*
+	/*
 	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
 	ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
 	ShadeShapeMatch ssm;
@@ -107,7 +107,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-/*
+	/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
