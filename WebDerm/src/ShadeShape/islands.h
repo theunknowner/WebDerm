@@ -37,7 +37,7 @@ public:
 	Point startPt();
 	void set_island_shade(int shade);
 	Point centerOfMass();
-	map<String,int> coordinates();
+	map<String,int>& coordinates();
 	String& labelName();
 };
 

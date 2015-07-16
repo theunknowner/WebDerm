@@ -126,7 +126,7 @@ Point Islands::centerOfMass() {
 	return this->_centerOfMass;
 }
 
-map<String,int> Islands::coordinates() {
+map<String,int>& Islands::coordinates() {
 	return this->coordMap;
 }
 

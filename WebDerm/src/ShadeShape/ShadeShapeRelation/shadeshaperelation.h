@@ -16,10 +16,10 @@ class ShadeShapeRelation {
 protected:
 	vector<vector<String> > relationMatrix;
 	vector<vector<int> > markedMap;
-	void setup_relationMatrix(map<String,int> &labels);
+	void setup_relationMatrix(map<String,float> &labels);
 
 public:
-	void surrounded_by(ShadeShape &ss, map<String,int> &labels, vector<vector<vector<Islands> > > &islandVec);
+	void surrounded_by(ShadeShape &ss, map<String,float> &labels, vector<vector<vector<Islands> > > &islandVec);
 };
 
 #endif /* SHADESHAPERELATION_H_ */
