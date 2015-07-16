@@ -2425,8 +2425,8 @@ void script27(String name) {
 	for(int i=0; i<ss.numOfFeatures(); i++) {
 		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
 			//printf("%s_%d.%d: Area: %d, Shade: %d\n",name.c_str(),i+1,j+1,ss.feature(i).island(j).area(),ss.feature(i).island(j).shade());
-			int x = ss.feature(i).island(j).coordinate().x;
-			int y = ss.feature(i).island(j).coordinate().y;
+			int x = ss.feature(i).island(j).startPt().x;
+			int y = ss.feature(i).island(j).startPt().y;
 			String coord = "["+toString(x)+","+toString(y)+"]";
 			String outName = out+name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+coord+".png";
 			imwrite(outName,ss.feature(i).island(j).image());
@@ -3227,8 +3227,8 @@ void script30(String name) {
 	ss.extract(img3);
 	for(int i=0; i<ss.numOfFeatures(); i++) {
 		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
-			int x = ss.feature(i).island(j).coordinate().x;
-			int y = ss.feature(i).island(j).coordinate().y;
+			int x = ss.feature(i).island(j).startPt().x;
+			int y = ss.feature(i).island(j).startPt().y;
 			String coord = "["+toString(x)+"."+toString(y)+"]";
 			String outName = name+"_shadeShape_"+toString(i+1)+"."+toString(j+1)+coord;
 			int shade = ss.feature(i).island(j).shade();

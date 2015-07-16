@@ -126,6 +126,7 @@ bool ShadeMatch::shade_translation(vector<vector<vector<Islands> > > &islandVec,
 	return false;
 }
 
+//! continuous shade_translation of islands until shiftType changes
 bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) {
 	if(SHIFT[shiftType]=="SHIFT_NONE")
 		return false;

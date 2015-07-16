@@ -11,6 +11,7 @@
 #include "../ShapeMatch/shapematch.h"
 #include "../ShadeMatch/shadematch.h"
 #include "../shadeshape.h"
+#include "../ShadeShapeRelation/shadeshaperelation.h"
 
 /******************* PRIVATE FUNCTIONS ******************/
 
@@ -91,6 +92,7 @@ vector<vector<vector<String> > > ShadeShapeMatch::createKeyLabels(vector<vector<
 				//label = "s"+toString(j)+"_shape"+toString(i)+"_";
 				label = "shape"+toString(i)+"_s"+toString(j)+"_";
 				label += Func::addDigitsForLabel(k,"0",3);
+				islandVec.at(i).at(j).at(k).labelName() = label;
 				if(map.find(label)==map.end()) {
 					map[label] = 1;
 					labels.at(i).at(j).push_back(label);
@@ -204,7 +206,6 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 			this->fillPropAreaMapGaps(upMapFilled,dbMapFilled);
 			float results = this->dotProduct(upMapFilled,dbMapFilled);
 			resultVec.push_back(results);
-
 			std::map<String,float>::iterator itUP;
 			std::map<String,float>::iterator itDB;
 			for(itUP=upMapFilled.begin(),itDB=dbMapFilled.begin();itUP!=upMapFilled.end(),itDB!=dbMapFilled.end(); itUP++, itDB++) {
@@ -240,16 +241,6 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 			}
 		}
 	}
-	/*
-	cout << "-----------------------------" << endl;
-	for(unsigned int i=0; i<resultVec.size(); i++) {
-		float results = resultVec.at(i);
-		if(i>0)
-			results *= pow(2,-1); // may change
-		printf("Results %d: %f\n",i+1,results);
-	}
-	 */
-
 }
 
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {

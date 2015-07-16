@@ -7,6 +7,7 @@
 
 #include "islands.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 /************ PRIVATE FUNCTIONS ******************/
 
@@ -38,10 +39,28 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	}
 }
 
-void Islands::getIslandStartPt(Mat &islandImg) {
-	Mat nonZeroPts;
-	cv::findNonZero(islandImg,nonZeroPts);
-	this->islPt = nonZeroPts.at<Point>(0);
+void Islands::getIslandPoints(Mat &islandImg) {
+	Mat nonZeroCoord;
+	cv::findNonZero(islandImg,nonZeroCoord);
+	// gets the center of mass and stores all the coords in a map
+	int x=0, y=0, xCenter=0,yCenter=0;
+	for(unsigned int i=0; i<nonZeroCoord.total(); i++) {
+		x = nonZeroCoord.at<Point>(i).x;
+		y = nonZeroCoord.at<Point>(i).y;
+		String coords = toString(x)+","+toString(y);
+		if(this->coordMap.find(coords)==this->coordMap.end())
+			this->coordMap[coords] = 1;
+		xCenter += x;
+		yCenter += y;
+	}
+	xCenter /= nonZeroCoord.total();
+	yCenter /= nonZeroCoord.total();
+	this->_centerOfMass = Point(xCenter,yCenter);
+
+	// gets the start point of the island
+	this->islPt = nonZeroCoord.at<Point>(0);
+
+
 }
 
 /*************** PUBLIC FUNCTIONS ******************/
@@ -52,8 +71,9 @@ Islands::Islands(Mat islandImg) {
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
 	this->islandImg = islandImg;
-	this->getIslandStartPt(islandImg);
 	this->determineIslandShape(islandImg);
+	this->getIslandPoints(islandImg);
+	this->_labelName = "";
 }
 
 //! returns area/number of pixels of island
@@ -87,7 +107,7 @@ Mat Islands::nn_results() {
 	return this->NN_Results;
 }
 
-Point Islands::coordinate() {
+Point Islands::startPt() {
 	return this->islPt;
 }
 
@@ -100,4 +120,16 @@ void Islands::set_island_shade(int shade) {
 		}
 	}
 	this->islShadeLevel = shade;
+}
+
+Point Islands::centerOfMass() {
+	return this->_centerOfMass;
+}
+
+map<String,int> Islands::coordinates() {
+	return this->coordMap;
+}
+
+String& Islands::labelName() {
+	return this->_labelName;
 }

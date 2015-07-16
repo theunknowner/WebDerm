@@ -11,7 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
 class Islands {
-public:
+protected:
 	int islArea;
 	int islShadeLevel;
 	int islShape;
@@ -19,9 +19,12 @@ public:
 	Mat islandImg;
 	Mat NN_Results;
 	Point islPt;
+	Point _centerOfMass;
+	map<String,int> coordMap;
+	String _labelName;
 
 	void determineIslandShape(Mat &islandImg);
-	void getIslandStartPt(Mat &islandImg);
+	void getIslandPoints(Mat &islandImg);
 public:
 	Islands();
 	Islands(Mat islandImg);
@@ -31,8 +34,11 @@ public:
 	int& shape();
 	String& shape_name();
 	Mat nn_results();
-	Point coordinate();
+	Point startPt();
 	void set_island_shade(int shade);
+	Point centerOfMass();
+	map<String,int> coordinates();
+	String& labelName();
 };
 
 #endif /* ISLANDS_H_ */
