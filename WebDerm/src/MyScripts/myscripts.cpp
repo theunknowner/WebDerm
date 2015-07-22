@@ -2447,7 +2447,7 @@ void script28a() {
 	Mat img, img2,img3, img4, img5, imgGray;
 	FileData fd;
 	deque<String> files;
-	String name = "clp5";
+	String name = "melanoma9";
 	String out = "/home/jason/Desktop/Programs/Discrete_New/";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);

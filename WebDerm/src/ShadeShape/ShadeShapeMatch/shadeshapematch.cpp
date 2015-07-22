@@ -178,6 +178,8 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 		cout << it->first << ": " << it->second << endl;
 	}
 	cout << "------------------" << endl;
+	ShadeShapeRelation ssr;
+	ssr.surrounded_by(ss,map,islandVec);
 }
 
 void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
