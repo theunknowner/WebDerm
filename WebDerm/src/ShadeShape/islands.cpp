@@ -39,6 +39,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	}
 }
 
+//get coordinates of non-zero pixels
 void Islands::getIslandPoints(Mat &islandImg) {
 	Mat nonZeroCoord;
 	cv::findNonZero(islandImg,nonZeroCoord);

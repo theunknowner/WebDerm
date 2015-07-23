@@ -234,9 +234,9 @@ double euclideanDist(deque<double> &vec1, deque<double> &vec2) {
 	return result;
 }
 
-double eucDist(Point pt1, Point pt2) {
-	double result=0;
-	double valX=0, valY=0;
+float eucDist(Point pt1, Point pt2) {
+	float result=0;
+	float valX=0, valY=0;
 	valX = pow(pt1.x-pt2.x,2);
 	valY = pow(pt1.y-pt2.y,2);
 	result = valX+valY;
