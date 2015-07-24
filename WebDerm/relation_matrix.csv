@@ -1,3 +1,4 @@
-,shape0_s1_000,shape7_s0_000,
-shape0_s1_000,NULL,NULL,
-shape7_s0_000,NULL,NULL,
+,shape5_s0_000,shape5_s2_000,shape6_s1_000,
+shape5_s0_000,NULL,INDIR,DIR,
+shape5_s2_000,INDIR,NULL,INDIR,
+shape6_s1_000,DIR,INDIR,NULL,

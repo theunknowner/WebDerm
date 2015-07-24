@@ -146,6 +146,27 @@ void ShadeShape::getShadesOfFeatures(Mat src) {
 	}
 }
 
+void ShadeShape::removeDuplicatePointsFromIslands() {
+	Mat img = this->img;
+	for(int i=0; i<this->numOfFeatures(); i++) {
+		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
+			Islands isl = this->feature(i).island(j);
+			map<String,int> coordMap = this->feature(i).island(j).coordinates();
+			for(auto it=coordMap.begin(); it!=coordMap.end(); it++) {
+				vector<String> vec;
+				getSubstr(it->first,',',vec);
+				int col = atoi(vec.at(0).c_str());
+				int row = atoi(vec.at(1).c_str());
+				int val = img.at<uchar>(row,col);
+				if(isl.shade()!=val) {
+					coordMap.erase(it->first);
+				}
+			}
+			this->feature(i).island(j).coordinates() = coordMap;
+		}
+	}
+}
+
 /******************** PUBLIC FUNCTIONS *********************/
 
 //! extracts the features from the image
@@ -159,6 +180,7 @@ void ShadeShape::extract(Mat src) {
 	this->numOfFeats = this->featureVec.size();
 	this->getShadesOfFeatures(src);
 	this->ssArea = countNonZero(src);
+	this->removeDuplicatePointsFromIslands();
 }
 
 //! returns feature of [index]
@@ -207,6 +229,18 @@ void ShadeShape::release() {
 	this->shadeVec.clear();
 	this->shadeVec.shrink_to_fit();
 	this->img.release();
+}
+
+Islands ShadeShape::getIslandWithPoint(Point pt) {
+	String coords = toString(pt.x)+","+toString(pt.y);
+	for(int i=0; i<this->numOfFeatures(); i++) {
+		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
+			Islands island = this->feature(i).island(j);
+			if(island.coordinates().find(coords)!=island.coordinates().end())
+				return island;
+		}
+	}
+	return Islands();
 }
 
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {

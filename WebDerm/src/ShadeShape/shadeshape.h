@@ -10,8 +10,10 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "features.h"
+#include "islands.h"
 
 class Features;
+class Islands;
 
 class ShadeShape {
 private:
@@ -27,6 +29,7 @@ private:
 	vector<Mat> extractFeatures(Mat src);
 	void storeFeature(Features feature);
 	void getShadesOfFeatures(Mat src);
+	void removeDuplicatePointsFromIslands();
 
 public:
 	void extract(Mat src);
@@ -39,6 +42,7 @@ public:
 	Mat& image();
 	vector<int> get_shades();
 	void release();
+	Islands getIslandWithPoint(Point pt);
 
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };

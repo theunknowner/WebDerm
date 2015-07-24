@@ -31,6 +31,7 @@ Mat ShapeColor::applyDiscreteShade(Mat input) {
 	return dst;
 }
 
+//applies midpoint value of each interval to each belonging pixel
 Mat ShapeColor::applyDiscreteShade(Mat input, int minVal, int maxVal, int intervals) {
 	double sw = (double)(maxVal - minVal) / intervals;
 	Mat dst(input.size(),CV_8U,Scalar(0));

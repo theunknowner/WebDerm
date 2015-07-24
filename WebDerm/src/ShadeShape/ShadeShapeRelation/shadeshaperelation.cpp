@@ -23,7 +23,7 @@ void ShadeShapeRelation::setup_relationMatrix(map<String,float> &labels) {
 
 /******************** PUBLIC FUNCTIONS ***********************/
 
-void ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &labels, vector<vector<vector<Islands> > > &islandVec) {
+vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &labels, vector<vector<vector<Islands> > > &islandVec) {
 	this->setup_relationMatrix(labels);
 	const int visibilityThresh = 3;
 	const int surroundedThreshUpper = 14;
@@ -45,6 +45,7 @@ void ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &lab
 				for(double theta=0.0; theta<360.0; theta+=15.0) {
 					vector<int> vecWidth(labels.size(),0);
 					int neighborNum = 0;
+					String prevIslandLabel="";
 					int row=center.y, col=center.x;
 					float fRow = center.y, fCol = center.x;
 					double deg = theta * M_PI / 180.0; //convert to degrees
@@ -55,7 +56,8 @@ void ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &lab
 							if(isl1.coordinates().find(coords2)!=isl1.coordinates().end()) {
 								insideIsland1 = ENTERED;
 							}
-						} else if(insideIsland1==ENTERED) {
+						}
+						if(insideIsland1==ENTERED) {
 							if(isl1.coordinates().find(coords2)!=isl1.coordinates().end()) {
 								vecWidth.at(index1)++;
 								minWidthForVisibility = min(vecWidth.at(index1),visibilityThresh);
@@ -64,33 +66,44 @@ void ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &lab
 							else {
 								insideIsland1 = EXITED;
 							}
-						} else if(insideIsland1==EXITED) {
+						}
+						if(insideIsland1==EXITED) {
 							for(unsigned int shape2=0; shape2<islandVec.size(); shape2++) {
 								for(unsigned int shade2=0; shade2<islandVec.at(shape2).size(); shade2++) {
 									for(unsigned int num2=0; num2<islandVec.at(shape2).at(shade2).size(); num2++) {
 										if(shape1!=shape2 || shade1!=shade2 || num1!=num2) { //checks so island1 != island2
 											Islands isl2 = islandVec.at(shape2).at(shade2).at(num2);
 											String label2 = isl2.labelName();
-											int insideIsland2 = OUTSIDE;
 											int index2 =  distance(labels.begin(),labels.find(label2));
+											int insideIsland2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? ENTERED : OUTSIDE;
+											/*if(index1==2 && index2==24) {
+												printf("Deg: %f, Coords2: %s, ",theta,coords2.c_str());
+												printf("State: %d\n",insideIsland2);
+											}*/
+											Point center2 = isl2.centerOfMass();
+											float centerDist = abs(MyMath::eucDist(center,center2));
+											float relArea1 = (float)isl1.area() / ss.area();
+											float relArea2 = (float)isl2.area() / ss.area();
+											float thresh = 800.0 * (relArea1 * relArea2);
+											if(centerDist<=thresh) {
+												this->relationMatrix.at(index1).at(index2) = this->rel_op[INDIR];
+												this->relationMatrix.at(index2).at(index1) = this->rel_op[INDIR];
+											}
+											if(index1==0 && index2==1) {
+												cout << "Thresh: " << thresh << endl;
+												cout << centerDist << endl;
+											}
 											if(markedMap.at(index1).at(index2)==0) {
-												if(isl2.coordinates().find(coords2)!=isl2.coordinates().end()) {
-													if(insideIsland2==OUTSIDE) {
-														insideIsland2 = ENTERED;
+												if(insideIsland2==ENTERED || insideIsland2==INSIDE) {
+													if(prevIslandLabel==label2) insideIsland2=INSIDE;
+													if(insideIsland2==ENTERED) {
 														neighborNum++;
 														neighborNumVec.at(index1).at(index2) = neighborNum;
 														endCoords = Point(col,row);
 														float dist = MyMath::eucDist(beginCoords,endCoords);
 														neighborDistVec.at(index1).at(index2) = min(neighborDistVec.at(index1).at(index2),dist);
-														if(index1==0 && index2==1) {
-															cout << "Degree: " << theta << endl;
-															cout << "Begin: " << beginCoords << ", " << "End: " << endCoords << endl;
-															cout << "Dist: " << dist << endl;
-														}
-													} else if(insideIsland2==ENTERED) {
-														insideIsland2 = INSIDE;
 													}
-
+													prevIslandLabel = label2;
 													vecWidth.at(index2)++;
 													goto jump_out;
 												}
@@ -138,14 +151,17 @@ void ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &lab
 							}
 						}
 					}
-					if(index1==0 && index2==1) {
+
+					if(index1==2 && index2==24) {
 						printf("Rel_Count: %d, Dist: %f\n",this->relationCount.at(index1).at(index2),neighborDistVec.at(index1).at(index2));
+						printf("Neighbor: %d\n",neighborNumVec.at(index1).at(index2));
 					}
 				}
 			}// end num1 loop
 		}// end shade1 loop
 	}// end shape1 loop
 	this->writeRelationMatrix(labels);
+	return this->relationMatrix;
 }
 
 void ShadeShapeRelation::writeRelationMatrix(map<String,float> &labels) {
