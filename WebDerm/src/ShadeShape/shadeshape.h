@@ -19,6 +19,7 @@ class ShadeShape {
 private:
 	vector<Features> featureVec;
 	vector<int> shadeVec;
+	vector<int> areaVec;
 	int numOfFeats;
 	int ssArea;
 	Mat img;
@@ -30,6 +31,7 @@ private:
 	void storeFeature(Features feature);
 	void getShadesOfFeatures(Mat src);
 	void removeDuplicatePointsFromIslands();
+	void storeIslandAreas();
 
 public:
 	void extract(Mat src);
@@ -43,6 +45,7 @@ public:
 	vector<int> get_shades();
 	void release();
 	Islands getIslandWithPoint(Point pt);
+	int getMaxArea();
 
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };

@@ -30,6 +30,7 @@ vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map
 	const int surroundedThreshLower = 3;
 	const float directNeighborDistThresh = 5.0;
 	int minWidthForVisibility = 0;
+	float maxRelArea = (float)ss.getMaxArea()/ss.area();
 	Point beginCoords, endCoords;
 	for(unsigned int shape1=0; shape1<islandVec.size(); shape1++) {
 		for(unsigned int shade1=0; shade1<islandVec.at(shape1).size(); shade1++) {
@@ -82,18 +83,18 @@ vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map
 											}*/
 											Point center2 = isl2.centerOfMass();
 											float centerDist = abs(MyMath::eucDist(center,center2));
-											float relArea1 = (float)isl1.area() / ss.area();
-											float relArea2 = (float)isl2.area() / ss.area();
-											float thresh = 800.0 * (relArea1 * relArea2);
-											if(centerDist<=thresh) {
+											float thresh = 50.0 * maxRelArea;
+											if(centerDist<=thresh && markedMap.at(index1).at(index2)==0) {
 												this->relationMatrix.at(index1).at(index2) = this->rel_op[INDIR];
 												this->relationMatrix.at(index2).at(index1) = this->rel_op[INDIR];
+												markedMap.at(index1).at(index2) = INDIR;
+												markedMap.at(index2).at(index1) = INDIR;
 											}
-											if(index1==0 && index2==1) {
-												cout << "Thresh: " << thresh << endl;
-												cout << centerDist << endl;
+											if(index1==1 && index2==2) {
+												printf("MaxRelArea: %f\n",maxRelArea);
+												printf("Thresh: %f, Dist: %f\n",thresh,centerDist);
 											}
-											if(markedMap.at(index1).at(index2)==0) {
+											if(markedMap.at(index1).at(index2)<=2) {
 												if(insideIsland2==ENTERED || insideIsland2==INSIDE) {
 													if(prevIslandLabel==label2) insideIsland2=INSIDE;
 													if(insideIsland2==ENTERED) {
@@ -139,8 +140,8 @@ vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map
 					if(relationCount.at(index1).at(index2)>=surroundedThreshUpper) {
 						this->relationMatrix.at(index1).at(index2) = this->rel_op[SURR_BY];
 						this->relationMatrix.at(index2).at(index1) = this->rel_op[SURR_BY_INV];
-						this->markedMap.at(index1).at(index2) = 1;
-						this->markedMap.at(index2).at(index1) = 1;
+						this->markedMap.at(index1).at(index2) = SURR_BY;
+						this->markedMap.at(index2).at(index1) = SURR_BY_INV;
 					}
 					if(this->relationCount.at(index1).at(index2)<surroundedThreshUpper) {
 						if(this->relationCount.at(index1).at(index2)>=surroundedThreshLower) {
@@ -148,11 +149,13 @@ vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map
 							if(neighborNumVec.at(index1).at(index2)==1 && dist<directNeighborDistThresh) {
 								this->relationMatrix.at(index1).at(index2) = this->rel_op[DIR];
 								this->relationMatrix.at(index2).at(index1) = this->rel_op[DIR];
+								this->markedMap.at(index1).at(index2) = DIR;
+								this->markedMap.at(index2).at(index1) = DIR;
 							}
 						}
 					}
 
-					if(index1==2 && index2==24) {
+					if(index1==1 && index2==2) {
 						printf("Rel_Count: %d, Dist: %f\n",this->relationCount.at(index1).at(index2),neighborDistVec.at(index1).at(index2));
 						printf("Neighbor: %d\n",neighborNumVec.at(index1).at(index2));
 					}

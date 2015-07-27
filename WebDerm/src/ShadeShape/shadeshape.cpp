@@ -167,6 +167,15 @@ void ShadeShape::removeDuplicatePointsFromIslands() {
 	}
 }
 
+void ShadeShape::storeIslandAreas() {
+	for(int i=0; i<this->numOfFeatures(); i++) {
+		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
+			Islands isl = this->feature(i).island(j);
+			this->areaVec.push_back(isl.area());
+		}
+	}
+}
+
 /******************** PUBLIC FUNCTIONS *********************/
 
 //! extracts the features from the image
@@ -179,6 +188,7 @@ void ShadeShape::extract(Mat src) {
 	}
 	this->numOfFeats = this->featureVec.size();
 	this->getShadesOfFeatures(src);
+	this->storeIslandAreas();
 	this->ssArea = countNonZero(src);
 	this->removeDuplicatePointsFromIslands();
 }
@@ -241,6 +251,11 @@ Islands ShadeShape::getIslandWithPoint(Point pt) {
 		}
 	}
 	return Islands();
+}
+
+//! returns the largest area of all the islands
+int ShadeShape::getMaxArea() {
+	return *max_element(this->areaVec.begin(),this->areaVec.end());
 }
 
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {

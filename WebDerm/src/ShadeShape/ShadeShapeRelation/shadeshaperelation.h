@@ -14,8 +14,8 @@ class ShadeShape;
 class Islands;
 class ShadeShapeRelation {
 protected:
-	String rel_op[4] = {"SURR_BY","SURR_BY_INV","INDIR","DIR"};
-	enum{SURR_BY, SURR_BY_INV, INDIR, DIR};
+	String rel_op[5] = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};
+	enum{NONE, INDIR, DIR, SURR_BY_INV, SURR_BY};
 	enum{ENTERED, INSIDE, OUTSIDE, EXITED};
 	vector<vector<String> > relationMatrix;
 	vector<vector<int> > relationCount;
