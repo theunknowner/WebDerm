@@ -246,8 +246,9 @@ Islands ShadeShape::getIslandWithPoint(Point pt) {
 	for(int i=0; i<this->numOfFeatures(); i++) {
 		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
 			Islands island = this->feature(i).island(j);
-			if(island.coordinates().find(coords)!=island.coordinates().end())
-				return island;
+			if(island.coordinates().find(coords)!=island.coordinates().end()) {
+				return this->feature(i).island(j);
+			}
 		}
 	}
 	return Islands();

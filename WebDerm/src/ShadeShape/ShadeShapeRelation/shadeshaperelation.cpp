@@ -21,6 +21,28 @@ void ShadeShapeRelation::setup_relationMatrix(map<String,float> &labels) {
 	this->relationCount.resize(labels.size(),vector<int>(labels.size(),0));
 }
 
+/* merges labels with the same shape and shade and
+ * counts the relationship between the merged labels
+ */
+void ShadeShapeRelation::downScaleShadeShapeLabels(vector<vector<String> > &srm, map<String,float> &labels) {
+	map<String,int> merged_labels;
+	for(auto it=labels.begin(); it!=labels.end(); it++) {
+		String newLabel = it->first.substr(0,it->first.length()-4);
+		if(merged_labels.find(newLabel)==merged_labels.end()) {
+			merged_labels[newLabel] = 1;
+		}
+	}
+	vector<vector<vector<int> > > srmCount3D(merged_labels.size(),vector<vector<int> >(merged_labels.size(),vector<int>(this->rel_op.size(),0)));
+	for(auto itY=labels.begin(); itY!=labels.end(); itY++) {
+		int y = distance(labels.begin(),itY);
+		auto itX = itY;
+		itX++;
+		for(; itX!=labels.end(); itX++) {
+			int x = distance(labels.begin(), itX);
+		}
+	}
+}
+
 /******************** PUBLIC FUNCTIONS ***********************/
 
 vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &labels, vector<vector<vector<Islands> > > &islandVec) {
@@ -30,7 +52,6 @@ vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map
 	const int surroundedThreshLower = 3;
 	const float directNeighborDistThresh = 5.0;
 	int minWidthForVisibility = 0;
-	float maxRelArea = (float)ss.getMaxArea()/ss.area();
 	Point beginCoords, endCoords;
 	for(unsigned int shape1=0; shape1<islandVec.size(); shape1++) {
 		for(unsigned int shade1=0; shade1<islandVec.at(shape1).size(); shade1++) {
@@ -83,16 +104,14 @@ vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map
 											}*/
 											Point center2 = isl2.centerOfMass();
 											float centerDist = abs(MyMath::eucDist(center,center2));
-											float thresh = 50.0 * maxRelArea;
+											float relArea1 = (float)isl1.area() / 19600.0;
+											float relArea2 = (float)isl2.area() / 19600.0;
+											float thresh = 250.0 * (relArea1 * relArea2);
 											if(centerDist<=thresh && markedMap.at(index1).at(index2)==0) {
 												this->relationMatrix.at(index1).at(index2) = this->rel_op[INDIR];
 												this->relationMatrix.at(index2).at(index1) = this->rel_op[INDIR];
 												markedMap.at(index1).at(index2) = INDIR;
 												markedMap.at(index2).at(index1) = INDIR;
-											}
-											if(index1==1 && index2==2) {
-												printf("MaxRelArea: %f\n",maxRelArea);
-												printf("Thresh: %f, Dist: %f\n",thresh,centerDist);
 											}
 											if(markedMap.at(index1).at(index2)<=2) {
 												if(insideIsland2==ENTERED || insideIsland2==INSIDE) {
@@ -154,17 +173,17 @@ vector<vector<String> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map
 							}
 						}
 					}
-
-					if(index1==1 && index2==2) {
-						printf("Rel_Count: %d, Dist: %f\n",this->relationCount.at(index1).at(index2),neighborDistVec.at(index1).at(index2));
-						printf("Neighbor: %d\n",neighborNumVec.at(index1).at(index2));
-					}
 				}
 			}// end num1 loop
 		}// end shade1 loop
 	}// end shape1 loop
 	this->writeRelationMatrix(labels);
+	this->downScaleShadeShapeLabels(this->relationMatrix,labels);
 	return this->relationMatrix;
+}
+
+float ShadeShapeRelation::srm_match(vector<vector<String> > srmUP,vector<vector<String> > srmDB) {
+
 }
 
 void ShadeShapeRelation::writeRelationMatrix(map<String,float> &labels) {

@@ -175,11 +175,14 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	std::map<String,float> map = this->createPropAreaMap(islandVec,totalArea);
 	std::map<String,float>::iterator it;
 	for(it=map.begin(); it!=map.end(); it++) {
+		int index = distance(map.begin(),it);
+		printf("%d) ",index);
 		cout << it->first << ": " << it->second << endl;
 	}
 	cout << "------------------" << endl;
 	ShadeShapeRelation ssr;
 	ssr.spatial_relation(ss,map,islandVec);
+
 }
 
 void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
