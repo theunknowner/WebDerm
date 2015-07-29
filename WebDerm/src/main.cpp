@@ -63,18 +63,18 @@ int main(int argc,char** argv)
 	Scripts::script30(name);
 /**/
 
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
-	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test12.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test15.png");
 	ShadeShapeMatch ssm;
-	//ssm.test_match(ss1,ss2);
-	ssm.test(ss1);
+	ssm.test_match(ss1,ss2);
+	//ssm.test(ss2);
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
-	//ShadeShape ss2 = Scripts::script31("tinea_corporis8b");
+	ShadeShape ss1 = Scripts::script31("melanoma8b");
+	ShadeShape ss2 = Scripts::script31("melanoma8c");
 	ShadeShapeMatch ssm;
-	//ssm.test_match(ss1,ss2);
-	ssm.test(ss1);
+	ssm.test_match(ss1,ss2);
+	//ssm.test(ss1);
 /**/
 	//Scripts::script25();
 	//Scripts::script_checkAllTestData();

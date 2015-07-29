@@ -173,16 +173,9 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	vector<vector<vector<Islands> > > islandVec = this->groupIslandsByShape(ss);
 	this->sortIslandsByArea(islandVec);
 	std::map<String,float> map = this->createPropAreaMap(islandVec,totalArea);
-	std::map<String,float>::iterator it;
-	for(it=map.begin(); it!=map.end(); it++) {
-		int index = distance(map.begin(),it);
-		printf("%d) ",index);
-		cout << it->first << ": " << it->second << endl;
-	}
-	cout << "------------------" << endl;
+	this->printLabels(map);
 	ShadeShapeRelation ssr;
-	ssr.spatial_relation(ss,map,islandVec);
-
+	vector<vector<int> > srm = ssr.spatial_relation(ss,map,islandVec);
 }
 
 void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
@@ -197,55 +190,16 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	this->sortIslandsByArea(this->upIslandVec);
 	std::map<String,float> upMap, upMapFilled, dbMapFilled;
 	std::map<String,float> dbMap = this->createPropAreaMap(this->dbIslandVec,dbTotalArea);
+	upMap = this->createPropAreaMap(this->upIslandVec,upTotalArea);
+	upMapFilled = upMap;
+	dbMapFilled = dbMap;
+	this->fillPropAreaMapGaps(upMapFilled,dbMapFilled);
 
-	vector<float> resultVec;
-	vector<vector<vector<Islands> > > islandVec2;
-	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
-		ShadeShape newUpSS = upSS;
-		if(shadeShift==0) {
-			islandVec2 = this->groupIslandsByShape(newUpSS);
-			this->sortIslandsByArea(islandVec2);
-			upMap = this->createPropAreaMap(islandVec2,upTotalArea);
-			upMapFilled = upMap;
-			dbMapFilled = dbMap;
-			this->fillPropAreaMapGaps(upMapFilled,dbMapFilled);
-			float results = this->dotProduct(upMapFilled,dbMapFilled);
-			resultVec.push_back(results);
-			std::map<String,float>::iterator itUP;
-			std::map<String,float>::iterator itDB;
-			for(itUP=upMapFilled.begin(),itDB=dbMapFilled.begin();itUP!=upMapFilled.end(),itDB!=dbMapFilled.end(); itUP++, itDB++) {
-				printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second,itDB->first.c_str(),itDB->second);
-			}
-			printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
-			printf("Results: %f\n",results);
-		}
-		else {
-			while(this->shade_translation(newUpSS,shadeShift)) {
-				ShadeShape matchSS;
-				matchSS.extract(newUpSS.image());
-				islandVec2 = this->groupIslandsByShape(matchSS);
-				this->sortIslandsByArea(islandVec2);
-				upMap = this->createPropAreaMap(islandVec2,upTotalArea);
-				upMapFilled = upMap;
-				dbMapFilled = dbMap;
-				this->fillPropAreaMapGaps(upMapFilled,dbMapFilled);
-				float results = this->dotProduct(upMapFilled,dbMapFilled);
-				if(ShadeMatch::SHIFT.at(shadeShift)!="SHIFT_NONE") {
-					std::map<String,float>::iterator itUP;
-					std::map<String,float>::iterator itDB;
-					for(itUP=upMapFilled.begin(),itDB=dbMapFilled.begin();itUP!=upMapFilled.end(),itDB!=dbMapFilled.end(); itUP++, itDB++) {
-						printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second,itDB->first.c_str(),itDB->second);
-					}
-				}
-				printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
-				printf("Results: %f\n",results);
-				if(results>resultVec.back())
-					resultVec.push_back(results);
-				else
-					break;
-			}
-		}
-	}
+	ShadeShapeRelation ssr;
+	vector<vector<int> > srmUP = ssr.spatial_relation(upSS,upMapFilled,this->upIslandVec);
+	vector<vector<int> > srmDB = ssr.spatial_relation(dbSS,dbMapFilled,this->dbIslandVec);
+	float matchVal = ssr.srm_match(srmUP,srmDB,upMapFilled);
+	cout << "Match: " << matchVal << endl;
 }
 
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
@@ -334,4 +288,13 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	 */
 
 	return 0.0;
+}
+
+void ShadeShapeMatch::printLabels(map<String,float> &labels) {
+	for(auto it=labels.begin(); it!=labels.end(); it++) {
+		int index = distance(labels.begin(),it);
+		printf("%d) ",index);
+		cout << it->first << ": " << it->second << endl;
+	}
+	cout << "------------------" << endl;
 }

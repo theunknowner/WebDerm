@@ -13,10 +13,11 @@
 class ShadeShape;
 class Islands;
 class ShadeShapeRelation {
-private:
+public:
 	void setup_relationMatrix(map<String,float> &labels);
 	vector<vector<vector<int> > > downScaleShadeShapeLabels(vector<vector<int> > &srm,map<String,float> &labels);
-	float entropy(vector<vector<vector<int> > > &srm);
+	float entropy(int count);
+	float entropy(vector<vector<vector<int> > > &srmUP, vector<vector<vector<int> > > &srmDB);
 
 protected:
 	vector<String> rel_op = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};

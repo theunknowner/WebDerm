@@ -49,7 +49,7 @@ vector<vector<vector<int> > > ShadeShapeRelation::downScaleShadeShapeLabels(vect
 			}
 		}
 	}
-	/*
+/*
 	for(auto itY=merged_labels.begin(); itY!=merged_labels.end(); itY++) {
 		int y = distance(merged_labels.begin(),itY);
 		for(auto itX=merged_labels.begin(); itX!=merged_labels.end(); itX++) {
@@ -67,15 +67,38 @@ vector<vector<vector<int> > > ShadeShapeRelation::downScaleShadeShapeLabels(vect
 	return srmCount3D;
 }
 
-float ShadeShapeRelation::entropy(vector<vector<vector<int> > > &srm) {
-	int count=0;
-	for(unsigned int i=0; i<srm.size(); i++) {
-		for(unsigned int j=0; j<srm.at(i).size(); j++) {
-			count += countNonZero(srm.at(i).at(j));
+float ShadeShapeRelation::entropy(int count) {
+	if(count==0) {
+		return -0.75;
+	} else if(count==1) {
+		return 0.25;
+	} else {
+		return log10(count);
+	}
+}
+
+//computes the entropy value for each label
+float ShadeShapeRelation::entropy(vector<vector<vector<int> > > &srmUP, vector<vector<vector<int> > > &srmDB) {
+	assert(srmUP.size()==srmDB.size());
+
+	float totalEntropy = 1.0;
+	for(unsigned int i=0; i<srmUP.size(); i++) {
+		for(unsigned int j=0; j<srmUP.at(i).size(); j++) {
+			int countUP = 0;
+			int countDB = 0;
+			for(unsigned int k=0; k<srmUP.at(i).at(j).size(); k++) {
+				countUP = srmUP.at(i).at(j).at(k);
+				countDB = srmDB.at(i).at(j).at(k);
+				if(countUP>0 || countDB>0) {
+					float entropyUP = this->entropy(countUP);
+					float entropyDB = this->entropy(countDB);
+					float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
+					totalEntropy *= entropyVal;
+				}
+			}
 		}
 	}
-	float entropyVal = -(1.0/count) * log2(1.0/count) * count;
-	return entropyVal;
+	return totalEntropy;
 }
 
 /******************** PUBLIC FUNCTIONS ***********************/
@@ -86,6 +109,7 @@ vector<vector<int> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<St
 	const int surroundedThreshUpper = 14;
 	const int surroundedThreshLower = 3;
 	const float directNeighborDistThresh = 5.0;
+	const float alpha = 0.25;
 	int minWidthForVisibility = 0;
 	Point beginCoords, endCoords;
 	for(unsigned int shape1=0; shape1<islandVec.size(); shape1++) {
@@ -139,9 +163,9 @@ vector<vector<int> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<St
 											}*/
 											Point center2 = isl2.centerOfMass();
 											float centerDist = abs(MyMath::eucDist(center,center2));
-											float relArea1 = (float)isl1.area() / 19600.0;
-											float relArea2 = (float)isl2.area() / 19600.0;
-											float thresh = 250.0 * (relArea1 * relArea2);
+											float relArea1 = (float)isl1.area() / ss.image().total();
+											float relArea2 = (float)isl2.area() / ss.image().total();
+											float thresh = 250.0 * pow(relArea1*relArea2, alpha);
 											if(centerDist<=thresh && relationMatrix.at(index1).at(index2)==NONE) {
 												this->relationMatrix.at(index1).at(index2) = INDIR;
 												this->relationMatrix.at(index2).at(index1) = INDIR;
@@ -206,19 +230,16 @@ vector<vector<int> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<St
 			}// end num1 loop
 		}// end shade1 loop
 	}// end shape1 loop
-	this->writeRelationMatrix(labels);
-	vector<vector<vector<int> > > srm3d = this->downScaleShadeShapeLabels(this->relationMatrix,labels);
-	this->entropy(srm3d);
+	//this->writeRelationMatrix(labels);
 	return this->relationMatrix;
 }
 
 float ShadeShapeRelation::srm_match(vector<vector<int> > srmUP,vector<vector<int> > srmDB, map<String,float> &labels) {
 	vector<vector<vector<int> > > srm3dUP = this->downScaleShadeShapeLabels(srmUP,labels);
 	vector<vector<vector<int> > > srm3dDB = this->downScaleShadeShapeLabels(srmDB,labels);
-	float entropyUP = this->entropy(srm3dUP);
-	float entropyDB = this->entropy(srm3dDB);
-
-	float matchVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
+	float matchVal = this->entropy(srm3dUP,srm3dDB);
+	//printf("EntUP: %f\n",entropyUP);
+	//printf("EntDB: %f\n",entropyDB);
 
 	return matchVal;
 }
