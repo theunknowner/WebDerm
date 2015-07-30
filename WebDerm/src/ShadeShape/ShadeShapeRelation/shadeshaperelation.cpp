@@ -9,102 +9,22 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/shadeshape.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "../Labels/labels.h"
 
 /******************** PRIVATE FUNCTIONS **********************/
 
-void ShadeShapeRelation::setup_relationMatrix(map<String,float> &labels) {
+void ShadeShapeRelation::setup_relationMatrix(Labels &labels) {
 	this->relationMatrix.clear();
 	this->relationMatrix.resize(labels.size(),vector<int>(labels.size(),0));
 	this->relationCount.clear();
 	this->relationCount.resize(labels.size(),vector<int>(labels.size(),0));
 }
 
-/* merges labels with the same shape and shade and
- * counts the relationship between the merged labels
- */
-vector<vector<vector<int> > > ShadeShapeRelation::downScaleShadeShapeLabels(vector<vector<int> > &srm, map<String,float> &labels) {
-	map<String,int> merged_labels;
-	for(auto it=labels.begin(); it!=labels.end(); it++) {
-		String newLabel = it->first.substr(0,it->first.length()-4);
-		if(merged_labels.find(newLabel)==merged_labels.end()) {
-			merged_labels[newLabel] = 1;
-		}
-	}
-	vector<vector<vector<int> > > srmCount3D(merged_labels.size(),vector<vector<int> >(merged_labels.size(),vector<int>(this->rel_op.size(),0)));
-	for(auto itY=labels.begin(); itY!=labels.end(); itY++) {
-		int y = distance(labels.begin(),itY);
-		String newLabel = itY->first.substr(0,itY->first.length()-4);
-		auto itY2 = merged_labels.find(newLabel);
-		int y2 = distance(merged_labels.begin(),itY2);
-		auto itX = itY;
-		itX++;
-		for(; itX!=labels.end(); itX++) {
-			int x = distance(labels.begin(), itX);
-			newLabel = itX->first.substr(0,itX->first.length()-4);
-			auto itX2 = merged_labels.find(newLabel);
-			int x2 = distance(merged_labels.begin(),itX2);
-			int rel_op_idx = srm.at(y).at(x);
-			if(rel_op_idx>0) { //ignores "NULL" relations
-				srmCount3D.at(y2).at(x2).at(rel_op_idx)++;
-			}
-		}
-	}
-/*
-	for(auto itY=merged_labels.begin(); itY!=merged_labels.end(); itY++) {
-		int y = distance(merged_labels.begin(),itY);
-		for(auto itX=merged_labels.begin(); itX!=merged_labels.end(); itX++) {
-			int x = distance(merged_labels.begin(), itX);
-			for(unsigned int z=0; z<srmCount3D.at(y).at(x).size(); z++) {
-				String relOp = this->rel_op.at(z);
-				int count = srmCount3D.at(y).at(x).at(z);
-				if(count>0) {
-					printf("[%s][%s][%s]: %d\n",itY->first.c_str(),itX->first.c_str(),relOp.c_str(),count);
-				}
-			}
-		}
-	}*/
-
-	return srmCount3D;
-}
-
-float ShadeShapeRelation::entropy(int count) {
-	if(count==0) {
-		return -0.75;
-	} else if(count==1) {
-		return 0.25;
-	} else {
-		return log10(count);
-	}
-}
-
-//computes the entropy value for each label
-float ShadeShapeRelation::entropy(vector<vector<vector<int> > > &srmUP, vector<vector<vector<int> > > &srmDB) {
-	assert(srmUP.size()==srmDB.size());
-
-	float totalEntropy = 1.0;
-	for(unsigned int i=0; i<srmUP.size(); i++) {
-		for(unsigned int j=0; j<srmUP.at(i).size(); j++) {
-			int countUP = 0;
-			int countDB = 0;
-			for(unsigned int k=0; k<srmUP.at(i).at(j).size(); k++) {
-				countUP = srmUP.at(i).at(j).at(k);
-				countDB = srmDB.at(i).at(j).at(k);
-				if(countUP>0 || countDB>0) {
-					float entropyUP = this->entropy(countUP);
-					float entropyDB = this->entropy(countDB);
-					float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-					totalEntropy *= entropyVal;
-				}
-			}
-		}
-	}
-	return totalEntropy;
-}
-
 /******************** PUBLIC FUNCTIONS ***********************/
 
-vector<vector<int> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<String,float> &labels, vector<vector<vector<Islands> > > &islandVec) {
+vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
 	this->setup_relationMatrix(labels);
+	map<String,pair<int,float> > lbls = labels.getLabels();
 	const int visibilityThresh = 3;
 	const int surroundedThreshUpper = 14;
 	const int surroundedThreshLower = 3;
@@ -117,11 +37,11 @@ vector<vector<int> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<St
 			for(unsigned int num1=0; num1<islandVec.at(shape1).at(shade1).size(); num1++) {
 				Islands isl1 = islandVec.at(shape1).at(shade1).at(num1);
 				String label1 = isl1.labelName();
-				int index1 = distance(labels.begin(),labels.find(label1));
+				int index1 = distance(lbls.begin(),lbls.find(label1));
 				Point center = isl1.centerOfMass();
 				String coords1 = toString(center.x)+","+toString(center.y);
-				vector<vector<int> > neighborNumVec(labels.size(),vector<int>(labels.size(),0));
-				vector<vector<float> > neighborDistVec(labels.size(),vector<float>(labels.size(),140.0));
+				vector<vector<int> > neighborNumVec(lbls.size(),vector<int>(lbls.size(),0));
+				vector<vector<float> > neighborDistVec(lbls.size(),vector<float>(lbls.size(),140.0));
 				//printf("%s: %s\n",label1.c_str(),coords1.c_str());
 				for(double theta=0.0; theta<360.0; theta+=15.0) {
 					vector<int> vecWidth(labels.size(),0);
@@ -155,7 +75,7 @@ vector<vector<int> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<St
 										if(shape1!=shape2 || shade1!=shade2 || num1!=num2) { //checks so island1 != island2
 											Islands isl2 = islandVec.at(shape2).at(shade2).at(num2);
 											String label2 = isl2.labelName();
-											int index2 =  distance(labels.begin(),labels.find(label2));
+											int index2 =  distance(lbls.begin(),lbls.find(label2));
 											int insideIsland2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? ENTERED : OUTSIDE;
 											/*if(index1==2 && index2==24) {
 												printf("Deg: %f, Coords2: %s, ",theta,coords2.c_str());
@@ -234,14 +154,13 @@ vector<vector<int> > ShadeShapeRelation::spatial_relation(ShadeShape &ss, map<St
 	return this->relationMatrix;
 }
 
-float ShadeShapeRelation::srm_match(vector<vector<int> > srmUP,vector<vector<int> > srmDB, map<String,float> &labels) {
-	vector<vector<vector<int> > > srm3dUP = this->downScaleShadeShapeLabels(srmUP,labels);
-	vector<vector<vector<int> > > srm3dDB = this->downScaleShadeShapeLabels(srmDB,labels);
-	float matchVal = this->entropy(srm3dUP,srm3dDB);
-	//printf("EntUP: %f\n",entropyUP);
-	//printf("EntDB: %f\n",entropyDB);
-
-	return matchVal;
+/*
+ * returns SSR object containing all info on the ShadeShape's spatial relationships
+ * accessible by the defined functions
+ */
+void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
+	this->areaMap = labels.getLabels();
+	this->generate_srm(ss,labels,islandVec);
 }
 
 void ShadeShapeRelation::writeRelationMatrix(map<String,float> &labels) {
@@ -267,4 +186,7 @@ void ShadeShapeRelation::writeRelationMatrix(map<String,float> &labels) {
 	fclose(fp);
 }
 
+vector<vector<int> >& ShadeShapeRelation::get_srm() {
+	return this->relationMatrix;
+}
 

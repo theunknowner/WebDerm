@@ -12,12 +12,8 @@
 
 class ShadeShape;
 class Islands;
+class Labels;
 class ShadeShapeRelation {
-public:
-	void setup_relationMatrix(map<String,float> &labels);
-	vector<vector<vector<int> > > downScaleShadeShapeLabels(vector<vector<int> > &srm,map<String,float> &labels);
-	float entropy(int count);
-	float entropy(vector<vector<vector<int> > > &srmUP, vector<vector<vector<int> > > &srmDB);
 
 protected:
 	vector<String> rel_op = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};
@@ -25,11 +21,26 @@ protected:
 	enum{ENTERED, INSIDE, OUTSIDE, EXITED};
 	vector<vector<int> > relationMatrix;
 	vector<vector<int> > relationCount;
+	map<String, pair<int,float> > areaMap;
+
+private:
+	void setup_relationMatrix(Labels &labels);
+
+	/************ ssr_match.cpp **************/
+
+	vector<vector<vector<int> > > downScaleShadeShapeLabels(vector<vector<int> > &srm,Labels &labels, Labels &mergedLabels);
+	float entropy(int count);
+	float entropy(ShadeShapeRelation &srrUP, vector<vector<vector<int> > > &srmUP, ShadeShapeRelation &srrDB, vector<vector<vector<int> > > &srmDB);
 
 public:
-	vector<vector<int> > spatial_relation(ShadeShape &ss, map<String,float> &labels, vector<vector<vector<Islands> > > &islandVec);
-	float srm_match(vector<vector<int> > srmUP, vector<vector<int> > srmDB, map<String,float> &labels);
+	Labels mergeLabels(Labels &labels);
+	vector<vector<int> > generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
+	void spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
 	void writeRelationMatrix(map<String,float> &labels);
+	vector<vector<int> >& get_srm();
+
+	/************ ssr_match.cpp **************/
+	float srm_match(ShadeShapeRelation &srrDB, Labels &labels);
 };
 
 #endif /* SHADESHAPERELATION_H_ */
