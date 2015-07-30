@@ -68,12 +68,48 @@ int Labels::area(String label) {
 	return -1;
 }
 
+int Labels::area(int num) {
+	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
+		int i = distance(this->labelMap.begin(),it);
+		if(i==num) {
+			return it->second.first;
+		}
+	}
+	return -1;
+}
+
+int Labels::totalArea() {
+	int total=0;
+	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
+		total += it->second.first;
+	}
+	return total;
+}
+
 float Labels::relativeArea(String label) {
 	auto it = this->labelMap.find(label);
 	if(it!=this->labelMap.end()) {
 		return it->second.second;
 	}
 	return -1.0;
+}
+
+float Labels::relativeArea(int num) {
+	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
+		int i = distance(this->labelMap.begin(),it);
+		if(i==num) {
+			return it->second.second;
+		}
+	}
+	return -1.0;
+}
+
+float Labels::totalRelArea() {
+	float total=0;
+	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
+		total += it->second.second;
+	}
+	return total;
 }
 
 int Labels::size() {

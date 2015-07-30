@@ -159,7 +159,6 @@ vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &la
  * accessible by the defined functions
  */
 void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
-	this->areaMap = labels.getLabels();
 	this->generate_srm(ss,labels,islandVec);
 }
 

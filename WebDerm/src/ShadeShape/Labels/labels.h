@@ -25,7 +25,11 @@ public:
 	map<String,int>& areaLabels();
 	map<String,float>& relAreaLabels();
 	int area(String label);
+	int area(int num);
+	int totalArea();
 	float relativeArea(String label);
+	float relativeArea(int num);
+	float totalRelArea();
 	int size();
 	void printLabels();
 };

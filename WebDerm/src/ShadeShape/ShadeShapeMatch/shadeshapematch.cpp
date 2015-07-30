@@ -195,11 +195,13 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
-	//ShadeShapeRelation ssrUP;
-	//ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec);
-	//ShadeShapeRelation ssrDB;
-	//float matchVal = ssrUP.srm_match(srrDB,dbMapFilled);
-	//cout << "Match: " << matchVal << endl;
+
+	ShadeShapeRelation ssrUP;
+	ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec);
+	ShadeShapeRelation ssrDB;
+	ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec);
+	float matchVal = ssrUP.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
+	cout << "Match: " << matchVal << endl;
 }
 
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
