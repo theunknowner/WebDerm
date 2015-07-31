@@ -9,11 +9,12 @@
 #define SHADESHAPERELATION_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../ShapeMatch/shapematch.h"
 
 class ShadeShape;
 class Islands;
 class Labels;
-class ShadeShapeRelation {
+class ShadeShapeRelation : public ShapeMatch{
 
 protected:
 	vector<String> rel_op = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};
@@ -34,7 +35,7 @@ private:
 public:
 	vector<vector<int> > generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
 	void spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
-	void writeRelationMatrix(map<String,float> &labels);
+	void writeRelationMatrix(Labels &labels,String name);
 	vector<vector<int> >& get_srm();
 
 	/************ ssr_match.cpp **************/

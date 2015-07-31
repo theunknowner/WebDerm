@@ -141,25 +141,28 @@ String getFileName(String filename, String end)
 {
 	char delimit1 = '/';
 	char delimit2 = '.';
-	String name;
+	String name = filename;
 	int pos=0;
 	int pos2=0;
-	for(unsigned int i=0; i<filename.size(); i++)
-	{
-		if(filename[i]==delimit1)
+	if(filename.find(delimit2)!=string::npos) {
+		for(unsigned int i=0; i<filename.size(); i++)
 		{
-			pos=i+1;
+			if(filename[i]==delimit1)
+			{
+				pos=i+1;
+			}
+			if(filename[i]==delimit2)
+			{
+				pos2=i;
+			}
 		}
-		if(filename[i]==delimit2)
-		{
-			pos2=i;
+		name = filename.substr(pos,pos2-pos);
+		if(end!="") {
+			pos = name.find(end);
+			name = name.substr(0,pos);
 		}
 	}
-	name = filename.substr(pos,pos2-pos);
-	if(end!="") {
-		pos = name.find(end);
-		name = name.substr(0,pos);
-	}
+
 	return name;
 }
 

@@ -14,7 +14,7 @@
 //! determines shape of island using shape neural network
 void Islands::determineIslandShape(Mat &islandImg) {
 	TestML ml;
-	String param = "/home/jason/git/Samples/Samples/param.xml";
+	String param = "/Thresholds/param.xml";
 	vector<Mat> sampleVec;
 	Mat sample = islandImg.clone();
 	sample *= 255;
@@ -49,8 +49,9 @@ void Islands::getIslandPoints(Mat &islandImg) {
 		x = nonZeroCoord.at<Point>(i).x;
 		y = nonZeroCoord.at<Point>(i).y;
 		String coords = toString(x)+","+toString(y);
-		if(this->coordMap.find(coords)==this->coordMap.end())
-			this->coordMap[coords] = 1;
+		if(this->coordMap.find(coords)==this->coordMap.end()) {
+			this->coordMap[coords] = Point(x,y);
+		}
 		xCenter += x;
 		yCenter += y;
 	}
@@ -104,7 +105,7 @@ String& Islands::shape_name() {
 }
 
 //! outputs shape neural network results
-Mat Islands::nn_results() {
+Mat& Islands::nn_results() {
 	return this->NN_Results;
 }
 
@@ -127,10 +128,14 @@ Point Islands::centerOfMass() {
 	return this->_centerOfMass;
 }
 
-map<String,int>& Islands::coordinates() {
+map<String,Point>& Islands::coordinates() {
 	return this->coordMap;
 }
 
 String& Islands::labelName() {
 	return this->_labelName;
+}
+
+bool Islands::isEmpty() {
+	return this->islandImg.empty();
 }

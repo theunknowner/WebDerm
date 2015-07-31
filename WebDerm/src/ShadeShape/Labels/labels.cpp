@@ -19,7 +19,8 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
-				label = "shape"+toString(i)+"_s"+toString(j)+"_";
+				String shape = this->shapeName(i);
+				label = toString(i)+"_"+shape+"_s"+toString(j)+"_";
 				label += Func::addDigitsForLabel(k,"0",3);
 				islandVec.at(i).at(j).at(k).labelName() = label;
 				if(this->labelMap.find(label)==this->labelMap.end()) {
@@ -114,6 +115,16 @@ float Labels::totalRelArea() {
 
 int Labels::size() {
 	return this->labelMap.size();
+}
+
+String Labels::at(int num) {
+	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
+		int i = distance(this->labelMap.begin(),it);
+		if(i==num) {
+			return it->first;
+		}
+	}
+	return "";
 }
 
 //! prints the labels and their areas;

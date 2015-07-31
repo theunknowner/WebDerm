@@ -69,7 +69,7 @@ ShadeShape script2(String name) {
 	ShapeColor sc;
 	Mat img2 = sc.applyDiscreteShade(img,minVal,maxVal,peakPos);
 	ShadeShape ss;
-	ss.extract(img2);
+	ss.extract(img2,name);
 	/*for(int i=0; i<ss.numOfFeatures(); i++) {
 		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
 			//imgshow(ss.feature(i).island(j).image());
@@ -3255,7 +3255,7 @@ ShadeShape script31(String filename) {
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	String name = filename;
-	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
+	img = imread("/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	Xyz xyz;
@@ -3420,7 +3420,7 @@ ShadeShape script31(String filename) {
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 	ShadeShape ss;
-	ss.extract(img3);
+	ss.extract(img3,name);
 	return ss;
 }
 

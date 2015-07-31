@@ -9,6 +9,36 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "islands.h"
+
+String winName = "Interactive Islands";
+void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
+	ShadeShape &ss = *((ShadeShape*)param);
+	Mat img = ss.image().clone();
+	Islands island;
+	if  ( event == EVENT_LBUTTONDOWN ){
+		island = ss.getIslandWithPoint(Point(x,y));
+		if(!island.isEmpty()) {
+			char text[100];
+			int lum = img.at<uchar>(y,x);
+			int shadeNum = ss.getIndexOfShade(island.shade());
+			float nnResult = *max_element(island.nn_results().begin<float>(),island.nn_results().end<float>());
+			cvtColor(img,img,CV_GRAY2BGR);
+			for(auto it=island.coordinates().begin(); it!=island.coordinates().end(); it++) {
+				int x = it->second.x;
+				int y = it->second.y;
+				img.at<Vec3b>(y,x) = Vec3b(0,255,0);
+			}
+			String shade_shape = island.shape_name() + "_s" + toString(shadeNum);
+			sprintf(text,"(%d,%d) | Lum: %d | ShadeShape: %s | NN: %f",x,y,lum,shade_shape.c_str(),nnResult);
+			cv::displayStatusBar(winName,text);
+		}
+	}
+	if(event == EVENT_LBUTTONUP) {
+		img = ss.image().clone();
+	}
+	imshow(winName,img);
+}
 
 /******************** PRIVATE FUNCTIONS **********************/
 bool ShadeShape::isOnTheEdge(Mat &src, int x, int y) {
@@ -151,12 +181,10 @@ void ShadeShape::removeDuplicatePointsFromIslands() {
 	for(int i=0; i<this->numOfFeatures(); i++) {
 		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
 			Islands isl = this->feature(i).island(j);
-			map<String,int> coordMap = this->feature(i).island(j).coordinates();
+			map<String,Point> coordMap = this->feature(i).island(j).coordinates();
 			for(auto it=coordMap.begin(); it!=coordMap.end(); it++) {
-				vector<String> vec;
-				getSubstr(it->first,',',vec);
-				int col = atoi(vec.at(0).c_str());
-				int row = atoi(vec.at(1).c_str());
+				int col = it->second.x;
+				int row = it->second.y;
 				int val = img.at<uchar>(row,col);
 				if(isl.shade()!=val) {
 					coordMap.erase(it->first);
@@ -179,7 +207,8 @@ void ShadeShape::storeIslandAreas() {
 /******************** PUBLIC FUNCTIONS *********************/
 
 //! extracts the features from the image
-void ShadeShape::extract(Mat src) {
+void ShadeShape::extract(Mat src, String name) {
+	this->ss_name = getFileName(name);
 	this->img = src.clone();
 	vector<Mat> featureVec = this->extractFeatures(src);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
@@ -226,6 +255,10 @@ Mat& ShadeShape::image() {
 	return this->img;
 }
 
+String& ShadeShape::name() {
+	return this->ss_name;
+}
+
 vector<int> ShadeShape::get_shades() {
 	return this->shadeVec;
 }
@@ -259,6 +292,12 @@ int ShadeShape::getMaxArea() {
 	return *max_element(this->areaVec.begin(),this->areaVec.end());
 }
 
+void ShadeShape::showInteractiveIslands() {
+	namedWindow(winName, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	cv::setMouseCallback(winName,onMouseCheckIslands, this);
+	imshow(winName,this->img);
+	waitKey(0);
+}
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
 	Size size(3,3);
 	vector<Point> ptsVec;

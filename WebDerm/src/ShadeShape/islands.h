@@ -20,7 +20,7 @@ protected:
 	Mat NN_Results;
 	Point islPt;
 	Point _centerOfMass;
-	map<String,int> coordMap;
+	map<String,Point> coordMap;
 	String _labelName;
 
 	void determineIslandShape(Mat &islandImg);
@@ -33,12 +33,13 @@ public:
 	Mat image();
 	int& shape();
 	String& shape_name();
-	Mat nn_results();
+	Mat& nn_results();
 	Point startPt();
 	void set_island_shade(int shade);
 	Point centerOfMass();
-	map<String,int>& coordinates();
+	map<String,Point>& coordinates();
 	String& labelName();
+	bool isEmpty();
 };
 
 #endif /* ISLANDS_H_ */

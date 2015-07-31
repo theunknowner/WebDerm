@@ -150,7 +150,7 @@ vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &la
 			}// end num1 loop
 		}// end shade1 loop
 	}// end shape1 loop
-	//this->writeRelationMatrix(labels);
+	this->writeRelationMatrix(labels,ss.name());
 	return this->relationMatrix;
 }
 
@@ -162,16 +162,17 @@ void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector
 	this->generate_srm(ss,labels,islandVec);
 }
 
-void ShadeShapeRelation::writeRelationMatrix(map<String,float> &labels) {
+void ShadeShapeRelation::writeRelationMatrix(Labels &labels, String name) {
+	name = "relation_matrix_"+name+".csv";
 	FILE * fp;
-	fp = fopen("relation_matrix.csv","w");
-	map<String,float>::iterator it;
+	fp = fopen(name.c_str(),"w");
+	map<String,pair<int,float> > labelMap = labels.getLabels();
 	fprintf(fp,",");
-	for(it=labels.begin(); it!=labels.end(); it++) {
+	for(auto it=labelMap.begin(); it!=labelMap.end(); it++) {
 		fprintf(fp,"%s,",it->first.c_str());
 	}
 	fprintf(fp,"\n");
-	it = labels.begin();
+	auto it = labelMap.begin();
 	for(unsigned int i=0; i<this->relationMatrix.size(); i++) {
 		fprintf(fp,"%s,",it->first.c_str());
 		it++;

@@ -17,6 +17,7 @@ class Islands;
 
 class ShadeShape {
 private:
+	String ss_name;
 	vector<Features> featureVec;
 	vector<int> shadeVec;
 	vector<int> areaVec;
@@ -34,7 +35,7 @@ private:
 	void storeIslandAreas();
 
 public:
-	void extract(Mat src);
+	void extract(Mat src, String name="");
 	Features& feature(int featNum);
 	int numOfFeatures();
 	int shade(int num);
@@ -42,10 +43,12 @@ public:
 	int getIndexOfShade(int shade);
 	int area();
 	Mat& image();
+	String& name();
 	vector<int> get_shades();
 	void release();
 	Islands getIslandWithPoint(Point pt);
 	int getMaxArea();
+	void showInteractiveIslands();
 
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };

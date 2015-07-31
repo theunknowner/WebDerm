@@ -10,9 +10,10 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "../islands.h"
+#include "../ShapeMatch/shapematch.h"
 
 class Islands;
-class Labels {
+class Labels : public ShapeMatch{
 private:
 	map<String, pair<int,float> > labelMap;
 	map<String,int> _areaLabels;
@@ -31,6 +32,7 @@ public:
 	float relativeArea(int num);
 	float totalRelArea();
 	int size();
+	String at(int num);
 	void printLabels();
 };
 
