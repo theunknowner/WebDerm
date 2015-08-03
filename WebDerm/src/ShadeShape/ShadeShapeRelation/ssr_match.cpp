@@ -29,7 +29,7 @@ Labels ShadeShapeRelation::mergeLabels(Labels &labels) {
 /* merges labels with the same shape and shade and
  * counts the relationship between the merged labels
  */
-vector<vector<vector<int> > > ShadeShapeRelation::downScaleSrm(vector<vector<int> > &srm, Labels &labels, Labels &mergedLabels) {
+vector<vector<vector<int> > > ShadeShapeRelation::downScaleSrm(ShadeShapeRelation &ssr, vector<vector<int> > &srm, Labels &labels, Labels &mergedLabels) {
 	map<String,pair<int,float> > labelMap = labels.getLabels();
 	map<String,pair<int,float> > merged_labels = mergedLabels.getLabels();
 
@@ -52,7 +52,11 @@ vector<vector<vector<int> > > ShadeShapeRelation::downScaleSrm(vector<vector<int
 			}
 		}
 	}
-/*
+
+	String filename = ssr.name() + "_downscale_srm.txt";
+	FILE *fp;
+	fp = fopen(filename.c_str(),"w");
+
 	for(auto itY=merged_labels.begin(); itY!=merged_labels.end(); itY++) {
 		int y = distance(merged_labels.begin(),itY);
 		for(auto itX=merged_labels.begin(); itX!=merged_labels.end(); itX++) {
@@ -61,12 +65,13 @@ vector<vector<vector<int> > > ShadeShapeRelation::downScaleSrm(vector<vector<int
 				String relOp = this->rel_op.at(z);
 				int count = srmCount3D.at(y).at(x).at(z);
 				if(count>0) {
-					printf("[%s][%s][%s]: %d\n",itY->first.c_str(),relOp.c_str(),itX->first.c_str(),count);
+					//printf("[%s][%s][%s]: %d\n",itY->first.c_str(),relOp.c_str(),itX->first.c_str(),count);
+					fprintf(fp,"[%s][%s][%s]: %d\n",itY->first.c_str(),relOp.c_str(),itX->first.c_str(),count);
 				}
 			}
 		}
 	}
-*/
+	fclose(fp);
 	return srmCount3D;
 }
 
@@ -102,18 +107,18 @@ float ShadeShapeRelation::entropy(vector<vector<vector<int> > > &srmUP, Labels &
 					float entropyUP = this->entropy(countUP);
 					float entropyDB = this->entropy(countDB);
 					float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-					float areaVal = max(areaUP1+areaUP2,areaDB1+areaDB2);
-					/*printf("%s |%s| %s\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
+					float areaVal = min(areaUP1+areaUP2,areaDB1+areaDB2);
+					printf("[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
 					printf("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 					printf("EntropyVal: %f\n",entropyVal);
 					printf("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
 					printf("AreaVal: %f\n",areaVal);
-					printf("MaxTotalArea: %d\n",maxTotalArea);*/
+					printf("MaxTotalArea: %d\n",maxTotalArea);
 					areaVal /= maxTotalArea;
-					//printf("NewAreaVal: %f\n",areaVal);
+					printf("NewAreaVal: %f\n",areaVal);
 
 					totalEntropy += (areaVal * entropyVal);
-					//printf("TotalEntropy: %f\n",totalEntropy);
+					printf("TotalEntropy: %f\n",totalEntropy);
 				}
 			}
 		}
@@ -126,10 +131,9 @@ float ShadeShapeRelation::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels,
 	Labels dbMergedLabels = this->mergeLabels(dbLabels);
 	vector<vector<int> > srmUP = ssrUP.get_srm();
 	vector<vector<int> > srmDB = ssrDB.get_srm();
-	vector<vector<vector<int> > > srm3dUP = this->downScaleSrm(srmUP,upLabels,upMergedLabels);
+	vector<vector<vector<int> > > srm3dUP = this->downScaleSrm(ssrUP,srmUP,upLabels,upMergedLabels);
 	//cout << "-------------------" << endl;
-	vector<vector<vector<int> > > srm3dDB = this->downScaleSrm(srmDB,dbLabels,dbMergedLabels);
+	vector<vector<vector<int> > > srm3dDB = this->downScaleSrm(ssrDB,srmDB,dbLabels,dbMergedLabels);
 	float matchVal = this->entropy(srm3dUP,upMergedLabels,srm3dDB,dbMergedLabels);
-
 	return matchVal;
 }

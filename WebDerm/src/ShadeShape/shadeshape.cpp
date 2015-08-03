@@ -181,11 +181,21 @@ void ShadeShape::removeDuplicatePointsFromIslands() {
 	for(int i=0; i<this->numOfFeatures(); i++) {
 		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
 			Islands isl = this->feature(i).island(j);
-			map<String,Point> coordMap = this->feature(i).island(j).coordinates();
+			map<String,Point> coordMap = isl.coordinates();
 			for(auto it=coordMap.begin(); it!=coordMap.end(); it++) {
 				int col = it->second.x;
 				int row = it->second.y;
 				int val = img.at<uchar>(row,col);
+
+				if(isl.shade()!=val) {
+					coordMap.erase(it->first);
+				}
+			}
+			for(auto it=coordMap.begin(); it!=coordMap.end(); it++) {
+				int col = it->second.x;
+				int row = it->second.y;
+				int val = img.at<uchar>(row,col);
+
 				if(isl.shade()!=val) {
 					coordMap.erase(it->first);
 				}

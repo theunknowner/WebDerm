@@ -175,7 +175,6 @@ Mat Cluster::kmeansCluster(vector<double> data_vec, int clusters) {
 	this->clusterCount = clusters;
 	int attempts = 5;
 	kmeans(this->samples,this->clusterCount,this->labels,TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, this->centers);
-
 	this->centerCount.resize(clusterCount,0);
 	this->ranges.resize(clusterCount,deque<double>(2,0.0));
 	for(unsigned int i=0; i<this->ranges.size(); i++) {

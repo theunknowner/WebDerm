@@ -202,8 +202,8 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec);
 	ShadeShapeRelation ssrDB;
 	ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec);
-	//float matchVal = ssrUP.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
-	//cout << "Match: " << matchVal << endl;
+	float matchVal = ssrUP.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
+	cout << "Match: " << matchVal << endl;
 }
 
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {

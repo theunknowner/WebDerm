@@ -18,6 +18,7 @@ private:
 			"Default","Strip","Blotch","Excavated"};
 	static bool THRESH_IMPORTED;
 public:
+	static String PARAM_PATH;
 	TestML();
 	Mat getData();
 	Mat getLabels();

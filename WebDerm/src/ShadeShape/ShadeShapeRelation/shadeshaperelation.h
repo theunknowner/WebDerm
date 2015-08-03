@@ -22,13 +22,14 @@ protected:
 	enum{ENTERED, INSIDE, OUTSIDE, EXITED};
 	vector<vector<int> > relationMatrix;
 	vector<vector<int> > relationCount;
+	String ssr_name;
 
 private:
 	void setup_relationMatrix(Labels &labels);
 
 	/************ ssr_match.cpp **************/
 	Labels mergeLabels(Labels &labels);
-	vector<vector<vector<int> > > downScaleSrm(vector<vector<int> > &srm,Labels &labels, Labels &mergedLabels);
+	vector<vector<vector<int> > > downScaleSrm(ShadeShapeRelation &ssr, vector<vector<int> > &srm,Labels &labels, Labels &mergedLabels);
 	float entropy(int count);
 	float entropy(vector<vector<vector<int> > > &srmUP, Labels &upLabels, vector<vector<vector<int> > > &srmDB, Labels &dbLabels);
 
@@ -37,6 +38,7 @@ public:
 	void spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
 	void writeRelationMatrix(Labels &labels,String name);
 	vector<vector<int> >& get_srm();
+	String name();
 
 	/************ ssr_match.cpp **************/
 	float srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);

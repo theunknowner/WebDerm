@@ -14,7 +14,7 @@
 //! determines shape of island using shape neural network
 void Islands::determineIslandShape(Mat &islandImg) {
 	TestML ml;
-	String param = "/Thresholds/param.xml";
+	String param = TestML::PARAM_PATH;
 	vector<Mat> sampleVec;
 	Mat sample = islandImg.clone();
 	sample *= 255;

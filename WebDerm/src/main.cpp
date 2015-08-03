@@ -62,32 +62,24 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
-	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
+/*
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test17.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test18.png");
 	ShadeShapeMatch ssm;
-	//ssm.test_match(ss1,ss2);
-	ssm.test(ss1);
+	ssm.test_match(ss1,ss2);
+	//ssm.test(ss1);
+	//Islands island = ss1.getIslandWithPoint(Point(48,68));
+	//imwrite("comp_disc.png",island.image());
 /**/
 
-	FileData fd;
-	deque<String> files;
-	fd.getFilesFromDirectory("Looks_Like/",files);
-	ShadeShape ss1 = Scripts::script31("herpes3");
-/*
-	for(unsigned int i=0; i<files.size(); i++) {
-		String name = "Looks_Like/"+files.at(i);
-		name = getFileName(name);
-		cout << name << endl;
-		if(name!="herpes3") {
-			//ShadeShape ss2 = Scripts::script31(name);
-			//ShadeShapeMatch ssm;
-			//ssm.test_match(ss1,ss2);
-		}
-	}
-	//ssm.test(ss2);
-	//Islands island = ss1.getIslandWithPoint(Point(99,105));
+	ShadeShape ss1 = Scripts::script31(argv[1]);
+	ShadeShape ss2 = Scripts::script31(argv[2]);
+	ShadeShapeMatch ssm;
+	ssm.test_match(ss1,ss2);
 
+	//ssm.test(ss2);
+	//Islands island = ss1.getIslandWithPoint(Point(50,61));
+	//imwrite("strip.png",island.image());
 	/**/
 	//Scripts::script25();
 	//Scripts::script_checkAllTestData();
@@ -110,7 +102,7 @@ int main(int argc,char** argv)
 /**/
 	/*
 	TestML ml;
-	String param = "/home/jason/git/Samples/Samples/param.xml";
+	String param = TestML::PARAM_PATH;
 	Mat sample = imread("/home/jason/Desktop/workspace/test10.png",0);
 	sample *= 255;
 	imgshow(sample);

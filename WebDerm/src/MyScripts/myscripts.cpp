@@ -2069,7 +2069,7 @@ void script_checkAllTestData() {
 	ofstream ofs;
 	ofs.open(out);
 	TestML ml;
-	String param = "/home/jason/git/Samples/Samples/param.xml";
+	String param = TestML::PARAM_PATH;
 	vector<Mat> sampleVec;
 	vector<String> nameVec;
 	for(unsigned int i=0; i<files.size(); i++) {
@@ -2135,7 +2135,7 @@ void script_checkHitRatioTestData() {
 	ofstream ofs(out);
 	ofs << "Name, 0,1,2,3,4,5,6,7, Result, MyLabel, Y/N" << endl;
 	TestML ml;
-	String param = "/home/jason/git/Samples/Samples/param.xml";
+	String param = TestML::PARAM_PATH;
 	vector<Mat> sampleVec;
 	vector<String> nameVec;
 	for(unsigned int i=0; i<files.size(); i++) {
@@ -3255,7 +3255,8 @@ ShadeShape script31(String filename) {
 	sh.importThresholds();
 	Mat img, img2,img3, img4, img5, imgGray;
 	String name = filename;
-	img = imread("/Looks_Like/"+name+".jpg");
+	img = imread("Looks_Like/"+name+".jpg");
+	assert(img.empty()==0);
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	Xyz xyz;
@@ -3277,7 +3278,6 @@ ShadeShape script31(String filename) {
 		}
 	}
 	Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
-
 	vector<double> pulldown;
 	vector<double> imgRowSlope;
 	vector<double> imgRowAvg;
@@ -3297,7 +3297,6 @@ ShadeShape script31(String filename) {
 				dE = -dE;
 			deltaE.push_back(dE);
 		}
-
 		vector<double> oX;
 		for(unsigned int i=0; i<deltaE.size(); i++) {
 			oX.push_back(i);
@@ -3328,6 +3327,183 @@ ShadeShape script31(String filename) {
 	Cluster clst;
 	clst.kmeansCluster(pulldown,3);
 
+	double thresh = clst.getMin(clst.getNumOfClusters()-1);
+	Mat map(img.size(),CV_8U, Scalar(0));
+	for(int i=0; i<img.rows; i++) {
+		for(int j=1; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+			HC = hc.at<float>(i,j);
+			HC0 = hc.at<float>(i,j-1);
+			int direction = HC - HC0;
+			double dE = cie.deltaE76(LAB,LAB0);
+			if(direction<0)
+				dE = -dE;
+			if(imgRowSlope.at(i)<0.07) {
+				if(imgRowAvg.at(i)>=0)
+					dE -= imgRowAvg.at(i);
+				else
+					dE += imgRowAvg.at(i);
+
+			}
+			if(abs(dE)>=thresh) {
+				map.at<uchar>(i,j) = 255;
+			}
+		}
+	}
+	ShapeMorph sm;
+	Mat map2 = sm.densityConnector(map,0.9999);
+	Mat map3 = sm.haloTransform(map2,2);
+	map3.convertTo(map3,CV_8U);
+	map3 = (map3 - 5) * 255;
+	vector<Mat> islands = sm.liquidFeatureExtraction(map3,0,-1);
+	vector<int> areas;
+	for(unsigned int i=0; i<islands.size(); i++) {
+		int count = countNonZero(islands.at(i));
+		areas.push_back(count);
+	}
+	int bestIdx = kc.kneeCurvePoint(areas);
+	islands.erase(islands.begin(),islands.begin()+bestIdx);
+	Mat unionMap;
+	for(unsigned int i=0; i<islands.size(); i++) {
+		//imgshow(islands.at(i));
+		islands.at(i).copyTo(unionMap,islands.at(i));
+	}
+
+	ShapeColor sc;
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+	Mat src = sm.prepareImage(imgGray);
+	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
+	Mat lcFilterMat = sc.filterKneePt(src);
+	Mat lcFilterNoNoise;
+	lcFilterMat.copyTo(lcFilterNoNoise,mapOfNonNoise);
+	Mat lcDenseConnect = sm.densityConnector(lcFilterNoNoise,0.9999);
+	Mat lcHaloTrans = sm.haloTransform(lcDenseConnect,2);
+	lcHaloTrans.convertTo(lcHaloTrans,CV_8U);
+	lcHaloTrans = (lcHaloTrans - 5) * 255;
+	vector<Mat> islandsLC = sm.liquidFeatureExtraction(lcHaloTrans,0,-1);
+	vector<int> areasLC;
+	for(unsigned int i=0; i<islandsLC.size(); i++) {
+		int count = countNonZero(islandsLC.at(i));
+		areasLC.push_back(count);
+	}
+	bestIdx = kc.kneeCurvePoint(areasLC);
+	islandsLC.erase(islandsLC.begin(),islandsLC.begin()+bestIdx);
+	Mat unionMapLC;
+	for(unsigned int i=0; i<islandsLC.size(); i++) {
+		//imgshow(islands.at(i));
+		islandsLC.at(i).copyTo(unionMapLC,islandsLC.at(i));
+	}
+
+	Mat maskFinal;
+	unionMapLC.copyTo(maskFinal,unionMapLC);
+	unionMap.copyTo(maskFinal,unionMap);
+	imgGray.copyTo(img2,maskFinal);
+
+	vector<double> data_vec;
+	for(int i=0; i<img2.rows; i++) {
+		for(int j=0; j<img2.cols; j++) {
+			double val = img2.at<uchar>(i,j);
+			if(val>0)
+				data_vec.push_back(val);
+		}
+	}
+	int peakPos = getPeakClusters(data_vec);
+	int minVal = *min_element(data_vec.begin(),data_vec.end());
+	int maxVal = *max_element(data_vec.begin(),data_vec.end());
+	//printf("PeakPos: %d\n",peakPos);
+	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
+	ShadeShape ss;
+	ss.extract(img3,name);
+	return ss;
+}
+
+ShadeShape script32(String filename) {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	Poly poly;
+	KneeCurve kc;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	Mat img, img2,img3, img4, img5, imgGray;
+	String name = filename;
+	img = imread("Looks_Like/"+name+".jpg");
+	assert(img.empty()==0);
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
+	Xyz xyz;
+	CieLab lab;
+	Cie cie;
+	vector<float> XYZ, XYZ0, LAB, LAB0;
+	vector<double> deltaE, HSL;
+	Mat hvec(img.size(),CV_32F,Scalar(0));
+	Mat svec(img.size(),CV_32F,Scalar(0));
+	Mat lvec(img.size(),CV_32F,Scalar(0));
+	double HC, HC0;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+			hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+			svec.at<float>(i,j) = round(HSL.at(1) * 100);
+			lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+		}
+	}
+	Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
+	vector<double> pulldown;
+	vector<double> imgRowSlope;
+	vector<double> imgRowAvg;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=1; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+			HC = hc.at<float>(i,j);
+			HC0 = hc.at<float>(i,j-1);
+			int direction = HC - HC0;
+			double dE = cie.deltaE76(LAB,LAB0);
+			if(direction<0)
+				dE = -dE;
+			deltaE.push_back(dE);
+		}
+		vector<double> oX;
+		for(unsigned int i=0; i<deltaE.size(); i++) {
+			oX.push_back(i);
+		}
+		vector<double> coeffs = poly.polyfit(oX,deltaE,1);
+		vector<double> oVals = poly.polyval(coeffs,oX);
+		double slope = (oVals.back() - oVals.front()) / oVals.size();
+		double avg = (oVals.front() + oVals.back()) / 2;
+		double pd=0;
+		for(unsigned int j=0; j<deltaE.size(); j++) {
+			if(slope<0.07) {
+				if(avg>=0)
+					pd = deltaE.at(j) - avg;
+				else
+					pd = deltaE.at(j) + avg;
+			}
+			else {
+				pd = deltaE.at(j);
+			}
+			pulldown.push_back(abs(pd));
+		}
+
+		imgRowSlope.push_back(slope);
+		imgRowAvg.push_back(avg);
+		deltaE.clear();
+	}//end row
+
+	Cluster clst;
+	clst.kmeansCluster(pulldown,3);
 	double thresh = clst.getMin(clst.getNumOfClusters()-1);
 	Mat map(img.size(),CV_8U, Scalar(0));
 	for(int i=0; i<img.rows; i++) {

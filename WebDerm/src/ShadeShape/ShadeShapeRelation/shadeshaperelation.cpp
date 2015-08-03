@@ -150,7 +150,6 @@ vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &la
 			}// end num1 loop
 		}// end shade1 loop
 	}// end shape1 loop
-	this->writeRelationMatrix(labels,ss.name());
 	return this->relationMatrix;
 }
 
@@ -159,11 +158,13 @@ vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &la
  * accessible by the defined functions
  */
 void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
+	this->ssr_name = ss.name();
 	this->generate_srm(ss,labels,islandVec);
+	//this->writeRelationMatrix(labels,ss.name());
 }
 
 void ShadeShapeRelation::writeRelationMatrix(Labels &labels, String name) {
-	name = "relation_matrix_"+name+".csv";
+	name += "_srm.csv";
 	FILE * fp;
 	fp = fopen(name.c_str(),"w");
 	map<String,pair<int,float> > labelMap = labels.getLabels();
@@ -188,5 +189,9 @@ void ShadeShapeRelation::writeRelationMatrix(Labels &labels, String name) {
 
 vector<vector<int> >& ShadeShapeRelation::get_srm() {
 	return this->relationMatrix;
+}
+
+String ShadeShapeRelation::name() {
+	return this->ssr_name;
 }
 

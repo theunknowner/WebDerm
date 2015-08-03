@@ -51,7 +51,7 @@ void Features::storeIsland(Islands island) {
 //! determines the shape of feature using shape neural network
 void Features::determineFeatureShape(Mat featureImg) {
 	TestML ml;
-	String param = "/home/jason/git/Samples/Samples/param.xml";
+	String param = TestML::PARAM_PATH;
 	vector<Mat> sampleVec;
 	Mat sample = featureImg.clone();
 	sample *= 255;

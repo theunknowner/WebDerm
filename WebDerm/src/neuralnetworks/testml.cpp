@@ -11,6 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
 bool TestML::THRESH_IMPORTED = false;
+String TestML::PARAM_PATH = "Thresholds/param.xml";
 
 TestML::TestML() {
 
