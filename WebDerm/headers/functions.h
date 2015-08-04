@@ -45,6 +45,7 @@ float majority(vector<float> vec);
 
 namespace Func {
 	String addDigitsForLabel(int num, String digit, int length=1);
+	vector<vector<vector<vector<int> > > > createVector4D(int dim1, int dim2, int dim3, int dim4, int val);
 }
 
 class Functions {

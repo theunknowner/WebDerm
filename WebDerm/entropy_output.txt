@@ -1,0 +1,27 @@
+[5_Comp_Disc_s0][SURR_BY][5_Comp_Disc_s1]
+CountUP: 2, EntUP: 1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 1.000000
+AreaUP: 1244, AreaDB: 1244
+AreaVal: 1244.000000
+MaxTotalArea: 5539
+RelArea: 0.224589
+WeightedEntropy: 0.224589
+TotalEntropy: 0.224589
+[5_Comp_Disc_s1][INDIR][5_Comp_Disc_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 3844, AreaDB: 3630
+AreaVal: 3630.000000
+MaxTotalArea: 5539
+RelArea: 0.655353
+WeightedEntropy: 0.655353
+TotalEntropy: 0.879942
+[5_Comp_Disc_s1][SURR_BY][5_Comp_Disc_s2]
+CountUP: 2, EntUP: 1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 1.000000
+AreaUP: 2779, AreaDB: 2779
+AreaVal: 2779.000000
+MaxTotalArea: 5539
+RelArea: 0.501715
+WeightedEntropy: 0.501715
+TotalEntropy: 1.381657

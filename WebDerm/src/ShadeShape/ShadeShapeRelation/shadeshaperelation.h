@@ -28,10 +28,11 @@ private:
 	void setup_relationMatrix(Labels &labels);
 
 	/************ ssr_match.cpp **************/
-	Labels mergeLabels(Labels &labels);
-	vector<vector<vector<int> > > downScaleSrm(ShadeShapeRelation &ssr, vector<vector<int> > &srm,Labels &labels, Labels &mergedLabels);
+	Labels mergeLabels(Labels &labels, vector<vector<int> > &srm);
+	pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> downScaleSrm(ShadeShapeRelation &ssr, vector<vector<int> > &srm,Labels &labels, Labels &mergedLabels);
 	float entropy(int count);
-	float entropy(vector<vector<vector<int> > > &srmUP, Labels &upLabels, vector<vector<vector<int> > > &srmDB, Labels &dbLabels);
+	float entropy(pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPairUP, Labels &upLabels, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPairDB, Labels &dbLabels);
+
 
 public:
 	vector<vector<int> > generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
@@ -42,6 +43,8 @@ public:
 
 	/************ ssr_match.cpp **************/
 	float srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
+	void writeDownScaleSrm(String name, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels);
+	void printDownScaleSrm(pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels);
 };
 
 #endif /* SHADESHAPERELATION_H_ */

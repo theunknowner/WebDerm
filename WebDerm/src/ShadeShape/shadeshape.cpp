@@ -21,6 +21,7 @@ void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 		if(!island.isEmpty()) {
 			char text[100];
 			int lum = img.at<uchar>(y,x);
+			int area = island.area();
 			int shadeNum = ss.getIndexOfShade(island.shade());
 			float nnResult = *max_element(island.nn_results().begin<float>(),island.nn_results().end<float>());
 			cvtColor(img,img,CV_GRAY2BGR);
@@ -30,7 +31,7 @@ void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 				img.at<Vec3b>(y,x) = Vec3b(0,255,0);
 			}
 			String shade_shape = island.shape_name() + "_s" + toString(shadeNum);
-			sprintf(text,"(%d,%d) | Lum: %d | ShadeShape: %s | NN: %f",x,y,lum,shade_shape.c_str(),nnResult);
+			sprintf(text,"(%d,%d) | Lum: %d | Area: %d | ShadeShape: %s | NN: %f",x,y,lum,area,shade_shape.c_str(),nnResult);
 			cv::displayStatusBar(winName,text);
 		}
 	}

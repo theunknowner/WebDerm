@@ -319,6 +319,11 @@ String addDigitsForLabel(int num, String digit, int length) {
 	return label;
 }
 
+vector<vector<vector<vector<int> > > > createVector4D(int dim1, int dim2, int dim3, int dim4, int val) {
+	vector<vector<vector<vector<int> > > > vec(dim1,vector<vector<vector<int> > >(dim2,vector<vector<int> >(dim3,vector<int>(dim4,val))));
+	return vec;
+}
+
 } //end namespace
 
 /* return value up to Nth occurrence = first,second,third... of delimiter */
