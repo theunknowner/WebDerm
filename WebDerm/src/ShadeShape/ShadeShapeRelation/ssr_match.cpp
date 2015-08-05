@@ -37,24 +37,32 @@ pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> ShadeShapeRela
 
 	vector<vector<vector<int> > >  srmCount3D(merged_labels.size(),vector<vector<int> >(merged_labels.size(),vector<int>(this->rel_op.size(),0)));
 	vector<vector<vector<int> > > srmArea3D(merged_labels.size(),vector<vector<int> >(merged_labels.size(),vector<int>(this->rel_op.size(),0)));
+	vector<vector<vector<map<String,int>> > > srmMarkMap(merged_labels.size(),vector<vector<map<String,int>> >(merged_labels.size(),vector<map<String,int>>(this->rel_op.size(),map<String,int>())));
 	for(auto itY=labelMap.begin(); itY!=labelMap.end(); itY++) {
 		int y = distance(labelMap.begin(),itY);
-		String newLabel = itY->first.substr(0,itY->first.length()-4);
-		auto itY2 = merged_labels.find(newLabel);
+		String newLabelY = itY->first.substr(0,itY->first.length()-4);
+		auto itY2 = merged_labels.find(newLabelY);
 		int y2 = distance(merged_labels.begin(),itY2);
-		int areaY2 = itY->second.first;
+		int areaY = itY->second.first;
 		auto itX = itY;
 		itX++;
 		for(; itX!=labelMap.end(); itX++) {
 			int x = distance(labelMap.begin(), itX);
-			newLabel = itX->first.substr(0,itX->first.length()-4);
-			auto itX2 = merged_labels.find(newLabel);
+			String newLabelX = itX->first.substr(0,itX->first.length()-4);
+			auto itX2 = merged_labels.find(newLabelX);
 			int x2 = distance(merged_labels.begin(),itX2);
-			int areaX2 = itX->second.first;
 			int rel_op_idx = srm.at(y).at(x);
 			if(rel_op_idx>0) { //ignores "NULL" relations
+				int areaX = itX->second.first;
 				srmCount3D.at(y2).at(x2).at(rel_op_idx)++;
-				srmArea3D.at(y2).at(x2).at(rel_op_idx) = areaY2 + areaX2;
+				if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).find(itX->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).end()) {
+					srmArea3D.at(y2).at(x2).at(rel_op_idx) += areaX;
+					srmMarkMap.at(y2).at(x2).at(rel_op_idx)[itX->first] = 1;
+				}
+				if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).find(itY->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).end()) {
+					srmArea3D.at(y2).at(x2).at(rel_op_idx) += areaY;
+					srmMarkMap.at(y2).at(x2).at(rel_op_idx)[itY->first] = 1;
+				}
 			}
 		}
 	}
@@ -88,7 +96,7 @@ float ShadeShapeRelation::entropy(pair<vector<vector<vector<int> > >,vector<vect
 			String labelUP2 = upLabels.at(j);
 			for(unsigned int k=0; k<srmCountUP.at(i).at(j).size(); k++) {
 				int countUP = srmCountUP.at(i).at(j).at(k);
-				int countDB = srmCountUP.at(i).at(j).at(k);
+				int countDB = srmCountDB.at(i).at(j).at(k);
 				int areaUP = srmAreaUP.at(i).at(j).at(k);
 				int areaDB = srmAreaDB.at(i).at(j).at(k);
 				String relOp = this->rel_op.at(k);

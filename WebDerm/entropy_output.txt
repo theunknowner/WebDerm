@@ -1,27 +1,990 @@
-[5_Comp_Disc_s0][SURR_BY][5_Comp_Disc_s1]
-CountUP: 2, EntUP: 1.000000, CountDB: 2, EntDB: 1.000000
-EntropyVal: 1.000000
-AreaUP: 1244, AreaDB: 1244
-AreaVal: 1244.000000
-MaxTotalArea: 5539
-RelArea: 0.224589
-WeightedEntropy: 0.224589
-TotalEntropy: 0.224589
-[5_Comp_Disc_s1][INDIR][5_Comp_Disc_s2]
+[0_Strip_s0][SURR_BY][1_Excavated_s1]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2816, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s0][SURR_BY][1_Excavated_s2]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6309, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s0][DIR][2_Default_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 30, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s0][INDIR][2_Default_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 229, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s2][INDIR][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 2006
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s3][SURR_BY][1_Excavated_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2746, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s3][DIR][1_Excavated_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6270, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s3][SURR_BY][1_Excavated_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6239, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[0_Strip_s3][SURR_BY_INV][2_Default_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 63, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.000000
+[1_Excavated_s1][SURR_BY][1_Excavated_s2]
 CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
 EntropyVal: 1.000000
-AreaUP: 3844, AreaDB: 3630
-AreaVal: 3630.000000
-MaxTotalArea: 5539
-RelArea: 0.655353
-WeightedEntropy: 0.655353
-TotalEntropy: 0.879942
-[5_Comp_Disc_s1][SURR_BY][5_Comp_Disc_s2]
+AreaUP: 8923, AreaDB: 3923
+AreaVal: 3923.000000
+MaxTotalArea: 11525
+RelArea: 0.340390
+WeightedEntropy: 0.340390
+TotalEntropy: 0.340390
+[1_Excavated_s1][DIR][2_Default_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1953
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.340390
+[1_Excavated_s1][SURR_BY_INV][2_Default_s0]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2800, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.340390
+[1_Excavated_s1][INDIR][2_Default_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 3453, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.340390
+[1_Excavated_s1][SURR_BY_INV][2_Default_s1]
+CountUP: 8, EntUP: 3.000000, CountDB: 4, EntDB: 2.000000
+EntropyVal: 0.750000
+AreaUP: 2729, AreaDB: 1955
+AreaVal: 1955.000000
+MaxTotalArea: 11525
+RelArea: 0.169631
+WeightedEntropy: 0.127223
+TotalEntropy: 0.467614
+[1_Excavated_s1][INDIR][2_Default_s2]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1951
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 0.467614
+[1_Excavated_s1][SURR_BY_INV][2_Default_s2]
+CountUP: 4, EntUP: 2.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.861654
+AreaUP: 2725, AreaDB: 1973
+AreaVal: 1973.000000
+MaxTotalArea: 11525
+RelArea: 0.171193
+WeightedEntropy: 0.147509
+TotalEntropy: 0.615123
+[1_Excavated_s1][SURR_BY_INV][2_Default_s3]
+CountUP: 8, EntUP: 3.000000, CountDB: 10, EntDB: 3.321928
+EntropyVal: 0.925513
+AreaUP: 3474, AreaDB: 2014
+AreaVal: 2014.000000
+MaxTotalArea: 11525
+RelArea: 0.174751
+WeightedEntropy: 0.161734
+TotalEntropy: 0.776857
+[1_Excavated_s1][INDIR][2_Default_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 2729, AreaDB: 1955
+AreaVal: 1955.000000
+MaxTotalArea: 11525
+RelArea: 0.169631
+WeightedEntropy: 0.169631
+TotalEntropy: 0.946488
+[1_Excavated_s1][SURR_BY_INV][2_Default_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.500000
+AreaUP: 2756, AreaDB: 1952
+AreaVal: 1952.000000
+MaxTotalArea: 11525
+RelArea: 0.169371
+WeightedEntropy: 0.084685
+TotalEntropy: 1.031174
+[1_Excavated_s1][SURR_BY_INV][3_Blotch_s0]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2748, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.031174
+[1_Excavated_s1][SURR_BY][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3938
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.031174
+[1_Excavated_s1][SURR_BY_INV][3_Blotch_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1969
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.031174
+[1_Excavated_s1][INDIR][4_Incomp_Disc_s1]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1954
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.031174
+[1_Excavated_s1][INDIR][4_Incomp_Disc_s2]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1951
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.031174
+[1_Excavated_s1][SURR_BY_INV][4_Incomp_Disc_s2]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1951
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.031174
+[1_Excavated_s1][SURR_BY_INV][4_Incomp_Disc_s3]
 CountUP: 2, EntUP: 1.000000, CountDB: 2, EntDB: 1.000000
 EntropyVal: 1.000000
-AreaUP: 2779, AreaDB: 2779
-AreaVal: 2779.000000
-MaxTotalArea: 5539
-RelArea: 0.501715
-WeightedEntropy: 0.501715
-TotalEntropy: 1.381657
+AreaUP: 2807, AreaDB: 1976
+AreaVal: 1976.000000
+MaxTotalArea: 11525
+RelArea: 0.171453
+WeightedEntropy: 0.171453
+TotalEntropy: 1.202627
+[1_Excavated_s1][INDIR][4_Incomp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2799, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s1][SURR_BY_INV][4_Incomp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2718, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s1][SURR_BY_INV][5_Comp_Disc_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2725, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s1][SURR_BY_INV][5_Comp_Disc_s3]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 2875, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s1][DIR][5_Comp_Disc_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1952
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s1][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3142
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s1][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3189
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s2][SURR_BY_INV][2_Default_s0]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6293, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.202627
+[1_Excavated_s2][SURR_BY_INV][2_Default_s1]
+CountUP: 9, EntUP: 3.169925, CountDB: 5, EntDB: 2.321928
+EntropyVal: 0.796640
+AreaUP: 6960, AreaDB: 1995
+AreaVal: 1995.000000
+MaxTotalArea: 11525
+RelArea: 0.173102
+WeightedEntropy: 0.137900
+TotalEntropy: 1.340527
+[1_Excavated_s2][INDIR][2_Default_s2]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1978
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.340527
+[1_Excavated_s2][SURR_BY_INV][2_Default_s2]
+CountUP: 4, EntUP: 2.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.861654
+AreaUP: 6218, AreaDB: 2000
+AreaVal: 2000.000000
+MaxTotalArea: 11525
+RelArea: 0.173536
+WeightedEntropy: 0.149528
+TotalEntropy: 1.490055
+[1_Excavated_s2][DIR][2_Default_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6216, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.490055
+[1_Excavated_s2][SURR_BY_INV][2_Default_s3]
+CountUP: 9, EntUP: 3.169925, CountDB: 10, EntDB: 3.321928
+EntropyVal: 0.964830
+AreaUP: 6980, AreaDB: 2041
+AreaVal: 2041.000000
+MaxTotalArea: 11525
+RelArea: 0.177093
+WeightedEntropy: 0.170865
+TotalEntropy: 1.660920
+[1_Excavated_s2][INDIR][2_Default_s4]
+CountUP: 2, EntUP: 1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.500000
+AreaUP: 6243, AreaDB: 1982
+AreaVal: 1982.000000
+MaxTotalArea: 11525
+RelArea: 0.171974
+WeightedEntropy: 0.085987
+TotalEntropy: 1.746907
+[1_Excavated_s2][SURR_BY_INV][2_Default_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.500000
+AreaUP: 6249, AreaDB: 1979
+AreaVal: 1979.000000
+MaxTotalArea: 11525
+RelArea: 0.171714
+WeightedEntropy: 0.085857
+TotalEntropy: 1.832763
+[1_Excavated_s2][SURR_BY_INV][3_Blotch_s0]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6241, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.832763
+[1_Excavated_s2][SURR_BY][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3965
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.832763
+[1_Excavated_s2][INDIR][3_Blotch_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6212, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 1.832763
+[1_Excavated_s2][SURR_BY_INV][3_Blotch_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 6223, AreaDB: 1996
+AreaVal: 1996.000000
+MaxTotalArea: 11525
+RelArea: 0.173189
+WeightedEntropy: 0.173189
+TotalEntropy: 2.005952
+[1_Excavated_s2][SURR_BY_INV][4_Incomp_Disc_s2]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1978
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.005952
+[1_Excavated_s2][SURR_BY_INV][4_Incomp_Disc_s3]
+CountUP: 3, EntUP: 1.584962, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.773706
+AreaUP: 6393, AreaDB: 2003
+AreaVal: 2003.000000
+MaxTotalArea: 11525
+RelArea: 0.173796
+WeightedEntropy: 0.134467
+TotalEntropy: 2.140419
+[1_Excavated_s2][SURR_BY_INV][4_Incomp_Disc_s4]
+CountUP: 3, EntUP: 1.584962, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6323, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[1_Excavated_s2][SURR_BY_INV][5_Comp_Disc_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6218, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[1_Excavated_s2][SURR_BY_INV][5_Comp_Disc_s3]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6368, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[1_Excavated_s2][SURR_BY_INV][5_Comp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 6215, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[1_Excavated_s2][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3169
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[1_Excavated_s2][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3216
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[1_Excavated_s3][INDIR][2_Default_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 769, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[2_Default_s0][INDIR][2_Default_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 8, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.140419
+[2_Default_s0][INDIR][2_Default_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 126, AreaDB: 15
+AreaVal: 15.000000
+MaxTotalArea: 11525
+RelArea: 0.001302
+WeightedEntropy: 0.001302
+TotalEntropy: 2.141721
+[2_Default_s1][SURR_BY_INV][2_Default_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 740, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.141721
+[2_Default_s1][INDIR][2_Default_s3]
+CountUP: 2, EntUP: 1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.500000
+AreaUP: 1255, AreaDB: 16
+AreaVal: 16.000000
+MaxTotalArea: 11525
+RelArea: 0.001388
+WeightedEntropy: 0.000694
+TotalEntropy: 2.142415
+[2_Default_s1][SURR_BY_INV][2_Default_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 831, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.142415
+[2_Default_s1][INDIR][2_Default_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 25
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.142415
+[2_Default_s1][SURR_BY][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1996
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.142415
+[2_Default_s1][INDIR][3_Blotch_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 38
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.142415
+[2_Default_s1][INDIR][4_Incomp_Disc_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 9, AreaDB: 28
+AreaVal: 9.000000
+MaxTotalArea: 11525
+RelArea: 0.000781
+WeightedEntropy: 0.000781
+TotalEntropy: 2.143196
+[2_Default_s1][SURR_BY_INV][4_Incomp_Disc_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 831, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s1][SURR_BY_INV][4_Incomp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 822, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s1][INDIR][5_Comp_Disc_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 9, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s1][INDIR][5_Comp_Disc_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 824, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s1][SURR_BY_INV][5_Comp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 745, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s1][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 5, EntDB: 2.321928
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1214
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s1][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 5, EntDB: 2.321928
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1261
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s2][INDIR][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1993
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s2][SURR_BY][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 2015
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s2][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1219
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s2][INDIR][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1244
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s2][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1266
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][DIR][2_Default_s4]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 423, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][INDIR][3_Blotch_s0]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 46, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][SURR_BY][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 9, EntDB: 3.169925
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 2044
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][INDIR][3_Blotch_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 365, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][DIR][4_Incomp_Disc_s4]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 361, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][SURR_BY_INV][4_Incomp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 159, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][INDIR][5_Comp_Disc_s1]
+CountUP: 2, EntUP: 1.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 397, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][DIR][5_Comp_Disc_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 6
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 10, EntDB: 3.321928
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1260
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s3][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 10, EntDB: 3.321928
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1307
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][INDIR][3_Blotch_s0]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1997
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][INDIR][4_Incomp_Disc_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 31
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][DIR][4_Incomp_Disc_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 30
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][DIR][5_Comp_Disc_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 100, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][INDIR][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1201
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1198
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][INDIR][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1248
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[2_Default_s4][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1245
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s0][INDIR][3_Blotch_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 2011
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s0][DIR][4_Incomp_Disc_s1]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1996
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s0][INDIR][4_Incomp_Disc_s2]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1993
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s0][SURR_BY_INV][4_Incomp_Disc_s2]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1993
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s0][SURR_BY_INV][4_Incomp_Disc_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 2018
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s0][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3184
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s0][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 3231
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s3][INDIR][4_Incomp_Disc_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 26
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s3][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1215
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[3_Blotch_s3][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1262
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[4_Incomp_Disc_s2][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1197
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[4_Incomp_Disc_s2][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1244
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[4_Incomp_Disc_s3][INDIR][5_Comp_Disc_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 135, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[4_Incomp_Disc_s3][SURR_BY_INV][5_Comp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 0, EntDB: -1.000000
+EntropyVal: 0.000000
+AreaUP: 100, AreaDB: 0
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[4_Incomp_Disc_s3][SURR_BY][7_Comp_Donut_s3]
+CountUP: 0, EntUP: -1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1222
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[4_Incomp_Disc_s3][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 1269
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
+[7_Comp_Donut_s3][SURR_BY][7_Comp_Donut_s4]
+CountUP: 0, EntUP: -1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.000000
+AreaUP: 0, AreaDB: 2435
+AreaVal: 0.000000
+MaxTotalArea: 11525
+RelArea: 0.000000
+WeightedEntropy: 0.000000
+TotalEntropy: 2.143196
