@@ -44,6 +44,7 @@
 #include "ShadeShape/ShadeMatch/shadematch.h"
 #include "ImageData/imagedata.h"
 #include "ShadeShape/ShadeShapeRelation/shadeshaperelation.h"
+#include "ShadeShape/Labels/labels.h"
 
 int main(int argc,char** argv)
 {
@@ -76,7 +77,12 @@ int main(int argc,char** argv)
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	ShadeShapeMatch ssm;
-	ssm.test_match(ss1,ss2);
+	//ShadeShape ss1 = Scripts::script31("herpes3");
+	//ssm.test(ss2);
+	float matchVal1 = ssm.test_match(ss1,ss2);
+	float matchVal2 = ssm.match(ss1,ss2);
+	float result = matchVal1 * matchVal2;
+	printf("%f * %f = %f\n",matchVal1,matchVal2,result);
 
 	//ssm.test(ss2);
 	//Islands island = ss1.getIslandWithPoint(Point(50,61));

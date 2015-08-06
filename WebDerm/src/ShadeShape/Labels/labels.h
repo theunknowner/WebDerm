@@ -18,10 +18,11 @@ private:
 	map<String, pair<int,float> > labelMap;
 	map<String,int> _areaLabels;
 	map<String,float> _relAreaLabels;
+	String labelName;
 public:
 	Labels();
-	Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea);
-	void create(vector<vector<vector<Islands> > > &islandVec, float totalArea);
+	Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
+	void create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
 	map<String,pair<int,float> >& getLabels();
 	map<String,int>& areaLabels();
 	map<String,float>& relAreaLabels();
@@ -33,6 +34,7 @@ public:
 	float totalRelArea();
 	int size();
 	String at(int num);
+	String& name();
 	void printLabels();
 };
 

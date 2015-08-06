@@ -1,0 +1,140 @@
+[0_Strip_s3][SURR_BY][1_Excavated_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 2746, AreaDB: 1644
+MaxTotalArea: 21098
+RelArea: 0.077922
+SumOfArea: 1644
+WeightedEntropy: 0.077922
+TotalEntropy: 0.077922
+----------------------------------
+[1_Excavated_s1][SURR_BY_INV][2_Default_s0]
+CountUP: 2, EntUP: 1.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.773706
+AreaUP: 2800, AreaDB: 1593
+MaxTotalArea: 21098
+RelArea: 0.075505
+SumOfArea: 3237
+WeightedEntropy: 0.058418
+TotalEntropy: 0.136341
+----------------------------------
+[1_Excavated_s1][INDIR][2_Default_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 3453, AreaDB: 4099
+MaxTotalArea: 21098
+RelArea: 0.163665
+SumOfArea: 6690
+WeightedEntropy: 0.163665
+TotalEntropy: 0.300005
+----------------------------------
+[1_Excavated_s1][SURR_BY_INV][2_Default_s1]
+CountUP: 8, EntUP: 3.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.646241
+AreaUP: 2729, AreaDB: 1608
+MaxTotalArea: 21098
+RelArea: 0.076216
+SumOfArea: 8298
+WeightedEntropy: 0.049254
+TotalEntropy: 0.349259
+----------------------------------
+[1_Excavated_s1][SURR_BY_INV][2_Default_s2]
+CountUP: 4, EntUP: 2.000000, CountDB: 4, EntDB: 2.000000
+EntropyVal: 1.000000
+AreaUP: 2725, AreaDB: 1987
+MaxTotalArea: 21098
+RelArea: 0.094180
+SumOfArea: 10285
+WeightedEntropy: 0.094180
+TotalEntropy: 0.443439
+----------------------------------
+[1_Excavated_s1][SURR_BY_INV][2_Default_s3]
+CountUP: 8, EntUP: 3.000000, CountDB: 11, EntDB: 3.459432
+EntropyVal: 0.896975
+AreaUP: 3474, AreaDB: 1642
+MaxTotalArea: 21098
+RelArea: 0.077827
+SumOfArea: 11927
+WeightedEntropy: 0.069809
+TotalEntropy: 0.513248
+----------------------------------
+[1_Excavated_s1][SURR_BY_INV][2_Default_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.500000
+AreaUP: 2756, AreaDB: 1593
+MaxTotalArea: 21098
+RelArea: 0.075505
+SumOfArea: 13520
+WeightedEntropy: 0.037752
+TotalEntropy: 0.551000
+----------------------------------
+[1_Excavated_s1][SURR_BY_INV][4_Incomp_Disc_s3]
+CountUP: 2, EntUP: 1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 1.000000
+AreaUP: 2807, AreaDB: 1603
+MaxTotalArea: 21098
+RelArea: 0.075979
+SumOfArea: 15123
+WeightedEntropy: 0.075979
+TotalEntropy: 0.626979
+----------------------------------
+[2_Default_s0][INDIR][2_Default_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.500000
+AreaUP: 126, AreaDB: 27
+MaxTotalArea: 21098
+RelArea: 0.001280
+SumOfArea: 15150
+WeightedEntropy: 0.000640
+TotalEntropy: 0.627619
+----------------------------------
+[2_Default_s1][SURR_BY_INV][2_Default_s2]
+CountUP: 1, EntUP: 0.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.386853
+AreaUP: 740, AreaDB: 2771
+MaxTotalArea: 21098
+RelArea: 0.035074
+SumOfArea: 15890
+WeightedEntropy: 0.013569
+TotalEntropy: 0.641187
+----------------------------------
+[2_Default_s1][INDIR][2_Default_s3]
+CountUP: 2, EntUP: 1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 1.000000
+AreaUP: 1255, AreaDB: 2537
+MaxTotalArea: 21098
+RelArea: 0.059484
+SumOfArea: 17145
+WeightedEntropy: 0.059484
+TotalEntropy: 0.700672
+----------------------------------
+[2_Default_s1][SURR_BY_INV][2_Default_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 10, EntDB: 3.321928
+EntropyVal: 0.231378
+AreaUP: 831, AreaDB: 2581
+MaxTotalArea: 21098
+RelArea: 0.039388
+SumOfArea: 17976
+WeightedEntropy: 0.009113
+TotalEntropy: 0.709785
+----------------------------------
+[2_Default_s1][SURR_BY_INV][4_Incomp_Disc_s3]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 831, AreaDB: 2520
+MaxTotalArea: 21098
+RelArea: 0.039388
+SumOfArea: 18807
+WeightedEntropy: 0.039388
+TotalEntropy: 0.749173
+----------------------------------
+[2_Default_s3][DIR][2_Default_s4]
+CountUP: 2, EntUP: 1.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 1.000000
+AreaUP: 423, AreaDB: 39
+MaxTotalArea: 21098
+RelArea: 0.001849
+SumOfArea: 18846
+WeightedEntropy: 0.001849
+TotalEntropy: 0.751021
+----------------------------------

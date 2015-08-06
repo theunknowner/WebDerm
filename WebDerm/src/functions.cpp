@@ -95,7 +95,7 @@ void getSubstr(String str, char delimiter, deque<String> &vec)
 	int j=0;
 	for(unsigned int i=0; i<str.size(); i++)
 	{
-		if(str[i]==delimiter)
+		if(str[i]==delimiter && i>j)
 		{
 			temp = str.substr(j,(i-j));
 			vec.push_back(temp.c_str());
@@ -120,7 +120,7 @@ void getSubstr(String str, char delimiter, vector<String> &vec)
 	int j=0;
 	for(unsigned int i=0; i<str.size(); i++)
 	{
-		if(str[i]==delimiter)
+		if(str[i]==delimiter && i>j)
 		{
 			temp = str.substr(j,(i-j));
 			vec.push_back(temp.c_str());
@@ -322,6 +322,26 @@ String addDigitsForLabel(int num, String digit, int length) {
 vector<vector<vector<vector<int> > > > createVector4D(int dim1, int dim2, int dim3, int dim4, int val) {
 	vector<vector<vector<vector<int> > > > vec(dim1,vector<vector<vector<int> > >(dim2,vector<vector<int> >(dim3,vector<int>(dim4,val))));
 	return vec;
+}
+
+//! returns every string that is between beginDelimit and endDelimit
+void getSubstr(String str, char beginDelimit, char endDelimit, vector<String> &vec) {
+	if(vec.size()>0) vec.clear();
+
+	String temp;
+	int pos1=-1;
+	int pos2=-1;
+	for(unsigned int i=0; i<str.length(); i++) {
+		if(str.at(i)==beginDelimit) pos1=i;
+		if(str.at(i)==endDelimit) pos2=i;
+		if(pos1>=0 && pos2>=0) {
+			pos1++;
+			temp = str.substr(pos1,pos2-pos1);
+			vec.push_back(temp);
+			pos1=-1;
+			pos2=-1;
+		}
+	}
 }
 
 } //end namespace

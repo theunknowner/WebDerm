@@ -1,4 +1,0 @@
-[5_Comp_Disc_s0][INDIR][5_Comp_Disc_s1]: 1212 : 1
-[5_Comp_Disc_s0][SURR_BY][5_Comp_Disc_s1]: 1352 : 2
-[5_Comp_Disc_s1][INDIR][5_Comp_Disc_s2]: 4777 : 2
-[5_Comp_Disc_s1][SURR_BY][5_Comp_Disc_s2]: 2975 : 2

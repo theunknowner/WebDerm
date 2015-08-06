@@ -1,0 +1,110 @@
+[1_Excavated_s2][SURR_BY_INV][2_Default_s1]
+CountUP: 9, EntUP: 3.169925, CountDB: 4, EntDB: 2.000000
+EntropyVal: 0.719437
+AreaUP: 6960, AreaDB: 9976
+MaxTotalArea: 19409
+RelArea: 0.358597
+SumOfArea: 6960
+WeightedEntropy: 0.257988
+TotalEntropy: 0.257988
+----------------------------------
+[1_Excavated_s2][SURR_BY_INV][2_Default_s2]
+CountUP: 4, EntUP: 2.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.333333
+AreaUP: 6218, AreaDB: 9513
+MaxTotalArea: 19409
+RelArea: 0.320367
+SumOfArea: 13178
+WeightedEntropy: 0.106789
+TotalEntropy: 0.364777
+----------------------------------
+[1_Excavated_s2][SURR_BY_INV][2_Default_s3]
+CountUP: 9, EntUP: 3.169925, CountDB: 7, EntDB: 2.807355
+EntropyVal: 0.913051
+AreaUP: 6980, AreaDB: 9689
+MaxTotalArea: 19409
+RelArea: 0.359627
+SumOfArea: 20158
+WeightedEntropy: 0.328358
+TotalEntropy: 0.693135
+----------------------------------
+[1_Excavated_s2][SURR_BY_INV][2_Default_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.500000
+AreaUP: 6249, AreaDB: 9543
+MaxTotalArea: 19409
+RelArea: 0.321964
+SumOfArea: 26407
+WeightedEntropy: 0.160982
+TotalEntropy: 0.854117
+----------------------------------
+[1_Excavated_s2][SURR_BY_INV][3_Blotch_s0]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 6241, AreaDB: 9517
+MaxTotalArea: 19409
+RelArea: 0.321552
+SumOfArea: 32648
+WeightedEntropy: 0.321552
+TotalEntropy: 1.175668
+----------------------------------
+[1_Excavated_s2][SURR_BY_INV][4_Incomp_Disc_s4]
+CountUP: 3, EntUP: 1.584962, CountDB: 10, EntDB: 3.321928
+EntropyVal: 0.598104
+AreaUP: 6323, AreaDB: 9766
+MaxTotalArea: 19409
+RelArea: 0.325777
+SumOfArea: 38971
+WeightedEntropy: 0.194848
+TotalEntropy: 1.370517
+----------------------------------
+[1_Excavated_s2][SURR_BY_INV][5_Comp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.386853
+AreaUP: 6215, AreaDB: 9584
+MaxTotalArea: 19409
+RelArea: 0.320212
+SumOfArea: 45186
+WeightedEntropy: 0.123875
+TotalEntropy: 1.494392
+----------------------------------
+[1_Excavated_s3][INDIR][2_Default_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 2, EntDB: 1.000000
+EntropyVal: 0.500000
+AreaUP: 769, AreaDB: 8189
+MaxTotalArea: 19409
+RelArea: 0.039621
+SumOfArea: 45955
+WeightedEntropy: 0.019810
+TotalEntropy: 1.514202
+----------------------------------
+[2_Default_s1][INDIR][2_Default_s3]
+CountUP: 2, EntUP: 1.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 0.500000
+AreaUP: 1255, AreaDB: 612
+MaxTotalArea: 19409
+RelArea: 0.031532
+SumOfArea: 46567
+WeightedEntropy: 0.015766
+TotalEntropy: 1.529968
+----------------------------------
+[2_Default_s1][SURR_BY_INV][4_Incomp_Disc_s4]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 822, AreaDB: 474
+MaxTotalArea: 19409
+RelArea: 0.024422
+SumOfArea: 47041
+WeightedEntropy: 0.024422
+TotalEntropy: 1.554390
+----------------------------------
+[2_Default_s3][INDIR][3_Blotch_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 365, AreaDB: 144
+MaxTotalArea: 19409
+RelArea: 0.007419
+SumOfArea: 47185
+WeightedEntropy: 0.007419
+TotalEntropy: 1.561809
+----------------------------------

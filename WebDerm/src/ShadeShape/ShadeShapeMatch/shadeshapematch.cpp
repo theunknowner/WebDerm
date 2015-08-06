@@ -180,7 +180,7 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	ssr.spatial_relation(ss,lbls,islandVec);
 }
 
-void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
+float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	ShapeMatch smatch;
 	ShadeMatch shadematch;
 	this->maxNumOfShades = max(upSS.numOfShades(),dbSS.numOfShades());
@@ -190,20 +190,23 @@ void ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	this->dbIslandVec = this->groupIslandsByShape(dbSS);
 	this->sortIslandsByArea(this->dbIslandVec);
 	this->sortIslandsByArea(this->upIslandVec);
-	Labels upLabels(this->upIslandVec,upTotalArea);
-	Labels dbLabels(this->dbIslandVec,dbTotalArea);
+	Labels upLabels(this->upIslandVec,upTotalArea,upSS.name());
+	Labels dbLabels(this->dbIslandVec,dbTotalArea,dbSS.name());
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
-	//upLabels.printLabels();
-	//cout << "-----------------------" << endl;
-	//dbLabels.printLabels();
 	ShadeShapeRelation ssrUP;
 	ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec);
 	ShadeShapeRelation ssrDB;
 	ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec);
 	float matchVal = ssrUP.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
+	FILE * fp;
+	String filename = upSS.name() + "_" + dbSS.name() + "_tr2_match_score.txt";
+	fp = fopen(filename.c_str(),"w");
+	fprintf(fp,"%f\n",matchVal);
+	fclose(fp);
 	cout << "Match: " << matchVal << endl;
+	return matchVal;
 }
 
 float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
@@ -283,6 +286,8 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 			}
 		}
 	}
+
+	float matchVal = *max_element(resultVec.begin(),resultVec.end());
 	/*
 	cout << "-----------------------------" << endl;
 	for(unsigned int i=0; i<resultVec.size(); i++) {
@@ -292,8 +297,13 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		printf("Results %d: %f\n",i+1,results);
 	}
 	 */
+	FILE * fp;
+	String filename = upSS.name() + "_" + dbSS.name() + "_tr1_match_score.txt";
+	fp = fopen(filename.c_str(),"w");
+	fprintf(fp,"%f\n",matchVal);
+	fclose(fp);
 
-	return 0.0;
+	return matchVal;
 }
 
 void ShadeShapeMatch::printLabels(map<String,float> &labels) {

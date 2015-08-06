@@ -10,11 +10,12 @@
 
 Labels::Labels() {}
 
-Labels::Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea) {
-	this->create(islandVec,totalArea);
+Labels::Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name) {
+	this->create(islandVec,totalArea,name);
 }
 
-void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalArea) {
+void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name) {
+	this->labelName= name;
 	String label;
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
@@ -125,6 +126,10 @@ String Labels::at(int num) {
 		}
 	}
 	return "";
+}
+
+String& Labels::name() {
+	return this->labelName;
 }
 
 //! prints the labels and their areas;

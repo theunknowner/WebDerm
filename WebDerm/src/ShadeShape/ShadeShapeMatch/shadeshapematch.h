@@ -31,7 +31,7 @@ private:
 	float dotProduct(Labels &upLabels, Labels &dbLabels);
 public:
 	void test(ShadeShape &ss);
-	void test_match(ShadeShape upSS, ShadeShape dbSS);
+	float test_match(ShadeShape upSS, ShadeShape dbSS);
 	float match(ShadeShape upSS, ShadeShape dbSS);
 	void printLabels(map<String,float> &labels);
 };
