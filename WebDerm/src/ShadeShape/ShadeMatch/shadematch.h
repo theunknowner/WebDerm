@@ -17,8 +17,8 @@ class Islands;
 class ShadeMatch {
 protected:
 	int maxNumOfShades;
-	enum {SHIFT_NONE=0, SHIFT_LEFT, SHIFT_RIGHT};
 	vector<String> SHIFT = {"SHIFT_NONE","SHIFT_LEFT","SHIFT_RIGHT"};
+	enum {SHIFT_NONE=0, SHIFT_LEFT=1, SHIFT_RIGHT=2};
 
 public:
 	void setMaxNumOfShades(int num);

@@ -19,6 +19,7 @@ class Islands;
 class Labels;
 class ShadeShapeMatch : public ShapeMatch, public ShadeMatch {
 private:
+	int debugMode = 0;
 	//[shape][shade][idx]
 	vector<vector<vector<Islands> > > upIslandVec;
 	vector<vector<vector<Islands> > > dbIslandVec;
@@ -29,11 +30,14 @@ private:
 	std::map<String,float> createPropAreaMap(vector<vector<vector<Islands> > > &islandVec, float totalArea);
 	void fillPropAreaMapGaps(Labels &upLabels, Labels &dbLabels);
 	float dotProduct(Labels &upLabels, Labels &dbLabels);
+	float tr1_match(ShadeShape &upSS, ShadeShape &dbSS);
+	float tr2_match(ShadeShape &upSS, ShadeShape &dbSS);
 public:
 	void test(ShadeShape &ss);
 	float test_match(ShadeShape upSS, ShadeShape dbSS);
 	float match(ShadeShape upSS, ShadeShape dbSS);
 	void printLabels(map<String,float> &labels);
+	void debug_mode(int mode);
 };
 
 #endif /* SHADESHAPEMATCH_H_ */

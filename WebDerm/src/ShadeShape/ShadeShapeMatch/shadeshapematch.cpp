@@ -167,49 +167,8 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 	return results;
 }
 
-/******************* PUBLIC FUNCTIONS ******************/
-
-void ShadeShapeMatch::test(ShadeShape &ss) {
-	float totalArea = ss.area();
-	this->maxNumOfShades = ss.numOfShades();
-	vector<vector<vector<Islands> > > islandVec = this->groupIslandsByShape(ss);
-	this->sortIslandsByArea(islandVec);
-	Labels lbls = Labels(islandVec,totalArea);
-	lbls.printLabels();
-	ShadeShapeRelation ssr;
-	ssr.spatial_relation(ss,lbls,islandVec);
-}
-
-float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
-	ShapeMatch smatch;
-	ShadeMatch shadematch;
-	this->maxNumOfShades = max(upSS.numOfShades(),dbSS.numOfShades());
-	float upTotalArea = upSS.area();
-	float dbTotalArea = dbSS.area();
-	this->upIslandVec = this->groupIslandsByShape(upSS);
-	this->dbIslandVec = this->groupIslandsByShape(dbSS);
-	this->sortIslandsByArea(this->dbIslandVec);
-	this->sortIslandsByArea(this->upIslandVec);
-	Labels upLabels(this->upIslandVec,upTotalArea,upSS.name());
-	Labels dbLabels(this->dbIslandVec,dbTotalArea,dbSS.name());
-	Labels upLabelsFilled = upLabels;
-	Labels dbLabelsFilled = dbLabels;
-	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
-	ShadeShapeRelation ssrUP;
-	ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec);
-	ShadeShapeRelation ssrDB;
-	ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec);
-	float matchVal = ssrUP.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
-	FILE * fp;
-	String filename = upSS.name() + "_" + dbSS.name() + "_tr2_match_score.txt";
-	fp = fopen(filename.c_str(),"w");
-	fprintf(fp,"%f\n",matchVal);
-	fclose(fp);
-	cout << "Match: " << matchVal << endl;
-	return matchVal;
-}
-
-float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
+//! TR1 matching using dot product && STT
+float ShadeShapeMatch::tr1_match(ShadeShape &upSS, ShadeShape &dbSS) {
 	ShapeMatch smatch;
 	ShadeMatch shadematch;
 	this->setMaxNumOfShades(max(upSS.numOfShades(),dbSS.numOfShades()));
@@ -220,9 +179,9 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	this->sortIslandsByArea(this->dbIslandVec);
 	this->sortIslandsByArea(this->upIslandVec);
 
-	Labels upLabels;
-	Labels dbLabels;
-	map<String,pair<int,float> > upMap;
+	Labels upLabels(this->upIslandVec,upTotalArea,upSS.name());
+	Labels dbLabels(this->dbIslandVec,dbTotalArea,dbSS.name());
+	map<String,pair<int,float> > upMap; //for printf
 	map<String,pair<int,float> > dbMap;
 	vector<float> resultVec;
 	vector<vector<vector<Islands> > > islandVec2;
@@ -241,17 +200,19 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 				this->fillPropAreaMapGaps(upLabels,dbLabels);
 				upMap = upLabels.getLabels();
 				dbMap = dbLabels.getLabels();
-				if(ShadeMatch::SHIFT.at(shadeShift)=="SHIFT_NONE" && ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_NONE") {
-					for(auto itUP=upMap.begin(),itDB=dbMap.begin();itUP!=upMap.end(),itDB!=dbMap.end(); itUP++, itDB++) {
-						printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second.second,itDB->first.c_str(),itDB->second.second);
-					}
-				}
 				float results = this->dotProduct(upLabels,dbLabels);
 				resultVec.push_back(results);
-				printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
-				printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
-				printf("ShapeNum: NULL, ");
-				printf("Results: %f\n",results);
+				if(this->debugMode>=2) {
+					if(ShadeMatch::SHIFT.at(shadeShift)=="SHIFT_NONE" && ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_NONE") {
+						for(auto itUP=upMap.begin(),itDB=dbMap.begin();itUP!=upMap.end(),itDB!=dbMap.end(); itUP++, itDB++) {
+							printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second.second,itDB->first.c_str(),itDB->second.second);
+						}
+					}
+					printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+					printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
+					printf("ShapeNum: NULL, ");
+					printf("Results: %f\n",results);
+				}
 			}
 			else {
 				for(unsigned int shapeNum=0; shapeNum<islandVec3.size(); shapeNum++) {
@@ -277,16 +238,19 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 
 						float results = this->dotProduct(upLabels,dbLabels);
 						resultVec.push_back(results);
-						printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
-						printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
-						printf("ShapeNum: %d, ", shapeNum);
-						printf("Results: %f\n",results);
+
+						if(this->debugMode>=2) {
+							printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+							printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
+							printf("ShapeNum: %d, ", shapeNum);
+							printf("Results: %f\n",results);
+						}
+
 					}
 				}//end for loop shapeNum
 			}
 		}
 	}
-
 	float matchVal = *max_element(resultVec.begin(),resultVec.end());
 	/*
 	cout << "-----------------------------" << endl;
@@ -297,13 +261,80 @@ float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		printf("Results %d: %f\n",i+1,results);
 	}
 	 */
-	FILE * fp;
-	String filename = upSS.name() + "_" + dbSS.name() + "_tr1_match_score.txt";
-	fp = fopen(filename.c_str(),"w");
-	fprintf(fp,"%f\n",matchVal);
-	fclose(fp);
 
 	return matchVal;
+}
+
+//! TR2 using SRMs(Spatial Relations Matrix)
+float ShadeShapeMatch::tr2_match(ShadeShape &upSS, ShadeShape &dbSS) {
+	ShapeMatch smatch;
+	ShadeMatch shadematch;
+	this->maxNumOfShades = max(upSS.numOfShades(),dbSS.numOfShades());
+	float upTotalArea = upSS.area();
+	float dbTotalArea = dbSS.area();
+	this->upIslandVec = this->groupIslandsByShape(upSS);
+	this->dbIslandVec = this->groupIslandsByShape(dbSS);
+	this->sortIslandsByArea(this->dbIslandVec);
+	this->sortIslandsByArea(this->upIslandVec);
+	Labels upLabels(this->upIslandVec,upTotalArea,upSS.name());
+	Labels dbLabels(this->dbIslandVec,dbTotalArea,dbSS.name());
+	Labels upLabelsFilled = upLabels;
+	Labels dbLabelsFilled = dbLabels;
+	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
+	ShadeShapeRelation ssrUP;
+	ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec);
+	ShadeShapeRelation ssrDB;
+	ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec);
+	float matchVal = ssrUP.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
+	return matchVal;
+}
+
+/******************* PUBLIC FUNCTIONS ******************/
+
+void ShadeShapeMatch::test(ShadeShape &ss) {
+	float totalArea = ss.area();
+	this->maxNumOfShades = ss.numOfShades();
+	vector<vector<vector<Islands> > > islandVec = this->groupIslandsByShape(ss);
+	this->sortIslandsByArea(islandVec);
+	Labels lbls = Labels(islandVec,totalArea);
+	lbls.printLabels();
+	//ShadeShapeRelation ssr;
+	//ssr.spatial_relation(ss,lbls,islandVec);
+}
+
+float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
+	ShapeMatch smatch;
+	ShadeMatch shadematch;
+	this->maxNumOfShades = max(upSS.numOfShades(),dbSS.numOfShades());
+	float upTotalArea = upSS.area();
+	float dbTotalArea = dbSS.area();
+	this->upIslandVec = this->groupIslandsByShape(upSS);
+	this->dbIslandVec = this->groupIslandsByShape(dbSS);
+	this->sortIslandsByArea(this->dbIslandVec);
+	this->sortIslandsByArea(this->upIslandVec);
+	Labels upLabels(this->upIslandVec,upTotalArea,upSS.name());
+	Labels dbLabels(this->dbIslandVec,dbTotalArea,dbSS.name());
+	Labels upLabelsFilled = upLabels;
+	Labels dbLabelsFilled = dbLabels;
+	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
+	float matchVal = this->tr2_match(upSS,dbSS);
+	return matchVal;
+}
+
+float ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
+	float tr1_score = this->tr1_match(upSS,dbSS);
+	float tr2_score = this->tr2_match(upSS,dbSS);
+	float tr_final = tr1_score * tr2_score;
+	if(this->debugMode>=1) {
+		printf("%f * %f = %f\n",tr1_score,tr2_score,tr_final);
+	}
+	FILE * fp;
+	String filename = upSS.name() + "_" + dbSS.name() + "_match_score.txt";
+	fp = fopen(filename.c_str(),"w");
+	fprintf(fp,"%f,%f,%f\n",tr1_score,tr2_score,tr_final);
+	fclose(fp);
+
+	return tr_final;
 }
 
 void ShadeShapeMatch::printLabels(map<String,float> &labels) {
@@ -313,4 +344,8 @@ void ShadeShapeMatch::printLabels(map<String,float> &labels) {
 		cout << it->first << ": " << it->second << endl;
 	}
 	cout << "------------------" << endl;
+}
+
+void ShadeShapeMatch::debug_mode(int mode) {
+	this->debugMode = mode;
 }

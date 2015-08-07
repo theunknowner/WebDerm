@@ -16,22 +16,21 @@ class Islands;
 class Labels : public ShapeMatch{
 private:
 	map<String, pair<int,float> > labelMap;
-	map<String,int> _areaLabels;
-	map<String,float> _relAreaLabels;
 	String labelName;
+	int labelTotalArea;
+	void calcTotalArea();
+
 public:
 	Labels();
 	Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
 	void create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
 	map<String,pair<int,float> >& getLabels();
-	map<String,int>& areaLabels();
-	map<String,float>& relAreaLabels();
+	void setLabels(map<String,pair<int,float> > labels);
 	int area(String label);
 	int area(int num);
-	int totalArea();
+	int& totalArea();
 	float relativeArea(String label);
 	float relativeArea(int num);
-	float totalRelArea();
 	int size();
 	String at(int num);
 	String& name();

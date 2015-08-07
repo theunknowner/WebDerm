@@ -25,7 +25,7 @@ Labels ShadeShapeRelation::mergeLabels(Labels &labels, vector<vector<int> > &srm
 			merged_labels[newLabel].second += it->second.second;
 		}
 	}
-	newLabels.getLabels() = merged_labels;
+	newLabels.setLabels(merged_labels);
 	return newLabels;
 }
 
@@ -157,15 +157,15 @@ float ShadeShapeRelation::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels,
 	auto srmPairUP = this->downScaleSrm(ssrUP,srmUP,upLabels,upMergedLabels);
 	auto srmPairDB = this->downScaleSrm(ssrDB,srmDB,dbLabels,dbMergedLabels);
 	float matchVal = this->srm_match(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);
-	this->writeDownScaleSrm(ssrUP.name(),srmPairUP,upMergedLabels);
-	this->writeDownScaleSrm(ssrDB.name(),srmPairDB,dbMergedLabels);
+	this->writeDownScaleSrm(ssrUP.name(),srmPairUP,upMergedLabels,upLabels.totalArea());
+	this->writeDownScaleSrm(ssrDB.name(),srmPairDB,dbMergedLabels,dbLabels.totalArea());
 	//this->printDownScaleSrm(srm3dUP,upMergedLabels);
 	//cout << "-----------------------" << endl;
 	//this->printDownScaleSrm(srm3dDB,dbMergedLabels);
 	return matchVal;
 }
 
-void ShadeShapeRelation::writeDownScaleSrm(String name, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels) {
+void ShadeShapeRelation::writeDownScaleSrm(String name, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels, int totalArea) {
 	String filename = name + "_downscale_srm.txt";
 	FILE *fp;
 	fp = fopen(filename.c_str(),"w");
@@ -186,6 +186,7 @@ void ShadeShapeRelation::writeDownScaleSrm(String name, pair<vector<vector<vecto
 			}
 		}
 	}
+	fprintf(fp,"TotalArea: %d\n",totalArea);
 	fclose(fp);
 }
 
@@ -221,12 +222,14 @@ void ShadeShapeRelation::importDownScaleSrms(String file, pair<vector<vector<vec
 		vector<String> vec2;
 		int area=0, count=0;
 		while(getline(fs,temp)) {
-			getSubstr(temp,separator,vec);
-			Func::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
-			for(unsigned int i=0; i<vec2.size(); i++) {
-				if(i==0 || i==2) {
-					if(srmLabels.find(vec2.at(i))==srmLabels.end()) {
-						srmLabels[vec2.at(i)] = std::make_pair(1,1.0);
+			if(temp.find("TotalArea")==string::npos) {
+				getSubstr(temp,separator,vec);
+				Func::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
+				for(unsigned int i=0; i<vec2.size(); i++) {
+					if(i==0 || i==2) {
+						if(srmLabels.find(vec2.at(i))==srmLabels.end()) {
+							srmLabels[vec2.at(i)] = std::make_pair(1,1.0);
+						}
 					}
 				}
 			}
@@ -237,23 +240,28 @@ void ShadeShapeRelation::importDownScaleSrms(String file, pair<vector<vector<vec
 		vector<vector<vector<int> > > srmArea(srmLabels.size(),vector<vector<int> >(srmLabels.size(),vector<int>(this->rel_op.size(),0)));
 		while(getline(fs,temp)) {
 			getSubstr(temp,separator,vec);
-			Func::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
-			String labelY = vec2.at(0);
-			String labelX = vec2.at(2);
-			String relOp = vec2.at(1);
-			int area = atoi(vec.at(1).c_str());
-			int count = atoi(vec.at(2).c_str());
-			auto itY = srmLabels.find(labelY);
-			auto itX = srmLabels.find(labelX);
-			int y = distance(srmLabels.begin(),itY);
-			int x = distance(srmLabels.begin(),itX);
-			int relOpIdx = this->getRelOpIndex(relOp);
-			srmCount.at(y).at(x).at(relOpIdx) = count;
-			srmArea.at(y).at(x).at(relOpIdx) = area;
+			if(temp.find("TotalArea")==string::npos) {
+				Func::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
+				String labelY = vec2.at(0);
+				String labelX = vec2.at(2);
+				String relOp = vec2.at(1);
+				int area = atoi(vec.at(1).c_str());
+				int count = atoi(vec.at(2).c_str());
+				auto itY = srmLabels.find(labelY);
+				auto itX = srmLabels.find(labelX);
+				int y = distance(srmLabels.begin(),itY);
+				int x = distance(srmLabels.begin(),itX);
+				int relOpIdx = this->getRelOpIndex(relOp);
+				srmCount.at(y).at(x).at(relOpIdx) = count;
+				srmArea.at(y).at(x).at(relOpIdx) = area;
+			} else {
+				int totalArea = atoi(vec.at(1).c_str());
+				labels.totalArea() = totalArea;
+			}
 		}
 		fs.close();
 		srmPair = std::make_pair(srmCount,srmArea);
-		labels.getLabels() = srmLabels;
+		labels.setLabels(srmLabels);
 	}
 	//this->printDownScaleSrm(srmPair,labels);
 }

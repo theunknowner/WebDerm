@@ -73,21 +73,37 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
+/*
+	String folder = "Looks_Like/";
+	deque<String> files;
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	ShadeShape ss1 = Scripts::script31(argv[1]);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		name = getFileName(name);
+		if(name!=argv[1]) {
+			ShadeShape ss2 = Scripts::script31(name);
+			ShadeShapeMatch ssm;
+			ssm.match(ss1,ss2);
+		}
+	}
+	/**/
 
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	ShadeShapeMatch ssm;
-	//ShadeShape ss1 = Scripts::script31("herpes3");
-	//ssm.test(ss2);
-	float matchVal1 = ssm.test_match(ss1,ss2);
-	float matchVal2 = ssm.match(ss1,ss2);
-	float result = matchVal1 * matchVal2;
-	printf("%f * %f = %f\n",matchVal1,matchVal2,result);
-
-	//ssm.test(ss2);
-	//Islands island = ss1.getIslandWithPoint(Point(50,61));
-	//imwrite("strip.png",island.image());
+	if(argc==4)
+		ssm.debug_mode(atoi(argv[3]));
+	//ssm.match(ss1,ss2);
+	ssm.test_match(ss1,ss2);
+	//float matchVal1 = ssm.test_match(ss1,ss2);
 	/**/
+	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
+	//ShadeShapeMatch ssm;
+	//ssm.test(ss1);
+	//Islands isl = ss1.getIslandWithPoint(Point(93,67));
+	//imwrite("excavated.png",isl.image());
 	//Scripts::script25();
 	//Scripts::script_checkAllTestData();
 	//Scripts::script_createTestDataList();

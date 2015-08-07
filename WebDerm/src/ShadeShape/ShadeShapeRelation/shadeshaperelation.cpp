@@ -105,6 +105,14 @@ vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &la
 													goto jump_out;
 												}
 											}
+											if(relationMatrix.at(index1).at(index2)>=SURR_BY_INV && isl1.area()<isl2.area()) {
+												if(insideIsland2==ENTERED || insideIsland2==INSIDE) {
+													if(prevIslandLabel==label2) insideIsland2=INSIDE;
+													prevIslandLabel = label2;
+													vecWidth.at(index2)++;
+													goto jump_out;
+												}
+											}
 
 										}
 									}// end num2 loop
@@ -137,10 +145,8 @@ vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &la
 					if(relationCount.at(index1).at(index2)>=surroundedThreshUpper) {
 						int area1 = labels.area(index1);
 						int area2 = labels.area(index2);
-						if(area2>area1) {
-							this->relationMatrix.at(index1).at(index2) = SURR_BY;
-							this->relationMatrix.at(index2).at(index1) = SURR_BY_INV;
-						}
+						this->relationMatrix.at(index1).at(index2) = SURR_BY;
+						this->relationMatrix.at(index2).at(index1) = SURR_BY_INV;
 					}
 					if(this->relationCount.at(index1).at(index2)<surroundedThreshUpper) {
 						if(this->relationCount.at(index1).at(index2)>=surroundedThreshLower) {

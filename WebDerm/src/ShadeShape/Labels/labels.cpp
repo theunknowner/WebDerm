@@ -8,10 +8,21 @@
 #include "labels.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
+/************************* PRIVATE FUNCTIONS ****************************/
+
+void Labels::calcTotalArea() {
+	this->labelTotalArea = 0;
+	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
+		this->labelTotalArea += it->second.first;
+	}
+}
+
+/************************* PUBLIC FUNCTIONS *****************************/
 Labels::Labels() {}
 
 Labels::Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name) {
 	this->create(islandVec,totalArea,name);
+	this->calcTotalArea();
 }
 
 void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name) {
@@ -28,8 +39,6 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 					int area = islandVec.at(i).at(j).at(k).area();
 					float relArea = area / totalArea;
 					this->labelMap[label] = std::make_pair(area,relArea);
-					this->_areaLabels[label] = area;
-					this->_relAreaLabels[label] = relArea;
 				} else {
 					cout << "Labels::create(): map<String,pair<int,float> > labelMap duplicate keys!!!" << endl;
 					cout << label << endl;
@@ -44,22 +53,9 @@ map<String,pair<int,float> >& Labels::getLabels() {
 	return this->labelMap;
 }
 
-map<String,int>& Labels::areaLabels() {
-	if(this->_areaLabels.size()!=this->labelMap.size()) {
-		for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
-			this->_areaLabels[it->first] = it->second.first;
-		}
-	}
-	return this->_areaLabels;
-}
-
-map<String,float>& Labels::relAreaLabels() {
-	if(this->_relAreaLabels.size()!=this->labelMap.size()) {
-		for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
-			this->_relAreaLabels[it->first] = it->second.first;
-		}
-	}
-	return this->_relAreaLabels;
+void Labels::setLabels(map<String,pair<int,float> > labels) {
+	this->labelMap = labels;
+	this->calcTotalArea();
 }
 
 int Labels::area(String label) {
@@ -80,12 +76,8 @@ int Labels::area(int num) {
 	return -1;
 }
 
-int Labels::totalArea() {
-	int total=0;
-	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
-		total += it->second.first;
-	}
-	return total;
+int& Labels::totalArea() {
+	return this->labelTotalArea;
 }
 
 float Labels::relativeArea(String label) {
@@ -104,14 +96,6 @@ float Labels::relativeArea(int num) {
 		}
 	}
 	return -1.0;
-}
-
-float Labels::totalRelArea() {
-	float total=0;
-	for(auto it=this->labelMap.begin(); it!=this->labelMap.end(); it++) {
-		total += it->second.second;
-	}
-	return total;
 }
 
 int Labels::size() {
