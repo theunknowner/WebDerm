@@ -158,9 +158,9 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 	int shiftedIndex=0;
 	static int index = 1;
 	if(prevShiftType != shiftType)	index = 1;
-	printf("prevShift: %d, currShift: %d\n",prevShiftType,shiftType);
+	//printf("prevShift: %d, currShift: %d\n",prevShiftType,shiftType);
 	prevShiftType = shiftType;
-	printf("index: %d\n",index);
+	//printf("index: %d\n",index);
 	int n =areaVec.size()-index;
 	index++;
 	if(n>=0) {

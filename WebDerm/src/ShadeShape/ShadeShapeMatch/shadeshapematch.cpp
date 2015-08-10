@@ -148,6 +148,7 @@ void ShadeShapeMatch::fillPropAreaMapGaps(Labels &upLabels, Labels &dbLabels) {
 }
 
 //! dot product using holder's inequality
+//! TR1
 float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 	if(upLabels.size()!=dbLabels.size()) {
 		cout << "ShapeMatch::dotProduct(): upLabels && dbLabels not same size!!!" << endl;
@@ -289,6 +290,16 @@ float ShadeShapeMatch::tr2_match(ShadeShape &upSS, ShadeShape &dbSS) {
 	return matchVal;
 }
 
+float ShadeShapeMatch::tr1(Labels &upLabels, Labels &dbLabels) {
+	float matchVal = this->dotProduct(upLabels,dbLabels);
+	return matchVal;
+}
+
+float ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
+	float matchVal = ssrUP.srm_match(ssrUP,upLabels,ssrDB,dbLabels);
+	return matchVal;
+}
+
 /******************* PUBLIC FUNCTIONS ******************/
 
 void ShadeShapeMatch::test(ShadeShape &ss) {
@@ -312,12 +323,168 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	this->dbIslandVec = this->groupIslandsByShape(dbSS);
 	this->sortIslandsByArea(this->dbIslandVec);
 	this->sortIslandsByArea(this->upIslandVec);
-	Labels upLabels(this->upIslandVec,upTotalArea,upSS.name());
+	Labels upLabels;
 	Labels dbLabels(this->dbIslandVec,dbTotalArea,dbSS.name());
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
-	float matchVal = this->tr2_match(upSS,dbSS);
+
+	map<String,pair<int,float> > upMap; //for printf
+	map<String,pair<int,float> > dbMap;
+	vector<float> resultVec;
+	vector<vector<vector<Islands> > > islandVec2;
+	vector<vector<vector<Islands> > > prevIslandVec2;
+	vector<vector<vector<Islands> > > islandVec3;
+	vector<vector<vector<Islands> > > islandVecTemp;
+	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
+		islandVec2 = this->upIslandVec;
+		ShadeShape newUpSS = upSS;
+		if(ShadeMatch::SHIFT.at(shadeShift)=="SHIFT_NONE") {
+			islandVec2 = this->groupIslandsByShape(newUpSS);
+			this->sortIslandsByArea(islandVec2);
+			upLabels = Labels(islandVec2,newUpSS.area(),newUpSS.name());
+			upLabelsFilled = upLabels;
+			dbLabelsFilled = dbLabels;
+			this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
+			float tr1_score = this->tr1(upLabelsFilled,dbLabelsFilled);
+			ShadeShapeRelation ssrUP;
+			ssrUP.spatial_relation(upSS,upLabels,islandVec3);
+			ShadeShapeRelation ssrDB;
+			ssrDB.spatial_relation(dbSS,dbLabels,this->dbIslandVec);
+			float tr2_score = this->tr2(ssrUP,upLabels,ssrDB,dbLabels);
+			float results = tr1_score * tr2_score;
+			resultVec.push_back(results);
+
+			/*** Debug Print ***/
+			if(this->debugMode>=1) {
+				auto upMap = upLabelsFilled.getLabels();
+				auto dbMap = dbLabelsFilled.getLabels();
+				for(auto itUP=upMap.begin(),itDB=dbMap.begin();itUP!=upMap.end(),itDB!=dbMap.end(); itUP++, itDB++) {
+					//printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second.second,itDB->first.c_str(),itDB->second.second);
+				}
+				printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+				printf("ShapeShift: SHIFT_NONE, ");
+				printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_score,results);
+				cout << "-------------------------" << endl;
+			}
+			/*** End Debug Print ***/
+		}
+		else {
+			vector<float> resultVecTemp;
+			resultVecTemp.push_back(0.0);
+			while(this->shade_translation(newUpSS,shadeShift)) {
+				ShadeShape matchSS;
+				matchSS.extract(newUpSS.image());
+				islandVec2 = this->groupIslandsByShape(matchSS);
+				this->sortIslandsByArea(islandVec2);
+				upLabels = Labels(islandVec2,newUpSS.area(),newUpSS.name());
+				upLabelsFilled = upLabels;
+				dbLabelsFilled = dbLabels;
+				this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
+				float results = this->tr1(upLabelsFilled,dbLabelsFilled);
+
+				/*** Debug Print ***/
+				if(this->debugMode==1) {
+					auto upMap = upLabelsFilled.getLabels();
+					auto dbMap = dbLabelsFilled.getLabels();
+					for(auto itUP=upMap.begin(),itDB=dbMap.begin();itUP!=upMap.end(),itDB!=dbMap.end(); itUP++, itDB++) {
+						//printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second.second,itDB->first.c_str(),itDB->second.second);
+					}
+					printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+					printf("Results: %f\n",results);
+					cout << "-------------------------" << endl;
+				}
+				/*** End Debug Print ***/
+
+				if(results>resultVecTemp.back()) {
+					resultVecTemp.pop_back();
+					resultVecTemp.push_back(results);
+					prevIslandVec2 = islandVec2;
+				}
+				else {
+					islandVec2 = prevIslandVec2;
+					resultVec.push_back(resultVecTemp.back());
+					break;
+				}
+			}
+		}
+		for(unsigned int shapeShift=0; shapeShift<ShapeMatch::SHIFT.size(); shapeShift++) {
+			islandVec3 = islandVec2;
+			if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_NONE") {
+				this->sortIslandsByArea(islandVec3);
+				upLabels = Labels(islandVec3,upTotalArea);
+				dbLabels = Labels(this->dbIslandVec,dbTotalArea);
+				this->fillPropAreaMapGaps(upLabels,dbLabels);
+				float tr1_score = this->tr1(upLabels,dbLabels);
+				ShadeShapeRelation ssrUP;
+				ssrUP.spatial_relation(upSS,upLabels,islandVec3);
+				ShadeShapeRelation ssrDB;
+				ssrDB.spatial_relation(dbSS,dbLabels,this->dbIslandVec);
+				float tr2_score = this->tr2(ssrUP,upLabels,ssrDB,dbLabels);
+				float results = tr1_score * tr2_score;
+				resultVec.push_back(results);
+
+				/*** Debug Print ***/
+				upMap = upLabels.getLabels();
+				dbMap = dbLabels.getLabels();
+				if(this->debugMode>=2) {
+					if(ShadeMatch::SHIFT.at(shadeShift)=="SHIFT_NONE" && ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_NONE") {
+						for(auto itUP=upMap.begin(),itDB=dbMap.begin();itUP!=upMap.end(),itDB!=dbMap.end(); itUP++, itDB++) {
+							//printf("%s: %f | %s: %f\n",itUP->first.c_str(),itUP->second.second,itDB->first.c_str(),itDB->second.second);
+						}
+					}
+					printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+					printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
+					printf("ShapeNum: NULL, ");
+					printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_score,results);
+				}
+				/*** End Debug Print ***/
+			}
+			else {
+				for(unsigned int shapeNum=0; shapeNum<islandVec3.size(); shapeNum++) {
+					islandVecTemp = islandVec3;
+					bool flag = false;
+					if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_LEFT") {
+						if(shapeNum==2 || shapeNum==3 || shapeNum==4 || shapeNum==6) {
+							//printf("ShadeShift: %d, ShapeShift: %d, ShapeNum: %d\n",shadeShift,shapeShift,shapeNum);
+							flag =  this->shape_translation(islandVecTemp,shapeNum,shapeShift);
+						}
+					}
+					if(ShapeMatch::SHIFT.at(shapeShift)=="SHIFT_RIGHT") {
+						if(shapeNum==1 || shapeNum==2 || shapeNum==3 || shapeNum==5) {
+							//printf("ShadeShift: %d, ShapeShift: %d, ShapeNum: %d\n",shadeShift,shapeShift,shapeNum);
+							flag = this->shape_translation(islandVecTemp,shapeNum,shapeShift);
+						}
+					}
+					if(flag==true) {
+						this->sortIslandsByArea(islandVecTemp);
+						upLabels = Labels(islandVecTemp,upTotalArea);
+						dbLabels = Labels(this->dbIslandVec,dbTotalArea);
+						this->fillPropAreaMapGaps(upLabels,dbLabels);
+
+						float tr1_score = this->tr1(upLabels,dbLabels);
+						ShadeShapeRelation ssrUP;
+						ssrUP.spatial_relation(upSS,upLabels,islandVecTemp);
+						ShadeShapeRelation ssrDB;
+						ssrDB.spatial_relation(dbSS,dbLabels,this->dbIslandVec);
+						float tr2_score = this->tr2(ssrUP,upLabels,ssrDB,dbLabels);
+						float results = tr1_score * tr2_score;
+						resultVec.push_back(results);
+
+						if(this->debugMode>=2) {
+							printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
+							printf("ShapeShift: %s, ",ShapeMatch::SHIFT[shapeShift].c_str());
+							printf("ShapeNum: %d, ", shapeNum);
+							printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_score,results);
+						}
+
+					}
+				}//end for loop shapeNum
+			}
+		}
+	}
+
+	float matchVal = *max_element(resultVec.begin(),resultVec.end());
 	return matchVal;
 }
 

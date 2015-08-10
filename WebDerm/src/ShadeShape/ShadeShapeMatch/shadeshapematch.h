@@ -17,6 +17,8 @@
 class ShadeShape;
 class Islands;
 class Labels;
+class ShadeShapeRelation;
+
 class ShadeShapeMatch : public ShapeMatch, public ShadeMatch {
 private:
 	int debugMode = 0;
@@ -32,6 +34,8 @@ private:
 	float dotProduct(Labels &upLabels, Labels &dbLabels);
 	float tr1_match(ShadeShape &upSS, ShadeShape &dbSS);
 	float tr2_match(ShadeShape &upSS, ShadeShape &dbSS);
+	float tr1(Labels &upLabels, Labels &dbLabels);
+	float tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
 public:
 	void test(ShadeShape &ss);
 	float test_match(ShadeShape upSS, ShadeShape dbSS);

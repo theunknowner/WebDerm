@@ -96,7 +96,7 @@ int main(int argc,char** argv)
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
 	//ssm.match(ss1,ss2);
-	ssm.test_match(ss1,ss2);
+	cout << ssm.test_match(ss1,ss2) << endl;
 	//float matchVal1 = ssm.test_match(ss1,ss2);
 	/**/
 	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
