@@ -63,11 +63,12 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test17.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test18.png");
+
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
 	ShadeShapeMatch ssm;
-	ssm.test_match(ss1,ss2);
+	ssm.debug_mode(2);
+	cout << ssm.test_match(ss1,ss2) << endl;
 	//ss2.showInteractiveIslands();
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
@@ -79,17 +80,30 @@ int main(int argc,char** argv)
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	ShadeShape ss1 = Scripts::script31(argv[1]);
+	vector<float> resultVec;
+	vector<String> nameVec;
+	vector<int> origPos;
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = folder + files.at(i);
 		name = getFileName(name);
 		if(name!=argv[1]) {
 			ShadeShape ss2 = Scripts::script31(name);
 			ShadeShapeMatch ssm;
-			ssm.match(ss1,ss2);
+			float matchVal = ssm.match(ss1,ss2);
+			nameVec.push_back(name);
+			resultVec.push_back(matchVal);
 		}
 	}
+	jaysort(resultVec,origPos);
+	String output = std::string(argv[1]) + "_matches_sorted.csv";
+	FILE * fp;
+	fp = fopen(output.c_str(),"w");
+	for(int i=origPos.size()-1; i>=0; i--) {
+		fprintf(fp,"%s,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i));
+	}
+	fclose(fp);
 	/**/
-
+/*
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	ShadeShapeMatch ssm;

@@ -14,7 +14,7 @@ bool TestML::THRESH_IMPORTED = false;
 String TestML::PARAM_PATH = "Thresholds/param.xml";
 
 TestML::TestML() {
-
+	assert(fs::exists(PARAM_PATH)==true);
 }
 
 Mat TestML::getData() {

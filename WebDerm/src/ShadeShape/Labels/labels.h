@@ -35,6 +35,7 @@ public:
 	String at(int num);
 	String& name();
 	void printLabels();
+	static void printCompareLabels(Labels &labels1, Labels &labels2);
 };
 
 #endif /* LABELS_H_ */

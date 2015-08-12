@@ -95,3 +95,19 @@ void jaysort(vector<int> &vec, vector<int> &origPos) {
 	}
 	vec = sortedVec;
 }
+
+//! sorts in ascending order
+void jaysort(vector<float> &vec, vector<int> &origPos) {
+	vector<vector<float> > vec2d(vec.size(),vector<float>(0,0));
+	for(unsigned int i=0; i<vec.size(); i++) {
+		vec2d.at(i).push_back(vec.at(i));
+		vec2d.at(i).push_back(i);
+	}
+	std::sort(vec2d.begin(), vec2d.end(), [](const std::vector< float >& a, const std::vector< float >& b){ return a[0] > b[0]; } );
+	vector<float> sortedVec;
+	for(unsigned int i=0; i<vec2d.size(); i++) {
+		sortedVec.push_back(vec2d.at(i).at(0));
+		origPos.push_back(vec2d.at(i).at(1));
+	}
+	vec = sortedVec;
+}

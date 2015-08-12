@@ -7,8 +7,69 @@
 
 #include "shapematch.h"
 #include "../islands.h"
+#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+
+vector<String> ShapeMatch::shapeNames;
+vector<vector<String> > ShapeMatch::shiftingRules;
+vector<vector<float> > ShapeMatch::shiftingPenalties;
+bool ShapeMatch::THRESH_IMPORTED = false;
 
 /******************* PUBLIC FUNCTIONS ******************/
+
+ShapeMatch::ShapeMatch() {
+	if(!this->THRESH_IMPORTED)
+		this->THRESH_IMPORTED = this->importThresholds();
+}
+
+bool ShapeMatch::importThresholds() {
+	if(!this->THRESH_IMPORTED) {
+		String folderName = "Thresholds/";
+		String filename = folderName+"stt_shifting_rules.csv";
+		String filename2 = folderName+"stt_penalties.csv";
+		assert(fs::exists(filename)==true);
+		assert(fs::exists(filename2)==true);
+		fstream fs(filename);
+		fstream fs2(filename2);
+		if(fs.is_open() && fs2.is_open()) {
+			String temp;
+			vector<String> vec;
+			vector<String> vec2;
+			vector<float> vec3;
+			while(getline(fs,temp)) {
+				getSubstr(temp,',',vec);
+				for(unsigned int i=0; i<vec.size(); i++) {
+					if(i==0) {
+						this->shapeNames.push_back(vec.at(i));
+					} else {
+						vec2.push_back(vec.at(i));
+					}
+				}
+				this->shiftingRules.push_back(vec2);
+				vec2.clear();
+			}
+			getline(fs2,temp);
+			while(getline(fs2,temp)) {
+				getSubstr(temp,',',vec);
+				for(unsigned int i=0; i<vec.size(); i++) {
+					if(i>0) {
+						vec3.push_back(atof(vec.at(i).c_str()));
+					}
+				}
+				this->shiftingPenalties.push_back(vec3);
+				vec3.clear();
+			}
+			assert(this->shapeNames.size()==this->shiftingPenalties.size());
+			assert(this->shapeNames.size()==this->shiftingRules.size());
+			fs.close();
+			fs2.close();
+			return true;
+		} else {
+			cout << "Importing ShapeMatch Thresholds failed!" << endl;
+			return false;
+		}
+	}
+	return true;
+}
 
 // shifts specified shape to the left
 bool ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shiftType) {
@@ -41,6 +102,35 @@ bool ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec,
 			islandVec = newIslandVec;
 			return true;
 		}
+	}
+	return false;
+}
+
+//! shifts specified shape to the left
+//! only shifts the largest shape no matter what shade
+bool ShapeMatch::shape_translation2(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape) {
+	vector<vector<vector<Islands> > > newIslandVec = islandVec;
+	vector<int> areaVec;
+	bool empty = true;
+	for(unsigned int j=0; j<islandVec.at(shapeNum).size(); j++) {
+		if(islandVec.at(shapeNum).at(j).size()>0) {
+			int area = islandVec.at(shapeNum).at(j).front().area();
+			areaVec.push_back(area);
+			empty = false;
+		}
+		else {
+			areaVec.push_back(0);
+		}
+	}
+	if(!empty) {
+		vector<int>::iterator it = max_element(areaVec.begin(),areaVec.end());
+		int max_pos = it - areaVec.begin();
+		int new_shape = newShape;
+		//printf("shape%d: %d | NewShape: %d\n",shapeNum,max_pos,new_shape);
+		newIslandVec.at(new_shape).at(max_pos).push_back(islandVec.at(shapeNum).at(max_pos).front());
+		newIslandVec.at(shapeNum).at(max_pos).erase(newIslandVec.at(shapeNum).at(max_pos).begin());
+		islandVec = newIslandVec;
+		return true;
 	}
 	return false;
 }
@@ -81,9 +171,43 @@ String ShapeMatch::shapeName(int num) {
 	return this->shapeNames.at(num);
 }
 
+int ShapeMatch::getShapeIndex(String shape) {
+	auto it = std::find(ShapeMatch::shapeNames.begin(),ShapeMatch::shapeNames.end(),shape);
+	if(it!=ShapeMatch::shapeNames.end())
+		return distance(ShapeMatch::shapeNames.begin(),it);
+
+	return -1;
+}
+
 //! assigns an island a new shape
 //! does not re-sort by area
 void ShapeMatch::moveShape(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shadeNum, int islNum, int newShape) {
 	islandVec.at(newShape).at(shadeNum).push_back(islandVec.at(shapeNum).at(shadeNum).at(islNum));
 	islandVec.at(shapeNum).at(shadeNum).erase(islandVec.at(shapeNum).at(shadeNum).begin()+islNum);
 }
+
+void ShapeMatch::printRules() {
+	for(unsigned int i=0; i<this->shiftingRules.size(); i++) {
+		printf("%s: ",this->shapeNames.at(i).c_str());
+		for(unsigned int j=0; j<this->shiftingRules.at(i).size(); j++) {
+			printf("%s, ",this->shiftingRules.at(i).at(j).c_str());
+		}
+		printf("\n");
+	}
+}
+
+void ShapeMatch::printPenalties() {
+	for(unsigned int i=0; i<this->shiftingPenalties.size(); i++) {
+		for(unsigned int j=0; j<this->shiftingPenalties.at(i).size(); j++) {
+			printf("%0.2f, ",this->shiftingPenalties.at(i).at(j));
+		}
+		printf("\n");
+	}
+}
+
+float ShapeMatch::applyShiftPenalty(float score, int shapeNum, int shapeNum2) {
+	float penalty = this->shiftingPenalties.at(shapeNum).at(shapeNum2);
+	float newScore = pow(2,penalty);
+	return newScore;
+}
+

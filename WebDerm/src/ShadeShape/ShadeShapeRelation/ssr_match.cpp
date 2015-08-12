@@ -157,8 +157,8 @@ float ShadeShapeRelation::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels,
 	auto srmPairUP = this->downScaleSrm(ssrUP,srmUP,upLabels,upMergedLabels);
 	auto srmPairDB = this->downScaleSrm(ssrDB,srmDB,dbLabels,dbMergedLabels);
 	float matchVal = this->srm_match(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);
-	this->writeDownScaleSrm(ssrUP.name(),srmPairUP,upMergedLabels,upLabels.totalArea());
-	this->writeDownScaleSrm(ssrDB.name(),srmPairDB,dbMergedLabels,dbLabels.totalArea());
+	//this->writeDownScaleSrm(ssrUP.name(),srmPairUP,upMergedLabels,upLabels.totalArea());
+	//this->writeDownScaleSrm(ssrDB.name(),srmPairDB,dbMergedLabels,dbLabels.totalArea());
 	//this->printDownScaleSrm(srm3dUP,upMergedLabels);
 	//cout << "-----------------------" << endl;
 	//this->printDownScaleSrm(srm3dDB,dbMergedLabels);

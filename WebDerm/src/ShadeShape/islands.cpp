@@ -117,8 +117,11 @@ Point Islands::startPt() {
 void Islands::set_island_shade(int shade) {
 	for(int i=0; i<this->islandImg.rows; i++) {
 		for(int j=0; j<this->islandImg.cols; j++) {
-			if(this->islandImg.at<uchar>(i,j)>0)
+			String coords = to_string(j) + "," + to_string(i);
+			if(this->islandImg.at<uchar>(i,j)>0 && this->coordMap.find(coords)!=this->coordMap.end())
 				this->islandImg.at<uchar>(i,j) = shade;
+			else
+				this->islandImg.at<uchar>(i,j) = 0;
 		}
 	}
 	this->islShadeLevel = shade;
