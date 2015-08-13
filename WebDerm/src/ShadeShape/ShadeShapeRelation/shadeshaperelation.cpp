@@ -14,6 +14,7 @@
 /******************** PRIVATE FUNCTIONS **********************/
 
 void ShadeShapeRelation::setup_relationMatrix(Labels &labels) {
+	assert(labels.size()>0);
 	this->relationMatrix.clear();
 	this->relationMatrix.resize(labels.size(),vector<int>(labels.size(),0));
 	this->relationCount.clear();
@@ -139,12 +140,9 @@ vector<vector<int> > ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &la
 						}
 					}
 				}// end theta loop
-
 				//check if island is surrounded by other islands
 				for(unsigned int index2=0; index2<relationCount.at(index1).size(); index2++) {
 					if(relationCount.at(index1).at(index2)>=surroundedThreshUpper) {
-						int area1 = labels.area(index1);
-						int area2 = labels.area(index2);
 						this->relationMatrix.at(index1).at(index2) = SURR_BY;
 						this->relationMatrix.at(index2).at(index1) = SURR_BY_INV;
 					}

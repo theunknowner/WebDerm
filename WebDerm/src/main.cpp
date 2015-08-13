@@ -63,12 +63,14 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-
+/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
 	ShadeShapeMatch ssm;
 	ssm.debug_mode(2);
-	cout << ssm.test_match(ss1,ss2) << endl;
+	//cout << ssm.test_match(ss1,ss2) << endl;
+	vector<float> results = ssm.match2(ss1,ss2);
+	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//ss2.showInteractiveIslands();
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
@@ -80,7 +82,7 @@ int main(int argc,char** argv)
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	ShadeShape ss1 = Scripts::script31(argv[1]);
-	vector<float> resultVec;
+	vector<vector<float> > resultVec;
 	vector<String> nameVec;
 	vector<int> origPos;
 	for(unsigned int i=0; i<files.size(); i++) {
@@ -89,17 +91,19 @@ int main(int argc,char** argv)
 		if(name!=argv[1]) {
 			ShadeShape ss2 = Scripts::script31(name);
 			ShadeShapeMatch ssm;
-			float matchVal = ssm.match(ss1,ss2);
+			if(argc>=3)
+				ssm.debug_mode(atoi(argv[2]));
+			vector<float> results = ssm.match2(ss1,ss2);
 			nameVec.push_back(name);
-			resultVec.push_back(matchVal);
+			resultVec.push_back(results);
 		}
 	}
-	jaysort(resultVec,origPos);
+	jaysort(resultVec,origPos,1);
 	String output = std::string(argv[1]) + "_matches_sorted.csv";
 	FILE * fp;
 	fp = fopen(output.c_str(),"w");
-	for(int i=origPos.size()-1; i>=0; i--) {
-		fprintf(fp,"%s,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i));
+	for(unsigned int i=0; i<resultVec.size(); i++) {
+		fprintf(fp,"%s,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2));
 	}
 	fclose(fp);
 	/**/
@@ -110,7 +114,8 @@ int main(int argc,char** argv)
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
 	//ssm.match(ss1,ss2);
-	cout << ssm.test_match(ss1,ss2) << endl;
+	vector<float> results = ssm.match2(ss1,ss2);
+	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//float matchVal1 = ssm.test_match(ss1,ss2);
 	/**/
 	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
@@ -151,7 +156,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-	/*
+/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;

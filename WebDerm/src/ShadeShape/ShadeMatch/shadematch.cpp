@@ -128,10 +128,12 @@ bool ShadeMatch::shade_translation(vector<vector<vector<Islands> > > &islandVec,
 
 //! continuous shade_translation of islands until shiftType changes
 bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) {
-	if(SHIFT[shiftType]=="SHIFT_NONE")
+	static int prevShiftType = 0;
+	if(SHIFT[shiftType]=="SHIFT_NONE") {
+		prevShiftType = shiftType;
 		return false;
+	}
 
-	static int prevShiftType = -1;
 	static vector<int> areaVec;
 	static vector<int> origPos;
 	static vector<int> indexVec;
@@ -155,37 +157,53 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 		}
 		jaysort(areaVec,origPos);
 	}
-	int shiftedIndex=0;
+	int newShadeInd=0;
 	static int index = 1;
 	if(prevShiftType != shiftType)	index = 1;
-	//printf("prevShift: %d, currShift: %d\n",prevShiftType,shiftType);
+	//printf("prevShift: %s, currShift: %s\n",ShadeMatch::SHIFT[prevShiftType].c_str(),ShadeMatch::SHIFT[shiftType].c_str());
 	prevShiftType = shiftType;
 	//printf("index: %d\n",index);
-	int n =areaVec.size()-index;
+	int n =  areaVec.size()-index;
 	index++;
 	if(n>=0) {
-		int pos = origPos.at(n);
-		int featNum = indexVec2d.at(pos).at(0);
-		int islNum = indexVec2d.at(pos).at(1);
-		int shade = ss.feature(featNum).island(islNum).shade();
-		int shadeInd = ss.getIndexOfShade(shade);
-		if(SHIFT[shiftType] == "SHIFT_LEFT")
-			shiftedIndex = max(shadeInd-shiftAmt,0);
-		if(SHIFT[shiftType] == "SHIFT_RIGHT")
-			shiftedIndex = min(shadeInd+shiftAmt,this->maxNumOfShades-1);
+		try {
+			int pos = origPos.at(n);
+			int featNum = indexVec2d.at(pos).at(0);
+			int islNum = indexVec2d.at(pos).at(1);
+			int shade = ss.feature(featNum).island(islNum).shade();
+			int shadeInd = ss.getIndexOfShade(shade);
+			if(SHIFT[shiftType] == "SHIFT_LEFT")
+				newShadeInd = max(shadeInd-shiftAmt,0);
+			if(SHIFT[shiftType] == "SHIFT_RIGHT")
+				newShadeInd = min(shadeInd+shiftAmt,this->maxNumOfShades-1);
 
-		int newShade = ss.shade(shiftedIndex);
-		Mat shiftedImg(ss.image().size(),ss.image().type(),Scalar(0));
-		for(int i=0; i<ss.numOfFeatures(); i++) {
-			for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
-				if(i==featNum && j==islNum)
-					ss.feature(i).island(j).set_island_shade(newShade);
-				ss.feature(i).island(j).image().copyTo(shiftedImg,ss.feature(i).island(j).image());
+			if(newShadeInd!=shadeInd) {
+				int newShade = ss.shade(newShadeInd);
+				Mat shiftedImg(ss.image().size(),ss.image().type(),Scalar(0));
+				for(int i=0; i<ss.numOfFeatures(); i++) {
+					for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
+						if(i==featNum && j==islNum) {
+							ss.feature(i).island(j).set_island_shade(newShade);
+						}
+						ss.feature(i).island(j).image().copyTo(shiftedImg,ss.feature(i).island(j).image());
+					}
+				}
+				ss.image() = shiftedImg;
 			}
+			return true;
+		} catch (const std::out_of_range &oor) {
+			printf("ShadeMatch::shade_translation() out of range!\n");
+			printf("origPos.size(): %u\n",origPos.size());
+			printf("indexVec2d.size(): %u\n",indexVec2d.size());
+			exit(1);
 		}
-		ss.image() = shiftedImg;
-		return true;
 	}
 	return false;
+}
+
+float ShadeMatch::applyShiftPenalty(float score, int shiftAmt) {
+	float penalty = -0.3 * min(shiftAmt,1); //not permanent
+	float newScore = score * pow(2.0,penalty);
+	return newScore;
 }
 

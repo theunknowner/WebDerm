@@ -30,7 +30,7 @@ public:
 	Islands(Mat islandImg);
 	int area();
 	int& shade();
-	Mat image();
+	Mat& image();
 	int& shape();
 	String& shape_name();
 	Mat& nn_results();

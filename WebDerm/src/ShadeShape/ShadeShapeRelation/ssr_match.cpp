@@ -11,7 +11,7 @@
 
 /**************************** PRIVATE FUNCTIONS ********************************/
 
-Labels ShadeShapeRelation::mergeLabels(Labels &labels, vector<vector<int> > &srm) {
+Labels ShadeShapeRelation::mergeLabels(Labels &labels) {
 	Labels newLabels = labels;
 	map<String,pair<int,float> > labelMap = newLabels.getLabels();
 	map<String,pair<int,float> > merged_labels;
@@ -152,8 +152,8 @@ float ShadeShapeRelation::srm_match(pair<vector<vector<vector<int> > >,vector<ve
 float ShadeShapeRelation::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
 	vector<vector<int> > srmUP = ssrUP.get_srm();
 	vector<vector<int> > srmDB = ssrDB.get_srm();
-	Labels upMergedLabels = this->mergeLabels(upLabels,srmUP);
-	Labels dbMergedLabels = this->mergeLabels(dbLabels,srmDB);
+	Labels upMergedLabels = this->mergeLabels(upLabels);
+	Labels dbMergedLabels = this->mergeLabels(dbLabels);
 	auto srmPairUP = this->downScaleSrm(ssrUP,srmUP,upLabels,upMergedLabels);
 	auto srmPairDB = this->downScaleSrm(ssrDB,srmDB,dbLabels,dbMergedLabels);
 	float matchVal = this->srm_match(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);

@@ -28,7 +28,7 @@ private:
 	void setup_relationMatrix(Labels &labels);
 
 	/************ ssr_match.cpp **************/
-	Labels mergeLabels(Labels &labels, vector<vector<int> > &srm);
+	Labels mergeLabels(Labels &labels);
 	pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> downScaleSrm(ShadeShapeRelation &ssr, vector<vector<int> > &srm,Labels &labels, Labels &mergedLabels);
 	float entropy(int count);
 	float entropy(vector<vector<vector<int> > > srmCountUP,vector<vector<vector<int> > > srmAreaUP, Labels &upLabels, vector<vector<vector<int> > > srmCountDB, vector<vector<vector<int> > > srmAreaDB, Labels &dbLabels);

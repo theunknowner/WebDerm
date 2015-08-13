@@ -38,6 +38,7 @@ public:
 	void test(ShadeShape &ss);
 	float test_match(ShadeShape upSS, ShadeShape dbSS);
 	float match(ShadeShape upSS, ShadeShape dbSS);
+	vector<float> match2(ShadeShape upSS, ShadeShape dbSS);
 	void printLabels(map<String,float> &labels);
 	void debug_mode(int mode);
 };

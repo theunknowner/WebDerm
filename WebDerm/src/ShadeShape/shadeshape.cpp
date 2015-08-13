@@ -217,6 +217,11 @@ void ShadeShape::storeIslandAreas() {
 
 /******************** PUBLIC FUNCTIONS *********************/
 
+ShadeShape::ShadeShape() {}
+
+ShadeShape::ShadeShape(Mat src, String name) {
+	this->extract(src,name);
+}
 //! extracts the features from the image
 void ShadeShape::extract(Mat src, String name) {
 	this->ss_name = getFileName(name);
@@ -309,6 +314,22 @@ void ShadeShape::showInteractiveIslands() {
 	imshow(winName,this->img);
 	waitKey(0);
 }
+
+void ShadeShape::set_island_shade(int featNum, int islNum, int newShade) {
+	Islands &island = this->feature(featNum).island(islNum);
+	for(int i=0; i<island.image().rows; i++) {
+		for(int j=0; j<island.image().cols; j++) {
+			String coords = to_string(j) + "," + to_string(i);
+			if(island.coordinates().find(coords)!=island.coordinates().end() && island.image().at<uchar>(i,j)>0) {
+				this->img.at<uchar>(i,j) = newShade;
+				island.image().at<uchar>(i,j) = newShade;
+			} else {
+				island.image().at<uchar>(i,j) = 0;
+			}
+		}
+	}
+}
+
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
 	Size size(3,3);
 	vector<Point> ptsVec;

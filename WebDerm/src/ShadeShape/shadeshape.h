@@ -35,6 +35,8 @@ private:
 	void storeIslandAreas();
 
 public:
+	ShadeShape();
+	ShadeShape(Mat src, String name="");
 	void extract(Mat src, String name="");
 	Features& feature(int featNum);
 	int numOfFeatures();
@@ -49,6 +51,7 @@ public:
 	Islands getIslandWithPoint(Point pt);
 	int getMaxArea();
 	void showInteractiveIslands();
+	void set_island_shade(int featNum, int islNum, int newShade);
 
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };

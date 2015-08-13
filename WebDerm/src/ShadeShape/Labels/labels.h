@@ -31,7 +31,7 @@ public:
 	int& totalArea();
 	float relativeArea(String label);
 	float relativeArea(int num);
-	int size();
+	size_t size();
 	String at(int num);
 	String& name();
 	void printLabels();

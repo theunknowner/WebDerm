@@ -16,6 +16,7 @@ void jaysort(Mat &src, Mat &pos);
 void jaysort(vector<double> &vec, vector<int> &origPos);
 void jaysort(vector<int> &vec, vector<int> &origPos);
 void jaysort(vector<float> &vec, vector<int> &origPos);
+void jaysort(vector<vector<float> > &vec, vector<int> &origPos, int flag=0);
 
 
 #endif /* JAYSORT_H_ */

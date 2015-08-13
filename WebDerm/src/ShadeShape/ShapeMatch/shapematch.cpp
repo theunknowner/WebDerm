@@ -175,8 +175,10 @@ int ShapeMatch::getShapeIndex(String shape) {
 	auto it = std::find(ShapeMatch::shapeNames.begin(),ShapeMatch::shapeNames.end(),shape);
 	if(it!=ShapeMatch::shapeNames.end())
 		return distance(ShapeMatch::shapeNames.begin(),it);
-
-	return -1;
+	else {
+		printf("ShapeMatch:getShapeIndex() %s does not exist\n",shape.c_str());
+		exit(1);
+	}
 }
 
 //! assigns an island a new shape

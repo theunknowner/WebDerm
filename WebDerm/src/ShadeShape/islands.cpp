@@ -90,7 +90,7 @@ int& Islands::shade() {
 }
 
 //! returns Mat type image of island
-Mat Islands::image() {
+Mat& Islands::image() {
 	return this->islandImg;
 }
 

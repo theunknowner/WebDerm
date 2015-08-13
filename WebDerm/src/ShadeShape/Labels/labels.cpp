@@ -98,7 +98,7 @@ float Labels::relativeArea(int num) {
 	return -1.0;
 }
 
-int Labels::size() {
+size_t Labels::size() {
 	return this->labelMap.size();
 }
 
