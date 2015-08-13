@@ -34,9 +34,9 @@ public:
 	String shapeName(int num);
 	int getShapeIndex(String shape);
 	void moveShape(vector<vector<vector<Islands> > > &islandVec,int shapeNum, int shadeNum, int islNum, int newShape);
-	void printRules();
-	void printPenalties();
-	float applyShiftPenalty(float score, int shapeNum, int shapeNum2);
+	static void printRules();
+	static void printPenalties();
+	static float applyShiftPenalty(float score, int shapeNum, int shapeNum2);
 };
 
 #endif /* SHAPEMATCH_H_ */

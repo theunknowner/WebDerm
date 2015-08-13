@@ -24,8 +24,8 @@ ShapeMatch::ShapeMatch() {
 bool ShapeMatch::importThresholds() {
 	if(!this->THRESH_IMPORTED) {
 		String folderName = "Thresholds/";
-		String filename = folderName+"stt_shifting_rules.csv";
-		String filename2 = folderName+"stt_penalties.csv";
+		String filename = folderName+"shape_shifting_rules.csv";
+		String filename2 = folderName+"shape_penalties.csv";
 		assert(fs::exists(filename)==true);
 		assert(fs::exists(filename2)==true);
 		fstream fs(filename);
@@ -187,27 +187,27 @@ void ShapeMatch::moveShape(vector<vector<vector<Islands> > > &islandVec, int sha
 }
 
 void ShapeMatch::printRules() {
-	for(unsigned int i=0; i<this->shiftingRules.size(); i++) {
-		printf("%s: ",this->shapeNames.at(i).c_str());
-		for(unsigned int j=0; j<this->shiftingRules.at(i).size(); j++) {
-			printf("%s, ",this->shiftingRules.at(i).at(j).c_str());
+	for(unsigned int i=0; i<ShapeMatch::shiftingRules.size(); i++) {
+		printf("%s: ",ShapeMatch::shapeNames.at(i).c_str());
+		for(unsigned int j=0; j<ShapeMatch::shiftingRules.at(i).size(); j++) {
+			printf("%s, ",ShapeMatch::shiftingRules.at(i).at(j).c_str());
 		}
 		printf("\n");
 	}
 }
 
 void ShapeMatch::printPenalties() {
-	for(unsigned int i=0; i<this->shiftingPenalties.size(); i++) {
-		for(unsigned int j=0; j<this->shiftingPenalties.at(i).size(); j++) {
-			printf("%0.2f, ",this->shiftingPenalties.at(i).at(j));
+	for(unsigned int i=0; i<ShapeMatch::shiftingPenalties.size(); i++) {
+		for(unsigned int j=0; j<ShapeMatch::shiftingPenalties.at(i).size(); j++) {
+			printf("%0.2f, ",ShapeMatch::shiftingPenalties.at(i).at(j));
 		}
 		printf("\n");
 	}
 }
 
 float ShapeMatch::applyShiftPenalty(float score, int shapeNum, int shapeNum2) {
-	float penalty = this->shiftingPenalties.at(shapeNum).at(shapeNum2);
-	float newScore = pow(2,penalty);
+	float penalty = ShapeMatch::shiftingPenalties.at(shapeNum).at(shapeNum2);
+	float newScore = score * pow(2.0,penalty);
 	return newScore;
 }
 
