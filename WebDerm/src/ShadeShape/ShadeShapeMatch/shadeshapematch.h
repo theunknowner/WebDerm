@@ -28,8 +28,6 @@ private:
 	vector<vector<vector<Islands> > > groupIslandsByShade(ShadeShape &ss);
 	vector<vector<vector<Islands> > > groupIslandsByShape(ShadeShape &ss);
 	void sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec);
-	vector<vector<vector<String> > > createKeyLabels(vector<vector<vector<Islands> > > &islandVec);
-	std::map<String,float> createPropAreaMap(vector<vector<vector<Islands> > > &islandVec, float totalArea);
 	void fillPropAreaMapGaps(Labels &upLabels, Labels &dbLabels);
 	float dotProduct(Labels &upLabels, Labels &dbLabels);
 	float tr1_match(ShadeShape &upSS, ShadeShape &dbSS);
