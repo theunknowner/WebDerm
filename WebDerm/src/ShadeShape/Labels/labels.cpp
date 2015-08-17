@@ -129,6 +129,7 @@ void Labels::printCompareLabels(Labels &labels1, Labels &labels2) {
 	auto labelMap1 = labels1.getLabels();
 	auto labelMap2 = labels2.getLabels();
 	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
-		printf("%s: %d | %s: %d\n",it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+		int i = distance(labelMap1.begin(),it1);
+		printf("%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
 	}
 }

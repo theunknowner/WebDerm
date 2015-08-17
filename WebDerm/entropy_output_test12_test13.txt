@@ -1,0 +1,10 @@
+[4_Comp_Disc_s0][SURR_BY][4_Comp_Disc_s1]
+CountUP: 4, EntUP: 2.000000, CountDB: 3, EntDB: 1.584962
+EntropyVal: 0.861654
+AreaUP: 8483, AreaDB: 8482
+MaxTotalArea: 8483
+RelArea: 0.999882
+SumOfArea: 8482
+WeightedEntropy: 0.861553
+TotalEntropy: 0.861553
+----------------------------------

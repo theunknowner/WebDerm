@@ -5,13 +5,14 @@
  *      Author: jason
  */
 
+#include "ssr_match.h"
 #include "shadeshaperelation.h"
 #include "../Labels/labels.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
 /**************************** PRIVATE FUNCTIONS ********************************/
 
-Labels ShadeShapeRelation::mergeLabels(Labels &labels) {
+Labels ShadeShapeRelationMatch::mergeLabels(Labels &labels) {
 	Labels newLabels = labels;
 	map<String,pair<int,float> > labelMap = newLabels.getLabels();
 	map<String,pair<int,float> > merged_labels;
@@ -33,7 +34,7 @@ Labels ShadeShapeRelation::mergeLabels(Labels &labels) {
  * counts the relationship between the merged labels
  * along with areas for that relationship
  */
-pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> ShadeShapeRelation::downScaleSrm(ShadeShapeRelation &ssr, vector<vector<int> > &srm, Labels &labels, Labels &mergedLabels) {
+pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> ShadeShapeRelationMatch::downScaleSrm(ShadeShapeRelation &ssr, vector<vector<vector<int> > > &srm, Labels &labels, Labels &mergedLabels) {
 	map<String,pair<int,float> > labelMap = labels.getLabels();
 	map<String,pair<int,float> > merged_labels = mergedLabels.getLabels();
 
@@ -53,7 +54,8 @@ pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> ShadeShapeRela
 			String newLabelX = itX->first.substr(0,itX->first.length()-4);
 			auto itX2 = merged_labels.find(newLabelX);
 			int x2 = distance(merged_labels.begin(),itX2);
-			int rel_op_idx = srm.at(y).at(x);
+			int rel_op_idx = srm.at(y).at(x).at(0);
+			int neighborNum = srm.at(y).at(x).at(1);
 			if(rel_op_idx>0) { //ignores "NULL" relations
 				int areaX = itX->second.first;
 				srmCount3D.at(y2).at(x2).at(rel_op_idx)++;
@@ -72,7 +74,7 @@ pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> ShadeShapeRela
 	return srm3dPair;
 }
 
-float ShadeShapeRelation::entropy(int count) {
+float ShadeShapeRelationMatch::entropy(int count) {
 	if(count==0) {
 		return -1.0;
 	} else {
@@ -81,7 +83,7 @@ float ShadeShapeRelation::entropy(int count) {
 }
 
 //! computes the entropy value for each label
-float ShadeShapeRelation::entropy(vector<vector<vector<int> > > srmCountUP,vector<vector<vector<int> > > srmAreaUP, Labels &upLabels, vector<vector<vector<int> > > srmCountDB, vector<vector<vector<int> > > srmAreaDB, Labels &dbLabels) {
+float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > srmCountUP,vector<vector<vector<vector<int> > > > srmAreaUP, Labels &upLabels, vector<vector<vector<vector<int> > > > srmCountDB, vector<vector<vector<vector<int> > > > srmAreaDB, Labels &dbLabels) {
 	assert(srmCountUP.size()==srmCountDB.size());
 	FILE * fp;
 	String filename = "entropy_output_" + upLabels.name() + "_" + dbLabels.name() + ".txt";
@@ -94,31 +96,56 @@ float ShadeShapeRelation::entropy(vector<vector<vector<int> > > srmCountUP,vecto
 		for(unsigned int j=0; j<srmCountUP.at(i).size(); j++) {
 			String labelUP2 = upLabels.at(j);
 			for(unsigned int k=0; k<srmCountUP.at(i).at(j).size(); k++) {
-				int countUP = srmCountUP.at(i).at(j).at(k);
-				int countDB = srmCountDB.at(i).at(j).at(k);
-				int areaUP = srmAreaUP.at(i).at(j).at(k);
-				int areaDB = srmAreaDB.at(i).at(j).at(k);
 				String relOp = this->rel_op.at(k);
-				if(countUP>0 || countDB>0) {
-					float entropyUP = this->entropy(countUP);
-					float entropyDB = this->entropy(countDB);
-					float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-					float areaVal = min(areaUP,areaDB);
-					float relArea = areaVal / maxTotalArea;
-					float weightedEntropy = relArea * entropyVal;
-					totalEntropy += weightedEntropy;
-					sumOfArea += areaVal;
-					if(weightedEntropy>0) {
-						fprintf(fp,"[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
-						fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-						fprintf(fp,"EntropyVal: %f\n",entropyVal);
-						fprintf(fp,"AreaUP: %d, AreaDB: %d\n",areaUP,areaDB);
-						fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
-						fprintf(fp,"RelArea: %f\n",relArea);
-						fprintf(fp,"SumOfArea: %d\n",sumOfArea);
-						fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
-						fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
-						fprintf(fp,"----------------------------------\n");
+				int totalCountUP = 0, totalCountDB = 0;
+				int totalAreaUP = 0, totalAreaDB = 0;
+				for(int m=0; m<this->relOpLevelSize; m++) {
+					totalCountUP += srmCountUP.at(i).at(j).at(k).at(m);
+					totalCountDB += srmCountDB.at(i).at(j).at(k).at(m);
+					totalAreaUP += srmAreaUP.at(i).at(j).at(k).at(m);
+					totalAreaDB += srmAreaDB.at(i).at(j).at(k).at(m);
+				}
+				for(int m=0; m<this->relOpLevelSize; m++) {
+					int countUP = srmCountUP.at(i).at(j).at(k).at(m);
+					int countDB = srmCountDB.at(i).at(j).at(k).at(m);
+					int areaUP = srmAreaUP.at(i).at(j).at(k).at(m);
+					int areaDB = srmAreaDB.at(i).at(j).at(k).at(m);
+					if(countUP>0 || countDB>0) {
+						float entropyUP = this->entropy(countUP);
+						float entropyDB = this->entropy(countDB);
+						float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
+						float areaValUP = totalAreaUP, areaValDB = totalAreaDB;
+						if(k==SURR_BY) {
+							int level = m<5 ? m : 5;
+							areaValUP = (float)areaUP * ((float)countUP/totalCountUP) * this->rVal[level];
+							areaValDB = (float)areaDB * ((float)countDB/totalCountDB) * this->rVal[level];
+							/*if(i==3 && j==4 && k==4) {
+								//printf("%d: %d : %d : %f : %f\n",m,countUP,areaUP,areaValUP,this->rVal[level]);
+								printf("Level: %d\n",m);
+								printf("CountUP: %d\n",countUP);
+								printf("TotalCountUP: %d\n",totalCountUP);
+								printf("AreaUP: %d\n",areaUP);
+								printf("AreaValUP: %f\n",areaValUP);
+								printf("R: %f\n",this->rVal[level]);
+							}*/
+						}
+						float areaVal = min(areaValUP,areaValDB);
+						float relArea = areaVal / maxTotalArea;
+						float weightedEntropy = relArea * entropyVal;
+						totalEntropy += weightedEntropy;
+						sumOfArea += min(areaUP,areaDB);
+						if(weightedEntropy>0) {
+							fprintf(fp,"[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
+							fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+							fprintf(fp,"EntropyVal: %f\n",entropyVal);
+							fprintf(fp,"AreaUP: %d, AreaDB: %d\n",areaUP,areaDB);
+							fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
+							fprintf(fp,"RelArea: %f\n",relArea);
+							fprintf(fp,"SumOfArea: %d\n",sumOfArea);
+							fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
+							fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
+							fprintf(fp,"----------------------------------\n");
+						}
 					}
 				}
 			}
@@ -131,11 +158,11 @@ float ShadeShapeRelation::entropy(vector<vector<vector<int> > > srmCountUP,vecto
 }
 
 //! computes the entropy value for each label
-float ShadeShapeRelation::entropy(pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPairUP, Labels &upLabels, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPairDB, Labels &dbLabels) {
-	vector<vector<vector<int> > > srmCountUP = srmPairUP.first;
-	vector<vector<vector<int> > > srmAreaUP = srmPairUP.second;
-	vector<vector<vector<int> > > srmCountDB = srmPairDB.first;
-	vector<vector<vector<int> > > srmAreaDB = srmPairDB.second;
+float ShadeShapeRelationMatch::entropy(pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairUP, Labels &upLabels, pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairDB, Labels &dbLabels) {
+	vector<vector<vector<vector<int> > > > srmCountUP = srmPairUP.first;
+	vector<vector<vector<vector<int> > > > srmAreaUP = srmPairUP.second;
+	vector<vector<vector<vector<int> > > > srmCountDB = srmPairDB.first;
+	vector<vector<vector<vector<int> > > > srmAreaDB = srmPairDB.second;
 
 	float totalEntropy = this->entropy(srmCountUP,srmAreaUP,upLabels,srmCountDB,srmAreaDB,dbLabels);
 	return totalEntropy;
@@ -144,18 +171,18 @@ float ShadeShapeRelation::entropy(pair<vector<vector<vector<int> > >,vector<vect
 
 /*************************** PUBLIC FUNCTIONS ***********************************/
 
-float ShadeShapeRelation::srm_match(pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPairUP, Labels &upMergedLabels, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPairDB, Labels &dbMergedLabels) {
+float ShadeShapeRelationMatch::srm_match(pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairUP, Labels &upMergedLabels, pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairDB, Labels &dbMergedLabels) {
 	float matchVal = this->entropy(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);
 	return matchVal;
 }
 
-float ShadeShapeRelation::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
-	vector<vector<int> > srmUP = ssrUP.get_srm();
-	vector<vector<int> > srmDB = ssrDB.get_srm();
+float ShadeShapeRelationMatch::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
+	vector<vector<vector<int> > > srmUP = ssrUP.get_srm();
+	vector<vector<vector<int> > > srmDB = ssrDB.get_srm();
 	Labels upMergedLabels = this->mergeLabels(upLabels);
 	Labels dbMergedLabels = this->mergeLabels(dbLabels);
-	auto srmPairUP = this->downScaleSrm(ssrUP,srmUP,upLabels,upMergedLabels);
-	auto srmPairDB = this->downScaleSrm(ssrDB,srmDB,dbLabels,dbMergedLabels);
+	auto srmPairUP = ssrUP.downScaleSrm(upLabels,upMergedLabels);
+	auto srmPairDB = ssrDB.downScaleSrm(dbLabels,dbMergedLabels);
 	float matchVal = this->srm_match(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);
 	//this->writeDownScaleSrm(ssrUP.name(),srmPairUP,upMergedLabels,upLabels.totalArea());
 	//this->writeDownScaleSrm(ssrDB.name(),srmPairDB,dbMergedLabels,dbLabels.totalArea());
@@ -165,7 +192,7 @@ float ShadeShapeRelation::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels,
 	return matchVal;
 }
 
-void ShadeShapeRelation::writeDownScaleSrm(String name, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels, int totalArea) {
+void ShadeShapeRelationMatch::writeDownScaleSrm(String name, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels, int totalArea) {
 	String filename = name + "_downscale_srm.txt";
 	FILE *fp;
 	fp = fopen(filename.c_str(),"w");
@@ -190,7 +217,7 @@ void ShadeShapeRelation::writeDownScaleSrm(String name, pair<vector<vector<vecto
 	fclose(fp);
 }
 
-void ShadeShapeRelation::printDownScaleSrm(pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels) {
+void ShadeShapeRelationMatch::printDownScaleSrm(pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &mergedLabels) {
 	auto merged_labels = mergedLabels.getLabels();
 	vector<vector<vector<int> > > srmCount = srmPair.first;
 	vector<vector<vector<int> > > srmArea = srmPair.second;
@@ -210,7 +237,7 @@ void ShadeShapeRelation::printDownScaleSrm(pair<vector<vector<vector<int> > >,ve
 	}
 }
 
-void ShadeShapeRelation::importDownScaleSrms(String file, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &labels) {
+void ShadeShapeRelationMatch::importDownScaleSrms(String file, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &labels) {
 	fstream fs(file);
 	if(fs.is_open()) {
 		map<String,pair<int,float> > srmLabels;

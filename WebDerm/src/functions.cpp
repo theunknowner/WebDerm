@@ -276,10 +276,16 @@ deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, i
 vector<vector<float> > frequency(vector<float> vec) {
 	std::map<float,int> freq;
 	for(unsigned int i=0; i<vec.size(); i++) {
-		if(freq.find(vec.at(i))==freq.end())
-			freq[vec.at(i)] = 1;
-		else
-			freq[vec.at(i)]++;
+		try {
+			if(freq.find(vec.at(i))==freq.end())
+				freq[vec.at(i)] = 1;
+			else
+				freq[vec.at(i)]++;
+		} catch (const std::out_of_range &oor) {
+			printf("Functions::frequency() out of range!\n");
+			printf("vec.size() = %lu\n",vec.size());
+			exit(1);
+		}
 	}
 	std::map<float,int>::iterator it;
 	vector<float> vals(2,0);
@@ -293,17 +299,35 @@ vector<vector<float> > frequency(vector<float> vec) {
 }
 
 float majority(vector<float> vec) {
+	assert(vec.size()>0);
 	vector<vector<float> > freq = frequency(vec);
 	float max=0.0;
 	int index=0;
-	for(auto i=0; i<freq.size(); i++) {
-		float num = freq.at(i).at(1);
-		if(num>max) {
-			max = num;
-			index = i;
+	float result = 0.0;
+	for(unsigned int i=0; i<freq.size(); i++) {
+		try {
+			float num = freq.at(i).at(1);
+			if(num>max) {
+				max = num;
+				index = i;
+			}
+		} catch (const std::out_of_range &oor) {
+			printf("Function::majority() out of range!\n");
+			printf("vec.size() = %lu\n",vec.size());
+			printf("freq.size() = %lu\n",freq.size());
+			exit(1);
 		}
 	}
-	return freq.at(index).at(0);
+	try {
+		result = freq.at(index).at(0);
+	} catch (const std::out_of_range &oor) {
+		printf("Function::majority() out of range!\n");
+		printf("vec.size() = %lu\n",vec.size());
+		printf("Index: %d\n",index);
+		printf("freq.size() = %lu\n",freq.size());
+		exit(1);
+	}
+	return result;
 }
 
 namespace Func {

@@ -13,6 +13,7 @@
 #include "../shadeshape.h"
 #include "../ShadeShapeRelation/shadeshaperelation.h"
 #include "../Labels/labels.h"
+#include "../ShadeShapeRelation/ssr_match.h"
 
 /******************* PRIVATE FUNCTIONS ******************/
 
@@ -238,7 +239,8 @@ float ShadeShapeMatch::tr2_match(ShadeShape &upSS, ShadeShape &dbSS) {
 	ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec);
 	ShadeShapeRelation ssrDB;
 	ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec);
-	float matchVal = ssrUP.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
+	ShadeShapeRelationMatch ssrm;
+	float matchVal = ssrm.srm_match(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
 	return matchVal;
 }
 
@@ -249,7 +251,8 @@ float ShadeShapeMatch::tr1(Labels &upLabels, Labels &dbLabels) {
 
 float ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
 	assert(upLabels.size()==dbLabels.size());
-	float matchVal = ssrUP.srm_match(ssrUP,upLabels,ssrDB,dbLabels);
+	ShadeShapeRelationMatch ssrm;
+	float matchVal = ssrm.srm_match(ssrUP,upLabels,ssrDB,dbLabels);
 	return matchVal;
 }
 
@@ -262,8 +265,8 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	this->sortIslandsByArea(islandVec);
 	Labels lbls = Labels(islandVec,totalArea);
 	lbls.printLabels();
-	//ShadeShapeRelation ssr;
-	//ssr.spatial_relation(ss,lbls,islandVec);
+	ShadeShapeRelation ssr;
+	ssr.spatial_relation(ss,lbls,islandVec);
 }
 
 float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
@@ -538,6 +541,7 @@ vector<float> ShadeShapeMatch::match2(ShadeShape upSS, ShadeShape dbSS) {
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
+	Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
 	vector<vector<float> > resultVec;
 	vector<vector<vector<Islands> > > islandVec2;
 	vector<vector<vector<Islands> > > prevIslandVec2;
@@ -563,16 +567,18 @@ vector<float> ShadeShapeMatch::match2(ShadeShape upSS, ShadeShape dbSS) {
 
 				/*** Debug Print ***/
 				if(this->debugMode==1) {
-					Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
 					printf("ShadeShift: %s, ",ShadeMatch::SHIFT[shadeShift].c_str());
 					printf("Results: %f\n",results);
+					Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
 					cout << "-------------------------" << endl;
 				}
 				/*** End Debug Print ***/
-
 				if(results>prevResults) {
 					prevResults = results;
 					prevIslandVec2 = islandVec2;
+				}
+				else if(results==0.0 && prevResults==0.0) {
+					prevResults = results;
 				}
 				else {
 					islandVec2 = prevIslandVec2;

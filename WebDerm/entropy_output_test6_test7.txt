@@ -1,0 +1,10 @@
+[6_Comp_Donut_s0][SURR_BY][6_Comp_Donut_s1]
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+EntropyVal: 1.000000
+AreaUP: 4131, AreaDB: 3618
+MaxTotalArea: 4196
+RelArea: 0.862250
+SumOfArea: 3618
+WeightedEntropy: 0.862250
+TotalEntropy: 0.862250
+----------------------------------
