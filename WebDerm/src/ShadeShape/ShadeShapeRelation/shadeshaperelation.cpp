@@ -174,7 +174,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
 	this->ssr_name = ss.name();
 	this->generate_srm(ss,labels,islandVec);
-	this->writeRelationMatrix(labels,ss.name());
+	//this->writeRelationMatrix(labels,ss.name());
 }
 
 void ShadeShapeRelation::writeRelationMatrix(Labels &labels, String name) {
@@ -247,17 +247,28 @@ pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > >
 			int rel_op_idx = this->relationMatrix.at(y).at(x).at(0);
 			int neighborNum = this->relationMatrix.at(y).at(x).at(1);
 			if(rel_op_idx>0) { //ignores "NULL" relations
-				int areaX = itX->second.first;
-				srmCount4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum)++;
-				if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itX->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
-					srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum) += areaX;
-					srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itX->first] = 1;
+				try {
+					int areaX = itX->second.first;
+					srmCount4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum)++;
+					if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itX->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
+						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum) += areaX;
+						srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itX->first] = 1;
+					}
+					if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itY->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
+						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum)+= areaY;
+						srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itY->first] = 1;
+					}
+				} catch (const std::out_of_range &oor) {
+					printf("ShadeShapeRelation::downScaleSrm() out of range!\n");
+					printf("relationMatrix.size(): %lu\n",this->relationMatrix.size());
+					printf("srmArea4D.size(): %lux%lux%lux%lu\n",srmArea4D.size(),srmArea4D.at(0).size(),srmArea4D.at(0).at(0).size(),srmArea4D.at(0).at(0).at(0).size());
+					printf("srmCount4D.size(): %lux%lux%lux%lu\n",srmCount4D.size(),srmCount4D.at(0).size(),srmCount4D.at(0).at(0).size(),srmCount4D.at(0).at(0).at(0).size());
+					printf("y: %d, x: %d\n",y,x);
+					printf("y2: %d, x2: %d\n",y2,x2);
+					printf("rel_op_idx: %d\n",rel_op_idx);
+					printf("neighborNum: %d\n",neighborNum);
+					exit(1);
 				}
-				if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itY->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
-					srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum)+= areaY;
-					srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itY->first] = 1;
-				}
-
 			}
 		}
 	}

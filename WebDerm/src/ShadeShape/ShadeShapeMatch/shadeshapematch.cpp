@@ -541,7 +541,8 @@ vector<float> ShadeShapeMatch::match2(ShadeShape upSS, ShadeShape dbSS) {
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillPropAreaMapGaps(upLabelsFilled,dbLabelsFilled);
-	Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
+	//Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
+	//cout << "--------------------------" << endl;
 	vector<vector<float> > resultVec;
 	vector<vector<vector<Islands> > > islandVec2;
 	vector<vector<vector<Islands> > > prevIslandVec2;
@@ -672,6 +673,7 @@ vector<float> ShadeShapeMatch::match2(ShadeShape upSS, ShadeShape dbSS) {
 			}
 		}
 	}
+	Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB);
 	ShadeShapeRelation ssrUP;
 	ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec);
 	ShadeShapeRelation ssrDB;

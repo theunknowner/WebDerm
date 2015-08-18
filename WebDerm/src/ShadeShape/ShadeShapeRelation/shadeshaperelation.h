@@ -17,7 +17,7 @@ class Labels;
 class ShadeShapeRelation : public ShapeMatch{
 
 protected:
-	const int relOpLevelSize = 10;
+	const int relOpLevelSize = 50;
 	vector<String> rel_op = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};
 	enum{NONE=0, INDIR=1, DIR=2, SURR_BY_INV=3, SURR_BY=4};
 	enum{ENTERED, INSIDE, OUTSIDE, EXITED};

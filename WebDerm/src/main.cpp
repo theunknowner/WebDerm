@@ -63,12 +63,12 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test12.png");
+/*
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test19.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	ssm.debug_mode(2);
+	//ssm.debug_mode(2);
 	//cout << ssm.test_match(ss1,ss2) << endl;
 	vector<float> results = ssm.match2(ss1,ss2);
 	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
@@ -77,11 +77,11 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script31("herpes3");
-	Islands island = ss1.getIslandWithPoint(Point(54,15));
+/*
+	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
+	Islands island = ss1.getIslandWithPoint(Point(91,52));
 	imwrite("strip.png",island.image());
-
+/**/
 /*
 	String folder = "Looks_Like/";
 	deque<String> files;
@@ -114,7 +114,6 @@ int main(int argc,char** argv)
 	fclose(fp);
 	/**/
 
-/*
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	ShadeShapeMatch ssm;

@@ -1,0 +1,44 @@
+[4_Comp_Disc_s1][SURR_BY][6_Comp_Donut_s0]: Lv 1
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+TotalCountUP: 1, TotalCountDB: 1
+EntropyVal: 1.000000
+AreaUP: 960, AreaDB: 960
+MaxTotalArea: 5301
+RelArea: 0.181098
+SumOfArea: 960
+WeightedEntropy: 0.181098
+TotalEntropy: 0.181098
+----------------------------------
+[4_Comp_Disc_s1][SURR_BY][6_Comp_Donut_s2]: Lv 1
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+TotalCountUP: 2, TotalCountDB: 2
+EntropyVal: 1.000000
+AreaUP: 2735, AreaDB: 2735
+MaxTotalArea: 5301
+RelArea: 0.257970
+SumOfArea: 3695
+WeightedEntropy: 0.257970
+TotalEntropy: 0.439068
+----------------------------------
+[4_Comp_Disc_s1][SURR_BY][6_Comp_Donut_s2]: Lv 2
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+TotalCountUP: 1, TotalCountDB: 1
+EntropyVal: 1.000000
+AreaUP: 1653, AreaDB: 1653
+MaxTotalArea: 5301
+RelArea: 0.196452
+SumOfArea: 5348
+WeightedEntropy: 0.196452
+TotalEntropy: 0.635520
+----------------------------------
+[6_Comp_Donut_s0][SURR_BY][6_Comp_Donut_s2]: Lv 1
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+TotalCountUP: 2, TotalCountDB: 2
+EntropyVal: 1.000000
+AreaUP: 2061, AreaDB: 2061
+MaxTotalArea: 5301
+RelArea: 0.194397
+SumOfArea: 7409
+WeightedEntropy: 0.194397
+TotalEntropy: 0.829917
+----------------------------------
