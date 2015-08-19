@@ -95,7 +95,7 @@ void getSubstr(String str, char delimiter, deque<String> &vec)
 	int j=0;
 	for(unsigned int i=0; i<str.size(); i++)
 	{
-		if(str[i]==delimiter && i>j)
+		if(str[i]==delimiter && i>=j)
 		{
 			temp = str.substr(j,(i-j));
 			vec.push_back(temp.c_str());
@@ -120,7 +120,7 @@ void getSubstr(String str, char delimiter, vector<String> &vec)
 	int j=0;
 	for(unsigned int i=0; i<str.size(); i++)
 	{
-		if(str[i]==delimiter && i>j)
+		if(str[i]==delimiter && i>=j)
 		{
 			temp = str.substr(j,(i-j));
 			vec.push_back(temp.c_str());

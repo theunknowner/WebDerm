@@ -1,0 +1,5 @@
+0) 4_Comp_Disc_s0_000: 313 | 4_Comp_Disc_s0_000: 313
+1) 4_Comp_Disc_s0_001: 269 | 4_Comp_Disc_s0_001: 226
+2) 4_Comp_Disc_s0_002: 226 | 4_Comp_Disc_s0_002: 224
+3) 4_Comp_Disc_s0_003: 224 | 4_Comp_Disc_s0_003: 0
+4) 4_Comp_Disc_s1_000: 7451 | 4_Comp_Disc_s1_000: 7719

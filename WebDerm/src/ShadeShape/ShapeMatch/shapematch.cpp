@@ -38,10 +38,12 @@ bool ShapeMatch::importThresholds() {
 			while(getline(fs,temp)) {
 				getSubstr(temp,',',vec);
 				for(unsigned int i=0; i<vec.size(); i++) {
-					if(i==0) {
-						this->shapeNames.push_back(vec.at(i));
-					} else {
-						vec2.push_back(vec.at(i));
+					if(vec.at(i)!="") {
+						if(i==0) {
+							this->shapeNames.push_back(vec.at(i));
+						} else {
+							vec2.push_back(vec.at(i));
+						}
 					}
 				}
 				this->shiftingRules.push_back(vec2);

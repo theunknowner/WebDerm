@@ -37,7 +37,7 @@ public:
 	vector<vector<vector<int> > >& get_srm();
 	String name();
 	int getRelOpIndex(String relOp);
-	pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> downScaleSrm(Labels &labels, Labels &mergedLabels);
+	pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int,int>> > > >> downScaleSrm(Labels &labels, Labels &mergedLabels);
 };
 
 #endif /* SHADESHAPERELATION_H_ */

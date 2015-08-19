@@ -30,50 +30,6 @@ Labels ShadeShapeRelationMatch::mergeLabels(Labels &labels) {
 	return newLabels;
 }
 
-/* merges labels with the same shape and shade and
- * counts the relationship between the merged labels
- * along with areas for that relationship
- */
-pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> ShadeShapeRelationMatch::downScaleSrm(ShadeShapeRelation &ssr, vector<vector<vector<int> > > &srm, Labels &labels, Labels &mergedLabels) {
-	map<String,pair<int,float> > labelMap = labels.getLabels();
-	map<String,pair<int,float> > merged_labels = mergedLabels.getLabels();
-
-	vector<vector<vector<int> > >  srmCount3D(merged_labels.size(),vector<vector<int> >(merged_labels.size(),vector<int>(this->rel_op.size(),0)));
-	vector<vector<vector<int> > > srmArea3D(merged_labels.size(),vector<vector<int> >(merged_labels.size(),vector<int>(this->rel_op.size(),0)));
-	vector<vector<vector<map<String,int>> > > srmMarkMap(merged_labels.size(),vector<vector<map<String,int>> >(merged_labels.size(),vector<map<String,int>>(this->rel_op.size(),map<String,int>())));
-	for(auto itY=labelMap.begin(); itY!=labelMap.end(); itY++) {
-		int y = distance(labelMap.begin(),itY);
-		String newLabelY = itY->first.substr(0,itY->first.length()-4);
-		auto itY2 = merged_labels.find(newLabelY);
-		int y2 = distance(merged_labels.begin(),itY2);
-		int areaY = itY->second.first;
-		auto itX = itY;
-		itX++;
-		for(; itX!=labelMap.end(); itX++) {
-			int x = distance(labelMap.begin(), itX);
-			String newLabelX = itX->first.substr(0,itX->first.length()-4);
-			auto itX2 = merged_labels.find(newLabelX);
-			int x2 = distance(merged_labels.begin(),itX2);
-			int rel_op_idx = srm.at(y).at(x).at(0);
-			int neighborNum = srm.at(y).at(x).at(1);
-			if(rel_op_idx>0) { //ignores "NULL" relations
-				int areaX = itX->second.first;
-				srmCount3D.at(y2).at(x2).at(rel_op_idx)++;
-				if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).find(itX->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).end()) {
-					srmArea3D.at(y2).at(x2).at(rel_op_idx) += areaX;
-					srmMarkMap.at(y2).at(x2).at(rel_op_idx)[itX->first] = 1;
-				}
-				if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).find(itY->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).end()) {
-					srmArea3D.at(y2).at(x2).at(rel_op_idx) += areaY;
-					srmMarkMap.at(y2).at(x2).at(rel_op_idx)[itY->first] = 1;
-				}
-			}
-		}
-	}
-	auto srm3dPair = std::make_pair(srmCount3D,srmArea3D);
-	return srm3dPair;
-}
-
 float ShadeShapeRelationMatch::entropy(int count) {
 	if(count==0) {
 		return -1.0;
@@ -83,7 +39,7 @@ float ShadeShapeRelationMatch::entropy(int count) {
 }
 
 //! computes the entropy value for each label
-float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > srmCountUP,vector<vector<vector<vector<int> > > > srmAreaUP, Labels &upLabels, vector<vector<vector<vector<int> > > > srmCountDB, vector<vector<vector<vector<int> > > > srmAreaDB, Labels &dbLabels) {
+float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > srmCountUP,vector<vector<vector<vector<pair<int,int>> > > > srmAreaUP, Labels &upLabels, vector<vector<vector<vector<int> > > > srmCountDB, vector<vector<vector<vector<pair<int,int>> > > > srmAreaDB, Labels &dbLabels) {
 	assert(srmCountUP.size()==srmCountDB.size());
 	FILE * fp;
 	String filename = "entropy_output_" + upLabels.name() + "_" + dbLabels.name() + ".txt";
@@ -105,45 +61,51 @@ float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > sr
 						totalAreaUP = 0; totalAreaDB = 0;
 						int countUP = srmCountUP.at(i).at(j).at(k).at(m);
 						int countDB = srmCountDB.at(i).at(j).at(k).at(m);
-						int areaUP = srmAreaUP.at(i).at(j).at(k).at(m);
-						int areaDB = srmAreaDB.at(i).at(j).at(k).at(m);
+						int areaUP1 = srmAreaUP.at(i).at(j).at(k).at(m).first;
+						int areaUP2 = srmAreaUP.at(i).at(j).at(k).at(m).second;
+						int areaDB1 = srmAreaDB.at(i).at(j).at(k).at(m).first;
+						int areaDB2 = srmAreaDB.at(i).at(j).at(k).at(m).second;
 						if(countUP>0 || countDB>0) {
-							if(k==SURR_BY) {
-								for(unsigned int y=0; y<srmCountUP.size(); y++) {
-									totalCountUP += srmCountUP.at(y).at(j).at(k).at(m);
-									totalCountDB += srmCountDB.at(y).at(j).at(k).at(m);
-									totalAreaUP += srmAreaUP.at(y).at(j).at(k).at(m);
-									totalAreaDB += srmAreaDB.at(y).at(j).at(k).at(m);
-								}
-							}
-							if(k==SURR_BY_INV) {
-								for(unsigned int x=0; x<srmCountUP.size(); x++) {
-									totalCountUP += srmCountUP.at(i).at(x).at(k).at(m);
-									totalCountDB += srmCountDB.at(i).at(x).at(k).at(m);
-									totalAreaUP += srmAreaUP.at(i).at(x).at(k).at(m);
-									totalAreaDB += srmAreaDB.at(i).at(x).at(k).at(m);
-								}
-							}
 							float entropyUP = this->entropy(countUP);
 							float entropyDB = this->entropy(countDB);
 							float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
 							float areaValUP = totalAreaUP, areaValDB = totalAreaDB;
 							int level = m<5 ? m : 5;
-							areaValUP = (float)areaUP * ((float)countUP/totalCountUP) * this->rVal[level];
-							areaValDB = (float)areaDB * ((float)countDB/totalCountDB) * this->rVal[level];
+
+							if(k==SURR_BY) {
+								for(unsigned int y=0; y<srmCountUP.size(); y++) {
+									totalCountUP += srmCountUP.at(y).at(j).at(k).at(m);
+									totalCountDB += srmCountDB.at(y).at(j).at(k).at(m);
+									totalAreaUP += srmAreaUP.at(y).at(j).at(k).at(m).first;
+									totalAreaDB += srmAreaDB.at(y).at(j).at(k).at(m).first;
+								}
+								areaValUP = ((float)areaUP1 + ((float)areaUP2 * ((float)areaUP1/totalAreaUP))) * this->rVal[level];
+								areaValDB = ((float)areaDB1 + ((float)areaDB2 * ((float)areaDB1/totalAreaDB))) * this->rVal[level];
+							}
+							if(k==SURR_BY_INV) {
+								for(unsigned int x=0; x<srmCountUP.size(); x++) {
+									totalCountUP += srmCountUP.at(i).at(x).at(k).at(m);
+									totalCountDB += srmCountDB.at(i).at(x).at(k).at(m);
+									totalAreaUP += srmAreaUP.at(i).at(x).at(k).at(m).second ;
+									totalAreaDB += srmAreaDB.at(i).at(x).at(k).at(m).second;
+								}
+								areaValUP = (float)areaUP2 + ((float)areaUP1 * ((float)areaUP2/totalAreaUP) * this->rVal[level]);
+								areaValDB = (float)areaDB2 + ((float)areaDB1 * ((float)areaDB2/totalAreaDB) * this->rVal[level]);
+							}
 							if(std::isnan(areaValUP)) areaValUP=0;
 							if(std::isnan(areaValDB)) areaValDB=0;
 							float areaVal = min(areaValUP,areaValDB);
 							float relArea = areaVal / maxTotalArea;
 							float weightedEntropy = relArea * entropyVal;
 							totalEntropy += weightedEntropy;
-							sumOfArea += min(areaUP,areaDB);
+							sumOfArea += min(areaValUP,areaValDB);
 							if(weightedEntropy>=0) {
 								fprintf(fp,"[%s][%s][%s]: Lv %d\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str(),m);
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp,"AreaUP: %d, AreaDB: %d\n",areaUP,areaDB);
+								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								fprintf(fp,"TotalAreaUP: %d, TotalAreaDB: %d\n",totalAreaUP,totalAreaDB);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"SumOfArea: %d\n",sumOfArea);
@@ -154,11 +116,40 @@ float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > sr
 						}
 					}
 				} else {
+					if(k==DIR) {
+						int totalAreaUP1=0, totalAreaUP2=0, totalAreaDB1=0, totalAreaDB2=0;
+						for(int m=0; m<this->relOpLevelSize; m++) {
+							totalCountUP += srmCountUP.at(i).at(j).at(k).at(m);
+							totalCountDB += srmCountDB.at(i).at(j).at(k).at(m);
+							totalAreaUP1 += srmAreaUP.at(i).at(j).at(k).at(m).first;
+							totalAreaUP2 += srmAreaUP.at(i).at(j).at(k).at(m).second;
+							totalAreaDB1 += srmAreaDB.at(i).at(j).at(k).at(m).first;
+							totalAreaDB2 += srmAreaDB.at(i).at(j).at(k).at(m).second;
+						}
+						if(totalAreaUP1>totalAreaUP2) {
+
+						}
+						for(int m=0; m<this->relOpLevelSize; m++) {
+							int countUP = srmCountUP.at(i).at(j).at(k).at(m);
+							int countDB = srmCountDB.at(i).at(j).at(k).at(m);
+							int areaUP1 = srmAreaUP.at(i).at(j).at(k).at(m).first;
+							int areaUP2 = srmAreaUP.at(i).at(j).at(k).at(m).second;
+							int areaDB1 = srmAreaDB.at(i).at(j).at(k).at(m).first;
+							int areaDB2 = srmAreaDB.at(i).at(j).at(k).at(m).second;
+							if(areaUP1>areaUP2) {
+								for(int x=0; x<srmAreaUP.size(); x++) {
+									for(int n=0; n<this->relOpLevelSize; n++) {
+										totalAreaUP += srmAreaUP.at(i).at(x).at(k).at(n);
+									}
+								}
+							}
+						}
+					}
 					for(int m=0; m<this->relOpLevelSize; m++) {
 						totalCountUP += srmCountUP.at(i).at(j).at(k).at(m);
 						totalCountDB += srmCountDB.at(i).at(j).at(k).at(m);
-						totalAreaUP += srmAreaUP.at(i).at(j).at(k).at(m);
-						totalAreaDB += srmAreaDB.at(i).at(j).at(k).at(m);
+						totalAreaUP += srmAreaUP.at(i).at(j).at(k).at(m).first + srmAreaUP.at(i).at(j).at(k).at(m).second;
+						totalAreaDB += srmAreaDB.at(i).at(j).at(k).at(m).first + srmAreaDB.at(i).at(j).at(k).at(m).second;
 					}
 					if(totalCountUP>0 || totalCountDB>0) {
 						float entropyUP = this->entropy(totalCountUP);
@@ -193,11 +184,11 @@ float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > sr
 }
 
 //! computes the entropy value for each label
-float ShadeShapeRelationMatch::entropy(pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairUP, Labels &upLabels, pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairDB, Labels &dbLabels) {
+float ShadeShapeRelationMatch::entropy(pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int,int>> > > >> &srmPairUP, Labels &upLabels, pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int,int>> > > >> &srmPairDB, Labels &dbLabels) {
 	vector<vector<vector<vector<int> > > > srmCountUP = srmPairUP.first;
-	vector<vector<vector<vector<int> > > > srmAreaUP = srmPairUP.second;
+	vector<vector<vector<vector<pair<int,int>> > > > srmAreaUP = srmPairUP.second;
 	vector<vector<vector<vector<int> > > > srmCountDB = srmPairDB.first;
-	vector<vector<vector<vector<int> > > > srmAreaDB = srmPairDB.second;
+	vector<vector<vector<vector<pair<int,int>> > > > srmAreaDB = srmPairDB.second;
 
 	float totalEntropy = this->entropy(srmCountUP,srmAreaUP,upLabels,srmCountDB,srmAreaDB,dbLabels);
 	return totalEntropy;
@@ -206,7 +197,7 @@ float ShadeShapeRelationMatch::entropy(pair<vector<vector<vector<vector<int> > >
 
 /*************************** PUBLIC FUNCTIONS ***********************************/
 
-float ShadeShapeRelationMatch::srm_match(pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairUP, Labels &upMergedLabels, pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> &srmPairDB, Labels &dbMergedLabels) {
+float ShadeShapeRelationMatch::srm_match(pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int,int>> > > >> &srmPairUP, Labels &upMergedLabels, pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int,int>> > > >> &srmPairDB, Labels &dbMergedLabels) {
 	float matchVal = this->entropy(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);
 	return matchVal;
 }

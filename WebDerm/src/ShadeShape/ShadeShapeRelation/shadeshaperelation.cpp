@@ -223,13 +223,13 @@ int ShadeShapeRelation::getRelOpIndex(String relOp) {
  * counts the relationship between the merged labels
  * along with areas for that relationship
  */
-pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > > >> ShadeShapeRelation::downScaleSrm(Labels &labels, Labels &mergedLabels) {
+pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int,int>> > > >> ShadeShapeRelation::downScaleSrm(Labels &labels, Labels &mergedLabels) {
 	map<String,pair<int,float> > labelMap = labels.getLabels();
 	map<String,pair<int,float> > merged_labels = mergedLabels.getLabels();
 
 	vector<vector<vector<vector<map<String,int>> > > > srmMarkMap(merged_labels.size(),vector<vector<vector<map<String,int>> > >(merged_labels.size(),vector<vector<map<String,int>> >(this->rel_op.size(),vector<map<String,int>>(relOpLevelSize,map<String,int>()))));
 	vector<vector<vector<vector<int> > > > srmCount4D = Func::createVector4D(merged_labels.size(),merged_labels.size(),this->rel_op.size(),relOpLevelSize,0);
-	vector<vector<vector<vector<int> > > > srmArea4D = Func::createVector4D(merged_labels.size(),merged_labels.size(),this->rel_op.size(),relOpLevelSize,0);
+	vector<vector<vector<vector<pair<int,int>> > > > srmArea4D(merged_labels.size(),vector<vector<vector<pair<int,int>> > >(merged_labels.size(),vector<vector<pair<int,int>> >(this->rel_op.size(),vector<pair<int,int>>(relOpLevelSize,std::make_pair(0,0)))));
 
 	for(auto itY=labelMap.begin(); itY!=labelMap.end(); itY++) {
 		int y = distance(labelMap.begin(),itY);
@@ -251,11 +251,11 @@ pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<int> > >
 					int areaX = itX->second.first;
 					srmCount4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum)++;
 					if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itX->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
-						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum) += areaX;
+						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum).second += areaX;
 						srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itX->first] = 1;
 					}
 					if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itY->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
-						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum)+= areaY;
+						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum).first += areaY;
 						srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itY->first] = 1;
 					}
 				} catch (const std::out_of_range &oor) {
