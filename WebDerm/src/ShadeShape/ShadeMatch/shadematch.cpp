@@ -15,8 +15,8 @@
 
 /*************** PUBLIC FUNCTIONS ********************/
 
-void ShadeMatch::setMaxNumOfShades(int num) {
-	this->maxNumOfShades = num;
+void ShadeMatch::setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2) {
+	this->maxNumOfShades = max(shadeVec1.size(),shadeVec2.size());
 }
 
 bool ShadeMatch::shade_translation(vector<vector<vector<Islands> > > &islandVec, float thresh, int shiftType, int shiftAmt) {
@@ -166,19 +166,21 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 	int n =  areaVec.size()-index;
 	index++;
 	if(n>=0) {
+		int pos=0,featNum=0,islNum=0,shade=0,shadeInd=0;
+		int newShade=0;
 		try {
-			int pos = origPos.at(n);
-			int featNum = indexVec2d.at(pos).at(0);
-			int islNum = indexVec2d.at(pos).at(1);
-			int shade = ss.feature(featNum).island(islNum).shade();
-			int shadeInd = ss.getIndexOfShade(shade);
+			pos = origPos.at(n);
+			featNum = indexVec2d.at(pos).at(0);
+			islNum = indexVec2d.at(pos).at(1);
+			shade = ss.feature(featNum).island(islNum).shade();
+			shadeInd = ss.getIndexOfShade(shade);
 			if(SHIFT[shiftType] == "SHIFT_LEFT")
 				newShadeInd = max(shadeInd-shiftAmt,0);
 			if(SHIFT[shiftType] == "SHIFT_RIGHT")
 				newShadeInd = min(shadeInd+shiftAmt,this->maxNumOfShades-1);
 
 			if(newShadeInd!=shadeInd) {
-				int newShade = ss.shade(newShadeInd);
+				newShade = ss.shade(newShadeInd);
 				Mat shiftedImg(ss.image().size(),ss.image().type(),Scalar(0));
 				for(int i=0; i<ss.numOfFeatures(); i++) {
 					for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
@@ -193,8 +195,16 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 			return true;
 		} catch (const std::out_of_range &oor) {
 			printf("ShadeMatch::shade_translation() out of range!\n");
-			printf("origPos.size(): %u\n",origPos.size());
-			printf("indexVec2d.size(): %u\n",indexVec2d.size());
+			printf("%s\n",SHIFT[shiftType].c_str());
+			printf("origPos.size(): %lu\n",origPos.size());
+			printf("indexVec2d.size(): %lu\n",indexVec2d.size());
+			printf("n: %d\n",n);
+			printf("pos: %d\n",pos);
+			printf("shade: %d\n",shade);
+			printf("shadeInd: %d\n",shadeInd);
+			printf("newShadeInd: %d\n",newShadeInd);
+			printf("newShade:%d\n",newShade);
+			printf("maxNumOfShades: %d\n",this->maxNumOfShades);
 			exit(1);
 		}
 	}

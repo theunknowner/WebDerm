@@ -1,8 +1,0 @@
-0) 3_Incomp_Disc_s0_000: 0 | 3_Incomp_Disc_s0_000: 86
-1) 4_Comp_Disc_s0_000: 0 | 4_Comp_Disc_s0_000: 86
-2) 4_Comp_Disc_s0_001: 0 | 4_Comp_Disc_s0_001: 57
-3) 4_Comp_Disc_s1_000: 394 | 4_Comp_Disc_s1_000: 394
-4) 4_Comp_Disc_s1_001: 276 | 4_Comp_Disc_s1_001: 276
-5) 6_Comp_Donut_s0_000: 684 | 6_Comp_Donut_s0_000: 684
-6) 6_Comp_Donut_s2_000: 2341 | 6_Comp_Donut_s2_000: 2341
-7) 6_Comp_Donut_s2_001: 1377 | 6_Comp_Donut_s2_001: 1377

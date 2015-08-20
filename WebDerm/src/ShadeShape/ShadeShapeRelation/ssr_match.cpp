@@ -46,7 +46,7 @@ float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > sr
 	fp = fopen(filename.c_str(),"w");
 	float totalEntropy = 0.0;
 	int maxTotalArea = max(upLabels.totalArea(),dbLabels.totalArea());
-	int sumOfArea=0;
+	float sumOfArea=0.0;
 	for(unsigned int i=0; i<srmCountUP.size(); i++) {
 		String labelUP1 = upLabels.at(i);
 		for(unsigned int j=0; j<srmCountUP.at(i).size(); j++) {
@@ -108,7 +108,7 @@ float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > sr
 								fprintf(fp,"TotalAreaUP: %d, TotalAreaDB: %d\n",totalAreaUP,totalAreaDB);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"SumOfArea: %d\n",sumOfArea);
+								fprintf(fp,"SumOfArea: %f\n",sumOfArea);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
 								fprintf(fp,"----------------------------------\n");
@@ -117,60 +117,108 @@ float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > sr
 					}
 				} else {
 					if(k==DIR) {
-						int totalAreaUP1=0, totalAreaUP2=0, totalAreaDB1=0, totalAreaDB2=0;
+						int countUP=0, countDB=0;
+						int areaUP1=0, areaUP2=0, areaDB1 = 0, areaDB2=0;
 						for(int m=0; m<this->relOpLevelSize; m++) {
-							totalCountUP += srmCountUP.at(i).at(j).at(k).at(m);
-							totalCountDB += srmCountDB.at(i).at(j).at(k).at(m);
-							totalAreaUP1 += srmAreaUP.at(i).at(j).at(k).at(m).first;
-							totalAreaUP2 += srmAreaUP.at(i).at(j).at(k).at(m).second;
-							totalAreaDB1 += srmAreaDB.at(i).at(j).at(k).at(m).first;
-							totalAreaDB2 += srmAreaDB.at(i).at(j).at(k).at(m).second;
+							countUP += srmCountUP.at(i).at(j).at(k).at(m);
+							countDB += srmCountDB.at(i).at(j).at(k).at(m);
+							areaUP1 += srmAreaUP.at(i).at(j).at(k).at(m).first;
+							areaUP2 += srmAreaUP.at(i).at(j).at(k).at(m).second;
+							areaDB1 += srmAreaDB.at(i).at(j).at(k).at(m).first;
+							areaDB2 += srmAreaDB.at(i).at(j).at(k).at(m).second;
 						}
-						if(totalAreaUP1>totalAreaUP2) {
-
-						}
-						for(int m=0; m<this->relOpLevelSize; m++) {
-							int countUP = srmCountUP.at(i).at(j).at(k).at(m);
-							int countDB = srmCountDB.at(i).at(j).at(k).at(m);
-							int areaUP1 = srmAreaUP.at(i).at(j).at(k).at(m).first;
-							int areaUP2 = srmAreaUP.at(i).at(j).at(k).at(m).second;
-							int areaDB1 = srmAreaDB.at(i).at(j).at(k).at(m).first;
-							int areaDB2 = srmAreaDB.at(i).at(j).at(k).at(m).second;
+						if(countUP>0 || countDB>0) {
 							if(areaUP1>areaUP2) {
 								for(int x=0; x<srmAreaUP.size(); x++) {
-									for(int n=0; n<this->relOpLevelSize; n++) {
-										totalAreaUP += srmAreaUP.at(i).at(x).at(k).at(n);
+									for(int m=0; m<this->relOpLevelSize; m++) {
+										totalAreaUP += srmAreaUP.at(i).at(x).at(k).at(m).second;
+										totalCountUP += srmCountUP.at(i).at(x).at(k).at(m);
 									}
 								}
 							}
+							else if(areaUP1<=areaUP2) {
+								for(int y=0; y<srmAreaUP.size(); y++) {
+									for(int m=0; m<this->relOpLevelSize; m++) {
+										totalAreaUP += srmAreaUP.at(y).at(j).at(k).at(m).first;
+										totalCountUP += srmCountUP.at(y).at(j).at(k).at(m);
+									}
+								}
+							}
+							if(areaDB1>areaDB2) {
+								for(int x=0; x<srmAreaDB.size(); x++) {
+									for(int m=0; m<this->relOpLevelSize; m++) {
+										totalAreaDB += srmAreaDB.at(i).at(x).at(k).at(m).second;
+										totalCountDB += srmCountDB.at(i).at(x).at(k).at(m);
+									}
+								}
+							}
+							else if(areaDB1<=areaDB2) {
+								for(int y=0; y<srmAreaDB.size(); y++) {
+									for(int m=0; m<this->relOpLevelSize; m++) {
+										totalAreaDB += srmAreaDB.at(y).at(j).at(k).at(m).first;
+										totalCountDB += srmCountDB.at(y).at(j).at(k).at(m);
+									}
+								}
+							}
+							float areaRatioUP = (float)min(areaUP1,areaUP2) / totalAreaUP;
+							float areaRatioDB = (float)min(areaDB1,areaDB2) / totalAreaDB;
+							float areaValUP = min(areaUP1,areaUP2) + (areaRatioUP) * (float)max(areaUP1,areaUP2);
+							float areaValDB = min(areaDB1,areaDB2) + (areaRatioDB) * (float)max(areaDB1,areaDB2);
+							if(std::isnan(areaValUP)) areaValUP=0;
+							if(std::isnan(areaValDB)) areaValDB=0;
+							float entropyUP = this->entropy(countUP);
+							float entropyDB = this->entropy(countDB);
+							float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
+							float areaVal = min(areaValUP,areaValDB);
+							float relArea = areaVal / maxTotalArea;
+							float weightedEntropy = relArea * entropyVal;
+							totalEntropy += weightedEntropy;
+							sumOfArea += areaVal;
+							if(weightedEntropy>=0) {
+								fprintf(fp,"[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
+								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								fprintf(fp,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								fprintf(fp,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
+								fprintf(fp,"TotalAreaUP: %d, TotalAreaDB: %d\n",totalAreaUP,totalAreaDB);
+								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp,"RelArea: %f\n",relArea);
+								fprintf(fp,"SumOfArea: %f\n",sumOfArea);
+								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
+								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
+								fprintf(fp,"----------------------------------\n");
+							}
 						}
 					}
-					for(int m=0; m<this->relOpLevelSize; m++) {
-						totalCountUP += srmCountUP.at(i).at(j).at(k).at(m);
-						totalCountDB += srmCountDB.at(i).at(j).at(k).at(m);
-						totalAreaUP += srmAreaUP.at(i).at(j).at(k).at(m).first + srmAreaUP.at(i).at(j).at(k).at(m).second;
-						totalAreaDB += srmAreaDB.at(i).at(j).at(k).at(m).first + srmAreaDB.at(i).at(j).at(k).at(m).second;
-					}
-					if(totalCountUP>0 || totalCountDB>0) {
-						float entropyUP = this->entropy(totalCountUP);
-						float entropyDB = this->entropy(totalCountDB);
-						float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-						float areaVal = min(totalAreaUP,totalAreaDB);
-						float relArea = areaVal / maxTotalArea;
-						float weightedEntropy = relArea * entropyVal;
-						totalEntropy += weightedEntropy;
-						sumOfArea += min(totalAreaUP,totalAreaDB);
-						if(weightedEntropy>0) {
-							fprintf(fp,"[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
-							fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",totalCountUP,entropyUP,totalCountDB,entropyDB);
-							fprintf(fp,"EntropyVal: %f\n",entropyVal);
-							fprintf(fp,"AreaUP: %d, AreaDB: %d\n",totalAreaUP,totalAreaDB);
-							fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
-							fprintf(fp,"RelArea: %f\n",relArea);
-							fprintf(fp,"SumOfArea: %d\n",sumOfArea);
-							fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
-							fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
-							fprintf(fp,"----------------------------------\n");
+					else {
+						for(int m=0; m<this->relOpLevelSize; m++) {
+							totalCountUP += srmCountUP.at(i).at(j).at(k).at(m);
+							totalCountDB += srmCountDB.at(i).at(j).at(k).at(m);
+							totalAreaUP += srmAreaUP.at(i).at(j).at(k).at(m).first + srmAreaUP.at(i).at(j).at(k).at(m).second;
+							totalAreaDB += srmAreaDB.at(i).at(j).at(k).at(m).first + srmAreaDB.at(i).at(j).at(k).at(m).second;
+						}
+						if(totalCountUP>0 || totalCountDB>0) {
+							float entropyUP = this->entropy(totalCountUP);
+							float entropyDB = this->entropy(totalCountDB);
+							float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
+							float areaVal = min(totalAreaUP,totalAreaDB);
+							float relArea = areaVal / maxTotalArea;
+							float weightedEntropy = relArea * entropyVal;
+							totalEntropy += weightedEntropy;
+							sumOfArea += min(totalAreaUP,totalAreaDB);
+							if(weightedEntropy>=0) {
+								fprintf(fp,"[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
+								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",totalCountUP,entropyUP,totalCountDB,entropyDB);
+								fprintf(fp,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp,"AreaUP: %d, AreaDB: %d\n",totalAreaUP,totalAreaDB);
+								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp,"RelArea: %f\n",relArea);
+								fprintf(fp,"SumOfArea: %f\n",sumOfArea);
+								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
+								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
+								fprintf(fp,"----------------------------------\n");
+							}
 						}
 					}
 				}
