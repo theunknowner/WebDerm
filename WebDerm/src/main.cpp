@@ -63,16 +63,16 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test9b.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test8.png");
+
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test18.png");
+	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test8.png");
 	ShadeShapeMatch ssm;
-	//ssm.test(ss1);
+	ssm.test(ss1);
 	//ssm.debug_mode(2);
 	//cout << ssm.test_match(ss1,ss2) << endl;
-	vector<float> results = ssm.match2(ss1,ss2);
-	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
-	ss1.showInteractiveIslands();
+	//vector<float> results = ssm.match(ss1,ss2);
+	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
+	//ss1.showInteractiveIslands();
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
@@ -99,7 +99,7 @@ int main(int argc,char** argv)
 			ShadeShapeMatch ssm;
 			if(argc>=3)
 				ssm.debug_mode(atoi(argv[2]));
-			vector<float> results = ssm.match2(ss1,ss2);
+			vector<float> results = ssm.match(ss1,ss2);
 			nameVec.push_back(name);
 			resultVec.push_back(results);
 		}
@@ -113,14 +113,14 @@ int main(int argc,char** argv)
 	}
 	fclose(fp);
 	/**/
-
+/*
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	ShadeShapeMatch ssm;
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
 	//ssm.match(ss1,ss2);
-	vector<float> results = ssm.match2(ss1,ss2);
+	vector<float> results = ssm.match(ss1,ss2);
 	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//float matchVal1 = ssm.test_match(ss1,ss2);
 	/**/

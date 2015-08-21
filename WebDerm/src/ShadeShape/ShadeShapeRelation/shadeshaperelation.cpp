@@ -78,9 +78,9 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 									for(unsigned int num2=0; num2<islandVec.at(shape2).at(shade2).size(); num2++) {
 										Islands isl2 = islandVec.at(shape2).at(shade2).at(num2);
 										String label2 = isl2.labelName();
-										int state2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? State::ENTERED : State::OUTSIDE;
-										State insideIsland2(state2);
 										if(shape1!=shape2 || shade1!=shade2 || num1!=num2) { //checks so island1 != island2
+											int state2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? State::ENTERED : State::OUTSIDE;
+											State insideIsland2(state2);
 											if(insideIsland2.currentState()==State::ENTERED || insideIsland2.currentState()==State::INSIDE) {
 												int index2 =  distance(lbls.begin(),lbls.find(label2));
 												Point center2 = isl2.centerOfMass();
@@ -114,24 +114,8 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												prevLabel2 = label2;
 											}
 										} else {
-											if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
-											if(insideIsland2.currentState()==State::ENTERED) {
-												int prevIndex2 = -1;
-												try {
-													prevIndex2 =  distance(lbls.begin(),lbls.find(prevLabel2));
-													neighborNum = 0;
-													neighborNumCount.at(index1).at(prevIndex2).back() = neighborNum;
-													prevLabel2 = label2;
-												} catch (const std::out_of_range &oor) {
-													printf("ShadeShapeRelation::generate_srm() out of range!\n");
-													printf("Coords: %s\n",coords2.c_str());
-													printf("prevLabel2: %s\n",prevLabel2.c_str());
-													printf("label2: %s\n",label2.c_str());
-													printf("prevIndex2: %d\n",prevIndex2);
-													printf("index1: %d\n",index1);
-													exit(1);
-												}
-											}
+											neighborNum = 0;
+											prevLabel2 = label2;
 										}
 									}// end num2 loop
 								}// end shade2 loop
