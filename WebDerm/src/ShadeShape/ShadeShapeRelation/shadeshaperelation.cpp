@@ -10,6 +10,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "../Labels/labels.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/State/state.h"
 
 /******************** PRIVATE FUNCTIONS **********************/
 
@@ -47,74 +48,90 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 				for(double theta=0.0; theta<360.0; theta+=15.0) {
 					vector<int> vecWidth(labels.size(),0);
 					float neighborNum = 0.;
-					String prevIslandLabel="";
+					String prevLabel2="";
 					int row=center.y, col=center.x;
 					float fRow = center.y, fCol = center.x;
 					double deg = theta * M_PI / 180.0; //convert to degrees
-					int insideIsland1 = isl1.coordinates().find(coords1)!=isl1.coordinates().end() ? ENTERED : OUTSIDE;
+					//int insideIsland1 = isl1.coordinates().find(coords1)!=isl1.coordinates().end() ? ENTERED : OUTSIDE;
+					int state = isl1.coordinates().find(coords1)!=isl1.coordinates().end() ? State::ENTERED : State::OUTSIDE;
+					State insideIsland1(state);
 					while(row<isl1.image().rows && col<isl1.image().cols && row>=0 && col>=0) {
 						String coords2 = toString(col)+","+toString(row);
-						if(insideIsland1==OUTSIDE) {
+						if(insideIsland1.currentState()==State::OUTSIDE) {
 							if(isl1.coordinates().find(coords2)!=isl1.coordinates().end()) {
-								insideIsland1 = ENTERED;
+								insideIsland1.setState(State::ENTERED);
 							}
 						}
-						if(insideIsland1==ENTERED) {
+						if(insideIsland1.currentState()==State::ENTERED) {
 							if(isl1.coordinates().find(coords2)!=isl1.coordinates().end()) {
 								vecWidth.at(index1)++;
 								minWidthForVisibility = min(vecWidth.at(index1),visibilityThresh);
 								beginCoords = Point(col,row);
 							}
 							else {
-								insideIsland1 = EXITED;
+								insideIsland1.setState(State::EXITED);
 							}
 						}
-						if(insideIsland1==EXITED) {
+						if(insideIsland1.currentState()==State::EXITED) {
 							for(unsigned int shape2=0; shape2<islandVec.size(); shape2++) {
 								for(unsigned int shade2=0; shade2<islandVec.at(shape2).size(); shade2++) {
 									for(unsigned int num2=0; num2<islandVec.at(shape2).at(shade2).size(); num2++) {
+										Islands isl2 = islandVec.at(shape2).at(shade2).at(num2);
+										String label2 = isl2.labelName();
+										int state2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? State::ENTERED : State::OUTSIDE;
+										State insideIsland2(state2);
 										if(shape1!=shape2 || shade1!=shade2 || num1!=num2) { //checks so island1 != island2
-											Islands isl2 = islandVec.at(shape2).at(shade2).at(num2);
-											String label2 = isl2.labelName();
-											int index2 =  distance(lbls.begin(),lbls.find(label2));
-											int insideIsland2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? ENTERED : OUTSIDE;
-											/*if(index1==2 && index2==24) {
-												printf("Deg: %f, Coords2: %s, ",theta,coords2.c_str());
-												printf("State: %d\n",insideIsland2);
-											}*/
-											Point center2 = isl2.centerOfMass();
-											float centerDist = abs(MyMath::eucDist(center,center2));
-											float relArea1 = (float)isl1.area() / ss.image().total();
-											float relArea2 = (float)isl2.area() / ss.image().total();
-											float thresh = 250.0 * pow(relArea1*relArea2, alpha);
-											if(centerDist<=thresh && relationMatrix.at(index1).at(index2).at(0)==NONE) {
-												this->relationMatrix.at(index1).at(index2).at(0) = INDIR;
-												this->relationMatrix.at(index2).at(index1).at(0) = INDIR;
-											}
-											if(relationMatrix.at(index1).at(index2).at(0)<=DIR) {
-												if(insideIsland2==ENTERED || insideIsland2==INSIDE) {
-													if(prevIslandLabel==label2) insideIsland2=INSIDE;
-													if(insideIsland2==ENTERED) {
+											if(insideIsland2.currentState()==State::ENTERED || insideIsland2.currentState()==State::INSIDE) {
+												int index2 =  distance(lbls.begin(),lbls.find(label2));
+												Point center2 = isl2.centerOfMass();
+												float centerDist = abs(MyMath::eucDist(center,center2));
+												float relArea1 = (float)isl1.area() / ss.image().total();
+												float relArea2 = (float)isl2.area() / ss.image().total();
+												float thresh = 250.0 * pow(relArea1*relArea2, alpha);
+												if(centerDist<=thresh && relationMatrix.at(index1).at(index2).at(0)==NONE) {
+													this->relationMatrix.at(index1).at(index2).at(0) = INDIR;
+													this->relationMatrix.at(index2).at(index1).at(0) = INDIR;
+												}
+												if(relationMatrix.at(index1).at(index2).at(0)<=DIR) {
+													if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
+													if(insideIsland2.currentState()==State::ENTERED) {
 														neighborNum++;
 														neighborNumCount.at(index1).at(index2).push_back(neighborNum);
 														endCoords = Point(col,row);
 														float dist = MyMath::eucDist(beginCoords,endCoords);
 														neighborDistVec.at(index1).at(index2) = min(neighborDistVec.at(index1).at(index2),dist);
 													}
-													prevIslandLabel = label2;
+													prevLabel2 = label2;
 													vecWidth.at(index2)++;
 													goto jump_out;
 												}
-											}
-											if(relationMatrix.at(index1).at(index2).at(0)>=SURR_BY_INV && isl1.area()<isl2.area()) {
-												if(insideIsland2==ENTERED || insideIsland2==INSIDE) {
-													if(prevIslandLabel==label2) insideIsland2=INSIDE;
-													prevIslandLabel = label2;
+												if(relationMatrix.at(index1).at(index2).at(0)>=SURR_BY_INV && isl1.area()<isl2.area()) {
+													if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
+													prevLabel2 = label2;
 													vecWidth.at(index2)++;
 													goto jump_out;
 												}
+												prevLabel2 = label2;
 											}
-
+										} else {
+											if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
+											if(insideIsland2.currentState()==State::ENTERED) {
+												int prevIndex2 = -1;
+												try {
+													prevIndex2 =  distance(lbls.begin(),lbls.find(prevLabel2));
+													neighborNum = 0;
+													neighborNumCount.at(index1).at(prevIndex2).back() = neighborNum;
+													prevLabel2 = label2;
+												} catch (const std::out_of_range &oor) {
+													printf("ShadeShapeRelation::generate_srm() out of range!\n");
+													printf("Coords: %s\n",coords2.c_str());
+													printf("prevLabel2: %s\n",prevLabel2.c_str());
+													printf("label2: %s\n",label2.c_str());
+													printf("prevIndex2: %d\n",prevIndex2);
+													printf("index1: %d\n",index1);
+													exit(1);
+												}
+											}
 										}
 									}// end num2 loop
 								}// end shade2 loop
@@ -174,7 +191,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
 	this->ssr_name = ss.name();
 	this->generate_srm(ss,labels,islandVec);
-	//this->writeRelationMatrix(labels,ss.name());
+	this->writeRelationMatrix(labels,ss.name());
 }
 
 void ShadeShapeRelation::writeRelationMatrix(Labels &labels, String name) {
@@ -250,10 +267,12 @@ pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int
 				try {
 					int areaX = itX->second.first;
 					srmCount4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum)++;
+					//for the x label
 					if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itX->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
 						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum).second += areaX;
 						srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itX->first] = 1;
 					}
+					// for the y label
 					if(srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).find(itY->first)==srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum).end()) {
 						srmArea4D.at(y2).at(x2).at(rel_op_idx).at(neighborNum).first += areaY;
 						srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itY->first] = 1;
