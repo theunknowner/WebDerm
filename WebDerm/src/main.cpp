@@ -63,7 +63,7 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-
+/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test18.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test8.png");
 	ShadeShapeMatch ssm;

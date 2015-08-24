@@ -24,7 +24,7 @@ public:
 	Labels();
 	Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
 	void create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
-	map<String,pair<int,float> >& getLabels();
+	map<String,pair<int,float> >& getMap();
 	void setLabels(map<String,pair<int,float> > labels);
 	int area(String label);
 	int area(int num);

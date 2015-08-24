@@ -84,8 +84,8 @@ void ShadeShapeMatch::sortIslandsByArea(vector<vector<vector<Islands> > > &islan
 
 //! compare two labels and fill in missing labels
 void ShadeShapeMatch::fillPropAreaMapGaps(Labels &upLabels, Labels &dbLabels) {
-	map<String,pair<int,float> > &upMap = upLabels.getLabels();
-	map<String,pair<int,float> > &dbMap = dbLabels.getLabels();
+	map<String,pair<int,float> > &upMap = upLabels.getMap();
+	map<String,pair<int,float> > &dbMap = dbLabels.getMap();
 	for(auto it=upMap.begin(); it!=upMap.end(); it++) {
 		String label = it->first;
 		if(dbMap.find(label)==dbMap.end()) {
@@ -110,8 +110,8 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 	float numerSum = 0.0;
 	float denomSumUP = 0.0;
 	float denomSumDB = 0.0;
-	map<String,pair<int,float> > upMap = upLabels.getLabels();
-	map<String,pair<int,float> > dbMap = dbLabels.getLabels();
+	map<String,pair<int,float> > upMap = upLabels.getMap();
+	map<String,pair<int,float> > dbMap = dbLabels.getMap();
 	for(auto itUP=upMap.begin(), itDB=dbMap.begin(); itUP!=upMap.end(), itDB!=dbMap.end(); itUP++, itDB++) {
 		numerSum += (itUP->second.second * itDB->second.second);
 		denomSumUP += pow(itUP->second.second,2);
@@ -152,8 +152,8 @@ float ShadeShapeMatch::tr1_match(ShadeShape &upSS, ShadeShape &dbSS) {
 				upLabels = Labels(islandVec3,upTotalArea);
 				dbLabels = Labels(this->dbIslandVec,dbTotalArea);
 				this->fillPropAreaMapGaps(upLabels,dbLabels);
-				upMap = upLabels.getLabels();
-				dbMap = dbLabels.getLabels();
+				upMap = upLabels.getMap();
+				dbMap = dbLabels.getMap();
 				float results = this->dotProduct(upLabels,dbLabels);
 				resultVec.push_back(results);
 				if(this->debugMode>=2) {

@@ -49,7 +49,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 	}
 }
 
-map<String,pair<int,float> >& Labels::getLabels() {
+map<String,pair<int,float> >& Labels::getMap() {
 	return this->labelMap;
 }
 
@@ -126,8 +126,8 @@ void Labels::printLabels() {
 }
 
 void Labels::printCompareLabels(Labels &labels1, Labels &labels2) {
-	auto labelMap1 = labels1.getLabels();
-	auto labelMap2 = labels2.getLabels();
+	auto labelMap1 = labels1.getMap();
+	auto labelMap2 = labels2.getMap();
 	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
 		int i = distance(labelMap1.begin(),it1);
 		printf("%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
@@ -138,8 +138,8 @@ void Labels::writeCompareLabels(Labels &labels1, Labels &labels2) {
 	String file = labels1.name() + "_" + labels2.name() + "_tr1_max_match_labels.txt";
 	FILE * fp;
 	fp = fopen(file.c_str(),"w");
-	auto labelMap1 = labels1.getLabels();
-	auto labelMap2 = labels2.getLabels();
+	auto labelMap1 = labels1.getMap();
+	auto labelMap2 = labels2.getMap();
 	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
 		int i = distance(labelMap1.begin(),it1);
 		fprintf(fp,"%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
