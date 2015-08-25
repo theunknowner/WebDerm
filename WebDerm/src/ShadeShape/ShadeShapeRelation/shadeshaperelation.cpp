@@ -31,6 +31,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 				Islands isl1 = islandVec.at(shape1).at(shade1).at(num1);
 				String label1 = isl1.labelName();
 				int index1 = distance(lbls.begin(),lbls.find(label1));
+				int area1 = isl1.area();
 				Point center = isl1.centerOfMass();
 				String coords1 = toString(center.x)+","+toString(center.y);
 				vector<vector<float> > neighborDistVec(lbls.size(),vector<float>(lbls.size(),140.0));
@@ -74,6 +75,8 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 											State insideIsland2(state2);
 											if(insideIsland2.currentState()==State::ENTERED || insideIsland2.currentState()==State::INSIDE) {
 												int index2 =  distance(lbls.begin(),lbls.find(label2));
+												int area2 = isl2.area();
+												srm.relationArea(index1,index2) = std::make_pair(area1,area2);
 												Point center2 = isl2.centerOfMass();
 												float centerDist = abs(MyMath::eucDist(center,center2));
 												float relArea1 = (float)isl1.area() / ss.image().total();
@@ -86,6 +89,11 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												if(srm.relation(index1,index2)<=DIR) {
 													if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
 													if(insideIsland2.currentState()==State::ENTERED) {
+														/*if(index1==4 && index2==5) {
+															printf("%s | %s\n",label1.c_str(),label2.c_str());
+															printf("Deg: %f\n",theta);
+															cout << neighborNum << endl;
+														}*/
 														neighborNum++;
 														neighborNumCount.at(index1).at(index2).push_back(neighborNum);
 														endCoords = Point(col,row);
@@ -105,8 +113,10 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												prevLabel2 = label2;
 											}
 										} else {
-											neighborNum = 0;
-											prevLabel2 = label2;
+											if(isl1.coordinates().find(coords2)!=isl1.coordinates().end()) {
+												neighborNum = 0;
+												prevLabel2 = label2;
+											}
 										}
 									}// end num2 loop
 								}// end shade2 loop
@@ -138,11 +148,12 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 					if(neighborNumCount.at(index1).at(index2).size()>0) {
 						neighborNumber = majority(neighborNumCount.at(index1).at(index2));
 					}
-					srm.neighborLevel(index1,index2) = max(neighborNumber,srm.neighborLevel(index1,index2));
-					srm.neighborLevel(index2,index1) = max(neighborNumber,srm.neighborLevel(index2,index1));
 					if(srm.relationCount(index1,index2)>=surroundedThreshUpper) {
 						srm.relation(index1,index2) = SURR_BY;
 						srm.relation(index2,index1) = SURR_BY_INV;
+						srm.neighborLevel(index1,index2) = max(neighborNumber,srm.neighborLevel(index1,index2));
+						srm.neighborLevel(index2,index1) = max(neighborNumber,srm.neighborLevel(index2,index1));
+						srm.maxNeighborLevel() = max(srm.maxNeighborLevel(),neighborNumber);
 					}
 					if(srm.relationCount(index1,index2)<surroundedThreshUpper) {
 						if(srm.relationCount(index1,index2)>=surroundedThreshLower) {
@@ -166,7 +177,8 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
 	this->ssr_name = ss.name();
 	this->generate_srm(ss,labels,islandVec);
-	this->writeRelationMatrix(labels,ss.name());
+	//this->srm.writeRelationMatrix(labels,ss.name());
+	//this->srm.writeNeighborLevelMatrix(labels,ss.name());
 }
 
 String ShadeShapeRelation::name() {
@@ -182,6 +194,7 @@ int ShadeShapeRelation::getRelOpIndex(String relOp) {
 	return -1;
 }
 
+//! use after running generate_srm() function
 Srm& ShadeShapeRelation::get_srm() {
 	return this->srm;
 }

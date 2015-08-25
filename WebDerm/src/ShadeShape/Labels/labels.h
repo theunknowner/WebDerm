@@ -35,6 +35,7 @@ public:
 	String at(int num);
 	String& name();
 	void printLabels();
+	int getIndex(String label);
 	static void printCompareLabels(Labels &labels1, Labels &labels2);
 	static void writeCompareLabels(Labels &labels1, Labels &labels2);
 };

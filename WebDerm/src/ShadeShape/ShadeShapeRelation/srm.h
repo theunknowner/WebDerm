@@ -19,14 +19,15 @@ private:
 	void setup_relationMatrix(Labels &labels);
 	Labels mergeLabels();
 	int max_neighbor_level;
-	int relOpLevelSize = 50;
-
-protected:
-	vector<String> rel_op = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};
-	enum{NONE=0, INDIR=1, DIR=2, SURR_BY_INV=3, SURR_BY=4};
 	vector<vector<int> > relationOpMatrix;
 	vector<vector<int> > neighborLevelMatrix;
 	vector<vector<int> > relationCountMatrix;
+	vector<vector<pair<int,int>> > relationAreaMatrix;
+
+protected:
+	int relOpLevelSize = 50;
+	vector<String> rel_op = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};
+	enum{NONE=0, INDIR=1, DIR=2, SURR_BY_INV=3, SURR_BY=4};
 
 public:
 	Srm();
@@ -34,18 +35,25 @@ public:
 	int& relation(int index1, int index2);
 	int& relationCount(int index1, int index2);
 	int& neighborLevel(int index1, int index2);
+	pair<int,int>& relationArea(int index1, int index2);
 	size_t size();
-	int maxNeighborLevel();
+	int& maxNeighborLevel();
 	void writeRelationMatrix(Labels &labels,String name);
-	//pair<vector<vector<vector<vector<int> > > >,vector<vector<vector<vector<pair<int,int>> > > >> downScaleSrm(Labels &labels, Labels &mergedLabels);
+	void writeNeighborLevelMatrix(Labels &labels, String name);
 	void downScaleSrm();
 	Labels getLabels();
 	Labels getMergedLabels();
+	vector<vector<vector<vector<int> > > >& downscaleSrmCount();
+	vector<vector<vector<vector<pair<int,int>> > > >& downscaleSrmArea();
 
+private:
 	/**** For downscaling srm ****/
 	vector<vector<vector<vector<int> > > > dsSrmCount;
 	vector<vector<vector<vector<pair<int,int>> > > > dsSrmArea;
-	map<String,vector<String>> mergedLabelContainer; //holds the individual labels that belongs to a merged label
+public:
+	//holds the individual labels that belongs to a merged label
+	vector<vector<vector<vector<pair<vector<String>,vector<String>> > > > > mergedLabelContainer;
+	map<String,pair<int,int>> equationMap;
 };
 
 #endif /* SRM_H_ */

@@ -63,7 +63,7 @@ int Labels::area(String label) {
 	if(it!=this->labelMap.end()) {
 		return it->second.first;
 	}
-	return -1;
+	return 0;
 }
 
 int Labels::area(int num) {
@@ -73,7 +73,7 @@ int Labels::area(int num) {
 			return it->second.first;
 		}
 	}
-	return -1;
+	return 0;
 }
 
 int& Labels::totalArea() {
@@ -85,7 +85,7 @@ float Labels::relativeArea(String label) {
 	if(it!=this->labelMap.end()) {
 		return it->second.second;
 	}
-	return -1.0;
+	return 0.0;
 }
 
 float Labels::relativeArea(int num) {
@@ -95,7 +95,7 @@ float Labels::relativeArea(int num) {
 			return it->second.second;
 		}
 	}
-	return -1.0;
+	return 0.0;
 }
 
 size_t Labels::size() {
@@ -123,6 +123,15 @@ void Labels::printLabels() {
 		printf("%d) ",index);
 		printf("%s: %d, %f\n",it->first.c_str(), it->second.first, it->second.second);
 	}
+}
+
+int Labels::getIndex(String label) {
+	auto it = this->labelMap.find(label);
+	if(it!=this->labelMap.end()) {
+		int idx = distance(labelMap.begin(),it);
+		return idx;
+	}
+	return -1;
 }
 
 void Labels::printCompareLabels(Labels &labels1, Labels &labels2) {

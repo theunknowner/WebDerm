@@ -252,6 +252,7 @@ float ShadeShapeMatch::tr1(Labels &upLabels, Labels &dbLabels) {
 
 //! TR2 metric using SRM(Spatial Relations Matrix) comparison
 float ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
+	assert(upLabels.size()>0 && dbLabels.size()>0);
 	assert(upLabels.size()==dbLabels.size());
 	ShadeShapeRelationMatch ssrm;
 	float matchVal = ssrm.srm_match(ssrUP,upLabels,ssrDB,dbLabels);
@@ -423,10 +424,10 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	vector<vector<vector<Islands> > > islandVec3;
 	float maxResult = 0.0;
 	Labels largestLabelsUP;
-	Labels largestLabelsDB;
+	Labels largestLabelsDB ;
 	vector<vector<vector<Islands> > > largestIslandVec;
 	Mat largestImg = upSS.image(), maxMatchImg;
-	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
+	for(unsigned int shadeShift=0; shadeShift<1; shadeShift++) {
 		islandVec2 = this->upIslandVec;
 		if(ShadeMatch::SHIFT.at(shadeShift)!="SHIFT_NONE") {
 			float prevResults = 0.0;
@@ -463,7 +464,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 				}
 			}
 		}
-		for(unsigned int shapeShift=0; shapeShift<ShapeMatch::SHIFT.size(); shapeShift++) {
+		for(unsigned int shapeShift=0; shapeShift<1; shapeShift++) {
 			if(ShapeMatch::SHIFT[shapeShift]=="SHIFT_START") {
 				for(unsigned int shapeNum=0; shapeNum<islandVec2.size(); shapeNum++) {
 					bool flag = false;
