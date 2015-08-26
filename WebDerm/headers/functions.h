@@ -40,8 +40,10 @@ void init_3D_Deque(deque< deque< deque<int> > > &vec, int rows, int cols, int de
 deque<deque<deque<deque<double> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, double val=0);
 deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, int dim4, int val=0);
 
-vector<vector<float> > frequency(vector<float> vec);
+map<float,int> frequency(vector<float> vec);
+map<int,int> frequency(vector<int> vec);
 float majority(vector<float> vec);
+int majority(vector<int> vec);
 
 namespace Func {
 	String addDigitsForLabel(int num, String digit, int length=1);

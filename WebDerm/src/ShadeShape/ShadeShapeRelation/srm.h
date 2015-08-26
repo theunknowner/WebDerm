@@ -40,12 +40,14 @@ public:
 	int& maxNeighborLevel();
 	void writeRelationMatrix(Labels &labels,String name);
 	void writeNeighborLevelMatrix(Labels &labels, String name);
+	void writeRelationCountMatrix(Labels &labels, String name);
 	void downScaleSrm();
 	Labels getLabels();
 	Labels getMergedLabels();
 	vector<vector<vector<vector<int> > > >& downscaleSrmCount();
 	vector<vector<vector<vector<pair<int,int>> > > >& downscaleSrmArea();
-
+	int getIndex(String label);
+	int area(String label);
 private:
 	/**** For downscaling srm ****/
 	vector<vector<vector<vector<int> > > > dsSrmCount;

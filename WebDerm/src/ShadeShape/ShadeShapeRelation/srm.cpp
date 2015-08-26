@@ -127,6 +127,29 @@ void Srm::writeNeighborLevelMatrix(Labels &labels, String name) {
 	fclose(fp);
 }
 
+void Srm::writeRelationCountMatrix(Labels &labels, String name) {
+	name += "_count.csv";
+	FILE * fp;
+	fp = fopen(name.c_str(),"w");
+	map<String,pair<int,float> > labelMap = labels.getMap();
+	fprintf(fp,",");
+	for(auto it=labelMap.begin(); it!=labelMap.end(); it++) {
+		fprintf(fp,"%s,",it->first.c_str());
+	}
+	fprintf(fp,"\n");
+	auto it = labelMap.begin();
+	for(unsigned int i=0; i<this->relationCountMatrix.size(); i++) {
+		fprintf(fp,"%s,",it->first.c_str());
+		it++;
+		for(unsigned int j=0; j<this->relationCountMatrix.at(i).size(); j++) {
+			int count = this->relationCountMatrix.at(i).at(j);
+			fprintf(fp,"%d,",count);
+		}
+		fprintf(fp,"\n");
+	}
+	fclose(fp);
+}
+
 void Srm::downScaleSrm() {
 	map<String,pair<int,float> > labelMap = this->labels.getMap();
 	this->mergedLabels = this->mergeLabels();
@@ -203,4 +226,12 @@ vector<vector<vector<vector<int> > > >& Srm::downscaleSrmCount() {
 
 vector<vector<vector<vector<pair<int,int>> > > >& Srm::downscaleSrmArea() {
 	return this->dsSrmArea;
+}
+
+int Srm::getIndex(String label) {
+	return this->labels.getIndex(label);
+}
+
+int Srm::area(String label) {
+	return this->labels.area(label);
 }

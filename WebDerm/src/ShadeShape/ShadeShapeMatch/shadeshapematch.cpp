@@ -268,6 +268,7 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	this->sortIslandsByArea(islandVec);
 	Labels lbls = Labels(islandVec,totalArea);
 	lbls.printLabels();
+	cout << "----------------------------" << endl;
 	ShadeShapeRelation ssr;
 	ssr.spatial_relation(ss,lbls,islandVec);
 }

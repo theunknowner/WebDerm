@@ -272,8 +272,9 @@ deque<deque<deque<deque<int> > > > createDeque4D(int dim1, int dim2, int dim3, i
 	return deq;
 }
 
-//returns a 2D vector with 1st col='value' & 2nd col='frequency'
-vector<vector<float> > frequency(vector<float> vec) {
+//returns a map with key='value' & val='frequency'
+map<float,int> frequency(vector<float> vec) {
+	assert(vec.size()>0);
 	std::map<float,int> freq;
 	for(unsigned int i=0; i<vec.size(); i++) {
 		try {
@@ -287,29 +288,41 @@ vector<vector<float> > frequency(vector<float> vec) {
 			exit(1);
 		}
 	}
-	std::map<float,int>::iterator it;
-	vector<float> vals(2,0);
-	vector<vector<float> > freqVec;
-	for(it=freq.begin(); it!=freq.end(); it++) {
-		vals.at(0) = it->first;
-		vals.at(1) = (float)it->second;
-		freqVec.push_back(vals);
+
+	return freq;
+}
+
+//returns a map with key='value' & val='frequency'
+map<int,int> frequency(vector<int> vec) {
+	assert(vec.size()>0);
+	std::map<int,int> freq;
+	for(unsigned int i=0; i<vec.size(); i++) {
+		try {
+			if(freq.find(vec.at(i))==freq.end())
+				freq[vec.at(i)] = 1;
+			else
+				freq[vec.at(i)]++;
+		} catch (const std::out_of_range &oor) {
+			printf("Functions::frequency() out of range!\n");
+			printf("vec.size() = %lu\n",vec.size());
+			exit(1);
+		}
 	}
-	return freqVec;
+
+	return freq;
 }
 
 float majority(vector<float> vec) {
 	assert(vec.size()>0);
-	vector<vector<float> > freq = frequency(vec);
-	float max=0.0;
-	int index=0;
+	auto freq = frequency(vec);
+	int max=0.0;
 	float result = 0.0;
-	for(unsigned int i=0; i<freq.size(); i++) {
+	for(auto it=freq.begin(); it!=freq.end(); it++) {
 		try {
-			float num = freq.at(i).at(1);
+			int num = it->second;
 			if(num>max) {
 				max = num;
-				index = i;
+				result = it->first;
 			}
 		} catch (const std::out_of_range &oor) {
 			printf("Function::majority() out of range!\n");
@@ -318,15 +331,30 @@ float majority(vector<float> vec) {
 			exit(1);
 		}
 	}
-	try {
-		result = freq.at(index).at(0);
-	} catch (const std::out_of_range &oor) {
-		printf("Function::majority() out of range!\n");
-		printf("vec.size() = %lu\n",vec.size());
-		printf("Index: %d\n",index);
-		printf("freq.size() = %lu\n",freq.size());
-		exit(1);
+
+	return result;
+}
+
+int majority(vector<int> vec) {
+	assert(vec.size()>0);
+	auto freq = frequency(vec);
+	int max=0;
+	int result = 0;
+	for(auto it=freq.begin(); it!=freq.end(); it++) {
+		try {
+			int num = it->second;
+			if(num>max) {
+				max = num;
+				result = it->first;
+			}
+		} catch (const std::out_of_range &oor) {
+			printf("Function::majority() out of range!\n");
+			printf("vec.size() = %lu\n",vec.size());
+			printf("freq.size() = %lu\n",freq.size());
+			exit(1);
+		}
 	}
+
 	return result;
 }
 
