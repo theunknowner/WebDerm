@@ -45,6 +45,7 @@
 #include "ImageData/imagedata.h"
 #include "ShadeShape/ShadeShapeRelation/shadeshaperelation.h"
 #include "ShadeShape/Labels/labels.h"
+#include "Timer/timer.h"
 
 int main(int argc,char** argv)
 {
@@ -63,29 +64,30 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test21.png");
-	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
+	/*
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test12.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test13.png");
 	ShadeShapeMatch ssm;
-	ssm.test(ss1);
+	//ssm.test(ss1);
 	//ssm.debug_mode(2);
 	//cout << ssm.test_match(ss1,ss2) << endl;
-	//vector<float> results = ssm.match(ss1,ss2);
-	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
+	vector<float> results = ssm.match(ss1,ss2);
+	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//ss1.showInteractiveIslands();
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-
+	/*
 	ShadeShape ss1 = Scripts::script31("psoriasis10");
-	ShadeShapeMatch ssm;
-	ssm.test(ss1);
-	//Islands island = ss1.getIslandWithPoint(Point(96,58));
-	//imwrite("strip.png",island.image());
+	//ShadeShapeMatch ssm;
+	//ssm.test(ss1);
+	Islands island = ss1.getIslandWithPoint(Point(88,51));
+	imwrite("strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
+	Timer time;
 	String folder = "Looks_Like/";
 	deque<String> files;
 	FileData fd;
@@ -115,16 +117,19 @@ int main(int argc,char** argv)
 		fprintf(fp,"%s,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2));
 	}
 	fclose(fp);
+	printf("%s...Done!\n",argv[1]);
+	time.end();
+	time.printTimer();
 	/**/
-/*
-	ShadeShape ss1 = Scripts::script31(argv[1]);
-	ShadeShape ss2 = Scripts::script31(argv[2]);
+	/*
+	ShadeShape ss1 = Scripts::script31("tinea_corporis13a");
+	ShadeShape ss2 = Scripts::script31("psoriasis1");
 	ShadeShapeMatch ssm;
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
-	//ssm.match(ss1,ss2);
-	vector<float> results = ssm.match(ss1,ss2);
-	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
+	ssm.test_match(ss1,ss2);
+	//vector<float> results = ssm.match(ss1,ss2);
+	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//float matchVal1 = ssm.test_match(ss1,ss2);
 	/**/
 	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
@@ -165,7 +170,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-/*
+	/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
