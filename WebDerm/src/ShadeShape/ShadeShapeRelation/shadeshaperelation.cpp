@@ -101,8 +101,8 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												if(srm.relation(index1,index2)<=DIR) {
 													if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
 													if(insideIsland2.currentState()==State::ENTERED) {
-														neighborNum++;
 														if(islandHitMap.find(label2)==islandHitMap.end()) {
+															neighborNum++;
 															islandHitVec.push_back(index2);
 															islandHitMap[label2] = neighborNum;
 															neighborNumCount.at(index1).at(index2).push_back(neighborNum);
