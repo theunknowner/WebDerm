@@ -27,6 +27,7 @@ public:
 	Srm& get_srm();
 	String name();
 	int getRelOpIndex(String relOp);
+	void importSrm(String file);
 };
 
 #endif /* SHADESHAPERELATION_H_ */

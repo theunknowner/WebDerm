@@ -273,6 +273,7 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	ssr.spatial_relation(ss,lbls,islandVec);
 }
 
+//same as match but for testing changes
 float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	ShapeMatch smatch;
 	ShadeMatch shadematch;
@@ -299,7 +300,7 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels largestLabelsDB ;
 	vector<vector<vector<Islands> > > largestIslandVec;
 	Mat largestImg = upSS.image(), maxMatchImg;
-	for(unsigned int shadeShift=0; shadeShift<1; shadeShift++) {
+	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
 		islandVec2 = this->upIslandVec;
 		if(ShadeMatch::SHIFT.at(shadeShift)!="SHIFT_NONE") {
 			float prevResults = 0.0;
@@ -336,7 +337,7 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 				}
 			}
 		}
-		for(unsigned int shapeShift=0; shapeShift<1; shapeShift++) {
+		for(unsigned int shapeShift=0; shapeShift<ShapeMatch::SHIFT.size(); shapeShift++) {
 			if(ShapeMatch::SHIFT[shapeShift]=="SHIFT_START") {
 				for(unsigned int shapeNum=0; shapeNum<islandVec2.size(); shapeNum++) {
 					bool flag = false;
@@ -410,10 +411,12 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 
 	//Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB);
 	//imwrite(upSS.name()+"_"+dbSS.name()+"_max_match_image.png",maxMatchImg);
+	Labels::printCompareLabels(largestLabelsUP,largestLabelsDB);
+	cout << "---------------------------" << endl;
 	ShadeShapeRelation ssrUP;
 	ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec);
-	//ShadeShapeRelation ssrDB;
-	//ssrDB.spatial_relation(dbSS,largestLabelsDB,this->dbIslandVec);
+	ShadeShapeRelation ssrDB;
+	ssrDB.spatial_relation(dbSS,largestLabelsDB,this->dbIslandVec);
 	//float tr2_score = this->tr2(ssrUP,largestLabelsUP,ssrDB,largestLabelsDB);
 	//float results = maxResult * tr2_score;
 	//vector<float> vec = {results,maxResult,tr2_score};
@@ -448,7 +451,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels largestLabelsDB ;
 	vector<vector<vector<Islands> > > largestIslandVec;
 	Mat largestImg = upSS.image(), maxMatchImg;
-	for(unsigned int shadeShift=0; shadeShift<1; shadeShift++) {
+	for(unsigned int shadeShift=0; shadeShift<ShadeMatch::SHIFT.size(); shadeShift++) {
 		islandVec2 = this->upIslandVec;
 		if(ShadeMatch::SHIFT.at(shadeShift)!="SHIFT_NONE") {
 			float prevResults = 0.0;
@@ -485,7 +488,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 				}
 			}
 		}
-		for(unsigned int shapeShift=0; shapeShift<1; shapeShift++) {
+		for(unsigned int shapeShift=0; shapeShift<ShapeMatch::SHIFT.size(); shapeShift++) {
 			if(ShapeMatch::SHIFT[shapeShift]=="SHIFT_START") {
 				for(unsigned int shapeNum=0; shapeNum<islandVec2.size(); shapeNum++) {
 					bool flag = false;

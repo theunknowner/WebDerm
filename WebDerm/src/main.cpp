@@ -64,9 +64,9 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test12.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test13.png");
+/*
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//ssm.debug_mode(2);
@@ -78,15 +78,15 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script31("psoriasis10");
+/*
+	ShadeShape ss1 = Scripts::script31("tinea_corporis13a");
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(88,51));
+	Islands island = ss1.getIslandWithPoint(Point(46,88));
 	imwrite("strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	Timer time;
 	String folder = "Looks_Like/";
 	deque<String> files;
@@ -121,22 +121,19 @@ int main(int argc,char** argv)
 	time.end();
 	time.printTimer();
 	/**/
-	/*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis13a");
-	ShadeShape ss2 = Scripts::script31("psoriasis1");
+/*
+	Timer time;
+	ShadeShape ss1 = Scripts::script31(argv[1]);
+	ShadeShape ss2 = Scripts::script31(argv[2]);
 	ShadeShapeMatch ssm;
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
-	ssm.test_match(ss1,ss2);
-	//vector<float> results = ssm.match(ss1,ss2);
-	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
-	//float matchVal1 = ssm.test_match(ss1,ss2);
+	//ssm.test_match(ss1,ss2);
+	vector<float> results = ssm.match(ss1,ss2);
+	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
+	time.end();
+	time.printTimer();
 	/**/
-	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
-	//ShadeShapeMatch ssm;
-	//ssm.test(ss1);
-	//Islands isl = ss1.getIslandWithPoint(Point(93,67));
-	//imwrite("excavated.png",isl.image());
 	//Scripts::script25();
 	//Scripts::script_checkAllTestData();
 	//Scripts::script_createTestDataList();
@@ -170,7 +167,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-	/*
+/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;

@@ -37,6 +37,7 @@ public:
 	static void printRules();
 	static void printPenalties();
 	static float applyShiftPenalty(float score, int shapeNum, int shapeNum2);
+	static float getShiftPenalty(int shapeNum, int shapeNum2);
 };
 
 #endif /* SHAPEMATCH_H_ */

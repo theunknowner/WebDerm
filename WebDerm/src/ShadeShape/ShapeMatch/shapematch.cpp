@@ -215,3 +215,8 @@ float ShapeMatch::applyShiftPenalty(float score, int shapeNum, int shapeNum2) {
 	return newScore;
 }
 
+float ShapeMatch::getShiftPenalty(int shapeNum, int shapeNum2) {
+	float weight = ShapeMatch::shiftingPenalties.at(shapeNum).at(shapeNum2);
+	float penalty = pow(2.0,weight);
+	return penalty;
+}

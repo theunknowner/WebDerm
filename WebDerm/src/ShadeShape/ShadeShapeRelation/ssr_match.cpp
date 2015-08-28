@@ -395,7 +395,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 												areaX += dbLabels.area(xLabel);
 											}
 										}
-										areaUP += areaX + (areaY * (areaX/totalDenomAreaDB));
+										areaDB += areaX + (areaY * (areaX/totalDenomAreaDB));
 									} catch (const std::out_of_range &oor) {
 										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 										printf("4\n");
@@ -417,6 +417,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
 								fprintf(fp,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
 								fprintf(fp,"TotalAreaUP: %d, TotalAreaDB: %d\n",totalAreaUP,totalAreaDB);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
