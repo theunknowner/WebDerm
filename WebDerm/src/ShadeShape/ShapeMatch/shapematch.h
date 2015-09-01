@@ -18,26 +18,28 @@ class ShapeMatch {
 protected:
 	static bool THRESH_IMPORTED;
 	enum {SHIFT_NONE=0, SHIFT_LEFT, SHIFT_RIGHT};
-	vector<String> SHIFT = {"SHIFT_NONE","SHIFT_START"};
+	vector<String> _SHIFT = {"SHIFT_NONE","SHIFT_START"};
 	static vector<String> shapeNames;
-	static vector<vector<String> > shiftingRules;
-	static vector<vector<float> > shiftingPenalties;
 
 public:
+	static vector<vector<String> > shiftingRules;
+	static vector<vector<float> > shiftingPenalties;
 	ShapeMatch();
 	bool importThresholds();
 	bool shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shiftType);
 	bool shape_translation2(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape);
 	void showIslands(vector<vector<vector<Islands> > > &islandVec);
 	void printIslandAreas(vector<vector<vector<Islands> > > &islandVec);
-	int numOfShapes();
+
 	String shapeName(int num);
 	int getShapeIndex(String shape);
 	void moveShape(vector<vector<vector<Islands> > > &islandVec,int shapeNum, int shadeNum, int islNum, int newShape);
+	int numOfShapes();
+	vector<String> SHIFT();
+	float applyShiftPenalty(float score, int shapeNum, int shapeNum2);
+	float getShiftPenalty(int shapeNum, int shapeNum2);
 	static void printRules();
 	static void printPenalties();
-	static float applyShiftPenalty(float score, int shapeNum, int shapeNum2);
-	static float getShiftPenalty(int shapeNum, int shapeNum2);
 };
 
 #endif /* SHAPEMATCH_H_ */

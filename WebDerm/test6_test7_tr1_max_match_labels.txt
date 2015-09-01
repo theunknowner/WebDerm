@@ -1,0 +1,5 @@
+0) 3_Incomp-Disc_s0_000: 26 | 3_Incomp-Disc_s0_000: 0
+1) 3_Incomp-Disc_s0_001: 20 | 3_Incomp-Disc_s0_001: 0
+2) 4_Comp-Disc_s0_000: 19 | 4_Comp-Disc_s0_000: 0
+3) 6_Comp-Donut_s0_000: 1828 | 6_Comp-Donut_s0_000: 1621
+4) 6_Comp-Donut_s1_000: 2303 | 6_Comp-Donut_s1_000: 1997

@@ -19,7 +19,7 @@ class Islands;
 class Labels;
 class ShadeShapeRelation;
 
-class ShadeShapeMatch : public ShapeMatch, public ShadeMatch {
+class ShadeShapeMatch {
 private:
 	int debugMode = 0;
 	//[shape][shade][idx]
@@ -28,11 +28,9 @@ private:
 	vector<vector<vector<Islands> > > groupIslandsByShade(ShadeShape &ss);
 	vector<vector<vector<Islands> > > groupIslandsByShape(ShadeShape &ss);
 	void sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec);
-	void fillPropAreaMapGaps(Labels &upLabels, Labels &dbLabels);
-	float dotProduct(Labels &upLabels, Labels &dbLabels);
-	float tr1_match(ShadeShape &upSS, ShadeShape &dbSS);
-	float tr2_match(ShadeShape &upSS, ShadeShape &dbSS);
-	float tr1(Labels &upLabels, Labels &dbLabels);
+	void fillMissingLabels(Labels &upLabels, Labels &dbLabels);
+	float dotProduct(Labels &upLabels, Labels &dbLabels, int shapeNum1=-1, int shapeNum2=-1);
+	float tr1(Labels &upLabels, Labels &dbLabels, int shapeNum1=-1, int shapeNum2=-1);
 	float tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
 public:
 	void test(ShadeShape &ss);

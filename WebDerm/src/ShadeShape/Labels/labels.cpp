@@ -39,6 +39,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 					int area = islandVec.at(i).at(j).at(k).area();
 					float relArea = area / totalArea;
 					this->labelMap[label] = std::make_pair(area,relArea);
+					this->labelShapeShiftMap[label] = islandVec.at(i).at(j).at(k).isShapeShifted();
 				} else {
 					cout << "Labels::create(): map<String,pair<int,float> > labelMap duplicate keys!!!" << endl;
 					cout << label << endl;
@@ -134,12 +135,36 @@ int Labels::getIndex(String label) {
 	return -1;
 }
 
+String Labels::getShape(String label) {
+	for(unsigned int i=0; i<ShapeMatch::shapeNames.size(); i++) {
+		if(label.find(this->shapeName(i))!=string::npos) {
+			return this->shapeName(i);
+		}
+	}
+	return "";
+}
+
+String Labels::getShade(String label) {
+	size_t pos = label.find("_") + 1;
+	String shade = label.substr(pos,label.length()-pos);
+	pos = shade.find("_");
+	return shade.substr(0,pos);
+}
 void Labels::printCompareLabels(Labels &labels1, Labels &labels2) {
 	auto labelMap1 = labels1.getMap();
 	auto labelMap2 = labels2.getMap();
 	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
 		int i = distance(labelMap1.begin(),it1);
 		printf("%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+	}
+}
+
+bool Labels::isShapeShifted(String label) {
+	if(this->labelShapeShiftMap.find(label)!=this->labelShapeShiftMap.end()) {
+		return this->labelShapeShiftMap.at(label);
+	}
+	else {
+		return false;
 	}
 }
 

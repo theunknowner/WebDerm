@@ -16,6 +16,7 @@ class Islands;
 class Labels : public ShapeMatch{
 private:
 	map<String, pair<int,float> > labelMap;
+	map<String,bool> labelShapeShiftMap;
 	String labelName;
 	int labelTotalArea;
 	void calcTotalArea();
@@ -36,6 +37,9 @@ public:
 	String& name();
 	void printLabels();
 	int getIndex(String label);
+	String getShape(String label);
+	String getShade(String label);
+	bool isShapeShifted(String label);
 	static void printCompareLabels(Labels &labels1, Labels &labels2);
 	static void writeCompareLabels(Labels &labels1, Labels &labels2);
 };

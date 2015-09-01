@@ -76,6 +76,7 @@ Islands::Islands(Mat islandImg) {
 	this->determineIslandShape(islandImg);
 	this->getIslandPoints(islandImg);
 	this->_labelName = "";
+	this->is_shape_shifted = false;
 }
 
 //! returns area/number of pixels of island
@@ -141,4 +142,8 @@ String& Islands::labelName() {
 
 bool Islands::isEmpty() {
 	return this->islandImg.empty();
+}
+
+bool& Islands::isShapeShifted() {
+	return this->is_shape_shifted;
 }

@@ -75,7 +75,7 @@ bool ShapeMatch::importThresholds() {
 
 // shifts specified shape to the left
 bool ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shiftType) {
-	if(SHIFT[shiftType]!="SHIFT_NONE") {
+	if(ShapeMatch::_SHIFT[shiftType]!="SHIFT_NONE") {
 		//printf("%d: %lu\n",shapeNum,islandVec.at(shapeNum).size());
 		vector<vector<vector<Islands> > > newIslandVec = islandVec;
 		vector<int> areaVec;
@@ -94,9 +94,9 @@ bool ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec,
 			vector<int>::iterator it = max_element(areaVec.begin(),areaVec.end());
 			int max_pos = it - areaVec.begin();
 			int new_shape = shapeNum;
-			if(SHIFT[shiftType] == "SHIFT_LEFT")
+			if(ShapeMatch::_SHIFT[shiftType] == "SHIFT_LEFT")
 				new_shape = shapeNum - 1;
-			if(SHIFT[shiftType] == "SHIFT_RIGHT")
+			if(ShapeMatch::_SHIFT[shiftType] == "SHIFT_RIGHT")
 				new_shape = shapeNum + 1;
 			//printf("shape%d: %d | NewShape: %d\n",shapeNum,max_pos,new_shape);
 			newIslandVec.at(new_shape).at(max_pos).push_back(islandVec.at(shapeNum).at(max_pos).front());
@@ -129,6 +129,7 @@ bool ShapeMatch::shape_translation2(vector<vector<vector<Islands> > > &islandVec
 		int max_pos = it - areaVec.begin();
 		int new_shape = newShape;
 		//printf("shape%d: %d | NewShape: %d\n",shapeNum,max_pos,new_shape);
+		islandVec.at(shapeNum).at(max_pos).front().isShapeShifted() = true;
 		newIslandVec.at(new_shape).at(max_pos).push_back(islandVec.at(shapeNum).at(max_pos).front());
 		newIslandVec.at(shapeNum).at(max_pos).erase(newIslandVec.at(shapeNum).at(max_pos).begin());
 		islandVec = newIslandVec;
@@ -188,6 +189,10 @@ int ShapeMatch::getShapeIndex(String shape) {
 void ShapeMatch::moveShape(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shadeNum, int islNum, int newShape) {
 	islandVec.at(newShape).at(shadeNum).push_back(islandVec.at(shapeNum).at(shadeNum).at(islNum));
 	islandVec.at(shapeNum).at(shadeNum).erase(islandVec.at(shapeNum).at(shadeNum).begin()+islNum);
+}
+
+vector<String> ShapeMatch::SHIFT() {
+	return this->_SHIFT;
 }
 
 void ShapeMatch::printRules() {

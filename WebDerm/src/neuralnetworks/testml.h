@@ -14,7 +14,7 @@ class TestML {
 private:
 	Mat data;
 	Mat labels;
-	vector<String> shapeNames = {"Comp_Disc","Incomp_Disc","Comp_Donut","Incomp_Donut",
+	vector<String> shapeNames = {"Comp-Disc","Incomp-Disc","Comp-Donut","Incomp-Donut",
 			"Default","Strip","Blotch","Excavated"};
 	static bool THRESH_IMPORTED;
 public:
