@@ -12,9 +12,27 @@
 
 bool TestML::THRESH_IMPORTED = false;
 String TestML::PARAM_PATH = "Thresholds/param.xml";
+vector<String> TestML::shapeNames;
 
 TestML::TestML() {
 	assert(fs::exists(PARAM_PATH)==true);
+	if(!TestML::THRESH_IMPORTED)
+		TestML::THRESH_IMPORTED = this->importThresholds();
+}
+
+bool TestML::importThresholds() {
+	fstream fs("Thresholds/shape_names.csv");
+	if(fs.is_open()) {
+		String temp;
+		while(getline(fs,temp)) {
+			TestML::shapeNames.push_back(temp);
+		}
+		fs.close();
+		return true;
+	} else {
+		printf("TestML::importThreshold() failed, shape_names.csv does not exist!\n");
+	}
+	return false;
 }
 
 Mat TestML::getData() {
@@ -248,9 +266,9 @@ void TestML::importTrainingData(String samplePath, String labelsPath, Size size)
 }
 
 String TestML::getShapeName(int num) {
-	return this->shapeNames[num];
+	return TestML::shapeNames[num];
 }
 
 int TestML::numOfShapes() {
-	return this->shapeNames.size();
+	return TestML::shapeNames.size();
 }

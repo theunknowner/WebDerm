@@ -14,12 +14,12 @@ class TestML {
 private:
 	Mat data;
 	Mat labels;
-	vector<String> shapeNames = {"Comp-Disc","Incomp-Disc","Comp-Donut","Incomp-Donut",
-			"Default","Strip","Blotch","Excavated"};
+	static vector<String> shapeNames;
 	static bool THRESH_IMPORTED;
 public:
 	static String PARAM_PATH;
 	TestML();
+	bool importThresholds();
 	Mat getData();
 	Mat getLabels();
 	Mat layers;

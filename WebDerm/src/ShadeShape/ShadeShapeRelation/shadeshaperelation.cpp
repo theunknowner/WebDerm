@@ -90,7 +90,6 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 											} else {
 												int index2 =  distance(lbls.begin(),lbls.find(label2));
 												int area2 = isl2.area();
-												srm.relationArea(index1,index2) = std::make_pair(area1,area2);
 												Point center2 = isl2.centerOfMass();
 												float centerDist = abs(MyMath::eucDist(center,center2));
 												float relArea1 = (float)isl1.area() / ss.image().total();
@@ -99,6 +98,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												if(centerDist<=thresh && srm.relation(index1,index2)==NONE) {
 													srm.relation(index1,index2) = INDIR;
 													srm.relation(index2,index1) = INDIR;
+													srm.relationArea(index1,index2) = std::make_pair(area1,area2);
 												}
 												if(srm.relation(index1,index2)<=DIR) {
 													if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
@@ -153,14 +153,16 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 				//check if island is surrounded by other islands
 				for(unsigned int index2=0; index2<srm.size(); index2++) {
 					int neighborNumber=0;
+					int area2 = labels.area(index2);
 					if(neighborNumCount.at(index1).at(index2).size()>0) {
 						neighborNumber = majority(neighborNumCount.at(index1).at(index2));
 					}
 					float countPercent = (float)srm.relationCount(index1,index2) / totalTimesEntered;
-					/*if(index1==75 && index2==76) {
+					/*if(index1==6 && index2==0) {
 						printf("%s | %s\n",label1.c_str(),labels.at(index2).c_str());
 						printf("Center: (%d,%d)\n",center.x,center.y);
 						printf("Relation: %s\n",this->rel_op.at(srm.relation(index1,index2)).c_str());
+						printf("Area1: %d, Area2: %d\n",area1,area2);
 						printf("Count: %d\n",srm.relationCount(index1,index2));
 						printf("NeighborNumCount.Size(): %lu\n",neighborNumCount.at(index1).at(index2).size());
 						printf("Majority: %d\n", neighborNumber);
@@ -180,6 +182,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 							srm.relation(index2,index1) = DIR;
 						}
 					}
+					srm.relationArea(index1,index2) = std::make_pair(area1,area2);
 				}
 			}// end num1 loop
 		}// end shade1 loop

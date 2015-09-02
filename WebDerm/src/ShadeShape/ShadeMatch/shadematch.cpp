@@ -87,6 +87,7 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 				ss.image() = shiftedImg;
 				this->featIslIdxStoreVec.push_back(indexVec2d.at(pos));
 				this->featIslStored = true;
+				return true;
 			}
 			this->featIslStored = false;
 			return true;
@@ -122,7 +123,6 @@ vector<String> ShadeMatch::SHIFT() {
 
 float ShadeMatch::applyShiftPenalty(ShadeShape &ss, float score, int shiftAmt) {
 	float totalRelArea = 0.0;
-	cout << this->featIslIdxStoreVec.size() << endl;
 	for(unsigned int i=0; i<this->featIslIdxStoreVec.size(); i++) {
 		int featNum = this->featIslIdxStoreVec.at(i).at(0);
 		int islNum = this->featIslIdxStoreVec.at(i).at(1);

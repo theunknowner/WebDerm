@@ -69,16 +69,15 @@ int main(int argc,char** argv)
 	Labels lbl;
 	cout << lbl.getShape(shape) << endl;;
 	*/
-
+/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	ssm.debug_mode(1);
+	//ssm.debug_mode(2);
 	//cout << ssm.test_match(ss1,ss2) << endl;
 	vector<float> results = ssm.match(ss1,ss2);
 	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
-	//ss1.showInteractiveIslands();
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
@@ -91,7 +90,7 @@ int main(int argc,char** argv)
 	imwrite("strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-	/*
+/*
 	Timer time;
 	String folder = "Looks_Like/";
 	deque<String> files;
@@ -126,7 +125,7 @@ int main(int argc,char** argv)
 	time.end();
 	time.printTimer();
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);

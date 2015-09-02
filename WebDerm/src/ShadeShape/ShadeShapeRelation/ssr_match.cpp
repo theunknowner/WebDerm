@@ -358,6 +358,14 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											int rel_op_idx = srmUP.relation(yIdx,xIdx);
 											if(rel_op_idx==k) {
 												totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
+												/*if(labelUP1=="0_Strip_s4" && labelUP2=="1_Default_s2" && m==1) {
+													printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
+													printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
+													printf("rel_op_idx: %d\n",rel_op_idx);
+													printf("srmRelationArea: %d\n",srmUP.relationArea(yIdx,xIdx).second);
+													printf("totalDenomAreaUP: %f\n",totalDenomAreaUP);
+
+												}*/
 											}
 										}
 										int areaX=0;
