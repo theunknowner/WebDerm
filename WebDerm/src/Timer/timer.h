@@ -19,6 +19,7 @@ public:
 	void begin();
 	void end();
 	vector<int> getTime();
+	String getTimeString();
 	void printTimer();
 };
 

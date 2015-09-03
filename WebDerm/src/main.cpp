@@ -90,7 +90,7 @@ int main(int argc,char** argv)
 	imwrite("strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	Timer time;
 	String folder = "Looks_Like/";
 	deque<String> files;
@@ -120,12 +120,16 @@ int main(int argc,char** argv)
 	for(unsigned int i=0; i<resultVec.size(); i++) {
 		fprintf(fp,"%s,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2));
 	}
-	fclose(fp);
 	printf("%s...Done!\n",argv[1]);
+	fclose(fp);
 	time.end();
 	time.printTimer();
+	output = std::string(argv[1]) + "_time_elapsed.txt";
+	fp = fopen(output.c_str(),"w"); //reuse fp
+	fprintf(fp,"%s\n",time.getTimeString().c_str());
+	fclose(fp);
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);

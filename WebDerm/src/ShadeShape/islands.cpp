@@ -136,6 +136,21 @@ map<String,Point>& Islands::coordinates() {
 	return this->coordMap;
 }
 
+bool Islands::containsCoordinate(String coords) {
+	if(this->coordMap.find(coords)!=this->coordMap.end()) {
+		return true;
+	}
+	return false;
+}
+
+bool Islands::containsCoordinate(Point pt) {
+	String coords = std::to_string(pt.x) + "," + std::to_string(pt.y);
+	if(this->coordMap.find(coords)!=this->coordMap.end()) {
+		return true;
+	}
+	return false;
+}
+
 String& Islands::labelName() {
 	return this->_labelName;
 }

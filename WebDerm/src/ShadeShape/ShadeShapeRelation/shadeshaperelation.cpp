@@ -35,30 +35,33 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 				int area1 = isl1.area();
 				Point center = isl1.centerOfMass();
 				String coords1 = toString(center.x)+","+toString(center.y);
-				vector<vector<float> > neighborDistVec(lbls.size(),vector<float>(lbls.size(),140.0));
 				vector<vector<vector<int> > > neighborNumCount(lbls.size(),vector<vector<int> >(lbls.size(),vector<int>(0,0)));
 				int totalTimesEntered = 0;
 				for(double theta=0.0; theta<360.0; theta+=interval) {
 					vector<int> vecWidth(labels.size(),0);
 					vector<int> islandHitVec; //stores the labels and index for islands that has been entered
 					map<String,int> islandHitMap;
+					vector<vector<int> > touchCountVec(lbls.size(),vector<int>(lbls.size(),0));
 					int neighborNum = 0;
 					String prevLabel2="";
 					int row=center.y, col=center.x;
 					float fRow = center.y, fCol = center.x;
 					double deg = theta * M_PI / 180.0; //convert to degrees
-					int state = isl1.coordinates().find(coords1)!=isl1.coordinates().end() ? State::ENTERED : State::OUTSIDE;
+					int state = isl1.containsCoordinate(coords1) ? State::ENTERED : State::OUTSIDE;
 					State insideIsland1(state);
 					while(row<isl1.image().rows && col<isl1.image().cols && row>=0 && col>=0) {
 						String coords2 = toString(col)+","+toString(row);
 						if(insideIsland1.currentState()==State::OUTSIDE) {
-							if(isl1.coordinates().find(coords2)!=isl1.coordinates().end()) {
+							if(isl1.containsCoordinate(coords2)) {
 								insideIsland1.setState(State::ENTERED);
-								totalTimesEntered++;
 							}
 						}
-						if(insideIsland1.currentState()==State::ENTERED) {
-							if(isl1.coordinates().find(coords2)!=isl1.coordinates().end()) {
+						if(insideIsland1.currentState()==State::ENTERED || insideIsland1.currentState()==State::INSIDE) {
+							if(insideIsland1.currentState()==State::ENTERED) {
+								totalTimesEntered++;
+								insideIsland1.setState(State::INSIDE);
+							}
+							if(isl1.containsCoordinate(coords2)) {
 								vecWidth.at(index1)++;
 								minWidthForVisibility = min(vecWidth.at(index1),visibilityThresh);
 								beginCoords = Point(col,row);
@@ -103,15 +106,27 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												if(srm.relation(index1,index2)<=DIR) {
 													if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
 													if(insideIsland2.currentState()==State::ENTERED) {
+														endCoords = Point(col,row);
+														float dist = MyMath::eucDist(beginCoords,endCoords);
 														if(islandHitMap.find(label2)==islandHitMap.end()) {
 															neighborNum++;
 															islandHitVec.push_back(index2);
 															islandHitMap[label2] = neighborNum;
 															neighborNumCount.at(index1).at(index2).push_back(neighborNum);
+															if(dist<2) {
+																touchCountVec.at(index1).at(index2)=1;
+															}
+															/*if(index1==31 && index2==107 && theta==180.0) {
+																printf("%s | %s\n",label1.c_str(),label2.c_str());
+																printf("Center: %s\n",coords1.c_str());
+																printf("Deg: %f\n",theta);
+																printf("Coords: %s\n",coords2.c_str());
+																printf("BeginCoord: (%d,%d)\n",beginCoords.x,beginCoords.y);
+																printf("EndCoord: (%d,%d)\n",endCoords.x,endCoords.y);
+																printf("Dist: %f\n",dist);
+																printf("TouchCount: %d\n",srm.relationTouchCount(index1,index2));
+															}*/
 														}
-														endCoords = Point(col,row);
-														float dist = MyMath::eucDist(beginCoords,endCoords);
-														neighborDistVec.at(index1).at(index2) = min(neighborDistVec.at(index1).at(index2),dist);
 														/*if(index1==45 && index2==84) {
 															printf("%s | %s\n",label1.c_str(),label2.c_str());
 															printf("Deg: %f, %s\n",theta,coords2.c_str());
@@ -148,6 +163,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 							if(vecWidth.at(index2)>=minWidthForVisibility && islandHitMap.find(labels.at(index2))!=islandHitMap.end())
 								srm.relationCount(index1,index2)++;
 						}
+						srm.relationTouchCount(index1,index2) += touchCountVec.at(index1).at(index2);
 					}
 				}// end theta loop
 				//check if island is surrounded by other islands
@@ -158,12 +174,14 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 						neighborNumber = majority(neighborNumCount.at(index1).at(index2));
 					}
 					float countPercent = (float)srm.relationCount(index1,index2) / totalTimesEntered;
-					/*if(index1==6 && index2==0) {
+					float touchCountPercent = (float)srm.relationTouchCount(index1,index2) / totalTimesEntered;
+					/*if(index1==8 && index2==107) {
 						printf("%s | %s\n",label1.c_str(),labels.at(index2).c_str());
 						printf("Center: (%d,%d)\n",center.x,center.y);
 						printf("Relation: %s\n",this->rel_op.at(srm.relation(index1,index2)).c_str());
 						printf("Area1: %d, Area2: %d\n",area1,area2);
-						printf("Count: %d\n",srm.relationCount(index1,index2));
+						printf("Count: %d(%f)\n",srm.relationCount(index1,index2),countPercent);
+						printf("TouchCount: %d(%f)\n",srm.relationTouchCount(index1,index2),touchCountPercent);
 						printf("NeighborNumCount.Size(): %lu\n",neighborNumCount.at(index1).at(index2).size());
 						printf("Majority: %d\n", neighborNumber);
 						printf("TotalTimesEntered: %d\n",totalTimesEntered);
@@ -175,9 +193,14 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 						srm.neighborLevel(index2,index1) = max(neighborNumber,srm.neighborLevel(index2,index1));
 						srm.maxNeighborLevel() = max(srm.maxNeighborLevel(),neighborNumber);
 					}
-					if(countPercent<surroundedThreshUpper && countPercent>=surroundedThreshLower) {
-						float dist = neighborDistVec.at(index1).at(index2);
-						if(neighborNumber==1 && dist<directNeighborDistThresh) {
+					else if(touchCountPercent<surroundedThreshUpper && touchCountPercent>=surroundedThreshLower) {
+						if(neighborNumber==1) {
+							srm.relation(index1,index2) = DIR;
+							srm.relation(index2,index1) = DIR;
+						}
+					}
+					else if(countPercent<surroundedThreshUpper && countPercent>=surroundedThreshLower && touchCountPercent>=surroundedThreshUpper) {
+						if(neighborNumber==1) {
 							srm.relation(index1,index2) = DIR;
 							srm.relation(index2,index1) = DIR;
 						}

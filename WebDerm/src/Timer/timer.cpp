@@ -32,6 +32,14 @@ vector<int> Timer::getTime() {
 	vector<int> time = {this->hours,this->minutes,this->seconds};
 	return time;
 }
+
+String Timer::getTimeString() {
+	char text[100];
+	sprintf(text,"Time Elapsed: %dh:%dm:%ds\n",this->hours,this->minutes,this->seconds);
+	String timeStr(text);
+	return timeStr;
+}
+
 void Timer::printTimer() {
 	printf("Time Elapsed: %dh:%dm:%ds\n",this->hours,this->minutes,this->seconds);
 }

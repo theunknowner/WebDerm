@@ -39,6 +39,8 @@ public:
 	void set_island_shade(int shade);
 	Point centerOfMass();
 	map<String,Point>& coordinates();
+	bool containsCoordinate(String coords);
+	bool containsCoordinate(Point pt);
 	String& labelName();
 	bool isEmpty();
 	bool& isShapeShifted();

@@ -1,0 +1,26 @@
+[1_Default_s4][SURR_BY][1_Default_s4] : Level 4
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+TotalCountUP: 0, TotalCountDB: 0
+EntropyVal: 1.000000
+MaxNeighborLevelUP: 5, MaxNeighborLevelDB: 5
+AreaValUP: 6.812500, AreaValDB: 3.312500
+TotalAreaUP: 0, TotalAreaDB: 0
+MaxTotalArea: 14011
+RelArea: 0.000236
+SumOfArea: 3.312500
+WeightedEntropy: 0.000236
+TotalEntropy: 0.000236
+----------------------------------
+[1_Default_s4][SURR_BY][5_Incomp-Donut_s3] : Level 1
+CountUP: 1, EntUP: 0.000000, CountDB: 1, EntDB: 0.000000
+TotalCountUP: 0, TotalCountDB: 0
+EntropyVal: 1.000000
+MaxNeighborLevelUP: 5, MaxNeighborLevelDB: 5
+AreaValUP: 3602.500000, AreaValDB: 3878.000000
+TotalAreaUP: 0, TotalAreaDB: 0
+MaxTotalArea: 14011
+RelArea: 0.257119
+SumOfArea: 3605.812500
+WeightedEntropy: 0.257119
+TotalEntropy: 0.257356
+----------------------------------

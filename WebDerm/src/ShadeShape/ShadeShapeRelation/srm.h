@@ -22,6 +22,7 @@ private:
 	vector<vector<int> > relationOpMatrix;
 	vector<vector<int> > neighborLevelMatrix;
 	vector<vector<int> > relationCountMatrix;
+	vector<vector<int> > relationTouchCountMatrix;
 	vector<vector<pair<int,int>> > relationAreaMatrix;
 
 protected:
@@ -35,6 +36,7 @@ public:
 	int& relation(int index1, int index2);
 	int& relationCount(int index1, int index2);
 	int& neighborLevel(int index1, int index2);
+	int& relationTouchCount(int index1, int index2);
 	pair<int,int>& relationArea(int index1, int index2);
 	size_t size();
 	int& maxNeighborLevel();
