@@ -330,6 +330,23 @@ void ShadeShape::set_island_shade(int featNum, int islNum, int newShade) {
 	}
 }
 
+void ShadeShape::writeListOfIslandsWithLowNN() {
+	FILE * fp;
+	FILE * fp2;
+	String file = this->ss_name + "_Low_NN_Islands.csv";
+	fp = fopen(file.c_str(),"w");
+	for(int i=0; i<this->numOfFeatures(); i++) {
+		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
+			Islands isl = this->feature(i).island(j);
+			float nn_results = *max_element(isl.nn_results().begin<float>(),isl.nn_results().end<float>());
+			if(nn_results<=0.50) {
+				fprintf(fp,"F%d_I%d,%d,(%d;%d),%f,%s\n",i,j,isl.area(),isl.coordinates().begin()->second.x,isl.coordinates().begin()->second.y,nn_results,isl.shape_name().c_str());
+			}
+		}
+	}
+	fclose(fp);
+}
+
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
 	Size size(3,3);
 	vector<Point> ptsVec;

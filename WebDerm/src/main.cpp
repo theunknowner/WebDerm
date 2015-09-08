@@ -83,14 +83,15 @@ int main(int argc,char** argv)
 	//imwrite("comp_disc.png",island.image());
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis13a");
+	ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
+	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(46,88));
+	Islands island = ss1.getIslandWithPoint(Point(123,48));
 	imwrite("strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	Timer time;
 	String folder = "Looks_Like/";
 	deque<String> files;
@@ -129,7 +130,7 @@ int main(int argc,char** argv)
 	fprintf(fp,"%s\n",time.getTimeString().c_str());
 	fclose(fp);
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -161,10 +162,10 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-	/*
+/*
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/Desktop/workspace/test10.png",0);
+	Mat sample = imread("/home/jason/git/WebDerm/WebDerm/strip.png",0);
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(20,20));

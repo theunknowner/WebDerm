@@ -291,6 +291,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 												int rel_op_idx = srmUP.relation(yIdx,xIdx);
 												if(rel_op_idx==k) {
 													totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).first;
+													totalCountUP++;
 												}
 											} catch (const std::out_of_range &oor) {
 												printf("ShadeShapeRelationMatch::entropy() out of range!\n");
@@ -327,6 +328,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											int rel_op_idx = srmDB.relation(yIdx,xIdx);
 											if(rel_op_idx==k) {
 												totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).first;
+												totalCountDB++;
 											}
 										}
 										int areaY=0;
@@ -358,6 +360,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											int rel_op_idx = srmUP.relation(yIdx,xIdx);
 											if(rel_op_idx==k) {
 												totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
+												totalCountUP++;
 												/*if(labelUP1=="0_Strip_s4" && labelUP2=="1_Default_s2" && m==1) {
 													printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
 													printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
@@ -393,6 +396,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											int rel_op_idx = srmDB.relation(yIdx,xIdx);
 											if(rel_op_idx==k) {
 												totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
+												totalCountDB++;
 											}
 										}
 										int areaX=0;
@@ -454,6 +458,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								for(unsigned int x=0; x<srmAreaUP.size(); x++) {
 									for(int m=0; m<this->relOpLevelSize; m++) {
 										totalAreaUP += srmAreaUP.at(i).at(x).at(k).at(m).second;
+										totalCountUP += srmCountUP.at(i).at(x).at(k).at(m);
 									}
 								}
 							}
@@ -461,6 +466,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								for(unsigned int y=0; y<srmAreaUP.size(); y++) {
 									for(int m=0; m<this->relOpLevelSize; m++) {
 										totalAreaUP += srmAreaUP.at(y).at(j).at(k).at(m).first;
+										totalCountUP += srmCountUP.at(y).at(j).at(k).at(m);
 									}
 								}
 							}
@@ -468,6 +474,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								for(unsigned int x=0; x<srmAreaDB.size(); x++) {
 									for(int m=0; m<this->relOpLevelSize; m++) {
 										totalAreaDB += srmAreaDB.at(i).at(x).at(k).at(m).second;
+										totalCountDB += srmCountDB.at(i).at(x).at(k).at(m);
 									}
 								}
 							}
@@ -475,6 +482,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								for(unsigned int y=0; y<srmAreaDB.size(); y++) {
 									for(int m=0; m<this->relOpLevelSize; m++) {
 										totalAreaDB += srmAreaDB.at(y).at(j).at(k).at(m).first;
+										totalCountDB += srmCountDB.at(y).at(j).at(k).at(m);
 									}
 								}
 							}

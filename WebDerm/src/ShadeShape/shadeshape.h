@@ -53,6 +53,7 @@ public:
 	void showInteractiveIslands();
 	void set_island_shade(int featNum, int islNum, int newShade);
 
+	void writeListOfIslandsWithLowNN();
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };
 
