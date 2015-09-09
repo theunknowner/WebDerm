@@ -12,11 +12,23 @@ Timer::Timer() {
 }
 
 void Timer::begin() {
-	this->time.restart();
+	time_t rawtime;
+	struct tm * timeinfo;
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+	this->start_time = std::string(asctime(timeinfo));
+
+	this->btimer.restart();
 }
 
 void Timer::end() {
-	this->seconds = round(this->time.elapsed());
+	time_t rawtime;
+	struct tm * timeinfo;
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+	this->end_time = std::string(asctime(timeinfo));
+
+	this->seconds = round(this->btimer.elapsed());
 	if(this->seconds>=60) {
 		this->minutes = floor(this->seconds/60);
 		this->seconds %= 60;
@@ -28,18 +40,42 @@ void Timer::end() {
 }
 
 //returns time in vector form of {0=hours,1=minutes,2=seconds}
-vector<int> Timer::getTime() {
-	vector<int> time = {this->hours,this->minutes,this->seconds};
-	return time;
+vector<int> Timer::getTimer() {
+	vector<int> timeVec = {this->hours,this->minutes,this->seconds};
+	return timeVec;
 }
 
-String Timer::getTimeString() {
+String Timer::getTimerString() {
 	char text[100];
-	sprintf(text,"Time Elapsed: %dh:%dm:%ds\n",this->hours,this->minutes,this->seconds);
+	sprintf(text,"Time Elapsed: %dh:%dm:%ds",this->hours,this->minutes,this->seconds);
 	String timeStr(text);
 	return timeStr;
 }
 
 void Timer::printTimer() {
 	printf("Time Elapsed: %dh:%dm:%ds\n",this->hours,this->minutes,this->seconds);
+}
+
+String Timer::getStartTime() {
+	return this->start_time;
+}
+
+String Timer::getEndTime() {
+	return this->end_time;
+}
+
+String Timer::getCurrentTime() {
+	time_t rawtime;
+	struct tm * timeinfo;
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+	return std::string(asctime(timeinfo));
+}
+
+void Timer::printCurrentTime() {
+	time_t rawtime;
+	struct tm * timeinfo;
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+	printf ("Current local time and date: %s", asctime(timeinfo));
 }

@@ -55,7 +55,7 @@ void Features::determineFeatureShape(Mat featureImg) {
 	vector<Mat> sampleVec;
 	Mat sample = featureImg.clone();
 	sample *= 255;
-	sample = ml.prepareImage(sample,Size(20,20));
+	sample = ml.prepareImage(sample,Size(40,40));
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	this->NN_Results = results;
@@ -68,7 +68,7 @@ void Features::determineFeatureShape(Mat featureImg) {
 				labelNum = j;
 			}
 		}
-		if(max<0) labelNum = 4;
+		//if(max<0) labelNum = 4; //sets shape to default if all results are negative
 		String shapeName = ml.getShapeName(labelNum);
 		this->featShape = labelNum;
 		this->featShapeName = shapeName;

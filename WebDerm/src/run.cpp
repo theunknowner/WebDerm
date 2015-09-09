@@ -121,6 +121,9 @@ Mat runResizeImage(Mat img, Size size)
 		if(img.cols<size.width || img.rows<size.height)
 		{resize(img, img2, size,0,0, INTER_CUBIC);}
 		img.release();
+	} else {
+		printf("runResizeImg(): img is empty!\n");
+		exit(1);
 	}
 	return img2;
 }

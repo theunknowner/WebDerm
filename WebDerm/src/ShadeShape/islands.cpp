@@ -18,7 +18,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	vector<Mat> sampleVec;
 	Mat sample = islandImg.clone();
 	sample *= 255;
-	sample = ml.prepareImage(sample,Size(20,20));
+	sample = ml.prepareImage(sample,Size(40,40));
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	this->NN_Results = results;
@@ -31,7 +31,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 				labelNum = j;
 			}
 		}
-		if(max<0) labelNum = 4;
+//		if(max<0) labelNum = 4; // sets shape to default if all results are negative
 		String shapeName = ml.getShapeName(labelNum);
 
 		this->islShape = labelNum;

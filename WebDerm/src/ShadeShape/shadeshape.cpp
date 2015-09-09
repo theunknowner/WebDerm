@@ -309,6 +309,7 @@ int ShadeShape::getMaxArea() {
 }
 
 void ShadeShape::showInteractiveIslands() {
+	winName = this->ss_name;
 	namedWindow(winName, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	cv::setMouseCallback(winName,onMouseCheckIslands, this);
 	imshow(winName,this->img);
@@ -345,6 +346,21 @@ void ShadeShape::writeListOfIslandsWithLowNN() {
 		}
 	}
 	fclose(fp);
+}
+
+void ShadeShape::extractIslandsWithLowNN() {
+	for(int i=0; i<this->numOfFeatures(); i++) {
+		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
+			Islands isl = this->feature(i).island(j);
+			float nn_results = *max_element(isl.nn_results().begin<float>(),isl.nn_results().end<float>());
+			if(nn_results<=0.50) {
+				char text[100];
+				sprintf(text,"%s_F%d_%d.png\n",this->ss_name.c_str(),i,j);
+				String name(text);
+				imwrite(name,isl.image());
+			}
+		}
+	}
 }
 
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {

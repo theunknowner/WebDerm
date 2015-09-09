@@ -68,8 +68,8 @@ int main(int argc,char** argv)
 	String shape = "2_Blotch_s0_000";
 	Labels lbl;
 	cout << lbl.getShape(shape) << endl;;
-	*/
-/*
+	 */
+	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
 	ShadeShapeMatch ssm;
@@ -83,15 +83,24 @@ int main(int argc,char** argv)
 	//imwrite("comp_disc.png",island.image());
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
+	String file = std::string(argv[1]);
+	String name = getFileName(file);
+	Mat img = imread(file,0);
+	ShadeShape ss1;
+	ss1.extract(img,name);
+	ss1.showInteractiveIslands();
+/**/
+/*
+	ShadeShape ss1 = Scripts::script31("urticaria8");
+	//ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(123,48));
-	imwrite("strip.png",island.image());
+	Islands island = ss1.getIslandWithPoint(Point(57,23));
+	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	Timer time;
 	String folder = "Looks_Like/";
 	deque<String> files;
@@ -127,10 +136,12 @@ int main(int argc,char** argv)
 	time.printTimer();
 	output = std::string(argv[1]) + "_time_elapsed.txt";
 	fp = fopen(output.c_str(),"w"); //reuse fp
-	fprintf(fp,"%s\n",time.getTimeString().c_str());
+	fprintf(fp,"%s\n",time.getTimerString().c_str());
+	fprintf(fp,"Begin: %s\n",time.getStartTime().c_str());
+	fprintf(fp,"End: %s\n",time.getEndTime().c_str());
 	fclose(fp);
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -165,10 +176,10 @@ int main(int argc,char** argv)
 /*
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/git/WebDerm/WebDerm/strip.png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/circle_test1.png",0);
 	sample *= 255;
 	imgshow(sample);
-	sample = ml.prepareImage(sample,Size(20,20));
+	sample = ml.prepareImage(sample,Size(40,40));
 	imgshow(sample);
 	vector<Mat> sampleVec;
 
@@ -180,9 +191,13 @@ int main(int argc,char** argv)
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
-	String path1 = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
-	String path2 = "/home/jason/git/Samples/Samples/Training/labels_path.csv";
-	ml.importTrainingData(path1,path2,Size(20,20));
+	String mainPath = "/home/jason/git/Samples/";
+	String path1 = mainPath + "Samples/Training/samples_path.csv";
+	String path2 = mainPath + "Samples/Training/labels_path.csv";
+	String path3 = mainPath + "Samples/log.txt";
+	Timer time;
+	time.begin();
+	ml.importTrainingData(path1,path2,Size(40,40));
 	Mat data = ml.getData();
 	Mat labels = ml.getLabels();
 	Mat training_set = data;
@@ -190,7 +205,7 @@ int main(int argc,char** argv)
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 20;
+	int hiddenNodes = 60;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
@@ -200,6 +215,16 @@ int main(int argc,char** argv)
 	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 4000, 0.000001);
 	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
 	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
+
+	time.end();
+	FILE * fp;
+	fp = fopen(path3.c_str(),"a");
+	fprintf(fp,"%s\n",time.getTimerString().c_str());
+	fprintf(fp,"%s",time.getEndTime().c_str());
+	fprintf(fp,"Iterations: %d\n",iter);
+	fprintf(fp,"-----------------------\n");
+	fclose(fp);
+
 	cout << "Iterations: " << iter << endl;
 	CvFileStorage* storage = cvOpenFileStorage("/home/jason/git/Samples/Samples/param.xml", 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");

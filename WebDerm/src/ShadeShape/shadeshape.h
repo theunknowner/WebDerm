@@ -54,6 +54,7 @@ public:
 	void set_island_shade(int featNum, int islNum, int newShade);
 
 	void writeListOfIslandsWithLowNN();
+	void extractIslandsWithLowNN();
 	vector<Mat> isolateConnectedFeatures(Mat src);
 };
 
