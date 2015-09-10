@@ -60,11 +60,20 @@ Mat TestML::prepareImage(Mat sample, Size size) {
 	float multiplier = (float)size.height / maxSize;
 
 	// assign new size using multiplier
-	int newRows = floor(crop_img.rows * multiplier);
-	int newCols = floor(crop_img.cols * multiplier);
+	int newRows = min((int)ceil(crop_img.rows * multiplier),size.height);
+	int newCols = min((int)ceil(crop_img.cols * multiplier),size.width);
 	_size = Size(newCols,newRows);
-
-	Mat img = runResizeImage(crop_img,_size);
+	Mat img;
+	try {
+		img = runResizeImage(crop_img,_size);
+	} catch(cv::Exception &e) {
+		printf("TestML::prepareImage(), runResizeImage() error!\n");
+		cout << "Crop_img size: " << crop_img.size() << endl;
+		cout << "Size: " << _size << endl;
+		printf("Max Size: %d\n",maxSize);
+		printf("Multiplier: %f\n",multiplier);
+		exit(1);
+	}
 	img *= 255;
 
 	//centers the feature
