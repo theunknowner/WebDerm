@@ -46,6 +46,7 @@
 #include "ShadeShape/ShadeShapeRelation/shadeshaperelation.h"
 #include "ShadeShape/Labels/labels.h"
 #include "Timer/timer.h"
+#include "Exceptions/my_exceptions.h"
 
 int main(int argc,char** argv)
 {
@@ -82,7 +83,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-/*
+	/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -90,58 +91,63 @@ int main(int argc,char** argv)
 	ss1.extract(img,name);
 	ss1.showInteractiveIslands();
 /**/
-/*
-	ShadeShape ss1 = Scripts::script31("urticaria8");
+	/*
+	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
 	//ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(57,23));
+	Islands island = ss1.getIslandWithPoint(Point(7,43));
 	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
-	Timer time;
-	String folder = "Looks_Like/";
-	deque<String> files;
-	FileData fd;
-	fd.getFilesFromDirectory(folder,files);
-	ShadeShape ss1 = Scripts::script31(argv[1]);
-	vector<vector<float> > resultVec;
-	vector<String> nameVec;
-	vector<int> origPos;
-	for(unsigned int i=0; i<files.size(); i++) {
-		String name = folder + files.at(i);
-		name = getFileName(name);
-		if(name!=argv[1]) {
-			ShadeShape ss2 = Scripts::script31(name);
-			ShadeShapeMatch ssm;
-			if(argc>=3)
-				ssm.debug_mode(atoi(argv[2]));
-			vector<float> results = ssm.match(ss1,ss2);
-			nameVec.push_back(name);
-			resultVec.push_back(results);
+	/*
+	try {
+		Timer time;
+		String folder = "Looks_Like/";
+		deque<String> files;
+		FileData fd;
+		fd.getFilesFromDirectory(folder,files);
+		ShadeShape ss1 = Scripts::script31(argv[1]);
+		vector<vector<float> > resultVec;
+		vector<String> nameVec;
+		vector<int> origPos;
+		for(unsigned int i=0; i<files.size(); i++) {
+			String name = folder + files.at(i);
+			name = getFileName(name);
+			if(name!=argv[1]) {
+				ShadeShape ss2 = Scripts::script31(name);
+				ShadeShapeMatch ssm;
+				if(argc>=3)
+					ssm.debug_mode(atoi(argv[2]));
+				vector<float> results = ssm.match(ss1,ss2);
+				nameVec.push_back(name);
+				resultVec.push_back(results);
+			}
 		}
+		jaysort(resultVec,origPos,1);
+		String output = std::string(argv[1]) + "_matches_sorted.csv";
+		FILE * fp;
+		fp = fopen(output.c_str(),"w");
+		for(unsigned int i=0; i<resultVec.size(); i++) {
+			fprintf(fp,"%s,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2));
+		}
+		printf("%s...Done!\n",argv[1]);
+		fclose(fp);
+		time.end();
+		time.printTimer();
+		output = std::string(argv[1]) + "_time_elapsed.txt";
+		fp = fopen(output.c_str(),"w"); //reuse fp
+		fprintf(fp,"%s\n",time.getTimerString().c_str());
+		fprintf(fp,"Begin: %s\n",time.getStartTime().c_str());
+		fprintf(fp,"End: %s\n",time.getEndTime().c_str());
+		fclose(fp);
+	} catch(MyExceptions &e) {
+		e.name(argv[1]);
+		e.writeErrorToFile();
 	}
-	jaysort(resultVec,origPos,1);
-	String output = std::string(argv[1]) + "_matches_sorted.csv";
-	FILE * fp;
-	fp = fopen(output.c_str(),"w");
-	for(unsigned int i=0; i<resultVec.size(); i++) {
-		fprintf(fp,"%s,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2));
-	}
-	printf("%s...Done!\n",argv[1]);
-	fclose(fp);
-	time.end();
-	time.printTimer();
-	output = std::string(argv[1]) + "_time_elapsed.txt";
-	fp = fopen(output.c_str(),"w"); //reuse fp
-	fprintf(fp,"%s\n",time.getTimerString().c_str());
-	fprintf(fp,"Begin: %s\n",time.getStartTime().c_str());
-	fprintf(fp,"End: %s\n",time.getEndTime().c_str());
-	fclose(fp);
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -173,13 +179,13 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-/*
+	/*
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/Desktop/workspace/TestNN/circle_test1.png",0);
+	Mat sample = imread("/home/jason/git/WebDerm/WebDerm/tinea_corporis8a_strip.png",0);
 	sample *= 255;
 	imgshow(sample);
-	sample = ml.prepareImage(sample,Size(40,40));
+	sample = ml.prepareImage(sample,Size(20,20));
 	imgshow(sample);
 	vector<Mat> sampleVec;
 
@@ -187,7 +193,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-/*
+	/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
@@ -197,7 +203,7 @@ int main(int argc,char** argv)
 	String path3 = mainPath + "Samples/log.txt";
 	Timer time;
 	time.begin();
-	ml.importTrainingData(path1,path2,Size(40,40));
+	ml.importTrainingData(path1,path2,Size(20,20));
 	Mat data = ml.getData();
 	Mat labels = ml.getLabels();
 	Mat training_set = data;
@@ -205,7 +211,7 @@ int main(int argc,char** argv)
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 60;
+	int hiddenNodes = 20;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;

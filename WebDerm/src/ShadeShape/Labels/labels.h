@@ -41,7 +41,7 @@ public:
 	String getShade(String label);
 	bool isShapeShifted(String label);
 	static void printCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
-	static void writeCompareLabels(Labels &labels1, Labels &labels2);
+	static void writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
 };
 
 #endif /* LABELS_H_ */

@@ -172,7 +172,7 @@ bool Labels::isShapeShifted(String label) {
 	}
 }
 
-void Labels::writeCompareLabels(Labels &labels1, Labels &labels2) {
+void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
 	String file = labels1.name() + "_" + labels2.name() + "_tr1_max_match_labels.txt";
 	FILE * fp;
 	fp = fopen(file.c_str(),"w");
@@ -180,7 +180,11 @@ void Labels::writeCompareLabels(Labels &labels1, Labels &labels2) {
 	auto labelMap2 = labels2.getMap();
 	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
 		int i = distance(labelMap1.begin(),it1);
-		fprintf(fp,"%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+		bool isShifted = labels1.isShapeShifted(it1->first);
+		if(markShifted==0 || !isShifted)
+			fprintf(fp,"%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+		else
+			fprintf(fp,"%d) *%s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
 	}
 	fclose(fp);
 }
