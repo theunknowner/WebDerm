@@ -110,7 +110,7 @@ bool ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec,
 
 //! shifts specified shape to the left
 //! only shifts the largest shape no matter what shade
-bool ShapeMatch::shape_translation2(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape) {
+bool ShapeMatch::shape_translation2(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape, int shiftAmt) {
 	vector<vector<vector<Islands> > > newIslandVec = islandVec;
 	vector<int> areaVec;
 	bool empty = true;
@@ -125,13 +125,17 @@ bool ShapeMatch::shape_translation2(vector<vector<vector<Islands> > > &islandVec
 		}
 	}
 	if(!empty) {
-		vector<int>::iterator it = max_element(areaVec.begin(),areaVec.end());
-		int max_pos = it - areaVec.begin();
-		int new_shape = newShape;
-		//printf("shape%d: %d | NewShape: %d\n",shapeNum,max_pos,new_shape);
-		islandVec.at(shapeNum).at(max_pos).front().isShapeShifted() = true;
-		newIslandVec.at(new_shape).at(max_pos).push_back(islandVec.at(shapeNum).at(max_pos).front());
-		newIslandVec.at(shapeNum).at(max_pos).erase(newIslandVec.at(shapeNum).at(max_pos).begin());
+		for(int i=0; i<shiftAmt; i++) {
+			auto it = max_element(areaVec.begin(), areaVec.end());
+			int max_shade_pos = it - areaVec.begin();
+			int new_shape = newShape;
+			if(areaVec.at(max_shade_pos)>0) {
+				islandVec.at(shapeNum).at(max_shade_pos).front().isShapeShifted() = true;
+				newIslandVec.at(new_shape).at(max_shade_pos).push_back(islandVec.at(shapeNum).at(max_shade_pos).front());
+				newIslandVec.at(shapeNum).at(max_shade_pos).erase(newIslandVec.at(shapeNum).at(max_shade_pos).begin());
+				areaVec.at(max_shade_pos) = 0;
+			}
+		}
 		islandVec = newIslandVec;
 		return true;
 	}

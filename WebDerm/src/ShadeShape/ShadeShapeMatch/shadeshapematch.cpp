@@ -313,6 +313,7 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 }
 
 vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
+	const int shapeShiftAmt = 2;
 	ShapeMatch shapematch;
 	ShadeMatch shadematch;
 	shadematch.setMaxShades(upSS.get_shades(),dbSS.get_shades());
@@ -383,15 +384,15 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 				}
 			}
 		}
-		for(unsigned int shapeShift=0; shapeShift<shapematch.SHIFT().size(); shapeShift++) {
-			if(shapematch.SHIFT()[shapeShift]=="SHIFT_START") {
+		for(unsigned int shapeShift=0; shapeShift<=shapeShiftAmt; shapeShift++) {
+			if(shapeShift>0) {
 				for(unsigned int shapeNum=0; shapeNum<islandVec2.size(); shapeNum++) {
 					bool flag = false;
 					for(unsigned int j=0; j<ShapeMatch::shiftingRules.at(shapeNum).size(); j++) {
 						islandVec3 = islandVec2; //resets to islandVec2
 						String newShape = ShapeMatch::shiftingRules.at(shapeNum).at(j);
 						int newShapeIdx = shapematch.getShapeIndex(newShape);
-						flag = shapematch.shape_translation2(islandVec3,shapeNum,newShapeIdx);
+						flag = shapematch.shape_translation2(islandVec3,shapeNum,newShapeIdx,shapeShift);
 						if(flag==true) {
 							this->sortIslandsByArea(islandVec3);
 							upLabels = Labels(islandVec3,upTotalArea,upSS.name());
@@ -414,6 +415,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 								printf("CurrShape: %s, ",shapematch.shapeName(shapeNum).c_str());
 								printf("NewShape: %s\n",newShape.c_str());
 								//printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_score,results);
+								printf("ShapeShiftAmt: %d\n",shapeShift);
 								printf("TR1: %f\n",tr1_score);
 								Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled,1);
 								cout << "-------------------------" << endl;
@@ -455,7 +457,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		}
 	}
 
-	Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB);
+	Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB,1);
 	imwrite(upSS.name()+"_"+dbSS.name()+"_max_match_image.png",maxMatchImg);
 	ShadeShapeRelation ssrUP;
 	ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec);

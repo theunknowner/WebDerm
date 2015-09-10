@@ -27,7 +27,7 @@ public:
 	ShapeMatch();
 	bool importThresholds();
 	bool shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shiftType);
-	bool shape_translation2(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape);
+	bool shape_translation2(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape, int shiftAmt=1);
 	void showIslands(vector<vector<vector<Islands> > > &islandVec);
 	void printIslandAreas(vector<vector<vector<Islands> > > &islandVec);
 
