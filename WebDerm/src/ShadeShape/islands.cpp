@@ -18,7 +18,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	vector<Mat> sampleVec;
 	Mat sample = islandImg.clone();
 	sample *= 255;
-	sample = ml.prepareImage(sample,Size(40,40));
+	sample = ml.prepareImage(sample,Size(20,20));
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	this->NN_Results = results;
