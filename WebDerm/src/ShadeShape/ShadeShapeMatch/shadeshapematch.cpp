@@ -127,7 +127,7 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels, int shapeN
 		denomSumUP += pow(itUP->second.second,2);
 		denomSumDB += pow(itDB->second.second,2);
 	}
-	float results = numerSum / (pow(denomSumUP,0.25) * pow(denomSumDB,0.25));
+	float results = numerSum / sqrt(denomSumUP) * sqrt(denomSumDB);
 	return results;
 }
 
