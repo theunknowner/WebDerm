@@ -70,9 +70,9 @@ int main(int argc,char** argv)
 	Labels lbl;
 	cout << lbl.getShape(shape) << endl;;
 	 */
-	/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test6.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test7.png");
+/*
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test19.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//ssm.debug_mode(2);
@@ -101,7 +101,9 @@ int main(int argc,char** argv)
 	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-	/*
+/*
+	MyExceptions ex;
+	String name = "";
 	try {
 		Timer time;
 		String folder = "Looks_Like/";
@@ -113,7 +115,7 @@ int main(int argc,char** argv)
 		vector<String> nameVec;
 		vector<int> origPos;
 		for(unsigned int i=0; i<files.size(); i++) {
-			String name = folder + files.at(i);
+			name = folder + files.at(i);
 			name = getFileName(name);
 			if(name!=argv[1]) {
 				ShadeShape ss2 = Scripts::script31(name);
@@ -139,15 +141,18 @@ int main(int argc,char** argv)
 		output = std::string(argv[1]) + "_time_elapsed.txt";
 		fp = fopen(output.c_str(),"w"); //reuse fp
 		fprintf(fp,"%s\n",time.getTimerString().c_str());
-		fprintf(fp,"Begin: %s\n",time.getStartTime().c_str());
-		fprintf(fp,"End: %s\n",time.getEndTime().c_str());
+		fprintf(fp,"Begin: %s",time.getStartTime().c_str());
+		fprintf(fp,"End: %s",time.getEndTime().c_str());
 		fclose(fp);
-	} catch(MyExceptions &e) {
-		e.name(argv[1]);
-		e.writeErrorToFile();
+	} catch(cv::Exception &e) {
+		ex.name(std::string(argv[1])+"_"+name);
+		ex.writeErrorToFile(e);
+	} catch(std::out_of_range &e) {
+		ex.name(std::string(argv[1])+"_"+name);
+		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);

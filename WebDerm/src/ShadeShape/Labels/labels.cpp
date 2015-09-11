@@ -40,6 +40,8 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 					float relArea = area / totalArea;
 					this->labelMap[label] = std::make_pair(area,relArea);
 					this->labelShapeShiftMap[label] = islandVec.at(i).at(j).at(k).isShapeShifted();
+					this->labelShapeNumMap[label] = islandVec.at(i).at(j).at(k).shape();
+					this->labelPrevShapeNumMap[label] = islandVec.at(i).at(j).at(k).prevShape();
 				} else {
 					cout << "Labels::create(): map<String,pair<int,float> > labelMap duplicate keys!!!" << endl;
 					cout << label << endl;
@@ -167,9 +169,24 @@ bool Labels::isShapeShifted(String label) {
 	if(this->labelShapeShiftMap.find(label)!=this->labelShapeShiftMap.end()) {
 		return this->labelShapeShiftMap.at(label);
 	}
-	else {
-		return false;
+
+	return false;
+}
+
+int Labels::getShapeNum(String label) {
+	if(this->labelShapeNumMap.find(label)!=this->labelShapeNumMap.end()) {
+		return this->labelShapeNumMap.at(label);
 	}
+
+	return -1;
+}
+
+int Labels::getPrevShapeNum(String label) {
+	if(this->labelPrevShapeNumMap.find(label)!=this->labelPrevShapeNumMap.end()) {
+		return this->labelPrevShapeNumMap.at(label);
+	}
+
+	return -1;
 }
 
 void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {

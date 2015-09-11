@@ -189,9 +189,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 					if(countPercent>=surroundedThreshUpper) {
 						srm.relation(index1,index2) = SURR_BY;
 						srm.relation(index2,index1) = SURR_BY_INV;
-						srm.neighborLevel(index1,index2) = max(neighborNumber,srm.neighborLevel(index1,index2));
-						srm.neighborLevel(index2,index1) = max(neighborNumber,srm.neighborLevel(index2,index1));
-						srm.maxNeighborLevel() = max(srm.maxNeighborLevel(),neighborNumber);
+
 					}
 					else if(touchCountPercent<surroundedThreshUpper && touchCountPercent>=surroundedThreshLower) {
 						if(neighborNumber==1) {
@@ -205,6 +203,9 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 							srm.relation(index2,index1) = DIR;
 						}
 					}
+					srm.neighborLevel(index1,index2) = max(neighborNumber,srm.neighborLevel(index1,index2));
+					srm.neighborLevel(index2,index1) = max(neighborNumber,srm.neighborLevel(index2,index1));
+					srm.maxNeighborLevel() = max(srm.maxNeighborLevel(),neighborNumber);
 					srm.relationArea(index1,index2) = std::make_pair(area1,area2);
 				}
 			}// end num1 loop

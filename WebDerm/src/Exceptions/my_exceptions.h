@@ -16,7 +16,8 @@ private:
 	String filename;
 public:
 	MyExceptions();
-	void writeErrorToFile();
+	void writeErrorToFile(cv::Exception &ex);
+	void writeErrorToFile(std::exception &ex);
 	void name(String filename);
 };
 

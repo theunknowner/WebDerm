@@ -131,6 +131,7 @@ bool ShapeMatch::shape_translation2(vector<vector<vector<Islands> > > &islandVec
 			int new_shape = newShape;
 			if(areaVec.at(max_shade_pos)>0) {
 				islandVec.at(shapeNum).at(max_shade_pos).front().isShapeShifted() = true;
+				islandVec.at(shapeNum).at(max_shade_pos).front().prevShape() = shapeNum;
 				newIslandVec.at(new_shape).at(max_shade_pos).push_back(islandVec.at(shapeNum).at(max_shade_pos).front());
 				newIslandVec.at(shapeNum).at(max_shade_pos).erase(newIslandVec.at(shapeNum).at(max_shade_pos).begin());
 				areaVec.at(max_shade_pos) = 0;

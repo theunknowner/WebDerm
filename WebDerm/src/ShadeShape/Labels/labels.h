@@ -17,6 +17,8 @@ class Labels : public ShapeMatch{
 private:
 	map<String, pair<int,float> > labelMap;
 	map<String,bool> labelShapeShiftMap;
+	map<String,int> labelShapeNumMap;
+	map<String,int> labelPrevShapeNumMap;
 	String labelName;
 	int labelTotalArea;
 	void calcTotalArea();
@@ -40,6 +42,8 @@ public:
 	String getShape(String label);
 	String getShade(String label);
 	bool isShapeShifted(String label);
+	int getShapeNum(String label);
+	int getPrevShapeNum(String label);
 	static void printCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
 	static void writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
 };

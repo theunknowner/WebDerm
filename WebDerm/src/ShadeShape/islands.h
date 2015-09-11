@@ -23,6 +23,7 @@ protected:
 	map<String,Point> coordMap;
 	String _labelName;
 	bool is_shape_shifted;
+	int prev_shape;
 
 	void determineIslandShape(Mat &islandImg);
 	void getIslandPoints(Mat &islandImg);
@@ -44,6 +45,7 @@ public:
 	String& labelName();
 	bool isEmpty();
 	bool& isShapeShifted();
+	int& prevShape();
 };
 
 #endif /* ISLANDS_H_ */

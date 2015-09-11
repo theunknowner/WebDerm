@@ -9,6 +9,7 @@
 #include "shadeshaperelation.h"
 #include "../Labels/labels.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../ShapeMatch/shapematch.h"
 
 /**************************** PRIVATE FUNCTIONS ********************************/
 
@@ -23,7 +24,7 @@ float ShadeShapeRelationMatch::entropy(int count) {
 //! computes the entropy value for each label
 float ShadeShapeRelationMatch::entropy(vector<vector<vector<vector<int> > > > srmCountUP,vector<vector<vector<vector<pair<int,int>> > > > srmAreaUP, Labels &upLabels, vector<vector<vector<vector<int> > > > srmCountDB, vector<vector<vector<vector<pair<int,int>> > > > srmAreaDB, Labels &dbLabels) {
 	assert(srmCountUP.size()==srmCountDB.size());
-	int maxNeighborLevel = 0; //place holder
+	int maxNeighborLevel = 0;
 	FILE * fp;
 	String filename = "entropy_output_" + upLabels.name() + "_" + dbLabels.name() + ".txt";
 	fp = fopen(filename.c_str(),"w");
@@ -248,6 +249,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 	auto dbLabels = srmDB.getLabels();
 	int maxNeighborLevelUP = srmUP.maxNeighborLevel();
 	int maxNeighborLevelDB = srmDB.maxNeighborLevel();
+	ShapeMatch shapematch;
 	FILE * fp;
 	String filename = "entropy_output_" + ssrUP.name() + "_" + ssrDB.name() + ".txt";
 	fp = fopen(filename.c_str(),"w");
@@ -268,6 +270,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 				if(k==SURR_BY || k==SURR_BY_INV) {
 					// for loop m: neighbor level of separation
 					for(int m=0; m<this->relOpLevelSize; m++) {
+						float penaltyX = 1.0, penaltyY = 1.0;
 						int countUP = srmCountUP.at(i).at(j).at(k).at(m);
 						int countDB = srmCountDB.at(i).at(j).at(k).at(m);
 						float areaUP=0., areaDB=0.;
@@ -295,7 +298,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 												}
 											} catch (const std::out_of_range &oor) {
 												printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-												printf("1a\n");
+												printf("SURR_BY: UP 1a\n");
 												printf("xLabel: %s\n",xLabel.c_str());
 												printf("xIdx: %d\n",xIdx);
 												exit(1);
@@ -306,13 +309,23 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 											String equationKeyUP = yLabel+"<"+relOp+">"+xLabel;
 											if(srmUP.equationMap.find(equationKeyUP)!=srmUP.equationMap.end()) {
-												areaY += upLabels.area(yLabel);
+												if(upLabels.isShapeShifted(yLabel)) {
+													int shapeNumY = upLabels.getShapeNum(yLabel);
+													int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
+													penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+												}
+												areaY += upLabels.area(yLabel) * penaltyY;
 											}
 										}
-										areaUP += areaY + (areaX * (areaY/totalDenomAreaUP));
+										if(upLabels.isShapeShifted(xLabel)) {
+											int shapeNumX = upLabels.getShapeNum(xLabel);
+											int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
+											penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+										}
+										areaUP += areaY + (areaX * penaltyX * (areaY/totalDenomAreaUP));
 									} catch (const std::out_of_range &oor) {
 										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-										printf("1\n");
+										printf("SURR_BY: UP 1b\n");
 										printf("x: %d\n",x);
 										exit(1);
 									}
@@ -342,7 +355,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										areaDB += areaY + (areaX * (areaY/totalDenomAreaDB));
 									} catch (const std::out_of_range &oor) {
 										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-										printf("2\n");
+										printf("SURR_BY: DB\n");
 										exit(1);
 									}
 								}
@@ -376,13 +389,23 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 											String equationKey = yLabel+"<"+relOp+">"+xLabel;
 											if(srmUP.equationMap.find(equationKey)!=srmUP.equationMap.end()) {
-												areaX += upLabels.area(xLabel);
+												if(upLabels.isShapeShifted(xLabel)) {
+													int shapeNumX = upLabels.getShapeNum(xLabel);
+													int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
+													penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+												}
+												areaX += upLabels.area(xLabel) * penaltyX;
 											}
 										}
-										areaUP += areaX + (areaY * (areaX/totalDenomAreaUP));
+										if(upLabels.isShapeShifted(yLabel)) {
+											int shapeNumY = upLabels.getShapeNum(yLabel);
+											int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
+											penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+										}
+										areaUP += areaX + (areaY * penaltyY * (areaX/totalDenomAreaUP));
 									} catch (const std::out_of_range &oor) {
 										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-										printf("3\n");
+										printf("SURR_BY_INV: UP\n");
 										exit(1);
 									}
 								}
@@ -410,7 +433,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										areaDB += areaX + (areaY * (areaX/totalDenomAreaDB));
 									} catch (const std::out_of_range &oor) {
 										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-										printf("4\n");
+										printf("SURR_BY_INV: DB\n");
 										exit(1);
 									}
 								}
@@ -431,7 +454,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
 								fprintf(fp,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
-								fprintf(fp,"TotalAreaUP: %d, TotalAreaDB: %d\n",totalAreaUP,totalAreaDB);
+								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penaltyY, penaltyX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"SumOfArea: %f\n",sumOfArea);
@@ -439,63 +462,197 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
 								fprintf(fp,"----------------------------------\n");
 							}
-						}
-					}
+						} // if countUP || countDB
+					} // end for loop m
 				} else {
-					if(k==DIR) {
-						int countUP=0, countDB=0;
-						int areaUP1=0, areaUP2=0, areaDB1 = 0, areaDB2=0;
-						for(int m=0; m<this->relOpLevelSize; m++) {
-							countUP += srmCountUP.at(i).at(j).at(k).at(m);
-							countDB += srmCountDB.at(i).at(j).at(k).at(m);
-							areaUP1 += srmAreaUP.at(i).at(j).at(k).at(m).first;
-							areaUP2 += srmAreaUP.at(i).at(j).at(k).at(m).second;
-							areaDB1 += srmAreaDB.at(i).at(j).at(k).at(m).first;
-							areaDB2 += srmAreaDB.at(i).at(j).at(k).at(m).second;
-						}
+					if(k==DIR) { // constant m=1 || neighborNum=1
+						const int neighborNum = 1;
+						float penaltyY = 1.0 , penaltyX = 1.0;
+						int countUP = srmCountUP.at(i).at(j).at(k).at(neighborNum);
+						int countDB = srmCountDB.at(i).at(j).at(k).at(neighborNum);
+						int areaUP1 = srmAreaUP.at(i).at(j).at(k).at(neighborNum).first;
+						int areaUP2 = srmAreaUP.at(i).at(j).at(k).at(neighborNum).second;
+						int areaDB1 = srmAreaDB.at(i).at(j).at(k).at(neighborNum).first;
+						int areaDB2 = srmAreaDB.at(i).at(j).at(k).at(neighborNum).second;
+						float areaUP=0.0, areaDB=0.0;
 						if(countUP>0 || countDB>0) {
-							if(areaUP1>areaUP2) {
-								for(unsigned int x=0; x<srmAreaUP.size(); x++) {
-									for(int m=0; m<this->relOpLevelSize; m++) {
-										totalAreaUP += srmAreaUP.at(i).at(x).at(k).at(m).second;
-										totalCountUP += srmCountUP.at(i).at(x).at(k).at(m);
-									}
-								}
-							}
-							else if(areaUP1<=areaUP2) {
+							if(areaUP1<=areaUP2) {
+								// counts total DIR relationships for areaUP2
 								for(unsigned int y=0; y<srmAreaUP.size(); y++) {
-									for(int m=0; m<this->relOpLevelSize; m++) {
-										totalAreaUP += srmAreaUP.at(y).at(j).at(k).at(m).first;
-										totalCountUP += srmCountUP.at(y).at(j).at(k).at(m);
-									}
+									totalCountUP += srmCountUP.at(y).at(j).at(k).at(neighborNum);
 								}
-							}
-							if(areaDB1>areaDB2) {
-								for(unsigned int x=0; x<srmAreaDB.size(); x++) {
-									for(int m=0; m<this->relOpLevelSize; m++) {
-										totalAreaDB += srmAreaDB.at(i).at(x).at(k).at(m).second;
-										totalCountDB += srmCountDB.at(i).at(x).at(k).at(m);
+								/*! for UP */
+								for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
+									try {
+										float totalDenomAreaUP=0.;
+										String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
+										int areaX = upLabels.area(xLabel); // get area
+										int xIdx = srmUP.getIndex(xLabel); // get pos from srm
+										for(unsigned int yIdx=0; yIdx<srmUP.size(); yIdx++) {
+											try {
+												int rel_op_idx = srmUP.relation(yIdx,xIdx);
+												if(rel_op_idx==k) {
+													totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).first;
+												}
+											} catch (const std::out_of_range &oor) {
+												printf("ShadeShapeRelationMatch::entropy() out of range!\n");
+												printf("DIR: UP 1a\n");
+												printf("xLabel: %s\n",xLabel.c_str());
+												printf("xIdx: %d\n",xIdx);
+												exit(1);
+											}
+										}
+										int areaY=0;
+										for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
+											String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
+											String equationKeyUP = yLabel+"<"+relOp+">"+xLabel;
+											if(srmUP.equationMap.find(equationKeyUP)!=srmUP.equationMap.end()) {
+												if(upLabels.isShapeShifted(yLabel)) {
+													int shapeNumY = upLabels.getShapeNum(yLabel);
+													int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
+													penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+												}
+												areaY += upLabels.area(yLabel) * penaltyY;
+											}
+										}
+										if(upLabels.isShapeShifted(xLabel)) {
+											int shapeNumX = upLabels.getShapeNum(xLabel);
+											int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
+											penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+										}
+										areaUP += areaY + (areaX * penaltyX * (areaY/totalDenomAreaUP));
+									} catch (const std::out_of_range &oor) {
+										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
+										printf("DIR: UP 1b\n");
+										printf("x: %d\n",x);
+										exit(1);
 									}
+								} // end for UP
+							} // end if areaUP1 <= areaUP2
+							else if(areaUP1>areaUP2) {
+								// counts total DIR relationships for areaUP1
+								for(unsigned int x=0; x<srmAreaUP.size(); x++) {
+									totalCountUP += srmCountUP.at(i).at(x).at(k).at(neighborNum);
 								}
-							}
-							else if(areaDB1<=areaDB2) {
+								/*! for UP */
+								for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
+									try {
+										float totalDenomAreaUP=0.;
+										String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
+										int yIdx = srmUP.getIndex(yLabel);
+										int areaY = upLabels.area(yLabel);
+										for(unsigned int xIdx=0; xIdx<srmUP.size(); xIdx++) {
+											int rel_op_idx = srmUP.relation(yIdx,xIdx);
+											if(rel_op_idx==k) {
+												totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
+												/*if(labelUP1=="0_Strip_s4" && labelUP2=="1_Default_s2" && m==1) {
+													printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
+													printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
+													printf("rel_op_idx: %d\n",rel_op_idx);
+													printf("srmRelationArea: %d\n",srmUP.relationArea(yIdx,xIdx).second);
+													printf("totalDenomAreaUP: %f\n",totalDenomAreaUP);
+
+												}*/
+											}
+										}
+										int areaX=0;
+										for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
+											String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
+											String equationKey = yLabel+"<"+relOp+">"+xLabel;
+											if(srmUP.equationMap.find(equationKey)!=srmUP.equationMap.end()) {
+												if(upLabels.isShapeShifted(xLabel)) {
+													int shapeNumX = upLabels.getShapeNum(xLabel);
+													int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
+													penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+												}
+												areaX += upLabels.area(xLabel) * penaltyX;
+											}
+										}
+										if(upLabels.isShapeShifted(yLabel)) {
+											int shapeNumY = upLabels.getShapeNum(yLabel);
+											int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
+											penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+										}
+										areaUP += areaX + (areaY * penaltyY * (areaX/totalDenomAreaUP));
+									} catch (const std::out_of_range &oor) {
+										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
+										printf("DIR: UP 2\n");
+										exit(1);
+									}
+								} // end for UP
+							} // end else if areaUP1 > areaUP2
+							if(areaDB1<=areaDB2) {
 								for(unsigned int y=0; y<srmAreaDB.size(); y++) {
-									for(int m=0; m<this->relOpLevelSize; m++) {
-										totalAreaDB += srmAreaDB.at(y).at(j).at(k).at(m).first;
-										totalCountDB += srmCountDB.at(y).at(j).at(k).at(m);
-									}
+									totalCountDB += srmCountDB.at(y).at(j).at(k).at(neighborNum);
 								}
-							}
-							float areaRatioUP = (float)min(areaUP1,areaUP2) / totalAreaUP;
-							float areaRatioDB = (float)min(areaDB1,areaDB2) / totalAreaDB;
-							float areaValUP = min(areaUP1,areaUP2) + (areaRatioUP) * (float)max(areaUP1,areaUP2);
-							float areaValDB = min(areaDB1,areaDB2) + (areaRatioDB) * (float)max(areaDB1,areaDB2);
-							if(std::isnan(areaValUP)) areaValUP=0;
-							if(std::isnan(areaValDB)) areaValDB=0;
+								/*! for DB */
+								for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
+									try {
+										float totalDenomAreaDB=0.;
+										String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
+										int areaX = dbLabels.area(xLabel);
+										int xIdx = srmDB.getIndex(xLabel);
+										for(unsigned int yIdx=0; yIdx<srmDB.size(); yIdx++) {
+											int rel_op_idx = srmDB.relation(yIdx,xIdx);
+											if(rel_op_idx==k) {
+												totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).first;
+											}
+										}
+										int areaY=0;
+										for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
+											String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
+											String equationKeyDB = yLabel+"<"+relOp+">"+xLabel;
+											if(srmDB.equationMap.find(equationKeyDB)!=srmDB.equationMap.end()) {
+												areaY += dbLabels.area(yLabel);
+											}
+										}
+										areaDB += areaY + (areaX * (areaY/totalDenomAreaDB));
+									} catch (const std::out_of_range &oor) {
+										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
+										printf("DIR: DB 1\n");
+										exit(1);
+									}
+								} // end for DB
+							} // end else if areaDB1 <= areaDB2
+							else if(areaDB1>areaDB2) {
+								for(unsigned int x=0; x<srmAreaDB.size(); x++) {
+									totalCountDB += srmCountDB.at(i).at(x).at(k).at(neighborNum);
+								}
+								/*! for DB */
+								for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
+									try {
+										float totalDenomAreaDB=0.;
+										String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
+										int yIdx = srmDB.getIndex(yLabel);
+										int areaY = dbLabels.area(yLabel);
+										for(unsigned int xIdx=0; xIdx<srmDB.size(); xIdx++) {
+											int rel_op_idx = srmDB.relation(yIdx,xIdx);
+											if(rel_op_idx==k) {
+												totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
+											}
+										}
+										int areaX=0;
+										for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
+											String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
+											String equationKey = yLabel+"<"+relOp+">"+xLabel;
+											if(srmDB.equationMap.find(equationKey)!=srmDB.equationMap.end()) {
+												areaX += dbLabels.area(xLabel);
+											}
+										}
+										areaDB += areaX + (areaY * (areaX/totalDenomAreaDB));
+									} catch (const std::out_of_range &oor) {
+										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
+										printf("DIR: DB 2\n");
+										exit(1);
+									}
+								} // end for DB
+							} // end else if areaDB1 > areaDB2
+							if(std::isnan(areaUP)) areaUP=0;
+							if(std::isnan(areaDB)) areaDB=0;
 							float entropyUP = this->entropy(countUP);
 							float entropyDB = this->entropy(countDB);
 							float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-							float areaVal = min(areaValUP,areaValDB);
+							float areaVal = min(areaUP,areaDB);
 							float relArea = areaVal / maxTotalArea;
 							float weightedEntropy = relArea * entropyVal;
 							totalEntropy += weightedEntropy;
@@ -506,8 +663,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								fprintf(fp,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
-								fprintf(fp,"TotalAreaUP: %d, TotalAreaDB: %d\n",totalAreaUP,totalAreaDB);
+								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penaltyY,penaltyX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"SumOfArea: %f\n",sumOfArea);
@@ -515,7 +672,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
 								fprintf(fp,"----------------------------------\n");
 							}
-						}
+
+						} // end if countUP || countDB
 					} // end if DIR
 					else { // else INDIR
 						for(int m=0; m<this->relOpLevelSize; m++) {

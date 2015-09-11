@@ -56,14 +56,17 @@ void Timer::printTimer() {
 	printf("Time Elapsed: %dh:%dm:%ds\n",this->hours,this->minutes,this->seconds);
 }
 
+//! has "\n" already
 String Timer::getStartTime() {
 	return this->start_time;
 }
 
+//! has "\n" already
 String Timer::getEndTime() {
 	return this->end_time;
 }
 
+//! has "\n" already
 String Timer::getCurrentTime() {
 	time_t rawtime;
 	struct tm * timeinfo;
