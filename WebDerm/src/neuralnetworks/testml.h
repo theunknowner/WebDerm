@@ -16,6 +16,7 @@ private:
 	Mat labels;
 	static vector<String> shapeNames;
 	static bool THRESH_IMPORTED;
+	static Size img_size;
 public:
 	static String PARAM_PATH;
 	TestML();
@@ -37,6 +38,7 @@ public:
 
 	String getShapeName(int num);
 	int numOfShapes();
+	Size getSize();
 };
 
 #endif /* TESTML_H_ */

@@ -13,6 +13,7 @@
 bool TestML::THRESH_IMPORTED = false;
 String TestML::PARAM_PATH = "Thresholds/param.xml";
 vector<String> TestML::shapeNames;
+Size TestML::img_size;
 
 TestML::TestML() {
 	assert(fs::exists(PARAM_PATH)==true);
@@ -22,12 +23,20 @@ TestML::TestML() {
 
 bool TestML::importThresholds() {
 	fstream fs("Thresholds/shape_names.csv");
-	if(fs.is_open()) {
+	fstream fs2("Thresholds/ml_nn_size.csv");
+	if(fs.is_open() && fs2.is_open()) {
 		String temp;
+		vector<String> vec;
 		while(getline(fs,temp)) {
 			TestML::shapeNames.push_back(temp);
 		}
 		fs.close();
+		while(getline(fs2,temp)) {
+			getSubstr(temp,',',vec);
+			TestML::img_size.width = atoi(vec.at(0).c_str());
+			TestML::img_size.height = atoi(vec.at(1).c_str());
+		}
+		fs2.close();
 		return true;
 	} else {
 		printf("TestML::importThreshold() failed, shape_names.csv does not exist!\n");
@@ -308,4 +317,8 @@ String TestML::getShapeName(int num) {
 
 int TestML::numOfShapes() {
 	return TestML::shapeNames.size();
+}
+
+Size TestML::getSize() {
+	return TestML::img_size;
 }

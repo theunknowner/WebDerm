@@ -332,8 +332,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
-	Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
-	cout << "--------------------------" << endl;
+	//Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
+	//cout << "--------------------------" << endl;
 	vector<vector<float> > resultVec;
 	vector<vector<vector<Islands> > > islandVec2;
 	vector<vector<vector<Islands> > > largestIslandVec2;

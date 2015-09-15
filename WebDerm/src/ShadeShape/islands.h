@@ -30,7 +30,7 @@ protected:
 public:
 	Islands();
 	Islands(Mat islandImg);
-	int area();
+	int& area();
 	int& shade();
 	Mat& image();
 	int& shape();

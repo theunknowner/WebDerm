@@ -55,7 +55,7 @@ void Features::determineFeatureShape(Mat featureImg) {
 	vector<Mat> sampleVec;
 	Mat sample = featureImg.clone();
 	sample *= 255;
-	sample = ml.prepareImage(sample,Size(20,20));
+	sample = ml.prepareImage(sample,ml.getSize());
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	this->NN_Results = results;

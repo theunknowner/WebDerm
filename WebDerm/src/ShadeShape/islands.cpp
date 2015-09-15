@@ -18,7 +18,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	vector<Mat> sampleVec;
 	Mat sample = islandImg.clone();
 	sample *= 255;
-	sample = ml.prepareImage(sample,Size(20,20));
+	sample = ml.prepareImage(sample,ml.getSize());
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	this->NN_Results = results;
@@ -81,7 +81,7 @@ Islands::Islands(Mat islandImg) {
 }
 
 //! returns area/number of pixels of island
-int Islands::area() {
+int& Islands::area() {
 	return this->islArea;
 }
 

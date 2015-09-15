@@ -83,7 +83,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-	/*
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -91,13 +91,13 @@ int main(int argc,char** argv)
 	ss1.extract(img,name);
 	ss1.showInteractiveIslands();
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
+/*
+	ShadeShape ss1 = Scripts::script31("tinea_corporis13b");
 	//ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(7,43));
+	Islands island = ss1.getIslandWithPoint(Point(37,18));
 	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
@@ -152,7 +152,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -184,13 +184,17 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-	/*
+
+	ShadeShape ss1 = Scripts::script31("melanoma8b");
+	Islands island = ss1.getIslandWithPoint(Point(35,52));
+	imwrite("sample.png",island.image());
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/git/WebDerm/WebDerm/tinea_corporis8a_strip.png",0);
+	//Mat sample = imread("/home/jason/git/Samples/Samples/Training/Circles-Disc-Complete/circle_disc_comp(082).png",0);
+	Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
-	sample = ml.prepareImage(sample,Size(20,20));
+	sample = ml.prepareImage(sample,Size(40,40));
 	imgshow(sample);
 	vector<Mat> sampleVec;
 
@@ -198,7 +202,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 /**/
-	/*
+/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
@@ -208,7 +212,7 @@ int main(int argc,char** argv)
 	String path3 = mainPath + "Samples/log.txt";
 	Timer time;
 	time.begin();
-	ml.importTrainingData(path1,path2,Size(20,20));
+	ml.importTrainingData(path1,path2,ml.getSize());
 	Mat data = ml.getData();
 	Mat labels = ml.getLabels();
 	Mat training_set = data;
@@ -216,11 +220,15 @@ int main(int argc,char** argv)
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 20;
+	int hiddenNodes = 65;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
 	layers.at<int>(2,0) = outputSize;
+	printf("Img Size: %dx%d\n",ml.getSize().width,ml.getSize().height);
+	printf("Input Size: %d\n",inputSize);
+	printf("Hidden Nodes: %d\n",hiddenNodes);
+	printf("Output Size: %d\n",outputSize);
 	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
 
 	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 4000, 0.000001);
@@ -232,6 +240,10 @@ int main(int argc,char** argv)
 	fp = fopen(path3.c_str(),"a");
 	fprintf(fp,"%s\n",time.getTimerString().c_str());
 	fprintf(fp,"%s",time.getEndTime().c_str());
+	fprintf(fp,"Img Size: %dx%d\n",ml.getSize().width,ml.getSize().height);
+	fprintf(fp,"Input Size: %d\n",inputSize);
+	fprintf(fp,"Hidden Nodes: %d\n",hiddenNodes);
+	fprintf(fp,"Output Size: %d\n",outputSize);
 	fprintf(fp,"Iterations: %d\n",iter);
 	fprintf(fp,"-----------------------\n");
 	fclose(fp);
