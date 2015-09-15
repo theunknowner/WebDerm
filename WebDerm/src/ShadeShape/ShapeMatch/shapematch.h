@@ -26,7 +26,8 @@ public:
 	static vector<vector<float> > shiftingPenalties;
 	ShapeMatch();
 	bool importThresholds();
-	bool shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shiftType);
+	vector<vector<int> > getIslandVecIdxByArea(vector<vector<vector<Islands> > > &islandVec);
+	bool shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape,int rank=0);
 	bool shape_translation2(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape, int shiftAmt=1);
 	void showIslands(vector<vector<vector<Islands> > > &islandVec);
 	void printIslandAreas(vector<vector<vector<Islands> > > &islandVec);

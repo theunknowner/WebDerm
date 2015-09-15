@@ -25,12 +25,13 @@ private:
 	//[shape][shade][idx]
 	vector<vector<vector<Islands> > > upIslandVec;
 	vector<vector<vector<Islands> > > dbIslandVec;
+
 	vector<vector<vector<Islands> > > groupIslandsByShade(ShadeShape &ss);
 	vector<vector<vector<Islands> > > groupIslandsByShape(ShadeShape &ss);
 	void sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec);
 	void fillMissingLabels(Labels &upLabels, Labels &dbLabels);
-	float dotProduct(Labels &upLabels, Labels &dbLabels, int shapeNum1=-1, int shapeNum2=-1);
-	float tr1(Labels &upLabels, Labels &dbLabels, int shapeNum1=-1, int shapeNum2=-1);
+	float dotProduct(Labels &upLabels, Labels &dbLabels);
+	float tr1(Labels &upLabels, Labels &dbLabels);
 	float tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
 public:
 	void test(ShadeShape &ss);

@@ -8,6 +8,7 @@
 #include "shapematch.h"
 #include "../islands.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 
 vector<String> ShapeMatch::shapeNames;
 vector<vector<String> > ShapeMatch::shiftingRules;
@@ -73,39 +74,50 @@ bool ShapeMatch::importThresholds() {
 	return true;
 }
 
-// shifts specified shape to the left
-bool ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int shiftType) {
-	if(ShapeMatch::_SHIFT[shiftType]!="SHIFT_NONE") {
-		//printf("%d: %lu\n",shapeNum,islandVec.at(shapeNum).size());
-		vector<vector<vector<Islands> > > newIslandVec = islandVec;
-		vector<int> areaVec;
-		bool empty = true;
-		for(unsigned int j=0; j<islandVec.at(shapeNum).size(); j++) {
-			if(islandVec.at(shapeNum).at(j).size()>0) {
-				int area = islandVec.at(shapeNum).at(j).front().area();
+vector<vector<int> > ShapeMatch::getIslandVecIdxByArea(vector<vector<vector<Islands> > > &islandVec) {
+	vector<vector<int> > islandVecIdx;
+	vector<int> idxVec;
+	vector<int> areaVec;
+	for(unsigned int i=0; i<islandVec.size(); i++) {
+		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
+			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
+				int area = islandVec.at(i).at(j).at(k).area();
 				areaVec.push_back(area);
-				empty = false;
+				idxVec.push_back(i);
+				idxVec.push_back(j);
+				idxVec.push_back(k);
+				islandVecIdx.push_back(idxVec);
+				idxVec.clear();
 			}
-			else {
-				areaVec.push_back(0);
-			}
-		}
-		if(!empty) {
-			vector<int>::iterator it = max_element(areaVec.begin(),areaVec.end());
-			int max_pos = it - areaVec.begin();
-			int new_shape = shapeNum;
-			if(ShapeMatch::_SHIFT[shiftType] == "SHIFT_LEFT")
-				new_shape = shapeNum - 1;
-			if(ShapeMatch::_SHIFT[shiftType] == "SHIFT_RIGHT")
-				new_shape = shapeNum + 1;
-			//printf("shape%d: %d | NewShape: %d\n",shapeNum,max_pos,new_shape);
-			newIslandVec.at(new_shape).at(max_pos).push_back(islandVec.at(shapeNum).at(max_pos).front());
-			newIslandVec.at(shapeNum).at(max_pos).erase(newIslandVec.at(shapeNum).at(max_pos).begin());
-			islandVec = newIslandVec;
-			return true;
 		}
 	}
-	return false;
+	vector<int> origPos;
+	jaysort(areaVec,origPos,1);
+	vector<vector<int> > islandVecIdxSorted;
+	for(unsigned int i=0; i<areaVec.size(); i++) {
+		islandVecIdxSorted.push_back(islandVecIdx.at(origPos.at(i)));
+	}
+	return islandVecIdxSorted;
+}
+
+
+//! shifts island specified by rank, 0=default=largest
+bool ShapeMatch::shape_translation(vector<vector<vector<Islands> > > &islandVec, int shapeNum, int newShape, int rank) {
+	vector<vector<vector<Islands> > > newIslandVec = islandVec;
+	vector<vector<int> > islandVecIdxSorted = this->getIslandVecIdxByArea(islandVec);
+	int shape = islandVecIdxSorted.at(rank).at(0);
+	int shade = islandVecIdxSorted.at(rank).at(1);
+	int isl = islandVecIdxSorted.at(rank).at(2);
+	assert(shape==shapeNum);
+
+	int new_shape = newShape;
+	islandVec.at(shapeNum).at(shade).at(isl).isShapeShifted() = true;
+	newIslandVec.at(new_shape).at(shade).push_back(islandVec.at(shapeNum).at(shade).at(isl));
+	newIslandVec.at(new_shape).at(shade).back().prevShape() = shapeNum;
+	newIslandVec.at(new_shape).at(shade).back().shape() = new_shape;
+	newIslandVec.at(shapeNum).at(shade).erase(newIslandVec.at(shapeNum).at(shade).begin()+isl);
+	islandVec = newIslandVec;
+	return true;
 }
 
 //! shifts specified shape to the left
