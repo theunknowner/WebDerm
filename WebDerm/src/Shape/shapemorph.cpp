@@ -1321,6 +1321,8 @@ Mat ShapeMorph::customFn2(Mat src) {
 	return map;
 }
 
+//! Nearest neighbor connector base on density
+//! q = probability of connecting to a neighboring unit
 Mat ShapeMorph::densityConnector(Mat src, double q) {
 	//Mat map = src.clone();
 	if(src.empty()) {

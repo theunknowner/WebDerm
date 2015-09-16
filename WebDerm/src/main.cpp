@@ -70,7 +70,7 @@ int main(int argc,char** argv)
 	Labels lbl;
 	cout << lbl.getShape(shape) << endl;;
 	 */
-/*
+	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test19.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
 	ShadeShapeMatch ssm;
@@ -101,7 +101,7 @@ int main(int argc,char** argv)
 	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+	/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -152,7 +152,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+	/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -184,14 +184,29 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
+/*
+	deque<String> files;
+	String folder = "/home/jason/git/Samples/Samples/Training/Strip/";
+	FileData fd;
+	TestML ml;
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		Mat img = imread(name,0);
+		name = getFileName(name);
+		Mat sample = img * 255;
+		sample = ml.prepareImage(sample,Size(40,40));
+		imwrite(name+".png",sample);
+	}
+/**/
 
-	ShadeShape ss1 = Scripts::script31("melanoma8b");
-	Islands island = ss1.getIslandWithPoint(Point(35,52));
-	imwrite("sample.png",island.image());
+	//ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
+	//Islands island = ss1.getIslandWithPoint(Point(108,50));
+	//imwrite("sample.png",island.image());
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	//Mat sample = imread("/home/jason/git/Samples/Samples/Training/Circles-Disc-Complete/circle_disc_comp(082).png",0);
-	Mat sample = island.image();
+	Mat sample = imread("/home/jason/Desktop/workspace/Samples/Training/Strip/strip(056).png",0);
+	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(40,40));
@@ -201,7 +216,7 @@ int main(int argc,char** argv)
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
-/**/
+	/**/
 /*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
@@ -249,7 +264,8 @@ int main(int argc,char** argv)
 	fclose(fp);
 
 	cout << "Iterations: " << iter << endl;
-	CvFileStorage* storage = cvOpenFileStorage("/home/jason/git/Samples/Samples/param.xml", 0, CV_STORAGE_WRITE );
+	String outputFile = mainPath + "Samples/param.xml";
+	CvFileStorage* storage = cvOpenFileStorage(outputFile.c_str(), 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/

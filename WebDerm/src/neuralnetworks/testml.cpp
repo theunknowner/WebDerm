@@ -74,7 +74,8 @@ Mat TestML::prepareImage(Mat sample, Size size) {
 	_size = Size(newCols,newRows);
 	Mat img;
 	try {
-		img = runResizeImage(crop_img,_size);
+		//img = runResizeImage(crop_img,_size);
+		img = fn.scaleDownImage(crop_img, _size);
 	} catch(cv::Exception &e) {
 		printf("TestML::prepareImage(), runResizeImage() error!\n");
 		cout << "Crop_img size: " << crop_img.size() << endl;

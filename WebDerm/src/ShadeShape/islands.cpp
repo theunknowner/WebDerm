@@ -31,7 +31,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 				labelNum = j;
 			}
 		}
-		if(max<0) labelNum = 4; // sets shape to default if all results are negative
+		if(max<=-0.5) labelNum = 4; // sets shape to default if all results are less than thresh
 		String shapeName = ml.getShapeName(labelNum);
 
 		this->islShape = labelNum;
