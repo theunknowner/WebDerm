@@ -494,6 +494,22 @@ Mat Functions::cropImage(Mat input)
 	return img2;
 }
 
+//! 8bit uchar image only
+Mat Functions::scaleDownImage(Mat input, Size size) {
+	Mat scaledDownImage(size,CV_8U,Scalar(0));
+	for(int x=0;x<size.height;x++)
+	{
+		for(int y=0;y<size.width ;y++)
+		{
+			int yd =ceil((float)(y*input.cols/size.width));
+			int xd = ceil((float)(x*input.rows/size.height));
+			scaledDownImage.at<uchar>(x,y) = input.at<uchar>(xd,yd);
+
+		}
+	}
+	return scaledDownImage;
+}
+
 Mat Functions::imageROI(Mat input, Point begin, Point end) {
 	Mat dst;
 	dst = input(Rect(begin,end));
