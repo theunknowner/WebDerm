@@ -65,20 +65,15 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-	/*ShapeMatch sm;
-	String shape = "2_Blotch_s0_000";
-	Labels lbl;
-	cout << lbl.getShape(shape) << endl;;
-	 */
-	/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test19.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
+
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test23.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test22.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	//ssm.debug_mode(2);
-	//cout << ssm.test_match(ss1,ss2) << endl;
-	vector<float> results = ssm.match(ss1,ss2);
-	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
+	ssm.debug_mode(1);
+	cout << ssm.test_match(ss1,ss2) << endl;
+	//vector<float> results = ssm.match(ss1,ss2);
+	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
@@ -152,7 +147,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-	/*
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -199,20 +194,20 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-
+/*
 	//ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
 	//Islands island = ss1.getIslandWithPoint(Point(108,50));
 	//imwrite("sample.png",island.image());
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/Desktop/workspace/Samples/Training/Strip/strip(056).png",0);
+	Mat sample = imread("/home/jason/git/Samples/Samples/Training/Excavated/excavated(055).png",0);
 	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(40,40));
 	imgshow(sample);
 	vector<Mat> sampleVec;
-
+/*
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
@@ -221,10 +216,10 @@ int main(int argc,char** argv)
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
-	String mainPath = "/home/jason/git/Samples/";
-	String path1 = mainPath + "Samples/Training/samples_path.csv";
-	String path2 = mainPath + "Samples/Training/labels_path.csv";
-	String path3 = mainPath + "Samples/log.txt";
+	//String mainPath = "/home/jason/git/Samples/";
+	String path1 = "Samples/Training/samples_path.csv";
+	String path2 = "Samples/Training/labels_path.csv";
+	String path3 = "Samples/log.txt";
 	Timer time;
 	time.begin();
 	ml.importTrainingData(path1,path2,ml.getSize());
@@ -264,7 +259,8 @@ int main(int argc,char** argv)
 	fclose(fp);
 
 	cout << "Iterations: " << iter << endl;
-	String outputFile = mainPath + "Samples/param.xml";
+	time.printTimer();
+	String outputFile = "Samples/param.xml";
 	CvFileStorage* storage = cvOpenFileStorage(outputFile.c_str(), 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);

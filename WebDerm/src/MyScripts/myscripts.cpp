@@ -2019,8 +2019,8 @@ void script_createTrainingLabels() {
 void script_createAllTrainingLabels() {
 	TestML ml;
 
-	String samplePath = "/home/jason/git/Samples/Samples/Training/samples_path.csv";
-	String labelPath = "/home/jason/git/Samples/Samples/Training/Labels/";
+	String samplePath = "Samples/Training/samples_path.csv";
+	String labelPath = "Samples/Training/Labels/";
 	fstream fs(samplePath);
 	if(fs.is_open()) {
 		String path;

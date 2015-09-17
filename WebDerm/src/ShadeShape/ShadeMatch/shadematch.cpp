@@ -11,6 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
+
 /*************** PRIVATE FUNCTIONS *******************/
 
 /*************** PUBLIC FUNCTIONS ********************/
@@ -24,7 +25,7 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 	static int prevShiftType = 0;
 	if(_SHIFT[shiftType]=="SHIFT_NONE") {
 		prevShiftType = shiftType;
-		return false;
+		return true;
 	}
 
 	static vector<int> areaVec;
@@ -133,4 +134,33 @@ float ShadeMatch::applyShiftPenalty(ShadeShape &ss, float score, int shiftAmt) {
 	}
 	float penalty = pow(2.0,(-2.0*totalRelArea));
 	return score * penalty;
+}
+
+vector<vector<vector<Islands> > > ShadeMatch::shiftShades(vector<vector<vector<Islands> > > &islandVec, int shiftType) {
+	if(shiftType==SHIFT_NONE)
+		return islandVec;
+
+	vector<vector<vector<Islands> > > newIslandVec(islandVec.size(),vector<vector<Islands> >(this->maxNumOfShades,vector<Islands>(0,Islands())));
+
+	for(unsigned int shape=0; shape<islandVec.size(); shape++) {
+		for(unsigned int shade=0; shade<islandVec.at(shape).size(); shade++) {
+			//> if SHIFT_LEFT get max, if SHIFT_RIGHT get min
+			int new_shade = shiftType==SHIFT_LEFT ? max((int)(shade-1),0) : min((int)(shade+1),this->maxNumOfShades-1);
+			try {
+				for(unsigned int isl=0; isl<islandVec.at(shape).at(shade).size(); isl++) {
+					newIslandVec.at(shape).at(new_shade).push_back(islandVec.at(shape).at(shade).at(isl));
+				}
+			}
+			catch(const std::out_of_range &oor) {
+				printf("OOR\n");
+				printf("shift_type: %d\n",shiftType);
+				printf("shade: %d\n",shade);
+				printf("new_shade: %d\n",new_shade);
+				printf("newIslVec Size: %lu\n",newIslandVec.size());
+				printf("newIslVec Size2: %lu\n",newIslandVec.at(shape).size());
+				exit(1);
+			}
+		}
+	}
+	return newIslandVec;
 }

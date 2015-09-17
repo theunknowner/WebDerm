@@ -31,6 +31,7 @@ public:
 	bool& isFeatIslStored();
 	vector<String> SHIFT();
 	float applyShiftPenalty(ShadeShape &ss, float score, int shiftAmt=1);
+	vector<vector<vector<Islands> > > shiftShades(vector<vector<vector<Islands> > > &islandVec, int shiftType);
 
 };
 
