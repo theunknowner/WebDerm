@@ -65,12 +65,12 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-
+/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test23.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test22.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	ssm.debug_mode(1);
+	//ssm.debug_mode(2);
 	cout << ssm.test_match(ss1,ss2) << endl;
 	//vector<float> results = ssm.match(ss1,ss2);
 	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
@@ -96,7 +96,7 @@ int main(int argc,char** argv)
 	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-	/*
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -195,24 +195,25 @@ int main(int argc,char** argv)
 	}
 /**/
 /*
-	//ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
-	//Islands island = ss1.getIslandWithPoint(Point(108,50));
-	//imwrite("sample.png",island.image());
+	ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
+	Islands island = ss1.getIslandWithPoint(Point(22,30));
+	imwrite("sample.png",island.image());
 	TestML ml;
-	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/git/Samples/Samples/Training/Excavated/excavated(055).png",0);
-	//Mat sample = island.image();
+	//String param = TestML::PARAM_PATH;
+	String param = "/home/jason/git/Samples/Samples/param1.xml";
+	//Mat sample = imread("/home/jason/git/Samples/Samples/Training/Circles-Donut-Complete/circle_donut_comp(001).png",0);
+	Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(40,40));
 	imgshow(sample);
 	vector<Mat> sampleVec;
-/*
+
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 	/**/
-/*
+
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
@@ -225,12 +226,13 @@ int main(int argc,char** argv)
 	ml.importTrainingData(path1,path2,ml.getSize());
 	Mat data = ml.getData();
 	Mat labels = ml.getLabels();
+	int shape=2; //> change for different shapes
 	Mat training_set = data;
-	Mat training_labels = labels;
+	Mat training_labels = labels.col(shape);
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 65;
+	int hiddenNodes = 40;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;

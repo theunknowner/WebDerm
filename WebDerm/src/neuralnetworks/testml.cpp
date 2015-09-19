@@ -194,57 +194,6 @@ void TestML::importLabels(String path,vector<Mat> &labels) {
 	}
 }
 
-void TestML::convertImagesToData(String folder, Mat outputLabels, Size size) {
-	vector<Mat> samples;
-	this->importSamples(folder,samples,size);
-	if(samples.size()==outputLabels.rows) {
-		Mat data(samples.size(),samples.at(0).total(),CV_32F);
-		Mat labels(samples.size(),outputLabels.cols,CV_32F);
-		int x=0;
-
-		for(unsigned int i=0; i<samples.size(); i++) {
-			Mat samp = samples.at(i);
-			//samp = this->tempFixPrepareImg(samp);
-			for(int j=0; j<samp.rows; j++) {
-				for(int k=0; k<samp.cols; k++) {
-					if(samp.type()==CV_8U)
-						data.at<float>(i,x) = samp.at<uchar>(j,k);
-					else if(samp.type()==CV_32S)
-						data.at<float>(i,x) = samp.at<int>(j,k);
-					if(samp.type()==CV_32F)
-						data.at<float>(i,x) = samp.at<float>(j,k);
-					x++;
-				}
-			}
-			x=0;
-			for(unsigned int n=0; n<outputLabels.cols; n++) {
-				labels.at<float>(i,n) = outputLabels.at<float>(i,n);
-			}
-		}
-		this->data = data;
-		this->labels = labels;
-	}
-	else {
-		cout << "Sample size =/= Label size!" << endl;
-		cout << "Sample Size: " << samples.size() << endl;
-		cout << "Label Size: " << outputLabels.rows << endl;
-		exit(1);
-	}
-}
-
-//!converts min & max to 0's & 1's
-Mat TestML::convertToBinary(Mat input, int min, int max, int newMin, int newMax) {
-	Mat result = input.clone();
-	for(int i=0; i<input.rows; i++) {
-		for(int j=0; j<input.cols; j++) {
-			int val = input.at<uchar>(i,j);
-			if(val==min) result.at<uchar>(i,j) = newMin;
-			else if(val==max) result.at<uchar>(i,j) = newMax;
-		}
-	}
-	return result;
-}
-
 Mat TestML::runANN(String param, vector<Mat> sampleVec) {
 	CvANN_MLP ann;
 	ann.load(param.c_str());

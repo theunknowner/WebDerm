@@ -29,8 +29,6 @@ public:
 	Mat prepareMatSamples(vector<Mat> sampleVec);
 	void importSamples(String folder, vector<Mat> &samples, Size size=Size(0,0));
 	void importLabels(String folder, vector<Mat> &labels);
-	void convertImagesToData(String folder,Mat outputLabels, Size size=Size(0,0));
-	Mat convertToBinary(Mat input, int min=0, int max=255, int newMin=0, int newMax=255);
 
 	Mat runANN(String param, vector<Mat> sampleVec);
 

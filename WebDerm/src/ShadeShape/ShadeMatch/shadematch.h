@@ -19,12 +19,12 @@ protected:
 	int maxNumOfShades;
 	vector<int> shadeVec;
 	vector<String> _SHIFT = {"SHIFT_NONE","SHIFT_LEFT","SHIFT_RIGHT"};
-	enum {SHIFT_NONE=0, SHIFT_LEFT=1, SHIFT_RIGHT=2};
 
 	vector<vector<int> > featIslIdxStoreVec;
 	bool featIslStored = false;
 
 public:
+	enum {SHIFT_NONE=0, SHIFT_LEFT=1, SHIFT_RIGHT=2};
 	void setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2);
 	bool shade_translation(ShadeShape &ss, int shiftType, int shiftAmt=1);
 	vector<vector<int> >& getStoredFeatIslIdx();
