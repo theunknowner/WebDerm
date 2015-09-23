@@ -59,20 +59,17 @@ void Features::determineFeatureShape(Mat featureImg) {
 	sampleVec.push_back(sample);
 	Mat results = ml.runANN(param,sampleVec);
 	this->NN_Results = results;
-	for(int i=0; i<results.rows; i++) {
-		float max = -2.0;
-		int labelNum = -1;
-		for(int j=0; j<results.cols; j++) {
-			if(results.at<float>(i,j)>max) {
-				max = results.at<float>(i,j);
-				labelNum = j;
-			}
-		}
-		if(max<=-0.5) labelNum = 4; //sets shape to default if all results are less than thresh
-		String shapeName = ml.getShapeName(labelNum);
-		this->featShape = labelNum;
-		this->featShapeName = shapeName;
+	int labelNum = -1;
+	auto maxIt = max_element(results.begin<float>(),results.end<float>());
+	auto minIt = min_element(results.begin<float>(),results.end<float>());
+	if(*maxIt==*minIt || *maxIt<=-0.5) labelNum = 4;
+	else {
+		labelNum = distance(results.begin<float>(),maxIt);
 	}
+	String shapeName = ml.getShapeName(labelNum);
+
+	this->featShape = labelNum;
+	this->featShapeName = shapeName;
 }
 
 //! gets the unique shade values of the islands and stores them in a vector
