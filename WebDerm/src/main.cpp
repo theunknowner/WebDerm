@@ -96,7 +96,7 @@ int main(int argc,char** argv)
 	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -179,6 +179,7 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
+
 /*
 	deque<String> files;
 	String folder = "/home/jason/git/Samples/Samples/Training/Strip/";
@@ -194,15 +195,16 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
+
+	//Scripts::checkAllTestData();
 /*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
-	Islands island = ss1.getIslandWithPoint(Point(22,30));
-	imwrite("sample.png",island.image());
+	//ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
+	//Islands island = ss1.getIslandWithPoint(Point(60,31));
+	//imwrite("sample.png",island.image());
 	TestML ml;
-	//String param = TestML::PARAM_PATH;
-	String param = "/home/jason/git/Samples/Samples/param1.xml";
-	//Mat sample = imread("/home/jason/git/Samples/Samples/Training/Circles-Donut-Complete/circle_donut_comp(001).png",0);
-	Mat sample = island.image();
+	String param = TestML::PARAM_PATH;
+	Mat sample = imread("/home/jason/Desktop/workspace/Test_Base_NN/psoriasis1_Point(97,85).png",0);
+	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(40,40));
@@ -213,7 +215,7 @@ int main(int argc,char** argv)
 	Mat results = ml.runANN(param,sampleVec);
 	cout << results << endl;
 	/**/
-
+/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
@@ -226,13 +228,12 @@ int main(int argc,char** argv)
 	ml.importTrainingData(path1,path2,ml.getSize());
 	Mat data = ml.getData();
 	Mat labels = ml.getLabels();
-	int shape=2; //> change for different shapes
 	Mat training_set = data;
-	Mat training_labels = labels.col(shape);
+	Mat training_labels = labels;
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 40;
+	int hiddenNodes = 65;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;

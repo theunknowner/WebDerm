@@ -2059,37 +2059,35 @@ void script_createAllTrainingLabels() {
 	}
 }
 
-void script_checkAllTestData() {
-	String folder = "/home/jason/Desktop/workspace/Test_Islands/";
-	deque<String> files;
-	FileData fd;
-	fd.getFilesFromDirectory(folder,files);
-	sort(files.begin(),files.end());
-	String out = folder+"results.csv";
-	ofstream ofs;
-	ofs.open(out);
-	TestML ml;
-	String param = TestML::PARAM_PATH;
-	vector<Mat> sampleVec;
-	vector<String> nameVec;
-	for(unsigned int i=0; i<files.size(); i++) {
-		String filename = folder+files.at(i);
-		Mat sample = imread(filename,0);
-		if(!sample.empty()) {
-			filename = getFileName(filename);
-			nameVec.push_back(filename);
-			printf("%s: %d\n",filename.c_str(),countNonZero(sample));
-			sample *= 255;
-			sample = ml.prepareImage(sample,Size(20,20));
-			sampleVec.push_back(sample);
-		}
+void checkAllTestData() {
+	String folder = "/home/jason/Desktop/workspace/Test_Base_NN/";
+	String output = "/home/jason/Desktop/workspace/Test_Base_NN/results.csv";
+	String file = "/home/jason/Desktop/workspace/Test_Base_NN/Test_Base_NN.csv";
+	fstream fs(file);
+	String temp;
+	vector<String> vec;
+	FILE * fp;
+	fp = fopen(output.c_str(),"w");
+	while(getline(fs,temp)) {
+		getSubstr(temp,',',vec);
+		String name = vec.at(0);
+		Point pt(atoi(vec.at(1).c_str()),atoi(vec.at(2).c_str()));
+		String val = vec.at(3);
+		String filename = "/home/jason/Desktop/Programs/Discrete_New/"+name+"_discrete.png";
+		Mat img = imread(filename,0);
+		ShadeShape ss1;
+		ss1.extract(img,name);
+		Islands island = ss1.getIslandWithPoint(pt);
+		Mat sample = island.image();
+		imwrite(folder+name+"_Point("+vec.at(1)+","+vec.at(2)+").png",sample);
+		Mat results = island.nn_results();
+		float maxVal = *max_element(results.begin<float>(),results.end<float>());
+		String shape = island.shape_name();
+		fprintf(fp,"%s,%d,%d,%s,%s,%f\n",name.c_str(),pt.x,pt.y,vec.at(3).c_str(),shape.c_str(),maxVal);
 	}
-	Mat results = ml.runANN(param,sampleVec);
-	for(int i=0; i<results.rows; i++) {
-		if(ofs.is_open())
-			ofs << nameVec.at(i) << "," << results.row(i) << endl;
-	}
-	ofs.close();
+	fs.close();
+	fclose(fp);
+
 }
 
 void script_createTestDataList() {
