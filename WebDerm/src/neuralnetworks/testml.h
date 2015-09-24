@@ -19,7 +19,7 @@ private:
 	static Size img_size;
 public:
 	static String PARAM_PATH;
-	TestML();
+	TestML(int import=1);
 	bool importThresholds();
 	Mat getData();
 	Mat getLabels();

@@ -15,8 +15,10 @@ String TestML::PARAM_PATH = "Thresholds/param.xml";
 vector<String> TestML::shapeNames;
 Size TestML::img_size;
 
-TestML::TestML() {
-	assert(fs::exists(PARAM_PATH)==true);
+TestML::TestML(int import) {
+	if(import==1) {
+		assert(fs::exists(PARAM_PATH)==true);
+	}
 	if(!TestML::THRESH_IMPORTED)
 		TestML::THRESH_IMPORTED = this->importThresholds();
 }

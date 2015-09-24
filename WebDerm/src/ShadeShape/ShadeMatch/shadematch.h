@@ -23,6 +23,8 @@ protected:
 	vector<vector<int> > featIslIdxStoreVec;
 	bool featIslStored = false;
 
+	static vector<float> shadeWeightsVec;
+
 public:
 	enum {SHIFT_NONE=0, SHIFT_LEFT=1, SHIFT_RIGHT=2};
 	void setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2);
@@ -32,6 +34,7 @@ public:
 	vector<String> SHIFT();
 	float applyShiftPenalty(ShadeShape &ss, float score, int shiftAmt=1);
 	vector<vector<vector<Islands> > > shiftShades(vector<vector<vector<Islands> > > &islandVec, int shiftType);
+	float applyShadeWeights(int shadeLevel);
 
 };
 

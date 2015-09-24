@@ -66,8 +66,8 @@ int main(int argc,char** argv)
 	Scripts::script30(name);
 /**/
 /*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test23.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test22.png");
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test19.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//ssm.debug_mode(2);
@@ -197,13 +197,14 @@ int main(int argc,char** argv)
 /**/
 
 	//Scripts::checkAllTestData();
+	//Scripts::checkAllTestData2();
 /*
-	//ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
-	//Islands island = ss1.getIslandWithPoint(Point(60,31));
+	//ShadeShape ss1 = Scripts::script31("tinea_corporis8b");
+	//Islands island = ss1.getIslandWithPoint(Point(104,49));
 	//imwrite("sample.png",island.image());
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/Desktop/workspace/Test_Base_NN/psoriasis1_Point(97,85).png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/Test_Base_NN_Prime/tinea_corporis8b_Point(104,49).png",0);
 	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
@@ -268,6 +269,59 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
+/*
+	Scripts::script_createAllTrainingLabels2();
+	sleep(3);
+	TestML ml;
+	//String mainPath = "/home/jason/git/Samples/";
+	String path1 = "Samples2/Training/samples_path.csv";
+	String path2 = "Samples2/Training/labels_path.csv";
+	String path3 = "Samples2/log.txt";
+	Timer time;
+	time.begin();
+	ml.importTrainingData(path1,path2,ml.getSize());
+	Mat data = ml.getData();
+	Mat labels = ml.getLabels();
+	Mat training_set = data;
+	Mat training_labels = labels;
+	int sampleSize = training_set.rows;
+	int inputSize = training_set.cols;
+	int outputSize = training_labels.cols;
+	int hiddenNodes = 65;
+	Mat layers(3,1,CV_32S);
+	layers.at<int>(0,0) = inputSize;
+	layers.at<int>(1,0) = hiddenNodes;
+	layers.at<int>(2,0) = outputSize;
+	printf("Img Size: %dx%d\n",ml.getSize().width,ml.getSize().height);
+	printf("Input Size: %d\n",inputSize);
+	printf("Hidden Nodes: %d\n",hiddenNodes);
+	printf("Output Size: %d\n",outputSize);
+	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
+
+	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 4000, 0.000001);
+	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
+	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
+
+	time.end();
+	FILE * fp;
+	fp = fopen(path3.c_str(),"a");
+	fprintf(fp,"%s\n",time.getTimerString().c_str());
+	fprintf(fp,"%s",time.getEndTime().c_str());
+	fprintf(fp,"Img Size: %dx%d\n",ml.getSize().width,ml.getSize().height);
+	fprintf(fp,"Input Size: %d\n",inputSize);
+	fprintf(fp,"Hidden Nodes: %d\n",hiddenNodes);
+	fprintf(fp,"Output Size: %d\n",outputSize);
+	fprintf(fp,"Iterations: %d\n",iter);
+	fprintf(fp,"-----------------------\n");
+	fclose(fp);
+
+	cout << "Iterations: " << iter << endl;
+	time.printTimer();
+	String outputFile = "Samples2/param2.xml";
+	CvFileStorage* storage = cvOpenFileStorage(outputFile.c_str(), 0, CV_STORAGE_WRITE );
+	ann.write(storage,"shapeML");
+	cvReleaseFileStorage(&storage);
+	/**/
 	/*
 	String name = "vesicles25";
 	//String file = "/home/jason/Desktop/workspace/True_Positive_Pairs.csv";

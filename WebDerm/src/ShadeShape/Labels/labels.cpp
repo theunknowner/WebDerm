@@ -42,6 +42,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 					this->labelShapeShiftMap[label] = islandVec.at(i).at(j).at(k).isShapeShifted();
 					this->labelShapeNumMap[label] = islandVec.at(i).at(j).at(k).shape();
 					this->labelPrevShapeNumMap[label] = islandVec.at(i).at(j).at(k).prevShape();
+					this->labelShadeLevelMap[label] = j;
 				} else {
 					cout << "Labels::create(): map<String,pair<int,float> > labelMap duplicate keys!!!" << endl;
 					cout << label << endl;
@@ -54,6 +55,10 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 
 map<String,pair<int,float> >& Labels::getMap() {
 	return this->labelMap;
+}
+
+map<String,int>& Labels::getShadeLevelMap() {
+	return this->labelShadeLevelMap;
 }
 
 void Labels::setLabels(map<String,pair<int,float> > labels) {
@@ -149,9 +154,20 @@ String Labels::getShape(String label) {
 String Labels::getShade(String label) {
 	size_t pos = label.find("_") + 1;
 	String shade = label.substr(pos,label.length()-pos);
+	pos = shade.find("_") + 1;
+	shade = shade.substr(pos,shade.length()-pos);
 	pos = shade.find("_");
 	return shade.substr(0,pos);
 }
+
+int Labels::getShadeLevel(String label) {
+	if(this->labelShadeLevelMap.find(label)!=this->labelShadeLevelMap.end()) {
+		return this->labelShadeLevelMap.at(label);
+	}
+
+	return -1;
+}
+
 void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
 	auto labelMap1 = labels1.getMap();
 	auto labelMap2 = labels2.getMap();

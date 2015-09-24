@@ -49,6 +49,7 @@ namespace Func {
 	String addDigitsForLabel(int num, String digit, int length=1);
 	vector<vector<vector<vector<int> > > > createVector4D(int dim1, int dim2, int dim3, int dim4, int val);
 	void getSubstr(String str, char beginDelimit, char endDelimit, vector<String> &vec);
+	int largest(Mat input, int rank=1);
 }
 
 class Functions {

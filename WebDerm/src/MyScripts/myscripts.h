@@ -50,7 +50,9 @@ ShadeShape script31(String filename);
 
 void script_createTrainingLabels();
 void script_createAllTrainingLabels();
+void script_createAllTrainingLabels2();
 void checkAllTestData();
+void checkAllTestData2();
 void script_createTestDataList();
 void script_checkHitRatioTestData();
 

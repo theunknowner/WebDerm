@@ -19,6 +19,7 @@ private:
 	map<String,bool> labelShapeShiftMap;
 	map<String,int> labelShapeNumMap;
 	map<String,int> labelPrevShapeNumMap;
+	map<String,int> labelShadeLevelMap;
 	String labelName;
 	int labelTotalArea;
 	void calcTotalArea();
@@ -28,6 +29,7 @@ public:
 	Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
 	void create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
 	map<String,pair<int,float> >& getMap();
+	map<String,int>& getShadeLevelMap();
 	void setLabels(map<String,pair<int,float> > labels);
 	int area(String label);
 	int area(int num);
@@ -41,6 +43,7 @@ public:
 	int getIndex(String label);
 	String getShape(String label);
 	String getShade(String label);
+	int getShadeLevel(String label);
 	bool isShapeShifted(String label);
 	int getShapeNum(String label);
 	int getPrevShapeNum(String label);

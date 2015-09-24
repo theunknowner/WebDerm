@@ -14,6 +14,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/stddev.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 
 String toString(int val)
 {
@@ -394,6 +395,16 @@ void getSubstr(String str, char beginDelimit, char endDelimit, vector<String> &v
 			pos2=-1;
 		}
 	}
+}
+
+//! returns the index of the largest element
+int largest(Mat input, int rank) {
+	int place = rank-1;
+	vector<float> vec;
+	vector<int> origPos;
+	input.row(0).copyTo(vec);
+	jaysort(vec,origPos);
+	return origPos.at(place);
 }
 
 } //end namespace

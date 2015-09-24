@@ -88,16 +88,20 @@ void ShadeShapeMatch::sortIslandsByArea(vector<vector<vector<Islands> > > &islan
 void ShadeShapeMatch::fillMissingLabels(Labels &upLabels, Labels &dbLabels) {
 	map<String,pair<int,float> > &upMap = upLabels.getMap();
 	map<String,pair<int,float> > &dbMap = dbLabels.getMap();
+	map<String,int> &upShadeLevelMap = upLabels.getShadeLevelMap();
+	map<String,int> &dbShadeLevelMap = dbLabels.getShadeLevelMap();
 	for(auto it=upMap.begin(); it!=upMap.end(); it++) {
 		String label = it->first;
 		if(dbMap.find(label)==dbMap.end()) {
 			dbMap[label] = std::make_pair(0,0.0);
+			dbShadeLevelMap[label] = upLabels.getShadeLevel(label);
 		}
 	}
 	for(auto it=dbMap.begin(); it!=dbMap.end(); it++) {
 		String label = it->first;
 		if(upMap.find(label)==upMap.end()) {
 			upMap[label] = std::make_pair(0,0.0);
+			upShadeLevelMap[label] = dbLabels.getShadeLevel(label);
 		}
 	}
 }
@@ -107,6 +111,7 @@ void ShadeShapeMatch::fillMissingLabels(Labels &upLabels, Labels &dbLabels) {
 //! applies shape shift penalties during calculations for the shapes shifted
 float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 	ShapeMatch spm;
+	ShadeMatch sdm;
 	if(upLabels.size()!=dbLabels.size()) {
 		cout << "ShapeMatch::dotProduct(): upLabels && dbLabels not same size!!!" << endl;
 		exit(1);
@@ -117,10 +122,11 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 	map<String,pair<int,float> > upMap = upLabels.getMap();
 	map<String,pair<int,float> > dbMap = dbLabels.getMap();
 	for(auto itUP=upMap.begin(), itDB=dbMap.begin(); itUP!=upMap.end(), itDB!=dbMap.end(); itUP++, itDB++) {
+		String label = itUP->first;
 		float penalty = 1.0;
-		if(upLabels.isShapeShifted(itUP->first)) {
-			int prevShapeNum = upLabels.getPrevShapeNum(itUP->first);
-			int shapeNum = upLabels.getShapeNum(itUP->first);
+		if(upLabels.isShapeShifted(label)) {
+			int prevShapeNum = upLabels.getPrevShapeNum(label);
+			int shapeNum = upLabels.getShapeNum(label);
 			if(prevShapeNum>=0 && shapeNum>=0) {
 				penalty = spm.getShiftPenalty(prevShapeNum,shapeNum);
 			} else {
@@ -128,7 +134,9 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 				printf("PrevShapeNum: %d, :CurrShapeNum: %d\n",prevShapeNum,shapeNum);
 			}
 		}
-		numerSum += (itUP->second.second * itDB->second.second) * penalty;
+		int shadeLevel = upLabels.getShadeLevel(label);
+		float weight = sdm.applyShadeWeights(shadeLevel);
+		numerSum += (itUP->second.second * itDB->second.second) * penalty * weight;
 		denomSumUP += pow(itUP->second.second,2);
 		denomSumDB += pow(itDB->second.second,2);
 	}

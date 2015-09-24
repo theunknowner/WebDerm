@@ -11,6 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 
+vector<float> ShadeMatch::shadeWeightsVec;
 
 /*************** PRIVATE FUNCTIONS *******************/
 
@@ -18,6 +19,27 @@
 
 void ShadeMatch::setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2) {
 	this->maxNumOfShades = max(shadeVec1.size(),shadeVec2.size());
+
+	ShadeMatch::shadeWeightsVec.clear();
+	ShadeMatch::shadeWeightsVec.resize(this->maxNumOfShades,0.0);
+	float weight = 5.0;
+	int shades = ceil(this->maxNumOfShades/2.0);
+	int j = this->maxNumOfShades-1;
+	float totalWeight = 0.0;
+	for(int i=0; i<shades; i++) {
+		ShadeMatch::shadeWeightsVec.at(i) = weight;
+		ShadeMatch::shadeWeightsVec.at(j) = weight;
+		weight /= 5.0;
+		j--;
+		if(i!=j) {
+			totalWeight += ShadeMatch::shadeWeightsVec.at(i) + ShadeMatch::shadeWeightsVec.at(j);
+		} else {
+			totalWeight += ShadeMatch::shadeWeightsVec.at(i);
+		}
+	}
+	for(unsigned int i=0; i<ShadeMatch::shadeWeightsVec.size(); i++) {
+		ShadeMatch::shadeWeightsVec.at(i) /= totalWeight;
+	}
 }
 
 //! continuous shade_translation of islands until shiftType changes
@@ -163,4 +185,8 @@ vector<vector<vector<Islands> > > ShadeMatch::shiftShades(vector<vector<vector<I
 		}
 	}
 	return newIslandVec;
+}
+
+float ShadeMatch::applyShadeWeights(int shadeLevel) {
+	return ShadeMatch::shadeWeightsVec.at(shadeLevel);
 }
