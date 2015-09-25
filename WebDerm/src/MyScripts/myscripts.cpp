@@ -2099,6 +2099,48 @@ void script_createAllTrainingLabels2() {
 	}
 }
 
+//! Create All Training Labels
+void script_createAllTrainingLabels3() {
+	String samplePath = "Samples3/Training/samples_path.csv";
+	String labelPath = "Samples3/Training/Labels/";
+	fstream fs(samplePath);
+	if(fs.is_open()) {
+		String path;
+		deque<String> vec;
+		while(getline(fs,path)) {
+			vec.push_back(path);
+		}
+		unsigned int sets = vec.size();
+		for(unsigned int i=0; i<vec.size(); i++) {
+			String folderSetName = getFolderName(vec.at(i));
+			FileData fd;
+			deque<String> files;
+			fd.getFilesFromDirectory(vec.at(i),files);
+			sort(files.begin(), files.end());
+			String out = labelPath+folderSetName+".csv";
+
+			FILE * fp;
+			fp = fopen(out.c_str(),"w");
+			int label = -1;
+			for(unsigned int n=0; n<files.size(); n++) {
+				String filename = vec.at(i)+files.at(n);
+				filename = getFileName(filename);
+				fprintf(fp,"%s,",filename.c_str());
+				for(unsigned int j=0; j<sets; j++) {
+					if(j==i) label = 1;
+					else label = -1;
+					if(j<(sets-1))
+						fprintf(fp,"%d,",label);
+					else
+						fprintf(fp,"%d\n",label);
+				}
+			}
+			fclose(fp);
+		}
+		fs.close();
+	}
+}
+
 void checkAllTestData() {
 	String folder = "/home/jason/Desktop/workspace/Test_Base_NN/";
 	String output = "/home/jason/Desktop/workspace/Test_Base_NN/results.csv";
@@ -2124,12 +2166,13 @@ void checkAllTestData() {
 		Mat results = island.nn_results();
 		//float maxVal = *max_element(results.begin<float>(),results.end<float>());
 		int maxIdx = Func::largest(results,1);
-		int secondMaxIdx = Func::largest(results,2);
+		//int secondMaxIdx = Func::largest(results,2);
 		float maxVal = results.at<float>(0,maxIdx);
-		float secondMaxVal = results.at<float>(0,secondMaxIdx);
+		//float secondMaxVal = results.at<float>(0,secondMaxIdx);
 		String shape = island.shape_name();
-		String shape2 = ml.getShapeName(secondMaxIdx);
-		fprintf(fp,"%s,%d;%d,%s,%s,%f,%s,%f\n",name.c_str(),pt.x,pt.y,vec.at(3).c_str(),shape.c_str(),maxVal,shape2.c_str(),secondMaxVal);
+		//String shape2 = ml.getShapeName(secondMaxIdx);
+		//fprintf(fp,"%s,%d;%d,%s,%s,%f,%s,%f\n",name.c_str(),pt.x,pt.y,vec.at(3).c_str(),shape.c_str(),maxVal,shape2.c_str(),secondMaxVal);
+		fprintf(fp,"%s,%d;%d,%s,%s,%f\n",name.c_str(),pt.x,pt.y,vec.at(3).c_str(),shape.c_str(),maxVal);
 	}
 	fs.close();
 	fclose(fp);

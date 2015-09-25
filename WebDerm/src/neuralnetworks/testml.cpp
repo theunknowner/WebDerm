@@ -11,7 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
 bool TestML::THRESH_IMPORTED = false;
-String TestML::PARAM_PATH = "Thresholds/param.xml";
+String TestML::PARAM_PATH = "Thresholds/param3.xml";
 vector<String> TestML::shapeNames;
 Size TestML::img_size;
 
