@@ -172,7 +172,7 @@ void ShadeShapeMatch::test(ShadeShape &ss) {
 	lbls.printLabels();
 	cout << "----------------------------" << endl;
 	ShadeShapeRelation ssr;
-	ssr.spatial_relation(ss,lbls,islandVec);
+	ssr.spatial_relation(ss,lbls,islandVec,1);
 }
 
 //same as match but for testing changes
@@ -477,11 +477,13 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	}// end shadeShift
 
 	Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB,1);
-	imwrite(upSS.name()+"_"+dbSS.name()+"_max_match_image.png",maxMatchImg);
+	String newNameUP = upSS.name()+"_"+dbSS.name();
+	String newNameDB = dbSS.name()+"_"+upSS.name();
+	imwrite(newNameUP+"_max_match_image.png",maxMatchImg);
 	ShadeShapeRelation ssrUP;
-	ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec);
+	ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec,1,newNameUP);
 	ShadeShapeRelation ssrDB;
-	ssrDB.spatial_relation(dbSS,largestLabelsDB,this->dbIslandVec);
+	ssrDB.spatial_relation(dbSS,largestLabelsDB,this->dbIslandVec,1,newNameDB);
 	float tr2_score = this->tr2(ssrUP,largestLabelsUP,ssrDB,largestLabelsDB);
 	float results = maxTR1 * tr2_score;
 	vector<float> vec = {results,maxTR1,tr2_score};

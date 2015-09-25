@@ -23,7 +23,7 @@ protected:
 
 public:
 	void generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
-	void spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
+	void spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec, int write, String newName="");
 	Srm& get_srm();
 	String name();
 	int getRelOpIndex(String relOp);

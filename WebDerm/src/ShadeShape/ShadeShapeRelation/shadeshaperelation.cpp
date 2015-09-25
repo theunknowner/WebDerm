@@ -217,12 +217,14 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
  * returns SSR object containing all info on the ShadeShape's spatial relationships
  * accessible by the defined functions
  */
-void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
-	this->ssr_name = ss.name();
+void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec, int write, String newName) {
+	this->ssr_name = newName!="" ? newName : ss.name();
 	this->generate_srm(ss,labels,islandVec);
-	this->srm.writeRelationMatrix(labels,ss.name());
-	this->srm.writeNeighborLevelMatrix(labels,ss.name());
-	this->srm.writeRelationCountMatrix(labels,ss.name());
+	if(write) {
+		this->srm.writeRelationMatrix(labels,this->ssr_name);
+		this->srm.writeNeighborLevelMatrix(labels,this->ssr_name);
+		this->srm.writeRelationCountMatrix(labels,this->ssr_name);
+	}
 }
 
 String ShadeShapeRelation::name() {
