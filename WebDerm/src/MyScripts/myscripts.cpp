@@ -2101,8 +2101,8 @@ void script_createAllTrainingLabels2() {
 
 //! Create All Training Labels
 void script_createAllTrainingLabels3() {
-	String samplePath = "Samples3/Training/samples_path.csv";
-	String labelPath = "Samples3/Training/Labels/";
+	String samplePath = "NN3-Excavated/Training/samples_path.csv";
+	String labelPath = "NN3-Excavated/Training/Labels/";
 	fstream fs(samplePath);
 	if(fs.is_open()) {
 		String path;
@@ -2180,40 +2180,31 @@ void checkAllTestData() {
 }
 
 void checkAllTestData2() {
-	String folder = "/home/jason/Desktop/workspace/Test_Base_NN_Prime/";
+	String folder = "/home/jason/git/Samples/Samples/Training/Blotch/";
 	String output = "/home/jason/Desktop/workspace/Test_Base_NN_Prime/results.csv";
-	String file = "/home/jason/Desktop/workspace/Test_Base_NN_Prime/Test_Base_NN.csv";
-	fstream fs(file);
-	String temp;
-	vector<String> vec;
+	deque<String> files;
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	sort(files.begin(),files.end());
 	FILE * fp;
 	fp = fopen(output.c_str(),"w");
 	TestML ml;
-	while(getline(fs,temp)) {
-		getSubstr(temp,',',vec);
-		String name = vec.at(0);
-		Point pt(atoi(vec.at(1).c_str()),atoi(vec.at(2).c_str()));
-		String val = vec.at(3);
-		String filename = "/home/jason/Desktop/Programs/Discrete_New/"+name+"_discrete.png";
-		Mat img = imread(filename,0);
-		ShadeShape ss1;
-		ss1.extract(img,name);
-		Islands island = ss1.getIslandWithPoint(pt);
-		Mat sample = island.image();
-		//imwrite(folder+name+"_Point("+vec.at(1)+","+vec.at(2)+").png",sample);
-		Mat results = island.nn_results();
-		//float maxVal = *max_element(results.begin<float>(),results.end<float>());
-		int maxIdx = Func::largest(results,1);
-		int secondMaxIdx = Func::largest(results,2);
-		float maxVal = results.at<float>(0,maxIdx);
-		float secondMaxVal = results.at<float>(0,secondMaxIdx);
-		String shape = island.shape_name();
-		String shape2 = ml.getShapeName(secondMaxIdx);
-		fprintf(fp,"%s,%d;%d,%s,%s,%f,%s,%f\n",name.c_str(),pt.x,pt.y,vec.at(3).c_str(),shape.c_str(),maxVal,shape2.c_str(),secondMaxVal);
+	vector<Mat> sampleVec;
+	vector<String> nameVec;
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		Mat sample = imread(name,0);
+		name = getFileName(name);
+		sample *= 255;
+		sample = ml.prepareImage(sample,Size(40,40));
+		sampleVec.push_back(sample);
+		nameVec.push_back(name);
 	}
-	fs.close();
+	Mat results = ml.runANN(TestML::PARAM_PATH,sampleVec);
+	for(int i=0; i<results.rows; i++) {
+		fprintf(fp,"%s,%f\n",nameVec.at(i).c_str(),results.at<float>(i,0));
+	}
 	fclose(fp);
-
 }
 
 void script_createTestDataList() {

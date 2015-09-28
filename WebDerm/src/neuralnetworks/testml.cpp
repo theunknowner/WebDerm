@@ -11,9 +11,11 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
 bool TestML::THRESH_IMPORTED = false;
-String TestML::PARAM_PATH = "Thresholds/param3.xml";
+String TestML::PARAM_PATH = "Thresholds/param-excavated.xml";
 vector<String> TestML::shapeNames;
 Size TestML::img_size;
+vector<String> TestML::shapeParamPaths;
+vector<String> TestML::shapeNames2;
 
 TestML::TestML(int import) {
 	if(import==1) {
@@ -26,7 +28,9 @@ TestML::TestML(int import) {
 bool TestML::importThresholds() {
 	fstream fs("Thresholds/shape_names.csv");
 	fstream fs2("Thresholds/ml_nn_size.csv");
-	if(fs.is_open() && fs2.is_open()) {
+	fstream fs3("Thresholds/shape_params.csv");
+	fstream fs4("Thresholds/shape_names2.csv");
+	if(fs.is_open() && fs2.is_open() && fs3.is_open() && fs4.is_open()) {
 		String temp;
 		vector<String> vec;
 		while(getline(fs,temp)) {
@@ -39,6 +43,13 @@ bool TestML::importThresholds() {
 			TestML::img_size.height = atoi(vec.at(1).c_str());
 		}
 		fs2.close();
+		while(getline(fs3,temp)) {
+			TestML::shapeParamPaths.push_back(temp);
+		}
+		fs3.close();
+		while(getline(fs4,temp)) {
+			TestML::shapeNames2.push_back(temp);
+		}
 		return true;
 	} else {
 		printf("TestML::importThreshold() failed, shape_names.csv does not exist!\n");
@@ -264,7 +275,7 @@ void TestML::importTrainingData(String samplePath, String labelsPath, Size size)
 }
 
 String TestML::getShapeName(int num) {
-	return TestML::shapeNames[num];
+	return TestML::shapeNames.at(num);
 }
 
 int TestML::numOfShapes() {
@@ -273,4 +284,26 @@ int TestML::numOfShapes() {
 
 Size TestML::getSize() {
 	return TestML::img_size;
+}
+
+//! NN3
+Mat TestML::runANN2(vector<Mat> sampleVec) {
+	Mat results = Mat::zeros(1,TestML::shapeNames2.size(),CV_32F);
+	CvANN_MLP ann;
+	Mat score;
+	for(unsigned int i=0; i<TestML::shapeNames2.size(); i++) {
+		String param = TestML::shapeParamPaths.at(i);
+		ann.load(param.c_str());
+		Mat layers = ann.get_layer_sizes();
+		this->setLayerParams(layers);
+		Mat sample_set  = this->prepareMatSamples(sampleVec);
+		ann.predict(sample_set,score);
+		results.at<float>(0,i) = score.at<float>(0,0);
+	}
+	return results;
+}
+
+//! NN3
+String TestML::getShapeName2(int num) {
+	return TestML::shapeNames2.at(num);
 }

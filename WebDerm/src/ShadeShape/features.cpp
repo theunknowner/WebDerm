@@ -57,6 +57,8 @@ void Features::determineFeatureShape(Mat featureImg) {
 	sample *= 255;
 	sample = ml.prepareImage(sample,ml.getSize());
 	sampleVec.push_back(sample);
+
+	/*** NN2
 	Mat results = ml.runANN(param,sampleVec);
 	this->NN_Results = results;
 	int labelNum = -1;
@@ -67,7 +69,12 @@ void Features::determineFeatureShape(Mat featureImg) {
 		labelNum = distance(results.begin<float>(),maxIt);
 	}
 	String shapeName = ml.getShapeName(labelNum);
-
+	 ***/
+	Mat results = ml.runANN2(sampleVec);
+	this->NN_Results = results;
+	auto maxIt = max_element(results.begin<float>(),results.end<float>());
+	int labelNum = distance(results.begin<float>(),maxIt);
+	String shapeName = ml.getShapeName2(labelNum);
 	this->featShape = labelNum;
 	this->featShapeName = shapeName;
 }

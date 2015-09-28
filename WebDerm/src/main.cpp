@@ -78,7 +78,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-/*
+
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -196,7 +196,7 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	Scripts::checkAllTestData();
+	//Scripts::checkAllTestData();
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script31("melanoma3");
@@ -204,7 +204,7 @@ int main(int argc,char** argv)
 	//imwrite("sample.png",island.image());
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/Desktop/workspace/test12.png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/test1.png",0);
 	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
@@ -213,7 +213,8 @@ int main(int argc,char** argv)
 	vector<Mat> sampleVec;
 
 	sampleVec.push_back(sample);
-	Mat results = ml.runANN(param,sampleVec);
+	//Mat results = ml.runANN(param,sampleVec);
+	Mat results = ml.runANN2(sampleVec);
 	cout << results << endl;
 	/**/
 /*
@@ -323,18 +324,19 @@ int main(int argc,char** argv)
 	cvReleaseFileStorage(&storage);
 	/**/
 /*
-	//Scripts::script_createAllTrainingLabels3();
-	//sleep(3);
+	Scripts::script_createAllTrainingLabels3();
+	sleep(3);
+
 	TestML ml;
 	//String mainPath = "/home/jason/git/Samples/";
-	String path1 = "Samples3/Training/samples_path.csv";
-	String path2 = "Samples3/Training/labels_path.csv";
-	String path3 = "Samples3/log.txt";
+	String path1 = "NN3-Excavated/Training/samples_path.csv";
+	String path2 = "NN3-Excavated/Training/labels_path.csv";
+	String path3 = "NN3-Excavated/log.txt";
 	Timer time;
 	time.begin();
 	ml.importTrainingData(path1,path2,ml.getSize());
 	Mat data = ml.getData();
-	Mat labels = ml.getLabels().col(2);
+	Mat labels = ml.getLabels().col(7); //> change for different shapes
 	Mat training_set = data;
 	Mat training_labels = labels;
 	int sampleSize = training_set.rows;
@@ -370,7 +372,7 @@ int main(int argc,char** argv)
 
 	cout << "Iterations: " << iter << endl;
 	time.printTimer();
-	String outputFile = "Samples3/param3.xml";
+	String outputFile = "NN3-Excavated/param-excavated.xml";
 	CvFileStorage* storage = cvOpenFileStorage(outputFile.c_str(), 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);

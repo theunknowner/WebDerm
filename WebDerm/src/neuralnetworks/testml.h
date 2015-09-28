@@ -17,6 +17,8 @@ private:
 	static vector<String> shapeNames;
 	static bool THRESH_IMPORTED;
 	static Size img_size;
+	static vector<String> shapeParamPaths;
+	static vector<String> shapeNames2;
 public:
 	static String PARAM_PATH;
 	TestML(int import=1);
@@ -37,6 +39,9 @@ public:
 	String getShapeName(int num);
 	int numOfShapes();
 	Size getSize();
+
+	Mat runANN2(vector<Mat> sampleVec);
+	String getShapeName2(int num);
 };
 
 #endif /* TESTML_H_ */
