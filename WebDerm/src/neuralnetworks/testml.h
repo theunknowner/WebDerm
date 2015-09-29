@@ -19,6 +19,7 @@ private:
 	static Size img_size;
 	static vector<String> shapeParamPaths;
 	static vector<String> shapeNames2;
+	static vector<CvANN_MLP> cvAnnVec;
 public:
 	static String PARAM_PATH;
 	TestML(int import=1);
@@ -39,6 +40,7 @@ public:
 	String getShapeName(int num);
 	int numOfShapes();
 	Size getSize();
+	int getShapeIndex(String shape);
 
 	Mat runANN2(vector<Mat> sampleVec);
 	String getShapeName2(int num);

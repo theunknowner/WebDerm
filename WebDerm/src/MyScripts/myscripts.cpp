@@ -2101,8 +2101,9 @@ void script_createAllTrainingLabels2() {
 
 //! Create All Training Labels
 void script_createAllTrainingLabels3() {
-	String samplePath = "NN3-Excavated/Training/samples_path.csv";
-	String labelPath = "NN3-Excavated/Training/Labels/";
+	String mainPath = "NN3-Excavated/";
+	String samplePath = mainPath+"Training/samples_path.csv";
+	String labelPath = mainPath+"Training/Labels/";
 	fstream fs(samplePath);
 	if(fs.is_open()) {
 		String path;
@@ -2165,9 +2166,10 @@ void checkAllTestData() {
 		//imwrite(folder+name+"_Point("+vec.at(1)+","+vec.at(2)+").png",sample);
 		Mat results = island.nn_results();
 		//float maxVal = *max_element(results.begin<float>(),results.end<float>());
-		int maxIdx = Func::largest(results,1);
+		//int maxIdx = Func::largest(results,1);
 		//int secondMaxIdx = Func::largest(results,2);
-		float maxVal = results.at<float>(0,maxIdx);
+		//float maxVal = results.at<float>(0,maxIdx);
+		float maxVal = island.nn_score();
 		//float secondMaxVal = results.at<float>(0,secondMaxIdx);
 		String shape = island.shape_name();
 		//String shape2 = ml.getShapeName(secondMaxIdx);
@@ -2180,7 +2182,7 @@ void checkAllTestData() {
 }
 
 void checkAllTestData2() {
-	String folder = "/home/jason/git/Samples/Samples/Training/Blotch/";
+	String folder = "/home/jason/git/Samples/Samples/Training/Excavated/";
 	String output = "/home/jason/Desktop/workspace/Test_Base_NN_Prime/results.csv";
 	deque<String> files;
 	FileData fd;

@@ -18,6 +18,7 @@ protected:
 	String islShapeName;
 	Mat islandImg;
 	Mat NN_Results;
+	float NN_Score;
 	Point islPt;
 	Point _centerOfMass;
 	map<String,Point> coordMap;
@@ -36,6 +37,7 @@ public:
 	int& shape();
 	String& shape_name();
 	Mat& nn_results();
+	float nn_score();
 	Point startPt();
 	void set_island_shade(int shade);
 	Point centerOfMass();

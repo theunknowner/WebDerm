@@ -11,16 +11,17 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 
 bool TestML::THRESH_IMPORTED = false;
-String TestML::PARAM_PATH = "Thresholds/param-excavated.xml";
+String TestML::PARAM_PATH = "Thresholds/param-Excavated.xml";
 vector<String> TestML::shapeNames;
 Size TestML::img_size;
 vector<String> TestML::shapeParamPaths;
 vector<String> TestML::shapeNames2;
+vector<CvANN_MLP> TestML::cvAnnVec;
 
 TestML::TestML(int import) {
-	if(import==1) {
-		assert(fs::exists(PARAM_PATH)==true);
-	}
+	//if(import==1) {
+	//	assert(fs::exists(PARAM_PATH)==true);
+	//}
 	if(!TestML::THRESH_IMPORTED)
 		TestML::THRESH_IMPORTED = this->importThresholds();
 }
@@ -284,6 +285,14 @@ int TestML::numOfShapes() {
 
 Size TestML::getSize() {
 	return TestML::img_size;
+}
+
+int TestML::getShapeIndex(String shape) {
+	auto it = std::find(TestML::shapeNames.begin(),TestML::shapeNames.end(),shape);
+	if(it!=TestML::shapeNames.end()) {
+		return distance(TestML::shapeNames.begin(),it);
+	}
+	return -1;
 }
 
 //! NN3

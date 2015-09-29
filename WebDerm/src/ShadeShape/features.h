@@ -22,6 +22,7 @@ private:
 	int featShape;
 	String featShapeName;
 	Mat NN_Results;
+	float NN_Score;
 
 	vector<Mat> extractIslands(Mat featureImg, int thresh);
 	void storeIsland(Islands island);
@@ -36,6 +37,7 @@ public:
 	int shape();
 	String shape_name();
 	Mat nn_results();
+	float nn_score();
 	int numOfShades();
 	int shade(int num);
 	void release();

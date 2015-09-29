@@ -36,16 +36,21 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	Mat results = ml.runANN2(sampleVec);
 	this->NN_Results = results;
 	float thresh = 0.0;
+	bool flag = false;
 	for(int i=0; i<results.cols; i++) {
 		if(results.at<float>(0,i)>thresh) { //> threshold may change from testing
 			int labelNum = i;
 			this->islShape = labelNum;
 			this->islShapeName = ml.getShapeName2(labelNum);
+			this->NN_Score = results.at<float>(0,i);
+			flag=true;
 			break;
-		} else {
-			this->islShape = 5;
-			this->islShapeName = "Default";
 		}
+	}
+	if(flag==false) {
+		this->NN_Score = *max_element(results.begin<float>(),results.end<float>());
+		this->islShape = 5;
+		this->islShapeName = "Default";
 	}
 }
 //get coordinates of non-zero pixels
@@ -118,6 +123,10 @@ String& Islands::shape_name() {
 //! outputs shape neural network results
 Mat& Islands::nn_results() {
 	return this->NN_Results;
+}
+
+float Islands::nn_score() {
+	return this->NN_Score;
 }
 
 Point Islands::startPt() {
