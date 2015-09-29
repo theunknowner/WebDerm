@@ -35,14 +35,19 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	 ***/
 	Mat results = ml.runANN2(sampleVec);
 	this->NN_Results = results;
-	auto maxIt = max_element(results.begin<float>(),results.end<float>());
-	int labelNum = distance(results.begin<float>(),maxIt);
-	String shapeName = ml.getShapeName2(labelNum);
-
-	this->islShape = labelNum;
-	this->islShapeName = shapeName;
+	float thresh = 0.0;
+	for(int i=0; i<results.cols; i++) {
+		if(results.at<float>(0,i)>thresh) { //> threshold may change from testing
+			int labelNum = i;
+			this->islShape = labelNum;
+			this->islShapeName = ml.getShapeName2(labelNum);
+			break;
+		} else {
+			this->islShape = 5;
+			this->islShapeName = "Default";
+		}
+	}
 }
-
 //get coordinates of non-zero pixels
 void Islands::getIslandPoints(Mat &islandImg) {
 	Mat nonZeroCoord;
