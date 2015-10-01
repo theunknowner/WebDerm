@@ -52,6 +52,7 @@ void script_createTrainingLabels();
 void script_createAllTrainingLabels();
 void script_createAllTrainingLabels2();
 void script_createAllTrainingLabels3();
+void script_createAllTrainingLabels3b(String shape);
 void checkAllTestData();
 void checkAllTestData2();
 void script_createTestDataList();

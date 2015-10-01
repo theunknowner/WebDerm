@@ -2099,7 +2099,8 @@ void script_createAllTrainingLabels2() {
 	}
 }
 
-//! Create All Training Labels
+//! Create All Training Labels NN3
+//! part manual, incomp disc & donut labels needs manual change
 void script_createAllTrainingLabels3() {
 	String mainPath = "NN3-Excavated/";
 	String samplePath = mainPath+"Training/samples_path.csv";
@@ -2117,7 +2118,7 @@ void script_createAllTrainingLabels3() {
 			FileData fd;
 			deque<String> files;
 			fd.getFilesFromDirectory(vec.at(i),files);
-			sort(files.begin(), files.end());
+			//sort(files.begin(), files.end());
 			String out = labelPath+folderSetName+".csv";
 
 			FILE * fp;
@@ -2130,6 +2131,59 @@ void script_createAllTrainingLabels3() {
 				for(unsigned int j=0; j<sets; j++) {
 					if(j==i) label = 1;
 					else label = -1;
+					if(j<(sets-1))
+						fprintf(fp,"%d,",label);
+					else
+						fprintf(fp,"%d\n",label);
+				}
+			}
+			fclose(fp);
+		}
+		fs.close();
+	}
+}
+
+//! Create All Training Labels NN3
+//! all automated
+void script_createAllTrainingLabels3b(String shape) {
+	//String shape = "Disc";
+	String mainPath = "NN3-"+shape+"/";
+	String samplePath = mainPath+"Training/samples_path.csv";
+	String labelPath = mainPath+"Training/Labels/";
+	fstream fs(samplePath);
+	if(fs.is_open()) {
+		String path;
+		deque<String> vec;
+		while(getline(fs,path)) {
+			vec.push_back(path);
+		}
+		unsigned int sets = vec.size();
+		for(unsigned int i=0; i<vec.size(); i++) {
+			String folderSetName = getFolderName(vec.at(i));
+			FileData fd;
+			deque<String> files;
+			fd.getFilesFromDirectory(vec.at(i),files);
+			//sort(files.begin(), files.end());
+			String out = labelPath+folderSetName+".csv";
+
+			FILE * fp;
+			fp = fopen(out.c_str(),"w");
+			int label = -1;
+			for(unsigned int n=0; n<files.size(); n++) {
+				String filename = vec.at(i)+files.at(n);
+				filename = getFileName(filename);
+				fprintf(fp,"%s,",filename.c_str());
+				for(unsigned int j=0; j<sets; j++) {
+					String folderSet2 = getFolderName(vec.at(j));
+					if(j==i) {
+						label = 1;
+					}
+					else if(folderSetName.find(shape)!=string::npos && folderSet2.find(shape)!=string::npos && j==i-1) {
+						label = 1;
+					}
+					else {
+						label = -1;
+					}
 					if(j<(sets-1))
 						fprintf(fp,"%d,",label);
 					else
@@ -2178,7 +2232,7 @@ void checkAllTestData() {
 	}
 	fs.close();
 	fclose(fp);
-
+	TestML::clear();
 }
 
 void checkAllTestData2() {
@@ -2564,11 +2618,12 @@ void script28a() {
 	Mat img, img2,img3, img4, img5, imgGray;
 	FileData fd;
 	deque<String> files;
-	String name = "melanoma9";
+	String name = "vesicles38";
 	String out = "/home/jason/Desktop/Programs/Discrete_New/";
 	img = imread("/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg");
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
+	imwrite(name+".png",img);
 	Xyz xyz;
 	CieLab lab;
 	Cie cie;
@@ -2688,6 +2743,7 @@ void script28a() {
 
 	ShapeColor sc;
 	cvtColor(img,imgGray,CV_BGR2GRAY);
+	imwrite(name+"_Gray.png",imgGray);
 	Mat src = sm.prepareImage(imgGray);
 	Mat mapOfNonNoise = sm.removeNoiseOnBoundary(src);
 	Mat lcFilterMat = sc.filterKneePt(src);

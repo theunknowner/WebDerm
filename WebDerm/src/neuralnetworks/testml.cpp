@@ -16,12 +16,14 @@ vector<String> TestML::shapeNames;
 Size TestML::img_size;
 vector<String> TestML::shapeParamPaths;
 vector<String> TestML::shapeNames2;
-vector<CvANN_MLP> TestML::cvAnnVec;
+vector<CvANN_MLP *> TestML::cvAnnVec;
+bool TestML::importParam = 0;
 
-TestML::TestML(int import) {
-	//if(import==1) {
-	//	assert(fs::exists(PARAM_PATH)==true);
-	//}
+/* CALL TestML::clear() function at end of program
+ * to free dyanmic memory from ANN params
+ */
+TestML::TestML(bool import) {
+	TestML::importParam = import;
 	if(!TestML::THRESH_IMPORTED)
 		TestML::THRESH_IMPORTED = this->importThresholds();
 }
@@ -44,8 +46,14 @@ bool TestML::importThresholds() {
 			TestML::img_size.height = atoi(vec.at(1).c_str());
 		}
 		fs2.close();
-		while(getline(fs3,temp)) {
-			TestML::shapeParamPaths.push_back(temp);
+		if(TestML::importParam) {
+			while(getline(fs3,temp)) {
+				//TestML::shapeParamPaths.push_back(temp);
+				//std::unique_ptr<CvANN_MLP> ann(new CvANN_MLP);
+				CvANN_MLP *ann = new CvANN_MLP();
+				ann->load(temp.c_str());
+				TestML::cvAnnVec.push_back(ann);
+			}
 		}
 		fs3.close();
 		while(getline(fs4,temp)) {
@@ -155,7 +163,7 @@ void TestML::importSamples(String folder, vector<Mat> &samples, Size size) {
 	deque<String> files;
 	String filename;
 	fd.getFilesFromDirectory(folder,files);
-	sort(files.begin(),files.end());
+	//sort(files.begin(),files.end());
 	for(unsigned int i=0; i<files.size(); i++) {
 		filename = folder+files.at(i);
 		Mat img = imread(filename,0);
@@ -298,15 +306,16 @@ int TestML::getShapeIndex(String shape) {
 //! NN3
 Mat TestML::runANN2(vector<Mat> sampleVec) {
 	Mat results = Mat::zeros(1,TestML::shapeNames2.size(),CV_32F);
-	CvANN_MLP ann;
 	Mat score;
-	for(unsigned int i=0; i<TestML::shapeNames2.size(); i++) {
-		String param = TestML::shapeParamPaths.at(i);
-		ann.load(param.c_str());
-		Mat layers = ann.get_layer_sizes();
+	for(unsigned int i=0; i<TestML::cvAnnVec.size(); i++) {
+		//String param = TestML::shapeParamPaths.at(i);
+		//ann.load(param.c_str());
+		//Mat layers = ann.get_layer_sizes();
+		Mat layers = TestML::cvAnnVec.at(i)->get_layer_sizes();
 		this->setLayerParams(layers);
 		Mat sample_set  = this->prepareMatSamples(sampleVec);
-		ann.predict(sample_set,score);
+		//ann.predict(sample_set,score);
+		TestML::cvAnnVec.at(i)->predict(sample_set,score);
 		results.at<float>(0,i) = score.at<float>(0,0);
 	}
 	return results;
@@ -315,4 +324,24 @@ Mat TestML::runANN2(vector<Mat> sampleVec) {
 //! NN3
 String TestML::getShapeName2(int num) {
 	return TestML::shapeNames2.at(num);
+}
+
+//! NN3
+//! returns first index containing shape
+int TestML::getIndexContainingShape(String shape) {
+	for(unsigned int i=0; i<TestML::shapeNames.size(); i++) {
+		if(TestML::shapeNames.at(i).find(shape)!=string::npos) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+//! free memory
+/*** MUST BE CALLED AT END OF PROGRAM ***/
+void TestML::clear() {
+	for(unsigned int i=0; i<TestML::cvAnnVec.size(); i++) {
+		delete TestML::cvAnnVec.at(i);
+		TestML::cvAnnVec.at(i) = NULL;
+	}
 }

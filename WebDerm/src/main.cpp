@@ -85,6 +85,7 @@ int main(int argc,char** argv)
 	ShadeShape ss1;
 	ss1.extract(img,name);
 	ss1.showInteractiveIslands();
+	TestML::clear();
 /**/
 /*
 	ShadeShape ss1 = Scripts::script31("melanoma3");
@@ -196,17 +197,17 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	//Scripts::checkAllTestData();
+	Scripts::checkAllTestData();
 	//Scripts::checkAllTestData2();
-
-	ShadeShape ss1 = Scripts::script31("acne_vulgaris3");
-	Islands island = ss1.getIslandWithPoint(Point(15,97));
+/*
+	ShadeShape ss1 = Scripts::script31("herpes3");
+	Islands island = ss1.getIslandWithPoint(Point(68,17));
 	imwrite(ss1.name()+"_sample.png",island.image());
 	Mat results = island.nn_results();
 	cout << results << endl;
 	TestML ml;
 	//String param = TestML::PARAM_PATH;
-	//Mat sample = imread("/home/jason/Desktop/workspace/Test_Base_NN/acne_vulgaris5_Point(103,87).png",0);
+	//Mat sample = imread("/home/jason/Desktop/workspace/Test_Base_NN/psoriasis1_Point(60,9).png",0);
 	Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
@@ -326,12 +327,14 @@ int main(int argc,char** argv)
 	cvReleaseFileStorage(&storage);
 	/**/
 /*
-	Scripts::script_createAllTrainingLabels3();
+	String shape(argv[1]);
+	Scripts::script_createAllTrainingLabels3b(shape);
 	sleep(3);
-	TestML ml(0);
-	String shape = "Excavated";
-	String mainPath = "NN3-Excavated/";
-	int labelNum = ml.getShapeIndex(shape);
+	TestML ml(false);
+	String mainPath = "NN3-"+shape+"/";
+	int labelNum = ml.getIndexContainingShape(shape);
+	//int labelNum = ml.getShapeIndex(shape);
+	//shape = "Excavated";
 	String path1 = mainPath+"Training/samples_path.csv";
 	String path2 = mainPath+"Training/labels_path.csv";
 	String path3 = mainPath+"log.txt";

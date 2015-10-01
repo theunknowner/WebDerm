@@ -512,7 +512,7 @@ Mat Functions::scaleDownImage(Mat input, Size size) {
 	{
 		for(int y=0;y<size.width ;y++)
 		{
-			int yd =ceil((float)(y*input.cols/size.width));
+			int yd = ceil((float)(y*input.cols/size.width));
 			int xd = ceil((float)(x*input.rows/size.height));
 			scaledDownImage.at<uchar>(x,y) = input.at<uchar>(xd,yd);
 

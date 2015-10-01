@@ -19,10 +19,12 @@ private:
 	static Size img_size;
 	static vector<String> shapeParamPaths;
 	static vector<String> shapeNames2;
-	static vector<CvANN_MLP> cvAnnVec;
+	static vector<CvANN_MLP *> cvAnnVec;
+	static bool importParam;
+
 public:
 	static String PARAM_PATH;
-	TestML(int import=1);
+	TestML(bool import=true);
 	bool importThresholds();
 	Mat getData();
 	Mat getLabels();
@@ -44,6 +46,9 @@ public:
 
 	Mat runANN2(vector<Mat> sampleVec);
 	String getShapeName2(int num);
+	int getIndexContainingShape(String shape);
+
+	static void clear();
 };
 
 #endif /* TESTML_H_ */

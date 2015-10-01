@@ -30,6 +30,7 @@
 #include <unordered_map>
 #include <map>
 #include <unistd.h>
+#include <memory>
 
 #define BOOST_SYSTEM_NO_DEPRECATED
 #include "boost/filesystem/operations.hpp"
