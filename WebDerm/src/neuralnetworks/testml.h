@@ -17,9 +17,9 @@ private:
 	static vector<String> shapeNames;
 	static bool THRESH_IMPORTED;
 	static Size img_size;
-	static vector<String> shapeParamPaths;
 	static vector<String> shapeNames2;
 	static vector<CvANN_MLP *> cvAnnVec;
+	static vector<CvANN_MLP *> cvAnnVec2;
 	static bool importParam;
 
 public:
@@ -47,6 +47,8 @@ public:
 	Mat runANN2(vector<Mat> sampleVec);
 	String getShapeName2(int num);
 	int getIndexContainingShape(String shape);
+
+	Mat runANN2b(vector<Mat> sampleVec);
 
 	static void clear();
 };

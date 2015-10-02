@@ -2058,9 +2058,9 @@ void script_createAllTrainingLabels() {
 }
 
 //! Create All Training Labels
-void script_createAllTrainingLabels2() {
-	String samplePath = "Samples2/Training/samples_path.csv";
-	String labelPath = "Samples2/Training/Labels/";
+void script_createAllTrainingLabels2(String shape) {
+	String samplePath = "NN3-"+shape+"-Comp-Incomp/Training/samples_path.csv";
+	String labelPath = "NN3-"+shape+"-Comp-Incomp/Training/Labels/";
 	fstream fs(samplePath);
 	if(fs.is_open()) {
 		String path;
@@ -2236,8 +2236,8 @@ void checkAllTestData() {
 }
 
 void checkAllTestData2() {
-	String folder = "/home/jason/git/Samples/Samples/Training/Excavated/";
-	String output = "/home/jason/Desktop/workspace/Test_Base_NN_Prime/results.csv";
+	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Disc-Incomplete/";
+	String output = "/home/jason/Desktop/workspace/results.csv";
 	deque<String> files;
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
@@ -2256,7 +2256,7 @@ void checkAllTestData2() {
 		sampleVec.push_back(sample);
 		nameVec.push_back(name);
 	}
-	Mat results = ml.runANN(TestML::PARAM_PATH,sampleVec);
+	Mat results = ml.runANN2b(sampleVec);
 	for(int i=0; i<results.rows; i++) {
 		fprintf(fp,"%s,%f\n",nameVec.at(i).c_str(),results.at<float>(i,0));
 	}

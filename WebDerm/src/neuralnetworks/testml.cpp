@@ -14,9 +14,9 @@ bool TestML::THRESH_IMPORTED = false;
 String TestML::PARAM_PATH = "Thresholds/param-Excavated.xml";
 vector<String> TestML::shapeNames;
 Size TestML::img_size;
-vector<String> TestML::shapeParamPaths;
 vector<String> TestML::shapeNames2;
 vector<CvANN_MLP *> TestML::cvAnnVec;
+vector<CvANN_MLP *> TestML::cvAnnVec2;
 bool TestML::importParam = 0;
 
 /* CALL TestML::clear() function at end of program
@@ -33,6 +33,7 @@ bool TestML::importThresholds() {
 	fstream fs2("Thresholds/ml_nn_size.csv");
 	fstream fs3("Thresholds/shape_params.csv");
 	fstream fs4("Thresholds/shape_names2.csv");
+	fstream fs5("Thresholds/shape_params2.csv");
 	if(fs.is_open() && fs2.is_open() && fs3.is_open() && fs4.is_open()) {
 		String temp;
 		vector<String> vec;
@@ -48,8 +49,6 @@ bool TestML::importThresholds() {
 		fs2.close();
 		if(TestML::importParam) {
 			while(getline(fs3,temp)) {
-				//TestML::shapeParamPaths.push_back(temp);
-				//std::unique_ptr<CvANN_MLP> ann(new CvANN_MLP);
 				CvANN_MLP *ann = new CvANN_MLP();
 				ann->load(temp.c_str());
 				TestML::cvAnnVec.push_back(ann);
@@ -58,6 +57,14 @@ bool TestML::importThresholds() {
 		fs3.close();
 		while(getline(fs4,temp)) {
 			TestML::shapeNames2.push_back(temp);
+		}
+		fs4.close();
+		if(TestML::importParam) {
+			while(getline(fs5,temp)) {
+				CvANN_MLP *ann = new CvANN_MLP();
+				ann->load(temp.c_str());
+				TestML::cvAnnVec2.push_back(ann);
+			}
 		}
 		return true;
 	} else {
@@ -305,7 +312,7 @@ int TestML::getShapeIndex(String shape) {
 
 //! NN3
 Mat TestML::runANN2(vector<Mat> sampleVec) {
-	Mat results = Mat::zeros(1,TestML::shapeNames2.size(),CV_32F);
+	Mat results = Mat::zeros(1,TestML::cvAnnVec.size(),CV_32F);
 	Mat score;
 	for(unsigned int i=0; i<TestML::cvAnnVec.size(); i++) {
 		//String param = TestML::shapeParamPaths.at(i);
@@ -335,6 +342,18 @@ int TestML::getIndexContainingShape(String shape) {
 		}
 	}
 	return -1;
+}
+
+//! NN3 Disc Comp/Incomp
+Mat TestML::runANN2b(vector<Mat> sampleVec) {
+	Mat results;
+	for(unsigned int i=0; i<TestML::cvAnnVec2.size(); i++) {
+		Mat layers = TestML::cvAnnVec2.at(i)->get_layer_sizes();
+		this->setLayerParams(layers);
+		Mat sample_set  = this->prepareMatSamples(sampleVec);
+		TestML::cvAnnVec2.at(i)->predict(sample_set,results);
+	}
+	return results;
 }
 
 //! free memory

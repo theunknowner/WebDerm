@@ -50,7 +50,7 @@ ShadeShape script31(String filename);
 
 void script_createTrainingLabels();
 void script_createAllTrainingLabels();
-void script_createAllTrainingLabels2();
+void script_createAllTrainingLabels2(String shape);
 void script_createAllTrainingLabels3();
 void script_createAllTrainingLabels3b(String shape);
 void checkAllTestData();

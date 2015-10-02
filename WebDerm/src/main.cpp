@@ -196,18 +196,18 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-
-	Scripts::checkAllTestData();
+//
+	//Scripts::checkAllTestData();
 	//Scripts::checkAllTestData2();
 /*
-	ShadeShape ss1 = Scripts::script31("herpes3");
-	Islands island = ss1.getIslandWithPoint(Point(68,17));
+	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
+	Islands island = ss1.getIslandWithPoint(Point(103,116));
 	imwrite(ss1.name()+"_sample.png",island.image());
 	Mat results = island.nn_results();
 	cout << results << endl;
 	TestML ml;
 	//String param = TestML::PARAM_PATH;
-	//Mat sample = imread("/home/jason/Desktop/workspace/Test_Base_NN/psoriasis1_Point(60,9).png",0);
+	//Mat sample = imread("/home/jason/git/WebDerm/WebDerm/circle_donut_comp(036).png",0);
 	Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
@@ -274,24 +274,25 @@ int main(int argc,char** argv)
 	cvReleaseFileStorage(&storage);
 /**/
 /*
-	Scripts::script_createAllTrainingLabels2();
+	String shape = "Disc";
+	Scripts::script_createAllTrainingLabels2(shape);
 	sleep(3);
 	TestML ml;
-	//String mainPath = "/home/jason/git/Samples/";
-	String path1 = "Samples2/Training/samples_path.csv";
-	String path2 = "Samples2/Training/labels_path.csv";
-	String path3 = "Samples2/log.txt";
+	String mainPath = "NN3-"+shape+"-Comp-Incomp/";
+	String path1 = mainPath+"Training/samples_path.csv";
+	String path2 = mainPath+"Training/labels_path.csv";
+	String path3 = mainPath+"log.txt";
 	Timer time;
 	time.begin();
 	ml.importTrainingData(path1,path2,ml.getSize());
 	Mat data = ml.getData();
-	Mat labels = ml.getLabels();
+	Mat labels = ml.getLabels().col(0);
 	Mat training_set = data;
 	Mat training_labels = labels;
 	int sampleSize = training_set.rows;
 	int inputSize = training_set.cols;
 	int outputSize = training_labels.cols;
-	int hiddenNodes = 65;
+	int hiddenNodes = 40;
 	Mat layers(3,1,CV_32S);
 	layers.at<int>(0,0) = inputSize;
 	layers.at<int>(1,0) = hiddenNodes;
@@ -321,7 +322,7 @@ int main(int argc,char** argv)
 
 	cout << "Iterations: " << iter << endl;
 	time.printTimer();
-	String outputFile = "Samples2/param2.xml";
+	String outputFile = mainPath+"param-"+shape+"-Comp-Incomp.xml";
 	CvFileStorage* storage = cvOpenFileStorage(outputFile.c_str(), 0, CV_STORAGE_WRITE );
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);

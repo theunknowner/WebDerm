@@ -10,12 +10,16 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "islands.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 
 String winName = "Interactive Islands";
+String winName2 = "40x40";
+String winName3 = "Extracted";
 void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 	ShadeShape &ss = *((ShadeShape*)param);
 	Mat img = ss.image().clone();
 	Islands island;
+	static TestML ml;
 	if  ( event == EVENT_LBUTTONDOWN ){
 		island = ss.getIslandWithPoint(Point(x,y));
 		if(!island.isEmpty()) {
@@ -33,6 +37,15 @@ void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 			String shade_shape = island.shape_name() + "_s" + toString(shadeNum);
 			sprintf(text,"(%d,%d) | Lum: %d | Area: %d | ShadeShape: %s | NN: %f",x,y,lum,area,shade_shape.c_str(),nnResult);
 			cv::displayStatusBar(winName,text);
+			char textScore[100];
+			Mat nnResults = island.nn_results();
+			sprintf(textScore,"[%.5f, %.5f, %.5f, %.5f, %.5f]",nnResults.at<float>(0,0),nnResults.at<float>(0,1),nnResults.at<float>(0,2),nnResults.at<float>(0,3),nnResults.at<float>(0,4));
+			Mat img_40x40 = ml.prepareImage(island.image(),Size(40,40));
+			namedWindow(winName3, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			imshow(winName3,island.image());
+			namedWindow(winName2, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			cv::displayStatusBar(winName2,textScore);
+			imshow(winName2,img_40x40);
 		}
 	}
 	if(event == EVENT_LBUTTONUP) {
