@@ -22,20 +22,21 @@ void ShadeMatch::setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2) {
 
 	ShadeMatch::shadeWeightsVec.clear();
 	ShadeMatch::shadeWeightsVec.resize(this->maxNumOfShades,0.0);
-	float weight = 5.0;
+	const float initWeight = 5.0;
+	float weight = initWeight;
 	int shades = ceil(this->maxNumOfShades/2.0);
 	int j = this->maxNumOfShades-1;
 	float totalWeight = 0.0;
 	for(int i=0; i<shades; i++) {
+		if(i>0) weight = initWeight / (i*initWeight);
 		ShadeMatch::shadeWeightsVec.at(i) = weight;
 		ShadeMatch::shadeWeightsVec.at(j) = weight;
-		weight /= 5.0;
-		j--;
 		if(i!=j) {
 			totalWeight += ShadeMatch::shadeWeightsVec.at(i) + ShadeMatch::shadeWeightsVec.at(j);
 		} else {
 			totalWeight += ShadeMatch::shadeWeightsVec.at(i);
 		}
+		j--;
 	}
 	for(unsigned int i=0; i<ShadeMatch::shadeWeightsVec.size(); i++) {
 		ShadeMatch::shadeWeightsVec.at(i) /= totalWeight;

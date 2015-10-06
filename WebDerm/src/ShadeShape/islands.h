@@ -15,6 +15,7 @@ protected:
 	int islArea;
 	int islShadeLevel;
 	int islShape;
+	int islSubShape;
 	String islShapeName;
 	Mat islandImg;
 	Mat NN_Results;

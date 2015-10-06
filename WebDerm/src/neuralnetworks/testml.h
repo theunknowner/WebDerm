@@ -15,6 +15,7 @@ private:
 	Mat data;
 	Mat labels;
 	static vector<String> shapeNames;
+	static map<String,int> shapeNamesMap;
 	static bool THRESH_IMPORTED;
 	static Size img_size;
 	static vector<String> shapeNames2;
@@ -48,7 +49,7 @@ public:
 	String getShapeName2(int num);
 	int getIndexContainingShape(String shape);
 
-	Mat runANN2b(vector<Mat> sampleVec);
+	Mat runANN2b(vector<Mat> sampleVec, int nnShape);
 
 	static void clear();
 };

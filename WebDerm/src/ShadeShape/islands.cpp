@@ -21,18 +21,6 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	sample = ml.prepareImage(sample,ml.getSize());
 	sampleVec.push_back(sample);
 
-	/*** NN2
-	Mat results = ml.runANN(param,sampleVec);
-	this->NN_Results = results;
-	int labelNum = -1;
-	auto maxIt = max_element(results.begin<float>(),results.end<float>());
-	auto minIt = min_element(results.begin<float>(),results.end<float>());
-	if(*maxIt==*minIt || *maxIt<=-0.5) labelNum = 4;
-	else {
-		labelNum = distance(results.begin<float>(),maxIt);
-	}
-	String shapeName = ml.getShapeName(labelNum);
-	 ***/
 	Mat results = ml.runANN2(sampleVec);
 	this->NN_Results = results;
 	auto maxIt = max_element(results.begin<float>(),results.end<float>());
@@ -40,6 +28,15 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	float thresh = 0.0;
 	if(*maxIt<thresh) labelNum = 5;
 	String shapeName = ml.getShapeName2(labelNum);
+	if(labelNum==0 || labelNum==1) {
+		results = ml.runANN2b(sampleVec,labelNum);
+		if(results.at<float>(0,0)>0.0) {
+			shapeName = "Comp-" + shapeName;
+		} else {
+			shapeName = "Incomp-" + shapeName;
+		}
+	}
+	labelNum = ml.getShapeIndex(shapeName);
 	this->NN_Score = *maxIt;
 	this->islShape = labelNum;
 	this->islShapeName = shapeName;
@@ -75,6 +72,8 @@ void Islands::getIslandPoints(Mat &islandImg) {
 Islands::Islands(){}
 
 Islands::Islands(Mat islandImg) {
+	this->islSubShape = -1;
+
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
 	this->islandImg = islandImg;

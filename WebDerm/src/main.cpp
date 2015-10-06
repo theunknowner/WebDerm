@@ -65,7 +65,7 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-/*
+	/*
 	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
 	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test19.png");
 	ShadeShapeMatch ssm;
@@ -78,7 +78,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-/*
+	/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -87,7 +87,7 @@ int main(int argc,char** argv)
 	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-/*
+	/*
 	ShadeShape ss1 = Scripts::script31("melanoma3");
 	//ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
@@ -97,7 +97,8 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -110,6 +111,10 @@ int main(int argc,char** argv)
 		vector<vector<float> > resultVec;
 		vector<String> nameVec;
 		vector<int> origPos;
+		/*** STT counter setup ***/
+		ShapeMatch spm;
+		vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0)); //8 shapes
+		/****************/
 		for(unsigned int i=0; i<files.size(); i++) {
 			name = folder + files.at(i);
 			name = getFileName(name);
@@ -121,8 +126,28 @@ int main(int argc,char** argv)
 				vector<float> results = ssm.match(ss1,ss2);
 				nameVec.push_back(name);
 				resultVec.push_back(results);
+				ssm.countShapeTranslations(shapeTranslateCount);
 			}
 		}
+		/*** STT counter continue ***/
+		String sttFileName = string(argv[1]) + "_STT_Count.csv";
+		FILE * sttCountFile;
+		sttCountFile = fopen(sttFileName.c_str(),"w");
+		fprintf(sttCountFile,",");
+		for(unsigned int i=0; i<8; i++) {
+			fprintf(sttCountFile,"%s,",spm.shapeName(i).c_str());
+		}
+		fprintf(sttCountFile,"\n");
+		for(unsigned int i=0; i<shapeTranslateCount.size(); i++) {
+			fprintf(sttCountFile,"%s,",spm.shapeName(i).c_str());
+			for(unsigned int j=0; j<shapeTranslateCount.at(i).size(); j++) {
+				fprintf(sttCountFile,"%d,",shapeTranslateCount.at(i).at(j));
+			}
+			fprintf(sttCountFile,"\n");
+		}
+		fclose(sttCountFile);
+		/**********************/
+
 		jaysort(resultVec,origPos,1);
 		String output = std::string(argv[1]) + "_matches_sorted.csv";
 		FILE * fp;
@@ -148,18 +173,36 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+	/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	ShadeShapeMatch ssm;
+	vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0));
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
 	//ssm.test_match(ss1,ss2);
 	vector<float> results = ssm.match(ss1,ss2);
+	ssm.countShapeTranslations(shapeTranslateCount);
 	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	time.end();
 	time.printTimer();
+	ShapeMatch spm;
+	FILE * fp;
+	fp = fopen("stt-count.csv","w");
+	fprintf(fp,",");
+	for(unsigned int i=0; i<8; i++) {
+		fprintf(fp,"%s,",spm.shapeName(i).c_str());
+	}
+	fprintf(fp,"\n");
+	for(unsigned int i=0; i<shapeTranslateCount.size(); i++) {
+		fprintf(fp,"%s,",spm.shapeName(i).c_str());
+		for(unsigned int j=0; j<shapeTranslateCount.at(i).size(); j++) {
+			fprintf(fp,"%d,",shapeTranslateCount.at(i).at(j));
+		}
+		fprintf(fp,"\n");
+	}
+	fclose(fp);
 	/**/
 	//Scripts::script25();
 	//Scripts::script_checkAllTestData();
@@ -181,7 +224,7 @@ int main(int argc,char** argv)
 	}
 /**/
 
-/*
+	/*
 	deque<String> files;
 	String folder = "/home/jason/git/Samples/Samples/Training/Strip/";
 	FileData fd;
@@ -196,31 +239,32 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-//
+	//
 	//Scripts::checkAllTestData();
 	//Scripts::checkAllTestData2();
-/*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
-	Islands island = ss1.getIslandWithPoint(Point(103,116));
-	imwrite(ss1.name()+"_sample.png",island.image());
-	Mat results = island.nn_results();
-	cout << results << endl;
+	/*
+//	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
+//	Islands island = ss1.getIslandWithPoint(Point(103,116));
+//	imwrite(ss1.name()+"_sample.png",island.image());
+//	Mat results = island.nn_results();
+//	cout << results << endl;
 	TestML ml;
 	//String param = TestML::PARAM_PATH;
-	//Mat sample = imread("/home/jason/git/WebDerm/WebDerm/circle_donut_comp(036).png",0);
-	Mat sample = island.image();
+	Mat sample = imread("/home/jason/Desktop/workspace/circle_donut_incomp(020).png",0);
+	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(40,40));
 	imgshow(sample);
 	vector<Mat> sampleVec;
-/*
+
 	sampleVec.push_back(sample);
 	//Mat results = ml.runANN(param,sampleVec);
-	Mat results = ml.runANN2(sampleVec);
+	//Mat results = ml.runANN2(sampleVec);
+	Mat results = ml.runANN2b(sampleVec);
 	cout << results << endl;
 	/**/
-/*
+	/*
 	Scripts::script_createAllTrainingLabels();
 	sleep(3);
 	TestML ml;
@@ -273,8 +317,8 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-/*
-	String shape = "Disc";
+	/*
+	String shape = "Donut";
 	Scripts::script_createAllTrainingLabels2(shape);
 	sleep(3);
 	TestML ml;
@@ -327,7 +371,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 	/**/
-/*
+	/*
 	String shape(argv[1]);
 	Scripts::script_createAllTrainingLabels3b(shape);
 	sleep(3);

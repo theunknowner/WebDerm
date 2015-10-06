@@ -2236,7 +2236,7 @@ void checkAllTestData() {
 }
 
 void checkAllTestData2() {
-	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Disc-Incomplete/";
+	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Donut-Incomplete/";
 	String output = "/home/jason/Desktop/workspace/results.csv";
 	deque<String> files;
 	FileData fd;
@@ -2256,7 +2256,7 @@ void checkAllTestData2() {
 		sampleVec.push_back(sample);
 		nameVec.push_back(name);
 	}
-	Mat results = ml.runANN2b(sampleVec);
+	Mat results = ml.runANN2b(sampleVec,1);
 	for(int i=0; i<results.rows; i++) {
 		fprintf(fp,"%s,%f\n",nameVec.at(i).c_str(),results.at<float>(i,0));
 	}

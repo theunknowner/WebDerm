@@ -26,6 +26,8 @@ private:
 	vector<vector<vector<Islands> > > upIslandVec;
 	vector<vector<vector<Islands> > > dbIslandVec;
 
+	vector<vector<int> > shapeTranslateCount;
+
 	vector<vector<vector<Islands> > > groupIslandsByShade(ShadeShape &ss);
 	vector<vector<vector<Islands> > > groupIslandsByShape(ShadeShape &ss);
 	void sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec);
@@ -39,6 +41,8 @@ public:
 	vector<float> match(ShadeShape upSS, ShadeShape dbSS);
 	void printLabels(map<String,float> &labels);
 	void debug_mode(int mode);
+
+	void countShapeTranslations(vector<vector<int> > &shapeTranslateCount);
 };
 
 #endif /* SHADESHAPEMATCH_H_ */

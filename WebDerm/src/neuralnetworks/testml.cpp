@@ -13,6 +13,7 @@
 bool TestML::THRESH_IMPORTED = false;
 String TestML::PARAM_PATH = "Thresholds/param-Excavated.xml";
 vector<String> TestML::shapeNames;
+map<String,int> TestML::shapeNamesMap;
 Size TestML::img_size;
 vector<String> TestML::shapeNames2;
 vector<CvANN_MLP *> TestML::cvAnnVec;
@@ -39,6 +40,7 @@ bool TestML::importThresholds() {
 		vector<String> vec;
 		while(getline(fs,temp)) {
 			TestML::shapeNames.push_back(temp);
+			this->shapeNamesMap[temp] = (int)TestML::shapeNames.size()-1;
 		}
 		fs.close();
 		while(getline(fs2,temp)) {
@@ -303,9 +305,8 @@ Size TestML::getSize() {
 }
 
 int TestML::getShapeIndex(String shape) {
-	auto it = std::find(TestML::shapeNames.begin(),TestML::shapeNames.end(),shape);
-	if(it!=TestML::shapeNames.end()) {
-		return distance(TestML::shapeNames.begin(),it);
+	if(TestML::shapeNamesMap.find(shape)!=TestML::shapeNamesMap.end()) {
+		return TestML::shapeNamesMap[shape];
 	}
 	return -1;
 }
@@ -344,15 +345,16 @@ int TestML::getIndexContainingShape(String shape) {
 	return -1;
 }
 
-//! NN3 Disc Comp/Incomp
-Mat TestML::runANN2b(vector<Mat> sampleVec) {
+//! NN3 Disc/Donut Comp/Incomp
+//! 0=Disc; 1=Donut
+Mat TestML::runANN2b(vector<Mat> sampleVec, int nnShape) {
 	Mat results;
-	for(unsigned int i=0; i<TestML::cvAnnVec2.size(); i++) {
-		Mat layers = TestML::cvAnnVec2.at(i)->get_layer_sizes();
+	//for(unsigned int i=0; i<TestML::cvAnnVec2.size(); i++) {
+		Mat layers = TestML::cvAnnVec2.at(nnShape)->get_layer_sizes();
 		this->setLayerParams(layers);
 		Mat sample_set  = this->prepareMatSamples(sampleVec);
-		TestML::cvAnnVec2.at(i)->predict(sample_set,results);
-	}
+		TestML::cvAnnVec2.at(nnShape)->predict(sample_set,results);
+	//}
 	return results;
 }
 

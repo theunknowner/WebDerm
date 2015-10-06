@@ -121,6 +121,7 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 	float denomSumDB = 0.0;
 	map<String,pair<int,float> > upMap = upLabels.getMap();
 	map<String,pair<int,float> > dbMap = dbLabels.getMap();
+	this->shapeTranslateCount.resize(8,vector<int>(8,0)); // 8 shapes
 	for(auto itUP=upMap.begin(), itDB=dbMap.begin(); itUP!=upMap.end(), itDB!=dbMap.end(); itUP++, itDB++) {
 		String label = itUP->first;
 		float penalty = 1.0;
@@ -476,6 +477,17 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		}// end for shapeShift1
 	}// end shadeShift
 
+	/*** Shape STT counter ***/
+	auto largestUpMap = largestLabelsUP.getMap();
+	for(auto it=largestUpMap.begin(); it!=largestUpMap.end(); it++) {
+		if(largestLabelsUP.isShapeShifted(it->first)) {
+			int prevShape = largestLabelsUP.getPrevShapeNum(it->first);
+			int currShape = largestLabelsUP.getShapeNum(it->first);
+			this->shapeTranslateCount.at(prevShape).at(currShape)=1;
+		}
+	}
+	/*****************************/
+
 	Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB,1);
 	String newNameUP = upSS.name()+"_"+dbSS.name();
 	String newNameDB = dbSS.name()+"_"+upSS.name();
@@ -502,4 +514,16 @@ void ShadeShapeMatch::printLabels(map<String,float> &labels) {
 
 void ShadeShapeMatch::debug_mode(int mode) {
 	this->debugMode = mode;
+}
+
+void ShadeShapeMatch::countShapeTranslations(vector<vector<int> > &shapeTranslateCount) {
+	assert(this->shapeTranslateCount.size()==shapeTranslateCount.size());
+
+	for(unsigned int i=0; i<this->shapeTranslateCount.size(); i++) {
+		for(unsigned int j=0; j<this->shapeTranslateCount.at(i).size(); j++) {
+			if(this->shapeTranslateCount.at(i).at(j)>0) {
+				shapeTranslateCount.at(i).at(j) += this->shapeTranslateCount.at(i).at(j);
+			}
+		}
+	}
 }
