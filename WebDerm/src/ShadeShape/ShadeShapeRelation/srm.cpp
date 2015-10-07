@@ -69,11 +69,12 @@ int& Srm::neighborLevel(int index1, int index2) {
 	return this->neighborLevelMatrix.at(index1).at(index2);
 }
 
-//! return reference to SRM DN touch count between label1 and label2
+//! return reference to SRM DN touch count between label1 & label2
 int& Srm::relationTouchCount(int index1, int index2) {
 	return this->relationTouchCountMatrix.at(index1).at(index2);
 }
 
+//! return reference to SRM area between label1 & label2
 pair<int,int>& Srm::relationArea(int index1, int index2) {
 	return this->relationAreaMatrix.at(index1).at(index2);
 }

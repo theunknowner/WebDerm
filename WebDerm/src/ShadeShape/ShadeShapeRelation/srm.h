@@ -55,7 +55,8 @@ private:
 	vector<vector<vector<vector<int> > > > dsSrmCount;
 	vector<vector<vector<vector<pair<int,int>> > > > dsSrmArea;
 public:
-	//holds the individual labels that belongs to a merged label
+	//! holds the individual labels that belongs to a merged label
+	//! first->y; second->x
 	vector<vector<vector<vector<pair<vector<String>,vector<String>> > > > > mergedLabelContainer;
 	map<String,pair<int,int>> equationMap;
 };

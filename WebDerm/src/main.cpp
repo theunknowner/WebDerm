@@ -98,7 +98,6 @@ int main(int argc,char** argv)
 	//cout << island.nn_results() << endl;
 /**/
 
-
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -111,10 +110,10 @@ int main(int argc,char** argv)
 		vector<vector<float> > resultVec;
 		vector<String> nameVec;
 		vector<int> origPos;
-		/*** STT counter setup ***/
+		//> STT counter setup <//
 		ShapeMatch spm;
 		vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0)); //8 shapes
-		/****************/
+		///////////////////////
 		for(unsigned int i=0; i<files.size(); i++) {
 			name = folder + files.at(i);
 			name = getFileName(name);
@@ -129,7 +128,7 @@ int main(int argc,char** argv)
 				ssm.countShapeTranslations(shapeTranslateCount);
 			}
 		}
-		/*** STT counter continue ***/
+		//> STT counter continue <//
 		String sttFileName = string(argv[1]) + "_STT_Count.csv";
 		FILE * sttCountFile;
 		sttCountFile = fopen(sttFileName.c_str(),"w");
@@ -146,7 +145,7 @@ int main(int argc,char** argv)
 			fprintf(sttCountFile,"\n");
 		}
 		fclose(sttCountFile);
-		/**********************/
+		//////////////////////////
 
 		jaysort(resultVec,origPos,1);
 		String output = std::string(argv[1]) + "_matches_sorted.csv";
@@ -173,7 +172,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-	/*
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
