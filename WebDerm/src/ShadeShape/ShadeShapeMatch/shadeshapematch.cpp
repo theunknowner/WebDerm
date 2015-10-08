@@ -406,6 +406,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 			if(maxShadeShiftResult>largestResult) {
 				largestResult = maxShadeShiftResult;
 				largestIslandVec2 = maxShadeShiftIslandVec;
+				largestImg = matchSS.image();
 				if(shadeShift==ShadeMatch::SHIFT_NONE) {
 					break;
 				}

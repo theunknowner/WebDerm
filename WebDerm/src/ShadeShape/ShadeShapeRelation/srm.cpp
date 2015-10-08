@@ -23,6 +23,8 @@ void Srm::setup_relationMatrix(Labels &labels) {
 	this->relationAreaMatrix.resize(labels.size(),vector<pair<int,int>>(labels.size(),make_pair(0,0)));
 	this->relationTouchCountMatrix.clear();
 	this->relationTouchCountMatrix.resize(labels.size(),vector<int>(labels.size(),0));
+	this->relationDistanceMatrix.clear();
+	this->relationDistanceMatrix.resize(labels.size(),vector<map<float,float>>(labels.size(),map<float,float>()));
 }
 
 Labels Srm::mergeLabels() {
@@ -78,6 +80,34 @@ int& Srm::relationTouchCount(int index1, int index2) {
 pair<int,int>& Srm::relationArea(int index1, int index2) {
 	return this->relationAreaMatrix.at(index1).at(index2);
 }
+
+//! return SRM distance between label1 & label2
+//! if (degree = -1) function returns sum of the distances
+float Srm::getRelationDistance(int index1, int index2, float degree) {
+	auto &distMap = this->relationDistanceMatrix.at(index1).at(index2);
+
+	//> if (degree = -1) return sum
+	if(degree==-1.0) {
+		float sum=0.0;
+		for(auto it=distMap.begin(); it!=distMap.end(); it++) {
+			sum += it->second;
+		}
+		return sum;
+	}
+
+	//> return distance at (degree) if found
+	if(distMap.find(degree)!=distMap.end()) {
+		return distMap.at(degree);
+	}
+
+	return 0.0;
+}
+
+void Srm::setRelationDistance(int index1, int index2, float degree, float val) {
+	auto &distMap = this->relationDistanceMatrix.at(index1).at(index2);
+	distMap[degree] = val;
+}
+
 
 size_t Srm::size() {
 	return this->relationOpMatrix.size();
@@ -167,6 +197,7 @@ void Srm::downScaleSrm() {
 	this->dsSrmCount = Func::createVector4D(merged_labels.size(),merged_labels.size(),this->rel_op.size(),this->relOpLevelSize,0);
 	this->dsSrmArea.resize(merged_labels.size(),vector<vector<vector<pair<int,int>> > >(merged_labels.size(),vector<vector<pair<int,int>> >(this->rel_op.size(),vector<pair<int,int>>(relOpLevelSize,std::make_pair(0,0)))));
 	this->mergedLabelContainer.resize(merged_labels.size(),vector<vector<vector<pair<vector<String>,vector<String>>> > >(merged_labels.size(),vector<vector<pair<vector<String>,vector<String>>> >(this->rel_op.size(),vector<pair<vector<String>,vector<String>>>(relOpLevelSize,std::make_pair(vector<String>(),vector<String>())))));
+	this->mergedRelationDistance.resize(merged_labels.size(),vector<vector<vector<float> > >(merged_labels.size(),vector<vector<float> >(this->rel_op.size(),vector<float>(0,0.0))));
 
 	for(auto itY=labelMap.begin(); itY!=labelMap.end(); itY++) {
 		int y = distance(labelMap.begin(),itY);
@@ -203,6 +234,11 @@ void Srm::downScaleSrm() {
 						this->dsSrmArea.at(y2).at(x2).at(rel_op_idx).at(neighborNum).first += areaY;
 						srmMarkMap.at(y2).at(x2).at(rel_op_idx).at(neighborNum)[itY->first] = 1;
 						this->mergedLabelContainer.at(y2).at(x2).at(rel_op_idx).at(neighborNum).first.push_back(itY->first);
+					}
+					auto &distMap = this->relationDistanceMatrix.at(y).at(x);
+					for(auto it=distMap.begin(); it!=distMap.end(); it++) {
+						float dist = it->second;
+						this->mergedRelationDistance.at(y2).at(x2).at(rel_op_idx).push_back(dist);
 					}
 				} catch (const std::out_of_range &oor) {
 					printf("ShadeShapeRelation::downScaleSrm() out of range!\n");

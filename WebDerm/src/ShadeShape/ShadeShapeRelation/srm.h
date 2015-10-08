@@ -24,6 +24,7 @@ private:
 	vector<vector<int> > relationCountMatrix;
 	vector<vector<int> > relationTouchCountMatrix;
 	vector<vector<pair<int,int>> > relationAreaMatrix;
+	vector<vector<map<float,float>> > relationDistanceMatrix;
 
 protected:
 	int relOpLevelSize = 50;
@@ -38,6 +39,8 @@ public:
 	int& neighborLevel(int index1, int index2);
 	int& relationTouchCount(int index1, int index2);
 	pair<int,int>& relationArea(int index1, int index2);
+	float getRelationDistance(int index1, int index2, float degree);
+	void setRelationDistance(int index1, int index2, float degree, float val);
 	size_t size();
 	int& maxNeighborLevel();
 	void writeRelationMatrix(Labels &labels,String name);
@@ -59,6 +62,8 @@ public:
 	//! first->y; second->x
 	vector<vector<vector<vector<pair<vector<String>,vector<String>> > > > > mergedLabelContainer;
 	map<String,pair<int,int>> equationMap;
+	vector<vector<vector<vector<float> > > > mergedRelationDistance;
+
 };
 
 #endif /* SRM_H_ */

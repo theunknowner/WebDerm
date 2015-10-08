@@ -454,6 +454,10 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
 								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
 							}
+							float distSum = std::accumulate(srm.mergedRelationDistance.at(i).at(j).at(k).begin(),srm.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
+							distSum /= srm.mergedRelationDistance.at(i).at(j).at(k).size();
+							//> Expected value of Shade Gradient <//
+							float esg =	upMergedLabels.getShadeLevel(labelUP1);
 							if(std::isnan(areaValUP)) areaValUP=0;
 							if(std::isnan(areaValDB)) areaValDB=0;
 							float areaVal = min(areaValUP,areaValDB);
@@ -556,7 +560,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										for(unsigned int xIdx=0; xIdx<srmUP.size(); xIdx++) {
 											unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
 											//for all relations
-											if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
+											if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
 												totalCountUP++; //total relations for areaUP1
 												totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
 											}
@@ -643,7 +647,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										for(unsigned int xIdx=0; xIdx<srmDB.size(); xIdx++) {
 											unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
 											//for all relations
-											if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
+											if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
 												totalCountDB++; //total relations for areaUP1
 												totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
 											}

@@ -22,7 +22,6 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 	const int visibilityThresh = 3;
 	const float surroundedThreshUpper = 0.58; // 14/24; 360.0 deg/ 15.0 deg = 24;
 	const float surroundedThreshLower = 0.125; // 3/24
-	const float directNeighborDistThresh = 5.0;
 	const float alpha = 0.25;
 	int minWidthForVisibility = 0;
 	Point beginCoords, endCoords;
@@ -46,7 +45,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 					String prevLabel2="";
 					int row=center.y, col=center.x;
 					float fRow = center.y, fCol = center.x;
-					double deg = theta * M_PI / 180.0; //convert to degrees
+					double deg = theta * M_PI / 180.0; //convert from radians to degrees
 					int state = isl1.containsCoordinate(coords1) ? State::ENTERED : State::OUTSIDE;
 					State insideIsland1(state);
 					while(row<isl1.image().rows && col<isl1.image().cols && row>=0 && col>=0) {
@@ -78,9 +77,9 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 										String label2 = isl2.labelName();
 										int state2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? State::ENTERED : State::OUTSIDE;
 										State insideIsland2(state2);
+										if(label2==prevLabel2) insideIsland2.setState(State::INSIDE);
 										if(insideIsland2.currentState()==State::ENTERED || insideIsland2.currentState()==State::INSIDE) {
 											if(shape1==shape2 && shade1==shade2 && num1==num2) { //revert if island1 enters itself
-												if(label2==prevLabel2) insideIsland2.setState(State::INSIDE);
 												if(insideIsland2.currentState()==State::ENTERED) {
 													neighborNum = 0;
 													for(unsigned int i=0; i<islandHitVec.size(); i++) {
@@ -92,6 +91,13 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												}
 											} else {
 												int index2 =  distance(lbls.begin(),lbls.find(label2));
+
+												if(insideIsland2.currentState()==State::ENTERED) {
+													if(srm.getRelationDistance(index1,index2,theta)==0) {
+														float dist = MyMath::eucDist(center,Point(col,row));
+														srm.setRelationDistance(index1,index2,theta,dist);
+													}
+												}
 												int area2 = isl2.area();
 												Point center2 = isl2.centerOfMass();
 												float centerDist = abs(MyMath::eucDist(center,center2));
@@ -104,7 +110,6 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 													srm.relationArea(index1,index2) = std::make_pair(area1,area2);
 												}
 												if(srm.relation(index1,index2)<=DIR) {
-													if(prevLabel2==label2) insideIsland2.setState(State::INSIDE);
 													if(insideIsland2.currentState()==State::ENTERED) {
 														endCoords = Point(col,row);
 														float dist = MyMath::eucDist(beginCoords,endCoords);

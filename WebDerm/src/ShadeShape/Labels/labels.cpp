@@ -216,8 +216,10 @@ void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifte
 		bool isShifted = labels1.isShapeShifted(it1->first);
 		if(markShifted==0 || !isShifted)
 			fprintf(fp,"%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
-		else
-			fprintf(fp,"%d) *%s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+		else {
+			int prevShape = labels1.getPrevShapeNum(it1->first);
+			fprintf(fp,"%d) %d->%s: %d | %s: %d\n",i,prevShape,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+		}
 	}
 	fclose(fp);
 }

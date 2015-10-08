@@ -39,7 +39,8 @@ void ShadeMatch::setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2) {
 		j--;
 	}
 	for(unsigned int i=0; i<ShadeMatch::shadeWeightsVec.size(); i++) {
-		ShadeMatch::shadeWeightsVec.at(i) /= totalWeight;
+		//ShadeMatch::shadeWeightsVec.at(i) /= totalWeight;
+		ShadeMatch::shadeWeightsVec.at(i) = 1.0; //> set weights to 1 for now
 	}
 }
 
@@ -159,6 +160,7 @@ float ShadeMatch::applyShiftPenalty(ShadeShape &ss, float score, int shiftAmt) {
 	return score * penalty;
 }
 
+//! shifts all the shades to either left(darker)  or right(lighter)
 vector<vector<vector<Islands> > > ShadeMatch::shiftShades(vector<vector<vector<Islands> > > &islandVec, int shiftType) {
 	if(shiftType==SHIFT_NONE)
 		return islandVec;

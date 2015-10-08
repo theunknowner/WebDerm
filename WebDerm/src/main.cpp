@@ -47,6 +47,7 @@
 #include "ShadeShape/Labels/labels.h"
 #include "Timer/timer.h"
 #include "Exceptions/my_exceptions.h"
+#include "ShadeShape/ShadeShapeRelation/srm.h"
 
 int main(int argc,char** argv)
 {
@@ -97,7 +98,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
