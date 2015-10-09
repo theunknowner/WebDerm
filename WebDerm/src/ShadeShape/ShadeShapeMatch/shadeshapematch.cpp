@@ -125,9 +125,10 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 	for(auto itUP=upMap.begin(), itDB=dbMap.begin(); itUP!=upMap.end(), itDB!=dbMap.end(); itUP++, itDB++) {
 		String label = itUP->first;
 		float penalty = 1.0;
+		int shapeNum = upLabels.getShapeNum(label);
+		if(shapeNum==-1) shapeNum = dbLabels.getShapeNum(label);
 		if(upLabels.isShapeShifted(label)) {
 			int prevShapeNum = upLabels.getPrevShapeNum(label);
-			int shapeNum = upLabels.getShapeNum(label);
 			if(prevShapeNum>=0 && shapeNum>=0) {
 				penalty = spm.getShiftPenalty(prevShapeNum,shapeNum);
 			} else {
@@ -136,8 +137,9 @@ float ShadeShapeMatch::dotProduct(Labels &upLabels, Labels &dbLabels) {
 			}
 		}
 		int shadeLevel = upLabels.getShadeLevel(label);
-		float weight = sdm.applyShadeWeights(shadeLevel);
-		numerSum += (itUP->second.second * itDB->second.second) * penalty * weight;
+		float shadeWeight = sdm.applyShadeWeights(shadeLevel);
+		float shapeWeight = spm.applyShapeWeight(shapeNum);
+		numerSum += (itUP->second.second * itDB->second.second) * penalty * shadeWeight * shapeWeight;
 		denomSumUP += pow(itUP->second.second,2);
 		denomSumDB += pow(itDB->second.second,2);
 	}

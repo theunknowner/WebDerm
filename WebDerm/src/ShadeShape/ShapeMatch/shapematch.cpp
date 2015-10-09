@@ -15,6 +15,9 @@ vector<vector<String> > ShapeMatch::shiftingRules;
 vector<vector<float> > ShapeMatch::shiftingPenalties;
 bool ShapeMatch::THRESH_IMPORTED = false;
 
+//> 8 different shapes for 8 different weights
+vector<float> ShapeMatch::shapeWeightsVec = {1.0,1.0,1.0,1.0,0.5,0.5,0.5,0.25};
+
 /******************* PUBLIC FUNCTIONS ******************/
 
 ShapeMatch::ShapeMatch() {
@@ -242,4 +245,8 @@ float ShapeMatch::getShiftPenalty(int shapeNum, int shapeNum2) {
 	float weight = ShapeMatch::shiftingPenalties.at(shapeNum).at(shapeNum2);
 	float penalty = pow(2.0,weight);
 	return penalty;
+}
+
+float ShapeMatch::applyShapeWeight(int shapeNum) {
+	return ShapeMatch::shapeWeightsVec.at(shapeNum);
 }

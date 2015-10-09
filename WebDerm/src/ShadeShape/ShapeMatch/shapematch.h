@@ -21,6 +21,8 @@ protected:
 	vector<String> _SHIFT = {"SHIFT_NONE","SHIFT_START"};
 	static vector<String> shapeNames;
 
+	static vector<float> shapeWeightsVec;
+
 public:
 	static vector<vector<String> > shiftingRules;
 	static vector<vector<float> > shiftingPenalties;
@@ -39,6 +41,7 @@ public:
 	vector<String> SHIFT();
 	float applyShiftPenalty(float score, int shapeNum, int shapeNum2);
 	float getShiftPenalty(int shapeNum, int shapeNum2);
+	float applyShapeWeight(int shapeNum);
 	static void printRules();
 	static void printPenalties();
 };
