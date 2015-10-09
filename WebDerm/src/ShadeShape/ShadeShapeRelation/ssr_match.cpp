@@ -255,43 +255,14 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 	fp = fopen(filename.c_str(),"w");
 	float totalEntropy = 0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
-	float sumESG = 0.0;
-	//> Calculate the sum of all ESG for all relations <//
-	for(unsigned int i=0; i<srmCountUP.size(); i++) {
-		String labelUP1 = upMergedLabels.at(i);
-		for(unsigned int j=0; j<srmCountUP.at(i).size(); j++) {
-			String labelUP2	= upMergedLabels.at(j);
-			for(unsigned int k=0; k<srmCountUP.at(i).at(j).size(); k++) {
-				if(k>NONE) {
-					if(srmUP.mergedRelationDistance.at(i).at(j).at(k).size()>0) {
-						try {
-							float distAvg = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvg /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
-							//> Expected value of Shade Gradient <//
-							int shadeDiff = abs(upMergedLabels.getShadeLevel(labelUP1)-upMergedLabels.getShadeLevel(labelUP2));
-							float esg =	shadeDiff / (distAvg + 1.0);
-							sumESG += esg;
-						} catch (const std::out_of_range &e) {
-							printf("i: %u\n",i);
-							printf("j: %u\n",j);
-							printf("k: %u\n",k);
-							printf("mergedDistSize: %lu\n",srmUP.mergedRelationDistance.at(i).at(j).at(k).size());
-							printf("mergedShadeMapSize: %lu\n",upMergedLabels.getShadeLevelMap().size());
-							exit(1);
-						}
-					}
-				}
-			}
-		}
-	}
-	///////////////////////////////////////////////////
 
+	const float alpha = 3.2;
 	// for loop i: labels for the y axis
 	for(unsigned int i=0; i<srmCountUP.size(); i++) {
-		String labelUP1 = upMergedLabels.at(i);
+		String label1 = upMergedLabels.at(i);
 		// for loop j: labels for x axis
 		for(unsigned int j=0; j<srmCountUP.at(i).size(); j++) {
-			String labelUP2 = upMergedLabels.at(j);
+			String label2 = upMergedLabels.at(j);
 			// for loop k: counts for relations "y [op] x"
 			for(unsigned int k=0; k<srmCountUP.at(i).at(j).size(); k++) {
 				String relOp = this->rel_op.at(k);
@@ -413,7 +384,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
 												totalCountUP++;
 												totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
-												/*if(labelUP1=="0_Strip_s4" && labelUP2=="1_Default_s2" && m==1) {
+												/*if(label1=="0_Strip_s4" && label2=="1_Default_s2" && m==1) {
 													printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
 													printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
 													printf("rel_op_idx: %d\n",rel_op_idx);
@@ -485,13 +456,20 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
 								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
 							}
-							float distAvg = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvg /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
+							float distAvgUP = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
+							distAvgUP /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
+							float distAvgDB = std::accumulate(srmDB.mergedRelationDistance.at(i).at(j).at(k).begin(),srmDB.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
+							distAvgDB /= srmDB.mergedRelationDistance.at(i).at(j).at(k).size();
 							//> Expected value of Shade Gradient <//
-							int shadeDiff = abs(upMergedLabels.getShadeLevel(labelUP1)-upMergedLabels.getShadeLevel(labelUP2));
-							float esg =	shadeDiff / (distAvg + 1.0);
-							float contrastWeight = esg / sumESG;
-							if(std::isnan(contrastWeight)) contrastWeight = 1.0;
+							int shadeDiffUP = abs(upMergedLabels.getShadeLevel(label1)-upMergedLabels.getShadeLevel(label2));
+							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
+							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
+							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
+							float contrastWeightUP = pow(alpha,esgUP);
+							float contrastWeightDB = pow(alpha,esgDB);
+							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
+							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
+							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 							if(std::isnan(areaValUP)) areaValUP=0;
 							if(std::isnan(areaValDB)) areaValDB=0;
 							float areaVal = min(areaValUP,areaValDB);
@@ -499,7 +477,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							float weightedEntropy = relArea * entropyVal * contrastWeight;
 							totalEntropy += weightedEntropy;
 							if(weightedEntropy>0) {
-								fprintf(fp,"[%s][%s][%s] : Level %d\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str(),m);
+								fprintf(fp,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
@@ -508,9 +486,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"DistAvg: %f\n",distAvg);
-								fprintf(fp,"ESG: %f\n",esg);
-								fprintf(fp,"SumESG: %f\n",sumESG);
+								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
+								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
@@ -601,7 +578,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 												totalCountUP++; //total relations for areaUP1
 												totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
 											}
-											/*if(labelUP1=="0_Strip_s4" && labelUP2=="1_Default_s2" && m==1) {
+											/*if(label1=="0_Strip_s4" && label2=="1_Default_s2" && m==1) {
 													printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
 													printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
 													printf("rel_op_idx: %d\n",rel_op_idx);
@@ -706,13 +683,20 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 									}
 								} // end for DB
 							} // end else if areaDB1 > areaDB2
-							float distAvg = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvg /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
+							float distAvgUP = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
+							distAvgUP /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
+							float distAvgDB = std::accumulate(srmDB.mergedRelationDistance.at(i).at(j).at(k).begin(),srmDB.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
+							distAvgDB /= srmDB.mergedRelationDistance.at(i).at(j).at(k).size();
 							//> Expected value of Shade Gradient <//
-							int shadeDiff = abs(upMergedLabels.getShadeLevel(labelUP1)-upMergedLabels.getShadeLevel(labelUP2));
-							float esg =	shadeDiff / (distAvg + 1.0);
-							float contrastWeight = esg / sumESG;
-							if(std::isnan(contrastWeight)) contrastWeight = 1.0;
+							int shadeDiffUP = abs(upMergedLabels.getShadeLevel(label1)-upMergedLabels.getShadeLevel(label2));
+							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
+							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
+							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
+							float contrastWeightUP = pow(alpha,esgUP);
+							float contrastWeightDB = pow(alpha,esgDB);
+							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
+							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
+							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 							if(std::isnan(areaUP)) areaUP=0;
 							if(std::isnan(areaDB)) areaDB=0;
 							float entropyUP = this->entropy(countUP);
@@ -723,7 +707,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							float weightedEntropy = relArea * entropyVal * contrastWeight;
 							totalEntropy += weightedEntropy;
 							if(weightedEntropy>0) {
-								fprintf(fp,"[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
+								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
@@ -732,9 +716,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"DistAvg: %f\n",distAvg);
-								fprintf(fp,"ESG: %f\n",esg);
-								fprintf(fp,"SumESG: %f\n",sumESG);
+								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
+								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);
@@ -827,13 +810,20 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							for(auto it=markAreaMapDB.begin(); it!=markAreaMapDB.end(); it++) {
 								totalAreaDB += it->second;
 							}
-							float distAvg = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvg /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
+							float distAvgUP = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
+							distAvgUP /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
+							float distAvgDB = std::accumulate(srmDB.mergedRelationDistance.at(i).at(j).at(k).begin(),srmDB.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
+							distAvgDB /= srmDB.mergedRelationDistance.at(i).at(j).at(k).size();
 							//> Expected value of Shade Gradient <//
-							int shadeDiff = abs(upMergedLabels.getShadeLevel(labelUP1)-upMergedLabels.getShadeLevel(labelUP2));
-							float esg =	shadeDiff / (distAvg + 1.0);
-							float contrastWeight = esg / sumESG;
-							if(std::isnan(contrastWeight)) contrastWeight = 1.0;
+							int shadeDiffUP = abs(upMergedLabels.getShadeLevel(label1)-upMergedLabels.getShadeLevel(label2));
+							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
+							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
+							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
+							float contrastWeightUP = pow(alpha,esgUP);
+							float contrastWeightDB = pow(alpha,esgDB);
+							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
+							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
+							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 							totalAreaUP = totalAreaUP * this->rVal[maxNeighborLevelUP];
 							totalAreaDB = totalAreaDB * this->rVal[maxNeighborLevelDB];
 							float entropyUP = this->entropy(totalCountUP);
@@ -844,16 +834,15 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							float weightedEntropy = relArea * entropyVal * contrastWeight;
 							totalEntropy += weightedEntropy;
 							if(weightedEntropy>0) {
-								fprintf(fp,"[%s][%s][%s]\n", labelUP1.c_str(),relOp.c_str(),labelUP2.c_str());
+								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",totalCountUP,entropyUP,totalCountDB,entropyDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",totalAreaUP,totalAreaDB);
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"DistAvg: %f\n",distAvg);
-								fprintf(fp,"ESG: %f\n",esg);
-								fprintf(fp,"SumESG: %f\n",sumESG);
+								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
+								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalEntropy: %f\n",totalEntropy);

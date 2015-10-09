@@ -44,6 +44,7 @@ public:
 	String getShape(String label);
 	String getShade(String label);
 	int getShadeLevel(String label);
+	void setShadeLevel(String label, int level);
 	bool isShapeShifted(String label);
 	int getShapeNum(String label);
 	int getPrevShapeNum(String label);

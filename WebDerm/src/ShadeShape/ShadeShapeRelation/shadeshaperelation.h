@@ -17,7 +17,7 @@ class Islands;
 class Labels;
 class ShadeShapeRelation : public ShapeMatch, public Srm {
 
-protected:
+private:
 	String ssr_name;
 	Srm srm;
 

@@ -31,11 +31,13 @@ Labels Srm::mergeLabels() {
 	Labels newLabels = this->labels;
 	map<String,pair<int,float> > labelMap = newLabels.getMap();
 	map<String,pair<int,float> > merged_labels;
+	map<String,int> shadeLevelMap;
 	for(auto it=labelMap.begin(); it!=labelMap.end(); it++) {
 		String merged_key = it->first.substr(0,it->first.length()-4);
 
 		if(merged_labels.find(merged_key)==merged_labels.end()) {
 			merged_labels[merged_key] = it->second;
+			shadeLevelMap[merged_key] = this->labels.getShadeLevel(it->first);
 		}
 		else {
 			merged_labels[merged_key].first += it->second.first;
@@ -43,6 +45,7 @@ Labels Srm::mergeLabels() {
 		}
 	}
 	newLabels.setLabels(merged_labels);
+	newLabels.getShadeLevelMap() = shadeLevelMap;
 
 	return newLabels;
 }
@@ -198,7 +201,6 @@ void Srm::downScaleSrm() {
 	this->dsSrmArea.resize(merged_labels.size(),vector<vector<vector<pair<int,int>> > >(merged_labels.size(),vector<vector<pair<int,int>> >(this->rel_op.size(),vector<pair<int,int>>(relOpLevelSize,std::make_pair(0,0)))));
 	this->mergedLabelContainer.resize(merged_labels.size(),vector<vector<vector<pair<vector<String>,vector<String>>> > >(merged_labels.size(),vector<vector<pair<vector<String>,vector<String>>> >(this->rel_op.size(),vector<pair<vector<String>,vector<String>>>(relOpLevelSize,std::make_pair(vector<String>(),vector<String>())))));
 	this->mergedRelationDistance.resize(merged_labels.size(),vector<vector<vector<float> > >(merged_labels.size(),vector<vector<float> >(this->rel_op.size(),vector<float>(0,0.0))));
-
 	for(auto itY=labelMap.begin(); itY!=labelMap.end(); itY++) {
 		int y = distance(labelMap.begin(),itY);
 		String newLabelY = itY->first.substr(0,itY->first.length()-4);

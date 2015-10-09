@@ -168,6 +168,10 @@ int Labels::getShadeLevel(String label) {
 	return -1;
 }
 
+void Labels::setShadeLevel(String label, int level) {
+	this->labelShadeLevelMap[label] = level;
+}
+
 void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
 	auto labelMap1 = labels1.getMap();
 	auto labelMap2 = labels2.getMap();

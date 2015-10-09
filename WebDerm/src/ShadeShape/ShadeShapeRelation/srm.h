@@ -61,6 +61,7 @@ public:
 	//! holds the individual labels that belongs to a merged label
 	//! first->y; second->x
 	vector<vector<vector<vector<pair<vector<String>,vector<String>> > > > > mergedLabelContainer;
+	//! Key = x<op>y, holds area of x and y in a pair
 	map<String,pair<int,int>> equationMap;
 	vector<vector<vector<vector<float> > > > mergedRelationDistance;
 

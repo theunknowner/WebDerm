@@ -173,7 +173,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
