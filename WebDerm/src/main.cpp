@@ -98,7 +98,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -173,7 +173,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -239,29 +239,30 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-	//
+
 	//Scripts::checkAllTestData();
 	//Scripts::checkAllTestData2();
-	/*
-//	ShadeShape ss1 = Scripts::script31("tinea_corporis8a");
-//	Islands island = ss1.getIslandWithPoint(Point(103,116));
-//	imwrite(ss1.name()+"_sample.png",island.image());
-//	Mat results = island.nn_results();
-//	cout << results << endl;
+/*
+	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Runs/herpes3_lph1_max_match_image.png");
+	ShadeShape ss1 = Scripts::script31("lph9");
+	Islands island = ss1.getIslandWithPoint(Point(46,67));
+	imwrite(ss1.name()+"_sample.png",island.image());
+	Mat results = island.nn_results();
+	cout << results << endl;
 	TestML ml;
 	//String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/Desktop/workspace/circle_donut_incomp(020).png",0);
-	//Mat sample = island.image();
+	//Mat sample = imread("/home/jason/Desktop/workspace/circle_donut_incomp(020).png",0);
+	Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(40,40));
 	imgshow(sample);
 	vector<Mat> sampleVec;
-
+/*
 	sampleVec.push_back(sample);
 	//Mat results = ml.runANN(param,sampleVec);
-	//Mat results = ml.runANN2(sampleVec);
-	Mat results = ml.runANN2b(sampleVec);
+	Mat results = ml.runANN2(sampleVec);
+	//Mat results = ml.runANN2b(sampleVec);
 	cout << results << endl;
 	/**/
 	/*
@@ -371,7 +372,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 	/**/
-	/*
+/*
 	String shape(argv[1]);
 	Scripts::script_createAllTrainingLabels3b(shape);
 	sleep(3);
