@@ -85,7 +85,7 @@ Islands::Islands(Mat islandImg) {
 }
 
 //! returns area/number of pixels of island
-int& Islands::area() {
+int Islands::area() {
 	return this->islArea;
 }
 

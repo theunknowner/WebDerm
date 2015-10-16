@@ -223,7 +223,10 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-
+	TestML ml;
+	Mat img = imread("/home/jason/Desktop/Programs/Discrete_New/tinea_corporis5_discrete.png",0);
+	Mat img2 = Func::prepareImage(img,Size(140,140));
+	imwrite("img.png",img2);
 	/*
 	deque<String> files;
 	String folder = "/home/jason/git/Samples/Samples/Training/Strip/";
@@ -243,8 +246,8 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData();
 	//Scripts::checkAllTestData2();
 /*
-	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Runs/herpes3_lph1_max_match_image.png");
-	ShadeShape ss1 = Scripts::script31("lph9");
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Runs/tinea_corporis5_tinea_corporis1_max_match_image.png");
+	//ShadeShape ss1 = Scripts::script31("lph9");
 	Islands island = ss1.getIslandWithPoint(Point(46,67));
 	imwrite(ss1.name()+"_sample.png",island.image());
 	Mat results = island.nn_results();
