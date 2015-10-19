@@ -560,7 +560,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							}
 						} // end if countUP || countDB
 					} // end if DIR
-					else {
+					else { // INDIR
 						float penalizedY = 1.0 , penalizedX = 1.0;
 						int countUP=0, countDB=0;
 						int areaUP1=0, areaUP2=0, areaDB1=0, areaDB2=0;

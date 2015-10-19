@@ -75,10 +75,10 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 									for(unsigned int num2=0; num2<islandVec.at(shape2).at(shade2).size(); num2++) {
 										Islands isl2 = islandVec.at(shape2).at(shade2).at(num2);
 										String label2 = isl2.labelName();
-										int state2 = isl2.coordinates().find(coords2)!=isl2.coordinates().end() ? State::ENTERED : State::OUTSIDE;
+										int state2 = isl2.containsCoordinate(coords2) ? State::ENTERED : State::OUTSIDE;
 										State insideIsland2(state2);
-										if(label2==prevLabel2) insideIsland2.setState(State::INSIDE);
 										if(insideIsland2.currentState()==State::ENTERED || insideIsland2.currentState()==State::INSIDE) {
+											if(label2==prevLabel2) insideIsland2.setState(State::INSIDE);
 											if(shape1==shape2 && shade1==shade2 && num1==num2) { //revert if island1 enters itself
 												if(insideIsland2.currentState()==State::ENTERED) {
 													neighborNum = 0;
@@ -91,7 +91,6 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												}
 											} else {
 												int index2 =  distance(lbls.begin(),lbls.find(label2));
-
 												if(insideIsland2.currentState()==State::ENTERED) {
 													if(srm.getRelationDistance(index1,index2,theta)==0) {
 														float dist = MyMath::eucDist(center,Point(col,row));
@@ -121,7 +120,8 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 															if(dist<2) {
 																touchCountVec.at(index1).at(index2)=1;
 															}
-															/*if(index1==31 && index2==107 && theta==180.0) {
+															/*
+															if(index1==37 && index2==32 && theta==90.0) {
 																printf("%s | %s\n",label1.c_str(),label2.c_str());
 																printf("Center: %s\n",coords1.c_str());
 																printf("Deg: %f\n",theta);
@@ -180,7 +180,8 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 					}
 					float countPercent = (float)srm.relationCount(index1,index2) / totalTimesEntered;
 					float touchCountPercent = (float)srm.relationTouchCount(index1,index2) / totalTimesEntered;
-					/*if(index1==8 && index2==107) {
+					/*
+					if(index1==37 && index2==32) {
 						printf("%s | %s\n",label1.c_str(),labels.at(index2).c_str());
 						printf("Center: (%d,%d)\n",center.x,center.y);
 						printf("Relation: %s\n",this->rel_op.at(srm.relation(index1,index2)).c_str());
