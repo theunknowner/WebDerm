@@ -32,7 +32,7 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 				shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
 			}
 			// helps connect islands that should be together
-			shadeShape = sm.densityConnector(shadeShape,0.9999);
+			shadeShape = sm.densityConnector(shadeShape,.999999999999,1.0);
 			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
 			for(unsigned int k=0; k<littleIslands.size(); k++) {
 				if(countNonZero(littleIslands.at(k))>thresh)

@@ -1323,7 +1323,7 @@ Mat ShapeMorph::customFn2(Mat src) {
 
 //! Nearest neighbor connector base on density
 //! q = probability of connecting to a neighboring unit
-Mat ShapeMorph::densityConnector(Mat src, double q) {
+Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
 	//Mat map = src.clone();
 	if(src.empty()) {
 		printf("ShapeMorph::densityConnector() src is empty\n");
@@ -1389,12 +1389,12 @@ Mat ShapeMorph::densityConnector(Mat src, double q) {
 	}
 	//connect nearest neighbors
 	double b = fxThresh;
-	double a = pow(-log(1.0-q)/(3.14159 * b),0.5);
+	double a = pow(-coeff*log(1.0-q)/(3.14159 * b),0.5);
 	//cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
-	Size square(ceil(a),ceil(a));
 	a = ceil(a);
+	Size square(a,a);
 	while(row<src.rows) {
 		while(col<src.cols) {
 			int lc = src.at<uchar>(row,col);

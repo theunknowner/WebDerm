@@ -3590,6 +3590,10 @@ ShadeShape script31(String filename) {
 	int maxVal = *max_element(data_vec.begin(),data_vec.end());
 	//printf("PeakPos: %d\n",peakPos);
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
+
+	//> Testing Resizing of feature
+	img3 = Func::prepareImage(img3,Size(140,140));
+
 	ShadeShape ss;
 	ss.extract(img3,name);
 	return ss;

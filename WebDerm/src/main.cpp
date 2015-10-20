@@ -79,10 +79,11 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-	/*
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
+	img = Func::prepareImage(img,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(img,name);
 	ss1.showInteractiveIslands();
@@ -98,7 +99,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -243,7 +244,9 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Runs/tinea_corporis5_tinea_corporis1_max_match_image.png");
-	ShadeShape ss1 = Scripts::script31("lph4");
+	ShadeShape ss1 = Scripts::script31("melanoma8c");
+	ss1.showInteractiveIslands();
+	/*
 	Islands island = ss1.getIslandWithPoint(Point(84,71));
 	imwrite(ss1.name()+"_sample.png",island.image());
 	Mat results = island.nn_results();
