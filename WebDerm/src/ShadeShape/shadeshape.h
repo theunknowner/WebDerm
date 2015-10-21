@@ -9,8 +9,8 @@
 #define SHADESHAPE_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 #include "features.h"
-#include "islands.h"
 
 class Features;
 class Islands;
@@ -24,11 +24,13 @@ private:
 	int numOfFeats;
 	int ssArea;
 	Mat img;
+	ImageData id;
 
 	bool isBridgeWeak(Mat &src, int x, int y);
 	bool isOnTheEdge(Mat &src, int x, int y);
 	bool isUnitBridged(Mat &src, int x, int y);
 	vector<Mat> extractFeatures(Mat src);
+	vector<ImageData> extractFeatures(ImageData &id);
 	void storeFeature(Features feature);
 	void getShadesOfFeatures(Mat src);
 	void removeDuplicatePointsFromIslands();
@@ -38,6 +40,7 @@ public:
 	ShadeShape();
 	ShadeShape(Mat src, String name="");
 	void extract(Mat src, String name="");
+	void extract(ImageData &id);
 	Features& feature(int featNum);
 	int numOfFeatures();
 	int shade(int num);
@@ -52,6 +55,7 @@ public:
 	int getMaxArea();
 	void showInteractiveIslands();
 	void set_island_shade(int featNum, int islNum, int newShade);
+	ImageData& getImageData();
 
 	void writeListOfIslandsWithLowNN();
 	void extractIslandsWithLowNN();

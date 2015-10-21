@@ -29,6 +29,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShapeMatch/shapematch.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShadeShapeMatch/shadeshapematch.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 namespace Scripts {
 void script1() {
@@ -2213,6 +2214,7 @@ void checkAllTestData() {
 		String val = vec.at(3);
 		String filename = "/home/jason/Desktop/Programs/Discrete_New/"+name+"_discrete.png";
 		Mat img = imread(filename,0);
+
 		ShadeShape ss1;
 		ss1.extract(img,name);
 		Islands island = ss1.getIslandWithPoint(pt);
@@ -2261,6 +2263,50 @@ void checkAllTestData2() {
 		fprintf(fp,"%s,%f\n",nameVec.at(i).c_str(),results.at<float>(i,0));
 	}
 	fclose(fp);
+}
+
+//! same as checkAllTestData() but without cropping & resizing feature
+void checkAllTestData3() {
+	String folder = "/home/jason/Desktop/workspace/Test_Base_NN/";
+	String output = "/home/jason/Desktop/workspace/Test_Base_NN/results.csv";
+	String file = "/home/jason/Desktop/workspace/Test_Base_NN/Test_Base_NN_Normalize.csv";
+	fstream fs(file);
+	String temp;
+	vector<String> vec;
+	FILE * fp;
+	fp = fopen(output.c_str(),"w");
+	TestML ml;
+	while(getline(fs,temp)) {
+		getSubstr(temp,',',vec);
+		String name = vec.at(0);
+		Point pt(atoi(vec.at(1).c_str()),atoi(vec.at(2).c_str()));
+		String val = vec.at(3);
+		String filename = "/home/jason/Desktop/Programs/Discrete_New/"+name+"_discrete.png";
+		Mat img = imread(filename,0);
+
+		//>crop, resize feature
+		ImageData id(img,name);
+		Func::prepareImage(id,Size(140,140));
+		ShadeShape ss1;
+		ss1.extract(id);
+		Islands island = ss1.getIslandWithPoint(pt);
+		Mat sample = island.image();
+		//imwrite(folder+name+"_Point("+vec.at(1)+","+vec.at(2)+").png",sample);
+		Mat results = island.nn_results();
+		//float maxVal = *max_element(results.begin<float>(),results.end<float>());
+		//int maxIdx = Func::largest(results,1);
+		//int secondMaxIdx = Func::largest(results,2);
+		//float maxVal = results.at<float>(0,maxIdx);
+		float maxVal = island.nn_score();
+		//float secondMaxVal = results.at<float>(0,secondMaxIdx);
+		String shape = island.shape_name();
+		//String shape2 = ml.getShapeName(secondMaxIdx);
+		//fprintf(fp,"%s,%d;%d,%s,%s,%f,%s,%f\n",name.c_str(),pt.x,pt.y,vec.at(3).c_str(),shape.c_str(),maxVal,shape2.c_str(),secondMaxVal);
+		fprintf(fp,"%s,%d;%d,%s,%s,%f\n",name.c_str(),pt.x,pt.y,vec.at(3).c_str(),shape.c_str(),maxVal);
+	}
+	fs.close();
+	fclose(fp);
+	TestML::clear();
 }
 
 void script_createTestDataList() {
@@ -3592,10 +3638,11 @@ ShadeShape script31(String filename) {
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 	//> Testing Resizing of feature
-	img3 = Func::prepareImage(img3,Size(140,140));
+	ImageData id(img3,name);
+	Func::prepareImage(id,Size(140,140));
 
 	ShadeShape ss;
-	ss.extract(img3,name);
+	ss.extract(id);
 	return ss;
 }
 

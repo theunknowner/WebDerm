@@ -10,7 +10,9 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 #include "islands.h"
+#include "features.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 String winName = "Interactive Islands";
 String winName2 = "40x40";
@@ -170,6 +172,12 @@ vector<Mat> ShadeShape::extractFeatures(Mat src) {
 	return featureVec;
 }
 
+vector<ImageData> ShadeShape::extractFeatures(ImageData &id) {
+	ShapeMorph sm;
+	vector<ImageData> featureVec = sm.liquidFeatureExtraction(id,0,0,0);
+	return featureVec;
+}
+
 void ShadeShape::storeFeature(Features feature) {
 	this->featureVec.push_back(feature);
 }
@@ -241,13 +249,30 @@ void ShadeShape::extract(Mat src, String name) {
 	this->img = src.clone();
 	vector<Mat> featureVec = this->extractFeatures(src);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
-		Features feature(featureVec.at(i));
+		Features feature(featureVec.at(i),this->id);
 		this->storeFeature(feature);
 	}
 	this->numOfFeats = this->featureVec.size();
 	this->getShadesOfFeatures(src);
 	this->storeIslandAreas();
 	this->ssArea = countNonZero(src);
+	this->removeDuplicatePointsFromIslands();
+}
+
+//! extracts the features from the image
+void ShadeShape::extract(ImageData &id) {
+	this->id = id;
+	this->ss_name = getFileName(id.name());
+	this->img = id.image();
+	vector<Mat> featureVec = this->extractFeatures(this->img);
+	for(unsigned int i=0; i<featureVec.size(); i++)  {
+		Features feature(featureVec.at(i),id);
+		this->storeFeature(feature);
+	}
+	this->numOfFeats = this->featureVec.size();
+	this->getShadesOfFeatures(this->img);
+	this->storeIslandAreas();
+	this->ssArea = countNonZero(this->img);
 	this->removeDuplicatePointsFromIslands();
 }
 
@@ -343,6 +368,11 @@ void ShadeShape::set_island_shade(int featNum, int islNum, int newShade) {
 		}
 	}
 }
+
+ImageData& ShadeShape::getImageData() {
+	return this->id;
+}
+
 
 void ShadeShape::writeListOfIslandsWithLowNN() {
 	FILE * fp;

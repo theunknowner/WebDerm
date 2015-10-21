@@ -10,7 +10,11 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
+class ImageData;
+
 class Islands {
+private:
+
 protected:
 	int islArea;
 	int islShadeLevel;
@@ -32,6 +36,7 @@ protected:
 public:
 	Islands();
 	Islands(Mat islandImg);
+	Islands(ImageData &islandId);
 	int area();
 	int& shade();
 	Mat& image();

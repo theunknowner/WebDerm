@@ -83,9 +83,10 @@ int main(int argc,char** argv)
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
-	img = Func::prepareImage(img,Size(140,140));
+	ImageData id(img);
+	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
-	ss1.extract(img,name);
+	ss1.extract(id);
 	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
@@ -240,14 +241,14 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	//Scripts::checkAllTestData();
+	Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Runs/tinea_corporis5_tinea_corporis1_max_match_image.png");
-	ShadeShape ss1 = Scripts::script31("melanoma8c");
-	ss1.showInteractiveIslands();
-	/*
-	Islands island = ss1.getIslandWithPoint(Point(84,71));
+	ShadeShape ss1 = Scripts::script31("tinea_corporis5");
+	//ss1.showInteractiveIslands();
+
+	Islands island = ss1.getIslandWithPoint(Point(47,45));
 	imwrite(ss1.name()+"_sample.png",island.image());
 	Mat results = island.nn_results();
 	cout << results << endl;

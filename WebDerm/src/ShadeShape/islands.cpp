@@ -8,6 +8,7 @@
 #include "islands.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 /************ PRIVATE FUNCTIONS ******************/
 
@@ -72,8 +73,21 @@ void Islands::getIslandPoints(Mat &islandImg) {
 Islands::Islands(){}
 
 Islands::Islands(Mat islandImg) {
-	this->islSubShape = -1;
 
+	this->islSubShape = -1;
+	this->islArea = countNonZero(islandImg);
+	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
+	this->islandImg = islandImg;
+	this->determineIslandShape(islandImg);
+	this->getIslandPoints(islandImg);
+	this->_labelName = "";
+	this->is_shape_shifted = false;
+	this->prev_shape = -1;
+}
+
+Islands::Islands(ImageData &islandId) {
+	Mat islandImg = islandId.image();
+	this->islSubShape = -1;
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
 	this->islandImg = islandImg;

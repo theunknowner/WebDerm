@@ -16,6 +16,11 @@ void ImageData::storePixelData(PixelData pd, int row, int col) {
 }
 
 /*************************** PUBLIC FUNCTIONS *************************/
+ImageData::ImageData() {}
+
+ImageData::ImageData(Mat image, String name) {
+	this->extract(image,name);
+}
 
 //! extracts pixel info from image
 void ImageData::extract(Mat image, String name) {
@@ -24,8 +29,11 @@ void ImageData::extract(Mat image, String name) {
 	this->imgSize = image.size();
 	this->imgRows = image.rows;
 	this->imgCols = image.cols;
+	this->pixelVec.clear();
 	this->pixelVec.resize(image.rows,vector<PixelData>(image.cols,PixelData()));
+	this->dataVec.clear();
 	this->dataVec.resize(image.rows,vector<String>(image.cols,""));
+	this->hslVec.clear();
 	this->hslVec.resize(image.rows,vector<String>(image.cols,""));
 	double h,s,l;
 	String pix, hslStr;
@@ -56,6 +64,10 @@ String ImageData::path() {
 //! return's size of image
 Size ImageData::size() {
 	return this->imgSize;
+}
+
+Size& ImageData::prevSize() {
+	return this->prevImgSize;
 }
 
 int ImageData::rows() {

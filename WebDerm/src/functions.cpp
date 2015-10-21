@@ -15,6 +15,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 String toString(int val)
 {
@@ -412,7 +413,6 @@ Mat prepareImage(Mat input, Size size) {
 	Size _size = input.size();
 	if(size.width>0 && size.height>0)
 		_size = size;
-	//sample = this->convertToBinary(sample,0,255,0,1);
 	Mat crop_img = fn.cropImage(input);
 
 	// get multiplier base on the biggest side
@@ -456,6 +456,56 @@ Mat prepareImage(Mat input, Size size) {
 		exit(1);
 	}
 	return newImg;
+}
+
+void prepareImage(ImageData &id, Size size) {
+	Functions fn;
+	Mat input = id.image();
+	Size _size = input.size();
+	if(size.width>0 && size.height>0)
+		_size = size;
+	Mat crop_img = fn.cropImage(input);
+	// get multiplier base on the biggest side
+	int maxSize = max(crop_img.cols,crop_img.rows);
+	float multiplier = (float)size.height / maxSize;
+
+	// assign new size using multiplier
+	int newRows = min((int)ceil(crop_img.rows * multiplier),size.height);
+	int newCols = min((int)ceil(crop_img.cols * multiplier),size.width);
+	_size = Size(newCols,newRows);
+	Mat img;
+	try {
+		img = fn.scaleDownImage(crop_img, _size);
+	} catch(cv::Exception &e) {
+		printf("TestML::prepareImage(), runResizeImage() error!\n");
+		cout << "Crop_img size: " << crop_img.size() << endl;
+		cout << "Size: " << _size << endl;
+		printf("Max Size: %d\n",maxSize);
+		printf("Multiplier: %f\n",multiplier);
+		exit(1);
+	}
+
+	//centers the feature
+	Mat newImg = Mat::zeros(size,img.type());
+	Point centerSize(floor(size.width)/2,floor(size.height/2));
+	Point center(floor(img.cols/2),floor(img.rows/2));
+	Point startPt(centerSize.x-center.x,centerSize.y-center.y);
+	try {
+		img.copyTo(newImg(Rect(startPt.x,startPt.y,img.cols,img.rows)));
+	} catch(cv::Exception &e) {
+		cout << "Orig Img Size: " << crop_img.size() << endl;
+		printf("Max Size: %d\n",maxSize);
+		printf("Multiplier: %f\n",multiplier);
+		cout << "New Size: " << _size << endl;
+		cout << "Img Size: " << img.size() << endl;
+		cout << "New Img Size: " << newImg.size() << endl;
+		cout << "CenterSize: " << centerSize << endl;
+		cout << "Center: " << center << endl;
+		cout << "StartPt: " << startPt << endl;
+		exit(1);
+	}
+	id.extract(newImg,id.name());
+	id.prevSize() = crop_img.size();
 }
 
 } //end namespace

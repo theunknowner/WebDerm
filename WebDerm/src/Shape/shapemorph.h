@@ -10,6 +10,8 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
+class ImageData;
+
 class ShapeMorph {
 private:
 	bool debugMode=false;
@@ -28,6 +30,7 @@ public:
 	Mat custAnd(Mat origImg, Mat scaleImg, Mat map=Mat());
 	Mat grayscaleReconstruct(Mat src, Mat scaleImg);
 	vector<Mat> liquidFeatureExtraction(Mat src, double lcThresh=0, int sort=0, int numOfPtsThresh=10);
+	vector<ImageData> liquidFeatureExtraction(ImageData &id, double lcThresh=0, int sort=0, int numOfPtsThresh=10);
 	vector<Mat> filterFeatures(vector<Mat> featureVec);
 
 	Mat connectImage(Mat src, Size size, double dist);

@@ -14,6 +14,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 void ShapeMorph::setDebugMode(bool mode) {
 	this->debugMode = mode;
@@ -816,6 +817,143 @@ vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double lcThresh, int so
 		vector<Mat> tempVec;
 		for(unsigned int i=0; i<featureVec.size(); i++) {
 			countPix = countNonZero(featureVec.at(i));
+			idx = i;
+			countVec.push_back(countPix);
+		}
+		jaysort(countVec,idxVec);
+		for(unsigned int i=0; i<idxVec.size(); i++) {
+			try {
+				tempVec.push_back(featureVec.at(idxVec.at(i)));
+			} catch(const std::out_of_range &oor) {
+				printf("idxVec.size(): %lu\n",idxVec.size());
+				printf("featureVec.size(): %lu\n",featureVec.size());
+				printf("i:%d\n",i);
+				printf("idx:%d\n",idxVec.at(i));
+				exit(1);
+			}
+		}
+		featureVec = tempVec;
+	}
+	return featureVec;
+}
+
+//thresh = discernible thresh; set sort = -1;1 -> Descending;Ascending
+vector<ImageData> ShapeMorph::liquidFeatureExtraction(ImageData &id, double lcThresh, int sort,int numOfPtsThresh) {
+	Mat src = id.image();
+	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
+	deque<deque<Point> > numFeatures;
+	deque<Point> ptVec;
+	deque<Point> temp;
+	int row=0, col=0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			if(src.at<uchar>(row,col)>0 && map.at<uchar>(row,col)==0) {
+				ptVec.push_back(Point(col,row));
+				map.at<uchar>(row,col) = 255;
+				temp.push_back(Point(col,row));
+				while(temp.size()>0) {
+					Point up(temp.at(0).x,temp.at(0).y-1);
+					Point left(temp.at(0).x-1,temp.at(0).y);
+					Point right(temp.at(0).x+1,temp.at(0).y);
+					Point down(temp.at(0).x,temp.at(0).y+1);
+					Point downLeft(temp.at(0).x-1,temp.at(0).y+1);
+					Point downRight(temp.at(0).x+1,temp.at(0).y+1);
+					if(up.y>=0) {
+						if(map.at<uchar>(up)==0 && src.at<uchar>(up)>lcThresh) {
+							ptVec.push_back(up);
+							map.at<uchar>(up)=255;
+							temp.push_back(up);
+						}
+					}
+					if(left.x>=0) {
+						if(map.at<uchar>(left)==0 && src.at<uchar>(left)>lcThresh) {
+							ptVec.push_back(left);
+							map.at<uchar>(left)=255;
+							temp.push_back(left);
+						}
+					}
+					if(right.x<src.cols) {
+						if(map.at<uchar>(right)==0 && src.at<uchar>(right)>lcThresh) {
+							ptVec.push_back(right);
+							map.at<uchar>(right)=255;
+							temp.push_back(right);
+						}
+					}
+					if(down.y<src.rows) {
+						if(map.at<uchar>(down)==0 && src.at<uchar>(down)>lcThresh) {
+							ptVec.push_back(down);
+							map.at<uchar>(down)=255;
+							temp.push_back(down);
+						}
+					}
+					if(down.y<src.rows && left.x>=0) {
+						if(map.at<uchar>(downLeft)==0 && src.at<uchar>(downLeft)>lcThresh) {
+							ptVec.push_back(downLeft);
+							map.at<uchar>(downLeft)=255;
+							temp.push_back(downLeft);
+						}
+					}
+					if(down.y<src.rows && right.x<src.cols) {
+						if(map.at<uchar>(downRight)==0 && src.at<uchar>(downRight)>lcThresh) {
+							ptVec.push_back(downRight);
+							map.at<uchar>(downRight)=255;
+							temp.push_back(downRight);
+						}
+					}
+					temp.pop_front();
+				}
+				numFeatures.push_back(ptVec);
+				ptVec.clear();
+				temp.clear();
+			}
+			col++;
+		}//end while col
+		col=0;
+		row++;
+	}//end while row
+
+	vector<ImageData> featureVec;
+	for(unsigned int i=0; i<numFeatures.size(); i++) {
+		Mat feature(src.rows, src.cols, CV_8U,Scalar(0));
+		if(numFeatures.at(i).size()>=numOfPtsThresh) {
+			for(unsigned int j=0; j<numFeatures.at(i).size(); j++) {
+				feature.at<uchar>(numFeatures.at(i).at(j)) = src.at<uchar>(numFeatures.at(i).at(j));
+			}
+			ImageData id(feature);
+			featureVec.push_back(id);
+		}
+	}
+	if(sort==1) {
+		int countPix, idx;
+		deque<int> countVec;
+		deque<int> idxVec;
+		vector<ImageData> tempVec;
+		for(unsigned int i=0; i<featureVec.size(); i++) {
+			countPix = countNonZero(featureVec.at(i).image());
+			idx = i;
+			countVec.push_back(countPix);
+		}
+		jaysort(countVec,idxVec);
+		for(int i=idxVec.size()-1; i>=0; --i) {
+			try {
+				tempVec.push_back(featureVec.at(idxVec.at(i)));
+			} catch(const std::out_of_range &oor) {
+				printf("idxVec.size(): %lu\n",idxVec.size());
+				printf("featureVec.size(): %lu\n",featureVec.size());
+				printf("i:%d\n",i);
+				printf("idx:%d\n",idxVec.at(i));
+				exit(1);
+			}
+		}
+		featureVec = tempVec;
+	}
+	if(sort==-1) {
+		int countPix, idx;
+		deque<int> countVec;
+		deque<int> idxVec;
+		vector<ImageData> tempVec;
+		for(unsigned int i=0; i<featureVec.size(); i++) {
+			countPix = countNonZero(featureVec.at(i).image());
 			idx = i;
 			countVec.push_back(countPix);
 		}

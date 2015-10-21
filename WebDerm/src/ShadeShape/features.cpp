@@ -9,6 +9,9 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "islands.h"
+#include "shadeshape.h"
 
 /************ PRIVATE FUNCTIONS ****************/
 
@@ -16,6 +19,42 @@
 vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 	ShapeMorph sm;
 	vector<Mat> islandVec;
+	vector<vector<Point> > ptsVec(256,vector<Point>(0,Point(-1,-1)));
+	for(int row=0; row<featureImg.rows; row++) {
+		for(int col=0; col<featureImg.cols; col++) {
+			int val = featureImg.at<uchar>(row,col);
+			if(val>0) {
+				ptsVec.at(val).push_back(Point(col,row));
+			}
+		}
+	}
+	//> prev size of image before resizing to 140x140
+	Size prevSize = this->parentId.prevSize();
+	//> magnification factor == (140 x 140) / (L x W)
+	double m = featureImg.total() / (double)(prevSize.height * prevSize.width);
+	for(unsigned int j=0; j<ptsVec.size(); j++) {
+		Mat shadeShape(featureImg.size(),CV_8U,Scalar(0));
+		if(ptsVec.at(j).size()>0) {
+			for(unsigned int k=0; k<ptsVec.at(j).size(); k++) {
+				shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
+			}
+			// helps connect islands that should be together
+			shadeShape = sm.densityConnector(shadeShape,.999999, m);
+			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
+			for(unsigned int k=0; k<littleIslands.size(); k++) {
+				if(countNonZero(littleIslands.at(k))>thresh)
+					islandVec.push_back(littleIslands.at(k));
+			}
+		}
+	}
+	return islandVec;
+}
+
+//! extracts islands from feature
+vector<ImageData> Features::extractIslands(ImageData &featureId, int thresh) {
+	ShapeMorph sm;
+	vector<ImageData> islandVec;
+	Mat featureImg = featureId.image();
 	vector<vector<Point> > ptsVec(256,vector<Point>(0,Point(-1,-1)));
 	for(int row=0; row<featureImg.rows; row++) {
 		for(int col=0; col<featureImg.cols; col++) {
@@ -33,9 +72,10 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 			}
 			// helps connect islands that should be together
 			shadeShape = sm.densityConnector(shadeShape,.999999999999,1.0);
-			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
+			ImageData id(shadeShape);
+			vector<ImageData> littleIslands = sm.liquidFeatureExtraction(id,0,0,0);
 			for(unsigned int k=0; k<littleIslands.size(); k++) {
-				if(countNonZero(littleIslands.at(k))>thresh)
+				if(countNonZero(littleIslands.at(k).image())>thresh)
 					islandVec.push_back(littleIslands.at(k));
 			}
 		}
@@ -102,11 +142,29 @@ void Features::getShadesOfIslands() {
 
 /************ PUBLIC FUNCTIONS *******************/
 
-Features::Features(Mat featureImg) {
+Features::Features() {}
+
+Features::Features(Mat featureImg, ImageData &parentId) {
+	this->parentId = parentId;
 	int thresh=0;
 	this->featureImg = featureImg;
 	this->featArea = countNonZero(featureImg);
 	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);
+	for(unsigned int i=0; i<littleIslands.size(); i++) {
+		Islands island(littleIslands.at(i));
+		this->storeIsland(island);
+	}
+	this->numOfIsls = this->islandVec.size();
+	this->determineFeatureShape(featureImg);
+	this->getShadesOfIslands();
+	//this->groupIslandsByShade();
+}
+
+Features::Features(ImageData &featureId) {
+	int thresh=0;
+	this->featureImg = featureId.image();
+	this->featArea = countNonZero(featureImg);
+	vector<ImageData> littleIslands = this->extractIslands(featureId, thresh);
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
 		this->storeIsland(island);

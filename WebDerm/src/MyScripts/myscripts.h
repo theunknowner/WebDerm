@@ -55,6 +55,7 @@ void script_createAllTrainingLabels3();
 void script_createAllTrainingLabels3b(String shape);
 void checkAllTestData();
 void checkAllTestData2();
+void checkAllTestData3();
 void script_createTestDataList();
 void script_checkHitRatioTestData();
 

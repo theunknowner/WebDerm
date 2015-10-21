@@ -9,11 +9,15 @@
 #define FEATURES_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "islands.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 class Islands;
+class ImageData;
+
 class Features {
 private:
+	ImageData parentId;
+
 	vector<Islands> islandVec;
 	vector<int> shadeVec;
 	Mat featureImg;
@@ -25,11 +29,14 @@ private:
 	float NN_Score;
 
 	vector<Mat> extractIslands(Mat featureImg, int thresh);
+	vector<ImageData> extractIslands(ImageData &featureId, int thresh);
 	void storeIsland(Islands island);
 	void determineFeatureShape(Mat featureImg);
 	void getShadesOfIslands();
 public:
-	Features(Mat featureImg);
+	Features();
+	Features(Mat featureImg, ImageData &parentId);
+	Features(ImageData &featureId);
 	Islands& island(int islNum);
 	Mat image();
 	int area();

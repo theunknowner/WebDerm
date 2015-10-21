@@ -9,6 +9,8 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 
+class ImageData;
+
 template< class T, size_t N >
 std::size_t length(const T (&)[N] )
 {
@@ -51,6 +53,7 @@ namespace Func {
 	void getSubstr(String str, char beginDelimit, char endDelimit, vector<String> &vec);
 	int largest(Mat input, int rank=1);
 	Mat prepareImage(Mat input, Size size);
+	void prepareImage(ImageData &id, Size size);
 }
 
 class Functions {
