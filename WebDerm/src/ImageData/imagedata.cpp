@@ -18,36 +18,39 @@ void ImageData::storePixelData(PixelData pd, int row, int col) {
 /*************************** PUBLIC FUNCTIONS *************************/
 ImageData::ImageData() {}
 
-ImageData::ImageData(Mat image, String name) {
-	this->extract(image,name);
+ImageData::ImageData(Mat image, String name, int option) {
+	this->extract(image,name, option);
 }
 
 //! extracts pixel info from image
-void ImageData::extract(Mat image, String name) {
+//! option==1 => extracts PixelData
+void ImageData::extract(Mat image, String name, int option) {
 	this->imgName = name;
 	this->matImage = image.clone();
 	this->imgSize = image.size();
 	this->imgRows = image.rows;
 	this->imgCols = image.cols;
-	this->pixelVec.clear();
-	this->pixelVec.resize(image.rows,vector<PixelData>(image.cols,PixelData()));
-	this->dataVec.clear();
-	this->dataVec.resize(image.rows,vector<String>(image.cols,""));
-	this->hslVec.clear();
-	this->hslVec.resize(image.rows,vector<String>(image.cols,""));
-	double h,s,l;
-	String pix, hslStr;
-	for(int i=0; i<image.rows; i++) {
-		for(int j=0; j<image.cols; j++) {
-			PixelData pixData(image.at<Vec3b>(i,j));
-			this->storePixelData(pixData,i,j);
-			this->dataVec.at(i).at(j) = pixData.color();
+	if(option==1) {
+		this->pixelVec.clear();
+		this->pixelVec.resize(image.rows,vector<PixelData>(image.cols,PixelData()));
+		this->dataVec.clear();
+		this->dataVec.resize(image.rows,vector<String>(image.cols,""));
+		this->hslVec.clear();
+		this->hslVec.resize(image.rows,vector<String>(image.cols,""));
+		double h,s,l;
+		String pix, hslStr;
+		for(int i=0; i<image.rows; i++) {
+			for(int j=0; j<image.cols; j++) {
+				PixelData pixData(image.at<Vec3b>(i,j));
+				this->storePixelData(pixData,i,j);
+				this->dataVec.at(i).at(j) = pixData.color();
 
-			h = pixData.hsl()[0];
-			s = pixData.hsl()[1];
-			l = pixData.hsl()[2];
-			hslStr = toString(h)+";"+toString(s)+";"+toString(l);
-			this->hslVec.at(i).at(j) = hslStr;
+				h = pixData.hsl()[0];
+				s = pixData.hsl()[1];
+				l = pixData.hsl()[2];
+				hslStr = toString(h)+";"+toString(s)+";"+toString(l);
+				this->hslVec.at(i).at(j) = hslStr;
+			}
 		}
 	}
 }

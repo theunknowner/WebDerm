@@ -919,7 +919,7 @@ vector<ImageData> ShapeMorph::liquidFeatureExtraction(ImageData &id, double lcTh
 			for(unsigned int j=0; j<numFeatures.at(i).size(); j++) {
 				feature.at<uchar>(numFeatures.at(i).at(j)) = src.at<uchar>(numFeatures.at(i).at(j));
 			}
-			ImageData id(feature);
+			ImageData id(feature,"",0);
 			featureVec.push_back(id);
 		}
 	}

@@ -66,14 +66,14 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/test20.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/test19.png");
+/*
+	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
+	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	//ssm.debug_mode(2);
-	cout << ssm.test_match(ss1,ss2) << endl;
-	//vector<float> results = ssm.match(ss1,ss2);
+	ssm.debug_mode(1);
+	//cout << ssm.test_match(ss1,ss2) << endl;
+	vector<float> results = ssm.match(ss1,ss2);
 	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
@@ -241,14 +241,13 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	Scripts::checkAllTestData3();
+	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
 /*
-	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Runs/tinea_corporis5_tinea_corporis1_max_match_image.png");
-	ShadeShape ss1 = Scripts::script31("tinea_corporis5");
+	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
+	ShadeShape ss1 = Scripts::script31("lph4");
 	//ss1.showInteractiveIslands();
-
-	Islands island = ss1.getIslandWithPoint(Point(47,45));
+	Islands island = ss1.getIslandWithPoint(Point(16,59));
 	imwrite(ss1.name()+"_sample.png",island.image());
 	Mat results = island.nn_results();
 	cout << results << endl;

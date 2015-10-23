@@ -12,6 +12,8 @@
 #include "../Labels/labels.h"
 
 class Labels;
+class ShadeShape;
+
 class Srm {
 private:
 	Labels labels;
@@ -33,7 +35,7 @@ protected:
 
 public:
 	Srm();
-	Srm(Labels &labels);
+	Srm(ShadeShape &ss, Labels &labels);
 	int& relation(int index1, int index2);
 	int& relationCount(int index1, int index2);
 	int& neighborLevel(int index1, int index2);

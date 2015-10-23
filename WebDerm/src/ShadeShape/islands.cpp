@@ -41,6 +41,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	this->NN_Score = *maxIt;
 	this->islShape = labelNum;
 	this->islShapeName = shapeName;
+	this->nn_prepared_img = sample;
 }
 //get coordinates of non-zero pixels
 void Islands::getIslandPoints(Mat &islandImg) {
@@ -112,6 +113,10 @@ int& Islands::shade() {
 //! returns Mat type image of island
 Mat& Islands::image() {
 	return this->islandImg;
+}
+
+Mat& Islands::nn_image() {
+	return this->nn_prepared_img;
 }
 
 //! returns index of shape of the island

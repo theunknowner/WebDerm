@@ -39,6 +39,7 @@ private:
 public:
 	ShadeShape();
 	ShadeShape(Mat src, String name="");
+	ShadeShape(ImageData &id);
 	void extract(Mat src, String name="");
 	void extract(ImageData &id);
 	Features& feature(int featNum);

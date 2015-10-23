@@ -72,7 +72,7 @@ vector<ImageData> Features::extractIslands(ImageData &featureId, int thresh) {
 			}
 			// helps connect islands that should be together
 			shadeShape = sm.densityConnector(shadeShape,.999999999999,1.0);
-			ImageData id(shadeShape);
+			ImageData id(shadeShape,"",0);
 			vector<ImageData> littleIslands = sm.liquidFeatureExtraction(id,0,0,0);
 			for(unsigned int k=0; k<littleIslands.size(); k++) {
 				if(countNonZero(littleIslands.at(k).image())>thresh)

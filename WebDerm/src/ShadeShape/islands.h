@@ -22,6 +22,7 @@ protected:
 	int islSubShape;
 	String islShapeName;
 	Mat islandImg;
+	Mat nn_prepared_img;
 	Mat NN_Results;
 	float NN_Score;
 	Point islPt;
@@ -40,6 +41,7 @@ public:
 	int area();
 	int& shade();
 	Mat& image();
+	Mat& nn_image();
 	int& shape();
 	String& shape_name();
 	Mat& nn_results();

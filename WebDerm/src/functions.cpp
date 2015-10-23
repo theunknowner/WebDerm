@@ -504,7 +504,7 @@ void prepareImage(ImageData &id, Size size) {
 		cout << "StartPt: " << startPt << endl;
 		exit(1);
 	}
-	id.extract(newImg,id.name());
+	id.extract(newImg,id.name(),0);
 	id.prevSize() = crop_img.size();
 }
 

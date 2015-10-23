@@ -51,9 +51,8 @@ Labels Srm::mergeLabels() {
 }
 
 /********************* PUBLIC FUNCTIONS ***********************/
-
 Srm::Srm() {};
-Srm::Srm(Labels &labels) {
+Srm::Srm(ShadeShape &ss, Labels &labels) {
 	this->labels = labels;
 	this->setup_relationMatrix(labels);
 	this->max_neighbor_level=0;

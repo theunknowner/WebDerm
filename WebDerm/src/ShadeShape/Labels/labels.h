@@ -20,9 +20,11 @@ private:
 	map<String,int> labelShapeNumMap;
 	map<String,int> labelPrevShapeNumMap;
 	map<String,int> labelShadeLevelMap;
+	map<String, vector<vector<float> > > labelStatSignMap;
 	String labelName;
 	int labelTotalArea;
 	void calcTotalArea();
+	void calcStatSign();
 
 public:
 	Labels();

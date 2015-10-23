@@ -20,7 +20,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 	map<String,pair<int,float> > lbls = labels.getMap();
 	const float interval = 15.0;
 	const int visibilityThresh = 3;
-	const float surroundedThreshUpper = 0.58; //> 14/24; 360.0 deg/ 15.0 deg = 24;
+	const float surroundedThreshUpper = 0.58; //> 14/24; 360.0 deg/15.0 deg = 24;
 	const float surroundedThreshLower = 0.125; //> 3/24
 	const float alpha = 0.25;
 	int minWidthForVisibility = 0;

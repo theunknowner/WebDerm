@@ -69,8 +69,10 @@ ShadeShape script2(String name) {
 	printf("PeakPos: %d\n",peakPos);
 	ShapeColor sc;
 	Mat img2 = sc.applyDiscreteShade(img,minVal,maxVal,peakPos);
+	ImageData id(img2,name,0);
+	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss;
-	ss.extract(img2,name);
+	ss.extract(id);
 	/*for(int i=0; i<ss.numOfFeatures(); i++) {
 		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
 			//imgshow(ss.feature(i).island(j).image());
@@ -2285,7 +2287,7 @@ void checkAllTestData3() {
 		Mat img = imread(filename,0);
 
 		//>crop, resize feature
-		ImageData id(img,name);
+		ImageData id(img,name,0);
 		Func::prepareImage(id,Size(140,140));
 		ShadeShape ss1;
 		ss1.extract(id);
@@ -3638,7 +3640,7 @@ ShadeShape script31(String filename) {
 	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
 
 	//> Testing Resizing of feature
-	ImageData id(img3,name);
+	ImageData id(img3,name,0);
 	Func::prepareImage(id,Size(140,140));
 
 	ShadeShape ss;

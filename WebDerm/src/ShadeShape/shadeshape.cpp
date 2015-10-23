@@ -42,12 +42,11 @@ void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 			char textScore[100];
 			Mat nnResults = island.nn_results();
 			sprintf(textScore,"[%.5f, %.5f, %.5f, %.5f, %.5f]",nnResults.at<float>(0,0),nnResults.at<float>(0,1),nnResults.at<float>(0,2),nnResults.at<float>(0,3),nnResults.at<float>(0,4));
-			Mat img_40x40 = ml.prepareImage(island.image(),Size(40,40));
 			namedWindow(winName3, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 			imshow(winName3,island.image());
 			namedWindow(winName2, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 			cv::displayStatusBar(winName2,textScore);
-			imshow(winName2,img_40x40);
+			imshow(winName2,island.nn_image());
 		}
 	}
 	if(event == EVENT_LBUTTONUP) {
@@ -242,6 +241,10 @@ ShadeShape::ShadeShape() {}
 
 ShadeShape::ShadeShape(Mat src, String name) {
 	this->extract(src,name);
+}
+
+ShadeShape::ShadeShape(ImageData &id) {
+	this->extract(id);
 }
 //! extracts the features from the image
 void ShadeShape::extract(Mat src, String name) {

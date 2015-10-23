@@ -29,8 +29,8 @@ protected:
 
 public:
 	ImageData();
-	ImageData(Mat image, String name="");
-	void extract(Mat image, String name="");
+	ImageData(Mat image, String name="", int option=0);
+	void extract(Mat image, String name="", int option=0);
 	String name();
 	String path();
 	Size size();
