@@ -357,10 +357,10 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	vector<vector<vector<Islands> > > islandVec2;
 	vector<vector<vector<Islands> > > islandVec3;
 	float maxTR1 = 0.0;
-	Labels largestLabelsUP;
-	Labels largestLabelsDB ;
+	Labels largestLabelsUP = upLabelsFilled;
+	Labels largestLabelsDB = dbLabelsFilled ;
 	vector<vector<vector<Islands> > > largestIslandVec;
-	Mat largestImg = upSS.image(), maxMatchImg;
+	Mat largestImg = upSS.image(), maxMatchImg = upSS.image();
 
 	float prevScore = tr1(upLabelsFilled,dbLabelsFilled); //> initialize
 	for(unsigned int shadeShift=0; shadeShift<shadematch.SHIFT().size(); shadeShift++) {
@@ -370,10 +370,11 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 
 		ShadeShape newUpSS(upSS.image(),upSS.name());
 		while(shadematch.shade_translation(newUpSS,shadeShift)) {
-			ShadeShape matchSS(newUpSS.image(),newUpSS.name());
+			ImageData newUpId(newUpSS.image(),newUpSS.name());
+			Func::prepareImage(newUpId,Size(140,140));
+			ShadeShape matchSS(newUpId);
 			islandVec2 = this->groupIslandsByShape(matchSS);
 			this->sortIslandsByArea(islandVec2);
-
 			float maxShadeShiftResult = 0.0;
 			vector<vector<vector<Islands> > > maxShadeShiftIslandVec = islandVec2;
 			for(unsigned int shadeShift2=0; shadeShift2<shadematch.SHIFT().size(); shadeShift2++) {
@@ -394,6 +395,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 					printf("ShadeShift: %s, ",shadematch.SHIFT()[shadeShift].c_str());
 					printf("ShadeShift2: %s, ",shadematch.SHIFT()[shadeShift2].c_str());
 					printf("Results: %f\n",results);
+					printf("PrevScore: %f\n",prevScore);
 					Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
 					printf("MaxShadeShiftResult: %f\n",maxShadeShiftResult);
 					printf("LargestResult: %f\n",largestResult);
@@ -410,6 +412,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 				largestIslandVec2 = maxShadeShiftIslandVec;
 				largestImg = matchSS.image();
 				if(shadeShift==ShadeMatch::SHIFT_NONE) {
+					islandVec2 = largestIslandVec2;
 					break;
 				}
 			} else {
@@ -490,7 +493,6 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		}
 	}
 	/*****************************/
-
 	Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB,1);
 	String newNameUP = upSS.name()+"_"+dbSS.name();
 	String newNameDB = dbSS.name()+"_"+upSS.name();
