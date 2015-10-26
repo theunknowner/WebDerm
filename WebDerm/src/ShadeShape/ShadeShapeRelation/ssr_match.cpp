@@ -13,6 +13,21 @@
 
 /**************************** PRIVATE FUNCTIONS ********************************/
 
+float ShadeShapeRelationMatch::dotProduct(vector<float> statSignUP, vector<float> statSignDB) {
+	assert(statSignUP.size()==statSignDB.size());
+	float numerSum = 0.0;
+	float denomSumUP = 0.0;
+	float denomSumDB = 0.0;
+	for(unsigned int i=0; i<statSignUP.size(); i++) {
+		numerSum += (statSignUP.at(i) * statSignDB.at(i));
+		denomSumUP += pow(statSignUP.at(i),2);
+		denomSumDB += pow(statSignDB.at(i),2);
+	}
+	float denomSum = sqrt(denomSumUP) * sqrt(denomSumDB);
+	float results = numerSum / denomSum;
+	return results;
+}
+
 float ShadeShapeRelationMatch::entropy(float count) {
 	if(count==0) {
 		return -1.0;
@@ -65,6 +80,10 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 						//> used for entropy calculation
 						int maxIslandAreaUP=0, maxIslandAreaDB=0;
 						float sumIslandAreaUP=0.0, sumIslandAreaDB=0.0;
+						//> used for dot product calculation
+						vector<float> sumStatSignUP1(80,0.0), sumStatSignUP2((80,0.0)), sumStatSignDB1(80,0.0), sumStatSignDB2(80,0.0);
+						vector<float> statSignUP1(80,0.0), statSignUP2(80,0.0), statSignDB1(80,0.0), statSignDB2(80,0.0);
+						float totalStatSignUP1=0.0, totalStatSignUP2=0.0, totalStatSignDB1=0.0, totalStatSignDB2=0.0;
 						if(countUP>0 || countDB>0) {
 							float areaValUP = totalAreaUP, areaValDB = totalAreaDB;
 							if(maxNeighborLevelUP>5) maxNeighborLevelUP = 5;
@@ -77,6 +96,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 										int areaX = upLabels.area(xLabel); // get area
 										int xIdx = srmUP.getIndex(xLabel); // get pos from srm
+										bool flagStatSign = false;
 										for(unsigned int yIdx=0; yIdx<srmUP.size(); yIdx++) {
 											try {
 												unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
@@ -111,8 +131,28 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 												//> for entropy calculations
 												sumIslandAreaUP += upLabels.area(yLabel);
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(yLabel));
+
+												//> for dot product calculations (REI only so far)
+												if(yLabel.find("Excavated")!=string::npos) {
+													vector<float> statSignY = upLabels.getStatSign(yLabel);
+													for(unsigned int n=0; n<statSignY.size(); n++) {
+														sumStatSignUP1.at(n) += statSignY.at(n);
+														totalStatSignUP1 += sumStatSignUP1.at(n);
+													}
+													flagStatSign = true;
+												}
+											}
+										} // end y mergedLabelContainer UP
+
+										//> for dot product calculations (REI only so far)
+										if(flagStatSign==true) {
+											vector<float> statSignX = upLabels.getStatSign(xLabel);
+											for(unsigned int n=0; n<statSignX.size(); n++) {
+												sumStatSignUP2.at(n) += statSignX.at(n);
+												totalStatSignUP2 += sumStatSignUP2.at(n);
 											}
 										}
+
 										float penaltyX = 1.0;
 										if(upLabels.isShapeShifted(xLabel)) {
 											int shapeNumX = upLabels.getShapeNum(xLabel);
@@ -127,7 +167,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										printf("x: %d\n",x);
 										exit(1);
 									}
-								}
+								} // end x mergedLabelContatiner UP
 								// for DB
 								for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 									try {
@@ -135,6 +175,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 										int areaX = dbLabels.area(xLabel);
 										int xIdx = srmDB.getIndex(xLabel);
+										bool flagStatSign = false;
 										for(unsigned int yIdx=0; yIdx<srmDB.size(); yIdx++) {
 											unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
 											if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
@@ -153,15 +194,35 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 												//> used for entropy calculations
 												sumIslandAreaDB += dbLabels.area(yLabel);
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
+
+												//> for dot product calculations (REI only so far)
+												if(yLabel.find("Excavated")!=string::npos) {
+													vector<float> statSignY = dbLabels.getStatSign(yLabel);
+													for(unsigned int n=0; n<statSignY.size(); n++) {
+														sumStatSignDB1.at(n) += statSignY.at(n);
+														totalStatSignDB1 += sumStatSignDB1.at(n);
+													}
+													flagStatSign = true;
+												}
+											}
+										} // end y mergedLabelContainer DB
+
+										//> for dot product calculations (REI only so far)
+										if(flagStatSign==true) {
+											vector<float> statSignX = dbLabels.getStatSign(xLabel);
+											for(unsigned int n=0; n<statSignX.size(); n++) {
+												sumStatSignDB2.at(n) += statSignX.at(n);
+												totalStatSignDB2 += sumStatSignDB2.at(n);
 											}
 										}
+
 										areaDB += areaY + (areaX * (areaY/totalDenomAreaDB));
 									} catch (const std::out_of_range &oor) {
 										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 										printf("SURR_BY: DB\n");
 										exit(1);
 									}
-								}
+								} // end x mergedLabelContainer DB
 								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
 								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
 							}
@@ -173,6 +234,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 										int yIdx = srmUP.getIndex(yLabel);
 										int areaY = upLabels.area(yLabel);
+										bool flagStatSign = false;
 										for(unsigned int xIdx=0; xIdx<srmUP.size(); xIdx++) {
 											unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
 											//for all relations
@@ -205,8 +267,28 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 
 												sumIslandAreaUP += upLabels.area(xLabel);
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(xLabel));
+
+												//> for dot product calculations (REI only so far)
+												if(xLabel.find("Excavated")!=string::npos) {
+													vector<float> statSignX = upLabels.getStatSign(xLabel);
+													for(unsigned int n=0; n<statSignX.size(); n++) {
+														sumStatSignUP1.at(n) += statSignX.at(n);
+														totalStatSignUP1 += sumStatSignUP1.at(n);
+													}
+													flagStatSign = true;
+												}
 											}
 										}
+
+										//> for dot product calculations (REI only so far)
+										if(flagStatSign==true) {
+											vector<float> statSignY = upLabels.getStatSign(yLabel);
+											for(unsigned int n=0; n<statSignY.size(); n++) {
+												sumStatSignUP2.at(n) += statSignY.at(n);
+												totalStatSignUP2 += sumStatSignUP2.at(n);
+											}
+										}
+
 										float penaltyY = 1.0;
 										if(upLabels.isShapeShifted(yLabel)) {
 											int shapeNumY = upLabels.getShapeNum(yLabel);
@@ -228,6 +310,7 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 										int yIdx = srmDB.getIndex(yLabel);
 										int areaY = dbLabels.area(yLabel);
+										bool flagStatSign = false;
 										for(unsigned int xIdx=0; xIdx<srmDB.size(); xIdx++) {
 											unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
 											//for all relations
@@ -246,18 +329,39 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 												//> for entropy calculations
 												sumIslandAreaDB += dbLabels.area(xLabel);
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(xLabel));
+
+												//> for dot product calculations (REI only so far)
+												if(xLabel.find("Excavated")!=string::npos) {
+													vector<float> statSignX = dbLabels.getStatSign(xLabel);
+													for(unsigned int n=0; n<statSignX.size(); n++) {
+														sumStatSignDB1.at(n) += statSignX.at(n);
+														totalStatSignDB1 += sumStatSignDB1.at(n);
+													}
+													flagStatSign = true;
+												}
+											}
+										} // end x mergedLabelContainer DB
+
+										//> for dot product calculations (REI only so far)
+										if(flagStatSign==true) {
+											vector<float> statSignY = dbLabels.getStatSign(yLabel);
+											for(unsigned int n=0; n<statSignY.size(); n++) {
+												sumStatSignDB2.at(n) += statSignY.at(n);
+												totalStatSignDB2 += sumStatSignDB2.at(n);
 											}
 										}
+
 										areaDB += areaX + (areaY * (areaX/totalDenomAreaDB));
 									} catch (const std::out_of_range &oor) {
 										printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 										printf("SURR_BY_INV: DB\n");
 										exit(1);
 									}
-								}
+								} // end y mergedLabelContainer
 								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
 								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
-							}
+							} // end SURR_BY_INV
+							//> Expected value of Shade Gradient <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
 							if(std::isnan(countProportionUP)) countProportionUP = 0.0;
@@ -269,7 +373,6 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							distAvgUP /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
 							float distAvgDB = std::accumulate(srmDB.mergedRelationDistance.at(i).at(j).at(k).begin(),srmDB.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
 							distAvgDB /= srmDB.mergedRelationDistance.at(i).at(j).at(k).size();
-							//> Expected value of Shade Gradient <//
 							int shadeDiffUP = abs(upMergedLabels.getShadeLevel(label1)-upMergedLabels.getShadeLevel(label2));
 							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
 							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
@@ -279,6 +382,17 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
+							//> Dot Product **NEEDS CONDITIONS FOR WHEN TO EXCECUTE **
+							for(unsigned int n=0; n<statSignUP1.size(); n++) {
+								statSignUP1.at(n) = sumStatSignUP1.at(n) / totalStatSignUP1;
+								statSignUP2.at(n) = sumStatSignUP2.at(n) / totalStatSignUP2;
+								statSignDB1.at(n) = sumStatSignDB1.at(n) / totalStatSignDB1;
+								statSignDB2.at(n) = sumStatSignDB2.at(n) / totalStatSignDB2;
+							}
+							float dotProduct1 = this->dotProduct(statSignUP1,statSignDB1);
+							float dotProduct2 = this->dotProduct(statSignUP2,statSignDB2);
+							//> end Dot Product
+
 							if(std::isnan(areaValUP)) areaValUP=0;
 							if(std::isnan(areaValDB)) areaValDB=0;
 							float areaVal = min(areaValUP,areaValDB);

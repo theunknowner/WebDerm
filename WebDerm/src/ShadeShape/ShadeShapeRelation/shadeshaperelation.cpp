@@ -16,7 +16,7 @@
 /******************** PUBLIC FUNCTIONS ***********************/
 
 void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {
-	this->srm = Srm(labels);
+	this->srm = Srm(ss,labels);
 	map<String,pair<int,float> > lbls = labels.getMap();
 	const float interval = 15.0;
 	const int visibilityThresh = 3;

@@ -20,11 +20,10 @@ private:
 	map<String,int> labelShapeNumMap;
 	map<String,int> labelPrevShapeNumMap;
 	map<String,int> labelShadeLevelMap;
-	map<String, vector<vector<float> > > labelStatSignMap;
+	map<String, vector<float> > labelStatSignMap;
 	String labelName;
 	int labelTotalArea;
 	void calcTotalArea();
-	void calcStatSign();
 
 public:
 	Labels();
@@ -50,6 +49,8 @@ public:
 	bool isShapeShifted(String label);
 	int getShapeNum(String label);
 	int getPrevShapeNum(String label);
+	map<String, vector<float> >& getLabelStatSignMap();
+	vector<float> getStatSign(String label);
 	static void printCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
 	static void writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
 };

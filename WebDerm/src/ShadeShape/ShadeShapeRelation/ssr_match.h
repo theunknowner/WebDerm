@@ -15,6 +15,7 @@ class Islands;
 class Labels;
 class ShadeShapeRelationMatch : public ShadeShapeRelation {
 private:
+	float dotProduct(vector<float> statSignUP, vector<float> statSignDB);
 	float entropy(float count);
 	float entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB);
 	float rVal[6] = {1.0,1.0,0.63,0.55,0.52,0.5};

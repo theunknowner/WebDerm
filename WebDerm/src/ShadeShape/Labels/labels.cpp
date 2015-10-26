@@ -17,20 +17,6 @@ void Labels::calcTotalArea() {
 	}
 }
 
-void Labels::calcStatSign() {
-	for(auto it=this->labelStatSignMap.begin(); it!=this->labelStatSignMap.end(); it++) {
-		vector<vector<float> > vec = it->second;
-		float total = 0.0;
-		for(unsigned int i=0; i<vec.size(); i++) {
-			total += vec.at(i).at(0);
-		}
-		for(unsigned int i=0; i<vec.size(); i++) {
-			vec.at(i).at(1) = vec.at(i).at(0) / total;
-		}
-		it->second = vec;
-	}
-}
-
 /************************* PUBLIC FUNCTIONS *****************************/
 Labels::Labels() {}
 
@@ -42,7 +28,7 @@ Labels::Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, St
 void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name) {
 	this->labelName= name;
 	String label;
-	vector<vector<float> > statSignVec(40,vector<float>(2,0.0));
+	vector<float> statSignVec(80,0.0);
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
@@ -54,17 +40,31 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 
 				//> to calculate the statistical signature of each label
 				for(int y=0; y<isl.image().rows; y++) {
-					int countConsec = 0;
+					int countConsecWhite = 0;
+					int countConsecBlack = 0;
 					for(int x=0; x<isl.image().cols; x++) {
 						if(isl.image().at<uchar>(y,x)>0) {
-							countConsec++;
+							countConsecWhite++;
+							if(countConsecBlack>0) {
+								statSignVec.at((countConsecBlack-1)+40)++;
+								countConsecBlack=0;
+							}
 						} else {
-							if(countConsec>0) {
-								statSignVec.at(countConsec-1)++;
+							countConsecBlack++;
+							if(countConsecWhite>0) {
+								statSignVec.at(countConsecWhite-1)++;
+								countConsecWhite=0;
 							}
 						}
 					}
 				}
+				float total = 0.0;
+				for(unsigned int y=0; y<statSignVec.size(); y++) {
+					if(statSignVec.at(y)>0) {
+						statSignVec.at(y) *= isl.area();
+					}
+				}
+
 				if(this->labelMap.find(label)==this->labelMap.end()) {
 					int area = islandVec.at(i).at(j).at(k).area();
 					float relArea = area / totalArea;
@@ -238,6 +238,17 @@ int Labels::getPrevShapeNum(String label) {
 	}
 
 	return -1;
+}
+
+map<String,vector<float> >& Labels::getLabelStatSignMap() {
+	return this->labelStatSignMap;
+}
+
+vector<float> Labels::getStatSign(String label) {
+	if(this->labelStatSignMap.find(label)!=this->labelStatSignMap.end()) {
+		return this->labelStatSignMap.at(label);
+	}
+	return vector<float>();
 }
 
 void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
