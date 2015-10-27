@@ -67,13 +67,15 @@ int main(int argc,char** argv)
 	Scripts::script30(name);
 /**/
 /*
-	ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
-	ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
+	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
+	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
+	ShadeShape ss1 = Scripts::script31("lph4");
+	ShadeShape ss2 = Scripts::script31("lph7");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	ssm.debug_mode(1);
-	//cout << ssm.test_match(ss1,ss2) << endl;
-	vector<float> results = ssm.match(ss1,ss2);
+	//ssm.debug_mode(1);
+	cout << ssm.test_match(ss1,ss2) << endl;
+	//vector<float> results = ssm.match(ss1,ss2);
 	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
@@ -175,7 +177,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -245,8 +247,11 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
-	ShadeShape ss1 = Scripts::script31("lph4");
+	ShadeShape ss1 = Scripts::script31("lph7");
+	ShadeShapeMatch ssm;
+	ssm.test(ss1);
 	//ss1.showInteractiveIslands();
+	/*
 	Islands island = ss1.getIslandWithPoint(Point(16,59));
 	imwrite(ss1.name()+"_sample.png",island.image());
 	Mat results = island.nn_results();

@@ -28,22 +28,24 @@ Labels::Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, St
 void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name) {
 	this->labelName= name;
 	String label;
-	vector<float> statSignVec(80,0.0);
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
-				Islands isl = islandVec.at(i).at(j).at(k);
+				Islands &isl = islandVec.at(i).at(j).at(k);
 				String shape = this->shapeName(i);
 				label = toString(i)+"_"+shape+"_s"+toString(j)+"_";
 				label += Func::addDigitsForLabel(k,"0",3);
 				isl.labelName() = label;
 
 				//> to calculate the statistical signature of each label
-				for(int y=0; y<isl.image().rows; y++) {
+				vector<float> statSignVec(80,0.0);
+				for(int y=0; y<isl.nn_image().rows; y++) {
 					int countConsecWhite = 0;
 					int countConsecBlack = 0;
-					for(int x=0; x<isl.image().cols; x++) {
-						if(isl.image().at<uchar>(y,x)>0) {
+					bool entered=false;
+					for(int x=0; x<isl.nn_image().cols; x++) {
+						if(isl.nn_image().at<uchar>(y,x)>0) {
+							entered=true;
 							countConsecWhite++;
 							if(countConsecBlack>0) {
 								statSignVec.at((countConsecBlack-1)+40)++;
@@ -56,12 +58,14 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 								countConsecWhite=0;
 							}
 						}
-					}
-				}
-				float total = 0.0;
-				for(unsigned int y=0; y<statSignVec.size(); y++) {
-					if(statSignVec.at(y)>0) {
-						statSignVec.at(y) *= isl.area();
+						if(x==isl.nn_image().cols-1) {
+							if(countConsecWhite>0) {
+								statSignVec.at(countConsecWhite-1)++;
+							}
+							if(countConsecBlack>0) {
+								statSignVec.at((countConsecBlack-1)+40)++;
+							}
+						}
 					}
 				}
 
