@@ -335,7 +335,7 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec,0,newNameUP);
 	ShadeShapeRelation ssrDB;
 	ssrDB.spatial_relation(dbSS,largestLabelsDB,this->dbIslandVec,0,newNameDB);
-	//float tr2_score = this->tr2(ssrUP,largestLabelsUP,ssrDB,largestLabelsDB);
+	float tr2_score = this->tr2(ssrUP,largestLabelsUP,ssrDB,largestLabelsDB);
 	//float results = maxTR1 * tr2_score;
 	//vector<float> vec = {results,maxTR1,tr2_score};
 	//resultVec.push_back(vec);

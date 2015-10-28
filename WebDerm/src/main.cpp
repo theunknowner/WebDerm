@@ -247,7 +247,7 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
-	ShadeShape ss1 = Scripts::script31("lph7");
+	ShadeShape ss1 = Scripts::script31("herpes3");
 	ShadeShapeMatch ssm;
 	ssm.test(ss1);
 	//ss1.showInteractiveIslands();

@@ -42,29 +42,24 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 				for(int y=0; y<isl.nn_image().rows; y++) {
 					int countConsecWhite = 0;
 					int countConsecBlack = 0;
-					bool entered=false;
+					int entered=0;
 					for(int x=0; x<isl.nn_image().cols; x++) {
-						if(isl.nn_image().at<uchar>(y,x)>0) {
-							entered=true;
+						if(isl.nn_image().at<uchar>(y,x)>0 && entered==-1) {
+							entered=1;
 							countConsecWhite++;
-							if(countConsecBlack>0) {
-								statSignVec.at((countConsecBlack-1)+40)++;
-								countConsecBlack=0;
-							}
-						} else {
+							statSignVec.at((countConsecBlack-1)+40)++;
+							countConsecBlack=0;
+						} else if(isl.nn_image().at<uchar>(y,x)>0) {
+							entered=1;
+							countConsecWhite++;
+						} else if(isl.nn_image().at<uchar>(y,x)==0 && entered==1) {
+							entered=-1;
 							countConsecBlack++;
-							if(countConsecWhite>0) {
-								statSignVec.at(countConsecWhite-1)++;
-								countConsecWhite=0;
-							}
-						}
-						if(x==isl.nn_image().cols-1) {
-							if(countConsecWhite>0) {
-								statSignVec.at(countConsecWhite-1)++;
-							}
-							if(countConsecBlack>0) {
-								statSignVec.at((countConsecBlack-1)+40)++;
-							}
+							statSignVec.at(countConsecWhite-1)++;
+							countConsecWhite=0;
+						} else if(isl.nn_image().at<uchar>(y,x)==0 && entered!=0) {
+							entered=-1;
+							countConsecBlack++;
 						}
 					}
 				}
