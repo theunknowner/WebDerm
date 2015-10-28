@@ -110,6 +110,7 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 					}
 				}
 				ss.image() = shiftedImg;
+				ss.getImageData().setImage(shiftedImg);
 				this->featIslIdxStoreVec.push_back(indexVec2d.at(pos));
 				this->featIslStored = true;
 				return true;
@@ -131,7 +132,7 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 			exit(1);
 		}
 	}
-	return false;
+	return true;
 }
 
 vector<vector<int> >& ShadeMatch::getStoredFeatIslIdx() {

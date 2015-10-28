@@ -38,9 +38,12 @@ public:
 	int rows();
 	int cols();
 	Mat image();
+	void setImage(Mat img);
 	vector<vector<String> > data_matrix();
 	vector<vector<String> > hsl_matrix();
 	PixelData pixel(int row, int col);
+	void writePrevSize(String filename="");
+	void readPrevSize();
 };
 
 #endif /* IMAGEDATA_H_ */

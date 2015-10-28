@@ -33,6 +33,7 @@ private:
 	void sortIslandsByArea(vector<vector<vector<Islands> > > &islandVec);
 	void fillMissingLabels(Labels &upLabels, Labels &dbLabels);
 	float dotProduct(Labels &upLabels, Labels &dbLabels);
+	float tr1ForShade(Labels &upLabels, Labels &dbLabels);
 	float tr1(Labels &upLabels, Labels &dbLabels);
 	float tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
 public:

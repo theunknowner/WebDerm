@@ -139,7 +139,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 													vector<float> statSignY = upLabels.getStatSign(yLabel);
 													assert(statSignY.size()==sumStatSignUP1.size());
 													for(unsigned int n=0; n<statSignY.size(); n++) {
-														sumStatSignUP1.at(n) += statSignY.at(n);
+														int mul = n<40 ? (n+1) : ((n+1)-40);
+														sumStatSignUP1.at(n) += statSignY.at(n) * mul;
 														totalStatSignUP1 += sumStatSignUP1.at(n);
 													}
 												}
@@ -150,7 +151,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 										if(label2.find("Excavated")!=string::npos) {
 											vector<float> statSignX = upLabels.getStatSign(xLabel);
 											for(unsigned int n=0; n<statSignX.size(); n++) {
-												sumStatSignUP2.at(n) += statSignX.at(n);
+												int mul = n<40 ? (n+1) : ((n+1)-40);
+												sumStatSignUP2.at(n) += statSignX.at(n) * mul;
 												totalStatSignUP2 += sumStatSignUP2.at(n);
 											}
 										}
@@ -201,7 +203,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 													vector<float> statSignY = dbLabels.getStatSign(yLabel);
 													assert(statSignY.size()==sumStatSignDB1.size());
 													for(unsigned int n=0; n<statSignY.size(); n++) {
-														sumStatSignDB1.at(n) += statSignY.at(n);
+														int mul = n<40 ? (n+1) : ((n+1)-40);
+														sumStatSignDB1.at(n) += statSignY.at(n) * mul;
 														totalStatSignDB1 += sumStatSignDB1.at(n);
 													}
 												}
@@ -213,7 +216,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											vector<float> statSignX = dbLabels.getStatSign(xLabel);
 											assert(statSignX.size()==sumStatSignDB2.size());
 											for(unsigned int n=0; n<statSignX.size(); n++) {
-												sumStatSignDB2.at(n) += statSignX.at(n);
+												int mul = n<40 ? (n+1) : ((n+1)-40);
+												sumStatSignDB2.at(n) += statSignX.at(n) * mul;
 												totalStatSignDB2 += sumStatSignDB2.at(n);
 											}
 										}
@@ -273,7 +277,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 													vector<float> statSignX = upLabels.getStatSign(xLabel);
 													assert(statSignX.size()==sumStatSignUP1.size());
 													for(unsigned int n=0; n<statSignX.size(); n++) {
-														sumStatSignUP1.at(n) += statSignX.at(n);
+														int mul = n<40 ? (n+1) : ((n+1)-40);
+														sumStatSignUP1.at(n) += statSignX.at(n) * mul;
 														totalStatSignUP1 += sumStatSignUP1.at(n);
 													}
 												}
@@ -285,7 +290,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											vector<float> statSignY = upLabels.getStatSign(yLabel);
 											assert(statSignY.size()==sumStatSignUP2.size());
 											for(unsigned int n=0; n<statSignY.size(); n++) {
-												sumStatSignUP2.at(n) += statSignY.at(n);
+												int mul = n<40 ? (n+1) : ((n+1)-40);
+												sumStatSignUP2.at(n) += statSignY.at(n) * mul;
 												totalStatSignUP2 += sumStatSignUP2.at(n);
 											}
 										}
@@ -335,7 +341,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 													vector<float> statSignX = dbLabels.getStatSign(xLabel);
 													assert(statSignX.size()==sumStatSignDB1.size());
 													for(unsigned int n=0; n<statSignX.size(); n++) {
-														sumStatSignDB1.at(n) += statSignX.at(n);
+														int mul = n<40 ? (n+1) : ((n+1)-40);
+														sumStatSignDB1.at(n) += statSignX.at(n) * mul;
 														totalStatSignDB1 += sumStatSignDB1.at(n);
 													}
 												}
@@ -347,7 +354,8 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 											vector<float> statSignY = dbLabels.getStatSign(yLabel);
 											assert(statSignY.size()==sumStatSignDB2.size());
 											for(unsigned int n=0; n<statSignY.size(); n++) {
-												sumStatSignDB2.at(n) += statSignY.at(n);
+												int mul = n<40 ? (n+1) : ((n+1)-40);
+												sumStatSignDB2.at(n) += statSignY.at(n) * mul;
 												totalStatSignDB2 += sumStatSignDB2.at(n);
 											}
 										}
@@ -384,6 +392,10 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 							if(label1.find("Excavated")!=string::npos || label2.find("Excavated")!=string::npos) {
+								totalStatSignUP1 = std::accumulate(sumStatSignUP1.begin(),sumStatSignUP1.end(),0.0);
+								totalStatSignUP2 = std::accumulate(sumStatSignUP2.begin(),sumStatSignUP2.end(),0.0);
+								totalStatSignDB1 = std::accumulate(sumStatSignDB1.begin(),sumStatSignDB1.end(),0.0);
+								totalStatSignDB2 = std::accumulate(sumStatSignDB2.begin(),sumStatSignDB2.end(),0.0);
 								for(unsigned int n=0; n<sumStatSignUP1.size(); n++) {
 									if(totalStatSignUP1==0) totalStatSignUP1 = 1.0;
 									if(totalStatSignUP2==0) totalStatSignUP2 = 1.0;
@@ -401,18 +413,20 @@ float ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRela
 							if(dotProduct1==-1) dotProduct1 = 1;
 							if(dotProduct2==-1) dotProduct2 = 1;
 
-							if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY) {
+							if(label1=="5_Excavated_s2" && label2=="5_Excavated_s3" && k==SURR_BY) {
 								FILE * file;
-								file = fopen("dot_product_comparison.txt","w");
+								String fileDotProd = ssrUP.name() + "_dot_product_comparison.csv";
+								file = fopen(fileDotProd.c_str(),"w");
+								fprintf(file,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
 								for(unsigned int n=0; n<statSignUP1.size(); n++) {
-									fprintf(file,"L%d: %f(%f) | L%d: %f(%f)\n",n+1,sumStatSignUP1.at(n),statSignUP1.at(n),n+1,sumStatSignDB1.at(n),statSignDB1.at(n));
+									fprintf(file,"L%d,%d,(%f),L%d,%d,(%f)\n",n+1,(int)sumStatSignUP1.at(n),statSignUP1.at(n),n+1,(int)sumStatSignDB1.at(n),statSignDB1.at(n));
 								}
-								fprintf(file,"Total: %f | Total: %f\n",totalStatSignUP1,totalStatSignDB1);
+								fprintf(file,"Total,%d,Total,%d\n",(int)totalStatSignUP1,(int)totalStatSignDB1);
 								fprintf(file,"------------------------\n");
 								for(unsigned int n=0; n<statSignUP2.size(); n++) {
-									fprintf(file,"L%d: %f(%f) | L%d: %f(%f)\n",n+1,sumStatSignUP2.at(n),statSignUP2.at(n),n+1,sumStatSignDB2.at(n),statSignDB2.at(n));
+									fprintf(file,"L%d,%d,(%f),L%d,%d,(%f)\n",n+1,(int)sumStatSignUP2.at(n),statSignUP2.at(n),n+1,(int)sumStatSignDB2.at(n),statSignDB2.at(n));
 								}
-								fprintf(file,"Total: %f | Total: %f\n",totalStatSignUP2,totalStatSignDB2);
+								fprintf(file,"Total,%d,Total,%d\n",(int)totalStatSignUP2,(int)totalStatSignDB2);
 								fclose(file);
 							}
 							//> end Dot Product

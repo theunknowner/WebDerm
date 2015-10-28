@@ -28,6 +28,7 @@ void ImageData::extract(Mat image, String name, int option) {
 	this->imgName = name;
 	this->matImage = image.clone();
 	this->imgSize = image.size();
+	this->prevImgSize = image.size();
 	this->imgRows = image.rows;
 	this->imgCols = image.cols;
 	if(option==1) {
@@ -86,6 +87,10 @@ Mat ImageData::image() {
 	return this->matImage;
 }
 
+void ImageData::setImage(Mat img) {
+	this->matImage = img;
+}
+
 //! returns the image's data for each pixel in 2D string
 vector<vector<String> > ImageData::data_matrix() {
 	return this->dataVec;
@@ -99,4 +104,26 @@ vector<vector<String> > ImageData::hsl_matrix() {
 //! returns PixelData object pixel (row,col)
 PixelData ImageData::pixel(int row, int col) {
 	return this->pixelVec.at(row).at(col);
+}
+
+void ImageData::writePrevSize(String filename) {
+	if(filename=="") filename = this->name();
+	filename += "_prev_size.csv";
+	FILE * fp;
+	fp = fopen(filename.c_str(),"w");
+	fprintf(fp,"%d,%d",this->prevImgSize.width,this->prevImgSize.height);
+	fclose(fp);
+}
+
+void ImageData::readPrevSize() {
+	fstream fs(this->name()+"_prev_size.csv");
+	if(fs.is_open()) {
+		String temp;
+		deque<String> vec;
+		while(getline(fs,temp)) {
+			getSubstr(temp,',',vec);
+			this->prevImgSize = Size(atoi(vec.at(0).c_str()),atoi(vec.at(1).c_str()));
+		}
+	}
+	fs.close();
 }

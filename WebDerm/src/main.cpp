@@ -85,7 +85,7 @@ int main(int argc,char** argv)
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
-	ImageData id(img);
+	ImageData id(img,name);
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id);
@@ -185,7 +185,6 @@ int main(int argc,char** argv)
 	vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0));
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
-	//ssm.test_match(ss1,ss2);
 	vector<float> results = ssm.match(ss1,ss2);
 	ssm.countShapeTranslations(shapeTranslateCount);
 	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));

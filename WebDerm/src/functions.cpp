@@ -506,6 +506,7 @@ void prepareImage(ImageData &id, Size size) {
 	}
 	id.extract(newImg,id.name(),0);
 	id.prevSize() = crop_img.size();
+	id.readPrevSize();
 }
 
 } //end namespace
