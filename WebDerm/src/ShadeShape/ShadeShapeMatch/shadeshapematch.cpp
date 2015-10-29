@@ -342,12 +342,15 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 		}// end for shapeShift1
 	}// end shadeShift
 
-	Labels::printCompareLabels(largestLabelsUP,largestLabelsDB,1);
+	//Labels::printCompareLabels(largestLabelsUP,largestLabelsDB,1);
+	//cout << "----------------------------" << endl;
+	String label = "5_Excavated_s2_000";
+	Labels::printCompareStatSign(largestLabelsUP,largestLabelsDB,label);
 	cout << "----------------------------" << endl;
-	String newNameUP = upSS.name()+"_"+dbSS.name() + "_max_match_image";
-	String newNameDB = dbSS.name()+"_"+upSS.name() + "_max_match_image";
-	imwrite(newNameUP+".png",maxMatchImg);
-	upSS.getImageData().writePrevSize(newNameUP);
+	String newNameUP = upSS.name()+"_"+dbSS.name();
+	String newNameDB = dbSS.name()+"_"+upSS.name();
+	imwrite(newNameUP+"_max_match_image.png",maxMatchImg);
+	upSS.getImageData().writePrevSize(newNameUP+"_max_match_image");
 	//ShadeShapeRelation ssrUP;
 	//ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec,0,newNameUP);
 	//ShadeShapeRelation ssrDB;

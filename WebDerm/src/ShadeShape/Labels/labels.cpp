@@ -7,6 +7,7 @@
 
 #include "labels.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../StatSign/statsign.h"
 
 /************************* PRIVATE FUNCTIONS ****************************/
 
@@ -28,6 +29,7 @@ Labels::Labels(vector<vector<vector<Islands> > > &islandVec, float totalArea, St
 void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name) {
 	this->labelName= name;
 	String label;
+	StatSign statSign;
 	for(unsigned int i=0; i<islandVec.size(); i++) {
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
@@ -37,33 +39,6 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 				label += Func::addDigitsForLabel(k,"0",3);
 				isl.labelName() = label;
 
-				//> to calculate the statistical signature of each label
-				vector<float> statSignVec(80,0.0);
-				for(int y=0; y<isl.nn_image().rows; y++) {
-					int countConsecWhite = 0;
-					int countConsecBlack = 0;
-					int entered=0;
-					for(int x=0; x<isl.nn_image().cols; x++) {
-						if(isl.nn_image().at<uchar>(y,x)>0 && entered==-1) {
-							entered=1;
-							countConsecWhite++;
-							statSignVec.at((countConsecBlack-1)+40)++;
-							countConsecBlack=0;
-						} else if(isl.nn_image().at<uchar>(y,x)>0) {
-							entered=1;
-							countConsecWhite++;
-						} else if(isl.nn_image().at<uchar>(y,x)==0 && entered==1) {
-							entered=-1;
-							countConsecBlack++;
-							statSignVec.at(countConsecWhite-1)++;
-							countConsecWhite=0;
-						} else if(isl.nn_image().at<uchar>(y,x)==0 && entered!=0) {
-							entered=-1;
-							countConsecBlack++;
-						}
-					}
-				}
-
 				if(this->labelMap.find(label)==this->labelMap.end()) {
 					int area = islandVec.at(i).at(j).at(k).area();
 					float relArea = area / totalArea;
@@ -72,7 +47,13 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 					this->labelShapeNumMap[label] = islandVec.at(i).at(j).at(k).shape();
 					this->labelPrevShapeNumMap[label] = islandVec.at(i).at(j).at(k).prevShape();
 					this->labelShadeLevelMap[label] = j;
-					this->labelStatSignMap[label] = statSignVec;
+
+					//> to calculate the statistical signature of each label
+					if(label.find("Excavated")!=string::npos) {
+						vector<int> statSignVec = statSign.create(isl.nn_image());
+						this->labelStatSignMap[label] = statSignVec;
+					}
+
 				} else {
 					cout << "Labels::create(): map<String,pair<int,float> > labelMap duplicate keys!!!" << endl;
 					cout << label << endl;
@@ -202,18 +183,6 @@ void Labels::setShadeLevel(String label, int level) {
 	this->labelShadeLevelMap[label] = level;
 }
 
-void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
-	auto labelMap1 = labels1.getMap();
-	auto labelMap2 = labels2.getMap();
-	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
-		int i = distance(labelMap1.begin(),it1);
-		bool isShifted = labels1.isShapeShifted(it1->first);
-		if(markShifted==0 || !isShifted)
-			printf("%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
-		else
-			printf("%d) *%s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
-	}
-}
 
 bool Labels::isShapeShifted(String label) {
 	if(this->labelShapeShiftMap.find(label)!=this->labelShapeShiftMap.end()) {
@@ -239,15 +208,30 @@ int Labels::getPrevShapeNum(String label) {
 	return -1;
 }
 
-map<String,vector<float> >& Labels::getLabelStatSignMap() {
-	return this->labelStatSignMap;
-}
-
-vector<float> Labels::getStatSign(String label) {
+//! returns the statistical signature of each label/urn/feature.
+//! The total number of balls is stored in statSign[0].
+vector<int> Labels::getStatSign(String label) {
 	if(this->labelStatSignMap.find(label)!=this->labelStatSignMap.end()) {
 		return this->labelStatSignMap.at(label);
 	}
-	return vector<float>();
+	return vector<int>();
+}
+
+map<String,vector<int>>& Labels::getStatSignMap() {
+	return this->labelStatSignMap;
+}
+
+void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
+	auto labelMap1 = labels1.getMap();
+	auto labelMap2 = labels2.getMap();
+	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
+		int i = distance(labelMap1.begin(),it1);
+		bool isShifted = labels1.isShapeShifted(it1->first);
+		if(markShifted==0 || !isShifted)
+			printf("%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+		else
+			printf("%d) *%s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+	}
 }
 
 void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
@@ -267,4 +251,48 @@ void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifte
 		}
 	}
 	fclose(fp);
+}
+
+void Labels::printCompareStatSign(Labels &labels1, Labels &labels2, String label) {
+	vector<int> statSignVec1 = labels1.getStatSign(label);
+	vector<int> statSignVec2 = labels2.getStatSign(label);
+	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
+	assert(statSignVec1.size()==statSignVec2.size());
+	for(unsigned int i=1; i<statSignVec1.size(); i++) {
+		float porp1 = (float)statSignVec1.at(i) / statSignVec1.at(0);
+		float porp2 = (float)statSignVec2.at(i) / statSignVec2.at(0);
+		try {
+			printf("L%d: %d(%f) | L%d: %d(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+		} catch(const std::out_of_range &oor) {
+			printf("statSignVec1.size(): %lu\n",statSignVec1.size());
+			printf("statSignVec2.size(): %lu\n",statSignVec2.size());
+			printf("i: %d\n",i);
+			exit(1);
+		}
+	}
+	printf("Total: %d | Total: %d\n",statSignVec1.at(0), statSignVec2.at(0));
+}
+
+void Labels::writeCompareStatSign(Labels &labels1, Labels &labels2, String label, String fileType) {
+	vector<int> statSignVec1 = labels1.getStatSign(label);
+	vector<int> statSignVec2 = labels2.getStatSign(label);
+	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
+	assert(statSignVec1.size()==statSignVec2.size());
+	String file = labels1.name() + "_" + labels2.name() + "_" + label + "_stat_sign_compare." + fileType;
+	FILE * fp;
+	fp = fopen(file.c_str(),"w");
+	for(unsigned int i=1; i<statSignVec1.size(); i++) {
+		float porp1 = (float)statSignVec1.at(i) / statSignVec1.at(0);
+		float porp2 = (float)statSignVec2.at(i) / statSignVec2.at(0);
+		if(fileType=="txt") {
+			fprintf(fp,"L%d: %d(%f) | L%d: %d(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+		} else if(fileType=="csv") {
+			fprintf(fp,"L%d,%f,%d,L%d,%d,%f\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+		}
+	}
+	if(fileType=="txt") {
+		fprintf(fp,"Total: %d | Total: %d\n",statSignVec1.at(0), statSignVec2.at(0));
+	} else if(fileType=="csv") {
+		fprintf(fp,"Total,%d,Total,%d\n",statSignVec1.at(0), statSignVec2.at(0));
+	}
 }
