@@ -31,6 +31,7 @@ public:
 	void create(vector<vector<vector<Islands> > > &islandVec, float totalArea, String name="");
 	map<String,pair<int,float> >& getMap();
 	map<String,int>& getShadeLevelMap();
+	map<String, int>& getShapeMap();
 	void setLabels(map<String,pair<int,float> > labels);
 	int area(String label);
 	int area(int num);

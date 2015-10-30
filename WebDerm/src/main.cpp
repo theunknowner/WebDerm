@@ -190,6 +190,7 @@ int main(int argc,char** argv)
 	vector<float> results = ssm.match(ss1,ss2);
 	ssm.countShapeTranslations(shapeTranslateCount);
 	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
+	printf("TR2 Mismatch: %f]\n",results.at(3));
 	time.end();
 	time.printTimer();
 	ShapeMatch spm;
@@ -244,15 +245,15 @@ int main(int argc,char** argv)
 	}
 /**/
 /*
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/lph7_rei_s2.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/melanoma8c_rei_s0.png",0);
+	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s2.png",0);
+	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/lph7_rei_s2.png",0);
 	StatSign statSign;
 	vector<int> statSignVec1 = statSign.create(img1);
 	vector<int> statSignVec2 = statSign.create(img2);
 	statSign.adjustValues(statSignVec1);
 	statSign.adjustValues(statSignVec2);
 	statSign.printCompare(statSignVec1,statSignVec2);
-	//cout << statSign.dotProduct(statSignVec1,statSignVec2);
+	cout << statSign.dotProduct(statSignVec1,statSignVec2) << endl;
 	cout << statSign.proportion(statSignVec1,statSignVec2) << endl;
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/

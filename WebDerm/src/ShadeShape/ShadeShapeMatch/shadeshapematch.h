@@ -35,12 +35,11 @@ private:
 	float dotProduct(Labels &upLabels, Labels &dbLabels);
 	float tr1ForShade(Labels &upLabels, Labels &dbLabels);
 	float tr1(Labels &upLabels, Labels &dbLabels);
-	float tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
+	vector<float> tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
 public:
 	void test(ShadeShape &ss);
 	float test_match(ShadeShape upSS, ShadeShape dbSS);
 	vector<float> match(ShadeShape upSS, ShadeShape dbSS);
-	void printLabels(map<String,float> &labels);
 	void debug_mode(int mode);
 
 	void countShapeTranslations(vector<vector<int> > &shapeTranslateCount);

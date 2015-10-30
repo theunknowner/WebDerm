@@ -172,12 +172,16 @@ float ShadeShapeMatch::tr1(Labels &upLabels, Labels &dbLabels) {
 }
 
 //! TR2 metric using SRM(Spatial Relations Matrix) comparison
-float ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
+//! returns vector holding pos[0] = match score; pos[1] = mismatch score.
+vector<float> ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
 	assert(upLabels.size()>0 && dbLabels.size()>0);
 	assert(upLabels.size()==dbLabels.size());
 	ShadeShapeRelationMatch ssrm;
-	float matchVal = ssrm.srm_match(ssrUP,upLabels,ssrDB,dbLabels);
-	return matchVal;
+	ssrm.srm_match(ssrUP,upLabels,ssrDB,dbLabels);
+	float matchScore = ssrm.getMatchScore();
+	float mismatchScore = ssrm.getMismatchScore();
+	vector<float> results = {matchScore,mismatchScore};
+	return results;
 }
 
 /******************* PUBLIC FUNCTIONS ******************/
@@ -528,20 +532,11 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec,1,newNameUP);
 	ShadeShapeRelation ssrDB;
 	ssrDB.spatial_relation(dbSS,largestLabelsDB,this->dbIslandVec,1,newNameDB);
-	float tr2_score = this->tr2(ssrUP,largestLabelsUP,ssrDB,largestLabelsDB);
-	float results = maxTR1 * tr2_score;
-	vector<float> vec = {results,maxTR1,tr2_score};
+	vector<float> tr2_scores = this->tr2(ssrUP,largestLabelsUP,ssrDB,largestLabelsDB);
+	float results = maxTR1 * tr2_scores.at(0);
+	vector<float> vec = {results,maxTR1,tr2_scores.at(0),tr2_scores.at(1)};
 	resultVec.push_back(vec);
 	return *max_element(resultVec.begin(),resultVec.end());
-}
-
-void ShadeShapeMatch::printLabels(map<String,float> &labels) {
-	for(auto it=labels.begin(); it!=labels.end(); it++) {
-		int index = distance(labels.begin(),it);
-		printf("%d) ",index);
-		cout << it->first << ": " << it->second << endl;
-	}
-	cout << "------------------" << endl;
 }
 
 void ShadeShapeMatch::debug_mode(int mode) {

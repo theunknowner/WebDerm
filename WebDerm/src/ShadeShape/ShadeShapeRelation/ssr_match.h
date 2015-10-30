@@ -16,11 +16,19 @@ class Labels;
 class ShadeShapeRelationMatch : public ShadeShapeRelation {
 private:
 	float entropy(float count);
-	float entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB);
+	void entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB);
 	float rVal[6] = {1.0,1.0,0.63,0.55,0.52,0.5};
+	float shapeWeight[8] = {1.0,1.0,1.0,1.0,0.7071,0.7071,0.7071,0.5	};
+
+	float matchScore;
+	float mismatchScore;
 
 public:
-	float srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
+	void srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
+	float getMatchScore();
+	float getMismatchScore();
+	float getShapeWeight(int shape, float prop);
+
 	void importDownScaleSrms(String file, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &labels);
 };
 

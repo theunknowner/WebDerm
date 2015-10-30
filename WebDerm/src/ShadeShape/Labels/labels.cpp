@@ -72,6 +72,10 @@ map<String,int>& Labels::getShadeLevelMap() {
 	return this->labelShadeLevelMap;
 }
 
+map<String,int>& Labels::getShapeMap() {
+	return this->labelShapeNumMap;
+}
+
 void Labels::setLabels(map<String,pair<int,float> > labels) {
 	this->labelMap = labels;
 	this->calcTotalArea();

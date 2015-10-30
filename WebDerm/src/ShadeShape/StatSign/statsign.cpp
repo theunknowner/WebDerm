@@ -86,8 +86,8 @@ float StatSign::proportion(vector<int> statSignVec1, vector<int> statSignVec2) {
 	}
 	float propWhite = min(totalWhite1,totalWhite2) / max(totalWhite1,totalWhite2);
 	float propBlack = min(totalBlack1,totalBlack2) / max(totalBlack1,totalBlack2);
-	if(std::isnan(propWhite)) propWhite = 0.0;
-	if(std::isnan(propBlack)) propBlack = 0.0;
+	if(std::isnan(propWhite)) propWhite = 1.0;
+	if(std::isnan(propBlack)) propBlack = 1.0;
 	float result = propWhite * propBlack;
 	return result;
 }
