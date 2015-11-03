@@ -118,12 +118,10 @@ void jaysort(vector<float> &vec, vector<int> &origPos) {
 
 //! flag=0 : ascending; flag=1 : descending
 void jaysort(vector<vector<float> > &vec, vector<int> &origPos, int flag) {
-	vector<vector<float> > vec2d(vec.size(),vector<float>(0,0));
+	vector<vector<float> > vec2d;
 	for(unsigned int i=0; i<vec.size(); i++) {
-		vec2d.at(i).push_back(vec.at(i).at(0));
-		vec2d.at(i).push_back(vec.at(i).at(1));
-		vec2d.at(i).push_back(vec.at(i).at(2));
-		vec2d.at(i).push_back(i);
+		vec2d.push_back(vec.at(i));
+		vec2d.back().push_back(i);
 	}
 	if(flag==0)
 		std::sort(vec2d.begin(), vec2d.end(), [](const std::vector< float >& a, const std::vector< float >& b){ return a[0] < b[0]; } );

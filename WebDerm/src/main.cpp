@@ -104,15 +104,20 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
 		Timer time;
 		String folder = "Looks_Like/";
 		deque<String> files;
-		FileData fd;
-		fd.getFilesFromDirectory(folder,files);
+		//FileData fd;
+		//fd.getFilesFromDirectory(folder,files);
+		fstream fs("test_list.csv");
+		String temp;
+		while(getline(fs,temp)) {
+			files.push_back(temp);
+		}
 		ShadeShape ss1 = Scripts::script31(argv[1]);
 		vector<vector<float> > resultVec;
 		vector<String> nameVec;
@@ -122,7 +127,7 @@ int main(int argc,char** argv)
 		vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0)); //8 shapes
 		///////////////////////
 		for(unsigned int i=0; i<files.size(); i++) {
-			name = folder + files.at(i);
+			name = folder + files.at(i) + ".jpg";
 			name = getFileName(name);
 			if(name!=argv[1]) {
 				ShadeShape ss2 = Scripts::script31(name);
@@ -155,22 +160,26 @@ int main(int argc,char** argv)
 		//////////////////////////
 
 		jaysort(resultVec,origPos,1);
-		String output = std::string(argv[1]) + "_matches_sorted.csv";
-		FILE * fp;
-		fp = fopen(output.c_str(),"w");
-		for(unsigned int i=0; i<resultVec.size(); i++) {
-			fprintf(fp,"%s,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2));
-		}
 		printf("%s...Done!\n",argv[1]);
-		fclose(fp);
 		time.end();
 		time.printTimer();
-		output = std::string(argv[1]) + "_time_elapsed.txt";
-		fp = fopen(output.c_str(),"w"); //reuse fp
+		String output = std::string(argv[1]) + "_time_elapsed.txt";
+		FILE * fp = fopen(output.c_str(),"w"); //reuse fp
 		fprintf(fp,"%s\n",time.getTimerString().c_str());
 		fprintf(fp,"Begin: %s",time.getStartTime().c_str());
 		fprintf(fp,"End: %s",time.getEndTime().c_str());
 		fclose(fp);
+		output = std::string(argv[1]) + "_matches_sorted_"+time.getEndTime()+".csv";
+		fp = fopen(output.c_str(),"w");
+		for(unsigned int i=0; i<resultVec.size(); i++) {
+			try {
+				fprintf(fp,"%s,%f,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2),resultVec.at(i).at(3));
+			} catch (const std::out_of_range &oor) {
+				printf("ResultVec.size(): %lu\n",resultVec.size());
+				printf("ResultVec.at(%d).size(): %lu\n",i,resultVec.at(i).size());
+				exit(1);
+			}
+		}
 	} catch(cv::Exception &e) {
 		ex.name(std::string(argv[1])+"_"+name);
 		ex.writeErrorToFile(e);
@@ -244,17 +253,15 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-/*
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s2.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/lph7_rei_s2.png",0);
+
+	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
+	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/psoriasis20a_rei_s2.png",0);
 	StatSign statSign;
 	vector<int> statSignVec1 = statSign.create(img1);
 	vector<int> statSignVec2 = statSign.create(img2);
-	statSign.adjustValues(statSignVec1);
-	statSign.adjustValues(statSignVec2);
 	statSign.printCompare(statSignVec1,statSignVec2);
 	cout << statSign.dotProduct(statSignVec1,statSignVec2) << endl;
-	cout << statSign.proportion(statSignVec1,statSignVec2) << endl;
+	//cout << statSign.proportion(statSignVec1,statSignVec2) << endl;
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/
 

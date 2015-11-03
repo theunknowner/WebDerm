@@ -14,7 +14,6 @@
 class StatSign {
 public:
 	vector<int> create(Mat img);
-	void adjustValues(vector<int> &statSignVec);
 	float dotProduct(vector<int> statSignVec1, vector<int> statSignVec2);
 	float proportion(vector<int> statSignVec1, vector<int> statSignVec2);
 	void printCompare(vector<int> statSignVec1, vector<int> statSignVec2);

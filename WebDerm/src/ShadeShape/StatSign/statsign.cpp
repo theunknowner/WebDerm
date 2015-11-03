@@ -13,7 +13,8 @@
 //! pos[1] -> pos[40] = White
 //! pos[41] -> pos[80] = Black
 vector<int> StatSign::create(Mat img) {
-	vector<int> statSignVec(81,0.0);
+	vector<int> statSignVec(81,0);
+	vector<int> statSignVec2(17,0); //> 80/5 = 16
 	for(int y=0; y<img.rows; y++) {
 		int countConsecWhite = 0;
 		int countConsecBlack = 0;
@@ -38,16 +39,15 @@ vector<int> StatSign::create(Mat img) {
 			}
 		}
 	}
-	this->adjustValues(statSignVec);
-	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0);
-	return statSignVec;
-}
-
-void StatSign::adjustValues(vector<int>& statSignVec) {
 	for(unsigned int i=1; i<statSignVec.size(); i++) {
 		int mul = i>40 ? (i-40) : i;
-		statSignVec.at(i) *= mul;
+		statSignVec.at(i) *= pow(2,mul);
+		int urnNum = ceil(i/5.0);
+		statSignVec2.at(urnNum) += statSignVec.at(i);
 	}
+	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0);
+	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0);
+	return statSignVec2;
 }
 
 //! scheme 1 for comparing statistical signature

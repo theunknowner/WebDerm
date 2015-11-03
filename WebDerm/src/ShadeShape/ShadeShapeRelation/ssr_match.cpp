@@ -1211,11 +1211,12 @@ float ShadeShapeRelationMatch::getMismatchScore() {
 	return this->mismatchScore;
 }
 
+//! return shape weights
 float ShadeShapeRelationMatch::getShapeWeight(int shape, float prop) {
 	if(shape!=5)  { //> 5=excavated
 		return this->shapeWeight[shape];
 	}
-	float weight = 0.45 + (0.55 * prop);
+	float weight = 0.13 + (0.87 * prop);
 	return weight;
 }
 
