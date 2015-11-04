@@ -12,9 +12,9 @@
 //! pos[0] = total
 //! pos[1] -> pos[40] = White
 //! pos[41] -> pos[80] = Black
-vector<int> StatSign::create(Mat img) {
-	vector<int> statSignVec(81,0);
-	vector<int> statSignVec2(17,0); //> 80/5 = 16
+vector<float> StatSign::create(Mat img) {
+	vector<float> statSignVec(81,0);
+	vector<float> statSignVec2(17,0); //> 80/5 = 16
 	for(int y=0; y<img.rows; y++) {
 		int countConsecWhite = 0;
 		int countConsecBlack = 0;
@@ -41,29 +41,37 @@ vector<int> StatSign::create(Mat img) {
 	}
 	for(unsigned int i=1; i<statSignVec.size(); i++) {
 		int mul = i>40 ? (i-40) : i;
-		statSignVec.at(i) *= pow(2,mul);
+		mul = ceil(mul/5.0);
+		statSignVec.at(i) *= pow(4.5,mul);
 		int urnNum = ceil(i/5.0);
 		statSignVec2.at(urnNum) += statSignVec.at(i);
 	}
-	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0);
-	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0);
+	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0.0);
+	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0.0);
 	return statSignVec2;
 }
 
 //! scheme 1 for comparing statistical signature
-float StatSign::dotProduct(vector<int> statSignVec1, vector<int> statSignVec2) {
+float StatSign::dotProduct(vector<float> statSignVec1, vector<float> statSignVec2) {
 	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
 	assert(statSignVec1.size()==statSignVec2.size());
-	if(*max_element(statSignVec1.begin(),statSignVec1.end())==0 || *max_element(statSignVec2.begin(),statSignVec2.end())==0) {
-		return -1.0;
+	if(statSignVec1.at(0)==0 || statSignVec2.at(0)==0) {
+		return 0.0;
+	}
+	vector<float> statSignVecF1(statSignVec1.size(),0.0);
+	vector<float> statSignVecF2(statSignVec2.size(),0.0);
+	//> relative proportions of the balls
+	for(unsigned int i=1; i<statSignVec1.size(); i++) {
+		statSignVecF1.at(i) = statSignVec1.at(i) / statSignVec1.at(0);
+		statSignVecF2.at(i) = statSignVec2.at(i) / statSignVec2.at(0);
 	}
 	float numerSum = 0.0;
 	float denomSumUP = 0.0;
 	float denomSumDB = 0.0;
-	for(unsigned int i=1; i<statSignVec1.size(); i++) {
-		numerSum += (statSignVec1.at(i) * statSignVec2.at(i));
-		denomSumUP += pow(statSignVec1.at(i),2);
-		denomSumDB += pow(statSignVec2.at(i),2);
+	for(unsigned int i=1; i<statSignVecF1.size(); i++) {
+		numerSum += (statSignVecF1.at(i) * statSignVecF2.at(i));
+		denomSumUP += pow(statSignVecF1.at(i),2);
+		denomSumDB += pow(statSignVecF2.at(i),2);
 	}
 	float denomSum = sqrt(denomSumUP) * sqrt(denomSumDB);
 	float results = numerSum / denomSum;
@@ -92,14 +100,14 @@ float StatSign::proportion(vector<int> statSignVec1, vector<int> statSignVec2) {
 	return result;
 }
 
-void StatSign::printCompare(vector<int> statSignVec1, vector<int> statSignVec2) {
+void StatSign::printCompare(vector<float> statSignVec1, vector<float> statSignVec2) {
 	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
 	assert(statSignVec1.size()==statSignVec2.size());
 	for(unsigned int i=1; i<statSignVec1.size(); i++) {
-		float porp1 = (float)statSignVec1.at(i) / statSignVec1.at(0);
-		float porp2 = (float)statSignVec2.at(i) / statSignVec2.at(0);
+		float porp1 = statSignVec1.at(i) / statSignVec1.at(0);
+		float porp2 = statSignVec2.at(i) / statSignVec2.at(0);
 		try {
-			printf("L%d: %d(%f) | L%d: %d(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+			printf("L%d: %0.f(%f) | L%d: %0.f(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
 		} catch(const std::out_of_range &oor) {
 			printf("statSignVec1.size(): %lu\n",statSignVec1.size());
 			printf("statSignVec2.size(): %lu\n",statSignVec2.size());
@@ -107,10 +115,10 @@ void StatSign::printCompare(vector<int> statSignVec1, vector<int> statSignVec2) 
 			exit(1);
 		}
 	}
-	printf("Total: %d | Total: %d\n",statSignVec1.at(0), statSignVec2.at(0));
+	printf("Total: %0.f | Total: %0.f\n",statSignVec1.at(0), statSignVec2.at(0));
 }
 
-void StatSign::writeCompare(String name, vector<int> statSignVec1, vector<int> statSignVec2) {
+void StatSign::writeCompare(String name, vector<float> statSignVec1, vector<float> statSignVec2) {
 	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
 	assert(statSignVec1.size()==statSignVec2.size());
 	FILE * fp;
@@ -118,7 +126,7 @@ void StatSign::writeCompare(String name, vector<int> statSignVec1, vector<int> s
 	for(unsigned int i=1; i<statSignVec1.size(); i++) {
 		float porp1 = (float)statSignVec1.at(i) / statSignVec1.at(0);
 		float porp2 = (float)statSignVec2.at(i) / statSignVec2.at(0);
-		fprintf(fp,"L%d,%d,%f,L%d,%d,%f\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+		fprintf(fp,"L%d,%0.f,%f,L%d,%0.f,%f\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
 	}
-	fprintf(fp,"Total,%d,Total,%d\n",statSignVec1.at(0), statSignVec2.at(0));
+	fprintf(fp,"Total,%0.f,Total,%0.f\n",statSignVec1.at(0), statSignVec2.at(0));
 }

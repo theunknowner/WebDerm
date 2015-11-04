@@ -68,9 +68,8 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 						int maxIslandAreaUP=0, maxIslandAreaDB=0;
 						float sumIslandAreaUP=0.0, sumIslandAreaDB=0.0;
 						//> used for dot product calculation
-						vector<int> sumStatSignUP1(81,0), sumStatSignUP2(81,0), sumStatSignDB1(81,0), sumStatSignDB2(81,0);
-						vector<float> statSignUP1(81,0.0), statSignUP2(81,0.0), statSignDB1(81,0.0), statSignDB2(81,0.0);
-						float totalStatSignUP1=0.0, totalStatSignUP2=0.0, totalStatSignDB1=0.0, totalStatSignDB2=0.0;
+						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
+						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						if(countUP>0 || countDB>0) {
 							float areaValUP = totalAreaUP, areaValDB = totalAreaDB;
 							if(maxNeighborLevelUP>5) maxNeighborLevelUP = 5;
@@ -120,7 +119,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for dot product calculations (REI only so far)
 												if(label1.find("Excavated")!=string::npos) {
-													vector<int> statSignY = upLabels.getStatSign(yLabel);
+													vector<float> statSignY = upLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
 															sumStatSignUP1.at(n) += statSignY.at(n);
@@ -132,7 +131,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for dot product calculations (REI only so far)
 										if(label2.find("Excavated")!=string::npos) {
-											vector<int> statSignX = upLabels.getStatSign(xLabel);
+											vector<float> statSignX = upLabels.getStatSign(xLabel);
 											if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 												for(unsigned int n=0; n<statSignX.size(); n++) {
 													sumStatSignUP2.at(n) += statSignX.at(n);
@@ -183,7 +182,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for dot product calculations (REI only so far)
 												if(label1.find("Excavated")!=string::npos) {
-													vector<int> statSignY = dbLabels.getStatSign(yLabel);
+													vector<float> statSignY = dbLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
 															sumStatSignDB1.at(n) += statSignY.at(n);
@@ -195,7 +194,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for dot product calculations (REI only so far)
 										if(label2.find("Excavated")!=string::npos) {
-											vector<int> statSignX = dbLabels.getStatSign(xLabel);
+											vector<float> statSignX = dbLabels.getStatSign(xLabel);
 											if(statSignX.size()>0 && statSignX.size()==sumStatSignDB2.size()) {
 												for(unsigned int n=0; n<statSignX.size(); n++) {
 													sumStatSignDB2.at(n) += statSignX.at(n);
@@ -255,7 +254,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for statsign calculations (REI only so far)
 												if(label2.find("Excavated")!=string::npos) {
-													vector<int> statSignX = upLabels.getStatSign(xLabel);
+													vector<float> statSignX = upLabels.getStatSign(xLabel);
 													if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 														for(unsigned int n=0; n<statSignX.size(); n++) {
 															sumStatSignUP2.at(n) += statSignX.at(n);
@@ -267,7 +266,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for dot product calculations (REI only so far)
 										if(label1.find("Excavated")!=string::npos) {
-											vector<int> statSignY = upLabels.getStatSign(yLabel);
+											vector<float> statSignY = upLabels.getStatSign(yLabel);
 											if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 												for(unsigned int n=0; n<statSignY.size(); n++) {
 													sumStatSignUP1.at(n) += statSignY.at(n);
@@ -317,7 +316,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for dot product calculations (REI only so far)
 												if(label2.find("Excavated")!=string::npos) {
-													vector<int> statSignX = dbLabels.getStatSign(xLabel);
+													vector<float> statSignX = dbLabels.getStatSign(xLabel);
 													if(statSignX.size()>0 && statSignX.size()==sumStatSignDB2.size()) {
 														for(unsigned int n=0; n<statSignX.size(); n++) {
 															sumStatSignDB2.at(n) += statSignX.at(n);
@@ -329,7 +328,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for statsign calculations (REI only so far)
 										if(label1.find("Excavated")!=string::npos) {
-											vector<int> statSignY = dbLabels.getStatSign(yLabel);
+											vector<float> statSignY = dbLabels.getStatSign(yLabel);
 											if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 												for(unsigned int n=0; n<statSignY.size(); n++) {
 													sumStatSignDB1.at(n) += statSignY.at(n);
@@ -368,44 +367,21 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
-							if(label1.find("Excavated")!=string::npos || label2.find("Excavated")!=string::npos) {
-								totalStatSignUP1 = sumStatSignUP1.at(0);
-								totalStatSignUP2 = sumStatSignUP2.at(0);
-								totalStatSignDB1 = sumStatSignDB1.at(0);
-								totalStatSignDB2 = sumStatSignDB2.at(0);
-								if(totalStatSignUP1==0) totalStatSignUP1 = 1.0;
-								if(totalStatSignUP2==0) totalStatSignUP2 = 1.0;
-								if(totalStatSignDB1==0) totalStatSignDB1 = 1.0;
-								if(totalStatSignDB2==0) totalStatSignDB2 = 1.0;
+							float dotProduct1 = 1.0;
+							float dotProduct2 = 1.0;
+							if(label1.find("Excavated")!=string::npos){
+								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 							}
-							float prop1 = statsign.proportion(sumStatSignUP1,sumStatSignDB1);
-							float prop2 = statsign.proportion(sumStatSignUP2,sumStatSignDB2);
-							/*
-							if(label1=="5_Excavated_s2" && label2=="5_Excavated_s3" && k==SURR_BY) {
-								FILE * file;
-								String fileDotProd = ssrUP.name() + "_dot_product_comparison.csv";
-								file = fopen(fileDotProd.c_str(),"w");
-								fprintf(file,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
-								for(unsigned int n=0; n<statSignUP1.size(); n++) {
-									fprintf(file,"L%d,%d,(%f),L%d,%d,(%f)\n",n+1,(int)sumStatSignUP1.at(n),statSignUP1.at(n),n+1,(int)sumStatSignDB1.at(n),statSignDB1.at(n));
-								}
-								fprintf(file,"Total,%d,Total,%d\n",(int)totalStatSignUP1,(int)totalStatSignDB1);
-								fprintf(file,"------------------------\n");
-								for(unsigned int n=0; n<statSignUP2.size(); n++) {
-									fprintf(file,"L%d,%d,(%f),L%d,%d,(%f)\n",n+1,(int)sumStatSignUP2.at(n),statSignUP2.at(n),n+1,(int)sumStatSignDB2.at(n),statSignDB2.at(n));
-								}
-								fprintf(file,"Total,%d,Total,%d\n",(int)totalStatSignUP2,(int)totalStatSignDB2);
-								fclose(file);
+							if(label2.find("Excavated")!=string::npos) {
+								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 							}
-							 */
-							//> end statsign calculations
 
 							if(std::isnan(areaValUP)) areaValUP=0.0;
 							if(std::isnan(areaValDB)) areaValDB=0.0;
 							float areaVal = min(areaValUP,areaValDB);
 							float relArea = areaVal / maxTotalArea;
-							float weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),prop1);
-							float weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),prop2);
+							float weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
+							float weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
 							float weightedEntropy = relArea * entropyVal * contrastWeight * weight1 * weight2;
 							totalMatchScore += weightedEntropy;
 							float weightedMismatchEntropy  = 0.0;
@@ -432,7 +408,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
 								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp,"Prop1: %f, Prop2: %f\n",prop1,prop2);
+								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
 								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
@@ -455,9 +431,8 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 						float areaUP=0.0, areaDB=0.0;
 						int maxIslandAreaUP = 0, maxIslandAreaDB = 0;
 						float sumIslandAreaUP=0.0, sumIslandAreaDB = 0.0;
-						vector<int> sumStatSignUP1(81,0), sumStatSignUP2(81,0), sumStatSignDB1(81,0), sumStatSignDB2(81,0);
-						vector<float> statSignUP1(81,0.0), statSignUP2(81,0.0), statSignDB1(81,0.0), statSignDB2(81,0.0);
-						float totalStatSignUP1=0.0, totalStatSignUP2=0.0, totalStatSignDB1=0.0, totalStatSignDB2=0.0;
+						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
+						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						if(countUP>0 || countDB>0) {
 							if(areaUP1<=areaUP2) {
 								/*! for UP */
@@ -503,7 +478,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for statsign calculations (REI only so far)
 												if(label1.find("Excavated")!=string::npos) {
-													vector<int> statSignY = upLabels.getStatSign(yLabel);
+													vector<float> statSignY = upLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
 															sumStatSignUP1.at(n) += statSignY.at(n);
@@ -515,7 +490,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for statsign calculations (REI only so far)
 										if(label2.find("Excavated")!=string::npos) {
-											vector<int> statSign = upLabels.getStatSign(xLabel);
+											vector<float> statSign = upLabels.getStatSign(xLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
 													sumStatSignUP2.at(n) += statSign.at(n);
@@ -582,7 +557,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for statsign calculations (REI only so far)
 												if(label2.find("Excavated")!=string::npos) {
-													vector<int> statSign = upLabels.getStatSign(xLabel);
+													vector<float> statSign = upLabels.getStatSign(xLabel);
 													if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 														for(unsigned int n=0; n<statSign.size(); n++) {
 															sumStatSignUP2.at(n) += statSign.at(n);
@@ -594,7 +569,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for statsign calculations (REI only so far)
 										if(label1.find("Excavated")!=string::npos) {
-											vector<int> statSign = upLabels.getStatSign(yLabel);
+											vector<float> statSign = upLabels.getStatSign(yLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
 													sumStatSignUP1.at(n) += statSign.at(n);
@@ -645,7 +620,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for statsign calculations (REI only so far)
 												if(label1.find("Excavated")!=string::npos) {
-													vector<int> statSignY = upLabels.getStatSign(yLabel);
+													vector<float> statSignY = upLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
 															sumStatSignUP1.at(n) += statSignY.at(n);
@@ -657,7 +632,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for statsign calculations (REI only so far)
 										if(label2.find("Excavated")!=string::npos) {
-											vector<int> statSign = upLabels.getStatSign(xLabel);
+											vector<float> statSign = upLabels.getStatSign(xLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
 													sumStatSignUP2.at(n) += statSign.at(n);
@@ -702,7 +677,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 												//> for statsign calculations (REI only so far)
 												if(label2.find("Excavated")!=string::npos) {
-													vector<int> statSign = upLabels.getStatSign(xLabel);
+													vector<float> statSign = upLabels.getStatSign(xLabel);
 													if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 														for(unsigned int n=0; n<statSign.size(); n++) {
 															sumStatSignUP2.at(n) += statSign.at(n);
@@ -714,7 +689,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 										//> for statsign calculations (REI only so far)
 										if(label1.find("Excavated")!=string::npos) {
-											vector<int> statSign = upLabels.getStatSign(yLabel);
+											vector<float> statSign = upLabels.getStatSign(yLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
 													sumStatSignUP1.at(n) += statSign.at(n);
@@ -754,24 +729,20 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 
-							if(label1.find("Excavated")!=string::npos || label2.find("Excavated")!=string::npos) {
-								totalStatSignUP1 = sumStatSignUP1.at(0);
-								totalStatSignUP2 = sumStatSignUP2.at(0);
-								totalStatSignDB1 = sumStatSignDB1.at(0);
-								totalStatSignDB2 = sumStatSignDB2.at(0);
-								if(totalStatSignUP1==0) totalStatSignUP1 = 1.0;
-								if(totalStatSignUP2==0) totalStatSignUP2 = 1.0;
-								if(totalStatSignDB1==0) totalStatSignDB1 = 1.0;
-								if(totalStatSignDB2==0) totalStatSignDB2 = 1.0;
+							float dotProduct1 = 1.0, dotProduct2 = 1.0;
+							if(label1.find("Excavated")!=string::npos){
+								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 							}
-							float prop1 = statsign.proportion(sumStatSignUP1,sumStatSignDB1);
-							float prop2 = statsign.proportion(sumStatSignUP2,sumStatSignDB2);
+							if(label2.find("Excavated")!=string::npos) {
+								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+							}
+
 							if(std::isnan(areaUP)) areaUP=0;
 							if(std::isnan(areaDB)) areaDB=0;
 							float areaVal = min(areaUP,areaDB);
 							float relArea = areaVal / maxTotalArea;
-							float weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),prop1);
-							float weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),prop2);
+							float weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
+							float weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
 							float weightedEntropy = relArea * entropyVal * contrastWeight * weight1 * weight2;
 							totalMatchScore += weightedEntropy;
 							float weightedMismatchEntropy  = 0.0;
@@ -796,7 +767,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
 								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp,"Prop1: %f, Prop2: %f\n",prop1,prop2);
+								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
 								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
@@ -820,9 +791,8 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 						float areaUP=0.0, areaDB=0.0;
 						int maxIslandAreaUP = 0, maxIslandAreaDB = 0;
 						float sumIslandAreaUP=0.0, sumIslandAreaDB = 0.0;
-						vector<int> sumStatSignUP1(81,0), sumStatSignUP2(81,0), sumStatSignDB1(81,0), sumStatSignDB2(81,0);
-						vector<float> statSignUP1(81,0.0), statSignUP2(81,0.0), statSignDB1(81,0.0), statSignDB2(81,0.0);
-						float totalStatSignUP1=0.0, totalStatSignUP2=0.0, totalStatSignDB1=0.0, totalStatSignDB2=0.0;
+						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
+						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						if(countUP>0 || countDB>0) {
 							if(areaUP1<=areaUP2) {
 								for (int m=0; m<this->relOpLevelSize; m++) {
@@ -869,7 +839,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 													//> for statsign calculations (REI only so far)
 													if(label1.find("Excavated")!=string::npos) {
-														vector<int> statSignY = upLabels.getStatSign(yLabel);
+														vector<float> statSignY = upLabels.getStatSign(yLabel);
 														if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 															for(unsigned int n=0; n<statSignY.size(); n++) {
 																sumStatSignUP1.at(n) += statSignY.at(n);
@@ -881,7 +851,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 											//> for statsign calculations (REI only so far)
 											if(label2.find("Excavated")!=string::npos) {
-												vector<int> statSign = upLabels.getStatSign(xLabel);
+												vector<float> statSign = upLabels.getStatSign(xLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
 														sumStatSignUP2.at(n) += statSign.at(n);
@@ -950,7 +920,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 													//> for statsign calculations (REI only so far)
 													if(label2.find("Excavated")!=string::npos) {
-														vector<int> statSign = upLabels.getStatSign(xLabel);
+														vector<float> statSign = upLabels.getStatSign(xLabel);
 														if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 															for(unsigned int n=0; n<statSign.size(); n++) {
 																sumStatSignUP2.at(n) += statSign.at(n);
@@ -962,7 +932,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 											//> for statsign calculations (REI only so far)
 											if(label1.find("Excavated")!=string::npos) {
-												vector<int> statSign = upLabels.getStatSign(yLabel);
+												vector<float> statSign = upLabels.getStatSign(yLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
 														sumStatSignUP1.at(n) += statSign.at(n);
@@ -1016,7 +986,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 													//> for statsign calculations (REI only so far)
 													if(label1.find("Excavated")!=string::npos) {
-														vector<int> statSign = upLabels.getStatSign(yLabel);
+														vector<float> statSign = upLabels.getStatSign(yLabel);
 														if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 															for(unsigned int n=0; n<statSign.size(); n++) {
 																sumStatSignUP1.at(n) += statSign.at(n);
@@ -1028,7 +998,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 											//> for statsign calculations (REI only so far)
 											if(label2.find("Excavated")!=string::npos) {
-												vector<int> statSign = upLabels.getStatSign(xLabel);
+												vector<float> statSign = upLabels.getStatSign(xLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
 														sumStatSignUP2.at(n) += statSign.at(n);
@@ -1074,7 +1044,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 													//> for statsign calculations (REI only so far)
 													if(label2.find("Excavated")!=string::npos) {
-														vector<int> statSign = upLabels.getStatSign(xLabel);
+														vector<float> statSign = upLabels.getStatSign(xLabel);
 														if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 															for(unsigned int n=0; n<statSign.size(); n++) {
 																sumStatSignUP2.at(n) += statSign.at(n);
@@ -1086,7 +1056,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 
 											//> for statsign calculations (REI only so far)
 											if(label1.find("Excavated")!=string::npos) {
-												vector<int> statSign = upLabels.getStatSign(yLabel);
+												vector<float> statSign = upLabels.getStatSign(yLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
 														sumStatSignUP1.at(n) += statSign.at(n);
@@ -1126,24 +1096,20 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 
-							if(label1.find("Excavated")!=string::npos || label2.find("Excavated")!=string::npos) {
-								totalStatSignUP1 = sumStatSignUP1.at(0);
-								totalStatSignUP2 = sumStatSignUP2.at(0);
-								totalStatSignDB1 = sumStatSignDB1.at(0);
-								totalStatSignDB2 = sumStatSignDB2.at(0);
-								if(totalStatSignUP1==0) totalStatSignUP1 = 1.0;
-								if(totalStatSignUP2==0) totalStatSignUP2 = 1.0;
-								if(totalStatSignDB1==0) totalStatSignDB1 = 1.0;
-								if(totalStatSignDB2==0) totalStatSignDB2 = 1.0;
+							float dotProduct1 = 1.0, dotProduct2 = 1.0;
+							if(label1.find("Excavated")!=string::npos){
+								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 							}
-							float prop1 = statsign.proportion(sumStatSignUP1,sumStatSignDB1);
-							float prop2 = statsign.proportion(sumStatSignUP2,sumStatSignDB2);
+							if(label2.find("Excavated")!=string::npos) {
+								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+							}
+
 							if(std::isnan(areaUP)) areaUP=0;
 							if(std::isnan(areaDB)) areaDB=0;
 							float areaVal = min(areaUP,areaDB);
 							float relArea = areaVal / maxTotalArea;
-							float weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),prop1);
-							float weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),prop2);
+							float weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
+							float weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
 							float weightedEntropy = relArea * entropyVal * contrastWeight * weight1 * weight2;
 							totalMatchScore += weightedEntropy;
 							float weightedMismatchEntropy  = 0.0;
@@ -1168,7 +1134,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
 								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp,"Prop1: %f, Prop2: %f\n",prop1,prop2);
+								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
 								fprintf(fp,"TotalMismatchScore: %f\n",totalMismatchScore);

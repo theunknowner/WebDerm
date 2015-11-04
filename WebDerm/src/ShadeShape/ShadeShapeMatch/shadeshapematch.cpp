@@ -204,8 +204,8 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	ShapeMatch shapematch;
 	ShadeMatch shadematch;
 	shadematch.setMaxShades(upSS.get_shades(),dbSS.get_shades());
-	float upTotalArea = upSS.area();
-	float dbTotalArea = dbSS.area();
+	float upTotalArea = upSS.areaPostDensityConnector();
+	float dbTotalArea = dbSS.areaPostDensityConnector();
 	this->upIslandVec = this->groupIslandsByShape(upSS);
 	this->dbIslandVec = this->groupIslandsByShape(dbSS);
 	this->sortIslandsByArea(this->dbIslandVec);
@@ -346,14 +346,11 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 		}// end for shapeShift1
 	}// end shadeShift
 
-	//Labels::printCompareLabels(largestLabelsUP,largestLabelsDB,1);
-	//cout << "----------------------------" << endl;
-	String label = "5_Excavated_s2_000";
-	Labels::printCompareStatSign(largestLabelsUP,largestLabelsDB,label);
+	Labels::printCompareLabels(largestLabelsUP,largestLabelsDB,1);
 	cout << "----------------------------" << endl;
 	String newNameUP = upSS.name()+"_"+dbSS.name();
 	String newNameDB = dbSS.name()+"_"+upSS.name();
-	imwrite(newNameUP+"_max_match_image.png",maxMatchImg);
+	//imwrite(newNameUP+"_max_match_image.png",maxMatchImg);
 	upSS.getImageData().writePrevSize(newNameUP+"_max_match_image");
 	//ShadeShapeRelation ssrUP;
 	//ssrUP.spatial_relation(upSS,largestLabelsUP,largestIslandVec,0,newNameUP);
@@ -371,8 +368,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	ShapeMatch shapematch;
 	ShadeMatch shadematch;
 	shadematch.setMaxShades(upSS.get_shades(),dbSS.get_shades());
-	float upTotalArea = upSS.area();
-	float dbTotalArea = dbSS.area();
+	float upTotalArea = upSS.areaPostDensityConnector();
+	float dbTotalArea = dbSS.areaPostDensityConnector();
 	this->upIslandVec = this->groupIslandsByShape(upSS);
 	this->dbIslandVec = this->groupIslandsByShape(dbSS);
 	this->sortIslandsByArea(this->dbIslandVec);

@@ -50,7 +50,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 
 					//> to calculate the statistical signature of each label
 					if(label.find("Excavated")!=string::npos) {
-						vector<int> statSignVec = statSign.create(isl.nn_image());
+						vector<float> statSignVec = statSign.create(isl.nn_image());
 						this->labelStatSignMap[label] = statSignVec;
 					}
 
@@ -214,14 +214,14 @@ int Labels::getPrevShapeNum(String label) {
 
 //! returns the statistical signature of each label/urn/feature.
 //! The total number of balls is stored in statSign[0].
-vector<int> Labels::getStatSign(String label) {
+vector<float> Labels::getStatSign(String label) {
 	if(this->labelStatSignMap.find(label)!=this->labelStatSignMap.end()) {
 		return this->labelStatSignMap.at(label);
 	}
-	return vector<int>();
+	return vector<float>();
 }
 
-map<String,vector<int>>& Labels::getStatSignMap() {
+map<String,vector<float>>& Labels::getStatSignMap() {
 	return this->labelStatSignMap;
 }
 
@@ -232,9 +232,9 @@ void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifte
 		int i = distance(labelMap1.begin(),it1);
 		bool isShifted = labels1.isShapeShifted(it1->first);
 		if(markShifted==0 || !isShifted)
-			printf("%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+			printf("%d) %s: %d(%f) | %s: %d(%f)\n",i,it1->first.c_str(),it1->second.first,it1->second.second,it2->first.c_str(),it2->second.first,it2->second.second);
 		else
-			printf("%d) *%s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+			printf("%d) *%s: %d(%f) | %s: %d(%f)\n",i,it1->first.c_str(),it1->second.first,it1->second.second,it2->first.c_str(),it2->second.first,it2->second.second);
 	}
 }
 
@@ -248,25 +248,25 @@ void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifte
 		int i = distance(labelMap1.begin(),it1);
 		bool isShifted = labels1.isShapeShifted(it1->first);
 		if(markShifted==0 || !isShifted)
-			fprintf(fp,"%d) %s: %d | %s: %d\n",i,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+			fprintf(fp,"%d) %s: %d(%f) | %s: %d(%f)\n",i,it1->first.c_str(),it1->second.first,it1->second.second,it2->first.c_str(),it2->second.first,it2->second.second);
 		else {
 			int prevShape = labels1.getPrevShapeNum(it1->first);
-			fprintf(fp,"%d) %d->%s: %d | %s: %d\n",i,prevShape,it1->first.c_str(),it1->second.first,it2->first.c_str(),it2->second.first);
+			fprintf(fp,"%d) %d->%s: %d(%f) | %s: %d(%f)\n",i,prevShape,it1->first.c_str(),it1->second.first,it1->second.second,it2->first.c_str(),it2->second.first,it2->second.second);
 		}
 	}
 	fclose(fp);
 }
 
 void Labels::printCompareStatSign(Labels &labels1, Labels &labels2, String label) {
-	vector<int> statSignVec1 = labels1.getStatSign(label);
-	vector<int> statSignVec2 = labels2.getStatSign(label);
+	vector<float> statSignVec1 = labels1.getStatSign(label);
+	vector<float> statSignVec2 = labels2.getStatSign(label);
 	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
 	assert(statSignVec1.size()==statSignVec2.size());
 	for(unsigned int i=1; i<statSignVec1.size(); i++) {
 		float porp1 = (float)statSignVec1.at(i) / statSignVec1.at(0);
 		float porp2 = (float)statSignVec2.at(i) / statSignVec2.at(0);
 		try {
-			printf("L%d: %d(%f) | L%d: %d(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+			printf("L%d: %0.2f(%f) | L%d: %0.2f(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
 		} catch(const std::out_of_range &oor) {
 			printf("statSignVec1.size(): %lu\n",statSignVec1.size());
 			printf("statSignVec2.size(): %lu\n",statSignVec2.size());
@@ -274,12 +274,12 @@ void Labels::printCompareStatSign(Labels &labels1, Labels &labels2, String label
 			exit(1);
 		}
 	}
-	printf("Total: %d | Total: %d\n",statSignVec1.at(0), statSignVec2.at(0));
+	printf("Total: %0.2f | Total: %0.2f\n",statSignVec1.at(0), statSignVec2.at(0));
 }
 
 void Labels::writeCompareStatSign(Labels &labels1, Labels &labels2, String label, String fileType) {
-	vector<int> statSignVec1 = labels1.getStatSign(label);
-	vector<int> statSignVec2 = labels2.getStatSign(label);
+	vector<float> statSignVec1 = labels1.getStatSign(label);
+	vector<float> statSignVec2 = labels2.getStatSign(label);
 	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
 	assert(statSignVec1.size()==statSignVec2.size());
 	String file = labels1.name() + "_" + labels2.name() + "_" + label + "_stat_sign_compare." + fileType;
@@ -291,12 +291,12 @@ void Labels::writeCompareStatSign(Labels &labels1, Labels &labels2, String label
 		if(fileType=="txt") {
 			fprintf(fp,"L%d: %d(%f) | L%d: %d(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
 		} else if(fileType=="csv") {
-			fprintf(fp,"L%d,%f,%d,L%d,%d,%f\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+			fprintf(fp,"L%d,%0.2f,%f,L%d,%0.2f,%f\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
 		}
 	}
 	if(fileType=="txt") {
-		fprintf(fp,"Total: %d | Total: %d\n",statSignVec1.at(0), statSignVec2.at(0));
+		fprintf(fp,"Total: %0.2f | Total: %0.2f\n",statSignVec1.at(0), statSignVec2.at(0));
 	} else if(fileType=="csv") {
-		fprintf(fp,"Total,%d,Total,%d\n",statSignVec1.at(0), statSignVec2.at(0));
+		fprintf(fp,"Total,%0.2f,Total,%0.2f\n",statSignVec1.at(0), statSignVec2.at(0));
 	}
 }

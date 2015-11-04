@@ -13,11 +13,11 @@
 //! Statistical signature class
 class StatSign {
 public:
-	vector<int> create(Mat img);
-	float dotProduct(vector<int> statSignVec1, vector<int> statSignVec2);
+	vector<float> create(Mat img);
+	float dotProduct(vector<float> statSignVec1, vector<float> statSignVec2);
 	float proportion(vector<int> statSignVec1, vector<int> statSignVec2);
-	void printCompare(vector<int> statSignVec1, vector<int> statSignVec2);
-	void writeCompare(String name, vector<int> statSignVec1, vector<int> statSignVec2);
+	void printCompare(vector<float> statSignVec1, vector<float> statSignVec2);
+	void writeCompare(String name, vector<float> statSignVec1, vector<float> statSignVec2);
 };
 
 #endif /* STATSIGN_H_ */

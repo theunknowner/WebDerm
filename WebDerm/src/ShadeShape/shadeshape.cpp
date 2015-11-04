@@ -259,6 +259,7 @@ void ShadeShape::extract(Mat src, String name) {
 	this->getShadesOfFeatures(src);
 	this->storeIslandAreas();
 	this->ssArea = countNonZero(src);
+	this->ssAreaPostDensityConnector = std::accumulate(this->areaVec.begin(),this->areaVec.end(),0);
 	this->removeDuplicatePointsFromIslands();
 }
 
@@ -276,7 +277,9 @@ void ShadeShape::extract(ImageData &id) {
 	this->getShadesOfFeatures(this->img);
 	this->storeIslandAreas();
 	this->ssArea = countNonZero(this->img);
+	this->ssAreaPostDensityConnector = std::accumulate(this->areaVec.begin(),this->areaVec.end(),0);
 	this->removeDuplicatePointsFromIslands();
+
 }
 
 //! returns feature of [index]
@@ -306,6 +309,11 @@ int ShadeShape::getIndexOfShade(int shade) {
 
 int ShadeShape::area() {
 	return this->ssArea;
+}
+
+//! returns total area of all islands post densityConnector()
+int ShadeShape::areaPostDensityConnector() {
+	return this->ssAreaPostDensityConnector;
 }
 
 Mat& ShadeShape::image() {

@@ -23,6 +23,7 @@ private:
 	vector<int> areaVec;
 	int numOfFeats;
 	int ssArea;
+	int ssAreaPostDensityConnector;
 	Mat img;
 	ImageData id;
 
@@ -48,6 +49,7 @@ public:
 	int numOfShades();
 	int getIndexOfShade(int shade);
 	int area();
+	int areaPostDensityConnector();
 	Mat& image();
 	String& name();
 	vector<int> get_shades();

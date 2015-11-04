@@ -70,8 +70,8 @@ int main(int argc,char** argv)
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
-	ShadeShape ss1 = Scripts::script31("lph4");
-	ShadeShape ss2 = Scripts::script31("lph7");
+	ShadeShape ss1 = Scripts::script31("melanoma8b");
+	ShadeShape ss2 = Scripts::script31("melanoma8c");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//ssm.debug_mode(1);
@@ -104,20 +104,20 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
 		Timer time;
 		String folder = "Looks_Like/";
 		deque<String> files;
-		//FileData fd;
-		//fd.getFilesFromDirectory(folder,files);
-		fstream fs("test_list.csv");
-		String temp;
-		while(getline(fs,temp)) {
-			files.push_back(temp);
-		}
+		FileData fd;
+		fd.getFilesFromDirectory(folder,files);
+		//fstream fs("test_list.csv");
+		//String temp;
+		//while(getline(fs,temp)) {
+		//	files.push_back(temp);
+		//}
 		ShadeShape ss1 = Scripts::script31(argv[1]);
 		vector<vector<float> > resultVec;
 		vector<String> nameVec;
@@ -127,7 +127,7 @@ int main(int argc,char** argv)
 		vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0)); //8 shapes
 		///////////////////////
 		for(unsigned int i=0; i<files.size(); i++) {
-			name = folder + files.at(i) + ".jpg";
+			name = folder + files.at(i);
 			name = getFileName(name);
 			if(name!=argv[1]) {
 				ShadeShape ss2 = Scripts::script31(name);
@@ -253,12 +253,12 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/psoriasis20a_rei_s2.png",0);
+/*
+	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/lph4_rei_s2.png",0);
+	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s2.png",0);
 	StatSign statSign;
-	vector<int> statSignVec1 = statSign.create(img1);
-	vector<int> statSignVec2 = statSign.create(img2);
+	vector<float> statSignVec1 = statSign.create(img1);
+	vector<float> statSignVec2 = statSign.create(img2);
 	statSign.printCompare(statSignVec1,statSignVec2);
 	cout << statSign.dotProduct(statSignVec1,statSignVec2) << endl;
 	//cout << statSign.proportion(statSignVec1,statSignVec2) << endl;
@@ -271,7 +271,7 @@ int main(int argc,char** argv)
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
 	ShadeShape ss1 = Scripts::script31("melanoma8c");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(41,54));
+	Islands island = ss1.getIslandWithPoint(Point(30,26));
 	imwrite(ss1.name()+"_sample.png",island.nn_image());
 	//imwrite(ss1.name()+"_sample.png",island.image());
 	/*
