@@ -1512,7 +1512,7 @@ Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
 	//calculate knee of curve for fx for filtering
 	KneeCurve kc;
 	int bestIdx;
-	double fxThresh;
+	float fxThresh=0.0;
 	if(fnVec.size()>0) {
 		try {
 			bestIdx = kc.kneeCurvePoint(fnVec);
@@ -1531,7 +1531,8 @@ Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	a = ceil(a);
-	//cout << a << endl;
+	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==128)
+	//	cout << a << endl;
 	Size square(a,a);
 	while(row<src.rows) {
 		while(col<src.cols) {

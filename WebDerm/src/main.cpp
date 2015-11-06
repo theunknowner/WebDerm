@@ -94,8 +94,8 @@ int main(int argc,char** argv)
 	TestML::clear();
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("herpes11");
-	cout << ss1.areaPostDensityConnector() << endl;
+	ShadeShape ss1 = Scripts::script31("herpes3");
+	//cout << ss1.areaPostDensityConnector() << endl;
 	//ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
@@ -104,7 +104,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -254,16 +254,17 @@ int main(int argc,char** argv)
 	}
 /**/
 /*
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s2.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes11_rei_s3.png",0);
+	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
+	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes11_rei_s2.png",0);
 	StatSign statSign;
-	vector<float> statSignVec1 = statSign.create(img1,0.541077807);
-	vector<float> statSignVec2 = statSign.create(img2,0.299190911);
+	vector<float> statSignVec1 = statSign.create(img1);
+	vector<float> statSignVec2 = statSign.create(img2);
 	statSign.printCompare(statSignVec1,statSignVec2);
 	float result = statSign.dotProduct(statSignVec1,statSignVec2);
 	cout << result << endl;
-	cout << statSign.adjustValue(0.95) << endl;
-	//cout << statSign.proportion(statSignVec1,statSignVec2) << endl;
+	cout << statSign.adjustValue(result) << endl;
+	//imgshow(img1);
+	//imgshow(img2);
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/
 
@@ -271,11 +272,11 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
-	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss1 = Scripts::script31("melanoma2");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(50,86));
-	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",island.image());
+	Islands island = ss1.getIslandWithPoint(Point(25,40));
+	imwrite(ss1.name()+"_sample.png",island.nn_image());
+	//imwrite(ss1.name()+"_sample.png",island.image());
 	/*
 	Mat results = island.nn_results();
 	cout << results << endl;

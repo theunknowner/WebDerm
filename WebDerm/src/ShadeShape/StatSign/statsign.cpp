@@ -103,8 +103,8 @@ float StatSign::proportion(vector<int> statSignVec1, vector<int> statSignVec2) {
 //! adjust the score using inverse tan-hyperbolic function
 float StatSign::adjustValue(float value) {
 	float pMark = 0.65; //> percentage mark where values gets pushed up or down
-	float result = value + atanh(value - pMark) * value;
-	result = min(result,1.0f);
+	float result = value + (45.0*atanh(value - pMark)) * value;
+	result = min(result,0.9f);
 	result = max(result,0.0f);
 	return result;
 }
