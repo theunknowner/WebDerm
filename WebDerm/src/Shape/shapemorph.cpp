@@ -1528,10 +1528,10 @@ Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
 	//connect nearest neighbors
 	double b = fxThresh;
 	double a = pow(-coeff*log(1.0-q)/(3.14159 * b),0.5);
-	//cout << a << endl;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	a = ceil(a);
+	//cout << a << endl;
 	Size square(a,a);
 	while(row<src.rows) {
 		while(col<src.cols) {

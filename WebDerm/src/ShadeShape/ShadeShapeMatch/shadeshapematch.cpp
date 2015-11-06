@@ -215,8 +215,9 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
-	//Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
-	//cout << "--------------------------" << endl;
+	Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
+	cout << "--------------------------" << endl;
+	upSS.showInteractiveIslands();
 	vector<vector<float> > resultVec;
 	vector<vector<vector<Islands> > > islandVec2;
 	vector<vector<vector<Islands> > > islandVec3;
@@ -274,6 +275,7 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 				largestResult = maxShadeShiftResult;
 				largestIslandVec2 = maxShadeShiftIslandVec;
 				largestImg = matchSS.image();
+				matchSS.showInteractiveIslands();
 				if(shadeShift==ShadeMatch::SHIFT_NONE) {
 					islandVec2 = largestIslandVec2;
 					break;

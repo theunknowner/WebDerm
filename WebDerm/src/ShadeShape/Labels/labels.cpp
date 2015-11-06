@@ -50,7 +50,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 
 					//> to calculate the statistical signature of each label
 					if(label.find("Excavated")!=string::npos) {
-						vector<float> statSignVec = statSign.create(isl.nn_image());
+						vector<float> statSignVec = statSign.create(isl.nn_image(),relArea);
 						this->labelStatSignMap[label] = statSignVec;
 					}
 

@@ -371,9 +371,11 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							float dotProduct2 = 1.0;
 							if(label1.find("Excavated")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
+								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2.find("Excavated")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
 
 							if(std::isnan(areaValUP)) areaValUP=0.0;
@@ -732,9 +734,11 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							float dotProduct1 = 1.0, dotProduct2 = 1.0;
 							if(label1.find("Excavated")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
+								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2.find("Excavated")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
 
 							if(std::isnan(areaUP)) areaUP=0;
@@ -1099,9 +1103,11 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							float dotProduct1 = 1.0, dotProduct2 = 1.0;
 							if(label1.find("Excavated")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
+								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2.find("Excavated")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
 
 							if(std::isnan(areaUP)) areaUP=0;
