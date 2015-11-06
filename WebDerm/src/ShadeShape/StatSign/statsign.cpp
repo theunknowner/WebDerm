@@ -12,7 +12,7 @@
 //! pos[0] = total
 //! pos[1] -> pos[40] = White
 //! pos[41] -> pos[80] = Black
-vector<float> StatSign::create(Mat img) {
+vector<float> StatSign::create(Mat img, float relArea) {
 	vector<float> statSignVec(81,0);
 	vector<float> statSignVec2(17,0); //> 80/5 = 16
 	for(int y=0; y<img.rows; y++) {
@@ -42,7 +42,7 @@ vector<float> StatSign::create(Mat img) {
 	for(unsigned int i=1; i<statSignVec.size(); i++) {
 		int mul = i>40 ? (i-40) : i;
 		mul = ceil(mul/5.0);
-		statSignVec.at(i) *= pow(4.5,mul);
+		statSignVec.at(i) *= pow(4.5,mul) * relArea;
 		int urnNum = ceil(i/5.0);
 		statSignVec2.at(urnNum) += statSignVec.at(i);
 	}
@@ -97,6 +97,15 @@ float StatSign::proportion(vector<int> statSignVec1, vector<int> statSignVec2) {
 	if(std::isnan(propWhite)) propWhite = 1.0;
 	if(std::isnan(propBlack)) propBlack = 1.0;
 	float result = propWhite * propBlack;
+	return result;
+}
+
+//! adjust the score using inverse tan-hyperbolic function
+float StatSign::adjustValue(float value) {
+	float pMark = 0.65; //> percentage mark where values gets pushed up or down
+	float result = value + atanh(value - pMark) * value;
+	result = min(result,1.0f);
+	result = max(result,0.0f);
 	return result;
 }
 

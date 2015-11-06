@@ -13,9 +13,10 @@
 //! Statistical signature class
 class StatSign {
 public:
-	vector<float> create(Mat img);
+	vector<float> create(Mat img, float relArea=1.0);
 	float dotProduct(vector<float> statSignVec1, vector<float> statSignVec2);
 	float proportion(vector<int> statSignVec1, vector<int> statSignVec2);
+	float adjustValue(float value);
 	void printCompare(vector<float> statSignVec1, vector<float> statSignVec2);
 	void writeCompare(String name, vector<float> statSignVec1, vector<float> statSignVec2);
 };
