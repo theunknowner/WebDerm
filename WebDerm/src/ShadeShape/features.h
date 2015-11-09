@@ -29,14 +29,15 @@ private:
 	float NN_Score;
 
 	vector<Mat> extractIslands(Mat featureImg, int thresh);
+	vector<Mat> disconnectIslands(Mat featureImg);
 	vector<ImageData> extractIslands(ImageData &featureId, int thresh);
+
 	void storeIsland(Islands island);
 	void determineFeatureShape(Mat featureImg);
 	void getShadesOfIslands();
 public:
 	Features();
 	Features(Mat featureImg, ImageData &parentId);
-	Features(ImageData &featureId);
 	Islands& island(int islNum);
 	Mat image();
 	int area();

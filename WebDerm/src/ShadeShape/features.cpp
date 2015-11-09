@@ -50,6 +50,20 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 	return islandVec;
 }
 
+//! disconnect islands from feature
+vector<Mat> Features::disconnectIslands(Mat featureImg) {
+	ShapeMorph sm;
+	vector<Mat> islandVec;
+	Mat shadeShape = sm.densityDisconnector(featureImg,0.99);
+	vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
+	for(unsigned int k=0; k<littleIslands.size(); k++) {
+		if(countNonZero(littleIslands.at(k))>0)
+			islandVec.push_back(littleIslands.at(k));
+	}
+
+	return islandVec;
+}
+
 //! extracts islands from feature
 vector<ImageData> Features::extractIslands(ImageData &featureId, int thresh) {
 	ShapeMorph sm;
@@ -152,22 +166,15 @@ Features::Features(Mat featureImg, ImageData &parentId) {
 	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
-		this->storeIsland(island);
-	}
-	this->numOfIsls = this->islandVec.size();
-	this->determineFeatureShape(featureImg);
-	this->getShadesOfIslands();
-	//this->groupIslandsByShade();
-}
-
-Features::Features(ImageData &featureId) {
-	int thresh=0;
-	this->featureImg = featureId.image();
-	this->featArea = countNonZero(featureImg);
-	vector<ImageData> littleIslands = this->extractIslands(featureId, thresh);
-	for(unsigned int i=0; i<littleIslands.size(); i++) {
-		Islands island(littleIslands.at(i));
-		this->storeIsland(island);
+		if(island.shape_name().find("Excavated")!=string::npos) {
+			vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
+			for(unsigned int j=0; j<littleIslands2.size(); j++) {
+				Islands island2(littleIslands2.at(j));
+				this->storeIsland(island2);
+			}
+		} else {
+			this->storeIsland(island);
+		}
 	}
 	this->numOfIsls = this->islandVec.size();
 	this->determineFeatureShape(featureImg);

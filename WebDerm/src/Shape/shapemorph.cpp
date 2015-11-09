@@ -1657,4 +1657,113 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 	return mapEdgeRemoval;
 }
 
+Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
+	if(src.empty()) {
+		printf("ShapeMorph::densityDisconnector() src is empty\n");
+		printf("src.size: %dx%d\n",src.rows,src.cols);
+		exit(1);
+	}
+	int lineVal = *max_element(src.begin<uchar>(),src.end<uchar>());
+	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
+	Size size(5,5);
+	const double C=1.0;
+	const double alpha=1.0;
+	const double beta=0.0;
+	int row=0, col=0;
+	deque<double> fnVec;
+	double density=0, countDk=0, avgDk=0;
+	double absDiscernThresh=5.0;
+	while(row<src.rows) {
+		while(col<src.cols) {
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if(j>=0 && i>=0 && j<src.cols && i<src.rows) {
+						int lc = src.at<uchar>(i,j);
+						if(lc>absDiscernThresh) {
+							density++;
+							avgDk += lc;
+							countDk++;
+						}
+					}
+				}
+			}
+			density /= size.area();
+			avgDk /= countDk;
+			if(countDk==0) avgDk = 0;
+			double fx = C * pow(density,alpha) * pow(avgDk,beta);
+			if(fx>0)
+				fnVec.push_back(fx);
+			avgDk=0;
+			density=0;
+			countDk=0;
+			//col+=size.width;
+			col++;
+		}
+		col=0;
+		//row+=size.height;
+		row++;
+	}
+
+	//calculate knee of curve for fx for filtering
+	KneeCurve kc;
+	int bestIdx;
+	float fxThresh=0.0;
+	if(fnVec.size()>0) {
+		try {
+			bestIdx = kc.kneeCurvePoint(fnVec);
+			//fx threshold filtering
+			fxThresh = fnVec.at(bestIdx);
+		} catch(const std::out_of_range &oor) {
+			printf("ShapeMorph::densityConnector() out of range!\n");
+			printf("fnVec.size: %lu\n",fnVec.size());
+			printf("BestIdx: %d\n",bestIdx);
+			exit(1);
+		}
+	}
+	//connect nearest neighbors
+	double b = fxThresh;
+	double a = pow(-coeff*log(1.0-q)/(3.14159 * b),0.5);
+	Mat result = src.clone();
+	Mat temp = src.clone();
+	row=0; col=0;
+	a = ceil(a) + 1;
+	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==128)
+	//cout << a << endl;
+	Size square(a,a);
+	while(row<src.rows) {
+		while(col<src.cols) {
+			int lc = src.at<uchar>(row,col);
+			bool isDisconnected = false;
+			if(lc>0) {
+				//> going vertical down
+				for(int i=row; i<(row+square.height); i++) {
+					temp.at<uchar>(i,col) = 0;
+				}
+				//> check if disconnected vertically
+				if(temp.at<uchar>(row-1,col)==0 && temp.at<uchar>(row+square.height,col)==0) {
+					result = temp.clone();
+					isDisconnected = true;
+				} else {
+					temp = result.clone();
+				}
+				if(!isDisconnected) {
+					//> going horizontal right
+					for(int j=col; j<(col+square.width); j++) {
+						temp.at<uchar>(row,j) = 0;
+					}
+					//> check if disconnected horizontally
+					if(temp.at<uchar>(row,col-1)==0 && temp.at<uchar>(row,col+square.width)==0) {
+						result = temp.clone();
+					} else {
+						temp = result.clone();
+					}
+				}
+			}
+			col++;
+		}
+		col=0;
+		row++;
+	}
+	return result;
+}
 
