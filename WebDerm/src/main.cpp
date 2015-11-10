@@ -67,7 +67,7 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-/*
+	/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
 	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
@@ -82,7 +82,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -94,7 +94,7 @@ int main(int argc,char** argv)
 	TestML::clear();
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
@@ -104,7 +104,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -255,14 +255,20 @@ int main(int argc,char** argv)
 /**/
 /*
 	ShapeMorph sm;
-	Mat img = imread("/home/jason/git/WebDerm/WebDerm/herpes3_sample.png",0);
+	Mat img = imread("/home/jason/git/WebDerm/WebDerm/tinea_corporis4_sample.png",0);
+	cout << countNonZero(img) << endl;
 	imgshow(img);
-	Mat img2 = sm.densityDisconnector(img,0.99);
-	imgshow(img2);
+	Mat img2 = sm.densityDisconnector(img,0.999);
+	vector<Mat> littleIslands = sm.liquidFeatureExtraction(img2,0,0,0);
+	for(unsigned int j=0; j<littleIslands.size(); j++) {
+		Islands island2(littleIslands.at(j));
+		cout << island2.shape_name() << ": " << island2.area() << endl;
+		imgshow(island2.image());
+	}
 	/**/
 /*
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes11_rei_s2.png",0);
+	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/melanoma8b_rei_s2.png",0);
+	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/melanoma8c_rei_s2.png",0);
 	StatSign statSign;
 	vector<float> statSignVec1 = statSign.create(img1);
 	vector<float> statSignVec2 = statSign.create(img2);
@@ -274,14 +280,14 @@ int main(int argc,char** argv)
 	//imgshow(img2);
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/
-
-	//Scripts::checkAllTestData3();
+/*
+	Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
-	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss1 = Scripts::script31("melanoma8c");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(68,16));
+	Islands island = ss1.getIslandWithPoint(Point(111,117));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
 	imwrite(ss1.name()+"_sample.png",island.image());
 	/*
@@ -410,7 +416,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 	/**/
-/*
+	/*
 	String shape(argv[1]);
 	Scripts::script_createAllTrainingLabels3b(shape);
 	sleep(3);

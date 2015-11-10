@@ -40,8 +40,11 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 	ShapeMatch shapematch;
 	StatSign statsign;
 	FILE * fp;
+	FILE * fp2;
 	String filename = ssrUP.name() + "_entropy_output.txt";
+	String filename2 = ssrUP.name() + "_mismatch_entropy_output.txt";
 	fp = fopen(filename.c_str(),"w");
+	fp2 = fopen(filename2.c_str(),"w");
 	float totalMatchScore = 0.0, totalMismatchScore=0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
 
@@ -118,7 +121,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(yLabel));
 
 												//> for dot product calculations (REI only so far)
-												if(label1.find("Excavated")!=string::npos) {
+												if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 													vector<float> statSignY = upLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
@@ -130,7 +133,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										} // end y mergedLabelContainer UP
 
 										//> for dot product calculations (REI only so far)
-										if(label2.find("Excavated")!=string::npos) {
+										if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 											vector<float> statSignX = upLabels.getStatSign(xLabel);
 											if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 												for(unsigned int n=0; n<statSignX.size(); n++) {
@@ -181,7 +184,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
 
 												//> for dot product calculations (REI only so far)
-												if(label1.find("Excavated")!=string::npos) {
+												if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 													vector<float> statSignY = dbLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
@@ -193,7 +196,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										} // end y mergedLabelContainer DB
 
 										//> for dot product calculations (REI only so far)
-										if(label2.find("Excavated")!=string::npos) {
+										if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 											vector<float> statSignX = dbLabels.getStatSign(xLabel);
 											if(statSignX.size()>0 && statSignX.size()==sumStatSignDB2.size()) {
 												for(unsigned int n=0; n<statSignX.size(); n++) {
@@ -253,7 +256,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(xLabel));
 
 												//> for statsign calculations (REI only so far)
-												if(label2.find("Excavated")!=string::npos) {
+												if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 													vector<float> statSignX = upLabels.getStatSign(xLabel);
 													if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 														for(unsigned int n=0; n<statSignX.size(); n++) {
@@ -265,7 +268,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										}
 
 										//> for dot product calculations (REI only so far)
-										if(label1.find("Excavated")!=string::npos) {
+										if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 											vector<float> statSignY = upLabels.getStatSign(yLabel);
 											if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 												for(unsigned int n=0; n<statSignY.size(); n++) {
@@ -315,7 +318,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(xLabel));
 
 												//> for dot product calculations (REI only so far)
-												if(label2.find("Excavated")!=string::npos) {
+												if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 													vector<float> statSignX = dbLabels.getStatSign(xLabel);
 													if(statSignX.size()>0 && statSignX.size()==sumStatSignDB2.size()) {
 														for(unsigned int n=0; n<statSignX.size(); n++) {
@@ -327,7 +330,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										} // end x mergedLabelContainer DB
 
 										//> for statsign calculations (REI only so far)
-										if(label1.find("Excavated")!=string::npos) {
+										if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 											vector<float> statSignY = dbLabels.getStatSign(yLabel);
 											if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 												for(unsigned int n=0; n<statSignY.size(); n++) {
@@ -369,11 +372,11 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 							float dotProduct1 = 1.0;
 							float dotProduct2 = 1.0;
-							if(label1.find("Excavated")!=string::npos){
+							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
-							if(label2.find("Excavated")!=string::npos) {
+							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
@@ -414,8 +417,29 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp,"----------------------------------\n");
+							}
+							if(weightedEntropy<=0) {
+								fprintf(fp2,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
+								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								fprintf(fp2,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								fprintf(fp2,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
+								fprintf(fp2,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
+								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp2,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
+								fprintf(fp2,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
+								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
+								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp2,"RelArea: %f\n",relArea);
+								fprintf(fp2,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
+								fprintf(fp2,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
+								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
+								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
+								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
+								fprintf(fp2,"----------------------------------\n");
 							}
 						} // if countUP || countDB
 					} // end for loop m
@@ -479,7 +503,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(yLabel));
 
 												//> for statsign calculations (REI only so far)
-												if(label1.find("Excavated")!=string::npos) {
+												if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 													vector<float> statSignY = upLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
@@ -491,7 +515,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										}
 
 										//> for statsign calculations (REI only so far)
-										if(label2.find("Excavated")!=string::npos) {
+										if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 											vector<float> statSign = upLabels.getStatSign(xLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
@@ -558,7 +582,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(xLabel));
 
 												//> for statsign calculations (REI only so far)
-												if(label2.find("Excavated")!=string::npos) {
+												if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 													vector<float> statSign = upLabels.getStatSign(xLabel);
 													if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 														for(unsigned int n=0; n<statSign.size(); n++) {
@@ -570,7 +594,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										}
 
 										//> for statsign calculations (REI only so far)
-										if(label1.find("Excavated")!=string::npos) {
+										if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 											vector<float> statSign = upLabels.getStatSign(yLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
@@ -621,7 +645,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
 
 												//> for statsign calculations (REI only so far)
-												if(label1.find("Excavated")!=string::npos) {
+												if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 													vector<float> statSignY = upLabels.getStatSign(yLabel);
 													if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 														for(unsigned int n=0; n<statSignY.size(); n++) {
@@ -633,7 +657,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										}
 
 										//> for statsign calculations (REI only so far)
-										if(label2.find("Excavated")!=string::npos) {
+										if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 											vector<float> statSign = upLabels.getStatSign(xLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
@@ -678,7 +702,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(xLabel));
 
 												//> for statsign calculations (REI only so far)
-												if(label2.find("Excavated")!=string::npos) {
+												if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 													vector<float> statSign = upLabels.getStatSign(xLabel);
 													if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 														for(unsigned int n=0; n<statSign.size(); n++) {
@@ -690,7 +714,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 										}
 
 										//> for statsign calculations (REI only so far)
-										if(label1.find("Excavated")!=string::npos) {
+										if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 											vector<float> statSign = upLabels.getStatSign(yLabel);
 											if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 												for(unsigned int n=0; n<statSign.size(); n++) {
@@ -732,11 +756,11 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 
 							float dotProduct1 = 1.0, dotProduct2 = 1.0;
-							if(label1.find("Excavated")!=string::npos){
+							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
-							if(label2.find("Excavated")!=string::npos) {
+							if(label2.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
@@ -777,6 +801,26 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
 								fprintf(fp,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp,"----------------------------------\n");
+							}
+							if(weightedEntropy<=0) {
+								fprintf(fp2,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								fprintf(fp2,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp2,"RelArea: %f\n",relArea);
+								fprintf(fp2,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
+								fprintf(fp2,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
+								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
+								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
+								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
+								fprintf(fp2,"----------------------------------\n");
 							}
 						} // end if countUP || countDB
 					} // end if DIR
@@ -842,7 +886,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(yLabel));
 
 													//> for statsign calculations (REI only so far)
-													if(label1.find("Excavated")!=string::npos) {
+													if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 														vector<float> statSignY = upLabels.getStatSign(yLabel);
 														if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 															for(unsigned int n=0; n<statSignY.size(); n++) {
@@ -854,7 +898,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 
 											//> for statsign calculations (REI only so far)
-											if(label2.find("Excavated")!=string::npos) {
+											if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 												vector<float> statSign = upLabels.getStatSign(xLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
@@ -923,7 +967,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(xLabel));
 
 													//> for statsign calculations (REI only so far)
-													if(label2.find("Excavated")!=string::npos) {
+													if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 														vector<float> statSign = upLabels.getStatSign(xLabel);
 														if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 															for(unsigned int n=0; n<statSign.size(); n++) {
@@ -935,7 +979,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 
 											//> for statsign calculations (REI only so far)
-											if(label1.find("Excavated")!=string::npos) {
+											if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 												vector<float> statSign = upLabels.getStatSign(yLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
@@ -989,7 +1033,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
 
 													//> for statsign calculations (REI only so far)
-													if(label1.find("Excavated")!=string::npos) {
+													if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 														vector<float> statSign = upLabels.getStatSign(yLabel);
 														if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 															for(unsigned int n=0; n<statSign.size(); n++) {
@@ -1001,7 +1045,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 
 											//> for statsign calculations (REI only so far)
-											if(label2.find("Excavated")!=string::npos) {
+											if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 												vector<float> statSign = upLabels.getStatSign(xLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
@@ -1047,7 +1091,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(xLabel));
 
 													//> for statsign calculations (REI only so far)
-													if(label2.find("Excavated")!=string::npos) {
+													if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 														vector<float> statSign = upLabels.getStatSign(xLabel);
 														if(statSign.size()>0 && statSign.size()==sumStatSignUP2.size()) {
 															for(unsigned int n=0; n<statSign.size(); n++) {
@@ -1059,7 +1103,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 
 											//> for statsign calculations (REI only so far)
-											if(label1.find("Excavated")!=string::npos) {
+											if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 												vector<float> statSign = upLabels.getStatSign(yLabel);
 												if(statSign.size()>0 && statSign.size()==sumStatSignUP1.size()) {
 													for(unsigned int n=0; n<statSign.size(); n++) {
@@ -1101,11 +1145,11 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 
 							float dotProduct1 = 1.0, dotProduct2 = 1.0;
-							if(label1.find("Excavated")!=string::npos){
+							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
-							if(label2.find("Excavated")!=string::npos) {
+							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
@@ -1145,6 +1189,25 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
 								fprintf(fp,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp,"----------------------------------\n");
+							}
+							if(weightedEntropy<=0) {
+								fprintf(fp2,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								fprintf(fp2,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp2,"RelArea: %f\n",relArea);
+								fprintf(fp2,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
+								fprintf(fp2,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
+								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
+								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
+								fprintf(fp2,"----------------------------------\n");
 							}
 						} // end if countUP || countDB
 					} // end else INDIR
