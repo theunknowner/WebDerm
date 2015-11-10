@@ -54,7 +54,7 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 vector<Mat> Features::disconnectIslands(Mat featureImg) {
 	ShapeMorph sm;
 	vector<Mat> islandVec;
-	Mat shadeShape = sm.densityDisconnector(featureImg,0.99);
+	Mat shadeShape = sm.densityDisconnector(featureImg,0.999);
 	vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
 	for(unsigned int k=0; k<littleIslands.size(); k++) {
 		if(countNonZero(littleIslands.at(k))>0)
@@ -100,6 +100,11 @@ vector<ImageData> Features::extractIslands(ImageData &featureId, int thresh) {
 //! store extracted island into vector
 void Features::storeIsland(Islands island) {
 	this->islandVec.push_back(island);
+}
+
+//! appends an islandVec to the existing islandVec
+void Features::appendIslands(vector<Islands> islandVec) {
+	this->islandVec.insert(this->islandVec.end(),islandVec.begin(),islandVec.end());
 }
 
 //! determines the shape of feature using shape neural network
@@ -164,13 +169,29 @@ Features::Features(Mat featureImg, ImageData &parentId) {
 	this->featureImg = featureImg;
 	this->featArea = countNonZero(featureImg);
 	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);
+	Functions fn;
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
-		if(island.shape_name().find("Excavated")!=string::npos) {
+		Mat crop_img = fn.cropImage(island.image());
+		float frameArea = (float) crop_img.total() / island.image().total();
+		if(frameArea>0.01 && (island.shape_name().find("Excavated")!=string::npos || island.shape_name().find("Default")!=string::npos)) {
+			bool containsRegularShape = false;
+			vector<Islands> islandVec2;
 			vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
 			for(unsigned int j=0; j<littleIslands2.size(); j++) {
 				Islands island2(littleIslands2.at(j));
-				this->storeIsland(island2);
+				islandVec2.push_back(island2);
+				if(island2.shape_name().find("Disc")!=string::npos || island2.shape_name().find("Donut")!=string::npos) {
+					float area = (float)island2.area()/island.area();
+					if(area>0.02) {
+						containsRegularShape = true;
+					}
+				}
+			}
+			if(containsRegularShape) {
+				this->appendIslands(islandVec2);
+			} else {
+				this->storeIsland(island);
 			}
 		} else {
 			this->storeIsland(island);

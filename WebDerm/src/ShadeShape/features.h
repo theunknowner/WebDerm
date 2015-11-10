@@ -33,6 +33,7 @@ private:
 	vector<ImageData> extractIslands(ImageData &featureId, int thresh);
 
 	void storeIsland(Islands island);
+	void appendIslands(vector<Islands> islandVec);
 	void determineFeatureShape(Mat featureImg);
 	void getShadesOfIslands();
 public:
