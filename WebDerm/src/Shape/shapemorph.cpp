@@ -1663,7 +1663,6 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 		printf("src.size: %dx%d\n",src.rows,src.cols);
 		exit(1);
 	}
-	int lineVal = *max_element(src.begin<uchar>(),src.end<uchar>());
 	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
 	Size size(5,5);
 	const double C=1.0;
@@ -1737,7 +1736,8 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 			if(lc>0) {
 				//> going vertical down
 				for(int i=row; i<(row+square.height); i++) {
-					temp.at<uchar>(i,col) = 0;
+					if(i<src.rows)
+						temp.at<uchar>(i,col) = 0;
 				}
 				//> check if disconnected vertically
 				if(temp.at<uchar>(row-1,col)==0 && temp.at<uchar>(row+square.height,col)==0) {
@@ -1749,7 +1749,8 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 				if(!isDisconnected) {
 					//> going horizontal right
 					for(int j=col; j<(col+square.width); j++) {
-						temp.at<uchar>(row,j) = 0;
+						if(j<src.cols)
+							temp.at<uchar>(row,j) = 0;
 					}
 					//> check if disconnected horizontally
 					if(temp.at<uchar>(row,col-1)==0 && temp.at<uchar>(row,col+square.width)==0) {

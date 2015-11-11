@@ -39,7 +39,7 @@ void ImageData::extract(Mat image, String name, int option) {
 		this->hslVec.clear();
 		this->hslVec.resize(image.rows,vector<String>(image.cols,""));
 		double h,s,l;
-		String pix, hslStr;
+		String hslStr;
 		for(int i=0; i<image.rows; i++) {
 			for(int j=0; j<image.cols; j++) {
 				PixelData pixData(image.at<Vec3b>(i,j));

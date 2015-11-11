@@ -799,7 +799,6 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp,"----------------------------------\n");
 							}
 							if(weightedEntropy<=0) {
@@ -1187,7 +1186,6 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp,"----------------------------------\n");
 							}
 							if(weightedEntropy<=0) {
@@ -1216,6 +1214,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 		} // end for loop j
 	} // end for loop i
 	fclose(fp);
+	fclose(fp2);
 
 	this->matchScore = totalMatchScore;
 	this->mismatchScore = totalMismatchScore;

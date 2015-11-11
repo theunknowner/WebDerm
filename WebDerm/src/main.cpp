@@ -94,7 +94,7 @@ int main(int argc,char** argv)
 	TestML::clear();
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
+	ShadeShape ss1 = Scripts::script31("herpes_zoster3");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
@@ -104,7 +104,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -188,7 +188,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -275,7 +275,7 @@ int main(int argc,char** argv)
 	statSign.printCompare(statSignVec1,statSignVec2);
 	float result = statSign.dotProduct(statSignVec1,statSignVec2);
 	cout << result << endl;
-	cout << statSign.adjustValue(result) << endl;
+	cout << statSign.adjustValue(0.40) << endl;
 	//imgshow(img1);
 	//imgshow(img2);
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);

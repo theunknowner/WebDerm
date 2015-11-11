@@ -177,14 +177,16 @@ Features::Features(Mat featureImg, ImageData &parentId) {
 		if(frameArea>0.01 && (island.shape_name().find("Excavated")!=string::npos || island.shape_name().find("Default")!=string::npos)) {
 			bool containsRegularShape = false;
 			vector<Islands> islandVec2;
-			vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
-			for(unsigned int j=0; j<littleIslands2.size(); j++) {
-				Islands island2(littleIslands2.at(j));
-				islandVec2.push_back(island2);
-				if(island2.shape_name().find("Disc")!=string::npos || island2.shape_name().find("Donut")!=string::npos) {
-					float area = (float)island2.area()/island.area();
-					if(area>0.02) {
-						containsRegularShape = true;
+			if(i==49) {
+				vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
+				for(unsigned int j=0; j<littleIslands2.size(); j++) {
+					Islands island2(littleIslands2.at(j));
+					islandVec2.push_back(island2);
+					if(island2.shape_name().find("Disc")!=string::npos || island2.shape_name().find("Donut")!=string::npos) {
+						float area = (float)island2.area()/island.area();
+						if(area>0.02) {
+							containsRegularShape = true;
+						}
 					}
 				}
 			}
