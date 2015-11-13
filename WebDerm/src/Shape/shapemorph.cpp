@@ -1727,7 +1727,7 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 	row=0; col=0;
 	a = round(a) + 1;
 	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==163)
-		//cout << a << endl;
+	//cout << a << endl;
 	Size square(a,a);
 	while(row<src.rows) {
 		while(col<src.cols) {
@@ -1766,5 +1766,21 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 		row++;
 	}
 	return result;
+}
+
+//! gets the black discs within a feature
+vector<Mat> ShapeMorph::liquidFeatureExtractionInverse(Mat src) {
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	cv::findContours(src,contours,hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_NONE);
+	vector<Mat> vecMat;
+	for(unsigned int i=0; i< contours.size(); i++ ) {
+		if(hierarchy.at(i)[3]>=0) {
+			Mat drawing = Mat::zeros(src.size(),CV_8U);
+			drawContours( drawing, contours, i, Scalar(255), CV_FILLED, 8, hierarchy, 0, Point() );
+			vecMat.push_back(drawing);
+		}
+	}
+	return vecMat;
 }
 

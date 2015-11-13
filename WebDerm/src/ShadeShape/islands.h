@@ -9,13 +9,12 @@
 #define ISLANDS_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-
-class ImageData;
+#include "subislands.h"
 
 class Islands {
 private:
 
-protected:
+	vector<SubIslands> subIslandVec;
 	int islArea;
 	int islShadeLevel;
 	int islShape;
@@ -34,10 +33,12 @@ protected:
 
 	void determineIslandShape(Mat &islandImg);
 	void getIslandPoints(Mat &islandImg);
+
+	vector<Mat> extractSubIslands(Mat islandImg);
+	void storeSubIslands(SubIslands subIsland);
 public:
 	Islands();
 	Islands(Mat islandImg);
-	Islands(ImageData &islandId);
 	int area();
 	int& shade();
 	Mat& image();
@@ -56,6 +57,10 @@ public:
 	bool isEmpty();
 	bool& isShapeShifted();
 	int& prevShape();
+
+	SubIslands& subIsland(int subIslNum);
+	int numOfSubIslands();
+
 };
 
 #endif /* ISLANDS_H_ */

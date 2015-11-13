@@ -57,6 +57,7 @@ public:
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 	Mat removeNoiseOnBoundary(Mat src);
 	Mat densityDisconnector(Mat src,double q, double coeff=1.0);
+	vector<Mat> liquidFeatureExtractionInverse(Mat src);
 
 	/* halo_transform.cpp */
 	Mat haloTransform(Mat src, int iterations=1);

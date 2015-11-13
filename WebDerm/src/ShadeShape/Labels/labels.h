@@ -21,6 +21,7 @@ private:
 	map<String,int> labelPrevShapeNumMap;
 	map<String,int> labelShadeLevelMap;
 	map<String, vector<float> > labelStatSignMap;
+	map<String,Islands> labelIslandMap;
 	String labelName;
 	int labelTotalArea;
 	void calcTotalArea();
@@ -52,6 +53,7 @@ public:
 	int getPrevShapeNum(String label);
 	vector<float> getStatSign(String label);
 	map<String,vector<float>>& getStatSignMap();
+	Islands& getIsland(String label);
 	static void printCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
 	static void writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
 	static void printCompareStatSign(Labels &labels1, Labels &labels2, String label);

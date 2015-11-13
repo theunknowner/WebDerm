@@ -47,6 +47,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 					this->labelShapeNumMap[label] = islandVec.at(i).at(j).at(k).shape();
 					this->labelPrevShapeNumMap[label] = islandVec.at(i).at(j).at(k).prevShape();
 					this->labelShadeLevelMap[label] = j;
+					this->labelIslandMap[label] = islandVec.at(i).at(j).at(k);
 
 					//> to calculate the statistical signature of each label
 					if(label.find("Excavated")!=string::npos) {
@@ -223,6 +224,11 @@ vector<float> Labels::getStatSign(String label) {
 
 map<String,vector<float>>& Labels::getStatSignMap() {
 	return this->labelStatSignMap;
+}
+
+
+Islands& Labels::getIsland(String label) {
+	return this->labelIslandMap.at(label);
 }
 
 void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {

@@ -7,8 +7,9 @@
 
 #include "islands.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "subislands.h"
 
 /************ PRIVATE FUNCTIONS ******************/
 
@@ -66,7 +67,18 @@ void Islands::getIslandPoints(Mat &islandImg) {
 	// gets the start point of the island
 	this->islPt = nonZeroCoord.at<Point>(0);
 
+}
 
+vector<Mat> Islands::extractSubIslands(Mat islandImg) {
+	ShapeMorph sm;
+	vector<Mat> littleIslands = sm.liquidFeatureExtractionInverse(islandImg);
+	return littleIslands;
+
+}
+
+
+void Islands::storeSubIslands(SubIslands subIsland) {
+	this->subIslandVec.push_back(subIsland);
 }
 
 /*************** PUBLIC FUNCTIONS ******************/
@@ -74,7 +86,6 @@ void Islands::getIslandPoints(Mat &islandImg) {
 Islands::Islands(){}
 
 Islands::Islands(Mat islandImg) {
-
 	this->islSubShape = -1;
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
@@ -84,19 +95,13 @@ Islands::Islands(Mat islandImg) {
 	this->_labelName = "";
 	this->is_shape_shifted = false;
 	this->prev_shape = -1;
-}
 
-Islands::Islands(ImageData &islandId) {
-	Mat islandImg = islandId.image();
-	this->islSubShape = -1;
-	this->islArea = countNonZero(islandImg);
-	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
-	this->islandImg = islandImg;
-	this->determineIslandShape(islandImg);
-	this->getIslandPoints(islandImg);
-	this->_labelName = "";
-	this->is_shape_shifted = false;
-	this->prev_shape = -1;
+
+	vector<Mat> littleSubIslands = this->extractSubIslands(islandImg);
+	for(unsigned int i=0; i<littleSubIslands.size(); i++) {
+		SubIslands subIsland(littleSubIslands.at(i));
+		this->storeSubIslands(subIsland);
+	}
 }
 
 //! returns area/number of pixels of island
@@ -193,4 +198,13 @@ bool& Islands::isShapeShifted() {
 
 int& Islands::prevShape() {
 	return this->prev_shape;
+}
+
+
+SubIslands& Islands::subIsland(int subIslNum) {
+	return this->subIslandVec.at(subIslNum);
+}
+
+int Islands::numOfSubIslands() {
+	return this->subIslandVec.size();
 }

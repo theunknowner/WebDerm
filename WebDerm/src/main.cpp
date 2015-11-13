@@ -82,7 +82,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-/*
+	/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -93,7 +93,7 @@ int main(int argc,char** argv)
 	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-/*
+	/*
 	ShadeShape ss1 = Scripts::script31("herpes_zoster3");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();
@@ -104,7 +104,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+	/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -188,7 +188,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+	/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -254,14 +254,14 @@ int main(int argc,char** argv)
 	}
 /**/
 /*
-	ShadeShape ss;
-	Mat img = imread("/home/jason/git/WebDerm/WebDerm/tinea_corporis4_sample.png",0);
-	vector<Mat> vecMat = ss.isolateConnectedFeatures(img);
+	ShapeMorph sm;
+	Mat img = imread("/home/jason/Desktop/workspace/test4.png",0);
+	vector<Mat> vecMat = sm.liquidFeatureExtractionInverse(img);
 	for(unsigned int i=0; i<vecMat.size(); i++) {
 		imgshow(vecMat.at(i));
 	}
 	/**/
-/*
+	/*
 	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s2.png",0);
 	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s3.png",0);
 	StatSign statSign;
@@ -278,7 +278,7 @@ int main(int argc,char** argv)
 
 	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
-/*
+	/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
 	ShadeShape ss1 = Scripts::script31("melanoma8c");
 	//ss1.showInteractiveIslands();

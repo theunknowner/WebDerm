@@ -169,7 +169,7 @@ Features::Features(Mat featureImg, ImageData &parentId) {
 	this->featureImg = featureImg;
 	this->featArea = countNonZero(featureImg);
 	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);
-	Functions fn;
+	//Functions fn;
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
 		/*
