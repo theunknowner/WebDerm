@@ -172,21 +172,24 @@ Features::Features(Mat featureImg, ImageData &parentId) {
 	Functions fn;
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
+		/*
 		Mat crop_img = fn.cropImage(island.image());
 		float frameArea = (float) crop_img.total() / island.image().total();
 		if(frameArea>0.01 && (island.shape_name().find("Excavated")!=string::npos || island.shape_name().find("Default")!=string::npos)) {
 			bool containsRegularShape = false;
 			vector<Islands> islandVec2;
-			if(i==49) {
-				vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
-				for(unsigned int j=0; j<littleIslands2.size(); j++) {
-					Islands island2(littleIslands2.at(j));
-					islandVec2.push_back(island2);
-					if(island2.shape_name().find("Disc")!=string::npos || island2.shape_name().find("Donut")!=string::npos) {
-						float area = (float)island2.area()/island.area();
-						if(area>0.02) {
-							containsRegularShape = true;
-						}
+			vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
+			for(unsigned int j=0; j<littleIslands2.size(); j++) {
+				Islands island2(littleIslands2.at(j));
+				islandVec2.push_back(island2);
+				if(island2.shape_name().find("Disc")!=string::npos || island2.shape_name().find("Donut")!=string::npos) {
+					Mat crop_img2 = fn.cropImage(island2.image());
+					float relArea = (float)island2.area()/island.area();
+					float frameArea = (float) crop_img2.total() / crop_img.total();
+					float bigFrameArea = (float) crop_img2.total() / island.image().total();
+					int count = fn.countPositive(island2.nn_results());
+					if(relArea>0.10 && frameArea>0.07 && bigFrameArea>0.05 && count==1) {
+						containsRegularShape = true;
 					}
 				}
 			}
@@ -197,7 +200,8 @@ Features::Features(Mat featureImg, ImageData &parentId) {
 			}
 		} else {
 			this->storeIsland(island);
-		}
+		}*/
+		this->storeIsland(island);
 	}
 	this->numOfIsls = this->islandVec.size();
 	this->determineFeatureShape(featureImg);

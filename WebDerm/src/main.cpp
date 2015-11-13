@@ -188,7 +188,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -254,34 +254,29 @@ int main(int argc,char** argv)
 	}
 /**/
 /*
-	ShapeMorph sm;
+	ShadeShape ss;
 	Mat img = imread("/home/jason/git/WebDerm/WebDerm/tinea_corporis4_sample.png",0);
-	cout << countNonZero(img) << endl;
-	imgshow(img);
-	Mat img2 = sm.densityDisconnector(img,0.999);
-	vector<Mat> littleIslands = sm.liquidFeatureExtraction(img2,0,0,0);
-	for(unsigned int j=0; j<littleIslands.size(); j++) {
-		Islands island2(littleIslands.at(j));
-		cout << island2.shape_name() << ": " << island2.area() << endl;
-		imgshow(island2.image());
+	vector<Mat> vecMat = ss.isolateConnectedFeatures(img);
+	for(unsigned int i=0; i<vecMat.size(); i++) {
+		imgshow(vecMat.at(i));
 	}
 	/**/
 /*
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/melanoma8b_rei_s2.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/melanoma8c_rei_s2.png",0);
+	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s2.png",0);
+	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s3.png",0);
 	StatSign statSign;
 	vector<float> statSignVec1 = statSign.create(img1);
 	vector<float> statSignVec2 = statSign.create(img2);
 	statSign.printCompare(statSignVec1,statSignVec2);
 	float result = statSign.dotProduct(statSignVec1,statSignVec2);
 	cout << result << endl;
-	cout << statSign.adjustValue(0.40) << endl;
+	cout << statSign.adjustValue(result) << endl;
 	//imgshow(img1);
 	//imgshow(img2);
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/
-/*
-	Scripts::checkAllTestData3();
+
+	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");

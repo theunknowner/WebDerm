@@ -380,6 +380,10 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
+							/*if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY && m==1) {
+								statsign.writeCompare(ssrUP.name()+"_rei_s1_s1.csv",sumStatSignUP1,sumStatSignDB1);
+								statsign.writeCompare(ssrUP.name()+"_rei_s2_s2.csv",sumStatSignUP2,sumStatSignDB2);
+							}*/
 
 							if(std::isnan(areaValUP)) areaValUP=0.0;
 							if(std::isnan(areaValDB)) areaValDB=0.0;

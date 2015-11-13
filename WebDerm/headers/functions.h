@@ -86,6 +86,8 @@ public:
 
 	void removeOutliersFromVec(deque<int> &vec, double thresh);
 	void removeOutliersFromVec(deque<double> &vec, double thresh);
+
+	int countPositive(Mat input);
 };
 
 #endif

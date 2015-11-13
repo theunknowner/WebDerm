@@ -1204,3 +1204,13 @@ void Functions::removeOutliersFromVec(deque<double> &vec, double thresh) {
 		vec.pop_front();
 	}
 }
+
+int Functions::countPositive(Mat input) {
+	int count = 0;
+	for(unsigned int i=0; i<input.total(); i++) {
+		if(input.at<float>(i)>0) {
+			count++;
+		}
+	}
+	return count;
+}
