@@ -3642,7 +3642,6 @@ ShadeShape script31(String filename) {
 	//> Testing Resizing of feature
 	ImageData id(img3,name,0);
 	Func::prepareImage(id,Size(140,140));
-
 	ShadeShape ss;
 	ss.extract(id);
 	return ss;

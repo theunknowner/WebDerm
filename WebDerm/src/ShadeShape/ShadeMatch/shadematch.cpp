@@ -178,7 +178,7 @@ vector<vector<vector<Islands> > > ShadeMatch::shiftShades(vector<vector<vector<I
 				}
 			}
 			catch(const std::out_of_range &oor) {
-				printf("OOR\n");
+				printf("ShadeMatch::shiftShades(): out of range!\n");
 				printf("shift_type: %d\n",shiftType);
 				printf("shade: %d\n",shade);
 				printf("new_shade: %d\n",new_shade);

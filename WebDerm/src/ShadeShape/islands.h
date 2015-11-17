@@ -35,7 +35,7 @@ private:
 	void getIslandPoints(Mat &islandImg);
 
 	vector<Mat> extractSubIslands(Mat islandImg);
-	void storeSubIslands(SubIslands subIsland);
+	void storeSubIslands(SubIslands& subIsland);
 public:
 	Islands();
 	Islands(Mat islandImg);

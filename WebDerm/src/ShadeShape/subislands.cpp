@@ -63,8 +63,8 @@ SubIslands::SubIslands() {}
 
 //! class is used to store the black discs subfeatures inside a feature
 SubIslands::SubIslands(Mat subIslandImg) {
-	this->islArea = countNonZero(islandImg);
-	this->islandImg = islandImg;
+	this->islArea = countNonZero(subIslandImg);
+	this->islandImg = subIslandImg;
 	this->determineIslandShape(subIslandImg);
 	this->getIslandPoints(subIslandImg);
 }

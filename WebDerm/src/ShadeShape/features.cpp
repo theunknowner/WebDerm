@@ -98,7 +98,7 @@ vector<ImageData> Features::extractIslands(ImageData &featureId, int thresh) {
 }
 
 //! store extracted island into vector
-void Features::storeIsland(Islands island) {
+void Features::storeIsland(Islands& island) {
 	this->islandVec.push_back(island);
 }
 

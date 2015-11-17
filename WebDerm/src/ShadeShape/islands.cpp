@@ -77,7 +77,7 @@ vector<Mat> Islands::extractSubIslands(Mat islandImg) {
 }
 
 
-void Islands::storeSubIslands(SubIslands subIsland) {
+void Islands::storeSubIslands(SubIslands& subIsland) {
 	this->subIslandVec.push_back(subIsland);
 }
 
@@ -96,8 +96,7 @@ Islands::Islands(Mat islandImg) {
 	this->is_shape_shifted = false;
 	this->prev_shape = -1;
 
-
-	vector<Mat> littleSubIslands = this->extractSubIslands(islandImg);
+	vector<Mat> littleSubIslands = this->extractSubIslands(islandImg.clone());
 	for(unsigned int i=0; i<littleSubIslands.size(); i++) {
 		SubIslands subIsland(littleSubIslands.at(i));
 		this->storeSubIslands(subIsland);

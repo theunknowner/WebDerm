@@ -67,14 +67,15 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-	/*
+/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
-	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
-	ShadeShape ss2 = Scripts::script31("melanoma4");
+	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss2 = Scripts::script31("herpes12");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//ssm.debug_mode(1);
+	//ss1.showInteractiveIslands();
 	cout << ssm.test_match(ss1,ss2) << endl;
 	//vector<float> results = ssm.match(ss1,ss2);
 	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
@@ -104,7 +105,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-	/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -188,7 +189,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-	/*
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);

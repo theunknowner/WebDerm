@@ -215,9 +215,8 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels upLabelsFilled = upLabels;
 	Labels dbLabelsFilled = dbLabels;
 	this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
-	Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
-	cout << "--------------------------" << endl;
-	upSS.showInteractiveIslands();
+	//Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
+	//cout << "--------------------------" << endl;
 	vector<vector<float> > resultVec;
 	vector<vector<vector<Islands> > > islandVec2;
 	vector<vector<vector<Islands> > > islandVec3;
@@ -275,7 +274,6 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 				largestResult = maxShadeShiftResult;
 				largestIslandVec2 = maxShadeShiftIslandVec;
 				largestImg = matchSS.image();
-				matchSS.showInteractiveIslands();
 				if(shadeShift==ShadeMatch::SHIFT_NONE) {
 					islandVec2 = largestIslandVec2;
 					break;
@@ -348,6 +346,16 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 		}// end for shapeShift1
 	}// end shadeShift
 
+	/*** Shape STT counter ***/
+	auto largestUpMap = largestLabelsUP.getMap();
+	for(auto it=largestUpMap.begin(); it!=largestUpMap.end(); it++) {
+		if(largestLabelsUP.isShapeShifted(it->first)) {
+			int prevShape = largestLabelsUP.getPrevShapeNum(it->first);
+			int currShape = largestLabelsUP.getShapeNum(it->first);
+			this->shapeTranslateCount.at(prevShape).at(currShape)=1;
+		}
+	}
+	/*****************************/
 	Labels::printCompareLabels(largestLabelsUP,largestLabelsDB,1);
 	cout << "----------------------------" << endl;
 	String newNameUP = upSS.name()+"_"+dbSS.name();
