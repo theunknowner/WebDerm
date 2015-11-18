@@ -105,7 +105,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -131,6 +131,7 @@ int main(int argc,char** argv)
 			name = folder + files.at(i);
 			name = getFileName(name);
 			if(name!=argv[1]) {
+				cout << name << endl;
 				ShadeShape ss2 = Scripts::script31(name);
 				ShadeShapeMatch ssm;
 				if(argc>=3)
@@ -189,7 +190,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -279,13 +280,14 @@ int main(int argc,char** argv)
 
 	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
-	/*
+/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
-	ShadeShape ss1 = Scripts::script31("melanoma8c");
+	ShadeShape ss1 = Scripts::script31("lph4");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(111,117));
+	Islands island = ss1.getIslandWithPoint(Point(58,23));
+	SubIslands subIsland = island.getSubIslandWithPoint(Point(27,55));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",island.image());
+	imwrite(ss1.name()+"_sample.png",subIsland.image());
 	/*
 	Mat results = island.nn_results();
 	cout << results << endl;

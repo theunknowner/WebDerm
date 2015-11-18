@@ -93,7 +93,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 												int index2 =  distance(lbls.begin(),lbls.find(label2));
 												if(insideIsland2.currentState()==State::ENTERED) {
 													if(srm.getRelationDistance(index1,index2,theta)==0) {
-														float dist = MyMath::eucDist(center,Point(col,row));
+														float dist = MyMath::eucDist(beginCoords,Point(col,row));
 														srm.setRelationDistance(index1,index2,theta,dist);
 													}
 												}

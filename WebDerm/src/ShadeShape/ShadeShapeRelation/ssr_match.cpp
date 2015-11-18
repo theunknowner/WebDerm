@@ -11,6 +11,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "../ShapeMatch/shapematch.h"
 #include "../StatSign/statsign.h"
+#include "esg.h"
 
 /**************************** PRIVATE FUNCTIONS ********************************/
 
@@ -25,9 +26,11 @@ float ShadeShapeRelationMatch::entropy(float count) {
 }
 
 float ShadeShapeRelationMatch::contrastWeight(float esg) {
-	const float alpha = 2.0;
-	const float scale = 0.05;
-	float result = pow(alpha,esg/scale);
+	//const float alpha = 2.0;
+	const float scale = 0.0007;
+
+	//float result = pow(alpha,esg/scale);
+	float result = pow(esg/scale,2);
 	return result;
 }
 
@@ -471,6 +474,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
 								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
 							} // end SURR_BY_INV
+							//> E-Value using count base on relArea <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
 							if(std::isnan(countProportionUP)) countProportionUP = 0.0;
@@ -478,20 +482,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float entropyUP = this->entropy(countProportionUP);
 							float entropyDB = this->entropy(countProportionDB);
 							float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-							//> Expected value of Shade Gradient <//
-							float distAvgUP = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvgUP /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
-							float distAvgDB = std::accumulate(srmDB.mergedRelationDistance.at(i).at(j).at(k).begin(),srmDB.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvgDB /= srmDB.mergedRelationDistance.at(i).at(j).at(k).size();
+							//> ********* End E-Value ************ <//
+							//> Expected value of Shade Gradient (ESG) <//
+							Esg esgUP;
+							Esg esgDB;
 							int shadeDiffUP = abs(upMergedLabels.getShadeLevel(label1)-upMergedLabels.getShadeLevel(label2));
 							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
-							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
-							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
-							float contrastWeightUP = this->contrastWeight(esgUP);
-							float contrastWeightDB = this->contrastWeight(esgDB);
+							esgUP.calculate(srmUP.mergedRelationDistance.at(i).at(j).at(k),shadeDiffUP);
+							esgDB.calculate(srmDB.mergedRelationDistance.at(i).at(j).at(k),shadeDiffDB);
+							float relAreaUP1 = srmAreaUP.at(i).at(j).at(k).at(m).first;
+							float relAreaUP2 = srmAreaUP.at(i).at(j).at(k).at(m).second;
+							float relAreaDB1 = srmAreaDB.at(i).at(j).at(k).at(m).first;
+							float relAreaDB2 = srmAreaDB.at(i).at(j).at(k).at(m).second;
+							float relAreaUP = min(relAreaUP1,relAreaUP2)/upLabels.totalArea();
+							float relAreaDB = min(relAreaDB1,relAreaDB2)/dbLabels.totalArea();
+							esgUP.esgVal = pow(esgUP.esgVal,2) * (exp(relAreaUP)-1.0);
+							esgDB.esgVal = pow(esgDB.esgVal,2) * (exp(relAreaDB)-1.0);
+							float contrastWeightUP = this->contrastWeight(esgUP.esgVal);
+							float contrastWeightDB = this->contrastWeight(esgDB.esgVal);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
+							//> ********** End (ESG) *********** <//
+							//> StatSign using Dot Product (Scheme I) <//
 							float dotProduct1 = 1.0;
 							float dotProduct2 = 1.0;
 							float countSubIslandPropUP1 = 0.0, countSubIslandPropDB1 = 0.0;
@@ -500,14 +513,20 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								if(label1.find("Excavated")!=string::npos) {
-									float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
-									countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
-									countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
-									subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
-									subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
-									subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
-									if(std::isnan(subIslandEntropyVal1)) subIslandEntropyVal1 = 0.0;
-									dotProduct1 *= subIslandEntropyVal1;
+									if(sumSubIslandAreaUP1==0 && sumSubIslandAreaDB1==0) {
+										subIslandEntropyVal1 = 1.0;
+									} else if(sumSubIslandAreaUP1>0 && sumSubIslandAreaDB1>0) {
+										float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
+										countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
+										countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
+										subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
+										subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
+										subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
+										if(std::isnan(subIslandEntropyVal1)) subIslandEntropyVal1 = 0.0;
+										dotProduct1 *= subIslandEntropyVal1;
+									} else {
+										subIslandEntropyVal1 = 0.0;
+									}
 								}
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
@@ -516,17 +535,24 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								if(label2.find("Excavated")!=string::npos) {
-									float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
-									countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
-									countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
-									subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
-									subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
-									subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
-									if(std::isnan(subIslandEntropyVal2)) subIslandEntropyVal2 = 0.0;
-									dotProduct2 *= subIslandEntropyVal2;
+									if(sumSubIslandAreaUP2==0 && sumSubIslandAreaDB2==0) {
+										subIslandEntropyVal2 = 1.0;
+									} else if(sumSubIslandAreaUP2>0 && sumSubIslandAreaDB2>0) {
+										float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
+										countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
+										countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
+										subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
+										subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
+										subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
+										if(std::isnan(subIslandEntropyVal2)) subIslandEntropyVal2 = 0.0;
+										dotProduct2 *= subIslandEntropyVal2;
+									} else {
+										subIslandEntropyVal2 = 0.0;
+									}
 								}
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
+							//> ************ End StatSign ************ <//
 							if(std::isnan(areaValUP)) areaValUP=0.0;
 							if(std::isnan(areaValDB)) areaValDB=0.0;
 							float areaVal = min(areaValUP,areaValDB);
@@ -558,8 +584,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
-								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
+								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -585,8 +611,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
-								fprintf(fp2,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp2,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
+								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp2,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1005,6 +1031,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							areaUP = areaUP * this->rVal[maxNeighborLevelUP];
 							areaDB = areaDB * this->rVal[maxNeighborLevelDB];
 
+							//> E-Value using count base on relArea <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
 							if(std::isnan(countProportionUP)) countProportionUP = 0.0;
@@ -1012,55 +1039,77 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float entropyUP = this->entropy(countProportionUP);
 							float entropyDB = this->entropy(countProportionDB);
 							float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-							float distAvgUP = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvgUP /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
-							float distAvgDB = std::accumulate(srmDB.mergedRelationDistance.at(i).at(j).at(k).begin(),srmDB.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvgDB /= srmDB.mergedRelationDistance.at(i).at(j).at(k).size();
-							//> Expected value of Shade Gradient <//
+							//> ********* End E-Value ************ <//
+							//> Expected value of Shade Gradient (ESG) <//
+							Esg esgUP;
+							Esg esgDB;
 							int shadeDiffUP = abs(upMergedLabels.getShadeLevel(label1)-upMergedLabels.getShadeLevel(label2));
 							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
-							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
-							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
-							float contrastWeightUP = this->contrastWeight(esgUP);
-							float contrastWeightDB = this->contrastWeight(esgDB);
+							esgUP.calculate(srmUP.mergedRelationDistance.at(i).at(j).at(k),shadeDiffUP);
+							esgDB.calculate(srmDB.mergedRelationDistance.at(i).at(j).at(k),shadeDiffDB);
+							float relAreaUP1 = areaUP1;
+							float relAreaUP2 = areaUP2;
+							float relAreaDB1 = areaDB1;
+							float relAreaDB2 = areaDB2;
+							float relAreaUP = min(relAreaUP1,relAreaUP2)/upLabels.totalArea();
+							float relAreaDB = min(relAreaDB1,relAreaDB2)/dbLabels.totalArea();
+							esgUP.esgVal = pow(esgUP.esgVal,2) * (exp(relAreaUP)-1.0);
+							esgDB.esgVal = pow(esgDB.esgVal,2) * (exp(relAreaDB)-1.0);
+							float contrastWeightUP = this->contrastWeight(esgUP.esgVal);
+							float contrastWeightDB = this->contrastWeight(esgDB.esgVal);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
-
-							float dotProduct1 = 1.0, dotProduct2 = 1.0;
-							float countSubIslandPropUP1=0.0, countSubIslandPropDB1=0.0;
-							float subIslandEntropyUP1=0.0, subIslandEntropyDB1=0.0;
-							float subIslandEntropyVal1=1.0, subIslandEntropyVal2=1.0;
+							//> ********** End (ESG) *********** <//
+							//> StatSign using Dot Product (Scheme I) <//
+							float dotProduct1 = 1.0;
+							float dotProduct2 = 1.0;
+							float countSubIslandPropUP1 = 0.0, countSubIslandPropDB1 = 0.0;
+							float subIslandEntropyUP1 = 0.0, subIslandEntropyDB1 = 0.0;
+							float subIslandEntropyVal1 = 1.0, subIslandEntropyVal2 = 1.0;
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								if(label1.find("Excavated")!=string::npos) {
-									float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
-									countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
-									countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
-									subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
-									subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
-									subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
-									if(std::isnan(subIslandEntropyVal1)) subIslandEntropyVal1 = 0.0;
-									dotProduct1 *= subIslandEntropyVal1;
+									if(sumSubIslandAreaUP1==0 && sumSubIslandAreaDB1==0) {
+										subIslandEntropyVal1 = 1.0;
+									} else if(sumSubIslandAreaUP1>0 && sumSubIslandAreaDB1>0) {
+										float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
+										countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
+										countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
+										subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
+										subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
+										subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
+										if(std::isnan(subIslandEntropyVal1)) subIslandEntropyVal1 = 0.0;
+										dotProduct1 *= subIslandEntropyVal1;
+									} else {
+										subIslandEntropyVal1 = 0.0;
+									}
 								}
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
-							float countSubIslandPropUP2=0.0, countSubIslandPropDB2=0.0;
-							float subIslandEntropyUP2=0.0, subIslandEntropyDB2=0.0;
-							if(label2.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
+							float countSubIslandPropUP2 = 0.0, countSubIslandPropDB2 = 0.0;
+							float subIslandEntropyUP2 = 0.0, subIslandEntropyDB2 = 0.0;
+							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								if(label2.find("Excavated")!=string::npos) {
-									float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
-									countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
-									countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
-									subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
-									subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
-									subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
-									if(std::isnan(subIslandEntropyVal2)) subIslandEntropyVal2 = 0.0;
-									dotProduct2 *= subIslandEntropyVal2;
+									if(sumSubIslandAreaUP2==0 && sumSubIslandAreaDB2==0) {
+										subIslandEntropyVal2 = 1.0;
+									} else if(sumSubIslandAreaUP2>0 && sumSubIslandAreaDB2>0) {
+										float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
+										countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
+										countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
+										subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
+										subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
+										subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
+										if(std::isnan(subIslandEntropyVal2)) subIslandEntropyVal2 = 0.0;
+										dotProduct2 *= subIslandEntropyVal2;
+									} else {
+										subIslandEntropyVal2 = 0.0;
+									}
 								}
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
+							//> ************ End StatSign ************ <//
 
 							if(std::isnan(areaUP)) areaUP=0;
 							if(std::isnan(areaDB)) areaDB=0;
@@ -1091,8 +1140,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
-								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp,"EsgAvgDistUP: %f, EsgAvgDistUP: %f\n",esgUP.avgDist,esgDB.avgDist);
+								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1116,8 +1165,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
-								fprintf(fp2,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp2,"EsgAvgDistUP: %f, EsgAvgDistUP: %f\n",esgUP.avgDist,esgDB.avgDist);
+								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp2,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1544,6 +1593,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							} // end else if areaDB1 > areaDB2
 							areaUP = areaUP * this->rVal[maxNeighborLevelDB];
 							areaDB = areaDB * this->rVal[maxNeighborLevelDB];
+							//> E-Value using count base on relArea <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
 							if(std::isnan(countProportionUP)) countProportionUP = 0.0;
@@ -1551,55 +1601,77 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float entropyUP = this->entropy(countProportionUP);
 							float entropyDB = this->entropy(countProportionDB);
 							float entropyVal = (min(entropyUP,entropyDB)+1.0) / (max(entropyUP,entropyDB)+1.0);
-							float distAvgUP = std::accumulate(srmUP.mergedRelationDistance.at(i).at(j).at(k).begin(),srmUP.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvgUP /= srmUP.mergedRelationDistance.at(i).at(j).at(k).size();
-							float distAvgDB = std::accumulate(srmDB.mergedRelationDistance.at(i).at(j).at(k).begin(),srmDB.mergedRelationDistance.at(i).at(j).at(k).end(),0.0);
-							distAvgDB /= srmDB.mergedRelationDistance.at(i).at(j).at(k).size();
-							//> Expected value of Shade Gradient <//
+							//> ********* End E-Value ************ <//
+							//> Expected value of Shade Gradient (ESG) <//
+							Esg esgUP;
+							Esg esgDB;
 							int shadeDiffUP = abs(upMergedLabels.getShadeLevel(label1)-upMergedLabels.getShadeLevel(label2));
 							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
-							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
-							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
-							float contrastWeightUP = this->contrastWeight(esgUP);
-							float contrastWeightDB = this->contrastWeight(esgDB);
+							esgUP.calculate(srmUP.mergedRelationDistance.at(i).at(j).at(k),shadeDiffUP);
+							esgDB.calculate(srmDB.mergedRelationDistance.at(i).at(j).at(k),shadeDiffDB);
+							float relAreaUP1 = areaUP1;
+							float relAreaUP2 = areaUP2;
+							float relAreaDB1 = areaDB1;
+							float relAreaDB2 = areaDB2;
+							float relAreaUP = min(relAreaUP1,relAreaUP2)/upLabels.totalArea();
+							float relAreaDB = min(relAreaDB1,relAreaDB2)/dbLabels.totalArea();
+							esgUP.esgVal = pow(esgUP.esgVal,2) * (exp(relAreaUP)-1.0);
+							esgDB.esgVal = pow(esgDB.esgVal,2) * (exp(relAreaDB)-1.0);
+							float contrastWeightUP = this->contrastWeight(esgUP.esgVal);
+							float contrastWeightDB = this->contrastWeight(esgDB.esgVal);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
-
-							float dotProduct1 = 1.0, dotProduct2 = 1.0;
-							float countSubIslandPropUP1=0.0, countSubIslandPropDB1=0.0;
-							float subIslandEntropyUP1 = 0.0, subIslandEntropyDB1=0.0;
-							float subIslandEntropyVal1=1.0, subIslandEntropyVal2=1.0;
+							//> ********** End (ESG) *********** <//
+							//> StatSign using Dot Product (Scheme I) <//
+							float dotProduct1 = 1.0;
+							float dotProduct2 = 1.0;
+							float countSubIslandPropUP1 = 0.0, countSubIslandPropDB1 = 0.0;
+							float subIslandEntropyUP1 = 0.0, subIslandEntropyDB1 = 0.0;
+							float subIslandEntropyVal1 = 1.0, subIslandEntropyVal2 = 1.0;
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								if(label1.find("Excavated")!=string::npos) {
-									float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
-									countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
-									countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
-									subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
-									subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
-									subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
-									if(std::isnan(subIslandEntropyVal1)) subIslandEntropyVal1 = 0.0;
-									dotProduct1 *= subIslandEntropyVal1;
+									if(sumSubIslandAreaUP1==0 && sumSubIslandAreaDB1==0) {
+										subIslandEntropyVal1 = 1.0;
+									} else if(sumSubIslandAreaUP1>0 && sumSubIslandAreaDB1>0) {
+										float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
+										countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
+										countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
+										subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
+										subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
+										subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
+										if(std::isnan(subIslandEntropyVal1)) subIslandEntropyVal1 = 0.0;
+										dotProduct1 *= subIslandEntropyVal1;
+									} else {
+										subIslandEntropyVal1 = 0.0;
+									}
 								}
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
-							float countSubIslandPropUP2=0.0, countSubIslandPropDB2=0.0;
-							float subIslandEntropyUP2 = 0.0, subIslandEntropyDB2=0.0;
+							float countSubIslandPropUP2 = 0.0, countSubIslandPropDB2 = 0.0;
+							float subIslandEntropyUP2 = 0.0, subIslandEntropyDB2 = 0.0;
 							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								if(label2.find("Excavated")!=string::npos) {
-									float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
-									countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
-									countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
-									subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
-									subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
-									subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
-									if(std::isnan(subIslandEntropyVal2)) subIslandEntropyVal2 = 0.0;
-									dotProduct2 *= subIslandEntropyVal2;
+									if(sumSubIslandAreaUP2==0 && sumSubIslandAreaDB2==0) {
+										subIslandEntropyVal2 = 1.0;
+									} else if(sumSubIslandAreaUP2>0 && sumSubIslandAreaDB2>0) {
+										float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
+										countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
+										countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
+										subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
+										subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
+										subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
+										if(std::isnan(subIslandEntropyVal2)) subIslandEntropyVal2 = 0.0;
+										dotProduct2 *= subIslandEntropyVal2;
+									} else {
+										subIslandEntropyVal2 = 0.0;
+									}
 								}
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
+							//> ************ End StatSign ************ <//
 
 							if(std::isnan(areaUP)) areaUP=0;
 							if(std::isnan(areaDB)) areaDB=0;
@@ -1619,34 +1691,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							}
 							totalMismatchScore += weightedMismatchEntropy;
 
-
-							if(std::isnan(totalMatchScore)) {
-								printf("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
-								printf("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								printf("TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
-								printf("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								printf("EntropyVal: %f\n",entropyVal);
-								printf("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								printf("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								printf("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								printf("MaxTotalArea: %d\n",maxTotalArea);
-								printf("RelArea: %f\n",relArea);
-								printf("DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
-								printf("esgUP: %f, esgDB: %f\n",esgUP,esgDB);
-								printf("ContrastWeight: %f\n",contrastWeight);
-								printf("CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
-								printf("CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
-								printf("SubIslandEntropyUP1: %f, subIslandEntropyDB1: %f\n",subIslandEntropyUP1,subIslandEntropyDB1);
-								printf("SubIslandEntropyUP2: %f, subIslandEntropyDB2: %f\n",subIslandEntropyUP2,subIslandEntropyDB2);
-								printf("SubIslandEntropy1: %f, subIslandEntropy2: %f\n",subIslandEntropyVal1,subIslandEntropyVal2);
-								printf("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								printf("WeightY: %f, WeightX: %f\n",weight1,weight2);
-								printf("weightedEntropy: %f\n",weightedEntropy);
-								printf("totalMatchScore: %f\n",totalMatchScore);
-								printf("----------------------------------\n");
-								exit(1);
-							}
-
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
@@ -1658,8 +1702,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
-								fprintf(fp,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
+								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1682,8 +1726,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
-								fprintf(fp2,"esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								fprintf(fp2,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
+								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp2,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
