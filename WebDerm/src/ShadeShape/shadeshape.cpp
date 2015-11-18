@@ -55,6 +55,49 @@ void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 	imshow(winName,img);
 }
 
+void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param) {
+	ShadeShape &ss = *((ShadeShape*)param);
+	Mat img = ss.image().clone();
+	Islands island;
+	static TestML ml;
+	bool islandExist = false;
+	if  ( event == EVENT_LBUTTONDOWN ){
+		island = ss.getIslandWithPoint(Point(x,y));
+		if(!island.isEmpty()) {
+			char text[100];
+			int lum = img.at<uchar>(y,x);
+			int area = island.area();
+			int shadeNum = ss.getIndexOfShade(island.shade());
+			float nnResult = *max_element(island.nn_results().begin<float>(),island.nn_results().end<float>());
+			cvtColor(img,img,CV_GRAY2BGR);
+			for(auto it=island.coordinates().begin(); it!=island.coordinates().end(); it++) {
+				int x = it->second.x;
+				int y = it->second.y;
+				img.at<Vec3b>(y,x) = Vec3b(0,255,0);
+			}
+			String shade_shape = island.shape_name() + "_s" + toString(shadeNum);
+			sprintf(text,"(%d,%d) | Lum: %d | Area: %d | ShadeShape: %s | NN: %f",x,y,lum,area,shade_shape.c_str(),nnResult);
+			cv::displayStatusBar(winName,text);
+			//char textScore[100];
+			//Mat nnResults = island.nn_results();
+			//sprintf(textScore,"[%.5f, %.5f, %.5f, %.5f, %.5f]",nnResults.at<float>(0,0),nnResults.at<float>(0,1),nnResults.at<float>(0,2),nnResults.at<float>(0,3),nnResults.at<float>(0,4));
+			//namedWindow(winName3, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			//imshow(winName3,island.image());
+			//namedWindow(winName2, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			//cv::displayStatusBar(winName2,textScore);
+			//imshow(winName2,island.nn_image());
+			islandExist = true;
+		}
+	}
+	if(event == EVENT_LBUTTONUP) {
+		img = ss.image().clone();
+	}
+	imshow(winName,img);
+	if(islandExist) {
+		island.showInteractiveSubIslands();
+	}
+}
+
 /******************** PRIVATE FUNCTIONS **********************/
 bool ShadeShape::isOnTheEdge(Mat &src, int x, int y) {
 	Size size(3,3);
@@ -384,39 +427,6 @@ ImageData& ShadeShape::getImageData() {
 	return this->id;
 }
 
-
-void ShadeShape::writeListOfIslandsWithLowNN() {
-	FILE * fp;
-	FILE * fp2;
-	String file = this->ss_name + "_Low_NN_Islands.csv";
-	fp = fopen(file.c_str(),"w");
-	for(int i=0; i<this->numOfFeatures(); i++) {
-		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
-			Islands isl = this->feature(i).island(j);
-			float nn_results = *max_element(isl.nn_results().begin<float>(),isl.nn_results().end<float>());
-			if(nn_results<=0.50) {
-				fprintf(fp,"F%d_I%d,%d,(%d;%d),%f,%s\n",i,j,isl.area(),isl.coordinates().begin()->second.x,isl.coordinates().begin()->second.y,nn_results,isl.shape_name().c_str());
-			}
-		}
-	}
-	fclose(fp);
-}
-
-void ShadeShape::extractIslandsWithLowNN() {
-	for(int i=0; i<this->numOfFeatures(); i++) {
-		for(int j=0; j<this->feature(i).numOfIslands(); j++) {
-			Islands isl = this->feature(i).island(j);
-			float nn_results = *max_element(isl.nn_results().begin<float>(),isl.nn_results().end<float>());
-			if(nn_results<=0.50) {
-				char text[100];
-				sprintf(text,"%s_F%d_%d.png\n",this->ss_name.c_str(),i,j);
-				String name(text);
-				imwrite(name,isl.image());
-			}
-		}
-	}
-}
-
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
 	Size size(3,3);
 	vector<Point> ptsVec;
@@ -444,3 +454,12 @@ vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {
 	vector<Mat> isolatedFeatures = sm.liquidFeatureExtraction(results);
 	return isolatedFeatures;
 }
+
+void ShadeShape::showInteractiveSubIslands() {
+	winName = this->ss_name;
+	namedWindow(winName, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	cv::setMouseCallback(winName,onMouseCheckSubIslands, this);
+	imshow(winName,this->img);
+	waitKey(0);
+}
+

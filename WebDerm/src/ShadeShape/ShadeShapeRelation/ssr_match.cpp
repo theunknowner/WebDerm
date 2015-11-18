@@ -15,14 +15,23 @@
 /**************************** PRIVATE FUNCTIONS ********************************/
 
 float ShadeShapeRelationMatch::entropy(float count) {
-	if(count==0) {
+	if(count==0.0) {
 		return -1.0;
+	} else if(count>0.0 && count<1.0) {
+		return count - 1.0;
 	} else {
 		return log2(count);
 	}
 }
 
-void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB) {
+float ShadeShapeRelationMatch::contrastWeight(float esg) {
+	const float alpha = 2.0;
+	const float scale = 0.05;
+	float result = pow(alpha,esg/scale);
+	return result;
+}
+
+void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB) {
 	Srm srmUP = ssrUP.get_srm();
 	Srm srmDB = ssrDB.get_srm();
 	auto srmCountUP = srmUP.downscaleSrmCount();
@@ -37,6 +46,8 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 	auto dbLabels = srmDB.getLabels();
 	int maxNeighborLevelUP = srmUP.maxNeighborLevel();
 	int maxNeighborLevelDB = srmDB.maxNeighborLevel();
+	if(maxNeighborLevelUP>5) maxNeighborLevelUP = 5;
+	if(maxNeighborLevelDB>5) maxNeighborLevelDB = 5;
 	ShapeMatch shapematch;
 	StatSign statsign;
 	FILE * fp;
@@ -48,7 +59,6 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 	float totalMatchScore = 0.0, totalMismatchScore=0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
 
-	const float alpha = 3.2;
 	// for loop i: labels for the y axis
 	for(unsigned int i=0; i<srmCountUP.size(); i++) {
 		String label1 = upMergedLabels.at(i);
@@ -67,18 +77,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 						int countUP = srmCountUP.at(i).at(j).at(k).at(m);
 						int countDB = srmCountDB.at(i).at(j).at(k).at(m);
 						float areaUP=0., areaDB=0.;
-						//> used for entropy calculation
+						//> used for match calculation
 						int maxIslandAreaUP=0, maxIslandAreaDB=0;
 						float sumIslandAreaUP=0.0, sumIslandAreaDB=0.0;
-						int maxSubIslandAreaUP1=0, maxSubIslandAreaUP2=0, maxSubIslandAreaDB1=0,maxSubIslandAreaDB2=0;
+						float maxSubIslandAreaUP1=0, maxSubIslandAreaUP2=0, maxSubIslandAreaDB1=0,maxSubIslandAreaDB2=0;
 						float sumSubIslandAreaUP1=0.0, sumSubIslandAreaUP2=0.0, sumSubIslandAreaDB1=0.0, sumSubIslandAreaDB2=0.0;
 						//> used for dot product calculation
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						if(countUP>0 || countDB>0) {
 							float areaValUP = totalAreaUP, areaValDB = totalAreaDB;
-							if(maxNeighborLevelUP>5) maxNeighborLevelUP = 5;
-							if(maxNeighborLevelDB>5) maxNeighborLevelDB = 5;
 							if(k==SURR_BY) {
 								//for UP
 								for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
@@ -118,7 +126,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 												areaY += upLabels.area(yLabel) * penaltyY;
 
-												//> for entropy calculations
+												//> for match calculations
 												sumIslandAreaUP += upLabels.area(yLabel);
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(yLabel));
 
@@ -132,14 +140,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = upLabels.getIsland(yLabel).subIsland(n).area();
-															sumSubIslandAreaUP1 += area;
-															maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,area);
+															int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
+															float bigArea = upLabels.getIsland(yLabel).area();
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaUP1 += relArea;
+															maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,relArea);
 														}
 													}
 												}
@@ -156,14 +166,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 										}
 
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = upLabels.getIsland(xLabel).subIsland(n).area();
-													sumSubIslandAreaUP2 += area;
-													maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,area);
+													int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
+													float bigArea = upLabels.getIsland(xLabel).area();
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaUP2 += relArea;
+													maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,relArea);
 												}
 											}
 										}
@@ -205,7 +217,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											if(srmDB.equationMap.find(equationKeyDB)!=srmDB.equationMap.end()) {
 												areaY += dbLabels.area(yLabel);
 
-												//> used for entropy calculations
+												//> used for match calculations
 												sumIslandAreaDB += dbLabels.area(yLabel);
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
 
@@ -219,14 +231,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = dbLabels.getIsland(yLabel).subIsland(n).area();
-															sumSubIslandAreaDB1 += area;
-															maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,area);
+															int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
+															float bigArea = dbLabels.getIsland(yLabel).area();
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaDB1 += relArea;
+															maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,relArea);
 														}
 													}
 												}
@@ -242,14 +256,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 											}
 										}
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = dbLabels.getIsland(xLabel).subIsland(n).area();
-													sumSubIslandAreaDB2 += area;
-													maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,area);
+													int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
+													float bigArea = dbLabels.getIsland(xLabel).area();
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaDB2 += relArea;
+													maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,relArea);
 												}
 											}
 										}
@@ -315,14 +331,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = upLabels.getIsland(xLabel).subIsland(n).area();
-															sumSubIslandAreaUP2 += area;
-															maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,area);
+															int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
+															float bigArea = upLabels.getIsland(xLabel).area();
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaUP2 += relArea;
+															maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,relArea);
 														}
 													}
 												}
@@ -339,14 +357,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 										}
 
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = upLabels.getIsland(yLabel).subIsland(n).area();
-													sumSubIslandAreaUP1 += area;
-													maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,area);
+													int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
+													float bigArea = upLabels.getIsland(yLabel).area();
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaUP1 += relArea;
+													maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,relArea);
 												}
 											}
 										}
@@ -387,7 +407,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											if(srmDB.equationMap.find(equationKey)!=srmDB.equationMap.end()) {
 												areaX += dbLabels.area(xLabel);
 
-												//> for entropy calculations
+												//> for match calculations
 												sumIslandAreaDB += dbLabels.area(xLabel);
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(xLabel));
 
@@ -401,14 +421,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = dbLabels.getIsland(xLabel).subIsland(n).area();
-															sumSubIslandAreaDB2 += area;
-															maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,area);
+															int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
+															float bigArea = dbLabels.getIsland(xLabel).area();
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaDB2 += relArea;
+															maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,relArea);
 														}
 													}
 												}
@@ -425,14 +447,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 										}
 
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = dbLabels.getIsland(yLabel).subIsland(n).area();
-													sumSubIslandAreaDB1 += area;
-													maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,area);
+													int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
+													float bigArea = dbLabels.getIsland(yLabel).area();
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaDB1 += relArea;
+													maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,relArea);
 												}
 											}
 										}
@@ -463,8 +487,8 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
 							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
 							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
-							float contrastWeightUP = pow(alpha,esgUP);
-							float contrastWeightDB = pow(alpha,esgDB);
+							float contrastWeightUP = this->contrastWeight(esgUP);
+							float contrastWeightDB = this->contrastWeight(esgDB);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
@@ -476,8 +500,9 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								if(label1.find("Excavated")!=string::npos) {
-									countSubIslandPropUP1 = sumSubIslandAreaUP1/maxSubIslandAreaUP1;
-									countSubIslandPropDB1 = sumSubIslandAreaDB1/maxSubIslandAreaDB1;
+									float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
+									countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
+									countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
 									subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
 									subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
 									subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
@@ -491,8 +516,9 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								if(label2.find("Excavated")!=string::npos) {
-									countSubIslandPropUP2 = sumSubIslandAreaUP2/maxSubIslandAreaUP2;
-									countSubIslandPropDB2 = sumSubIslandAreaDB2/maxSubIslandAreaDB2;
+									float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
+									countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
+									countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
 									subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
 									subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
 									subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
@@ -589,7 +615,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 						float areaUP=0.0, areaDB=0.0;
 						int maxIslandAreaUP = 0, maxIslandAreaDB = 0;
 						float sumIslandAreaUP=0.0, sumIslandAreaDB = 0.0;
-						int maxSubIslandAreaUP1=0, maxSubIslandAreaUP2=0, maxSubIslandAreaDB1=0,maxSubIslandAreaDB2=0;
+						float maxSubIslandAreaUP1=0, maxSubIslandAreaUP2=0, maxSubIslandAreaDB1=0,maxSubIslandAreaDB2=0;
 						float sumSubIslandAreaUP1=0.0, sumSubIslandAreaUP2=0.0, sumSubIslandAreaDB1=0.0, sumSubIslandAreaDB2=0.0;
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
@@ -632,7 +658,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 												areaY += upLabels.area(yLabel) * penaltyY;
 
-												//> for entropy calculations
+												//> for match calculations
 												sumIslandAreaUP += upLabels.area(yLabel);
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(yLabel));
 
@@ -646,14 +672,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = upLabels.getIsland(yLabel).subIsland(n).area();
-															sumSubIslandAreaUP1 += area;
-															maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,area);
+															int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
+															float bigArea = upLabels.area(yLabel);
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaUP1 += relArea;
+															maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,relArea);
 														}
 													}
 												}
@@ -670,14 +698,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 										}
 
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = upLabels.getIsland(xLabel).subIsland(n).area();
-													sumSubIslandAreaUP2 += area;
-													maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,area);
+													int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
+													float bigArea = upLabels.area(xLabel);
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaUP2 += relArea;
+													maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,relArea);
 												}
 											}
 										}
@@ -735,7 +765,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 												areaX += upLabels.area(xLabel) * penaltyX;
 
-												//> for entropy calculations
+												//> for match calculations
 												sumIslandAreaUP += upLabels.area(xLabel);
 												maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(xLabel));
 
@@ -749,14 +779,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = upLabels.getIsland(xLabel).subIsland(n).area();
-															sumSubIslandAreaUP2 += area;
-															maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,area);
+															int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
+															float bigArea = upLabels.area(xLabel);
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaUP2 += relArea;
+															maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,relArea);
 														}
 													}
 												}
@@ -772,14 +804,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 											}
 										}
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = upLabels.getIsland(yLabel).subIsland(n).area();
-													sumSubIslandAreaUP1 += area;
-													maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,area);
+													int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
+													float bigArea = upLabels.area(yLabel);
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaUP1 += relArea;
+													maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,relArea);
 												}
 											}
 										}
@@ -821,7 +855,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											if(srmDB.equationMap.find(equationKeyDB)!=srmDB.equationMap.end()) {
 												areaY += dbLabels.area(yLabel);
 
-												//>for entropy calculations
+												//>for match calculations
 												sumIslandAreaDB += dbLabels.area(yLabel);
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
 
@@ -835,14 +869,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = dbLabels.getIsland(yLabel).subIsland(n).area();
-															sumSubIslandAreaDB1 += area;
-															maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,area);
+															int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
+															float bigArea = dbLabels.area(yLabel);
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaDB1 += relArea;
+															maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,relArea);
 														}
 													}
 												}
@@ -859,14 +895,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 										}
 
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = dbLabels.getIsland(xLabel).subIsland(n).area();
-													sumSubIslandAreaDB2 += area;
-													maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,area);
+													int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
+													float bigArea = dbLabels.area(xLabel);
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaDB2 += relArea;
+													maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,relArea);
 												}
 											}
 										}
@@ -902,7 +940,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											if(srmDB.equationMap.find(equationKey)!=srmDB.equationMap.end()) {
 												areaX += dbLabels.area(xLabel);
 
-												//>for entropy calculations
+												//>for match calculations
 												sumIslandAreaDB += dbLabels.area(xLabel);
 												maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(xLabel));
 
@@ -916,14 +954,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 												}
 
-												//> for sub island entropy calculations
+												//> for sub island match calculations
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
 														if(shape_name.find("Disc")!=string::npos) {
-															int area = dbLabels.getIsland(xLabel).subIsland(n).area();
-															sumSubIslandAreaDB2 += area;
-															maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,area);
+															int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
+															float bigArea = dbLabels.area(xLabel);
+															float relArea = smallArea/bigArea;
+															sumSubIslandAreaDB2 += relArea;
+															maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,relArea);
 														}
 													}
 												}
@@ -940,14 +980,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 											}
 										}
 
-										//> for sub island entropy calculations
+										//> for sub island match calculations
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
 												if(shape_name.find("Disc")!=string::npos) {
-													int area = dbLabels.getIsland(yLabel).subIsland(n).area();
-													sumSubIslandAreaDB1 += area;
-													maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,area);
+													int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
+													float bigArea = dbLabels.area(yLabel);
+													float relArea = smallArea/bigArea;
+													sumSubIslandAreaDB1 += relArea;
+													maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,relArea);
 												}
 											}
 										}
@@ -962,6 +1004,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							} // end else if areaDB1 > areaDB2
 							areaUP = areaUP * this->rVal[maxNeighborLevelUP];
 							areaDB = areaDB * this->rVal[maxNeighborLevelDB];
+
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
 							if(std::isnan(countProportionUP)) countProportionUP = 0.0;
@@ -978,8 +1021,8 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
 							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
 							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
-							float contrastWeightUP = pow(alpha,esgUP);
-							float contrastWeightDB = pow(alpha,esgDB);
+							float contrastWeightUP = this->contrastWeight(esgUP);
+							float contrastWeightDB = this->contrastWeight(esgDB);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
@@ -991,8 +1034,9 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								if(label1.find("Excavated")!=string::npos) {
-									countSubIslandPropUP1 = sumSubIslandAreaUP1/maxSubIslandAreaUP1;
-									countSubIslandPropDB1 = sumSubIslandAreaDB1/maxSubIslandAreaDB1;
+									float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
+									countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
+									countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
 									subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
 									subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
 									subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
@@ -1006,8 +1050,9 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(label2.find("Excavated")!=string::npos || label1.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								if(label2.find("Excavated")!=string::npos) {
-									countSubIslandPropUP2 = sumSubIslandAreaUP2/maxSubIslandAreaUP2;
-									countSubIslandPropDB2 = sumSubIslandAreaDB2/maxSubIslandAreaDB2;
+									float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
+									countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
+									countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
 									subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
 									subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
 									subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
@@ -1034,6 +1079,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								weightedMismatchEntropy = contrastWeightDB * (areaDB / dbMergedLabels.totalArea());
 							}
 							totalMismatchScore += weightedMismatchEntropy;
+
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
@@ -1101,7 +1147,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 						float areaUP=0.0, areaDB=0.0;
 						int maxIslandAreaUP = 0, maxIslandAreaDB = 0;
 						float sumIslandAreaUP=0.0, sumIslandAreaDB=0.0;
-						int maxSubIslandAreaUP1=0, maxSubIslandAreaUP2=0, maxSubIslandAreaDB1=0,maxSubIslandAreaDB2=0;
+						float maxSubIslandAreaUP1=0, maxSubIslandAreaUP2=0, maxSubIslandAreaDB1=0,maxSubIslandAreaDB2=0;
 						float sumSubIslandAreaUP1=0.0, sumSubIslandAreaUP2=0.0, sumSubIslandAreaDB1=0.0, sumSubIslandAreaDB2=0.0;
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
@@ -1145,7 +1191,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 													areaY += upLabels.area(yLabel) * penaltyY;
 
-													//> for entropy calculations
+													//> for match calculations
 													sumIslandAreaUP += upLabels.area(yLabel);
 													maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(yLabel));
 
@@ -1159,14 +1205,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 														}
 													}
 
-													//> for sub island entropy calculations
+													//> for sub island match calculations
 													if(label1.find("Excavated")!=string::npos) {
 														for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 															String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
 															if(shape_name.find("Disc")!=string::npos) {
-																int area = upLabels.getIsland(yLabel).subIsland(n).area();
-																sumSubIslandAreaUP1 += area;
-																maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,area);
+																int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
+																float bigArea = upLabels.area(yLabel);
+																float relArea = smallArea/bigArea;
+																sumSubIslandAreaUP1 += relArea;
+																maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,relArea);
 															}
 														}
 													}
@@ -1183,14 +1231,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 											}
 
-											//> for sub island entropy calculations
+											//> for sub island match calculations
 											if(label2.find("Excavated")!=string::npos) {
 												for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 													String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
 													if(shape_name.find("Disc")!=string::npos) {
-														int area = upLabels.getIsland(xLabel).subIsland(n).area();
-														sumSubIslandAreaUP2 += area;
-														maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,area);
+														int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
+														float bigArea = upLabels.area(xLabel);
+														float relArea = smallArea/bigArea;
+														sumSubIslandAreaUP2 += relArea;
+														maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,relArea);
 													}
 												}
 											}
@@ -1250,7 +1300,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 													}
 													areaX += upLabels.area(xLabel) * penaltyX;
 
-													//> for entropy calculations
+													//> for match calculations
 													sumIslandAreaUP += upLabels.area(xLabel);
 													maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(xLabel));
 
@@ -1264,14 +1314,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 														}
 													}
 
-													//> for sub island entropy calculations
+													//> for sub island match calculations
 													if(label2.find("Excavated")!=string::npos) {
 														for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 															String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
 															if(shape_name.find("Disc")!=string::npos) {
-																int area = upLabels.getIsland(xLabel).subIsland(n).area();
-																sumSubIslandAreaUP2 += area;
-																maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,area);
+																int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
+																float bigArea = upLabels.area(xLabel);
+																float relArea = smallArea/bigArea;
+																sumSubIslandAreaUP2 += relArea;
+																maxSubIslandAreaUP2 = max(maxSubIslandAreaUP2,relArea);
 															}
 														}
 													}
@@ -1288,14 +1340,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 											}
 
-											//> for sub island entropy calculations
+											//> for sub island match calculations
 											if(label1.find("Excavated")!=string::npos) {
 												for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 													String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
 													if(shape_name.find("Disc")!=string::npos) {
-														int area = upLabels.getIsland(yLabel).subIsland(n).area();
-														sumSubIslandAreaUP1 += area;
-														maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,area);
+														int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
+														float bigArea = upLabels.area(yLabel);
+														float relArea = smallArea/bigArea;
+														sumSubIslandAreaUP1 += relArea;
+														maxSubIslandAreaUP1 = max(maxSubIslandAreaUP1,relArea);
 													}
 												}
 											}
@@ -1340,7 +1394,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												if(srmDB.equationMap.find(equationKeyDB)!=srmDB.equationMap.end()) {
 													areaY += dbLabels.area(yLabel);
 
-													//>for entropy calculations
+													//>for match calculations
 													sumIslandAreaDB += dbLabels.area(yLabel);
 													maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
 
@@ -1354,14 +1408,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 														}
 													}
 
-													//> for sub island entropy calculations
+													//> for sub island match calculations
 													if(label1.find("Excavated")!=string::npos) {
 														for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 															String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
 															if(shape_name.find("Disc")!=string::npos) {
-																int area = dbLabels.getIsland(yLabel).subIsland(n).area();
-																sumSubIslandAreaDB1 += area;
-																maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,area);
+																int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
+																float bigArea = dbLabels.area(yLabel);
+																float relArea = smallArea/bigArea;
+																sumSubIslandAreaDB1 += relArea;
+																maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,relArea);
 															}
 														}
 													}
@@ -1378,14 +1434,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 											}
 
-											//> for sub island entropy calculations
+											//> for sub island match calculations
 											if(label2.find("Excavated")!=string::npos) {
 												for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 													String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
 													if(shape_name.find("Disc")!=string::npos) {
-														int area = dbLabels.getIsland(xLabel).subIsland(n).area();
-														sumSubIslandAreaDB2 += area;
-														maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,area);
+														int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
+														float bigArea = dbLabels.area(xLabel);
+														float relArea = smallArea/bigArea;
+														sumSubIslandAreaDB2 += relArea;
+														maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,relArea);
 													}
 												}
 											}
@@ -1422,7 +1480,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												if(srmDB.equationMap.find(equationKey)!=srmDB.equationMap.end()) {
 													areaX += dbLabels.area(xLabel);
 
-													//>for entropy calculations
+													//>for match calculations
 													sumIslandAreaDB += dbLabels.area(xLabel);
 													maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(xLabel));
 
@@ -1436,14 +1494,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 														}
 													}
 
-													//> for sub island entropy calculations
+													//> for sub island match calculations
 													if(label2.find("Excavated")!=string::npos) {
 														for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 															String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
 															if(shape_name.find("Disc")!=string::npos) {
-																int area = dbLabels.getIsland(xLabel).subIsland(n).area();
-																sumSubIslandAreaDB2 += area;
-																maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,area);
+																int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
+																float bigArea = dbLabels.area(xLabel);
+																float relArea = smallArea/bigArea;
+																sumSubIslandAreaDB2 += relArea;
+																maxSubIslandAreaDB2 = max(maxSubIslandAreaDB2,relArea);
 															}
 														}
 													}
@@ -1460,14 +1520,16 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 												}
 											}
 
-											//> for sub island entropy calculations
+											//> for sub island match calculations
 											if(label1.find("Excavated")!=string::npos) {
 												for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 													String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
 													if(shape_name.find("Disc")!=string::npos) {
-														int area = dbLabels.getIsland(yLabel).subIsland(n).area();
-														sumSubIslandAreaDB1 += area;
-														maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,area);
+														int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
+														float bigArea = dbLabels.area(yLabel);
+														float relArea = smallArea/bigArea;
+														sumSubIslandAreaDB1 += relArea;
+														maxSubIslandAreaDB1 = max(maxSubIslandAreaDB1,relArea);
 													}
 												}
 											}
@@ -1498,8 +1560,8 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							int shadeDiffDB = abs(dbMergedLabels.getShadeLevel(label1)-dbMergedLabels.getShadeLevel(label2));
 							float esgUP = shadeDiffUP / (distAvgUP + 1.0);
 							float esgDB = shadeDiffDB / (distAvgDB + 1.0);
-							float contrastWeightUP = pow(alpha,esgUP);
-							float contrastWeightDB = pow(alpha,esgDB);
+							float contrastWeightUP = this->contrastWeight(esgUP);
+							float contrastWeightDB = this->contrastWeight(esgDB);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
@@ -1511,8 +1573,9 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 								if(label1.find("Excavated")!=string::npos) {
-									countSubIslandPropUP1 = sumSubIslandAreaUP1/maxSubIslandAreaUP1;
-									countSubIslandPropDB1 = sumSubIslandAreaDB1/maxSubIslandAreaDB1;
+									float normFactor = 1.0 / max(maxSubIslandAreaUP1,maxSubIslandAreaDB1);
+									countSubIslandPropUP1 = sumSubIslandAreaUP1 * normFactor;
+									countSubIslandPropDB1 = sumSubIslandAreaDB1 * normFactor;
 									subIslandEntropyUP1 = this->entropy(countSubIslandPropUP1);
 									subIslandEntropyDB1 = this->entropy(countSubIslandPropDB1);
 									subIslandEntropyVal1 = (min(subIslandEntropyUP1,subIslandEntropyDB1)+1.0) / (max(subIslandEntropyUP1,subIslandEntropyDB1)+1.0);
@@ -1526,8 +1589,9 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
 								if(label2.find("Excavated")!=string::npos) {
-									countSubIslandPropUP2 = sumSubIslandAreaUP2/maxSubIslandAreaUP2;
-									countSubIslandPropDB2 = sumSubIslandAreaDB2/maxSubIslandAreaDB2;
+									float normFactor = 1.0 / max(maxSubIslandAreaUP2,maxSubIslandAreaDB2);
+									countSubIslandPropUP2 = sumSubIslandAreaUP2 * normFactor;
+									countSubIslandPropDB2 = sumSubIslandAreaDB2 * normFactor;
 									subIslandEntropyUP2 = this->entropy(countSubIslandPropUP2);
 									subIslandEntropyDB2 = this->entropy(countSubIslandPropDB2);
 									subIslandEntropyVal2 = (min(subIslandEntropyUP2,subIslandEntropyDB2)+1.0) / (max(subIslandEntropyUP2,subIslandEntropyDB2)+1.0);
@@ -1554,6 +1618,35 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 								weightedMismatchEntropy = contrastWeightDB * (areaDB / dbMergedLabels.totalArea());
 							}
 							totalMismatchScore += weightedMismatchEntropy;
+
+
+							if(std::isnan(totalMatchScore)) {
+								printf("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								printf("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								printf("TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								printf("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								printf("EntropyVal: %f\n",entropyVal);
+								printf("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								printf("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								printf("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								printf("MaxTotalArea: %d\n",maxTotalArea);
+								printf("RelArea: %f\n",relArea);
+								printf("DistAvgUP: %f, DistAvgDB: %f\n",distAvgUP,distAvgDB);
+								printf("esgUP: %f, esgDB: %f\n",esgUP,esgDB);
+								printf("ContrastWeight: %f\n",contrastWeight);
+								printf("CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
+								printf("CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
+								printf("SubIslandEntropyUP1: %f, subIslandEntropyDB1: %f\n",subIslandEntropyUP1,subIslandEntropyDB1);
+								printf("SubIslandEntropyUP2: %f, subIslandEntropyDB2: %f\n",subIslandEntropyUP2,subIslandEntropyDB2);
+								printf("SubIslandEntropy1: %f, subIslandEntropy2: %f\n",subIslandEntropyVal1,subIslandEntropyVal2);
+								printf("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								printf("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								printf("weightedEntropy: %f\n",weightedEntropy);
+								printf("totalMatchScore: %f\n",totalMatchScore);
+								printf("----------------------------------\n");
+								exit(1);
+							}
+
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
@@ -1621,7 +1714,7 @@ void ShadeShapeRelationMatch::entropy(ShadeShapeRelation &ssrUP, ShadeShapeRelat
 void ShadeShapeRelationMatch::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
 	ssrUP.get_srm().downScaleSrm();
 	ssrDB.get_srm().downScaleSrm();
-	this->entropy(ssrUP,ssrDB);
+	this->match(ssrUP,ssrDB);
 	//float matchVal = this->srm_match(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);
 	//this->writeDownScaleSrm(ssrUP.name(),srmPairUP,upMergedLabels,upLabels.totalArea());
 	//this->writeDownScaleSrm(ssrDB.name(),srmPairDB,dbMergedLabels,dbLabels.totalArea());

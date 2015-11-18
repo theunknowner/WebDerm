@@ -11,10 +11,14 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "subislands.h"
 
+namespace Isl {
+	void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param);
+}
 class Islands {
 private:
 
 	vector<SubIslands> subIslandVec;
+	String islName;
 	int islArea;
 	int islShadeLevel;
 	int islShape;
@@ -39,6 +43,7 @@ private:
 public:
 	Islands();
 	Islands(Mat islandImg);
+	String name();
 	int area();
 	int& shade();
 	Mat& image();
@@ -60,6 +65,9 @@ public:
 
 	SubIslands& subIsland(int subIslNum);
 	int numOfSubIslands();
+
+	SubIslands getSubIslandWithPoint(Point pt);
+	void showInteractiveSubIslands();
 
 };
 

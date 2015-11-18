@@ -11,6 +11,47 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "subislands.h"
 
+namespace Isl {
+void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param) {
+	Islands &island = *((Islands*)param);
+	Mat img = island.image().clone();
+	SubIslands subIsland;
+	static TestML ml;
+	if  ( event == EVENT_LBUTTONDOWN ){
+		subIsland = island.getSubIslandWithPoint(Point(x,y));
+		if(!subIsland.isEmpty()) {
+			char text[100];
+			int lum = img.at<uchar>(y,x);
+			int area = subIsland.area();
+			float nnResult = *max_element(subIsland.nn_results().begin<float>(),subIsland.nn_results().end<float>());
+			cvtColor(img,img,CV_GRAY2BGR);
+			for(auto it=subIsland.coordinates().begin(); it!=subIsland.coordinates().end(); it++) {
+				int x = it->second.x;
+				int y = it->second.y;
+				img.at<Vec3b>(y,x) = Vec3b(0,255,0);
+			}
+			String shade_shape = subIsland.shape_name();
+			sprintf(text,"(%d,%d) | Lum: %d | Area: %d | ShadeShape: %s | NN: %f",x,y,lum,area,shade_shape.c_str(),nnResult);
+			cv::displayStatusBar(island.name(),text);
+			char textScore[100];
+			Mat nnResults = subIsland.nn_results();
+			sprintf(textScore,"[%.5f, %.5f, %.5f, %.5f, %.5f]",nnResults.at<float>(0,0),nnResults.at<float>(0,1),nnResults.at<float>(0,2),nnResults.at<float>(0,3),nnResults.at<float>(0,4));
+			namedWindow("SubIsland", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			imshow("SubIsland",subIsland.image());
+			namedWindow("SubIsland_NN", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			cv::displayStatusBar("SubIsland_NN",textScore);
+			imshow("SubIsland_NN",subIsland.nn_image());
+		}
+	}
+	if(event == EVENT_LBUTTONUP) {
+		img = island.image().clone();
+	}
+	imshow(island.name(),img);
+}
+
+}
+
+
 /************ PRIVATE FUNCTIONS ******************/
 
 //! determines shape of island using shape neural network
@@ -86,6 +127,7 @@ void Islands::storeSubIslands(SubIslands& subIsland) {
 Islands::Islands(){}
 
 Islands::Islands(Mat islandImg) {
+	this->islName = "Island";
 	this->islSubShape = -1;
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
@@ -101,6 +143,10 @@ Islands::Islands(Mat islandImg) {
 		SubIslands subIsland(littleSubIslands.at(i));
 		this->storeSubIslands(subIsland);
 	}
+}
+
+String Islands::name() {
+	return this->islName;
 }
 
 //! returns area/number of pixels of island
@@ -206,4 +252,21 @@ SubIslands& Islands::subIsland(int subIslNum) {
 
 int Islands::numOfSubIslands() {
 	return this->subIslandVec.size();
+}
+
+SubIslands Islands::getSubIslandWithPoint(Point pt) {
+	for(int i=0; i<this->numOfSubIslands(); i++) {
+		SubIslands subIsland = this->subIsland(i);
+		if(subIsland.containsCoordinate(pt)) {
+			return this->subIsland(i);
+		}
+	}
+	return SubIslands();
+}
+
+void Islands::showInteractiveSubIslands() {
+	namedWindow(this->islName, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	cv::setMouseCallback(this->islName,Isl::onMouseCheckSubIslands, this);
+	imshow(this->islName,this->islandImg);
+	waitKey(0);
 }

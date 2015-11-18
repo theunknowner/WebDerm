@@ -60,9 +60,10 @@ public:
 	void set_island_shade(int featNum, int islNum, int newShade);
 	ImageData& getImageData();
 
-	void writeListOfIslandsWithLowNN();
-	void extractIslandsWithLowNN();
 	vector<Mat> isolateConnectedFeatures(Mat src);
+
+	void showInteractiveSubIslands();
+
 };
 
 #endif /* SHADESHAPE_H_ */

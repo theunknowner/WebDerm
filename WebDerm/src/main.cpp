@@ -83,7 +83,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-	/*
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -91,13 +91,13 @@ int main(int argc,char** argv)
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id);
-	ss1.showInteractiveIslands();
+	ss1.showInteractiveSubIslands();
 	TestML::clear();
 /**/
-	/*
-	ShadeShape ss1 = Scripts::script31("herpes_zoster3");
+/*
+	ShadeShape ss1 = Scripts::script31("herpes3");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	ss1.showInteractiveIslands();
+	ss1.showInteractiveSubIslands();
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
