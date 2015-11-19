@@ -19,7 +19,7 @@ private:
 	float mismatchScore;
 
 	float entropy(float count);
-	float contrastWeight(float esg);
+	float contrastWeight(float esg, float relArea);
 
 	void match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB);
 	float rVal[6] = {1.0,1.0,0.63,0.55,0.52,0.5};

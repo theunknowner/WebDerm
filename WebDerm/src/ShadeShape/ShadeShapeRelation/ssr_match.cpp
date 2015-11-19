@@ -25,12 +25,11 @@ float ShadeShapeRelationMatch::entropy(float count) {
 	}
 }
 
-float ShadeShapeRelationMatch::contrastWeight(float esg) {
+float ShadeShapeRelationMatch::contrastWeight(float esg, float relArea) {
 	//const float alpha = 2.0;
 	const float scale = 0.0007;
 
-	//float result = pow(alpha,esg/scale);
-	float result = pow(esg/scale,2);
+	float result = esg * (exp(relArea)-1.0);
 	return result;
 }
 
@@ -496,10 +495,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float relAreaDB2 = srmAreaDB.at(i).at(j).at(k).at(m).second;
 							float relAreaUP = min(relAreaUP1,relAreaUP2)/upLabels.totalArea();
 							float relAreaDB = min(relAreaDB1,relAreaDB2)/dbLabels.totalArea();
-							esgUP.esgVal = pow(esgUP.esgVal,2) * (exp(relAreaUP)-1.0);
-							esgDB.esgVal = pow(esgDB.esgVal,2) * (exp(relAreaDB)-1.0);
-							float contrastWeightUP = this->contrastWeight(esgUP.esgVal);
-							float contrastWeightDB = this->contrastWeight(esgDB.esgVal);
+							float contrastWeightUP = this->contrastWeight(esgUP.esgVal,relAreaUP);
+							float contrastWeightDB = this->contrastWeight(esgDB.esgVal,relAreaDB);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
@@ -586,6 +583,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
 								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
+								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -613,6 +611,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"RelArea: %f\n",relArea);
 								fprintf(fp2,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
 								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
+								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp2,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1053,10 +1052,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float relAreaDB2 = areaDB2;
 							float relAreaUP = min(relAreaUP1,relAreaUP2)/upLabels.totalArea();
 							float relAreaDB = min(relAreaDB1,relAreaDB2)/dbLabels.totalArea();
-							esgUP.esgVal = pow(esgUP.esgVal,2) * (exp(relAreaUP)-1.0);
-							esgDB.esgVal = pow(esgDB.esgVal,2) * (exp(relAreaDB)-1.0);
-							float contrastWeightUP = this->contrastWeight(esgUP.esgVal);
-							float contrastWeightDB = this->contrastWeight(esgDB.esgVal);
+							float contrastWeightUP = this->contrastWeight(esgUP.esgVal,relAreaUP);
+							float contrastWeightDB = this->contrastWeight(esgDB.esgVal,relAreaDB);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
@@ -1142,6 +1139,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"EsgAvgDistUP: %f, EsgAvgDistUP: %f\n",esgUP.avgDist,esgDB.avgDist);
 								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
+								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1167,6 +1165,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"RelArea: %f\n",relArea);
 								fprintf(fp2,"EsgAvgDistUP: %f, EsgAvgDistUP: %f\n",esgUP.avgDist,esgDB.avgDist);
 								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
+								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp2,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1615,10 +1614,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float relAreaDB2 = areaDB2;
 							float relAreaUP = min(relAreaUP1,relAreaUP2)/upLabels.totalArea();
 							float relAreaDB = min(relAreaDB1,relAreaDB2)/dbLabels.totalArea();
-							esgUP.esgVal = pow(esgUP.esgVal,2) * (exp(relAreaUP)-1.0);
-							esgDB.esgVal = pow(esgDB.esgVal,2) * (exp(relAreaDB)-1.0);
-							float contrastWeightUP = this->contrastWeight(esgUP.esgVal);
-							float contrastWeightDB = this->contrastWeight(esgDB.esgVal);
+							float contrastWeightUP = this->contrastWeight(esgUP.esgVal,relAreaUP);
+							float contrastWeightDB = this->contrastWeight(esgDB.esgVal,relAreaDB);
 							if(std::isnan(contrastWeightUP)) contrastWeightUP = 1.0;
 							if(std::isnan(contrastWeightDB)) contrastWeightDB = 1.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
@@ -1704,6 +1701,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
 								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
+								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);
@@ -1728,6 +1726,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"RelArea: %f\n",relArea);
 								fprintf(fp2,"EsgAvgDistUP: %f, EsgAvgDistDB: %f\n",esgUP.avgDist,esgDB.avgDist);
 								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",esgUP.esgVal,esgDB.esgVal);
+								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"CountSubIslandPropUP1: %f, CountSubIslandPropDB1: %f\n",countSubIslandPropUP1,countSubIslandPropDB1);
 								fprintf(fp2,"CountSubIslandPropUP2: %f, CountSubIslandPropDB2: %f\n",countSubIslandPropUP2,countSubIslandPropDB2);

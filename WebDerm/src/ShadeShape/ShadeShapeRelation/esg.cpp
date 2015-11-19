@@ -10,7 +10,7 @@
 float Esg::calculate(vector<float> distVec, int shadeDiff) {
 	float avgDist = std::accumulate(distVec.begin(),distVec.end(),0.0);
 	avgDist /= distVec.size();
-	float esg = shadeDiff / (avgDist + 1.0);
+	float esg = pow(shadeDiff,10.0) / (avgDist + 4.0);
 
 	this->avgDist = avgDist;
 	this->esgVal = esg;
