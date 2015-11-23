@@ -76,7 +76,7 @@ void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param) {
 				img.at<Vec3b>(y,x) = Vec3b(0,255,0);
 			}
 			String shade_shape = island.shape_name() + "_s" + toString(shadeNum);
-			sprintf(text,"(%d,%d) | Lum: %d | Area: %d | ShadeShape: %s | NN: %f",x,y,lum,area,shade_shape.c_str(),nnResult);
+			sprintf(text,"(%d,%d) | Lum: %d | Area: %d | ShadeShape: %s | NN: %f | %d",x,y,lum,area,shade_shape.c_str(),nnResult,ss.area());
 			cv::displayStatusBar(winName,text);
 			//char textScore[100];
 			//Mat nnResults = island.nn_results();

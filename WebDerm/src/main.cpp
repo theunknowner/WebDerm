@@ -255,14 +255,7 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-/*
-	ShapeMorph sm;
-	Mat img = imread("/home/jason/Desktop/workspace/test4.png",0);
-	vector<Mat> vecMat = sm.liquidFeatureExtractionInverse(img);
-	for(unsigned int i=0; i<vecMat.size(); i++) {
-		imgshow(vecMat.at(i));
-	}
-	/**/
+
 	/*
 	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s2.png",0);
 	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s3.png",0);
