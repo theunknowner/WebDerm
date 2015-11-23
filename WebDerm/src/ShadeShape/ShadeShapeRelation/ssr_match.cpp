@@ -59,6 +59,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	float totalMatchScore = 0.0, totalMismatchScore=0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
 
+	float negArcScore = -100.0;
+	float posArcScore = 100.0;
 	// for loop i: labels for the y axis
 	for(unsigned int i=0; i<srmCountUP.size(); i++) {
 		String label1 = upMergedLabels.at(i);
@@ -143,13 +145,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 															float bigArea = upLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreUP1 += score;
 														}
 													}
@@ -171,13 +175,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreUP2 += score;
 												}
 											}
@@ -238,13 +244,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 															float bigArea = dbLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreDB1 += score;
 														}
 													}
@@ -265,13 +273,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreDB2 += score;
 												}
 											}
@@ -342,13 +352,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 															float bigArea = upLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreUP2 += score;
 														}
 													}
@@ -370,13 +382,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreUP1 += score;
 												}
 											}
@@ -436,13 +450,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 															float bigArea = dbLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreDB2 += score;
 														}
 													}
@@ -464,13 +480,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreDB1 += score;
 												}
 											}
@@ -670,13 +688,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 															float bigArea = upLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreUP1 += score;
 														}
 													}
@@ -698,13 +718,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreUP2 += score;
 												}
 											}
@@ -781,13 +803,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 															float bigArea = upLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreUP2 += score;
 														}
 													}
@@ -808,13 +832,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreUP1 += score;
 												}
 											}
@@ -875,13 +901,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label1.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 															float bigArea = dbLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreDB1 += score;
 														}
 													}
@@ -903,13 +931,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label2.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreDB2 += score;
 												}
 											}
@@ -964,13 +994,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(label2.find("Excavated")!=string::npos) {
 													for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 														String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 															int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 															float bigArea = dbLabels.totalArea();
 															float relArea = smallArea/bigArea;
-															float disc_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-															float blotch_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-															float score = (disc_score - blotch_score) * relArea;
+															float val = negArcScore;
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																val = posArcScore;
+															}
+															float score = val * relArea;
 															sumArcScoreDB2 += score;
 														}
 													}
@@ -992,13 +1024,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(label1.find("Excavated")!=string::npos) {
 											for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 												String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
-												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+												if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 													int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float disc_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-													float blotch_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-													float score = (disc_score - blotch_score) * relArea;
+													float val = negArcScore;
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+														val = posArcScore;
+													}
+													float score = val * relArea;
 													sumArcScoreDB1 += score;
 												}
 											}
@@ -1198,13 +1232,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(label1.find("Excavated")!=string::npos) {
 														for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 															String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
-															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 																int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 																float bigArea = upLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float disc_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-																float blotch_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-																float score = (disc_score - blotch_score) * relArea;
+																float val = negArcScore;
+																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																	val = posArcScore;
+																}
+																float score = val * relArea;
 																sumArcScoreUP1 += score;
 															}
 														}
@@ -1226,13 +1262,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											if(label2.find("Excavated")!=string::npos) {
 												for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 													String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 														int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 														float bigArea = upLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float disc_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-														float blotch_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-														float score = (disc_score - blotch_score) * relArea;
+														float val = negArcScore;
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+															val = posArcScore;
+														}
+														float score = val * relArea;
 														sumArcScoreUP2 += score;
 													}
 												}
@@ -1270,14 +1308,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													totalCountUP++; //total relations for areaUP1
 													totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
 												}
-												/*if(label1=="0_Strip_s4" && label2=="1_Default_s2" && m==1) {
-														printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
-														printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
-														printf("rel_op_idx: %d\n",rel_op_idx);
-														printf("srmRelationArea: %d\n",srmUP.relationArea(yIdx,xIdx).second);
-														printf("totalDenomAreaUP: %f\n",totalDenomAreaUP);
-
-													}*/
 											}
 											int areaX=0;
 											for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
@@ -1311,13 +1341,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(label2.find("Excavated")!=string::npos) {
 														for(int n=0; n<upLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 															String shape_name = upLabels.getIsland(xLabel).subIsland(n).shape_name();
-															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 																int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 																float bigArea = upLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float disc_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-																float blotch_score = upLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-																float score = (disc_score - blotch_score) * relArea;
+																float val = negArcScore;
+																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																	val = posArcScore;
+																}
+																float score = val * relArea;
 																sumArcScoreUP2 += score;
 															}
 														}
@@ -1339,13 +1371,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											if(label1.find("Excavated")!=string::npos) {
 												for(int n=0; n<upLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 													String shape_name = upLabels.getIsland(yLabel).subIsland(n).shape_name();
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 														int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 														float bigArea = upLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float disc_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-														float blotch_score = upLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-														float score = (disc_score - blotch_score) * relArea;
+														float val = negArcScore;
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+															val = posArcScore;
+														}
+														float score = val * relArea;
 														sumArcScoreUP1 += score;
 													}
 												}
@@ -1409,13 +1443,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(label1.find("Excavated")!=string::npos) {
 														for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 															String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
-															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 																int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 																float bigArea = dbLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float disc_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-																float blotch_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-																float score = (disc_score - blotch_score) * relArea;
+																float val = negArcScore;
+																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																	val = posArcScore;
+																}
+																float score = val * relArea;
 																sumArcScoreDB1 += score;
 															}
 														}
@@ -1437,13 +1473,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											if(label2.find("Excavated")!=string::npos) {
 												for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 													String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 														int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 														float bigArea = dbLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float disc_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-														float blotch_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-														float score = (disc_score - blotch_score) * relArea;
+														float val = negArcScore;
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+															val = posArcScore;
+														}
+														float score = val * relArea;
 														sumArcScoreDB2 += score;
 													}
 												}
@@ -1499,13 +1537,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(label2.find("Excavated")!=string::npos) {
 														for(int n=0; n<dbLabels.getIsland(xLabel).numOfSubIslands(); n++) {
 															String shape_name = dbLabels.getIsland(xLabel).subIsland(n).shape_name();
-															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+															if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 																int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 																float bigArea = dbLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float disc_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,0);
-																float blotch_score = dbLabels.getIsland(xLabel).subIsland(n).nn_results().at<float>(0,2);
-																float score = (disc_score - blotch_score) * relArea;
+																float val = negArcScore;
+																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+																	val = posArcScore;
+																}
+																float score = val * relArea;
 																sumArcScoreDB2 += score;
 															}
 														}
@@ -1527,13 +1567,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											if(label1.find("Excavated")!=string::npos) {
 												for(int n=0; n<dbLabels.getIsland(yLabel).numOfSubIslands(); n++) {
 													String shape_name = dbLabels.getIsland(yLabel).subIsland(n).shape_name();
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos) {
+													if(shape_name.find("Disc")!=string::npos || shape_name.find("Blotch")!=string::npos || shape_name.find("Donut")!=string::npos) {
 														int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 														float bigArea = dbLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float disc_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,0);
-														float blotch_score = dbLabels.getIsland(yLabel).subIsland(n).nn_results().at<float>(0,2);
-														float score = (disc_score - blotch_score) * relArea;
+														float val = negArcScore;
+														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
+															val = posArcScore;
+														}
+														float score = val * relArea;
 														sumArcScoreDB1 += score;
 													}
 												}

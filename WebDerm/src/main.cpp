@@ -190,7 +190,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -275,12 +275,12 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
-	ShadeShape ss1 = Scripts::script31("lph4");
+	ShadeShape ss1 = Scripts::script31("melanoma8b");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(58,23));
-	SubIslands subIsland = island.getSubIslandWithPoint(Point(27,55));
+	Islands island = ss1.getIslandWithPoint(Point(53,32));
+	//SubIslands subIsland = island.getSubIslandWithPoint(Point(27,55));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",subIsland.image());
+	imwrite(ss1.name()+"_sample.png",island.image());
 	/*
 	Mat results = island.nn_results();
 	cout << results << endl;
