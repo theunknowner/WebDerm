@@ -91,7 +91,8 @@ int main(int argc,char** argv)
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id);
-	ss1.showInteractiveSubIslands();
+	//ss1.showInteractiveSubIslands();
+	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
 /*
@@ -105,7 +106,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -131,7 +132,6 @@ int main(int argc,char** argv)
 			name = folder + files.at(i);
 			name = getFileName(name);
 			if(name!=argv[1]) {
-				cout << name << endl;
 				ShadeShape ss2 = Scripts::script31(name);
 				ShadeShapeMatch ssm;
 				if(argc>=3)
@@ -274,26 +274,27 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
 /*
-	//ShadeShape ss1 = Scripts::script2("/home/jason/git/NN3-Donut/NN3-Donut/Training/Excavated/excavated2(032).png");
-	ShadeShape ss1 = Scripts::script31("melanoma8b");
+	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_sample.png");
+	ShadeShape ss1 = Scripts::script31("herpes3");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(53,32));
-	//SubIslands subIsland = island.getSubIslandWithPoint(Point(27,55));
+	Islands island = ss1.getIslandWithPoint(Point(105,68));
+	SubIslands subIsland = island.getSubIslandWithPoint(Point(95,79));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",island.image());
-	/*
-	Mat results = island.nn_results();
-	cout << results << endl;
+	imwrite(ss1.name()+"_sample.png",subIsland.image());
+	//Mat results = island.nn_results();
+	//cout << results << endl;
+	/**/
+/*
 	TestML ml;
-	//String param = TestML::PARAM_PATH;
-	//Mat sample = imread("/home/jason/Desktop/workspace/circle_donut_incomp(020).png",0);
-	Mat sample = island.image();
+	String param = TestML::PARAM_PATH;
+	Mat sample = imread("/home/jason/git/NN3-Excavated/NN3-Excavated/Training/Excavated/excavated(062).png",0);
+	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
 	sample = ml.prepareImage(sample,Size(40,40));
 	imgshow(sample);
 	vector<Mat> sampleVec;
-/*
+
 	sampleVec.push_back(sample);
 	//Mat results = ml.runANN(param,sampleVec);
 	Mat results = ml.runANN2(sampleVec);
@@ -353,7 +354,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-	/*
+/*
 	String shape = "Donut";
 	Scripts::script_createAllTrainingLabels2(shape);
 	sleep(3);

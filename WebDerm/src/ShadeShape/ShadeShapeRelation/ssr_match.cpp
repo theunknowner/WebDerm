@@ -27,7 +27,7 @@ float ShadeShapeRelationMatch::entropy(float count) {
 
 float ShadeShapeRelationMatch::contrastWeight(float esg, float relArea) {
 
-	float result = esg * (exp(relArea)-1.0);
+	float result = esg * relArea;
 	return result;
 }
 
@@ -537,10 +537,26 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float dotProduct2 = 1.0;
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
+								if(label1.find("Excavated")!=string::npos) {
+									float val = 0.001 + abs(sumArcScoreUP1-sumArcScoreDB1);
+									val = val / (min(abs(sumArcScoreUP1),abs(sumArcScoreDB1)) + 1.0);
+									float arcScore = 1.0 / val;
+									float minVal = 1.0;
+									arcScore = min(arcScore,minVal);
+									dotProduct1 *= arcScore;
+								}
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+								if(label2.find("Excavated")!=string::npos) {
+									float val = 0.001 + abs(sumArcScoreUP2-sumArcScoreDB2);
+									val = val / (min(abs(sumArcScoreUP2),abs(sumArcScoreDB2)) + 1.0);
+									float arcScore = 1.0 / val;
+									float minVal = 1.0;
+									arcScore = min(arcScore,minVal);
+									dotProduct2 *= arcScore;
+								}
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
 							//> ************ End StatSign ************ <//
@@ -1082,10 +1098,26 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float dotProduct2 = 1.0;
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
+								if(label1.find("Excavated")!=string::npos) {
+									float val = 0.001 + abs(sumArcScoreUP1-sumArcScoreDB1);
+									val = val / (min(abs(sumArcScoreUP1),abs(sumArcScoreDB1)) + 1.0);
+									float arcScore = 1.0 / val;
+									float minVal = 1.0;
+									arcScore = min(arcScore,minVal);
+									dotProduct1 *= arcScore;
+								}
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+								if(label2.find("Excavated")!=string::npos) {
+									float val = 0.001 + abs(sumArcScoreUP2-sumArcScoreDB2);
+									val = val / (min(abs(sumArcScoreUP2),abs(sumArcScoreDB2)) + 1.0);
+									float arcScore = 1.0 / val;
+									float minVal = 1.0;
+									arcScore = min(arcScore,minVal);
+									dotProduct2 *= arcScore;
+								}
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
 							//> ************ End StatSign ************ <//
@@ -1624,10 +1656,26 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							float dotProduct2 = 1.0;
 							if(label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
+								if(label1.find("Excavated")!=string::npos) {
+									float val = 0.001 + abs(sumArcScoreUP1-sumArcScoreDB1);
+									val = val / (min(abs(sumArcScoreUP1),abs(sumArcScoreDB1)) + 1.0);
+									float arcScore = 1.0 / val;
+									float minVal = 1.0;
+									arcScore = min(arcScore,minVal);
+									dotProduct1 *= arcScore;
+								}
 								dotProduct1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
+								if(label2.find("Excavated")!=string::npos) {
+									float val = 0.001 + abs(sumArcScoreUP2-sumArcScoreDB2);
+									val = val / (min(abs(sumArcScoreUP2),abs(sumArcScoreDB2)) + 1.0);
+									float arcScore = 1.0 / val;
+									float minVal = 1.0;
+									arcScore = min(arcScore,minVal);
+									dotProduct2 *= arcScore;
+								}
 								dotProduct2 = statsign.adjustValue(dotProduct2);
 							}
 							//> ************ End StatSign ************ <//
@@ -1668,6 +1716,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
 								fprintf(fp,"----------------------------------\n");
@@ -1690,6 +1739,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp2,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp2,"----------------------------------\n");
@@ -1737,7 +1787,8 @@ float ShadeShapeRelationMatch::getShapeWeight(int shape, float prop) {
 	if(shape!=5)  { //> 5=excavated
 		return this->shapeWeight[shape];
 	}
-	float weight = 0.13 + (0.87 * prop);
+	float shapeWt = this->shapeWeight[shape];
+	float weight = (0.13 + (0.87 * prop)) * shapeWt;
 	return weight;
 }
 
