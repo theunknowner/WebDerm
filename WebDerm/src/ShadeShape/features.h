@@ -1,5 +1,5 @@
 /*
- * features.h
+f * features.h
  *
  *  Created on: Jun 12, 2015
  *      Author: jason
@@ -28,9 +28,8 @@ private:
 	Mat NN_Results;
 	float NN_Score;
 
-	vector<Mat> extractIslands(Mat featureImg, int thresh);
+	vector<Mat> extractIslands(Mat featureImg, float thresh);
 	vector<Mat> disconnectIslands(Mat featureImg);
-	vector<ImageData> extractIslands(ImageData &featureId, int thresh);
 
 	void storeIsland(Islands& island);
 	void appendIslands(vector<Islands> islandVec);

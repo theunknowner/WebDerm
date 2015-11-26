@@ -73,6 +73,8 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	String shapeName = ml.getShapeName2(labelNum);
 	if(labelNum==0 || labelNum==1) {
 		results = ml.runANN2b(sampleVec,labelNum);
+		this->NN_Results2 = results;
+		this->NN_Score_2 = results.at<float>(0,0);
 		if(results.at<float>(0,0)>0.0) {
 			shapeName = "Comp-" + shapeName;
 		} else {
@@ -128,7 +130,7 @@ Islands::Islands(){}
 
 Islands::Islands(Mat islandImg) {
 	this->islName = "Island";
-	this->islSubShape = -1;
+	this->NN_Score_2 = -2.0;
 	this->islArea = countNonZero(islandImg);
 	this->islShadeLevel = *max_element(islandImg.begin<uchar>(),islandImg.end<uchar>());
 	this->islandImg = islandImg;
@@ -184,8 +186,16 @@ Mat& Islands::nn_results() {
 	return this->NN_Results;
 }
 
+Mat& Islands::nn_results2() {
+	return this->NN_Results2;
+}
+
 float Islands::nn_score() {
 	return this->NN_Score;
+}
+
+float Islands::nn_score_2() {
+	return this->NN_Score_2;
 }
 
 Point Islands::startPt() {

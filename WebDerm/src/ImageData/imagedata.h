@@ -26,6 +26,7 @@ protected:
 	int imgRows, imgCols;
 	Mat matImage;
 	String imgName;
+	int imgArea;
 
 public:
 	ImageData();
@@ -42,6 +43,7 @@ public:
 	vector<vector<String> > data_matrix();
 	vector<vector<String> > hsl_matrix();
 	PixelData pixel(int row, int col);
+	int area();
 	void writePrevSize(String filename="");
 	void readPrevSize();
 };

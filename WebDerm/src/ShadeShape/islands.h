@@ -14,6 +14,7 @@
 namespace Isl {
 	void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param);
 }
+
 class Islands {
 private:
 
@@ -22,12 +23,13 @@ private:
 	int islArea;
 	int islShadeLevel;
 	int islShape;
-	int islSubShape;
 	String islShapeName;
 	Mat islandImg;
 	Mat nn_prepared_img;
 	Mat NN_Results;
+	Mat NN_Results2;
 	float NN_Score;
+	float NN_Score_2;
 	Point islPt;
 	Point _centerOfMass;
 	map<String,Point> coordMap;
@@ -51,7 +53,9 @@ public:
 	int& shape();
 	String& shape_name();
 	Mat& nn_results();
+	Mat& nn_results2();
 	float nn_score();
+	float nn_score_2();
 	Point startPt();
 	void set_island_shade(int shade);
 	Point centerOfMass();

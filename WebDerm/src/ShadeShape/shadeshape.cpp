@@ -15,8 +15,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 String winName = "Interactive Islands";
-String winName2 = "40x40";
-String winName3 = "Extracted";
+String winName2 = "Extracted";
+String winName3 = "40x40";
 void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 	ShadeShape &ss = *((ShadeShape*)param);
 	Mat img = ss.image().clone();
@@ -40,13 +40,16 @@ void onMouseCheckIslands(int event, int x, int y, int flags, void* param) {
 			sprintf(text,"(%d,%d) | Lum: %d | Area: %d | ShadeShape: %s | NN: %f",x,y,lum,area,shade_shape.c_str(),nnResult);
 			cv::displayStatusBar(winName,text);
 			char textScore[100];
+			char textScore2[20];
 			Mat nnResults = island.nn_results();
 			sprintf(textScore,"[%.5f, %.5f, %.5f, %.5f, %.5f]",nnResults.at<float>(0,0),nnResults.at<float>(0,1),nnResults.at<float>(0,2),nnResults.at<float>(0,3),nnResults.at<float>(0,4));
-			namedWindow(winName3, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-			imshow(winName3,island.image());
+			sprintf(textScore2,"[%.5f]",island.nn_score_2());
 			namedWindow(winName2, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 			cv::displayStatusBar(winName2,textScore);
-			imshow(winName2,island.nn_image());
+			imshow(winName2,island.image());
+			namedWindow(winName3, CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			cv::displayStatusBar(winName3,textScore2);
+			imshow(winName3,island.nn_image());
 		}
 	}
 	if(event == EVENT_LBUTTONUP) {
@@ -311,6 +314,7 @@ void ShadeShape::extract(ImageData &id) {
 	this->id = id;
 	this->ss_name = getFileName(id.name());
 	this->img = id.image();
+	this->ssArea = countNonZero(this->img);
 	vector<Mat> featureVec = this->extractFeatures(this->img);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
 		Features feature(featureVec.at(i),id);
@@ -319,7 +323,6 @@ void ShadeShape::extract(ImageData &id) {
 	this->numOfFeats = this->featureVec.size();
 	this->getShadesOfFeatures(this->img);
 	this->storeIslandAreas();
-	this->ssArea = countNonZero(this->img);
 	this->ssAreaPostDensityConnector = std::accumulate(this->areaVec.begin(),this->areaVec.end(),0);
 	this->removeDuplicatePointsFromIslands();
 

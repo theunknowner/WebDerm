@@ -16,7 +16,7 @@
 /************ PRIVATE FUNCTIONS ****************/
 
 //! extracts islands from feature
-vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
+vector<Mat> Features::extractIslands(Mat featureImg, float thresh) {
 	ShapeMorph sm;
 	vector<Mat> islandVec;
 	vector<vector<Point> > ptsVec(256,vector<Point>(0,Point(-1,-1)));
@@ -42,7 +42,8 @@ vector<Mat> Features::extractIslands(Mat featureImg, int thresh) {
 			shadeShape = sm.densityConnector(shadeShape,.999999, m);
 			vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
 			for(unsigned int k=0; k<littleIslands.size(); k++) {
-				if(countNonZero(littleIslands.at(k))>thresh)
+				float relArea = countNonZero(littleIslands.at(k)) / (float)this->parentId.area();
+				if(relArea>thresh)
 					islandVec.push_back(littleIslands.at(k));
 			}
 		}
@@ -61,39 +62,6 @@ vector<Mat> Features::disconnectIslands(Mat featureImg) {
 			islandVec.push_back(littleIslands.at(k));
 	}
 
-	return islandVec;
-}
-
-//! extracts islands from feature
-vector<ImageData> Features::extractIslands(ImageData &featureId, int thresh) {
-	ShapeMorph sm;
-	vector<ImageData> islandVec;
-	Mat featureImg = featureId.image();
-	vector<vector<Point> > ptsVec(256,vector<Point>(0,Point(-1,-1)));
-	for(int row=0; row<featureImg.rows; row++) {
-		for(int col=0; col<featureImg.cols; col++) {
-			int val = featureImg.at<uchar>(row,col);
-			if(val>0) {
-				ptsVec.at(val).push_back(Point(col,row));
-			}
-		}
-	}
-	for(unsigned int j=0; j<ptsVec.size(); j++) {
-		Mat shadeShape(featureImg.size(),CV_8U,Scalar(0));
-		if(ptsVec.at(j).size()>0) {
-			for(unsigned int k=0; k<ptsVec.at(j).size(); k++) {
-				shadeShape.at<uchar>(ptsVec.at(j).at(k)) = j;
-			}
-			// helps connect islands that should be together
-			shadeShape = sm.densityConnector(shadeShape,.999999999999,1.0);
-			ImageData id(shadeShape,"",0);
-			vector<ImageData> littleIslands = sm.liquidFeatureExtraction(id,0,0,0);
-			for(unsigned int k=0; k<littleIslands.size(); k++) {
-				if(countNonZero(littleIslands.at(k).image())>thresh)
-					islandVec.push_back(littleIslands.at(k));
-			}
-		}
-	}
 	return islandVec;
 }
 
@@ -165,42 +133,12 @@ Features::Features() {}
 
 Features::Features(Mat featureImg, ImageData &parentId) {
 	this->parentId = parentId;
-	int thresh=0;
 	this->featureImg = featureImg;
 	this->featArea = countNonZero(featureImg);
+	float thresh=0.001;
 	vector<Mat> littleIslands = this->extractIslands(featureImg, thresh);
-	//Functions fn;
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
-		/*
-		Mat crop_img = fn.cropImage(island.image());
-		float frameArea = (float) crop_img.total() / island.image().total();
-		if(frameArea>0.01 && (island.shape_name().find("Excavated")!=string::npos || island.shape_name().find("Default")!=string::npos)) {
-			bool containsRegularShape = false;
-			vector<Islands> islandVec2;
-			vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
-			for(unsigned int j=0; j<littleIslands2.size(); j++) {
-				Islands island2(littleIslands2.at(j));
-				islandVec2.push_back(island2);
-				if(island2.shape_name().find("Disc")!=string::npos || island2.shape_name().find("Donut")!=string::npos) {
-					Mat crop_img2 = fn.cropImage(island2.image());
-					float relArea = (float)island2.area()/island.area();
-					float frameArea = (float) crop_img2.total() / crop_img.total();
-					float bigFrameArea = (float) crop_img2.total() / island.image().total();
-					int count = fn.countPositive(island2.nn_results());
-					if(relArea>0.10 && frameArea>0.07 && bigFrameArea>0.05 && count==1) {
-						containsRegularShape = true;
-					}
-				}
-			}
-			if(containsRegularShape) {
-				this->appendIslands(islandVec2);
-			} else {
-				this->storeIsland(island);
-			}
-		} else {
-			this->storeIsland(island);
-		}*/
 		this->storeIsland(island);
 	}
 	this->numOfIsls = this->islandVec.size();

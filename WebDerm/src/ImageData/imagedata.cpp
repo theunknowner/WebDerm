@@ -31,6 +31,7 @@ void ImageData::extract(Mat image, String name, int option) {
 	this->prevImgSize = image.size();
 	this->imgRows = image.rows;
 	this->imgCols = image.cols;
+	this->imgArea = countNonZero(image);
 	if(option==1) {
 		this->pixelVec.clear();
 		this->pixelVec.resize(image.rows,vector<PixelData>(image.cols,PixelData()));
@@ -104,6 +105,10 @@ vector<vector<String> > ImageData::hsl_matrix() {
 //! returns PixelData object pixel (row,col)
 PixelData ImageData::pixel(int row, int col) {
 	return this->pixelVec.at(row).at(col);
+}
+
+int ImageData::area() {
+	return this->imgArea;
 }
 
 void ImageData::writePrevSize(String filename) {
