@@ -71,15 +71,22 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	float thresh = 0.0;
 	if(*maxIt<thresh) labelNum = 5;
 	String shapeName = ml.getShapeName2(labelNum);
-	if(labelNum==0 || labelNum==1) {
+	if(labelNum==0 || labelNum==1 || labelNum==3) {
 		results = ml.runANN2b(sampleVec,labelNum);
 		this->NN_Results2 = results;
 		this->NN_Score_2 = results.at<float>(0,0);
-		if(results.at<float>(0,0)>0.0) {
-			shapeName = "Comp-" + shapeName;
+		if(labelNum==0 || labelNum==1) {
+			if(results.at<float>(0,0)>0.0) {
+				shapeName = "Comp-" + shapeName;
+			} else {
+				shapeName = "Incomp-" + shapeName;
+			}
 		} else {
-			shapeName = "Incomp-" + shapeName;
+			if(results.at<float>(0,0)>0.0) {
+				shapeName = "Fused-Donuts";
+			}
 		}
+
 	}
 	labelNum = ml.getShapeIndex(shapeName);
 	this->NN_Score = *maxIt;

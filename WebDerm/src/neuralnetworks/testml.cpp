@@ -17,7 +17,7 @@ map<String,int> TestML::shapeNamesMap;
 Size TestML::img_size;
 vector<String> TestML::shapeNames2;
 vector<CvANN_MLP *> TestML::cvAnnVec;
-vector<CvANN_MLP *> TestML::cvAnnVec2;
+map<int,CvANN_MLP *> TestML::cvAnnVec2;
 bool TestML::importParam = 0;
 
 /* CALL TestML::clear() function at end of program
@@ -62,10 +62,14 @@ bool TestML::importThresholds() {
 		}
 		fs4.close();
 		if(TestML::importParam) {
+			int num = 0;
 			while(getline(fs5,temp)) {
-				CvANN_MLP *ann = new CvANN_MLP();
-				ann->load(temp.c_str());
-				TestML::cvAnnVec2.push_back(ann);
+				if(temp.find(".xml")!=string::npos) {
+					CvANN_MLP *ann = new CvANN_MLP();
+					ann->load(temp.c_str());
+					TestML::cvAnnVec2[num] = ann;
+				}
+				num++;
 			}
 		}
 		return true;
@@ -346,14 +350,14 @@ int TestML::getIndexContainingShape(String shape) {
 }
 
 //! NN3 Disc/Donut Comp/Incomp
-//! 0=Disc; 1=Donut
+//! 0=Disc; 1=Donut; 3=REI
 Mat TestML::runANN2b(vector<Mat> sampleVec, int nnShape) {
 	Mat results;
 	//for(unsigned int i=0; i<TestML::cvAnnVec2.size(); i++) {
-		Mat layers = TestML::cvAnnVec2.at(nnShape)->get_layer_sizes();
-		this->setLayerParams(layers);
-		Mat sample_set  = this->prepareMatSamples(sampleVec);
-		TestML::cvAnnVec2.at(nnShape)->predict(sample_set,results);
+	Mat layers = TestML::cvAnnVec2.at(nnShape)->get_layer_sizes();
+	this->setLayerParams(layers);
+	Mat sample_set  = this->prepareMatSamples(sampleVec);
+	TestML::cvAnnVec2.at(nnShape)->predict(sample_set,results);
 	//}
 	return results;
 }

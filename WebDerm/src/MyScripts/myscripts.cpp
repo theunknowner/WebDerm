@@ -2062,8 +2062,8 @@ void script_createAllTrainingLabels() {
 
 //! Create All Training Labels
 void script_createAllTrainingLabels2(String shape) {
-	String samplePath = "NN3-"+shape+"-Comp-Incomp/Training/samples_path.csv";
-	String labelPath = "NN3-"+shape+"-Comp-Incomp/Training/Labels/";
+	String samplePath = "NN3-"+shape+"/Training/samples_path.csv";
+	String labelPath = "NN3-"+shape+"/Training/Labels/";
 	fstream fs(samplePath);
 	if(fs.is_open()) {
 		String path;

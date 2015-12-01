@@ -25,7 +25,7 @@ private:
 	int ssArea;
 	int ssAreaPostDensityConnector;
 	Mat img;
-	ImageData id;
+	ImageData *id;
 
 	bool isBridgeWeak(Mat &src, int x, int y);
 	bool isOnTheEdge(Mat &src, int x, int y);

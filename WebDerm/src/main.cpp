@@ -67,7 +67,7 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-/*
+	/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
 	ShadeShape ss1 = Scripts::script31("herpes3");
@@ -83,7 +83,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -91,11 +91,11 @@ int main(int argc,char** argv)
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id);
-	//ss1.showInteractiveSubIslands();
-	ss1.showInteractiveIslands();
+	ss1.showInteractiveSubIslands();
+	//ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-/*
+	/*
 	ShadeShape ss1 = Scripts::script31("herpes3");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveSubIslands();
@@ -106,7 +106,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+	/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -190,7 +190,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+	/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -275,19 +275,19 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_sample.png");
-	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss1 = Scripts::script31("herpes12");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(105,68));
-	SubIslands subIsland = island.getSubIslandWithPoint(Point(95,79));
+	Islands island = ss1.getIslandWithPoint(Point(119,59));
+	//SubIslands subIsland = island.getSubIslandWithPoint(Point(110,110));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",subIsland.image());
+	imwrite(ss1.name()+"_sample.png",island.image());
 	//Mat results = island.nn_results();
 	//cout << results << endl;
 	/**/
-/*
+
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/git/NN3-Excavated/NN3-Excavated/Training/Excavated/excavated(062).png",0);
+	Mat sample = imread("/home/jason/Desktop/workspace/test9.png",0);
 	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);
@@ -298,8 +298,9 @@ int main(int argc,char** argv)
 	sampleVec.push_back(sample);
 	//Mat results = ml.runANN(param,sampleVec);
 	Mat results = ml.runANN2(sampleVec);
-	//Mat results = ml.runANN2b(sampleVec);
+	Mat results2 = ml.runANN2b(sampleVec,3);
 	cout << results << endl;
+	cout << results2 << endl;
 	/**/
 	/*
 	Scripts::script_createAllTrainingLabels();
@@ -355,6 +356,59 @@ int main(int argc,char** argv)
 	cvReleaseFileStorage(&storage);
 /**/
 /*
+	String shape = "Fused-Donuts";
+	Scripts::script_createAllTrainingLabels2(shape);
+	sleep(3);
+	TestML ml;
+	String mainPath = "NN3-"+shape+"/";
+	String path1 = mainPath+"Training/samples_path.csv";
+	String path2 = mainPath+"Training/labels_path.csv";
+	String path3 = mainPath+"log.txt";
+	Timer time;
+	time.begin();
+	ml.importTrainingData(path1,path2,ml.getSize());
+	Mat data = ml.getData();
+	Mat labels = ml.getLabels().col(0);
+	Mat training_set = data;
+	Mat training_labels = labels;
+	int sampleSize = training_set.rows;
+	int inputSize = training_set.cols;
+	int outputSize = training_labels.cols;
+	int hiddenNodes = 40;
+	Mat layers(3,1,CV_32S);
+	layers.at<int>(0,0) = inputSize;
+	layers.at<int>(1,0) = hiddenNodes;
+	layers.at<int>(2,0) = outputSize;
+	printf("Img Size: %dx%d\n",ml.getSize().width,ml.getSize().height);
+	printf("Input Size: %d\n",inputSize);
+	printf("Hidden Nodes: %d\n",hiddenNodes);
+	printf("Output Size: %d\n",outputSize);
+	CvANN_MLP ann(layers,CvANN_MLP::SIGMOID_SYM,0.6,1);
+
+	TermCriteria criteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 4000, 0.000001);
+	CvANN_MLP_TrainParams params(criteria,CvANN_MLP_TrainParams::BACKPROP,0.1,0.1);
+	int iter = ann.train(training_set,training_labels,Mat(),Mat(),params);
+
+	time.end();
+	FILE * fp;
+	fp = fopen(path3.c_str(),"a");
+	fprintf(fp,"%s\n",time.getTimerString().c_str());
+	fprintf(fp,"%s",time.getEndTime().c_str());
+	fprintf(fp,"Img Size: %dx%d\n",ml.getSize().width,ml.getSize().height);
+	fprintf(fp,"Input Size: %d\n",inputSize);
+	fprintf(fp,"Hidden Nodes: %d\n",hiddenNodes);
+	fprintf(fp,"Output Size: %d\n",outputSize);
+	fprintf(fp,"Iterations: %d\n",iter);
+	fprintf(fp,"-----------------------\n");
+	fclose(fp);
+
+	cout << "Iterations: " << iter << endl;
+	time.printTimer();
+	String outputFile = mainPath+"param-"+shape+".xml";
+	CvFileStorage* storage = cvOpenFileStorage(outputFile.c_str(), 0, CV_STORAGE_WRITE );
+	ann.write(storage,"shapeML");
+	cvReleaseFileStorage(&storage);
+	/*
 	String shape = "Donut";
 	Scripts::script_createAllTrainingLabels2(shape);
 	sleep(3);
@@ -408,7 +462,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 	/**/
-	/*
+/*
 	String shape(argv[1]);
 	Scripts::script_createAllTrainingLabels3b(shape);
 	sleep(3);

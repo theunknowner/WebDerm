@@ -298,7 +298,7 @@ void ShadeShape::extract(Mat src, String name) {
 	this->img = src.clone();
 	vector<Mat> featureVec = this->extractFeatures(src);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
-		Features feature(featureVec.at(i),this->id);
+		Features feature(featureVec.at(i),*this->id);
 		this->storeFeature(feature);
 	}
 	this->numOfFeats = this->featureVec.size();
@@ -311,13 +311,13 @@ void ShadeShape::extract(Mat src, String name) {
 
 //! extracts the features from the image
 void ShadeShape::extract(ImageData &id) {
-	this->id = id;
+	this->id = &id;
 	this->ss_name = getFileName(id.name());
 	this->img = id.image();
 	this->ssArea = countNonZero(this->img);
 	vector<Mat> featureVec = this->extractFeatures(this->img);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
-		Features feature(featureVec.at(i),id);
+		Features feature(featureVec.at(i),*this->id);
 		this->storeFeature(feature);
 	}
 	this->numOfFeats = this->featureVec.size();
@@ -427,7 +427,7 @@ void ShadeShape::set_island_shade(int featNum, int islNum, int newShade) {
 }
 
 ImageData& ShadeShape::getImageData() {
-	return this->id;
+	return *this->id;
 }
 
 vector<Mat> ShadeShape::isolateConnectedFeatures(Mat src) {

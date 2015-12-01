@@ -20,7 +20,7 @@ private:
 	static Size img_size;
 	static vector<String> shapeNames2;
 	static vector<CvANN_MLP *> cvAnnVec;
-	static vector<CvANN_MLP *> cvAnnVec2;
+	static map<int,CvANN_MLP *> cvAnnVec2;
 	static bool importParam;
 
 public:
