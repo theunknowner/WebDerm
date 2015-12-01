@@ -83,7 +83,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-/*
+	/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -91,14 +91,14 @@ int main(int argc,char** argv)
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id);
-	ss1.showInteractiveSubIslands();
-	//ss1.showInteractiveIslands();
+	//ss1.showInteractiveSubIslands();
+	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
 	/*
-	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss1 = Scripts::script31("herpes12");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	ss1.showInteractiveSubIslands();
+	ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
@@ -273,7 +273,7 @@ int main(int argc,char** argv)
 
 	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
-/*
+	/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_sample.png");
 	ShadeShape ss1 = Scripts::script31("herpes12");
 	//ss1.showInteractiveIslands();
@@ -284,7 +284,7 @@ int main(int argc,char** argv)
 	//Mat results = island.nn_results();
 	//cout << results << endl;
 	/**/
-
+	/*
 	TestML ml;
 	String param = TestML::PARAM_PATH;
 	Mat sample = imread("/home/jason/Desktop/workspace/test9.png",0);
@@ -355,7 +355,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-/*
+	/*
 	String shape = "Fused-Donuts";
 	Scripts::script_createAllTrainingLabels2(shape);
 	sleep(3);
@@ -462,7 +462,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 	/**/
-/*
+	/*
 	String shape(argv[1]);
 	Scripts::script_createAllTrainingLabels3b(shape);
 	sleep(3);

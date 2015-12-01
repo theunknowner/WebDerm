@@ -1726,8 +1726,8 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 	Mat temp = src.clone();
 	row=0; col=0;
 	a = round(a) + 1;
-	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==163)
-	//cout << a << endl;
+	if(*max_element(src.begin<uchar>(),src.end<uchar>())==156)
+		cout << a << endl;
 	Size square(a,a);
 	while(row<src.rows) {
 		while(col<src.cols) {
@@ -1738,6 +1738,9 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 				for(int i=row; i<(row+square.height); i++) {
 					if(i<src.rows)
 						temp.at<uchar>(i,col) = 0;
+				}
+				if(col==74 && row==107 && countNonZero(src)==7937) {
+					imgshow(temp);
 				}
 				//> check if disconnected vertically
 				if(temp.at<uchar>(row-1,col)==0 && temp.at<uchar>(row+square.height,col)==0) {
