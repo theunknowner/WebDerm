@@ -49,9 +49,24 @@
 #include "Exceptions/my_exceptions.h"
 #include "ShadeShape/ShadeShapeRelation/srm.h"
 #include "ShadeShape/StatSign/statsign.h"
+#include "Shape/LiquidFeatureExtraction/lfe.h"
 
 int main(int argc,char** argv)
-{
+{/*
+	ShapeMorph sm;
+	Mat img = imread("/home/jason/Desktop/workspace/test12.png",0);
+	img = sm.densityDisconnector(img,0.999999);
+	imgshow(img);
+	/*
+	LiquidFeatureExtraction lfe;
+	vector<Point> seed_vec;
+	seed_vec.push_back(Point(42,55));
+	seed_vec.push_back(Point(42,60));
+	vector<Mat> seed_map_vec = lfe.run(img,seed_vec);
+	bool crossover = lfe.doesSeedMapsCrossOver(seed_map_vec);
+	cout << crossover << endl;
+	imgshow(seed_map_vec.at(0));
+	imgshow(seed_map_vec.at(1));
 	//Entropy en;
 	//en.importEntropyThresholds();
 	//en.runAllEntropy();
@@ -95,7 +110,7 @@ int main(int argc,char** argv)
 	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-	/*
+
 	ShadeShape ss1 = Scripts::script31("herpes12");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();

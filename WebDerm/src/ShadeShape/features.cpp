@@ -55,7 +55,7 @@ vector<Mat> Features::extractIslands(Mat featureImg, float thresh) {
 vector<Mat> Features::disconnectIslands(Mat featureImg) {
 	ShapeMorph sm;
 	vector<Mat> islandVec;
-	Mat shadeShape = sm.densityDisconnector(featureImg,0.999);
+	Mat shadeShape = sm.densityDisconnector(featureImg,0.999999);
 	vector<Mat> littleIslands = sm.liquidFeatureExtraction(shadeShape,0,0,0);
 	for(unsigned int k=0; k<littleIslands.size(); k++) {
 		if(countNonZero(littleIslands.at(k))>0)

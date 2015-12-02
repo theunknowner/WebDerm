@@ -13,11 +13,12 @@
 class LiquidFeatureExtraction {
 private:
 	vector<Point> seed_vec;
-	vector<map<Point,int> > seed_map_vec;
+	vector<Mat> seed_map_vec;
 
 public:
-	void localExtraction(Mat src, vector<Point> seed_vec);
-	vector<Mat> run(Mat src, Point seed=Point(0,0), double lcThresh=0, int sort=0, int numOfPtsThresh=10);
+	bool doesSeedMapsCrossOver(vector<Mat> seed_map_vec);
+	Mat localExtraction(Mat src, Point seed, int steps=-1);
+	vector<Mat> run(Mat src, vector<Point> seed_vec);
 };
 
 #endif /* LFE_H_ */
