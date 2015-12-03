@@ -1762,6 +1762,8 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 					seed_vec.push_back(Point(col-1,row));
 				if(rightCheck==false && col+1<src.cols)
 					seed_vec.push_back(Point(col+1,row));
+
+
 				vector<Mat> seed_map_vec = lfe.run(temp,seed_vec);
 				bool crossover = lfe.doesSeedMapsCrossOver(seed_map_vec);
 				if(!crossover) {
