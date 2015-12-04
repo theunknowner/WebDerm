@@ -12,10 +12,16 @@
 
 class Pathfind {
 private:
+	vector<Point> pointVec;
+	bool pathFound;
+
 	int manhattanDist(Point pt1, Point pt2);
 	vector<Point> getAdjacentPoints(Mat &src, Point pt);
 public:
-	Mat run(Mat src, Point start, Point end);
+	//ndir = 4/8, 8 includes diagonals
+	Mat run(Mat src, Point start, Point end, int NDIR=4, int steps=25);
+	vector<Point> getPathPoints();
+	bool isPathFound();
 };
 
 #endif /* PATHFIND_H_ */
