@@ -1732,95 +1732,96 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 		cout << a << endl;
 		a = 7;
 	}
-	Size square(a,a);
+	double cutLength = a;
 	while(row<src.rows) {
 		while(col<src.cols) {
 			int lc = src.at<uchar>(row,col);
 			bool isDisconnected = false;
 			if(lc>0) {
-				//> going vertical down
-				vector<Point> seed_vec;
-				bool leftCheck=false, rightCheck=false;
-				for(int i=row; i<(row+square.height); i++) {
-					if(i<src.rows) {
-						temp.at<uchar>(i,col) = 0;
+				if((row-1>=0 && result.at<uchar>(row-1,col)==0) || (row+1<src.rows && result.at<uchar>(row+1,col)==0)) {
+					//> going vertical down
+					double length = 0.0;
+					for(int i=row-1; i<(row+a+1); i++) {
+						if(temp.at<uchar>(i,col-1)>0)
+							length++;
 					}
-					if(col-1>=0) {
-						if(temp.at<uchar>(i,col-1)>0 && leftCheck==false) {
-							seed_vec.push_back(Point(col-1,i));
-							leftCheck=true;
+					cutLength = min(a,length);
+					vector<Point> seed_vec;
+					bool leftCheck=false, rightCheck=false;
+					for(int i=row; i<(row+cutLength); i++) {
+						if(i<src.rows) {
+							temp.at<uchar>(i,col) = 0;
+						}
+						if(col-1>=0) {
+							if(temp.at<uchar>(i,col-1)>0 && leftCheck==false) {
+								seed_vec.push_back(Point(col-1,i));
+								leftCheck=true;
+							}
+						}
+						if(col+1<src.cols) {
+							if(temp.at<uchar>(i,col+1)>0 && rightCheck==false) {
+								seed_vec.push_back(Point(col+1,i));
+								rightCheck=true;
+							}
 						}
 					}
-					if(col+1<src.cols) {
-						if(temp.at<uchar>(i,col+1)>0 && rightCheck==false) {
-							seed_vec.push_back(Point(col+1,i));
-							rightCheck=true;
-						}
+					if(leftCheck==false && col-1>=0)
+						seed_vec.push_back(Point(col-1,row));
+					if(rightCheck==false && col+1<src.cols)
+						seed_vec.push_back(Point(col+1,row));
+
+					vector<Mat> seed_map_vec = lfe.run(temp,seed_vec);
+					bool crossover = lfe.doesSeedMapsCrossOver(seed_map_vec);
+					if(!crossover) {
+						result = temp.clone();
+						isDisconnected = true;
+					} else {
+						temp = result.clone();
 					}
 				}
-				if(leftCheck==false && col-1>=0)
-					seed_vec.push_back(Point(col-1,row));
-				if(rightCheck==false && col+1<src.cols)
-					seed_vec.push_back(Point(col+1,row));
-
-
-				vector<Mat> seed_map_vec = lfe.run(temp,seed_vec);
-				bool crossover = lfe.doesSeedMapsCrossOver(seed_map_vec);
-				if(!crossover) {
-					result = temp.clone();
-					isDisconnected = true;
-				} else {
-					temp = result.clone();
+				if(col==44 && row==84 && src.at<uchar>(row,col)==156) {
+					imgshow(result);
 				}
-				/*
-				//> check if disconnected vertically
-				if(temp.at<uchar>(row-1,col)==0 && temp.at<uchar>(row+square.height,col)==0) {
-					result = temp.clone();
-					isDisconnected = true;
-				} else {
-					temp = result.clone();
-				}
-				 */
 				if(!isDisconnected) {
-					//> going horizontal right
-					vector<Point> seed_vec2;
-					bool topCheck=false, bottomCheck=false;
-					for(int j=col; j<(col+square.width); j++) {
-						if(j<src.cols)
-							temp.at<uchar>(row,j) = 0;
+					if((col-1>=0 && result.at<uchar>(row,col-1)==0) || (col+1<src.cols && result.at<uchar>(row,col+1)==0)) {
+						//> going horizontal right
+						double length = 0.0;
+						for(int j=col-1; j<(col+a+1); j++) {
+							if(temp.at<uchar>(row-1,j)>0)
+								length++;
+						}
+						cutLength = min(a,length);
+						vector<Point> seed_vec2;
+						bool topCheck=false, bottomCheck=false;
+						for(int j=col; j<(col+cutLength); j++) {
+							if(j<src.cols)
+								temp.at<uchar>(row,j) = 0;
 
-						if(row-1>=0) {
-							if(temp.at<uchar>(row-1,j)>0 && topCheck==false) {
-								seed_vec2.push_back(Point(j,row-1));
-								topCheck=true;
+							if(row-1>=0) {
+								if(temp.at<uchar>(row-1,j)>0 && topCheck==false) {
+									seed_vec2.push_back(Point(j,row-1));
+									topCheck=true;
+								}
+							}
+							if(row+1<src.rows) {
+								if(temp.at<uchar>(row+1,j)>0 && bottomCheck==false) {
+									seed_vec2.push_back(Point(j,row+1));
+									bottomCheck=true;
+								}
 							}
 						}
-						if(row+1<src.rows) {
-							if(temp.at<uchar>(row+1,j)>0 && bottomCheck==false) {
-								seed_vec2.push_back(Point(j,row+1));
-								bottomCheck=true;
-							}
+						if(topCheck==false && row-1>=0)
+							seed_vec2.push_back(Point(col,row-1));
+						if(bottomCheck==false && row+1<src.rows)
+							seed_vec2.push_back(Point(col,row+1));
+						vector<Mat> seed_map_vec2 = lfe.run(temp,seed_vec2);
+						bool crossover2 = lfe.doesSeedMapsCrossOver(seed_map_vec2);
+						if(!crossover2) {
+							result = temp.clone();
+						} else {
+							temp = result.clone();
 						}
 					}
-					if(topCheck==false && row-1>=0)
-						seed_vec.push_back(Point(col,row-1));
-					if(bottomCheck==false && row+1<src.rows)
-						seed_vec.push_back(Point(col,row+1));
-					vector<Mat> seed_map_vec2 = lfe.run(temp,seed_vec2);
-					bool crossover2 = lfe.doesSeedMapsCrossOver(seed_map_vec2);
-					if(!crossover2) {
-						result = temp.clone();
-					} else {
-						temp = result.clone();
-					}
-					/*
-					//> check if disconnected horizontally
-					if(temp.at<uchar>(row,col-1)==0 && temp.at<uchar>(row,col+square.width)==0) {
-						result = temp.clone();
-					} else {
-						temp = result.clone();
-					}
-					 */
 				}
 			}
 			col++;

@@ -50,6 +50,7 @@
 #include "ShadeShape/ShadeShapeRelation/srm.h"
 #include "ShadeShape/StatSign/statsign.h"
 #include "Shape/LiquidFeatureExtraction/lfe.h"
+#include "Pathfind/pathfind.h"
 
 int main(int argc,char** argv)
 {/*
@@ -110,7 +111,11 @@ int main(int argc,char** argv)
 	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-
+	Pathfind pf;
+	Mat img = imread("/home/jason/Desktop/workspace/test7.png",0);
+	Mat result = pf.run(img,Point(35,55),Point(49,99),8);
+	imgshow(result);
+/*
 	ShadeShape ss1 = Scripts::script31("herpes12");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();

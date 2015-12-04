@@ -50,6 +50,8 @@ Mat LiquidFeatureExtraction::localExtraction(Mat src, Point seed, int steps) {
 			Point down(temp.at(0).x,temp.at(0).y+1);
 			Point downLeft(temp.at(0).x-1,temp.at(0).y+1);
 			Point downRight(temp.at(0).x+1,temp.at(0).y+1);
+			Point upLeft(temp.at(0).x-1,temp.at(0).y-1);
+			Point upRight(temp.at(0).x+1,temp.at(0).y-1);
 			if(up.y>=0) {
 				if(seed_map.at<uchar>(up)==0 && src.at<uchar>(up)>0) {
 					ptVec.push_back(up);
@@ -92,6 +94,20 @@ Mat LiquidFeatureExtraction::localExtraction(Mat src, Point seed, int steps) {
 					temp.push_back(downRight);
 				}
 			}
+			if(up.y>=0 && left.x>=0) {
+				if(seed_map.at<uchar>(upLeft)==0 && src.at<uchar>(upLeft)>0) {
+					ptVec.push_back(upLeft);
+					seed_map.at<uchar>(upLeft)=255;
+					temp.push_back(upLeft);
+				}
+			}
+			if(up.y>=0 && right.x<src.cols) {
+				if(seed_map.at<uchar>(upRight)==0 && src.at<uchar>(upRight)>0) {
+					ptVec.push_back(upRight);
+					seed_map.at<uchar>(upRight)=255;
+					temp.push_back(upRight);
+				}
+			}
 			temp.pop_front();
 			countSteps++;
 			if(countSteps==steps) {
@@ -105,7 +121,7 @@ Mat LiquidFeatureExtraction::localExtraction(Mat src, Point seed, int steps) {
 vector<Mat> LiquidFeatureExtraction::run(Mat src, vector<Point> seed_vec) {
 	this->seed_vec = seed_vec;
 	this->seed_map_vec.resize(this->seed_vec.size(),Mat());
-	const int steps = -1;
+	const int steps = 25;
 	for(unsigned int i=0; i<this->seed_vec.size(); i++) {
 		this->seed_map_vec.at(i) = this->localExtraction(src,seed_vec.at(i), steps);
 	}
