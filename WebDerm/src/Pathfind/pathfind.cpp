@@ -71,6 +71,7 @@ Mat Pathfind::run(Mat src, Point start, Point end, int NDIR, int steps) {
 	cvtColor(src,results,CV_GRAY2BGR);
 	results.at<Vec3b>(start) = Vec3b(0,0,255);
 	results.at<Vec3b>(end) = Vec3b(255,0,0);
+	this->pointVec.clear();
 	this->pointVec.push_back(start);
 	this->pathFound = false;
 

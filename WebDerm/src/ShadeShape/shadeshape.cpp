@@ -289,8 +289,8 @@ ShadeShape::ShadeShape(Mat src, String name) {
 	this->extract(src,name);
 }
 
-ShadeShape::ShadeShape(ImageData &id) {
-	this->extract(id);
+ShadeShape::ShadeShape(ImageData &id, bool disconnectIslands) {
+	this->extract(id, disconnectIslands);
 }
 //! extracts the features from the image
 void ShadeShape::extract(Mat src, String name) {
@@ -310,14 +310,14 @@ void ShadeShape::extract(Mat src, String name) {
 }
 
 //! extracts the features from the image
-void ShadeShape::extract(ImageData &id) {
+void ShadeShape::extract(ImageData &id, bool disconnectIslands) {
 	this->id = &id;
 	this->ss_name = getFileName(id.name());
 	this->img = id.image();
 	this->ssArea = countNonZero(this->img);
 	vector<Mat> featureVec = this->extractFeatures(this->img);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
-		Features feature(featureVec.at(i),*this->id);
+		Features feature(featureVec.at(i),*this->id,disconnectIslands);
 		this->storeFeature(feature);
 	}
 	this->numOfFeats = this->featureVec.size();

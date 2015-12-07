@@ -40,9 +40,9 @@ private:
 public:
 	ShadeShape();
 	ShadeShape(Mat src, String name="");
-	ShadeShape(ImageData &id);
+	ShadeShape(ImageData &id, bool disconnectIslands=true);
 	void extract(Mat src, String name="");
-	void extract(ImageData &id);
+	void extract(ImageData &id, bool disconnectIslands=true);
 	Features& feature(int featNum);
 	int numOfFeatures();
 	int shade(int num);

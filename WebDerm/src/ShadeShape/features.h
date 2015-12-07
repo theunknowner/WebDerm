@@ -37,7 +37,7 @@ private:
 	void getShadesOfIslands();
 public:
 	Features();
-	Features(Mat featureImg, ImageData &parentId);
+	Features(Mat featureImg, ImageData &parentId, bool disconnectIslands=true);
 	Islands& island(int islNum);
 	Mat image();
 	int area();

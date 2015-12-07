@@ -2290,7 +2290,7 @@ void checkAllTestData3() {
 		ImageData id(img,name,0);
 		Func::prepareImage(id,Size(140,140));
 		ShadeShape ss1;
-		ss1.extract(id);
+		ss1.extract(id,false);
 		Islands island = ss1.getIslandWithPoint(pt);
 		Mat sample = island.image();
 		//imwrite(folder+name+"_Point("+vec.at(1)+","+vec.at(2)+").png",sample);

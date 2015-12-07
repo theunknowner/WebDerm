@@ -19,7 +19,7 @@ private:
 	vector<Point> getAdjacentPoints(Mat &src, Point pt);
 public:
 	//ndir = 4/8, 8 includes diagonals
-	Mat run(Mat src, Point start, Point end, int NDIR=4, int steps=25);
+	Mat run(Mat src, Point start, Point end, int NDIR=4, int steps=-1);
 	vector<Point> getPathPoints();
 	bool isPathFound();
 };

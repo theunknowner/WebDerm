@@ -121,7 +121,7 @@ Mat LiquidFeatureExtraction::localExtraction(Mat src, Point seed, int steps) {
 vector<Mat> LiquidFeatureExtraction::run(Mat src, vector<Point> seed_vec) {
 	this->seed_vec = seed_vec;
 	this->seed_map_vec.resize(this->seed_vec.size(),Mat());
-	const int steps = 25;
+	const int steps = 50;
 	for(unsigned int i=0; i<this->seed_vec.size(); i++) {
 		this->seed_map_vec.at(i) = this->localExtraction(src,seed_vec.at(i), steps);
 	}

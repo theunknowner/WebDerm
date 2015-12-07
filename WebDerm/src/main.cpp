@@ -99,7 +99,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-	/*
+
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -111,10 +111,6 @@ int main(int argc,char** argv)
 	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-	Pathfind pf;
-	Mat img = imread("/home/jason/Desktop/workspace/test7.png",0);
-	Mat result = pf.run(img,Point(35,55),Point(49,99),8);
-	imgshow(result);
 /*
 	ShadeShape ss1 = Scripts::script31("herpes12");
 	//cout << ss1.areaPostDensityConnector() << endl;
@@ -122,7 +118,7 @@ int main(int argc,char** argv)
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	//Islands island = ss1.getIslandWithPoint(Point(44,61));
+	//Islands island = ss1.getIslandWithPoint(Point(16,59));
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
@@ -375,7 +371,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-	/*
+/*
 	String shape = "Fused-Donuts";
 	Scripts::script_createAllTrainingLabels2(shape);
 	sleep(3);

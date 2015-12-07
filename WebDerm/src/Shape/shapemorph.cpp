@@ -15,7 +15,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
-#include "LiquidFeatureExtraction/lfe.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Pathfind/pathfind.h"
 
 void ShapeMorph::setDebugMode(bool mode) {
 	this->debugMode = mode;
@@ -1664,7 +1664,6 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 		printf("src.size: %dx%d\n",src.rows,src.cols);
 		exit(1);
 	}
-	LiquidFeatureExtraction lfe;
 	Mat map(src.rows,src.cols,CV_8U,Scalar(0));
 	Size size(5,5);
 	const double C=1.0;
@@ -1728,11 +1727,13 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 	Mat temp = src.clone();
 	row=0; col=0;
 	a = round(a) + 1;
-	if(*max_element(src.begin<uchar>(),src.end<uchar>())==156) {
-		cout << a << endl;
-		a = 7;
-	}
+	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==156) {
+		//cout << a << endl;
+		//a = 7;
+	//}
 	double cutLength = a;
+
+	Pathfind pf;
 	while(row<src.rows) {
 		while(col<src.cols) {
 			int lc = src.at<uchar>(row,col);
@@ -1765,22 +1766,19 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 							}
 						}
 					}
-					if(leftCheck==false && col-1>=0)
-						seed_vec.push_back(Point(col-1,row));
-					if(rightCheck==false && col+1<src.cols)
-						seed_vec.push_back(Point(col+1,row));
 
-					vector<Mat> seed_map_vec = lfe.run(temp,seed_vec);
-					bool crossover = lfe.doesSeedMapsCrossOver(seed_map_vec);
-					if(!crossover) {
-						result = temp.clone();
-						isDisconnected = true;
+					if(seed_vec.size()>1) {
+						Mat pathMap = pf.run(temp,seed_vec.at(0),seed_vec.at(1),8,50);
+						bool crossover = pf.isPathFound();
+						if(!crossover) {
+							result = temp.clone();
+							isDisconnected = true;
+						} else {
+							temp = result.clone();
+						}
 					} else {
 						temp = result.clone();
 					}
-				}
-				if(col==44 && row==84 && src.at<uchar>(row,col)==156) {
-					imgshow(result);
 				}
 				if(!isDisconnected) {
 					if((col-1>=0 && result.at<uchar>(row,col-1)==0) || (col+1<src.cols && result.at<uchar>(row,col+1)==0)) {
@@ -1810,14 +1808,15 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 								}
 							}
 						}
-						if(topCheck==false && row-1>=0)
-							seed_vec2.push_back(Point(col,row-1));
-						if(bottomCheck==false && row+1<src.rows)
-							seed_vec2.push_back(Point(col,row+1));
-						vector<Mat> seed_map_vec2 = lfe.run(temp,seed_vec2);
-						bool crossover2 = lfe.doesSeedMapsCrossOver(seed_map_vec2);
-						if(!crossover2) {
-							result = temp.clone();
+
+						if(seed_vec2.size()>1) {
+							Mat pathMap2 = pf.run(temp,seed_vec2.at(0),seed_vec2.at(1),8,50);
+							bool crossover2 = pf.isPathFound();
+							if(!crossover2) {
+								result = temp.clone();
+							} else {
+								temp = result.clone();
+							}
 						} else {
 							temp = result.clone();
 						}
