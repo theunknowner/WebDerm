@@ -405,11 +405,10 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		islandVec2 = this->upIslandVec;
 		float largestResult = prevScore;
 		vector<vector<vector<Islands> > > largestIslandVec2 = islandVec2;
-
 		ImageData upId = upSS.getImageData();
-		ShadeShape newUpSS(upId);
+		ShadeShape newUpSS(upId,false);
 		while(shadematch.shade_translation(newUpSS,shadeShift)) {
-			ShadeShape matchSS(newUpSS.getImageData());
+			ShadeShape matchSS(newUpSS.getImageData(),false);
 			islandVec2 = this->groupIslandsByShape(matchSS);
 			this->sortIslandsByArea(islandVec2);
 			float maxShadeShiftResult = 0.0;

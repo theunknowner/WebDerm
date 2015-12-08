@@ -1727,10 +1727,10 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 	Mat temp = src.clone();
 	row=0; col=0;
 	a = round(a) + 1;
-	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==156) {
-		//cout << a << endl;
-		//a = 7;
-	//}
+	/*if(*max_element(src.begin<uchar>(),src.end<uchar>())==156) {
+		cout << a << endl;
+		a = 7;
+	}*/
 	double cutLength = a;
 
 	Pathfind pf;
@@ -1742,16 +1742,11 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 				if((row-1>=0 && result.at<uchar>(row-1,col)==0) || (row+1<src.rows && result.at<uchar>(row+1,col)==0)) {
 					//> going vertical down
 					double length = 0.0;
-					for(int i=row-1; i<(row+a+1); i++) {
-						if(temp.at<uchar>(i,col-1)>0)
-							length++;
-					}
-					cutLength = min(a,length);
 					vector<Point> seed_vec;
 					bool leftCheck=false, rightCheck=false;
-					for(int i=row; i<(row+cutLength); i++) {
-						if(i<src.rows) {
-							temp.at<uchar>(i,col) = 0;
+					for(int i=row-1; i<(row+a+1); i++) {
+						if(temp.at<uchar>(i,col-1)>0) {
+							length++;
 						}
 						if(col-1>=0) {
 							if(temp.at<uchar>(i,col-1)>0 && leftCheck==false) {
@@ -1766,7 +1761,12 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 							}
 						}
 					}
-
+					cutLength = min(a,length);
+					for(int i=row-1; i<(row+cutLength+1); i++) {
+						if(i<src.rows) {
+							temp.at<uchar>(i,col) = 0;
+						}
+					}
 					if(seed_vec.size()>1) {
 						Mat pathMap = pf.run(temp,seed_vec.at(0),seed_vec.at(1),8,50);
 						bool crossover = pf.isPathFound();
@@ -1784,17 +1784,12 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 					if((col-1>=0 && result.at<uchar>(row,col-1)==0) || (col+1<src.cols && result.at<uchar>(row,col+1)==0)) {
 						//> going horizontal right
 						double length = 0.0;
-						for(int j=col-1; j<(col+a+1); j++) {
-							if(temp.at<uchar>(row-1,j)>0)
-								length++;
-						}
-						cutLength = min(a,length);
 						vector<Point> seed_vec2;
 						bool topCheck=false, bottomCheck=false;
-						for(int j=col; j<(col+cutLength); j++) {
-							if(j<src.cols)
-								temp.at<uchar>(row,j) = 0;
-
+						for(int j=col-1; j<(col+a+1); j++) {
+							if(temp.at<uchar>(row-1,j)>0) {
+								length++;
+							}
 							if(row-1>=0) {
 								if(temp.at<uchar>(row-1,j)>0 && topCheck==false) {
 									seed_vec2.push_back(Point(j,row-1));
@@ -1807,6 +1802,11 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 									bottomCheck=true;
 								}
 							}
+						}
+						cutLength = min(a,length);
+						for(int j=col; j<(col+cutLength); j++) {
+							if(j<src.cols)
+								temp.at<uchar>(row,j) = 0;
 						}
 
 						if(seed_vec2.size()>1) {

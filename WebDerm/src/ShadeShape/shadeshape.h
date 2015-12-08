@@ -9,11 +9,12 @@
 #define SHADESHAPE_H_
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+//#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 #include "features.h"
 
 class Features;
 class Islands;
+class ImageData;
 
 class ShadeShape {
 private:
@@ -25,7 +26,7 @@ private:
 	int ssArea;
 	int ssAreaPostDensityConnector;
 	Mat img;
-	ImageData *id;
+	ImageData id;
 
 	bool isBridgeWeak(Mat &src, int x, int y);
 	bool isOnTheEdge(Mat &src, int x, int y);

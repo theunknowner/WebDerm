@@ -504,7 +504,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
 								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
 							} // end SURR_BY_INV
-							//> E-Value using count base on relArea <//
+							//> E-Value using count, base on relArea <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
 							if(std::isnan(countProportionUP)) countProportionUP = 0.0;

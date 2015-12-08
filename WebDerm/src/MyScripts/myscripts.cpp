@@ -72,7 +72,7 @@ ShadeShape script2(String name) {
 	ImageData id(img2,name,0);
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss;
-	ss.extract(id);
+	ss.extract(id,false);
 	/*for(int i=0; i<ss.numOfFeatures(); i++) {
 		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
 			//imgshow(ss.feature(i).island(j).image());
@@ -3643,7 +3643,7 @@ ShadeShape script31(String filename) {
 	ImageData id(img3,name,0);
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss;
-	ss.extract(id);
+	ss.extract(id,false);
 	return ss;
 }
 

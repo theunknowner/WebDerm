@@ -99,7 +99,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -112,14 +112,14 @@ int main(int argc,char** argv)
 	TestML::clear();
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("herpes12");
+	ShadeShape ss1 = Scripts::script31("melanoma8c");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	ss1.showInteractiveIslands();
+	//ss1.showInteractiveIslands();
 	//ss1.writeListOfIslandsWithLowNN();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	//Islands island = ss1.getIslandWithPoint(Point(16,59));
-	//imwrite(ss1.name()+"_strip.png",island.image());
+	Islands island = ss1.getIslandWithPoint(Point(57,30));
+	imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
 	/*
@@ -206,7 +206,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-	/*
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -287,16 +287,17 @@ int main(int argc,char** argv)
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/
 
-	//Scripts::checkAllTestData3();
+	Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
-	/*
-	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_sample.png");
-	ShadeShape ss1 = Scripts::script31("herpes12");
+/*
+	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_strip.png");
+	ShadeShape ss1 = Scripts::script31("melanoma8c");
 	//ss1.showInteractiveIslands();
-	Islands island = ss1.getIslandWithPoint(Point(119,59));
-	//SubIslands subIsland = island.getSubIslandWithPoint(Point(110,110));
+	//ss1.showInteractiveSubIslands();
+	Islands island = ss1.getIslandWithPoint(Point(51,31));
+	SubIslands subIsland = island.getSubIslandWithPoint(Point(84,108));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",island.image());
+	imwrite(ss1.name()+"_sample.png",subIsland.image());
 	//Mat results = island.nn_results();
 	//cout << results << endl;
 	/**/
