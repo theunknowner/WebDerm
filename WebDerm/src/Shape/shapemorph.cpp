@@ -1727,10 +1727,10 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 	Mat temp = src.clone();
 	row=0; col=0;
 	a = round(a) + 1;
-	/*if(*max_element(src.begin<uchar>(),src.end<uchar>())==156) {
-		cout << a << endl;
-		a = 7;
-	}*/
+	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==163) {
+		//cout << a << endl;
+		//a = 7;
+	//}
 	double cutLength = a;
 
 	Pathfind pf;

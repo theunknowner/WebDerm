@@ -145,7 +145,7 @@ Features::Features(Mat featureImg, ImageData &parentId, bool disconnectIslands) 
 			Mat crop_img = fn.cropImage(island.image());
 			float frameArea = (float) crop_img.total() / island.image().total();
 			Mat newIslandImg = island.image();
-			if(frameArea>0.01 && island.shape_name().find("Excavated")!=string::npos) {
+			if(frameArea>0.01 && (island.shape_name().find("Excavated")!=string::npos || island.shape_name().find("Default")!=string::npos)) {
 				vector<Islands> islandVec2;
 				vector<Mat> littleIslands2 = this->disconnectIslands(island.image());
 				for(unsigned int j=0; j<littleIslands2.size(); j++) {

@@ -112,14 +112,13 @@ int main(int argc,char** argv)
 	TestML::clear();
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("melanoma8c");
+	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	//ss1.showInteractiveIslands();
-	//ss1.writeListOfIslandsWithLowNN();
+	ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(57,30));
-	imwrite(ss1.name()+"_strip.png",island.image());
+	//Islands island = ss1.getIslandWithPoint(Point(57,30));
+	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
 	/*
@@ -206,7 +205,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -286,7 +285,7 @@ int main(int argc,char** argv)
 	//imgshow(img2);
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/
-
+/*
 	Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
 /*
