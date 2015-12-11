@@ -15,7 +15,7 @@ public:
 	float avgDist;
 	float esgVal;
 
-	float calculate(vector<float> distVec, int shadeDiff);
+	float calculate(float dist, int shadeDiff);
 };
 
 #endif /* ESG_H_ */

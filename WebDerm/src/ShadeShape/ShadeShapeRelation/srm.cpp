@@ -88,15 +88,20 @@ pair<int,int>& Srm::relationArea(int index1, int index2) {
 
 //! return SRM distance between label1 & label2
 //! if (degree = -1) function returns sum of the distances
+//! if (degree = -2) function returns avg of the distances
 float Srm::getRelationDistance(int index1, int index2, float degree) {
 	auto &distMap = this->relationDistanceMatrix.at(index1).at(index2);
 
 	//> if (degree = -1) return sum
-	if(degree==-1.0) {
+	if(degree==-1.0 || degree==-2.0) {
 		float sum=0.0;
 		for(auto it=distMap.begin(); it!=distMap.end(); it++) {
 			sum += it->second;
 		}
+		if(degree==-2.0) {
+			return sum/distMap.size();
+		}
+
 		return sum;
 	}
 
