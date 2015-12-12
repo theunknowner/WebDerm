@@ -195,18 +195,23 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 					if(countPercent>=surroundedThreshUpper) {
 						srm.relation(index1,index2) = SURR_BY;
 						srm.relation(index2,index1) = SURR_BY_INV;
-
+						srm.relationCountPercent(index1,index2) = countPercent;
+						srm.relationCountPercent(index2,index1) = countPercent;
 					}
 					else if(touchCountPercent<surroundedThreshUpper && touchCountPercent>=surroundedThreshLower) {
 						if(neighborNumber==1) {
 							srm.relation(index1,index2) = DIR;
 							srm.relation(index2,index1) = DIR;
+							srm.relationCountPercent(index1,index2) = touchCountPercent;
+							srm.relationCountPercent(index2,index1) = touchCountPercent;
 						}
 					}
 					else if(countPercent<surroundedThreshUpper && countPercent>=surroundedThreshLower && touchCountPercent>=surroundedThreshUpper) {
 						if(neighborNumber==1) {
 							srm.relation(index1,index2) = DIR;
 							srm.relation(index2,index1) = DIR;
+							srm.relationCountPercent(index1,index2) = countPercent;
+							srm.relationCountPercent(index2,index1) = countPercent;
 						}
 					}
 					srm.neighborLevel(index1,index2) = max(neighborNumber,srm.neighborLevel(index1,index2));

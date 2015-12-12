@@ -27,6 +27,7 @@ private:
 	vector<vector<int> > relationTouchCountMatrix;
 	vector<vector<pair<int,int>> > relationAreaMatrix;
 	vector<vector<map<float,float>> > relationDistanceMatrix;
+	vector<vector<float> > relationCountPercentMatrix;
 
 protected:
 	int relOpLevelSize = 50;
@@ -40,6 +41,7 @@ public:
 	int& relationCount(int index1, int index2);
 	int& neighborLevel(int index1, int index2);
 	int& relationTouchCount(int index1, int index2);
+	float& relationCountPercent(int index1, int index2);
 	pair<int,int>& relationArea(int index1, int index2);
 	float getRelationDistance(int index1, int index2, float degree);
 	void setRelationDistance(int index1, int index2, float degree, float val);

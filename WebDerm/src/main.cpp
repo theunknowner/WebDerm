@@ -112,7 +112,7 @@ int main(int argc,char** argv)
 	TestML::clear();
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
+	ShadeShape ss1 = Scripts::script31("herpes12");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
@@ -121,7 +121,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-	/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -205,7 +205,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);

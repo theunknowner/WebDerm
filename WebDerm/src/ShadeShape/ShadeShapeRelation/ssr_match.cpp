@@ -71,11 +71,11 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	// for loop i: labels for the y axis
 	for(unsigned int i=0; i<srmCountUP.size(); i++) {
 		String label1 = upMergedLabels.at(i);
-		bool label1Condition = label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos;
+		bool label1Condition = label1.find("Excavated")!=string::npos || label1.find("Default")!=string::npos || label1.find("Blotch")!=string::npos;
 		// for loop j: labels for x axis
 		for(unsigned int j=0; j<srmCountUP.at(i).size(); j++) {
 			String label2 = upMergedLabels.at(j);
-			bool label2Condition = label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos;
+			bool label2Condition = label2.find("Excavated")!=string::npos || label2.find("Default")!=string::npos  || label1.find("Blotch")!=string::npos;
 			// for loop k: counts for relations "y [op] x"
 			for(unsigned int k=0; k<srmCountUP.at(i).at(j).size(); k++) {
 				String relOp = this->rel_op.at(k);
@@ -99,7 +99,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						//> used for constrast weight
-						float sumEsgUP=0.0, sumEsgDB=0.0;
 						float contrastWeightUP = 0.0, contrastWeightDB = 0.0;
 						if(countUP>0 || countDB>0) {
 							float areaValUP = totalAreaUP, areaValDB = totalAreaDB;
@@ -296,13 +295,14 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel));
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
-												float dist = srmUP.getRelationDistance(index1,index2,-2);
+												float dist = srmUP.getRelationDistance(index1,index2,-2.0);
 												esg.calculate(dist,shadeDiff);
 												float relArea1 = upLabels.area(yLabel);
 												float relArea2 = upLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/upLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmUP.relationCountPercent(index1,index2);
+												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
 											}// end of equationMap
 										} // end y mergedLabelContainer UP
@@ -359,7 +359,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = dbLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/dbLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmDB.relationCountPercent(index1,index2);
 												contrastWeightDB += ctWt;
 											}// end if equationMap
 										} // end y mergedLabelContainer DB
@@ -570,7 +570,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = upLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/upLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmUP.relationCountPercent(index1,index2);
+												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
 											}// end if equationMap
 										}// end for x srmUP
@@ -626,7 +627,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = dbLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/dbLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmUP.relationCountPercent(index1,index2);
+												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightDB += ctWt;
 											}// end if equationMap
 										} // end x mergedLabelContainer DB
@@ -682,7 +684,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",sumEsgUP,sumEsgDB);
 								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
@@ -706,7 +707,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",sumEsgUP,sumEsgDB);
 								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
@@ -741,7 +741,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						//> for contrast weight
-						float sumEsgUP=0.0, sumEsgDB=0.0;
 						float contrastWeightUP=1.0, contrastWeightDB=1.0;
 						if(countUP>0 || countDB>0) {
 							if(areaUP1<=areaUP2) {
@@ -1082,7 +1081,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = upLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/upLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmUP.relationCountPercent(index1,index2);
+												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
 											}// end if equationMap
 										}// end for y srmUP
@@ -1157,7 +1157,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = upLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/upLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmUP.relationCountPercent(index1,index2);
+												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
 											}// end if equationMap
 										}// end for x srmUP
@@ -1215,7 +1216,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = dbLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/dbLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmDB.relationCountPercent(index1,index2);
+												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightDB += ctWt;
 											} //end equationMap
 										} //end y srmDB mergedContainer
@@ -1266,7 +1268,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = dbLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/dbLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												if(std::isnan(ctWt)) ctWt = 1.0;
+												ctWt *= srmDB.relationCountPercent(index1,index2);
+												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightDB += ctWt;
 											}// end if equationMap
 										}// end for x srmDB
@@ -1320,7 +1323,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",sumEsgUP,sumEsgDB);
 								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
@@ -1342,7 +1344,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",sumEsgUP,sumEsgDB);
 								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
@@ -1378,7 +1379,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						//> for contrast weight
-						float sumEsgUP=0.0, sumEsgDB=0.0;
 						float contrastWeightUP=1.0, contrastWeightDB=1.0;
 						if(countUP>0 || countDB>0) {
 							for(int m=0; m<this->relOpLevelSize; m++) {
@@ -1710,7 +1710,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													float relArea2 = upLabels.area(xLabel);
 													float relArea = min(relArea1,relArea2)/upLabels.totalArea();
 													float ctWt = this->contrastWeight(esg.esgVal,relArea);
-													if(std::isnan(ctWt)) ctWt = 1.0;
+													ctWt *= (4.0/24.0); // experimental
+													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
 												}// end if equationMap
 											}// end for y srmUP
@@ -1777,7 +1778,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													float relArea2 = upLabels.area(xLabel);
 													float relArea = min(relArea1,relArea2)/upLabels.totalArea();
 													float ctWt = this->contrastWeight(esg.esgVal,relArea);
-													if(std::isnan(ctWt)) ctWt = 1.0;
+													ctWt *= (4.0/24.0);
+													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
 												}// end if equationMap
 											}// end for x srmUP
@@ -1835,7 +1837,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													float relArea2 = dbLabels.area(xLabel);
 													float relArea = min(relArea1,relArea2)/dbLabels.totalArea();
 													float ctWt = this->contrastWeight(esg.esgVal,relArea);
-													if(std::isnan(ctWt)) ctWt = 1.0;
+													ctWt *= (4.0/24.0);
+													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
 												}// end if equationMap
 											}// end for y srmDB
@@ -1886,7 +1889,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													float relArea2 = dbLabels.area(xLabel);
 													float relArea = min(relArea1,relArea2)/dbLabels.totalArea();
 													float ctWt = this->contrastWeight(esg.esgVal,relArea);
-													if(std::isnan(ctWt)) ctWt = 1.0;
+													ctWt *= (4.0/24.0);
+													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
 												}// end if equationMap
 											}// end for x srmDB
@@ -1941,7 +1945,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"esgValUP: %f, esgValDB: %f\n",sumEsgUP,sumEsgDB);
 								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
@@ -1963,7 +1966,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
 								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"esgValUP: %f, esgValDB: %f\n",sumEsgUP,sumEsgDB);
 								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);

@@ -25,6 +25,8 @@ void Srm::setup_relationMatrix(Labels &labels) {
 	this->relationTouchCountMatrix.resize(labels.size(),vector<int>(labels.size(),0));
 	this->relationDistanceMatrix.clear();
 	this->relationDistanceMatrix.resize(labels.size(),vector<map<float,float>>(labels.size(),map<float,float>()));
+	this->relationCountPercentMatrix.clear();
+	this->relationCountPercentMatrix.resize(labels.size(),vector<float>(labels.size(),0.0));
 }
 
 Labels Srm::mergeLabels() {
@@ -79,6 +81,10 @@ int& Srm::neighborLevel(int index1, int index2) {
 //! return reference to SRM DN touch count between label1 & label2
 int& Srm::relationTouchCount(int index1, int index2) {
 	return this->relationTouchCountMatrix.at(index1).at(index2);
+}
+
+float& Srm::relationCountPercent(int index1, int index2) {
+	return this->relationCountPercentMatrix.at(index1).at(index2);
 }
 
 //! return reference to SRM area between label1 & label2
