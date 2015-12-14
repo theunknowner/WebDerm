@@ -30,9 +30,12 @@ int KneeCurve::kneeCurvePoint(deque<double> &vec) {
 	while(lastPtNormRep.rows!=vec.size()) {
 		lastPtNormRep.push_back(lastPtNorm.row(0));
 	}
-	Mat scalarProduct;
-	multiply(vecFromFirst,lastPtNormRep,scalarProduct);
-	Mat vecFromFirstParallel = scalarProduct.col(0) * lastPtNorm;
+	Mat scalarProduct(vec.size(),1,CV_32F,Scalar(0));
+	for(int i=0; i<vecFromFirst.rows; i++) {
+		double val = vecFromFirst.row(i).dot(lastPtNormRep.row(i));
+		scalarProduct.at<float>(i,0) = val;
+	}
+	Mat vecFromFirstParallel = scalarProduct * lastPtNorm;
 	Mat vecToLine = vecFromFirst - vecFromFirstParallel;
 	Mat vecToLinePow;
 	pow(vecToLine,2,vecToLinePow);
@@ -75,13 +78,19 @@ int KneeCurve::kneeCurvePoint(vector<double> &vec) {
 	while(lastPtNormRep.rows!=vec.size()) {
 		lastPtNormRep.push_back(lastPtNorm.row(0));
 	}
+
 	for(unsigned int i=0; i<vec.size(); i++) {
 		vecFromFirst.at<float>(i,0) = i - firstPt.at<float>(0,0);
 		vecFromFirst.at<float>(i,1) = vec.at(i) - firstPt.at<float>(0,1);
 	}
-	Mat scalarProduct;
-	multiply(vecFromFirst,lastPtNormRep,scalarProduct);
-	Mat vecFromFirstParallel = scalarProduct.col(0) * lastPtNorm;
+
+	//> row-wise dot product
+	Mat scalarProduct(vec.size(),1,CV_32F,Scalar(0));
+	for(int i=0; i<vecFromFirst.rows; i++) {
+		double val = vecFromFirst.row(i).dot(lastPtNormRep.row(i));
+		scalarProduct.at<float>(i,0) = val;
+	}
+	Mat vecFromFirstParallel = scalarProduct * lastPtNorm;
 	Mat vecToLine = vecFromFirst - vecFromFirstParallel;
 	Mat vecToLinePow;
 	pow(vecToLine,2,vecToLinePow);
@@ -89,7 +98,6 @@ int KneeCurve::kneeCurvePoint(vector<double> &vec) {
 	for(int i=0; i<vecToLinePow.rows; i++) {
 		for(int j=0; j<vecToLinePow.cols; j++) {
 			sumMat.at<float>(i,0) += vecToLinePow.at<float>(i,j);
-
 		}
 	}
 	Mat distMat;
@@ -128,9 +136,12 @@ int KneeCurve::kneeCurvePoint(vector<int> &vec) {
 	while(lastPtNormRep.rows!=vec.size()) {
 		lastPtNormRep.push_back(lastPtNorm.row(0));
 	}
-	Mat scalarProduct;
-	multiply(vecFromFirst,lastPtNormRep,scalarProduct);
-	Mat vecFromFirstParallel = scalarProduct.col(0) * lastPtNorm;
+	Mat scalarProduct(vec.size(),1,CV_32F,Scalar(0));
+	for(int i=0; i<vecFromFirst.rows; i++) {
+		double val = vecFromFirst.row(i).dot(lastPtNormRep.row(i));
+		scalarProduct.at<float>(i,0) = val;
+	}
+	Mat vecFromFirstParallel = scalarProduct * lastPtNorm;
 	Mat vecToLine = vecFromFirst - vecFromFirstParallel;
 	Mat vecToLinePow;
 	pow(vecToLine,2,vecToLinePow);
