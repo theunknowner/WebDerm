@@ -1517,6 +1517,11 @@ Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
 	if(fnVec.size()>0) {
 		try {
 			bestIdx = kc.kneeCurvePoint(fnVec);
+			float percent = roundDecimal((float)bestIdx/fnVec.size(),2);
+			if(percent<=0.05000001)
+				bestIdx = 0.25 * fnVec.size();
+			if(percent>=0.8999999)
+				bestIdx = 0.75 * fnVec.size();
 			//fx threshold filtering
 			fxThresh = fnVec.at(bestIdx);
 		} catch(const std::out_of_range &oor) {
@@ -1532,8 +1537,10 @@ Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	a = ceil(a);
-	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==128)
-	//	cout << a << endl;
+	/*if(*max_element(src.begin<uchar>(),src.end<uchar>())==144 && countNonZero(src)>3000) {
+		cout << a << endl;
+		cout << b << endl;
+	}*/
 	Size square(a,a);
 	while(row<src.rows) {
 		while(col<src.cols) {
@@ -1728,8 +1735,8 @@ Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {
 	row=0; col=0;
 	a = round(a) + 1;
 	//if(*max_element(src.begin<uchar>(),src.end<uchar>())==163) {
-		//cout << a << endl;
-		//a = 7;
+	//cout << a << endl;
+	//a = 7;
 	//}
 	double cutLength = a;
 

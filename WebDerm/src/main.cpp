@@ -53,21 +53,7 @@
 #include "Pathfind/pathfind.h"
 
 int main(int argc,char** argv)
-{/*
-	ShapeMorph sm;
-	Mat img = imread("/home/jason/Desktop/workspace/test12.png",0);
-	img = sm.densityDisconnector(img,0.999999);
-	imgshow(img);
-	/*
-	LiquidFeatureExtraction lfe;
-	vector<Point> seed_vec;
-	seed_vec.push_back(Point(42,55));
-	seed_vec.push_back(Point(42,60));
-	vector<Mat> seed_map_vec = lfe.run(img,seed_vec);
-	bool crossover = lfe.doesSeedMapsCrossOver(seed_map_vec);
-	cout << crossover << endl;
-	imgshow(seed_map_vec.at(0));
-	imgshow(seed_map_vec.at(1));
+{
 	//Entropy en;
 	//en.importEntropyThresholds();
 	//en.runAllEntropy();
@@ -106,22 +92,33 @@ int main(int argc,char** argv)
 	ImageData id(img,name);
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
-	ss1.extract(id);
+	ss1.extract(id,false);
 	//ss1.showInteractiveSubIslands();
 	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-/*
-	ShadeShape ss1 = Scripts::script31("herpes12");
+	/*
+	deque<String> files;
+	String folder = "Looks_Like/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String name = folder + files.at(i);
+		name = getFileName(name);
+		ShadeShape ss1 = Scripts::script31(name);
+		imwrite(name+"_discrete.png",ss1.image());
+	}*/
+	/*
+	ShadeShape ss1 = Scripts::script31("herpes3");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	ss1.showInteractiveIslands();
+	//ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	//Islands island = ss1.getIslandWithPoint(Point(57,30));
-	//imwrite(ss1.name()+"_strip.png",island.image());
+	Islands island = ss1.getIslandWithPoint(Point(94,10));
+	imwrite(ss1.name()+"_strip.png",island.nn_image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -244,7 +241,7 @@ int main(int argc,char** argv)
 	FileData fd;
 	String folder = "/home/jason/git/Samples/Samples/Training/Circles-Disc-Incomplete/";
 	fd.fixFileNumberSequence(folder,"(",3);
-/*
+
 	deque<String> files;
 	fd.getFilesFromDirectory(folder,files);
 	sort(files.begin(),files.end());
@@ -271,9 +268,8 @@ int main(int argc,char** argv)
 	}
 /**/
 
-	/*
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s2.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s3.png",0);
+	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
+	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s1.png",0);
 	StatSign statSign;
 	vector<float> statSignVec1 = statSign.create(img1);
 	vector<float> statSignVec2 = statSign.create(img2);

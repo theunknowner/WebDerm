@@ -11,3 +11,11 @@
 void KneeCurve::save_graph(String out, vector<double> &vec) {
 	Write::writeToCsv(vec,out);
 }
+
+void KneeCurve::save_graph(String out, deque<double> &vec) {
+	Write::writeToCsv(vec,out);
+}
+
+void KneeCurve::save_graph(String out, vector<int> &vec) {
+	Write::writeToCsv(vec,out);
+}

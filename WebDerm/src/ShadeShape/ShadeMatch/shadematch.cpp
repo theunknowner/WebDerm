@@ -45,6 +45,7 @@ void ShadeMatch::setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2) {
 }
 
 //! continuous shade_translation of islands until shiftType changes
+//! starting with the largest island
 bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) {
 	static int prevShiftType = 0;
 	if(_SHIFT[shiftType]=="SHIFT_NONE") {

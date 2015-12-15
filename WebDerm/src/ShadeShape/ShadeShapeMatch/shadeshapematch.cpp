@@ -413,7 +413,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 			this->sortIslandsByArea(islandVec2);
 			float maxShadeShiftResult = 0.0;
 			vector<vector<vector<Islands> > > maxShadeShiftIslandVec = islandVec2;
-			for(unsigned int shadeShift2=0; shadeShift2<shadematch.SHIFT().size(); shadeShift2++) {
+			for(unsigned int shadeShift2=0; shadeShift2<1; shadeShift2++) {
 				vector<vector<vector<Islands> > > islandVecTemp = shadematch.shiftShades(islandVec2,shadeShift2);
 				this->sortIslandsByArea(islandVecTemp);
 				upLabels = Labels(islandVecTemp,matchSS.area(),matchSS.name());
@@ -426,7 +426,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 					maxShadeShiftIslandVec = islandVecTemp;
 				}
 				///////////////////////////////////////////////
-				/*************** Debug Print *****************/
+				//################ Debug Print ####################//
 				if(this->debugMode>=1) {
 					printf("ShadeShift: %s, ",shadematch.SHIFT()[shadeShift].c_str());
 					printf("ShadeShift2: %s, ",shadematch.SHIFT()[shadeShift2].c_str());
@@ -439,7 +439,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 					printf("isStored: %d\n",shadematch.isFeatIslStored());
 					cout << "-------------------------" << endl;
 				}
-				/*************** End Debug Print **************/
+				//############### End Debug Print ###################//
 				////////////////////////////////////////////////
 			} // end for shadeShift2
 

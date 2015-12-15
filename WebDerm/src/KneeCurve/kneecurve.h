@@ -29,6 +29,8 @@ public:
 
 	/* save_graph.cpp */
 	void save_graph(String out, vector<double> &vec);
+	void save_graph(String out, deque<double> &vec);
+	void save_graph(String out, vector<int> &vec);
 };
 
 #endif /* KNEECURVE_H_ */

@@ -48,7 +48,7 @@ vector<float> StatSign::create(Mat img, float relArea) {
 	}
 	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0.0);
 	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0.0);
-	return statSignVec2;
+	return statSignVec;
 }
 
 //! scheme 1 for comparing statistical signature

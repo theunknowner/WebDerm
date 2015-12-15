@@ -95,6 +95,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float deltaArcScore1=1.0, deltaArcScore2 = 1.0;
 						//> used for dot product calculation
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
+						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1=0.0, weight2 = 0.0;
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
@@ -236,16 +237,16 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								//> StatSign using Dot Product (Scheme I) <//
 								if(label1Condition){
 									dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-									dotProduct1 = statsign.adjustValue(dotProduct1);
+									adjustedDP1 = statsign.adjustValue(dotProduct1);
 
 								}
 								if(label2Condition) {
 									dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-									dotProduct2 = statsign.adjustValue(dotProduct2);
+									adjustedDP2 = statsign.adjustValue(dotProduct2);
 								}
 								//> ************ End StatSign ************ <//
-								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
-								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
+								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
+								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
 								deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 								deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 								//for UP
@@ -292,7 +293,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel));
+												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
 												float dist = srmUP.getRelationDistance(index1,index2,-2.0);
@@ -508,15 +509,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								//> StatSign using Dot Product (Scheme I) <//
 								if(label1Condition){
 									dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-									dotProduct1 = statsign.adjustValue(dotProduct1);
+									adjustedDP1 = statsign.adjustValue(dotProduct1);
 								}
 								if(label2Condition) {
 									dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-									dotProduct2 = statsign.adjustValue(dotProduct2);
+									adjustedDP2 = statsign.adjustValue(dotProduct2);
 								}
 								//> ************ End StatSign ************ <//
-								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
-								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
+								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
+								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
 								deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 								deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 								// for UP
@@ -688,7 +689,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
@@ -711,7 +714,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp2,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp2,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp2,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
@@ -737,11 +742,12 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float deltaArcScore1=1.0, deltaArcScore2=1.0;
 						//> for dot product and weights
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
+						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1 = 1.0, weight2 = 1.0;
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						//> for contrast weight
-						float contrastWeightUP=1.0, contrastWeightDB=1.0;
+						float contrastWeightUP=0.0, contrastWeightDB=0.0;
 						if(countUP>0 || countDB>0) {
 							if(areaUP1<=areaUP2) {
 								//> UP initial calculations 1
@@ -1015,15 +1021,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							//> StatSign using Dot Product (Scheme I) <//
 							if(label1Condition){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-								dotProduct1 = statsign.adjustValue(dotProduct1);
+								adjustedDP1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2Condition) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-								dotProduct2 = statsign.adjustValue(dotProduct2);
+								adjustedDP2 = statsign.adjustValue(dotProduct2);
 							}
 							//> ************ End StatSign ************ <//
-							weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
-							weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
+							weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
+							weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
 							deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 							deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 
@@ -1072,7 +1078,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel));
+												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
 												float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1148,7 +1154,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel));
+												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
 												float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1207,7 +1213,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel));
+												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
 												int index1 = srmDB.getIndex(yLabel);
 												int index2 = srmDB.getIndex(xLabel);
 												float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -1259,7 +1265,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel));
+												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
 												int index1 = srmDB.getIndex(yLabel);
 												int index2 = srmDB.getIndex(xLabel);
 												float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -1327,7 +1333,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
@@ -1348,7 +1356,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp2,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp2,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp2,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
@@ -1375,11 +1385,12 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float deltaArcScore1=1.0, deltaArcScore2=1.0;
 						//> for dot products and weights
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
+						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1 = 1.0, weight2 = 1.0;
 						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
 						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
 						//> for contrast weight
-						float contrastWeightUP=1.0, contrastWeightDB=1.0;
+						float contrastWeightUP=0.0, contrastWeightDB=0.0;
 						if(countUP>0 || countDB>0) {
 							for(int m=0; m<this->relOpLevelSize; m++) {
 								if(areaUP1<=areaUP2) {
@@ -1643,15 +1654,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								//> StatSign using Dot Product (Scheme I) <//
 								if(label1Condition){
 									dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-									dotProduct1 = statsign.adjustValue(dotProduct1);
+									adjustedDP1 = statsign.adjustValue(dotProduct1);
 								}
 								if(label2Condition) {
 									dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-									dotProduct2 = statsign.adjustValue(dotProduct2);
+									adjustedDP2 = statsign.adjustValue(dotProduct2);
 								}
 								//> ************ End StatSign ************ <//
-								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
-								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
+								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
+								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
 								deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 								deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 							}
@@ -1701,7 +1712,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel));
+													int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
 													int index1 = srmUP.getIndex(yLabel);
 													int index2 = srmUP.getIndex(xLabel);
 													float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1769,7 +1780,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel));
+													int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
 													int index1 = srmUP.getIndex(yLabel);
 													int index2 = srmUP.getIndex(xLabel);
 													float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1828,7 +1839,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel));
+													int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
 													int index1 = srmDB.getIndex(yLabel);
 													int index2 = srmDB.getIndex(xLabel);
 													float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -1880,7 +1891,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel));
+													int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
 													int index1 = srmDB.getIndex(yLabel);
 													int index2 = srmDB.getIndex(xLabel);
 													float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -1949,7 +1960,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp,"DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
 								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
 								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
@@ -1970,7 +1983,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
 								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
 								fprintf(fp2,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp2,"DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
 								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp2,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
 								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);

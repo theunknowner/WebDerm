@@ -9,8 +9,9 @@
 #define SHADES_H_INCLUDED
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "peakcluster.h"
 
-class Shades {
+class Shades: public PeakCluster {
 public:
 	static deque<String> g_Shades;
 	static deque< deque<double> > g_ShadeThresh;

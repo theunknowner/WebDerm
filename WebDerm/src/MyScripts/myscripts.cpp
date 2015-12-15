@@ -55,20 +55,16 @@ void script1() {
 ShadeShape script2(String name) {
 	Mat img = imread(name,0);
 	img = runResizeImage(img,Size(140,140));
-	vector<double> data_vec;
-	for(int i=0; i<img.rows; i++) {
-		for(int j=0; j<img.cols; j++) {
-			double val = img.at<uchar>(i,j);
-			if(val>0)
-				data_vec.push_back(val);
-		}
-	}
-	int peakPos = getPeakClusters(data_vec);
-	int minVal = *min_element(data_vec.begin(),data_vec.end());
-	int maxVal = *max_element(data_vec.begin(),data_vec.end());
+	Shades sh;
+	int peakPos = sh.getPeakClusters(img);
 	printf("PeakPos: %d\n",peakPos);
 	ShapeColor sc;
-	Mat img2 = sc.applyDiscreteShade(img,minVal,maxVal,peakPos);
+	Mat img2 = sc.applyDiscreteShade(img,sh.minVal,sh.maxVal,peakPos);
+	img = sh.removeShadeOutliers(img2,img,0.001);
+	if(sh.isOutliersRemoved==true) {
+		img2 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
+	}
+
 	ImageData id(img2,name,0);
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss;
@@ -3625,19 +3621,13 @@ ShadeShape script31(String filename) {
 	unionMap.copyTo(maskFinal,unionMap);
 	imgGray.copyTo(img2,maskFinal);
 
-	vector<double> data_vec;
-	for(int i=0; i<img2.rows; i++) {
-		for(int j=0; j<img2.cols; j++) {
-			double val = img2.at<uchar>(i,j);
-			if(val>0)
-				data_vec.push_back(val);
-		}
-	}
-	int peakPos = getPeakClusters(data_vec);
-	int minVal = *min_element(data_vec.begin(),data_vec.end());
-	int maxVal = *max_element(data_vec.begin(),data_vec.end());
+	int peakPos = sh.getPeakClusters(img2);
 	//printf("PeakPos: %d\n",peakPos);
-	img3 = sc.applyDiscreteShade(img2,minVal,maxVal,peakPos);
+	img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
+	img2 = sh.removeShadeOutliers(img3,img2,0.001);
+	if(sh.isOutliersRemoved==true) {
+		img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
+	}
 
 	//> Testing Resizing of feature
 	ImageData id(img3,name,0);
