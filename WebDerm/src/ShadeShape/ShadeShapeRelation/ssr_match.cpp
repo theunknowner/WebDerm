@@ -117,7 +117,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 													for(unsigned int n=0; n<statSignY.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignUP1.at(n) = statSignY.at(n);
+														sumStatSignUP1.at(n) += statSignY.at(n);
 													}
 												}
 												//> for sub island match calculations, arc score
@@ -146,7 +146,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 											for(unsigned int n=0; n<statSignX.size(); n++) {
 												//change from "+=" -> "=" for individual application
-												sumStatSignUP2.at(n) = statSignX.at(n);
+												sumStatSignUP2.at(n) += statSignX.at(n);
 											}
 										}
 									}
@@ -182,7 +182,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 													for(unsigned int n=0; n<statSignY.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignDB1.at(n) = statSignY.at(n);
+														sumStatSignDB1.at(n) += statSignY.at(n);
 													}
 												}
 												//> for sub island match calculations, arc score
@@ -211,7 +211,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(statSignX.size()>0 && statSignX.size()==sumStatSignDB2.size()) {
 											for(unsigned int n=0; n<statSignX.size(); n++) {
 												//change from "+=" -> "=" for individual application
-												sumStatSignDB2.at(n) = statSignX.at(n);
+												sumStatSignDB2.at(n) += statSignX.at(n);
 											}
 										}
 									}
@@ -235,7 +235,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								}
 								// end DB initial calculation
 								//> StatSign using Dot Product (Scheme I) <//
-								if(label1Condition){
+								if(label1Condition) {
 									dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
 									adjustedDP1 = statsign.adjustValue(dotProduct1);
 
@@ -293,7 +293,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
+												int shadeDiff = esg.shadeDiff(upLabels.getShadeLevel(yLabel),upLabels.getShadeLevel(xLabel));
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
 												float dist = srmUP.getRelationDistance(index1,index2,-2.0);
@@ -305,6 +305,45 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												ctWt *= srmUP.relationCountPercent(index1,index2);
 												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
+												if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY && m==1) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** UP *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",upLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightUP: %f\n",contrastWeightUP);
+												}
+												if(label1=="4_Blotch_s3" && label2=="5_Excavated_s1" && k==SURR_BY && m==2) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** UP *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",upLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightUP: %f\n",contrastWeightUP);
+												}
+												if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && m==3) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** UP *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",upLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightUP: %f\n",contrastWeightUP);
+												}
 											}// end of equationMap
 										} // end y mergedLabelContainer UP
 
@@ -351,7 +390,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel));
+												int shadeDiff = esg.shadeDiff(dbLabels.getShadeLevel(yLabel),dbLabels.getShadeLevel(xLabel));
 												int index1 = srmDB.getIndex(yLabel);
 												int index2 = srmDB.getIndex(xLabel);
 												float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -362,6 +401,45 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
 												ctWt *= srmDB.relationCountPercent(index1,index2);
 												contrastWeightDB += ctWt;
+												if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY && m==1) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** DB *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",dbLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightDB: %f\n",contrastWeightDB);
+												}
+												if(label1=="4_Blotch_s3" && label2=="5_Excavated_s1" && k==SURR_BY && m==2) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** UP *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",dbLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightDB: %f\n",contrastWeightDB);
+												}
+												if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && m==3) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** UP *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",dbLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightDB: %f\n",contrastWeightDB);
+												}
 											}// end if equationMap
 										} // end y mergedLabelContainer DB
 
@@ -389,7 +467,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 													for(unsigned int n=0; n<statSignX.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignUP2.at(n) = statSignX.at(n);
+														sumStatSignUP2.at(n) += statSignX.at(n);
 													}
 												}
 												//> for sub island match calculations, arc score
@@ -418,7 +496,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 											for(unsigned int n=0; n<statSignY.size(); n++) {
 												//change from "+=" -> "=" for individual application
-												sumStatSignUP1.at(n) = statSignY.at(n);
+												sumStatSignUP1.at(n) += statSignY.at(n);
 											}
 										}
 									}
@@ -454,7 +532,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignX.size()>0 && statSignX.size()==sumStatSignDB2.size()) {
 													for(unsigned int n=0; n<statSignX.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignDB2.at(n) = statSignX.at(n);
+														sumStatSignDB2.at(n) += statSignX.at(n);
 													}
 												}
 												//> for sub island match calculations, arc score
@@ -483,7 +561,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 											for(unsigned int n=0; n<statSignY.size(); n++) {
 												//change from "+=" -> "=" for individual application
-												sumStatSignDB1.at(n) = statSignY.at(n);
+												sumStatSignDB1.at(n) += statSignY.at(n);
 											}
 										}
 									}
@@ -562,7 +640,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel));
+												int shadeDiff = esg.shadeDiff(upLabels.getShadeLevel(yLabel),upLabels.getShadeLevel(xLabel));
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
 												float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -619,7 +697,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel));
+												int shadeDiff = esg.shadeDiff(dbLabels.getShadeLevel(yLabel),dbLabels.getShadeLevel(xLabel));
 												int index1 = srmDB.getIndex(yLabel);
 												int index2 = srmDB.getIndex(xLabel);
 												float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -763,7 +841,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 													for(unsigned int n=0; n<statSignY.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignUP1.at(n) = statSignY.at(n);
+														sumStatSignUP1.at(n) += statSignY.at(n);
 													}
 												}
 
@@ -793,7 +871,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 											for(unsigned int n=0; n<statSignX.size(); n++) {
 												//change from "+=" -> "=" for individual application
-												sumStatSignUP2.at(n) = statSignX.at(n);
+												sumStatSignUP2.at(n) += statSignX.at(n);
 											}
 										}
 									}
@@ -832,7 +910,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignX.size()>0 && statSignX.size()==sumStatSignUP2.size()) {
 													for(unsigned int n=0; n<statSignX.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignUP2.at(n) = statSignX.at(n);
+														sumStatSignUP2.at(n) += statSignX.at(n);
 													}
 												}
 												//> for sub island match calculations
@@ -861,7 +939,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(statSignY.size()>0 && statSignY.size()==sumStatSignUP1.size()) {
 											for(unsigned int n=0; n<statSignY.size(); n++) {
 												//change from "+=" -> "=" for individual application
-												sumStatSignUP1.at(n) = statSignY.at(n);
+												sumStatSignUP1.at(n) += statSignY.at(n);
 											}
 										}
 									}
@@ -898,7 +976,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 													for(unsigned int n=0; n<statSignY.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignDB1.at(n) = statSignY.at(n);
+														sumStatSignDB1.at(n) += statSignY.at(n);
 													}
 												}
 												//> for sub island match calculations
@@ -965,7 +1043,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(statSignX.size()>0 && statSignX.size()==sumStatSignDB2.size()) {
 													for(unsigned int n=0; n<statSignX.size(); n++) {
 														//change from "+=" -> "=" for individual application
-														sumStatSignDB2.at(n) = statSignX.at(n);
+														sumStatSignDB2.at(n) += statSignX.at(n);
 													}
 												}
 												//> for sub island match calculations
@@ -994,7 +1072,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										if(statSignY.size()>0 && statSignY.size()==sumStatSignDB1.size()) {
 											for(unsigned int n=0; n<statSignY.size(); n++) {
 												//change from "+=" -> "=" for individual application
-												sumStatSignDB1.at(n) = statSignY.at(n);
+												sumStatSignDB1.at(n) += statSignY.at(n);
 											}
 										}
 									}
@@ -1078,7 +1156,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
+												int shadeDiff = esg.shadeDiff(upLabels.getShadeLevel(yLabel),upLabels.getShadeLevel(xLabel));
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
 												float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1154,7 +1232,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
+												int shadeDiff = esg.shadeDiff(upLabels.getShadeLevel(yLabel),upLabels.getShadeLevel(xLabel));
 												int index1 = srmUP.getIndex(yLabel);
 												int index2 = srmUP.getIndex(xLabel);
 												float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1213,7 +1291,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
+												int shadeDiff = esg.shadeDiff(dbLabels.getShadeLevel(yLabel),dbLabels.getShadeLevel(xLabel));
 												int index1 = srmDB.getIndex(yLabel);
 												int index2 = srmDB.getIndex(xLabel);
 												float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -1265,7 +1343,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 												//> Expected value of Shade Gradient (ESG) <//
 												Esg esg;
-												int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
+												int shadeDiff = esg.shadeDiff(dbLabels.getShadeLevel(yLabel),dbLabels.getShadeLevel(xLabel));
 												int index1 = srmDB.getIndex(yLabel);
 												int index2 = srmDB.getIndex(xLabel);
 												float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -1712,7 +1790,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
+													int shadeDiff = esg.shadeDiff(upLabels.getShadeLevel(yLabel),upLabels.getShadeLevel(xLabel));
 													int index1 = srmUP.getIndex(yLabel);
 													int index2 = srmUP.getIndex(xLabel);
 													float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1780,7 +1858,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(upLabels.getShadeLevel(yLabel)-upLabels.getShadeLevel(xLabel)) + 1;
+													int shadeDiff = esg.shadeDiff(upLabels.getShadeLevel(yLabel),upLabels.getShadeLevel(xLabel));
 													int index1 = srmUP.getIndex(yLabel);
 													int index2 = srmUP.getIndex(xLabel);
 													float dist = srmUP.getRelationDistance(index1,index2,-2);
@@ -1839,7 +1917,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
+													int shadeDiff = esg.shadeDiff(dbLabels.getShadeLevel(yLabel),dbLabels.getShadeLevel(xLabel));
 													int index1 = srmDB.getIndex(yLabel);
 													int index2 = srmDB.getIndex(xLabel);
 													float dist = srmDB.getRelationDistance(index1,index2,-2);
@@ -1891,7 +1969,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 													//> Expected value of Shade Gradient (ESG) <//
 													Esg esg;
-													int shadeDiff = abs(dbLabels.getShadeLevel(yLabel)-dbLabels.getShadeLevel(xLabel)) + 1;
+													int shadeDiff = esg.shadeDiff(dbLabels.getShadeLevel(yLabel),dbLabels.getShadeLevel(xLabel));
 													int index1 = srmDB.getIndex(yLabel);
 													int index2 = srmDB.getIndex(xLabel);
 													float dist = srmDB.getRelationDistance(index1,index2,-2);

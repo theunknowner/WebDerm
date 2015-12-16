@@ -17,6 +17,7 @@ public:
 	float dotProduct(vector<float> statSignVec1, vector<float> statSignVec2);
 	float proportion(vector<int> statSignVec1, vector<int> statSignVec2);
 	float adjustValue(float value);
+	void print(vector<float> statSignVec);
 	void printCompare(vector<float> statSignVec1, vector<float> statSignVec2);
 	void writeCompare(String name, vector<float> statSignVec1, vector<float> statSignVec2);
 };

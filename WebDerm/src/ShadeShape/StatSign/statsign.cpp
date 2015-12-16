@@ -42,13 +42,13 @@ vector<float> StatSign::create(Mat img, float relArea) {
 	for(unsigned int i=1; i<statSignVec.size(); i++) {
 		int mul = i>40 ? (i-40) : i;
 		mul = ceil(mul/5.0);
-		statSignVec.at(i) *= pow(4.5,mul) * relArea;
+		statSignVec.at(i) *= pow(2.5,mul) * relArea;
 		int urnNum = ceil(i/5.0);
 		statSignVec2.at(urnNum) += statSignVec.at(i);
 	}
 	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0.0);
 	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0.0);
-	return statSignVec;
+	return statSignVec2;
 }
 
 //! scheme 1 for comparing statistical signature
@@ -109,6 +109,21 @@ float StatSign::adjustValue(float value) {
 	result = min(result,upperLimit);
 	result = max(result,lowerLimit);
 	return result;
+}
+
+void StatSign::print(vector<float> statSignVec) {
+	assert(statSignVec.size()>0);
+	for(unsigned int i=1; i<statSignVec.size(); i++) {
+		float porp = statSignVec.at(i) / statSignVec.at(0);
+		try {
+			printf("L%d: %0.f(%f)\n",i,statSignVec.at(i),porp);
+		} catch(const std::out_of_range &oor) {
+			printf("statSignVec.size(): %lu\n",statSignVec.size());
+			printf("i: %d\n",i);
+			exit(1);
+		}
+	}
+	printf("Total: %0.f\n",statSignVec.at(0));
 }
 
 void StatSign::printCompare(vector<float> statSignVec1, vector<float> statSignVec2) {

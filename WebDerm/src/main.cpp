@@ -108,13 +108,13 @@ int main(int argc,char** argv)
 		ShadeShape ss1 = Scripts::script31(name);
 		imwrite(name+"_discrete.png",ss1.image());
 	}*/
-	/*
+/*
 	ShadeShape ss1 = Scripts::script31("herpes3");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	//ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(94,10));
+	Islands island = ss1.getIslandWithPoint(Point(71,92));
 	imwrite(ss1.name()+"_strip.png",island.nn_image());
 	//cout << island.nn_results() << endl;
 /**/
@@ -202,7 +202,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -267,12 +267,12 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-
+/*
 	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
 	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s1.png",0);
 	StatSign statSign;
-	vector<float> statSignVec1 = statSign.create(img1);
-	vector<float> statSignVec2 = statSign.create(img2);
+	vector<float> statSignVec1 = statSign.create(img1,0.2936);
+	vector<float> statSignVec2 = statSign.create(img2,0.002);
 	statSign.printCompare(statSignVec1,statSignVec2);
 	float result = statSign.dotProduct(statSignVec1,statSignVec2);
 	cout << result << endl;

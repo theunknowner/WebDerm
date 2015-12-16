@@ -15,6 +15,7 @@ public:
 	float avgDist;
 	float esgVal;
 
+	int shadeDiff(int shade1, int shade2);
 	float calculate(float dist, int shadeDiff);
 };
 
