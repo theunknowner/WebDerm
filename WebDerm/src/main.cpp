@@ -93,11 +93,11 @@ int main(int argc,char** argv)
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id,false);
-	//ss1.showInteractiveSubIslands();
-	ss1.showInteractiveIslands();
+	ss1.showInteractiveSubIslands();
+	//ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-	/*
+/*
 	deque<String> files;
 	String folder = "Looks_Like/";
 	FileData fd;
@@ -106,16 +106,16 @@ int main(int argc,char** argv)
 		String name = folder + files.at(i);
 		name = getFileName(name);
 		ShadeShape ss1 = Scripts::script31(name);
-		imwrite(name+"_discrete.png",ss1.image());
-	}*/
-/*
+	}
+/**/
+
 	ShadeShape ss1 = Scripts::script31("herpes3");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	//ss1.showInteractiveIslands();
+	ss1.showInteractiveSubIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(71,92));
-	imwrite(ss1.name()+"_strip.png",island.nn_image());
+	//Islands island = ss1.getIslandWithPoint(Point(52,69));
+	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
 /*
@@ -202,7 +202,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -281,8 +281,8 @@ int main(int argc,char** argv)
 	//imgshow(img2);
 	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
 	/**/
-/*
-	Scripts::checkAllTestData3();
+
+	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_strip.png");
@@ -296,10 +296,10 @@ int main(int argc,char** argv)
 	//Mat results = island.nn_results();
 	//cout << results << endl;
 	/**/
-	/*
+/*
 	TestML ml;
 	String param = TestML::PARAM_PATH;
-	Mat sample = imread("/home/jason/Desktop/workspace/test9.png",0);
+	Mat sample = imread("/home/jason/git/WebDerm/WebDerm/melanoma8c_strip.png",0);
 	//Mat sample = island.image();
 	sample *= 255;
 	imgshow(sample);

@@ -35,7 +35,7 @@ void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param) {
 			cv::displayStatusBar(island.name(),text);
 			char textScore[100];
 			Mat nnResults = subIsland.nn_results();
-			sprintf(textScore,"[%.5f, %.5f, %.5f, %.5f, %.5f]",nnResults.at<float>(0,0),nnResults.at<float>(0,1),nnResults.at<float>(0,2),nnResults.at<float>(0,3),nnResults.at<float>(0,4));
+			sprintf(textScore,"[%.5f, %.5f, %.5f, %.5f, %.5f, %.5f]",nnResults.at<float>(0,0),nnResults.at<float>(0,1),nnResults.at<float>(0,2),nnResults.at<float>(0,3),nnResults.at<float>(0,4),nnResults.at<float>(0,5));
 			namedWindow("SubIsland", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 			imshow("SubIsland",subIsland.image());
 			namedWindow("SubIsland_NN", CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -69,7 +69,7 @@ void Islands::determineIslandShape(Mat &islandImg) {
 	auto maxIt = max_element(results.begin<float>(),results.end<float>());
 	int labelNum = distance(results.begin<float>(),maxIt);
 	float thresh = 0.0;
-	if(*maxIt<thresh) labelNum = 5;
+	if(*maxIt<thresh) labelNum = ml.getShapeIndex2("Default");
 	String shapeName = ml.getShapeName2(labelNum);
 	if(labelNum==0 || labelNum==1 || labelNum==3) {
 		results = ml.runANN2b(sampleVec,labelNum);
@@ -147,10 +147,12 @@ Islands::Islands(Mat islandImg) {
 	this->is_shape_shifted = false;
 	this->prev_shape = -1;
 
-	vector<Mat> littleSubIslands = this->extractSubIslands(islandImg.clone());
-	for(unsigned int i=0; i<littleSubIslands.size(); i++) {
-		SubIslands subIsland(littleSubIslands.at(i));
-		this->storeSubIslands(subIsland);
+	if(this->islShapeName.find("Excavated")!=string::npos) {
+		vector<Mat> littleSubIslands = this->extractSubIslands(islandImg.clone());
+		for(unsigned int i=0; i<littleSubIslands.size(); i++) {
+			SubIslands subIsland(littleSubIslands.at(i));
+			this->storeSubIslands(subIsland);
+		}
 	}
 }
 

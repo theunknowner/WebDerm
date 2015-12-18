@@ -44,9 +44,9 @@ void ShadeMatch::setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2) {
 	}
 }
 
-//! continuous shade_translation of islands until shiftType changes
+//! continuous shade_translation1 of islands until shiftType changes
 //! starting with the largest island
-bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) {
+bool ShadeMatch::shade_translation1(ShadeShape &ss, int shiftType, int shiftAmt) {
 	static int prevShiftType = 0;
 	if(_SHIFT[shiftType]=="SHIFT_NONE") {
 		prevShiftType = shiftType;
@@ -106,11 +106,11 @@ bool ShadeMatch::shade_translation(ShadeShape &ss, int shiftType, int shiftAmt) 
 					for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
 						if(i==featNum && j==islNum) {
 							ss.feature(i).island(j).set_island_shade(newShade);
+							ss.feature(i).island(j).image().copyTo(shiftedImg,ss.feature(i).island(j).image());
 						}
-						ss.feature(i).island(j).image().copyTo(shiftedImg,ss.feature(i).island(j).image());
 					}
 				}
-				ss.image() = shiftedImg;
+				shiftedImg.copyTo(ss.image(),shiftedImg);
 				ss.getImageData().setImage(shiftedImg);
 				this->featIslIdxStoreVec.push_back(indexVec2d.at(pos));
 				this->featIslStored = true;
@@ -194,4 +194,44 @@ vector<vector<vector<Islands> > > ShadeMatch::shiftShades(vector<vector<vector<I
 
 float ShadeMatch::applyShadeWeights(int shadeLevel) {
 	return ShadeMatch::shadeWeightsVec.at(shadeLevel);
+}
+
+//! shifts the lightest shades darker by one shade
+//! or shifts the darkest shades lighter by one shade
+bool ShadeMatch::shade_translation2(ShadeShape &ss, int shiftType, int shiftAmt) {
+	if(shiftType==SHIFT_NONE)
+		return false;
+
+	this->featIslIdxStoreVec.clear();
+	vector<int> indexVec;
+	Mat shiftedImg = Mat::zeros(ss.image().size(),ss.image().type());
+	for(int i=0; i<ss.numOfFeatures(); i++) {
+		bool isShifted = false;
+		for(int j=0; j<ss.feature(i).numOfIslands(); j++) {
+			int shade = ss.feature(i).island(j).shade();
+			int shadeLevel = ss.getIndexOfShade(shade);
+			if(shiftType==SHIFT_LEFT && shadeLevel==this->maxNumOfShades-1) {
+				int new_shade = ss.shade(shadeLevel-shiftAmt);
+				ss.feature(i).island(j).set_island_shade(new_shade);
+				isShifted = true;
+			}
+			if(shiftType==SHIFT_RIGHT && shadeLevel==0) {
+				int new_shade = ss.shade(shadeLevel+shiftAmt);
+				ss.feature(i).island(j).set_island_shade(new_shade);
+				isShifted = true;
+			}
+			if(isShifted) {
+				indexVec.push_back(i);
+				indexVec.push_back(j);
+				this->featIslIdxStoreVec.push_back(indexVec);
+				indexVec.clear();
+				ss.feature(i).island(j).image().copyTo(shiftedImg,ss.feature(i).island(j).image());
+			}
+			isShifted = false;
+		}
+	}
+	shiftedImg.copyTo(ss.image(),shiftedImg);
+	ss.getImageData().setImage(shiftedImg);
+
+	return true;
 }

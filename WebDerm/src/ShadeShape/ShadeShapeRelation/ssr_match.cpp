@@ -59,10 +59,13 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	StatSign statsign;
 	FILE * fp;
 	FILE * fp2;
+	FILE * fp3;
 	String filename = ssrUP.name() + "_entropy_output.txt";
 	String filename2 = ssrUP.name() + "_mismatch_entropy_output.txt";
+	String filename3 = ssrUP.name() + "_no_entropy.txt";
 	fp = fopen(filename.c_str(),"w");
 	fp2 = fopen(filename2.c_str(),"w");
+	fp3 = fopen(filename3.c_str(),"w");
 	float totalMatchScore = 0.0, totalMismatchScore=0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
 
@@ -305,7 +308,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												ctWt *= srmUP.relationCountPercent(index1,index2);
 												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
-												if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY && m==1) {
+												/*if(label1=="5_Excavated_s0" && label2=="5_Excavated_s1" && k==SURR_BY && m==1) {
 													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 													printf("**** UP *****");
 													printf("ShadeDiff: %d\n",shadeDiff);
@@ -317,33 +320,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													printf("ctWt: %f\n",ctWt);
 													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 													printf("ContrastWeightUP: %f\n",contrastWeightUP);
-												}
-												if(label1=="4_Blotch_s3" && label2=="5_Excavated_s1" && k==SURR_BY && m==2) {
-													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-													printf("**** UP *****");
-													printf("ShadeDiff: %d\n",shadeDiff);
-													printf("AvgDist: %f\n",dist);
-													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
-													printf("TotalArea: %d\n",upLabels.totalArea());
-													printf("RelArea: %f\n",relArea);
-													printf("EsgVal: %f\n",esg.esgVal);
-													printf("ctWt: %f\n",ctWt);
-													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
-													printf("ContrastWeightUP: %f\n",contrastWeightUP);
-												}
-												if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && m==3) {
-													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-													printf("**** UP *****");
-													printf("ShadeDiff: %d\n",shadeDiff);
-													printf("AvgDist: %f\n",dist);
-													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
-													printf("TotalArea: %d\n",upLabels.totalArea());
-													printf("RelArea: %f\n",relArea);
-													printf("EsgVal: %f\n",esg.esgVal);
-													printf("ctWt: %f\n",ctWt);
-													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
-													printf("ContrastWeightUP: %f\n",contrastWeightUP);
-												}
+												}*/
 											}// end of equationMap
 										} // end y mergedLabelContainer UP
 
@@ -401,7 +378,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
 												ctWt *= srmDB.relationCountPercent(index1,index2);
 												contrastWeightDB += ctWt;
-												if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY && m==1) {
+												/*if(label1=="5_Excavated_s0" && label2=="5_Excavated_s1" && k==SURR_BY && m==1) {
 													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 													printf("**** DB *****");
 													printf("ShadeDiff: %d\n",shadeDiff);
@@ -413,33 +390,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													printf("ctWt: %f\n",ctWt);
 													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 													printf("ContrastWeightDB: %f\n",contrastWeightDB);
-												}
-												if(label1=="4_Blotch_s3" && label2=="5_Excavated_s1" && k==SURR_BY && m==2) {
-													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-													printf("**** UP *****");
-													printf("ShadeDiff: %d\n",shadeDiff);
-													printf("AvgDist: %f\n",dist);
-													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
-													printf("TotalArea: %d\n",dbLabels.totalArea());
-													printf("RelArea: %f\n",relArea);
-													printf("EsgVal: %f\n",esg.esgVal);
-													printf("ctWt: %f\n",ctWt);
-													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
-													printf("ContrastWeightDB: %f\n",contrastWeightDB);
-												}
-												if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && m==3) {
-													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-													printf("**** UP *****");
-													printf("ShadeDiff: %d\n",shadeDiff);
-													printf("AvgDist: %f\n",dist);
-													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
-													printf("TotalArea: %d\n",dbLabels.totalArea());
-													printf("RelArea: %f\n",relArea);
-													printf("EsgVal: %f\n",esg.esgVal);
-													printf("ctWt: %f\n",ctWt);
-													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
-													printf("ContrastWeightDB: %f\n",contrastWeightDB);
-												}
+												}*/
 											}// end if equationMap
 										} // end y mergedLabelContainer DB
 
@@ -652,6 +603,19 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												ctWt *= srmUP.relationCountPercent(index1,index2);
 												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
+												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** UP *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",upLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightUP: %f\n",contrastWeightUP);
+												}
 											}// end if equationMap
 										}// end for x srmUP
 
@@ -709,6 +673,19 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												ctWt *= srmUP.relationCountPercent(index1,index2);
 												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightDB += ctWt;
+												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV) {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** DB *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",dbLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightDB: %f\n",contrastWeightDB);
+												}
 											}// end if equationMap
 										} // end x mergedLabelContainer DB
 
@@ -749,6 +726,31 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								weightedMismatchEntropy = contrastWeightDB * (areaValDB / dbMergedLabels.totalArea());
 							}
 							totalMismatchScore += weightedMismatchEntropy;
+							if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV) {
+								printf("[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
+								printf("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								printf("TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								printf("sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
+								printf("maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
+								printf("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								printf("EntropyVal: %f\n",entropyVal);
+								printf("MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
+								printf("AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
+								printf("PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
+								printf("MaxTotalArea: %d\n",maxTotalArea);
+								printf("RelArea: %f\n",relArea);
+								printf("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								printf("ContrastWeight: %f\n",contrastWeight);
+								printf("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								printf("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								printf("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								printf("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								printf("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								printf("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								printf("WeightedEntropy: %f\n",weightedEntropy);
+								printf("TotalMatchScore: %f\n",totalMatchScore);
+								printf("----------------------------------\n");
+							}
 
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
@@ -799,6 +801,31 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp2,"----------------------------------\n");
+							}
+							if(weightedEntropy<=0) {
+								fprintf(fp3,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
+								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								fprintf(fp3,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								fprintf(fp3,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
+								fprintf(fp3,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
+								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp3,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
+								fprintf(fp3,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
+								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
+								fprintf(fp3,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp3,"RelArea: %f\n",relArea);
+								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
+								fprintf(fp3,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								fprintf(fp3,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp3,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								fprintf(fp3,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp3,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								fprintf(fp3,"WeightY: %f, WeightX: %f\n",weight1,weight2);
+								fprintf(fp3,"WeightedEntropy: %f\n",weightedEntropy);
+								fprintf(fp3,"TotalMatchScore: %f\n",totalMatchScore);
+								fprintf(fp3,"----------------------------------\n");
 							}
 						} // if countUP || countDB
 					} // end for loop m
@@ -1442,6 +1469,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp2,"----------------------------------\n");
 							}
+							if(weightedEntropy<=0) {
+								fprintf(fp3,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								fprintf(fp3,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								fprintf(fp3,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp3,"RelArea: %f\n",relArea);
+								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
+								fprintf(fp3,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								fprintf(fp3,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp3,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								fprintf(fp3,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp3,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								fprintf(fp3,"WeightY: %f, WeightX: %f\n",weight1,weight2);
+								fprintf(fp3,"WeightedEntropy: %f\n",weightedEntropy);
+								fprintf(fp3,"TotalMatchScore: %f\n",totalMatchScore);
+								fprintf(fp3,"----------------------------------\n");
+							}
 						} // end if countUP || countDB
 					} // end if DIR
 					else { // INDIR
@@ -2068,6 +2118,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
 								fprintf(fp2,"----------------------------------\n");
+							}
+							if(weightedEntropy<=0) {
+								fprintf(fp3,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								fprintf(fp3,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
+								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
+								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								fprintf(fp3,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp3,"RelArea: %f\n",relArea);
+								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
+								fprintf(fp3,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								fprintf(fp3,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								fprintf(fp3,"DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
+								fprintf(fp3,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								fprintf(fp3,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								fprintf(fp3,"WeightY: %f, WeightX: %f\n",weight1,weight2);
+								fprintf(fp3,"WeightedEntropy: %f\n",weightedEntropy);
+								fprintf(fp3,"TotalMatchScore: %f\n",totalMatchScore);
+								fprintf(fp3,"----------------------------------\n");
 							}
 						} // end if countUP || countDB
 					} // end else INDIR

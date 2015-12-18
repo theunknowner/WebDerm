@@ -91,7 +91,7 @@ void Features::determineFeatureShape(Mat featureImg) {
 	auto maxIt = max_element(results.begin<float>(),results.end<float>());
 	int labelNum = distance(results.begin<float>(),maxIt);
 	float thresh = 0.0;
-	if(*maxIt<thresh) labelNum = 5;
+	if(*maxIt<thresh) labelNum = ml.getShapeIndex2("Default");
 	String shapeName = ml.getShapeName2(labelNum);
 	if(labelNum==0 || labelNum==1) {
 		results = ml.runANN2b(sampleVec,labelNum);

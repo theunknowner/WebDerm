@@ -28,13 +28,14 @@ protected:
 public:
 	enum {SHIFT_NONE=0, SHIFT_LEFT=1, SHIFT_RIGHT=2};
 	void setMaxShades(vector<int> shadeVec1, vector<int> shadeVec2);
-	bool shade_translation(ShadeShape &ss, int shiftType, int shiftAmt=1);
+	bool shade_translation1(ShadeShape &ss, int shiftType, int shiftAmt=1);
 	vector<vector<int> >& getStoredFeatIslIdx();
 	bool& isFeatIslStored();
 	vector<String> SHIFT();
 	float applyShiftPenalty(ShadeShape &ss, float score, int shiftAmt=1);
 	vector<vector<vector<Islands> > > shiftShades(vector<vector<vector<Islands> > > &islandVec, int shiftType);
 	float applyShadeWeights(int shadeLevel);
+	bool shade_translation2(ShadeShape &ss, int shiftType, int shiftAmt=1);
 
 };
 

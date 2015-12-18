@@ -95,6 +95,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 													if(srm.getRelationDistance(index1,index2,theta)==0) {
 														float dist = MyMath::eucDist(beginCoords,Point(col,row));
 														srm.setRelationDistance(index1,index2,theta,dist);
+														srm.setRelationDistance(index2,index1,theta,dist);
 													}
 												}
 												int area2 = isl2.area();

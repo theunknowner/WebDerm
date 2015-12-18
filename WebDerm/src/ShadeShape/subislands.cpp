@@ -20,11 +20,13 @@ void SubIslands::determineIslandShape(Mat &subIslandImg) {
 	sampleVec.push_back(sample);
 
 	Mat results = ml.runANN2(sampleVec);
+	Mat results2 = ml.runANN2b(sampleVec,3); //Fused-Donut NN3
+	cv::hconcat(results,results2,results);
 	this->NN_Results = results;
 	auto maxIt = max_element(results.begin<float>(),results.end<float>());
 	int labelNum = distance(results.begin<float>(),maxIt);
 	float thresh = 0.0;
-	if(*maxIt<thresh) labelNum = 5;
+	if(*maxIt<thresh) labelNum = ml.getShapeIndex2("Default");
 	String shapeName = ml.getShapeName2(labelNum);
 	if(labelNum==0 || labelNum==1) {
 		results = ml.runANN2b(sampleVec,labelNum);
