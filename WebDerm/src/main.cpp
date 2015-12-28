@@ -108,7 +108,7 @@ int main(int argc,char** argv)
 		ShadeShape ss1 = Scripts::script31(name);
 	}
 /**/
-
+/*
 	ShadeShape ss1 = Scripts::script31("herpes3");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveSubIslands();
@@ -202,7 +202,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);

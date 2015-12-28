@@ -34,16 +34,16 @@ private:
 	vector<Mat> extractFeatures(Mat src);
 	vector<ImageData> extractFeatures(ImageData &id);
 	void storeFeature(Features feature);
-	void getShadesOfFeatures(Mat src);
+	void getShadesOfFeatures(Mat src, int debugSym=0);
 	void removeDuplicatePointsFromIslands();
 	void storeIslandAreas();
 
 public:
 	ShadeShape();
-	ShadeShape(Mat src, String name="");
-	ShadeShape(ImageData &id, bool disconnectIslands=false);
-	void extract(Mat src, String name="");
-	void extract(ImageData &id, bool disconnectIslands=false);
+	ShadeShape(Mat src, String name="", int debugSym=0);
+	ShadeShape(ImageData &id, bool disconnectIslands=false, int debugSym=0);
+	void extract(Mat src, String name="", int debugSym=0);
+	void extract(ImageData &id, bool disconnectIslands=false, int debugSym=0);
 	Features& feature(int featNum);
 	int numOfFeatures();
 	int shade(int num);

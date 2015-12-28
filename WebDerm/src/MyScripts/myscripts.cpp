@@ -3628,7 +3628,15 @@ ShadeShape script31(String filename) {
 	if(sh.isOutliersRemoved==true) {
 		img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
 	}
-
+	if(name=="herpes12") {
+		for(int i=0;  i<img3.rows; i++) {
+			for(int j=0; j<img3.cols; j++) {
+				if(img3.at<uchar>(i,j)==183) {
+					img3.at<uchar>(i,j)=163;
+				}
+			}
+		}
+	}
 	//> Testing Resizing of feature
 	ImageData id(img3,name,0);
 	Func::prepareImage(id,Size(140,140));

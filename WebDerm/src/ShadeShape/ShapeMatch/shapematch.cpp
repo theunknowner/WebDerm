@@ -94,6 +94,7 @@ vector<vector<int> > ShapeMatch::getIslandVecIdxByArea(vector<vector<vector<Isla
 			}
 		}
 	}
+	assert(areaVec.size()>0);
 	vector<int> origPos;
 	jaysort(areaVec,origPos,1);
 	vector<vector<int> > islandVecIdxSorted;

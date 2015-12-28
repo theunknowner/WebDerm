@@ -228,7 +228,7 @@ void ShadeShape::storeFeature(Features feature) {
 }
 
 //! gets the unique shade values of the islands and stores them in a vector
-void ShadeShape::getShadesOfFeatures(Mat src) {
+void ShadeShape::getShadesOfFeatures(Mat src, int debugSym) {
 	int maxVal = *max_element(src.begin<uchar>(),src.end<uchar>());
 	vector<int> shadeVec(maxVal+1,0);
 	for(int i=0; i<this->numOfFeatures(); i++) {
@@ -240,6 +240,9 @@ void ShadeShape::getShadesOfFeatures(Mat src) {
 		if(shadeVec.at(i)>0) {
 			this->shadeVec.push_back(i);
 		}
+	}
+	if(debugSym==1) {
+		cout << this->shadeVec.size() << endl;
 	}
 }
 
@@ -285,15 +288,15 @@ void ShadeShape::storeIslandAreas() {
 
 ShadeShape::ShadeShape() {}
 
-ShadeShape::ShadeShape(Mat src, String name) {
-	this->extract(src,name);
+ShadeShape::ShadeShape(Mat src, String name, int debugSym) {
+	this->extract(src,name,debugSym);
 }
 
-ShadeShape::ShadeShape(ImageData &id, bool disconnectIslands) {
-	this->extract(id, disconnectIslands);
+ShadeShape::ShadeShape(ImageData &id, bool disconnectIslands, int debugSym) {
+	this->extract(id, disconnectIslands,debugSym);
 }
 //! extracts the features from the image
-void ShadeShape::extract(Mat src, String name) {
+void ShadeShape::extract(Mat src, String name, int debugSym) {
 	this->ss_name = getFileName(name);
 	this->img = src.clone();
 	vector<Mat> featureVec = this->extractFeatures(src);
@@ -310,10 +313,10 @@ void ShadeShape::extract(Mat src, String name) {
 }
 
 //! extracts the features from the image
-void ShadeShape::extract(ImageData &id, bool disconnectIslands) {
+void ShadeShape::extract(ImageData &id, bool disconnectIslands, int debugSym) {
 	this->id = id;
 	this->ss_name = getFileName(id.name());
-	this->img = id.image();
+	this->img = id.image().clone();
 	this->ssArea = countNonZero(this->img);
 	vector<Mat> featureVec = this->extractFeatures(this->img);
 	for(unsigned int i=0; i<featureVec.size(); i++)  {
