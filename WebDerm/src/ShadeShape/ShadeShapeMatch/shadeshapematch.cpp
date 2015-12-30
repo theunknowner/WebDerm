@@ -401,6 +401,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels largestLabelsDB = dbLabelsFilled ;
 	vector<vector<vector<Islands> > > largestIslandVec;
 	Mat largestImg = upSS.image(), maxMatchImg = upSS.image();
+	String maxNStr = "";
 
 	float prevScore = tr1ForShade(upLabelsFilled,dbLabelsFilled); //> initialize
 	for(int n=0; n<3; n++) {
@@ -517,6 +518,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 								largestLabelsDB = dbLabelsFilled;
 								largestIslandVec = islandVec4;
 								maxMatchImg = largestImg;
+								maxNStr = nStr; //use for labeling image
 							}
 
 							///// Debug Print /////
@@ -554,7 +556,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	}
 	/*****************************/
 	Labels::writeCompareLabels(largestLabelsUP,largestLabelsDB,1);
-	imwrite(newNameUP+"_max_match_image.png",maxMatchImg);
+	imwrite(newNameUP+"_max_match_image_"+maxNStr+".png",maxMatchImg);
 	upSS.getImageData().writePrevSize(newNameUP+"_max_match_image");
 	vector<float> vec = {maxResults,finalTR1,finalTR2_match,finalTR2_mismatch};
 	resultVec.push_back(vec);

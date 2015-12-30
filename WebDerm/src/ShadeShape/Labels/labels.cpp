@@ -48,6 +48,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 					this->labelPrevShapeNumMap[label] = islandVec.at(i).at(j).at(k).prevShape();
 					this->labelShadeLevelMap[label] = j;
 					this->labelIslandMap[label] = islandVec.at(i).at(j).at(k);
+					this->labelShadeLumMap[label] = isl.shade();
 
 					//> to calculate the statistical signature of each label
 					if(label.find("Excavated")!=string::npos) {
@@ -167,13 +168,11 @@ String Labels::getShape(String label) {
 	return "";
 }
 
-String Labels::getShade(String label) {
-	size_t pos = label.find("_") + 1;
-	String shade = label.substr(pos,label.length()-pos);
-	pos = shade.find("_") + 1;
-	shade = shade.substr(pos,shade.length()-pos);
-	pos = shade.find("_");
-	return shade.substr(0,pos);
+int Labels::getShade(String label) {
+	if(this->labelShadeLumMap.find(label)!=this->labelShadeLumMap.end()) {
+		return this->labelShadeLumMap.at(label);
+	}
+	return -1;
 }
 
 int Labels::getShadeLevel(String label) {

@@ -22,6 +22,7 @@ private:
 	map<String,int> labelShadeLevelMap;
 	map<String, vector<float> > labelStatSignMap;
 	map<String,Islands> labelIslandMap;
+	map<String,int> labelShadeLumMap;
 	String labelName;
 	int labelTotalArea;
 	void calcTotalArea();
@@ -45,7 +46,7 @@ public:
 	void printLabels();
 	int getIndex(String label);
 	String getShape(String label);
-	String getShade(String label);
+	int getShade(String label);
 	int getShadeLevel(String label);
 	void setShadeLevel(String label, int level);
 	bool isShapeShifted(String label);
