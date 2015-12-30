@@ -173,11 +173,11 @@ float ShadeShapeMatch::tr1(Labels &upLabels, Labels &dbLabels) {
 
 //! TR2 metric using SRM(Spatial Relations Matrix) comparison
 //! returns vector holding pos[0] = match score; pos[1] = mismatch score.
-vector<float> ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
+vector<float> ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr) {
 	assert(upLabels.size()>0 && dbLabels.size()>0);
 	assert(upLabels.size()==dbLabels.size());
 	ShadeShapeRelationMatch ssrm;
-	ssrm.srm_match(ssrUP,upLabels,ssrDB,dbLabels);
+	ssrm.srm_match(ssrUP,upLabels,ssrDB,dbLabels,nStr);
 	float matchScore = ssrm.getMatchScore();
 	float mismatchScore = ssrm.getMismatchScore();
 	vector<float> results = {matchScore,mismatchScore};
@@ -413,7 +413,6 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 			ShadeShape newUpSS(upId,false);
 			if(n==0) {
 				while(shadematch.shade_translation1(newUpSS,shadeShift)) {
-					isShifted = true;
 					ShadeShape matchSS(newUpSS.getImageData(),false);
 					islandVec2 = this->groupIslandsByShape(matchSS);
 					this->sortIslandsByArea(islandVec2);
@@ -437,7 +436,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 					}
 					//############### End Debug Print ###################//
 					////////////////////////////////////////////////
-					if(results>largestResult) {
+					if(results>largestResult || (results>=largestResult && shadeShift==ShadeMatch::SHIFT_NONE)) {
+						isShifted = true;
 						largestResult = results;
 						largestIslandVec2 = islandVec2;
 						largestImg = matchSS.image();
@@ -504,7 +504,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 							ssrUP.spatial_relation(upSS,upLabelsFilled,islandVec4,1,newNameUP);
 							ShadeShapeRelation ssrDB;
 							ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec,1,newNameDB);
-							vector<float> tr2_scores = this->tr2(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled);
+							String nStr = "n"+toString(n)+"_shd"+toString(shadeShift)+"_shp"+toString(shapeShift1)+toString(shapeShift2);
+							vector<float> tr2_scores = this->tr2(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled,nStr);
 							float results = tr1_score * tr2_scores.at(0);
 
 							if(results>maxResults) {

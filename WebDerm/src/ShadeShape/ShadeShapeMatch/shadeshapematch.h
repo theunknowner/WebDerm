@@ -35,7 +35,7 @@ private:
 	float dotProduct(Labels &upLabels, Labels &dbLabels);
 	float tr1ForShade(Labels &upLabels, Labels &dbLabels);
 	float tr1(Labels &upLabels, Labels &dbLabels);
-	vector<float> tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
+	vector<float> tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr="");
 public:
 	void test(ShadeShape &ss);
 	float test_match(ShadeShape upSS, ShadeShape dbSS);

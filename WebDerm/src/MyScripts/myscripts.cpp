@@ -54,18 +54,8 @@ void script1() {
 // test ShapeMatch::shape_translation()
 ShadeShape script2(String name) {
 	Mat img = imread(name,0);
-	img = runResizeImage(img,Size(140,140));
-	Shades sh;
-	int peakPos = sh.getPeakClusters(img);
-	printf("PeakPos: %d\n",peakPos);
-	ShapeColor sc;
-	Mat img2 = sc.applyDiscreteShade(img,sh.minVal,sh.maxVal,peakPos);
-	img = sh.removeShadeOutliers(img2,img,0.001);
-	if(sh.isOutliersRemoved==true) {
-		img2 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
-	}
 
-	ImageData id(img2,name,0);
+	ImageData id(img,name,0);
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss;
 	ss.extract(id,false);
@@ -3628,15 +3618,7 @@ ShadeShape script31(String filename) {
 	if(sh.isOutliersRemoved==true) {
 		img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
 	}
-	if(name=="herpes12") {
-		for(int i=0;  i<img3.rows; i++) {
-			for(int j=0; j<img3.cols; j++) {
-				if(img3.at<uchar>(i,j)==183) {
-					img3.at<uchar>(i,j)=163;
-				}
-			}
-		}
-	}
+
 	//> Testing Resizing of feature
 	ImageData id(img3,name,0);
 	Func::prepareImage(id,Size(140,140));

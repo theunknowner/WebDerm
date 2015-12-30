@@ -22,13 +22,13 @@ private:
 	float contrastWeight(float esg, float relArea);
 	float calculateArcScore(float score1, float score2);
 
-	void match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB);
+	void match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB, String nStr="");
 	float rVal[6] = {1.0,1.0,0.63,0.55,0.52,0.5};
 	float shapeWeight[8] = {1.0,1.0,1.0,1.0,0.7071,0.4082,0.7071,0.25};
 
 
 public:
-	void srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels);
+	void srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr="");
 	float getMatchScore();
 	float getMismatchScore();
 	float getShapeWeight(int shape, float prop);

@@ -38,7 +38,7 @@ float ShadeShapeRelationMatch::calculateArcScore(float score1, float score2) {
 	return result;
 }
 
-void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB) {
+void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB, String nStr) {
 	Srm srmUP = ssrUP.get_srm();
 	Srm srmDB = ssrDB.get_srm();
 	auto srmCountUP = srmUP.downscaleSrmCount();
@@ -60,9 +60,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	FILE * fp;
 	FILE * fp2;
 	FILE * fp3;
-	String filename = ssrUP.name() + "_entropy_output.txt";
-	String filename2 = ssrUP.name() + "_mismatch_entropy_output.txt";
-	String filename3 = ssrUP.name() + "_no_entropy.txt";
+	String filename = ssrUP.name() + "_entropy_output_"+nStr+".txt";
+	String filename2 = ssrUP.name() + "_mismatch_entropy_output_"+nStr+".txt";
+	String filename3 = ssrUP.name() + "_no_entropy_"+nStr+".txt";
 	fp = fopen(filename.c_str(),"w");
 	fp2 = fopen(filename2.c_str(),"w");
 	fp3 = fopen(filename3.c_str(),"w");
@@ -308,7 +308,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												ctWt *= srmUP.relationCountPercent(index1,index2);
 												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
-												/*if(label1=="5_Excavated_s0" && label2=="5_Excavated_s1" && k==SURR_BY && m==1) {
+												/*if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
 													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 													printf("**** UP *****");
 													printf("ShadeDiff: %d\n",shadeDiff);
@@ -320,7 +320,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													printf("ctWt: %f\n",ctWt);
 													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 													printf("ContrastWeightUP: %f\n",contrastWeightUP);
-												}*/
+												}
+												 */
 											}// end of equationMap
 										} // end y mergedLabelContainer UP
 
@@ -378,7 +379,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
 												ctWt *= srmDB.relationCountPercent(index1,index2);
 												contrastWeightDB += ctWt;
-												/*if(label1=="5_Excavated_s0" && label2=="5_Excavated_s1" && k==SURR_BY && m==1) {
+												/*if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
 													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 													printf("**** DB *****");
 													printf("ShadeDiff: %d\n",shadeDiff);
@@ -388,9 +389,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													printf("RelArea: %f\n",relArea);
 													printf("EsgVal: %f\n",esg.esgVal);
 													printf("ctWt: %f\n",ctWt);
-													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
 													printf("ContrastWeightDB: %f\n",contrastWeightDB);
-												}*/
+												}
+												 */
 											}// end if equationMap
 										} // end y mergedLabelContainer DB
 
@@ -603,7 +605,20 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												ctWt *= srmUP.relationCountPercent(index1,index2);
 												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightUP += ctWt;
-												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV) {
+												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** UP *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",upLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("ContrastWeightUP: %f\n",contrastWeightUP);
+												}
+												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s1" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
 													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 													printf("**** UP *****");
 													printf("ShadeDiff: %d\n",shadeDiff);
@@ -670,10 +685,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												float relArea2 = dbLabels.area(xLabel);
 												float relArea = min(relArea1,relArea2)/dbLabels.totalArea();
 												float ctWt = this->contrastWeight(esg.esgVal,relArea);
-												ctWt *= srmUP.relationCountPercent(index1,index2);
+												ctWt *= srmDB.relationCountPercent(index1,index2);
 												if(std::isnan(ctWt)) ctWt=0.0;
 												contrastWeightDB += ctWt;
-												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV) {
+												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
 													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 													printf("**** DB *****");
 													printf("ShadeDiff: %d\n",shadeDiff);
@@ -683,9 +698,23 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													printf("RelArea: %f\n",relArea);
 													printf("EsgVal: %f\n",esg.esgVal);
 													printf("ctWt: %f\n",ctWt);
-													printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
 													printf("ContrastWeightDB: %f\n",contrastWeightDB);
 												}
+												if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s1" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
+													printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													printf("**** DB *****");
+													printf("ShadeDiff: %d\n",shadeDiff);
+													printf("AvgDist: %f\n",dist);
+													printf("RelAreaY: %.0f, RelAreaX: %.0f\n",relArea1,relArea2);
+													printf("TotalArea: %d\n",dbLabels.totalArea());
+													printf("RelArea: %f\n",relArea);
+													printf("EsgVal: %f\n",esg.esgVal);
+													printf("ctWt: %f\n",ctWt);
+													printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
+													printf("ContrastWeightDB: %f\n",contrastWeightDB);
+												}
+
 											}// end if equationMap
 										} // end x mergedLabelContainer DB
 
@@ -726,31 +755,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								weightedMismatchEntropy = contrastWeightDB * (areaValDB / dbMergedLabels.totalArea());
 							}
 							totalMismatchScore += weightedMismatchEntropy;
-							if(label1=="2_Comp-Donut_s4" && label2=="5_Excavated_s0" && k==SURR_BY_INV) {
-								printf("[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
-								printf("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								printf("TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
-								printf("sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
-								printf("maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
-								printf("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								printf("EntropyVal: %f\n",entropyVal);
-								printf("MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
-								printf("AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
-								printf("PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
-								printf("MaxTotalArea: %d\n",maxTotalArea);
-								printf("RelArea: %f\n",relArea);
-								printf("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								printf("ContrastWeight: %f\n",contrastWeight);
-								printf("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								printf("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								printf("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
-								printf("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								printf("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								printf("WeightY: %f, WeightX: %f\n",weight1,weight2);
-								printf("WeightedEntropy: %f\n",weightedEntropy);
-								printf("TotalMatchScore: %f\n",totalMatchScore);
-								printf("----------------------------------\n");
-							}
 
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
@@ -2158,10 +2162,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 /*************************** PUBLIC FUNCTIONS ***********************************/
 
-void ShadeShapeRelationMatch::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels) {
+void ShadeShapeRelationMatch::srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr) {
 	ssrUP.get_srm().downScaleSrm();
 	ssrDB.get_srm().downScaleSrm();
-	this->match(ssrUP,ssrDB);
+	this->match(ssrUP,ssrDB,nStr);
 	//float matchVal = this->srm_match(srmPairUP,upMergedLabels,srmPairDB,dbMergedLabels);
 	//this->writeDownScaleSrm(ssrUP.name(),srmPairUP,upMergedLabels,upLabels.totalArea());
 	//this->writeDownScaleSrm(ssrDB.name(),srmPairDB,dbMergedLabels,dbLabels.totalArea());

@@ -51,6 +51,7 @@
 #include "ShadeShape/StatSign/statsign.h"
 #include "Shape/LiquidFeatureExtraction/lfe.h"
 #include "Pathfind/pathfind.h"
+#include "ShadeShape/ShadeShapeRelation/esg.h"
 
 int main(int argc,char** argv)
 {
@@ -206,6 +207,8 @@ int main(int argc,char** argv)
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
+	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/pic1.png");
+	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/pic2.png");
 	ShadeShapeMatch ssm;
 	vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0));
 	if(argc==4)
