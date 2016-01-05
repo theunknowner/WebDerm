@@ -100,14 +100,17 @@ void jaysort(vector<int> &vec, vector<int> &origPos, int flag) {
 	vec = sortedVec;
 }
 
-//! sorts in descending order
-void jaysort(vector<float> &vec, vector<int> &origPos) {
+//! flag=0 : ascending; flag=1 : descending
+void jaysort(vector<float> &vec, vector<int> &origPos, int flag) {
 	vector<vector<float> > vec2d(vec.size(),vector<float>(0,0));
 	for(unsigned int i=0; i<vec.size(); i++) {
 		vec2d.at(i).push_back(vec.at(i));
 		vec2d.at(i).push_back(i);
 	}
-	std::sort(vec2d.begin(), vec2d.end(), [](const std::vector< float >& a, const std::vector< float >& b){ return a[0] > b[0]; } );
+	if(flag==0)
+		std::sort(vec2d.begin(), vec2d.end(), [](const std::vector< float >& a, const std::vector< float >& b){ return a[0] < b[0]; } );
+	if(flag==1)
+		std::sort(vec2d.begin(), vec2d.end(), [](const std::vector< float >& a, const std::vector< float >& b){ return a[0] > b[0]; } );
 	vector<float> sortedVec;
 	for(unsigned int i=0; i<vec2d.size(); i++) {
 		sortedVec.push_back(vec2d.at(i).at(0));

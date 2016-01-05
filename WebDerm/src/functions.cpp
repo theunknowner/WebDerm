@@ -408,6 +408,14 @@ int largest(Mat input, int rank) {
 	return origPos.at(place);
 }
 
+//! returns the index of the smallest element
+int smallest(vector<float> vec, int rank) {
+	int place = rank-1;
+	vector<int> origPos;
+	jaysort(vec,origPos,0);
+	return origPos.at(place);
+}
+
 Mat prepareImage(Mat input, Size size) {
 	Functions fn;
 	Size _size = input.size();

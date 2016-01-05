@@ -27,6 +27,7 @@ namespace MyMath {
 	double euclideanDist(deque<double> &vec1, deque<double> &vec2);
 	double euclideanDist(double *vec1, double *vec2);
 	double euclideanDist(int *vec1, int *vec2);
+	double euclideanDist(float x0, float y0, float x1, float y1);
 	float eucDist(Point pt1, Point pt2);
 	double findDegreeDistance(double deg1, double deg2);
 

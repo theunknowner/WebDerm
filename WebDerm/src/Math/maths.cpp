@@ -234,6 +234,11 @@ double euclideanDist(deque<double> &vec1, deque<double> &vec2) {
 	return result;
 }
 
+double euclideanDist(float x0, float y0, float x1, float y1) {
+	double result = sqrt(pow(x0-x1,2)+pow(y0-y1,2));
+	return result;
+}
+
 float eucDist(Point pt1, Point pt2) {
 	float result=0;
 	float valX=0, valY=0;

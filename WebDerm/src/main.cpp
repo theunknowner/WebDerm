@@ -112,7 +112,7 @@ int main(int argc,char** argv)
 /*
 	ShadeShape ss1 = Scripts::script31("herpes3");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	ss1.showInteractiveSubIslands();
+	ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(52,69));
@@ -203,6 +203,8 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
+	Esg esg;
+	cout << esg.calculate(24.134203,39) << endl;
 /*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
