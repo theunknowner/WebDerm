@@ -20,6 +20,7 @@ class ShadeShapeRelation : public ShapeMatch, public Srm {
 private:
 	String ssr_name;
 	Srm srm;
+	bool isImported;
 
 public:
 	void generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec);
@@ -27,7 +28,9 @@ public:
 	Srm& get_srm();
 	String name();
 	int getRelOpIndex(String relOp);
-	void importSrm(String file);
+	void importSrmFiles(String name);
+	void dbg_import_srm(bool setImport=false);
+
 };
 
 #endif /* SHADESHAPERELATION_H_ */

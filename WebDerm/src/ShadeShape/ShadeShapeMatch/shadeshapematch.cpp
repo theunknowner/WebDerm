@@ -501,11 +501,11 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 							this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
 							float tr1_score = this->tr1(upLabelsFilled,dbLabelsFilled);
 							tr1_score = shadematch.applyShiftPenalty(upSS,tr1_score,shadeShift);
+							String nStr = "n"+toString(n)+"_shd"+toString(shadeShift)+"_shp"+toString(shapeShift1)+toString(shapeShift2);
 							ShadeShapeRelation ssrUP;
 							ssrUP.spatial_relation(upSS,upLabelsFilled,islandVec4,1,newNameUP);
 							ShadeShapeRelation ssrDB;
 							ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec,1,newNameDB);
-							String nStr = "n"+toString(n)+"_shd"+toString(shadeShift)+"_shp"+toString(shapeShift1)+toString(shapeShift2);
 							vector<float> tr2_scores = this->tr2(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled,nStr);
 							float results = tr1_score * tr2_scores.at(0);
 

@@ -110,7 +110,7 @@ int main(int argc,char** argv)
 	}
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss1 = Scripts::script31("melanoma10");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
@@ -203,9 +203,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-	Esg esg;
-	cout << esg.calculate(24.134203,39) << endl;
-/*
+
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -291,13 +289,13 @@ int main(int argc,char** argv)
 	//Scripts::checkAllTestData2();
 /*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_strip.png");
-	ShadeShape ss1 = Scripts::script31("melanoma8c");
+	ShadeShape ss1 = Scripts::script31("melanoma10");
 	//ss1.showInteractiveIslands();
 	//ss1.showInteractiveSubIslands();
-	Islands island = ss1.getIslandWithPoint(Point(51,31));
-	SubIslands subIsland = island.getSubIslandWithPoint(Point(84,108));
+	Islands island = ss1.getIslandWithPoint(Point(45,81));
+	//SubIslands subIsland = island.getSubIslandWithPoint(Point(84,108));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",subIsland.image());
+	imwrite(ss1.name()+"_sample.png",island.image());
 	//Mat results = island.nn_results();
 	//cout << results << endl;
 	/**/

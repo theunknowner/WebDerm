@@ -141,6 +141,24 @@ Features::Features(Mat featureImg, ImageData &parentId, bool disconnectIslands) 
 	Functions fn;
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
+		try {
+			Mat crop_img = fn.cropImage(island.image());
+			float relArea = (float)island.area() / parentId.area();
+			float frameArea = (float) crop_img.total() / parentId.image().total();
+			/*if(island.shade()==176 && island.area()==71) {
+				printf("islandArea: %d, parentArea: %d\n",island.area(),parentId.area());
+				printf("RelArea: %f\n",relArea);
+				printf("CropImgTotal: %lu, parentFrameTotal: %lu\n",crop_img.total(),parentId.image().total());
+				printf("FrameArea: %f\n",frameArea);
+			}*/
+			if(relArea<=0.01 && frameArea<=0.02) {
+				island.shape_name() = "Unknown";
+				island.shape() = 7;
+			}
+		} catch (const std::out_of_range &oor) {
+			printf("islandArea: %d, parentArea: %d\n",island.area(),parentId.area());
+			exit(1);
+		}
 		if(disconnectIslands) {
 			Mat crop_img = fn.cropImage(island.image());
 			float frameArea = (float) crop_img.total() / island.image().total();

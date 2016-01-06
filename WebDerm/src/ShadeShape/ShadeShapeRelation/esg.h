@@ -19,6 +19,7 @@ private:
 public:
 	float avgDist;
 	float esgVal;
+	float esgTestVal;
 
 	Esg();
 	bool importThresholds();

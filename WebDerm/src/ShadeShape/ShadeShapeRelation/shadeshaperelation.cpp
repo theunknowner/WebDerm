@@ -231,7 +231,7 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
  */
 void ShadeShapeRelation::spatial_relation(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec, int write, String newName) {
 	this->ssr_name = newName!="" ? newName : ss.name();
-	this->generate_srm(ss,labels,islandVec);
+		this->generate_srm(ss,labels,islandVec);
 	if(write) {
 		this->srm.writeRelationMatrix(labels,this->ssr_name);
 		this->srm.writeNeighborLevelMatrix(labels,this->ssr_name);
@@ -257,8 +257,13 @@ Srm& ShadeShapeRelation::get_srm() {
 	return this->srm;
 }
 
-void ShadeShapeRelation::importSrm(String file) {
-	fstream fs(file);
+void ShadeShapeRelation::importSrmFiles(String name) {
+	String srm_file = name+"_srm.csv";
+	String los_file = name+"_los.csv";
+	String count_file = name+ "_count.csv";
+	fstream fs(srm_file);
+	fstream fs2(los_file);
+	fstream fs3(count_file);
 	if(fs.is_open()) {
 		String temp;
 		vector<String> vec;
@@ -275,4 +280,8 @@ void ShadeShapeRelation::importSrm(String file) {
 		}
 		fs.close();
 	}
+}
+
+void ShadeShapeRelation::dbg_import_srm(bool setImport) {
+	this->isImported = setImport;
 }
