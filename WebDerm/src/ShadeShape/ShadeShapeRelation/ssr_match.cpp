@@ -633,7 +633,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
 													totalCountUP++;
 													totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
-													/*if(label1=="5_Excavated_s1" && label2=="7_Default_s3" && m==2 && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="5_Excavated_s1" && label2=="7_Default_s3" && los==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
 														printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
 														printf("rel_op_idx: %d\n",rel_op_idx);
@@ -676,7 +676,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													/*if(label1=="5_Excavated_s1" && label2=="7_Default_s3" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="5_Excavated_s1" && label2=="7_Default_s3" && k==SURR_BY_INV && los==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -810,7 +810,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							totalMismatchScore += weightedMismatchEntropy;
 
 							if(weightedEntropy>0) {
-								fprintf(fp,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
+								fprintf(fp,"[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
@@ -836,7 +836,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"----------------------------------\n");
 							}
 							if(weightedMismatchEntropy>0) {
-								fprintf(fp2,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
+								fprintf(fp2,"[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
 								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 								fprintf(fp2,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp2,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
@@ -862,7 +862,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"----------------------------------\n");
 							}
 							if(weightedEntropy<=0 || std::isnan(weightedEntropy)) {
-								fprintf(fp3,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
+								fprintf(fp3,"[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
 								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
 								fprintf(fp3,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp3,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);

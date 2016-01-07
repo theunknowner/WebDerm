@@ -34,7 +34,7 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 		for(unsigned int j=0; j<islandVec.at(i).size(); j++) {
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
 				Islands &isl = islandVec.at(i).at(j).at(k);
-				String shape = this->shapeName(i);
+				String shape = this->getShapeName(i);
 				label = toString(i)+"_"+shape+"_s"+toString(j)+"_";
 				label += Func::addDigitsForLabel(k,"0",3);
 				isl.labelName() = label;
@@ -161,8 +161,8 @@ int Labels::getIndex(String label) {
 
 String Labels::getShape(String label) {
 	for(unsigned int i=0; i<ShapeMatch::shapeNames.size(); i++) {
-		if(label.find(this->shapeName(i))!=string::npos) {
-			return this->shapeName(i);
+		if(label.find(this->getShapeName(i))!=string::npos) {
+			return this->getShapeName(i);
 		}
 	}
 	return "";
@@ -243,8 +243,8 @@ void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifte
 	}
 }
 
-void Labels::writeCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
-	String file = labels1.name() + "_" + labels2.name() + "_tr1_max_match_labels.txt";
+void Labels::writeCompareLabels(String name, Labels &labels1, Labels &labels2, int markShifted) {
+	String file = name+".txt";
 	FILE * fp;
 	fp = fopen(file.c_str(),"w");
 	auto labelMap1 = labels1.getMap();

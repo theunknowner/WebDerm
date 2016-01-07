@@ -52,6 +52,7 @@
 #include "Shape/LiquidFeatureExtraction/lfe.h"
 #include "Pathfind/pathfind.h"
 #include "ShadeShape/ShadeShapeRelation/esg.h"
+#include "Shape/shapes.h"
 
 int main(int argc,char** argv)
 {
@@ -70,11 +71,11 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-	/*
+
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
-	ShadeShape ss1 = Scripts::script31("herpes3");
-	ShadeShape ss2 = Scripts::script31("herpes12");
+	ShadeShape ss1 = Scripts::script31("melanoma9");
+	ShadeShape ss2 = Scripts::script31("melanoma10");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//ssm.debug_mode(1);
@@ -86,7 +87,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-/*
+
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -94,8 +95,8 @@ int main(int argc,char** argv)
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id,false);
-	ss1.showInteractiveSubIslands();
-	//ss1.showInteractiveIslands();
+	//ss1.showInteractiveSubIslands();
+	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
 /*
@@ -203,14 +204,14 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/pic1.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/pic2.png");
 	ShadeShapeMatch ssm;
-	vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0));
+	vector<vector<int> > shapeTranslateCount(10,vector<int>(10,0));
 	if(argc==4)
 		ssm.debug_mode(atoi(argv[3]));
 	vector<float> results = ssm.match(ss1,ss2);
@@ -224,11 +225,11 @@ int main(int argc,char** argv)
 	fp = fopen("stt-count.csv","w");
 	fprintf(fp,",");
 	for(unsigned int i=0; i<8; i++) {
-		fprintf(fp,"%s,",spm.shapeName(i).c_str());
+		fprintf(fp,"%s,",spm.getShapeName(i).c_str());
 	}
 	fprintf(fp,"\n");
 	for(unsigned int i=0; i<shapeTranslateCount.size(); i++) {
-		fprintf(fp,"%s,",spm.shapeName(i).c_str());
+		fprintf(fp,"%s,",spm.getShapeName(i).c_str());
 		for(unsigned int j=0; j<shapeTranslateCount.at(i).size(); j++) {
 			fprintf(fp,"%d,",shapeTranslateCount.at(i).at(j));
 		}

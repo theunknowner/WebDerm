@@ -215,9 +215,12 @@ void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vec
 							srm.relationCountPercent(index2,index1) = countPercent;
 						}
 					}
+					int maxNeighborLevelCap = 2;
 					srm.neighborLevel(index1,index2) = max(neighborNumber,srm.neighborLevel(index1,index2));
 					srm.neighborLevel(index2,index1) = max(neighborNumber,srm.neighborLevel(index2,index1));
-					srm.maxNeighborLevel() = max(srm.maxNeighborLevel(),neighborNumber);
+					srm.neighborLevel(index1,index2) = min(srm.neighborLevel(index1,index2),maxNeighborLevelCap);
+					srm.neighborLevel(index2,index1) = min(srm.neighborLevel(index2,index1),maxNeighborLevelCap);
+					srm.maxNeighborLevel() = max(srm.maxNeighborLevel(),srm.neighborLevel(index1,index2));
 					srm.relationArea(index1,index2) = std::make_pair(area1,area2);
 				}
 			}// end num1 loop

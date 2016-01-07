@@ -30,7 +30,7 @@ private:
 	vector<vector<float> > relationCountPercentMatrix;
 
 protected:
-	int relOpLevelSize = 50;
+	int relOpLevelSize = 4;
 	vector<String> rel_op = {"NULL","INDIR","DIR","SURR_BY_INV","SURR_BY"};
 	enum{NONE=0, INDIR=1, DIR=2, SURR_BY_INV=3, SURR_BY=4};
 

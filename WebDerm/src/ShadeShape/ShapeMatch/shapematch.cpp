@@ -10,13 +10,11 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 
-vector<String> ShapeMatch::shapeNames;
 vector<vector<String> > ShapeMatch::shiftingRules;
 vector<vector<float> > ShapeMatch::shiftingPenalties;
 bool ShapeMatch::THRESH_IMPORTED = false;
 
-//> 8 different shapes for 8 different weights
-vector<float> ShapeMatch::shapeWeightsVec = {1.0,1.0,1.0,1.0,0.5,0.5,0.5,0.25};
+vector<float> ShapeMatch::shapeWeightsVec;
 
 /******************* PUBLIC FUNCTIONS ******************/
 
@@ -26,15 +24,18 @@ ShapeMatch::ShapeMatch() {
 }
 
 bool ShapeMatch::importThresholds() {
-	if(!this->THRESH_IMPORTED) {
+	if(!ShapeMatch::THRESH_IMPORTED) {
 		String folderName = "Thresholds/";
 		String filename = folderName+"shape_shifting_rules.csv";
 		String filename2 = folderName+"shape_penalties.csv";
+		String filename3 = folderName+"shape_weights.csv";
 		assert(fs::exists(filename)==true);
 		assert(fs::exists(filename2)==true);
+		assert(fs::exists(filename3)==true);
 		fstream fs(filename);
 		fstream fs2(filename2);
-		if(fs.is_open() && fs2.is_open()) {
+		fstream fs3(filename3);
+		if(fs.is_open() && fs2.is_open() && fs3.is_open()) {
 			String temp;
 			vector<String> vec;
 			vector<String> vec2;
@@ -43,14 +44,12 @@ bool ShapeMatch::importThresholds() {
 				getSubstr(temp,',',vec);
 				for(unsigned int i=0; i<vec.size(); i++) {
 					if(vec.at(i)!="") {
-						if(i==0) {
-							this->shapeNames.push_back(vec.at(i));
-						} else {
+						if(i>0) {
 							vec2.push_back(vec.at(i));
 						}
 					}
 				}
-				this->shiftingRules.push_back(vec2);
+				ShapeMatch::shiftingRules.push_back(vec2);
 				vec2.clear();
 			}
 			getline(fs2,temp);
@@ -61,13 +60,19 @@ bool ShapeMatch::importThresholds() {
 						vec3.push_back(atof(vec.at(i).c_str()));
 					}
 				}
-				this->shiftingPenalties.push_back(vec3);
+				ShapeMatch::shiftingPenalties.push_back(vec3);
 				vec3.clear();
 			}
-			assert(this->shapeNames.size()==this->shiftingPenalties.size());
-			assert(this->shapeNames.size()==this->shiftingRules.size());
+			while(getline(fs3,temp)) {
+				getSubstr(temp,',',vec);
+				ShapeMatch::shapeWeightsVec.push_back(atof(vec.at(1).c_str()));
+			}
+			assert(ShapeMatch::shapeNames.size()==ShapeMatch::shiftingPenalties.size());
+			assert(ShapeMatch::shapeNames.size()==ShapeMatch::shiftingRules.size());
+			assert(ShapeMatch::shapeNames.size()==ShapeMatch::shapeWeightsVec.size());
 			fs.close();
 			fs2.close();
+			fs3.close();
 			return true;
 		} else {
 			cout << "Importing ShapeMatch Thresholds failed!" << endl;
@@ -189,21 +194,7 @@ void ShapeMatch::printIslandAreas(vector<vector<vector<Islands> > > &islandVec) 
 }
 
 int ShapeMatch::numOfShapes() {
-	return this->shapeNames.size();
-}
-
-String ShapeMatch::shapeName(int num) {
-	return this->shapeNames.at(num);
-}
-
-int ShapeMatch::getShapeIndex(String shape) {
-	auto it = std::find(ShapeMatch::shapeNames.begin(),ShapeMatch::shapeNames.end(),shape);
-	if(it!=ShapeMatch::shapeNames.end())
-		return distance(ShapeMatch::shapeNames.begin(),it);
-	else {
-		printf("ShapeMatch:getShapeIndex() %s does not exist\n",shape.c_str());
-		exit(1);
-	}
+	return ShapeMatch::shapeNames.size();
 }
 
 //! assigns an island a new shape
@@ -236,6 +227,12 @@ void ShapeMatch::printPenalties() {
 	}
 }
 
+void ShapeMatch::printWeights() {
+	for(unsigned int i=0; i<ShapeMatch::shapeWeightsVec.size(); i++) {
+		printf("%s: %f\n",ShapeMatch::shapeNames.at(i).c_str(),ShapeMatch::shapeWeightsVec.at(i));
+	}
+}
+
 float ShapeMatch::applyShiftPenalty(float score, int shapeNum, int shapeNum2) {
 	float penalty = ShapeMatch::shiftingPenalties.at(shapeNum).at(shapeNum2);
 	float newScore = score * pow(2.0,penalty);
@@ -249,5 +246,12 @@ float ShapeMatch::getShiftPenalty(int shapeNum, int shapeNum2) {
 }
 
 float ShapeMatch::applyShapeWeight(int shapeNum) {
-	return ShapeMatch::shapeWeightsVec.at(shapeNum);
+	try {
+		return ShapeMatch::shapeWeightsVec.at(shapeNum);
+	} catch (const std::out_of_range &oor) {
+		printf("ShapeMatch::applyShapeWeight() out of range!\n");
+		printf("ShapeNum: %d\n", shapeNum);
+		printf("ShapeWeightVec.size(): %lu\n",ShapeMatch::shapeWeightsVec.size());
+		exit(1);
+	}
 }

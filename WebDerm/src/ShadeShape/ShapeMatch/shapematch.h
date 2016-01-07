@@ -11,15 +11,15 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "../shadeshape.h"
 #include "../islands.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapes.h"
 
 class ShadeShape;
 class Islands;
-class ShapeMatch {
+class ShapeMatch : public Shapes {
 protected:
 	static bool THRESH_IMPORTED;
 	enum {SHIFT_NONE=0, SHIFT_LEFT, SHIFT_RIGHT};
 	vector<String> _SHIFT = {"SHIFT_NONE","SHIFT_START"};
-	static vector<String> shapeNames;
 
 	static vector<float> shapeWeightsVec;
 
@@ -34,8 +34,6 @@ public:
 	void showIslands(vector<vector<vector<Islands> > > &islandVec);
 	void printIslandAreas(vector<vector<vector<Islands> > > &islandVec);
 
-	String shapeName(int num);
-	int getShapeIndex(String shape);
 	void moveShape(vector<vector<vector<Islands> > > &islandVec,int shapeNum, int shadeNum, int islNum, int newShape);
 	int numOfShapes();
 	vector<String> SHIFT();
@@ -44,6 +42,7 @@ public:
 	float applyShapeWeight(int shapeNum);
 	static void printRules();
 	static void printPenalties();
+	static void printWeights();
 };
 
 #endif /* SHAPEMATCH_H_ */
