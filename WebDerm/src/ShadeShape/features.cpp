@@ -12,6 +12,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 #include "islands.h"
 #include "shadeshape.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapes.h"
 
 /************ PRIVATE FUNCTIONS ****************/
 
@@ -152,8 +153,9 @@ Features::Features(Mat featureImg, ImageData &parentId, bool disconnectIslands) 
 			}*/
 
 		if(relArea<=0.01 && frameArea<=0.02) {
+			Shapes shapes;
 			island.shape_name() = "Unknown";
-			island.shape() = 7;
+			island.shape() = shapes.getShapeIndex(island.shape_name());
 		}
 		if(disconnectIslands) {
 			Mat crop_img = fn.cropImage(island.image());

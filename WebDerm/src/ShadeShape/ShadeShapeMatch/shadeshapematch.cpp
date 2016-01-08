@@ -90,11 +90,14 @@ void ShadeShapeMatch::fillMissingLabels(Labels &upLabels, Labels &dbLabels) {
 	map<String,pair<int,float> > &dbMap = dbLabels.getMap();
 	map<String,int> &upShadeLevelMap = upLabels.getShadeLevelMap();
 	map<String,int> &dbShadeLevelMap = dbLabels.getShadeLevelMap();
+	map<String,int> &upShapeNumMap = upLabels.getShapeMap();
+	map<String,int> &dbShapeNumMap = dbLabels.getShapeMap();
 	for(auto it=upMap.begin(); it!=upMap.end(); it++) {
 		String label = it->first;
 		if(dbMap.find(label)==dbMap.end()) {
 			dbMap[label] = std::make_pair(0,0.0);
 			dbShadeLevelMap[label] = upLabels.getShadeLevel(label);
+			dbShapeNumMap[label] = upLabels.getShapeNum(label);
 		}
 	}
 	for(auto it=dbMap.begin(); it!=dbMap.end(); it++) {
@@ -102,6 +105,7 @@ void ShadeShapeMatch::fillMissingLabels(Labels &upLabels, Labels &dbLabels) {
 		if(upMap.find(label)==upMap.end()) {
 			upMap[label] = std::make_pair(0,0.0);
 			upShadeLevelMap[label] = dbLabels.getShadeLevel(label);
+			upShapeNumMap[label] = dbLabels.getShapeNum(label);
 		}
 	}
 }
@@ -219,9 +223,6 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
 	Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
 	cout << "--------------------------" << endl;
-	Islands island = upLabels.getIsland("3_Incomp-Donut_s4_000");
-	imgshow(island.image());
-
 
 	return 0.0;
 }
@@ -256,6 +257,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	String maxNStr = "";
 
 	float prevScore = tr1ForShade(upLabelsFilled,dbLabelsFilled); //> initialize
+	prevScore = roundDecimal(prevScore,6);
 	for(int n=0; n<3; n++) {
 		for(unsigned int shadeShift=0; shadeShift<shadematch.SHIFT().size(); shadeShift++) {
 			bool isShifted = false;
@@ -274,6 +276,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 					dbLabelsFilled = dbLabels;
 					this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
 					float results = this->tr1ForShade(upLabelsFilled,dbLabelsFilled);
+					results = roundDecimal(results,6);
 					///////////////////////////////////////////////
 					//################ Debug Print ####################//
 					if(this->debugMode>=1) {
@@ -361,8 +364,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 							vector<float> tr2_scores = this->tr2(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled,nStr);
 							float results = tr1_score * tr2_scores.at(0);
 
-							printf("%s\n",nStr.c_str());
-							printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_scores.at(0),results);
+							//printf("%s\n",nStr.c_str());
+							//printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_scores.at(0),results);
 							String labelFilename = upLabelsFilled.name()+"_"+dbLabelsFilled.name()+"_labels_"+nStr;
 							Labels::writeCompareLabels(labelFilename,upLabelsFilled,dbLabelsFilled,1);
 
@@ -415,7 +418,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	String labelFilename = largestLabelsUP.name()+"_"+largestLabelsDB.name()+"_tr1_max_match_labels";
 	Labels::writeCompareLabels(labelFilename,largestLabelsUP,largestLabelsDB,1);
 	imwrite(newNameUP+"_max_match_image_"+maxNStr+".png",maxMatchImg);
-	upSS.getImageData().writePrevSize(newNameUP+"_max_match_image");
+	upSS.getImageData().writePrevSize(newNameUP+"_max_match_image_"+maxNStr);
 	vector<float> vec = {maxResults,finalTR1,finalTR2_match,finalTR2_mismatch};
 	resultVec.push_back(vec);
 	return *max_element(resultVec.begin(),resultVec.end());

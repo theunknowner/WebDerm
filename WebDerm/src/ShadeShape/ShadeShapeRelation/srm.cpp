@@ -34,14 +34,13 @@ Labels Srm::mergeLabels() {
 	map<String,pair<int,float> > labelMap = newLabels.getMap();
 	map<String,pair<int,float> > merged_labels;
 	map<String,int> shadeLevelMap;
-	map<String,int> shapeMap;
+	map<String,int> shapeNumMap;
 	for(auto it=labelMap.begin(); it!=labelMap.end(); it++) {
 		String merged_key = it->first.substr(0,it->first.length()-4);
-
 		if(merged_labels.find(merged_key)==merged_labels.end()) {
 			merged_labels[merged_key] = it->second;
 			shadeLevelMap[merged_key] = this->labels.getShadeLevel(it->first);
-			shapeMap[merged_key] = this->labels.getShapeNum(it->first);
+			shapeNumMap[merged_key] = this->labels.getShapeNum(it->first);
 		}
 		else {
 			merged_labels[merged_key].first += it->second.first;
@@ -50,7 +49,7 @@ Labels Srm::mergeLabels() {
 	}
 	newLabels.setLabels(merged_labels);
 	newLabels.getShadeLevelMap() = shadeLevelMap;
-	newLabels.getShapeMap() = shapeMap;
+	newLabels.getShapeMap() = shapeNumMap;
 
 	return newLabels;
 }

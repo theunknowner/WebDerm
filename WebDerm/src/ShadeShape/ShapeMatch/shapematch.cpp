@@ -15,6 +15,7 @@ vector<vector<float> > ShapeMatch::shiftingPenalties;
 bool ShapeMatch::THRESH_IMPORTED = false;
 
 vector<float> ShapeMatch::shapeWeightsVec;
+vector<float> ShapeMatch::shapeWeightsVec2;
 
 /******************* PUBLIC FUNCTIONS ******************/
 
@@ -63,13 +64,16 @@ bool ShapeMatch::importThresholds() {
 				ShapeMatch::shiftingPenalties.push_back(vec3);
 				vec3.clear();
 			}
+			getline(fs3,temp);
 			while(getline(fs3,temp)) {
 				getSubstr(temp,',',vec);
 				ShapeMatch::shapeWeightsVec.push_back(atof(vec.at(1).c_str()));
+				ShapeMatch::shapeWeightsVec2.push_back(atof(vec.at(2).c_str()));
 			}
 			assert(ShapeMatch::shapeNames.size()==ShapeMatch::shiftingPenalties.size());
 			assert(ShapeMatch::shapeNames.size()==ShapeMatch::shiftingRules.size());
 			assert(ShapeMatch::shapeNames.size()==ShapeMatch::shapeWeightsVec.size());
+			assert(ShapeMatch::shapeNames.size()==ShapeMatch::shapeWeightsVec2.size());
 			fs.close();
 			fs2.close();
 			fs3.close();

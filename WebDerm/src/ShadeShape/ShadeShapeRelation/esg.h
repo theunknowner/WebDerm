@@ -18,13 +18,13 @@ private:
 
 public:
 	float avgDist;
-	float esgVal;
+	double esgVal;
 	float esgTestVal;
 
 	Esg();
 	bool importThresholds();
 	int shadeDiff(int shade1, int shade2);
-	float calculate(float dist, int shadeDiff);
+	double calculate(float dist, int shadeDiff);
 
 };
 

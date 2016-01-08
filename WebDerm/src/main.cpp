@@ -71,7 +71,7 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-
+/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
 	ShadeShape ss1 = Scripts::script31("melanoma9");
@@ -87,7 +87,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -120,7 +120,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -162,11 +162,11 @@ int main(int argc,char** argv)
 		sttCountFile = fopen(sttFileName.c_str(),"w");
 		fprintf(sttCountFile,",");
 		for(unsigned int i=0; i<8; i++) {
-			fprintf(sttCountFile,"%s,",spm.shapeName(i).c_str());
+			fprintf(sttCountFile,"%s,",spm.getShapeName(i).c_str());
 		}
 		fprintf(sttCountFile,"\n");
 		for(unsigned int i=0; i<shapeTranslateCount.size(); i++) {
-			fprintf(sttCountFile,"%s,",spm.shapeName(i).c_str());
+			fprintf(sttCountFile,"%s,",spm.getShapeName(i).c_str());
 			for(unsigned int j=0; j<shapeTranslateCount.at(i).size(); j++) {
 				fprintf(sttCountFile,"%d,",shapeTranslateCount.at(i).at(j));
 			}

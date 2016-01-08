@@ -22,6 +22,7 @@ protected:
 	vector<String> _SHIFT = {"SHIFT_NONE","SHIFT_START"};
 
 	static vector<float> shapeWeightsVec;
+	static vector<float> shapeWeightsVec2;
 
 public:
 	static vector<vector<String> > shiftingRules;

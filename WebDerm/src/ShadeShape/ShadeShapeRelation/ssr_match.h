@@ -10,22 +10,21 @@
 
 #include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
 #include "shadeshaperelation.h"
+#include "../ShapeMatch/shapematch.h"
 
 class Islands;
 class Labels;
-class ShadeShapeRelationMatch : public ShadeShapeRelation {
+class ShadeShapeRelationMatch : public ShadeShapeRelation, public ShapeMatch {
 private:
 	float matchScore;
 	float mismatchScore;
 
 	float entropy(float count);
-	float contrastWeight(float esg, float relArea);
+	double contrastWeight(double esg, double relArea);
 	float calculateArcScore(float score1, float score2);
 
 	void match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB, String nStr="");
 	float rVal[6] = {1.0,1.0,0.63,0.55,0.52,0.5};
-	float shapeWeight[8] = {1.0,1.0,1.0,1.0,0.7071,0.4082,0.7071,0.25};
-
 
 public:
 	void srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr="");

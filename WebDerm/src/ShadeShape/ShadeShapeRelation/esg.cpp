@@ -46,7 +46,7 @@ int Esg::shadeDiff(int shade1, int shade2) {
 	return abs(shade1-shade2);
 }
 
-float Esg::calculate(float dist, int shadeDiff) {
+double Esg::calculate(float dist, int shadeDiff) {
 	this->esgVal = pow(shadeDiff+1,4.0) / (ceil(dist/4.0) + 2.0);
 	//const float p00 = 3.654;
 	/*const float p10 = 0.01354;
