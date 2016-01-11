@@ -677,7 +677,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													if(label1=="2_Comp-Donut_s3" && label2=="5_Excavated_s0" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="2_Comp-Donut_s3" && label2=="5_Excavated_s0" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -702,7 +702,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}
+													}*/
 												}// end if equationMap
 											}// end for x srmUP
 
@@ -764,7 +764,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
-													if(label1=="2_Comp-Donut_s3" && label2=="5_Excavated_s0" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="2_Comp-Donut_s3" && label2=="5_Excavated_s0" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** DB *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -789,7 +789,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
 														printf("ContrastWeightDB: %f\n",contrastWeightDB);
-													}
+													}*/
 												}// end if equationMap
 											} // end x mergedLabelContainer DB
 
