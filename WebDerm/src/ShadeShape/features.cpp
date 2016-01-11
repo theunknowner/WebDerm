@@ -143,8 +143,7 @@ Features::Features(Mat featureImg, ImageData &parentId, bool disconnectIslands) 
 	for(unsigned int i=0; i<littleIslands.size(); i++) {
 		Islands island(littleIslands.at(i));
 		Mat crop_img = fn.cropImage(island.image());
-		float relArea = (float)island.area() / parentId.area();
-		float frameArea = (float) crop_img.total() / parentId.image().total();
+		int frameArea = crop_img.total();
 		/*if(island.shade()==176 && island.area()==71) {
 				printf("islandArea: %d, parentArea: %d\n",island.area(),parentId.area());
 				printf("RelArea: %f\n",relArea);
@@ -152,7 +151,7 @@ Features::Features(Mat featureImg, ImageData &parentId, bool disconnectIslands) 
 				printf("FrameArea: %f\n",frameArea);
 			}*/
 
-		if(relArea<=0.01 && frameArea<=0.02) {
+		if(frameArea<=50) {
 			Shapes shapes;
 			island.shape_name() = "Unknown";
 			island.shape() = shapes.getShapeIndex(island.shape_name());

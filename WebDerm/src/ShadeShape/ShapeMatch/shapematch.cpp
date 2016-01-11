@@ -244,9 +244,17 @@ float ShapeMatch::applyShiftPenalty(float score, int shapeNum, int shapeNum2) {
 }
 
 float ShapeMatch::getShiftPenalty(int shapeNum, int shapeNum2) {
-	float weight = ShapeMatch::shiftingPenalties.at(shapeNum).at(shapeNum2);
-	float penalty = pow(2.0,weight);
-	return penalty;
+	try {
+		float weight = ShapeMatch::shiftingPenalties.at(shapeNum).at(shapeNum2);
+		float penalty = pow(2.0,weight);
+		return penalty;
+	} catch (const std::out_of_range &oor) {
+		printf("ShapeMatch::getShiftPenalty() out of range!\n");
+		printf("ShapeNum: %d\n",shapeNum);
+		printf("ShapeNum2: %d\n",shapeNum2);
+		printf("ShiftPenalty[%d].size(): %lu\n",shapeNum,ShapeMatch::shiftingPenalties.at(shapeNum).size());
+		exit(1);
+	}
 }
 
 float ShapeMatch::applyShapeWeight(int shapeNum) {

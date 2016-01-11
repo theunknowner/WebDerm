@@ -340,68 +340,77 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 						flag1 = shapematch.shape_translation(islandVec3,shapeNum1,newShapeIdx1,0);
 					}
 					for(int shapeShift2=-1; shapeShift2<ruleSize2; shapeShift2++) {
-						vector<vector<vector<Islands> > > islandVec4 = islandVec3;
-						bool flag2 = false;
-						String newShape2 = "NONE";
-						if(shapeShift2>=0) {
-							newShape2 = ShapeMatch::shiftingRules.at(shapeNum2).at(shapeShift2);
-							int newShapeIdx2 = shapematch.getShapeIndex(newShape2);
-							flag2 = shapematch.shape_translation(islandVec4,shapeNum2,newShapeIdx2,1);
+						try {
+							vector<vector<vector<Islands> > > islandVec4 = islandVec3;
+							bool flag2 = false;
+							String newShape2 = "NONE";
+							if(shapeShift2>=0) {
+								newShape2 = ShapeMatch::shiftingRules.at(shapeNum2).at(shapeShift2);
+								int newShapeIdx2 = shapematch.getShapeIndex(newShape2);
+								flag2 = shapematch.shape_translation(islandVec4,shapeNum2,newShapeIdx2,1);
+							}
+							if((shapeShift1==-1 && shapeShift2==-1) || (flag1==true || flag2==true)) {
+								this->sortIslandsByArea(islandVec4);
+								upLabels = Labels(islandVec4,upTotalArea,upSS.name());
+								upLabelsFilled = upLabels;
+								dbLabelsFilled = dbLabels;
+								this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
+								float tr1_score = this->tr1(upLabelsFilled,dbLabelsFilled);
+								tr1_score = shadematch.applyShiftPenalty(upSS,tr1_score,shadeShift);
+								String nStr = "n"+toString(n)+"_shd"+toString(shadeShift)+"_shp"+toString(shapeShift1)+toString(shapeShift2);
+								ShadeShapeRelation ssrUP;
+								ssrUP.spatial_relation(upSS,upLabelsFilled,islandVec4,1,newNameUP);
+								ShadeShapeRelation ssrDB;
+								ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec,1,newNameDB);
+								vector<float> tr2_scores = this->tr2(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled,nStr);
+								float results = tr1_score * tr2_scores.at(0);
+
+								//printf("%s\n",nStr.c_str());
+								//printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_scores.at(0),results);
+								String labelFilename = upLabelsFilled.name()+"_"+dbLabelsFilled.name()+"_labels_"+nStr;
+								Labels::writeCompareLabels(labelFilename,upLabelsFilled,dbLabelsFilled,1);
+
+								if(results>maxResults) {
+									maxResults = results;
+									finalTR1 = tr1_score;
+									finalTR2_match = tr2_scores.at(0);
+									finalTR2_mismatch = tr2_scores.at(1);
+									largestLabelsUP = upLabelsFilled;
+									largestLabelsDB = dbLabelsFilled;
+									largestIslandVec = islandVec4;
+									maxMatchImg = largestImg;
+									maxNStr = nStr; //use for labeling image
+								}
+
+								///// Debug Print /////
+								if(this->debugMode>=2) {
+									printf("n: %d\n", n);
+									printf("ShadeShift: %s, ",shadematch.SHIFT()[shadeShift].c_str());
+									printf("CurrShape1: %s, ",shapematch.getShapeName(shapeNum1).c_str());
+									printf("NewShape1: %s\n",newShape1.c_str());
+									printf("ShadeShift: %s, ",shadematch.SHIFT()[shadeShift].c_str());
+									printf("CurrShape2: %s, ",shapematch.getShapeName(shapeNum2).c_str());
+									printf("NewShape2: %s\n",newShape2.c_str());
+									printf("Flag1: %d, Flag2: %d\n",flag1,flag2);
+									printf("TR1: %f\n",tr1_score);
+									printf("TR2: %f\n",tr2_scores.at(0));
+									printf("Result: %f\n",results);
+									Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled,1);
+									cout << "-------------------------" << endl;
+								}
+								///// End Debug Print /////
+							}// end if flag1 || flag2
+						} catch (const std::out_of_range &oor) {
+							printf("ShapeShift1: %d\n",shapeShift1);
+							printf("ShapeShift2: %d\n",shapeShift2);
+							printf("CurrShape1: %s\n",shapematch.getShapeName(shapeNum1).c_str());
+							printf("CurrShape2: %s\n",shapematch.getShapeName(shapeNum2).c_str());
+							printf("NewShape1: %s\n",newShape1.c_str());
+							exit(1);
 						}
-						if((shapeShift1==-1 && shapeShift2==-1) || (flag1==true || flag2==true)) {
-							this->sortIslandsByArea(islandVec4);
-							upLabels = Labels(islandVec4,upTotalArea,upSS.name());
-							upLabelsFilled = upLabels;
-							dbLabelsFilled = dbLabels;
-							this->fillMissingLabels(upLabelsFilled,dbLabelsFilled);
-							float tr1_score = this->tr1(upLabelsFilled,dbLabelsFilled);
-							tr1_score = shadematch.applyShiftPenalty(upSS,tr1_score,shadeShift);
-							String nStr = "n"+toString(n)+"_shd"+toString(shadeShift)+"_shp"+toString(shapeShift1)+toString(shapeShift2);
-							ShadeShapeRelation ssrUP;
-							ssrUP.spatial_relation(upSS,upLabelsFilled,islandVec4,1,newNameUP);
-							ShadeShapeRelation ssrDB;
-							ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec,1,newNameDB);
-							vector<float> tr2_scores = this->tr2(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled,nStr);
-							float results = tr1_score * tr2_scores.at(0);
-
-							//printf("%s\n",nStr.c_str());
-							//printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_scores.at(0),results);
-							String labelFilename = upLabelsFilled.name()+"_"+dbLabelsFilled.name()+"_labels_"+nStr;
-							Labels::writeCompareLabels(labelFilename,upLabelsFilled,dbLabelsFilled,1);
-
-							if(results>maxResults) {
-								maxResults = results;
-								finalTR1 = tr1_score;
-								finalTR2_match = tr2_scores.at(0);
-								finalTR2_mismatch = tr2_scores.at(1);
-								largestLabelsUP = upLabelsFilled;
-								largestLabelsDB = dbLabelsFilled;
-								largestIslandVec = islandVec4;
-								maxMatchImg = largestImg;
-								maxNStr = nStr; //use for labeling image
-							}
-
-							///// Debug Print /////
-							if(this->debugMode>=2) {
-								printf("n: %d\n", n);
-								printf("ShadeShift: %s, ",shadematch.SHIFT()[shadeShift].c_str());
-								printf("CurrShape1: %s, ",shapematch.getShapeName(shapeNum1).c_str());
-								printf("NewShape1: %s\n",newShape1.c_str());
-								printf("ShadeShift: %s, ",shadematch.SHIFT()[shadeShift].c_str());
-								printf("CurrShape2: %s, ",shapematch.getShapeName(shapeNum2).c_str());
-								printf("NewShape2: %s\n",newShape2.c_str());
-								printf("Flag1: %d, Flag2: %d\n",flag1,flag2);
-								printf("TR1: %f\n",tr1_score);
-								printf("TR2: %f\n",tr2_scores.at(0));
-								printf("Result: %f\n",results);
-								Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled,1);
-								cout << "-------------------------" << endl;
-							}
-							///// End Debug Print /////
-						}// end if flag1 || flag2
 					}// end for shapeShift2
 				}// end for shapeShift1
-			}
+			}// end if shifted condition
 		}// end shadeShift
 	}// end n
 

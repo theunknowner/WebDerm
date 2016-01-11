@@ -120,7 +120,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -140,7 +140,7 @@ int main(int argc,char** argv)
 		vector<int> origPos;
 		//> STT counter setup <//
 		ShapeMatch spm;
-		vector<vector<int> > shapeTranslateCount(8,vector<int>(8,0)); //8 shapes
+		vector<vector<int> > shapeTranslateCount(10,vector<int>(10,0)); //8 shapes
 		///////////////////////
 		for(unsigned int i=0; i<files.size(); i++) {
 			name = folder + files.at(i);
@@ -204,7 +204,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
@@ -293,7 +293,7 @@ int main(int argc,char** argv)
 	ShadeShape ss1 = Scripts::script31("melanoma10");
 	//ss1.showInteractiveIslands();
 	//ss1.showInteractiveSubIslands();
-	Islands island = ss1.getIslandWithPoint(Point(45,81));
+	Islands island = ss1.getIslandWithPoint(Point(75,94));
 	//SubIslands subIsland = island.getSubIslandWithPoint(Point(84,108));
 	//imwrite(ss1.name()+"_sample.png",island.nn_image());
 	imwrite(ss1.name()+"_sample.png",island.image());
