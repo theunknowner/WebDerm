@@ -47,9 +47,9 @@ int Esg::shadeDiff(int shade1, int shade2) {
 }
 
 double Esg::calculate(float dist, int shadeDiff) {
-	this->esgVal = pow(shadeDiff+1,4.0) / (ceil(dist/4.0) + 2.0);
+	//this->esgVal = pow(shadeDiff+1,4.0) / (ceil(dist/4.0) + 2.0);
 	//const float p00 = 3.654;
-	/*const float p10 = 0.01354;
+	const float p10 = 0.01354;
 	const float p01 = 0.08377;
 	const float p20 = -0.0001186;
 	const float p11 = -0.0007105;
@@ -71,11 +71,11 @@ double Esg::calculate(float dist, int shadeDiff) {
 	float del_zx = p10 + p11*y0 + 2*p20*x0 + 2*p21*x0*y0* + p12*y0*y0;
 	float del_zy = p01 + p11*x0 + 2*p02*y0 + p21*x0*x0 + 2*p12*x0*y0 + 3*p03*y0*y0;
 	float z = z0 + del_zx*(x-x0) + del_zy*(y-y0);
-	/*printf("X0,Y0,Z0: %f,%f,%f\n",x0,y0,z0);
-	printf("Esg: %e\n",this->esgVec.at(smallestIndex1).at(2));
-	printf("Z: %f\n",z);
-	*/
-	//this->esgVal = pow(10,z);
+	//printf("X0,Y0,Z0: %f,%f,%f\n",x0,y0,z0);
+	//printf("Esg: %e\n",this->esgVec.at(smallestIndex1).at(2));
+	//printf("Z: %f\n",z);
+
+	this->esgVal = pow(10,z);
 	this->avgDist = dist;
 	return this->esgVal;
 }

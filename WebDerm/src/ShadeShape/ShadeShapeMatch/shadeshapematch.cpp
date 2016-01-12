@@ -224,6 +224,14 @@ float ShadeShapeMatch::test_match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels::printCompareLabels(upLabelsFilled,dbLabelsFilled);
 	cout << "--------------------------" << endl;
 
+	ShadeShapeRelation ssrUP;
+	ssrUP.spatial_relation(upSS,upLabelsFilled,this->upIslandVec,0,upSS.name());
+	//ShadeShapeRelation ssrDB;
+	//ssrDB.spatial_relation(dbSS,dbLabelsFilled,this->dbIslandVec,0,dbSS.name());
+	//ShadeShapeRelationMatch ssrm;
+	ssrUP.get_srm().downScaleSrm();
+	ssrUP.get_srm().printDownScaleSrm("5_Excavated_s1","9_Unknown_s4");
+
 	return 0.0;
 }
 
@@ -258,8 +266,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 
 	float prevScore = tr1ForShade(upLabelsFilled,dbLabelsFilled); //> initialize
 	prevScore = roundDecimal(prevScore,6);
-	for(int n=0; n<3; n++) {
-		for(unsigned int shadeShift=0; shadeShift<shadematch.SHIFT().size(); shadeShift++) {
+	for(int n=0; n<1; n++) {
+		for(unsigned int shadeShift=0; shadeShift<1; shadeShift++) {
 			bool isShifted = false;
 			islandVec2 = this->upIslandVec;
 			float largestResult = prevScore;
@@ -365,8 +373,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 								vector<float> tr2_scores = this->tr2(ssrUP,upLabelsFilled,ssrDB,dbLabelsFilled,nStr);
 								float results = tr1_score * tr2_scores.at(0);
 
-								//printf("%s\n",nStr.c_str());
-								//printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_scores.at(0),results);
+								printf("%s\n",nStr.c_str());
+								printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_scores.at(0),results);
 								String labelFilename = upLabelsFilled.name()+"_"+dbLabelsFilled.name()+"_labels_"+nStr;
 								Labels::writeCompareLabels(labelFilename,upLabelsFilled,dbLabelsFilled,1);
 

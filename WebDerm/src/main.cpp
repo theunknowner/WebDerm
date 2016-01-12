@@ -71,11 +71,11 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-/*
+
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
-	ShadeShape ss1 = Scripts::script31("melanoma9");
-	ShadeShape ss2 = Scripts::script31("melanoma10");
+	ShadeShape ss1 = Scripts::script31("herpes3");
+	ShadeShape ss2 = Scripts::script31("herpes12");
 	ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//ssm.debug_mode(1);
@@ -95,11 +95,11 @@ int main(int argc,char** argv)
 	Func::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id,false);
-	//ss1.showInteractiveSubIslands();
-	ss1.showInteractiveIslands();
+	ss1.showInteractiveSubIslands();
+	//ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-/*
+	/*
 	deque<String> files;
 	String folder = "Looks_Like/";
 	FileData fd;
@@ -111,7 +111,7 @@ int main(int argc,char** argv)
 	}
 /**/
 /*
-	ShadeShape ss1 = Scripts::script31("melanoma10");
+	ShadeShape ss1 = Scripts::script31("melanoma8b");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
@@ -120,7 +120,7 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -146,14 +146,30 @@ int main(int argc,char** argv)
 			name = folder + files.at(i);
 			name = getFileName(name);
 			if(name!=argv[1]) {
-				ShadeShape ss2 = Scripts::script31(name);
-				ShadeShapeMatch ssm;
-				if(argc>=3)
-					ssm.debug_mode(atoi(argv[2]));
-				vector<float> results = ssm.match(ss1,ss2);
-				nameVec.push_back(name);
-				resultVec.push_back(results);
-				ssm.countShapeTranslations(shapeTranslateCount);
+				try {
+					ShadeShape ss2 = Scripts::script31(name);
+					ShadeShapeMatch ssm;
+					if(argc>=3)
+						ssm.debug_mode(atoi(argv[2]));
+					vector<float> results = ssm.match(ss1,ss2);
+					nameVec.push_back(name);
+					resultVec.push_back(results);
+					ssm.countShapeTranslations(shapeTranslateCount);
+				} catch (cv::Exception &e) {
+					String exOutput = std::string(argv[1]) + "_matches_sorted_exceptions.csv";
+					FILE * exFp = fopen(exOutput.c_str(),"w");
+					for(unsigned int i=0; i<resultVec.size(); i++) {
+						try {
+							fprintf(exFp,"%s,%f,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2),resultVec.at(i).at(3));
+						} catch (const std::out_of_range &oor) {
+							printf("ResultVec.size(): %lu\n",resultVec.size());
+							printf("ResultVec.at(%d).size(): %lu\n",i,resultVec.at(i).size());
+							exit(1);
+						}
+					}
+					fclose(exFp);
+					exit(1);
+				}
 			}
 		}
 		//> STT counter continue <//
@@ -196,6 +212,7 @@ int main(int argc,char** argv)
 				exit(1);
 			}
 		}
+		fclose(fp);
 	} catch(cv::Exception &e) {
 		ex.name(std::string(argv[1])+"_"+name);
 		ex.writeErrorToFile(e);
@@ -271,7 +288,7 @@ int main(int argc,char** argv)
 		imwrite(name+".png",sample);
 	}
 /**/
-/*
+	/*
 	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
 	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s1.png",0);
 	StatSign statSign;
@@ -288,7 +305,7 @@ int main(int argc,char** argv)
 
 	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
-/*
+	/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_strip.png");
 	ShadeShape ss1 = Scripts::script31("melanoma10");
 	//ss1.showInteractiveIslands();
@@ -300,7 +317,7 @@ int main(int argc,char** argv)
 	//Mat results = island.nn_results();
 	//cout << results << endl;
 	/**/
-/*
+	/*
 	TestML ml;
 	String param = TestML::PARAM_PATH;
 	Mat sample = imread("/home/jason/git/WebDerm/WebDerm/melanoma8c_strip.png",0);
@@ -371,7 +388,7 @@ int main(int argc,char** argv)
 	ann.write(storage,"shapeML");
 	cvReleaseFileStorage(&storage);
 /**/
-/*
+	/*
 	String shape = "Fused-Donuts";
 	Scripts::script_createAllTrainingLabels2(shape);
 	sleep(3);

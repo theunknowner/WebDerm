@@ -293,3 +293,22 @@ int Srm::getIndex(String label) {
 int Srm::area(String label) {
 	return this->labels.area(label);
 }
+
+void Srm::printDownScaleSrm(String label1, String label2) {
+	auto mergedLabelsMap = this->mergedLabels.getMap();
+	auto it1 = mergedLabelsMap.find(label1);
+	int index1 = std::distance(mergedLabelsMap.begin(),it1);
+	auto it2 = mergedLabelsMap.find(label2);
+	int index2 = std::distance(mergedLabelsMap.begin(),it2);
+	for(unsigned int i=0; i<this->dsSrmCount.at(index1).at(index2).size(); i++) {
+		for(unsigned int j=0; j<this->dsSrmCount.at(index1).at(index2).at(i).size(); j++) {
+			int count  = this->dsSrmCount.at(index1).at(index2).at(i).at(j);
+			if(count>0) {
+				printf("%s[%s]%s\n",label1.c_str(),this->rel_op.at(i).c_str(),label2.c_str());
+				printf("Count: %d\n",count);
+				printf("LevelOfSeparation: %d\n",j);
+			}
+		}
+	}
+}
+

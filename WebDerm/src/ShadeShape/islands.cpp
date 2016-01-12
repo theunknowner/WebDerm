@@ -10,6 +10,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "subislands.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapes.h"
 
 namespace Isl {
 void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param) {
@@ -148,9 +149,17 @@ Islands::Islands(Mat islandImg) {
 	this->prev_shape = -1;
 
 	if(this->islShapeName.find("Excavated")!=string::npos) {
+		Functions fn;
 		vector<Mat> littleSubIslands = this->extractSubIslands(islandImg.clone());
 		for(unsigned int i=0; i<littleSubIslands.size(); i++) {
 			SubIslands subIsland(littleSubIslands.at(i));
+			Mat crop_img = fn.cropImage(subIsland.image());
+			int frameArea = crop_img.total();
+			if(frameArea<=50) {
+			Shapes shapes;
+			subIsland.shape_name() = "Unknown";
+			subIsland.shape() = shapes.getShapeIndex(subIsland.shape_name());
+		}
 			this->storeSubIslands(subIsland);
 		}
 	}

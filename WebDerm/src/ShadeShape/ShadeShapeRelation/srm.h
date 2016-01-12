@@ -57,6 +57,7 @@ public:
 	vector<vector<vector<vector<pair<int,int>> > > >& downscaleSrmArea();
 	int getIndex(String label);
 	int area(String label);
+	void printDownScaleSrm(String label1, String label2);
 private:
 	/**** For downscaling srm ****/
 	vector<vector<vector<vector<int> > > > dsSrmCount;

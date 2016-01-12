@@ -317,33 +317,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													/*if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
-														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-														printf("**** UP *****");
-														printf("ShadeDiff: %d\n",shadeDiff);
-														printf("AvgDist: %f\n",dist);
-														printf("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
-														printf("TotalArea: %d\n",upLabels.totalArea());
-														printf("RelArea: %f\n",relArea);
-														printf("EsgVal: %f\n",esg.esgVal);
-														printf("ctWt: %f\n",ctWt);
-														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
-														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}
-													if(label1=="4_Blotch_s3" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
-														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-														printf("**** UP *****");
-														printf("ShadeDiff: %d\n",shadeDiff);
-														printf("AvgDist: %f\n",dist);
-														printf("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
-														printf("TotalArea: %d\n",upLabels.totalArea());
-														printf("RelArea: %f\n",relArea);
-														printf("EsgVal: %f\n",esg.esgVal);
-														printf("ctWt: %f\n",ctWt);
-														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
-														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}
-													if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="9_Unknown_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -418,33 +392,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
-													/*if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
-														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-														printf("**** DB *****");
-														printf("ShadeDiff: %d\n",shadeDiff);
-														printf("AvgDist: %f\n",dist);
-														printf("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
-														printf("TotalArea: %d\n",dbLabels.totalArea());
-														printf("RelArea: %f\n",relArea);
-														printf("EsgVal: %f\n",esg.esgVal);
-														printf("ctWt: %f\n",ctWt);
-														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
-														printf("ContrastWeightDB: %f\n",contrastWeightDB);
-													}
-													if(label1=="4_Blotch_s3" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
-														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-														printf("**** DB *****");
-														printf("ShadeDiff: %d\n",shadeDiff);
-														printf("AvgDist: %f\n",dist);
-														printf("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
-														printf("TotalArea: %d\n",dbLabels.totalArea());
-														printf("RelArea: %f\n",relArea);
-														printf("EsgVal: %f\n",esg.esgVal);
-														printf("ctWt: %f\n",ctWt);
-														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
-														printf("ContrastWeightDB: %f\n",contrastWeightDB);
-													}
-													if(label1=="5_Excavated_s1" && label2=="5_Excavated_s2" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="9_Unknown_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** DB *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -677,7 +625,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													/*if(label1=="2_Comp-Donut_s3" && label2=="5_Excavated_s0" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
+													if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -690,19 +638,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 														printf("ContrastWeightUP: %f\n",contrastWeightUP);
 													}
-													if(label1=="5_Excavated_s0" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
-														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-														printf("**** UP *****");
-														printf("ShadeDiff: %d\n",shadeDiff);
-														printf("AvgDist: %f\n",dist);
-														printf("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
-														printf("TotalArea: %d\n",upLabels.totalArea());
-														printf("RelArea: %f\n",relArea);
-														printf("EsgVal: %f\n",esg.esgVal);
-														printf("ctWt: %f\n",ctWt);
-														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
-														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}*/
 												}// end if equationMap
 											}// end for x srmUP
 
@@ -714,6 +649,12 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 												penalizedY = penaltyY;
 											}
 											areaUP += (areaX * weight2 * deltaArcScore2) + (areaY * penaltyY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaUP));
+											if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
+												printf("AreaUP: %f\n",areaUP);
+												printf("areaY: %d, areaX: %d\n",areaY,areaX);
+												printf("Weight1: %f, Weight2: %f\n",weight1,weight2);
+												printf("TotalDenom: %f\n",totalDenomAreaUP);
+											}
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("SURR_BY_INV: UP\n");
@@ -764,7 +705,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
-													/*if(label1=="2_Comp-Donut_s3" && label2=="5_Excavated_s0" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
+													if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** DB *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -777,23 +718,16 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
 														printf("ContrastWeightDB: %f\n",contrastWeightDB);
 													}
-													if(label1=="5_Excavated_s0" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
-														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
-														printf("**** DB *****");
-														printf("ShadeDiff: %d\n",shadeDiff);
-														printf("AvgDist: %f\n",dist);
-														printf("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
-														printf("TotalArea: %d\n",dbLabels.totalArea());
-														printf("RelArea: %f\n",relArea);
-														printf("EsgVal: %f\n",esg.esgVal);
-														printf("ctWt: %f\n",ctWt);
-														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
-														printf("ContrastWeightDB: %f\n",contrastWeightDB);
-													}*/
 												}// end if equationMap
 											} // end x mergedLabelContainer DB
 
 											areaDB += (areaX * weight2 * deltaArcScore2) + (areaY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaDB));
+											if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
+												printf("AreaDB: %f\n",areaDB);
+												printf("areaY: %d, areaX: %d\n",areaY,areaX);
+												printf("Weight1: %f, Weight2: %f\n",weight1,weight2);
+												printf("TotalDenom: %f\n",totalDenomAreaDB);
+											}
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("SURR_BY_INV: DB\n");
@@ -849,7 +783,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
 								fprintf(fp,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
-								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
@@ -877,7 +811,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
 								fprintf(fp2,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
-								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp2,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
 								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
@@ -905,7 +839,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp3,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
 								fprintf(fp3,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
 								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
-								fprintf(fp3,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp3,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp3,"RelArea: %f\n",relArea);
 								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
@@ -1547,7 +1481,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
 								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
@@ -1571,7 +1505,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
 								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp2,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
 								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
@@ -1595,7 +1529,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
 								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp3,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp3,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp3,"RelArea: %f\n",relArea);
 								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
@@ -1612,7 +1546,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							}
 						} // end if countUP || countDB
 					} // end if DIR
-					else { // INDIR
+					else if(k==INDIR) { // INDIR
 						float penalizedY = 1.0 , penalizedX = 1.0;
 						int countUP=0, countDB=0;
 						int areaUP1=0, areaUP2=0, areaDB1=0, areaDB2=0;
@@ -2222,7 +2156,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
 								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
 								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
@@ -2246,7 +2180,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
 								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp2,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp2,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
 								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
@@ -2270,7 +2204,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
 								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp3,"MaxTotalArea: %d\n",maxTotalArea);
+								fprintf(fp3,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp3,"RelArea: %f\n",relArea);
 								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
 								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
@@ -2293,6 +2227,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	} // end for loop i
 	fclose(fp);
 	fclose(fp2);
+	fclose(fp3);
 
 	this->matchScore = totalMatchScore;
 	this->mismatchScore = totalMismatchScore;
