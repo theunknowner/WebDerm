@@ -70,8 +70,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	float totalMatchScore = 0.0, totalMismatchScore=0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
 
-	float negArcScore = -100.0;
-	float posArcScore = 100.0;
+	float arcVal = 100.0;
 	// for loop i: labels for the y axis
 	for(unsigned int i=0; i<srmCountUP.size(); i++) {
 		String label1 = upMergedLabels.at(i);
@@ -83,8 +82,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 			// for loop k: counts for relations "y [op] x"
 			for(unsigned int k=0; k<srmCountUP.at(i).at(j).size(); k++) {
 				String relOp = this->rel_op.at(k);
-				int totalCountUP = 0, totalCountDB = 0;
-				float totalAreaUP = 0.0, totalAreaDB = 0.0;
 				if(k==SURR_BY || k==SURR_BY_INV) {
 					// for loop m: neighbor level of separation
 					for(int m=0; m<this->relOpLevelSize; m++) {
@@ -107,7 +104,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						double contrastWeightUP = 0.0, contrastWeightDB = 0.0;
 						float sumOfAreaUP = 0.0, sumOfAreaDB = 0.0;
 						if(countUP>0 || countDB>0) {
-							float areaValUP = totalAreaUP, areaValDB = totalAreaDB;
 							if(k==SURR_BY) {
 								//> UP initial calculations
 								if (countUP>0) {
@@ -134,11 +130,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 																float bigArea = upLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = upLabels.getIsland(yLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreUP1 += score;
 															}
 														}
@@ -164,16 +159,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = upLabels.getIsland(xLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreUP2 += score;
 												}
 											}
 										}
-									}
+									}// for x srmUP
 								} // end if countUP > 0
 								//> end UP initial calculations
 								//DB initial calculations
@@ -201,11 +195,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 																float bigArea = dbLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = dbLabels.getIsland(yLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreDB1 += score;
 															}
 														}
@@ -231,11 +224,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = dbLabels.getIsland(xLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreDB2 += score;
 												}
 											}
@@ -262,27 +254,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								if (countUP>0) {
 									for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 										try {
-											float totalDenomAreaUP=0.;
 											String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 											int areaX = upLabels.area(xLabel); // get area
-											int xIdx = srmUP.getIndex(xLabel); // get pos from srm
-											for(unsigned int yIdx=0; yIdx<srmUP.size(); yIdx++) {
-												try {
-													unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
-													//for all relations
-													if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
-														totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).first;
-														totalCountUP++;
-													}
-												} catch (const std::out_of_range &oor) {
-													printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-													printf("SURR_BY: UP 1a\n");
-													printf("xLabel: %s\n",xLabel.c_str());
-													printf("xIdx: %d\n",xIdx);
-													exit(1);
-												}
+											float penaltyX = 1.0;
+											if(upLabels.isShapeShifted(xLabel)) {
+												int shapeNumX = upLabels.getShapeNum(xLabel);
+												int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
+												penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+												penalizedX = penaltyX;
 											}
-											int areaY=0;
 											for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 												String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 												String equationKeyUP = yLabel+"<"+relOp+">"+xLabel;
@@ -295,7 +275,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
 														penalizedY = penaltyY;
 													}
-													areaY += upLabels.area(yLabel) * penaltyY;
+													int areaY = upLabels.area(yLabel);
+													float rval = pow(this->rVal[maxNeighborLevelUP],m);
+													areaUP += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 													//> for match calculations
 													sumIslandAreaUP += upLabels.area(yLabel);
@@ -332,15 +314,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													}*/
 												}// end of equationMap
 											} // end y mergedLabelContainer UP
-
-											float penaltyX = 1.0;
-											if(upLabels.isShapeShifted(xLabel)) {
-												int shapeNumX = upLabels.getShapeNum(xLabel);
-												int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
-												penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
-												penalizedX = penaltyX;
-											}
-											areaUP += (areaY  * weight1 * deltaArcScore1)+ (areaX * penaltyX * weight2 * deltaArcScore2 * (areaY/totalDenomAreaUP));
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("SURR_BY: UP 1b\n");
@@ -353,25 +326,30 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								if (countDB>0) {
 									for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 										try {
-											float totalDenomAreaDB=0.;
 											String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 											int areaX = dbLabels.area(xLabel);
-											int xIdx = srmDB.getIndex(xLabel);
-											for(unsigned int yIdx=0; yIdx<srmDB.size(); yIdx++) {
-												unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
-												if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
-													//for all relations
-													totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).first;
-													totalCountDB++;
-												}
+											float penaltyX = 1.0;
+											if(dbLabels.isShapeShifted(xLabel)) {
+												int shapeNumX = dbLabels.getShapeNum(xLabel);
+												int prevShapeNumX = dbLabels.getPrevShapeNum(xLabel);
+												penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+												penalizedX = penaltyX;
 											}
-											int areaY=0;
 											for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 												String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 												String equationKeyDB = yLabel+"<"+relOp+">"+xLabel;
 												if(srmDB.equationMap.find(equationKeyDB)!=srmDB.equationMap.end()) {
-													areaY += dbLabels.area(yLabel);
-
+													float penaltyY = 1.0;
+													//> check if shape is shifted to apply penalty <//
+													if(dbLabels.isShapeShifted(yLabel)) {
+														int shapeNumY = dbLabels.getShapeNum(yLabel);
+														int prevShapeNumY = dbLabels.getPrevShapeNum(yLabel);
+														penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+														penalizedY = penaltyY;
+													}
+													int areaY = dbLabels.area(yLabel);
+													float rval = pow(this->rVal[maxNeighborLevelDB],m);
+													areaDB += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
 													//> used for match calculations
 													sumIslandAreaDB += dbLabels.area(yLabel);
 													maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
@@ -407,8 +385,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													}*/
 												}// end if equationMap
 											} // end y mergedLabelContainer DB
-
-											areaDB += (areaY * weight1 * deltaArcScore1) + (areaX * weight2 * deltaArcScore2 * (areaY/totalDenomAreaDB));
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("SURR_BY: DB\n");
@@ -416,8 +392,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										}
 									} // end x mergedLabelContainer DB
 								} // end if countDB>0
-								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
-								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
 							}
 							if(k==SURR_BY_INV) {
 								//> UP initial calculations
@@ -445,11 +419,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 																float bigArea = upLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = upLabels.getIsland(xLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreUP2 += score;
 															}
 														}
@@ -475,11 +448,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = upLabels.getIsland(yLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreUP1 += score;
 												}
 											}
@@ -512,11 +484,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 																float bigArea = dbLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = dbLabels.getIsland(xLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreDB2 += score;
 															}
 														}
@@ -542,11 +513,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = dbLabels.getIsland(yLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreDB1 += score;
 												}
 											}
@@ -572,27 +542,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								if (countUP>0) {
 									for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 										try {
-											float totalDenomAreaUP=0.;
 											String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
-											int yIdx = srmUP.getIndex(yLabel);
 											int areaY = upLabels.area(yLabel);
-											for(unsigned int xIdx=0; xIdx<srmUP.size(); xIdx++) {
-												unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
-												//for all relations
-												if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
-													totalCountUP++;
-													totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
-													/*if(label1=="5_Excavated_s1" && label2=="7_Default_s3" && los==2 && nStr=="n0_shd0_shp-1-1") {
-														printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
-														printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
-														printf("rel_op_idx: %d\n",rel_op_idx);
-														printf("srmRelationArea: %d\n",srmUP.relationArea(yIdx,xIdx).second);
-														printf("totalDenomAreaUP: %f\n",totalDenomAreaUP);
-
-													}*/
-												}
+											float penaltyY = 1.0;
+											if(upLabels.isShapeShifted(yLabel)) {
+												int shapeNumY = upLabels.getShapeNum(yLabel);
+												int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
+												penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+												penalizedY = penaltyY;
 											}
-											int areaX=0;
 											for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 												String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 												String equationKey = yLabel+"<"+relOp+">"+xLabel;
@@ -604,8 +562,11 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
 														penalizedX = penaltyX;
 													}
-													areaX += upLabels.area(xLabel) * penaltyX;
+													int areaX = upLabels.area(xLabel);
+													float rval = pow(this->rVal[maxNeighborLevelUP],m);
+													areaUP += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
+													//> used for match calculations
 													sumIslandAreaUP += upLabels.area(xLabel);
 													maxIslandAreaUP = max(maxIslandAreaUP,upLabels.area(xLabel));
 
@@ -625,7 +586,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -637,24 +598,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}
+													}*/
 												}// end if equationMap
 											}// end for x srmUP
-
-											float penaltyY = 1.0;
-											if(upLabels.isShapeShifted(yLabel)) {
-												int shapeNumY = upLabels.getShapeNum(yLabel);
-												int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
-												penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
-												penalizedY = penaltyY;
-											}
-											areaUP += (areaX * weight2 * deltaArcScore2) + (areaY * penaltyY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaUP));
-											if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
-												printf("AreaUP: %f\n",areaUP);
-												printf("areaY: %d, areaX: %d\n",areaY,areaX);
-												printf("Weight1: %f, Weight2: %f\n",weight1,weight2);
-												printf("TotalDenom: %f\n",totalDenomAreaUP);
-											}
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("SURR_BY_INV: UP\n");
@@ -666,24 +612,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								if (countDB>0) {
 									for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 										try {
-											float totalDenomAreaDB=0.;
 											String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
-											int yIdx = srmDB.getIndex(yLabel);
 											int areaY = dbLabels.area(yLabel);
-											for(unsigned int xIdx=0; xIdx<srmDB.size(); xIdx++) {
-												unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
-												//for all relations
-												if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
-													totalCountDB++;
-													totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
-												}
+											float penaltyY = 1.0;
+											if(dbLabels.isShapeShifted(yLabel)) {
+												int shapeNumY = dbLabels.getShapeNum(yLabel);
+												int prevShapeNumY = dbLabels.getPrevShapeNum(yLabel);
+												penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+												penalizedY = penaltyY;
 											}
-											int areaX=0;
 											for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 												String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 												String equationKey = yLabel+"<"+relOp+">"+xLabel;
 												if(srmDB.equationMap.find(equationKey)!=srmDB.equationMap.end()) {
-													areaX += dbLabels.area(xLabel);
+													float penaltyX = 1.0;
+													if(dbLabels.isShapeShifted(xLabel)) {
+														int shapeNumX = dbLabels.getShapeNum(xLabel);
+														int prevShapeNumX = dbLabels.getPrevShapeNum(xLabel);
+														penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+														penalizedX = penaltyX;
+													}
+													int areaX = dbLabels.area(xLabel);
+													float rval = pow(this->rVal[maxNeighborLevelDB],m);
+													areaDB += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 													//> for match calculations
 													sumIslandAreaDB += dbLabels.area(xLabel);
@@ -705,7 +656,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
-													if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
+													/*if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && m==2 && nStr=="n0_shd0_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** DB *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -717,17 +668,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
 														printf("ContrastWeightDB: %f\n",contrastWeightDB);
-													}
+													}*/
 												}// end if equationMap
 											} // end x mergedLabelContainer DB
-
-											areaDB += (areaX * weight2 * deltaArcScore2) + (areaY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaDB));
-											if(label1=="5_Excavated_s1" && label2=="9_Unknown_s4" && k==SURR_BY_INV && nStr=="n0_shd0_shp-1-1") {
-												printf("AreaDB: %f\n",areaDB);
-												printf("areaY: %d, areaX: %d\n",areaY,areaX);
-												printf("Weight1: %f, Weight2: %f\n",weight1,weight2);
-												printf("TotalDenom: %f\n",totalDenomAreaDB);
-											}
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("SURR_BY_INV: DB\n");
@@ -735,9 +678,8 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										}
 									} // end y mergedLabelContainer
 								}// end if countDB > 0
-								areaValUP = areaUP * pow(this->rVal[maxNeighborLevelUP],m);
-								areaValDB = areaDB * pow(this->rVal[maxNeighborLevelDB],m);
 							} // end SURR_BY_INV
+
 							//> E-Value using count, base on relArea <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
@@ -754,26 +696,23 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(std::isnan(contrastWeightDB)) contrastWeightDB=0.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 							//> ********** End (ESG) *********** <//
-							if(std::isnan(areaValUP)) areaValUP=0.0;
-							if(std::isnan(areaValDB)) areaValDB=0.0;
-							float areaVal = min(areaValUP,areaValDB);
+							float areaVal = min(areaUP,areaDB);
 							float relArea = areaVal / maxTotalArea;
 							float weightedEntropy = relArea * entropyVal * contrastWeight;
 							totalMatchScore += weightedEntropy;
 
 							float weightedMismatchEntropy  = 0.0;
 							if(countUP>0 && countDB==0) {
-								weightedMismatchEntropy = contrastWeightUP * (areaValUP / upMergedLabels.totalArea());
+								weightedMismatchEntropy = contrastWeightUP * (areaUP / upMergedLabels.totalArea());
 							}
 							if(countDB>0 && countUP==0) {
-								weightedMismatchEntropy = contrastWeightDB * (areaValDB / dbMergedLabels.totalArea());
+								weightedMismatchEntropy = contrastWeightDB * (areaDB / dbMergedLabels.totalArea());
 							}
 							totalMismatchScore += weightedMismatchEntropy;
 
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
 								fprintf(fp,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
 								fprintf(fp,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
@@ -781,7 +720,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
 								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
-								fprintf(fp,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
 								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp,"RelArea: %f\n",relArea);
@@ -801,7 +739,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedMismatchEntropy>0) {
 								fprintf(fp2,"[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
 								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp2,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp2,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
 								fprintf(fp2,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
 								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
@@ -809,7 +746,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp2,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
 								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp2,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
-								fprintf(fp2,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
 								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp2,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp2,"RelArea: %f\n",relArea);
@@ -829,7 +765,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedEntropy<=0 || std::isnan(weightedEntropy)) {
 								fprintf(fp3,"[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
 								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp3,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp3,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
 								fprintf(fp3,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
 								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
@@ -837,7 +772,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								fprintf(fp3,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
 								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
 								fprintf(fp3,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
-								fprintf(fp3,"AreaValUP: %f, AreaValDB: %f\n",areaValUP,areaValDB);
 								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
 								fprintf(fp3,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
 								fprintf(fp3,"RelArea: %f\n",relArea);
@@ -909,11 +843,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 																float bigArea = upLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = upLabels.getIsland(yLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreUP1 += score;
 															}
 														}
@@ -940,11 +873,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = upLabels.getIsland(xLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreUP2 += score;
 												}
 											}
@@ -977,11 +909,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 																float bigArea = upLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = upLabels.getIsland(xLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreUP2 += score;
 															}
 														}
@@ -1006,11 +937,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = upLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = upLabels.getIsland(yLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreUP1 += score;
 												}
 											}
@@ -1045,11 +975,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 																float bigArea = dbLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = dbLabels.getIsland(yLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreDB1 += score;
 															}
 														}
@@ -1075,11 +1004,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = dbLabels.getIsland(xLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreDB2 += score;
 												}
 											}
@@ -1112,11 +1040,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 																float bigArea = dbLabels.totalArea();
 																float relArea = smallArea/bigArea;
-																float val = negArcScore;
-																if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																	val = posArcScore;
-																}
-																float score = val * relArea;
+																Mat nnResults = dbLabels.getIsland(xLabel).subIsland(n).nn_results();
+																float nnDiscScore = nnResults.at<float>(0,0);
+																float nnBlotchScore = nnResults.at<float>(0,2);
+																float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																sumArcScoreDB2 += score;
 															}
 														}
@@ -1142,11 +1069,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 													float bigArea = dbLabels.totalArea();
 													float relArea = smallArea/bigArea;
-													float val = negArcScore;
-													if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-														val = posArcScore;
-													}
-													float score = val * relArea;
+													Mat nnResults = dbLabels.getIsland(yLabel).subIsland(n).nn_results();
+													float nnDiscScore = nnResults.at<float>(0,0);
+													float nnBlotchScore = nnResults.at<float>(0,2);
+													float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 													sumArcScoreDB1 += score;
 												}
 											}
@@ -1170,33 +1096,21 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 							deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 
-							//> Y <OP> X
+							//> Y <OP> X DIR
 							if (countUP>0) {
 								if(areaUP1<=areaUP2) {
 									/*! for UP */
 									for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
 										try {
-											float totalDenomAreaUP=0.;
 											String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
 											int areaX = upLabels.area(xLabel); // get area
-											int xIdx = srmUP.getIndex(xLabel); // get pos from srm
-											for(unsigned int yIdx=0; yIdx<srmUP.size(); yIdx++) {
-												try {
-													unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
-													//for all relations
-													if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
-														totalCountUP++; //total relations for areaUP2
-														totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).first;
-													}
-												} catch (const std::out_of_range &oor) {
-													printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-													printf("DIR: UP 1a\n");
-													printf("xLabel: %s\n",xLabel.c_str());
-													printf("xIdx: %d\n",xIdx);
-													exit(1);
-												}
+											float penaltyX = 1.0;
+											if(upLabels.isShapeShifted(xLabel)) {
+												int shapeNumX = upLabels.getShapeNum(xLabel);
+												int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
+												penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+												penalizedX = penaltyX;
 											}
-											int areaY=0;
 											for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
 												String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
 												String equationKeyUP = yLabel+"<"+relOp+">"+xLabel;
@@ -1208,7 +1122,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
 														penalizedY = penaltyY;
 													}
-													areaY += upLabels.area(yLabel) * penaltyY;
+													int areaY = upLabels.area(yLabel);
+													float rval = this->rVal[maxNeighborLevelUP];
+													areaUP += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 													//> for match calculations
 													sumIslandAreaUP += upLabels.area(yLabel);
@@ -1232,15 +1148,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													contrastWeightUP += ctWt;
 												}// end if equationMap
 											}// end for y srmUP
-
-											float penaltyX = 1.0;
-											if(upLabels.isShapeShifted(xLabel)) {
-												int shapeNumX = upLabels.getShapeNum(xLabel);
-												int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
-												penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
-												penalizedX = penaltyX;
-											}
-											areaUP += (areaY * weight1 * deltaArcScore1) + (areaX * penaltyX * weight2 * deltaArcScore2 *(areaY/totalDenomAreaUP));
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("DIR: UP 1b\n");
@@ -1249,32 +1156,20 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										}
 									} // end for UP
 								} // end if areaUP1 <= areaUP2
-								//> X <OP> Y
+								//> X <OP> Y DIR
 								else if(areaUP1>areaUP2) {
 									/*! for UP */
 									for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
 										try {
-											float totalDenomAreaUP=0.;
 											String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
-											int yIdx = srmUP.getIndex(yLabel);
 											int areaY = upLabels.area(yLabel);
-											for(unsigned int xIdx=0; xIdx<srmUP.size(); xIdx++) {
-												unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
-												//for all relations
-												if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
-													totalCountUP++; //total relations for areaUP1
-													totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
-												}
-												/*if(label1=="0_Strip_s4" && label2=="1_Default_s2" && m==1) {
-														printf("yIdx: %d, %s\n",yIdx,yLabel.c_str());
-														printf("xIdx: %d, %s\n",xIdx,upLabels.at(xIdx).c_str());
-														printf("rel_op_idx: %d\n",rel_op_idx);
-														printf("srmRelationArea: %d\n",srmUP.relationArea(yIdx,xIdx).second);
-														printf("totalDenomAreaUP: %f\n",totalDenomAreaUP);
-
-													}*/
+											float penaltyY = 1.0;
+											if(upLabels.isShapeShifted(yLabel)) {
+												int shapeNumY = upLabels.getShapeNum(yLabel);
+												int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
+												penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+												penalizedY = penaltyY;
 											}
-											int areaX=0;
 											for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
 												String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
 												String equationKey = yLabel+"<"+relOp+">"+xLabel;
@@ -1286,7 +1181,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
 														penalizedX = penaltyX;
 													}
-													areaX += upLabels.area(xLabel) * penaltyX;
+													int areaX = upLabels.area(xLabel);
+													float rval = this->rVal[maxNeighborLevelUP];
+													areaUP += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 													//> for match calculations
 													sumIslandAreaUP += upLabels.area(xLabel);
@@ -1310,15 +1207,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													contrastWeightUP += ctWt;
 												}// end if equationMap
 											}// end for x srmUP
-
-											float penaltyY = 1.0;
-											if(upLabels.isShapeShifted(yLabel)) {
-												int shapeNumY = upLabels.getShapeNum(yLabel);
-												int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
-												penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
-												penalizedY = penaltyY;
-											}
-											areaUP += (areaX * weight2 * deltaArcScore2) + (areaY * penaltyY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaUP));
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("DIR: UP 2\n");
@@ -1332,24 +1220,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 									/*! for DB */
 									for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
 										try {
-											float totalDenomAreaDB=0.;
 											String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
 											int areaX = dbLabels.area(xLabel);
-											int xIdx = srmDB.getIndex(xLabel);
-											for(unsigned int yIdx=0; yIdx<srmDB.size(); yIdx++) {
-												unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
-												//for all relations
-												if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
-													totalCountDB++; //total relations for areaDB1
-													totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
-												}
+											float penaltyX = 1.0;
+											if(dbLabels.isShapeShifted(xLabel)) {
+												int shapeNumX = dbLabels.getShapeNum(xLabel);
+												int prevShapeNumX = dbLabels.getPrevShapeNum(xLabel);
+												penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+												penalizedX = penaltyX;
 											}
-											int areaY=0;
 											for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
 												String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
 												String equationKeyDB = yLabel+"<"+relOp+">"+xLabel;
 												if(srmDB.equationMap.find(equationKeyDB)!=srmDB.equationMap.end()) {
-													areaY += dbLabels.area(yLabel);
+													float penaltyY = 1.0;
+													if(dbLabels.isShapeShifted(yLabel)) {
+														int shapeNumY = dbLabels.getShapeNum(yLabel);
+														int prevShapeNumY = dbLabels.getPrevShapeNum(yLabel);
+														penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+														penalizedY = penaltyY;
+													}
+													int areaY = dbLabels.area(yLabel);
+													float rval = this->rVal[maxNeighborLevelDB];
+													areaDB += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 													//>for match calculations
 													sumIslandAreaDB += dbLabels.area(yLabel);
@@ -1373,8 +1266,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													contrastWeightDB += ctWt;
 												} //end equationMap
 											} //end y srmDB mergedContainer
-
-											areaDB += (areaY * weight1 * deltaArcScore1) + (areaX * weight2 * deltaArcScore2 *(areaY/totalDenomAreaDB));
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("DIR: DB 1\n");
@@ -1386,24 +1277,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 									/*! for DB */
 									for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.size(); y++) {
 										try {
-											float totalDenomAreaDB=0.;
 											String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
-											int yIdx = srmDB.getIndex(yLabel);
 											int areaY = dbLabels.area(yLabel);
-											for(unsigned int xIdx=0; xIdx<srmDB.size(); xIdx++) {
-												unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
-												//for all relations
-												if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
-													totalCountDB++; //total relations for areaUP1
-													totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
-												}
+											float penaltyY = 1.0;
+											if(dbLabels.isShapeShifted(yLabel)) {
+												int shapeNumY = dbLabels.getShapeNum(yLabel);
+												int prevShapeNumY = dbLabels.getPrevShapeNum(yLabel);
+												penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+												penalizedY = penaltyY;
 											}
-											int areaX=0;
 											for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.size(); x++) {
 												String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
 												String equationKey = yLabel+"<"+relOp+">"+xLabel;
 												if(srmDB.equationMap.find(equationKey)!=srmDB.equationMap.end()) {
-													areaX += dbLabels.area(xLabel);
+													float penaltyX = 1.0;
+													if(dbLabels.isShapeShifted(xLabel)) {
+														int shapeNumX = dbLabels.getShapeNum(xLabel);
+														int prevShapeNumX = dbLabels.getPrevShapeNum(xLabel);
+														penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+														penalizedX = penaltyX;
+													}
+													int areaX = dbLabels.area(xLabel);
+													float rval = this->rVal[maxNeighborLevelDB];
+													areaDB += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 													//>for match calculations
 													sumIslandAreaDB += dbLabels.area(xLabel);
@@ -1427,8 +1323,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													contrastWeightDB += ctWt;
 												}// end if equationMap
 											}// end for x srmDB
-
-											areaDB += (areaX * weight2 * deltaArcScore2) + (areaY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaDB));
 										} catch (const std::out_of_range &oor) {
 											printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 											printf("DIR: DB 2\n");
@@ -1437,8 +1331,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 									} // end for DB
 								} // end else if areaDB1 > areaDB2
 							}
-							areaUP = areaUP * this->rVal[maxNeighborLevelUP];
-							areaDB = areaDB * this->rVal[maxNeighborLevelDB];
 
 							//> E-Value using count base on relArea <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
@@ -1475,7 +1367,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
@@ -1499,7 +1390,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedMismatchEntropy>0) {
 								fprintf(fp2,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp2,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
 								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
@@ -1523,7 +1413,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedEntropy<=0 || std::isnan(weightedEntropy)) {
 								fprintf(fp3,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp3,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
 								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
@@ -1599,11 +1488,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																	int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 																	float bigArea = upLabels.totalArea();
 																	float relArea = smallArea/bigArea;
-																	float val = negArcScore;
-																	if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																		val = posArcScore;
-																	}
-																	float score = val * relArea;
+																	Mat nnResults = upLabels.getIsland(yLabel).subIsland(n).nn_results();
+																	float nnDiscScore = nnResults.at<float>(0,0);
+																	float nnBlotchScore = nnResults.at<float>(0,2);
+																	float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																	sumArcScoreUP1 += score;
 																}
 															}
@@ -1628,11 +1516,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 														float bigArea = upLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float val = negArcScore;
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-															val = posArcScore;
-														}
-														float score = val * relArea;
+														Mat nnResults = upLabels.getIsland(xLabel).subIsland(n).nn_results();
+														float nnDiscScore = nnResults.at<float>(0,0);
+														float nnBlotchScore = nnResults.at<float>(0,2);
+														float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 														sumArcScoreUP2 += score;
 													}
 												}
@@ -1664,11 +1551,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																	int smallArea = upLabels.getIsland(xLabel).subIsland(n).area();
 																	float bigArea = upLabels.totalArea();
 																	float relArea = smallArea/bigArea;
-																	float val = negArcScore;
-																	if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																		val = posArcScore;
-																	}
-																	float score = val * relArea;
+																	Mat nnResults = upLabels.getIsland(xLabel).subIsland(n).nn_results();
+																	float nnDiscScore = nnResults.at<float>(0,0);
+																	float nnBlotchScore = nnResults.at<float>(0,2);
+																	float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																	sumArcScoreUP2 += score;
 																}
 															}
@@ -1693,11 +1579,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														int smallArea = upLabels.getIsland(yLabel).subIsland(n).area();
 														float bigArea = upLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float val = negArcScore;
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-															val = posArcScore;
-														}
-														float score = val * relArea;
+														Mat nnResults = upLabels.getIsland(yLabel).subIsland(n).nn_results();
+														float nnDiscScore = nnResults.at<float>(0,0);
+														float nnBlotchScore = nnResults.at<float>(0,2);
+														float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 														sumArcScoreUP1 += score;
 													}
 												}
@@ -1731,11 +1616,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																	int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 																	float bigArea = dbLabels.totalArea();
 																	float relArea = smallArea/bigArea;
-																	float val = negArcScore;
-																	if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																		val = posArcScore;
-																	}
-																	float score = val * relArea;
+																	Mat nnResults = dbLabels.getIsland(yLabel).subIsland(n).nn_results();
+																	float nnDiscScore = nnResults.at<float>(0,0);
+																	float nnBlotchScore = nnResults.at<float>(0,2);
+																	float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																	sumArcScoreDB1 += score;
 																}
 															}
@@ -1760,11 +1644,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 														float bigArea = dbLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float val = negArcScore;
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-															val = posArcScore;
-														}
-														float score = val * relArea;
+														Mat nnResults = dbLabels.getIsland(xLabel).subIsland(n).nn_results();
+														float nnDiscScore = nnResults.at<float>(0,0);
+														float nnBlotchScore = nnResults.at<float>(0,2);
+														float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 														sumArcScoreDB2 += score;
 													}
 												}
@@ -1795,11 +1678,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 																	int smallArea = dbLabels.getIsland(xLabel).subIsland(n).area();
 																	float bigArea = dbLabels.totalArea();
 																	float relArea = smallArea/bigArea;
-																	float val = negArcScore;
-																	if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-																		val = posArcScore;
-																	}
-																	float score = val * relArea;
+																	Mat nnResults = dbLabels.getIsland(xLabel).subIsland(n).nn_results();
+																	float nnDiscScore = nnResults.at<float>(0,0);
+																	float nnBlotchScore = nnResults.at<float>(0,2);
+																	float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 																	sumArcScoreDB2 += score;
 																}
 															}
@@ -1823,11 +1705,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														int smallArea = dbLabels.getIsland(yLabel).subIsland(n).area();
 														float bigArea = dbLabels.totalArea();
 														float relArea = smallArea/bigArea;
-														float val = negArcScore;
-														if(shape_name.find("Disc")!=string::npos || shape_name.find("Donut")!=string::npos) {
-															val = posArcScore;
-														}
-														float score = val * relArea;
+														Mat nnResults = dbLabels.getIsland(yLabel).subIsland(n).nn_results();
+														float nnDiscScore = nnResults.at<float>(0,0);
+														float nnBlotchScore = nnResults.at<float>(0,2);
+														float score = (nnDiscScore - nnBlotchScore) * relArea * arcVal;
 														sumArcScoreDB1 += score;
 													}
 												}
@@ -1852,33 +1733,21 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 							}
 							for(int m=0; m<this->relOpLevelSize; m++) {
-								// Y <OP> X
+								// Y <OP> X INDIR
 								if (countUP>0) {
 									if(areaUP1<=areaUP2) {
 										/*! for UP */
 										for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 											try {
-												float totalDenomAreaUP=0.;
 												String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 												int areaX = upLabels.area(xLabel); // get area
-												int xIdx = srmUP.getIndex(xLabel); // get pos from srm
-												for(unsigned int yIdx=0; yIdx<srmUP.size(); yIdx++) {
-													try {
-														unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
-														//for all relations
-														if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
-															totalCountUP++; //total relations for areaUP2
-															totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).first;
-														}
-													} catch (const std::out_of_range &oor) {
-														printf("ShadeShapeRelationMatch::entropy() out of range!\n");
-														printf("INDIR: UP 1a\n");
-														printf("xLabel: %s\n",xLabel.c_str());
-														printf("xIdx: %d\n",xIdx);
-														exit(1);
-													}
+												float penaltyX = 1.0;
+												if(upLabels.isShapeShifted(xLabel)) {
+													int shapeNumX = upLabels.getShapeNum(xLabel);
+													int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
+													penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+													penalizedX = penaltyX;
 												}
-												int areaY=0;
 												for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 													String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 													String equationKeyUP = yLabel+"<"+relOp+">"+xLabel;
@@ -1890,7 +1759,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 															penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
 															penalizedY = penaltyY;
 														}
-														areaY += upLabels.area(yLabel) * penaltyY;
+														int areaY = upLabels.area(yLabel);
+														float rval = this->rVal[maxNeighborLevelUP];
+														areaUP += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 														//> for match calculations
 														sumIslandAreaUP += upLabels.area(yLabel);
@@ -1914,15 +1785,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														contrastWeightUP += ctWt;
 													}// end if equationMap
 												}// end for y srmUP
-
-												float penaltyX = 1.0;
-												if(upLabels.isShapeShifted(xLabel)) {
-													int shapeNumX = upLabels.getShapeNum(xLabel);
-													int prevShapeNumX = upLabels.getPrevShapeNum(xLabel);
-													penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
-													penalizedX = penaltyX;
-												}
-												areaUP += (areaY * weight1 * deltaArcScore1) + (areaX * penaltyX * weight2 * deltaArcScore2 *(areaY/totalDenomAreaUP));
 											} catch (const std::out_of_range &oor) {
 												printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 												printf("INDIR: UP 1b\n");
@@ -1936,19 +1798,15 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										/*! for srmUP */
 										for(unsigned int y=0; y<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 											try {
-												float totalDenomAreaUP=0.;
 												String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
-												int yIdx = srmUP.getIndex(yLabel);
 												int areaY = upLabels.area(yLabel);
-												for(unsigned int xIdx=0; xIdx<srmUP.size(); xIdx++) {
-													unsigned int rel_op_idx = srmUP.relation(yIdx,xIdx);
-													//for all relations
-													if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
-														totalCountUP++; //total relations for areaUP1
-														totalDenomAreaUP += srmUP.relationArea(yIdx,xIdx).second;
-													}
+												float penaltyY = 1.0;
+												if(upLabels.isShapeShifted(yLabel)) {
+													int shapeNumY = upLabels.getShapeNum(yLabel);
+													int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
+													penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+													penalizedY = penaltyY;
 												}
-												int areaX=0;
 												for(unsigned int x=0; x<srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 													String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 													String equationKey = yLabel+"<"+relOp+">"+xLabel;
@@ -1960,7 +1818,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 															penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
 															penalizedX = penaltyX;
 														}
-														areaX += upLabels.area(xLabel) * penaltyX;
+														int areaX = dbLabels.area(xLabel);
+														float rval = this->rVal[maxNeighborLevelUP];
+														areaUP += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 														//> for match calculations
 														sumIslandAreaUP += upLabels.area(xLabel);
@@ -1984,15 +1844,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														contrastWeightUP += ctWt;
 													}// end if equationMap
 												}// end for x srmUP
-
-												float penaltyY = 1.0;
-												if(upLabels.isShapeShifted(yLabel)) {
-													int shapeNumY = upLabels.getShapeNum(yLabel);
-													int prevShapeNumY = upLabels.getPrevShapeNum(yLabel);
-													penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
-													penalizedY = penaltyY;
-												}
-												areaUP += (areaX *weight2 * deltaArcScore2) + (areaY * penaltyY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaUP));
 											} catch (const std::out_of_range &oor) {
 												printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 												printf("INDIR: UP 2\n");
@@ -2006,24 +1857,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										/*! for DB */
 										for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 											try {
-												float totalDenomAreaDB=0.;
 												String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 												int areaX = dbLabels.area(xLabel);
-												int xIdx = srmDB.getIndex(xLabel);
-												for(unsigned int yIdx=0; yIdx<srmDB.size(); yIdx++) {
-													unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
-													//for all relations
-													if(rel_op_idx>NONE && rel_op_idx!=SURR_BY_INV) {
-														totalCountDB++; //total relations for areaDB1
-														totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
-													}
+												float penaltyX = 1.0;
+												if(dbLabels.isShapeShifted(xLabel)) {
+													int shapeNumX = dbLabels.getShapeNum(xLabel);
+													int prevShapeNumX = dbLabels.getPrevShapeNum(xLabel);
+													penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+													penalizedX = penaltyX;
 												}
-												int areaY=0;
 												for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 													String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 													String equationKeyDB = yLabel+"<"+relOp+">"+xLabel;
 													if(srmDB.equationMap.find(equationKeyDB)!=srmDB.equationMap.end()) {
-														areaY += dbLabels.area(yLabel);
+														float penaltyY = 1.0;
+														if(dbLabels.isShapeShifted(yLabel)) {
+															int shapeNumY = dbLabels.getShapeNum(yLabel);
+															int prevShapeNumY = dbLabels.getPrevShapeNum(yLabel);
+															penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+															penalizedY = penaltyY;
+														}
+														int areaY = dbLabels.area(yLabel);
+														float rval = this->rVal[maxNeighborLevelDB];
+														areaDB += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 														//>for match calculations
 														sumIslandAreaDB += dbLabels.area(yLabel);
@@ -2047,8 +1903,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														contrastWeightDB += ctWt;
 													}// end if equationMap
 												}// end for y srmDB
-
-												areaDB += (areaY * weight1 * deltaArcScore1) + (areaX * weight2 * deltaArcScore2 *(areaY/totalDenomAreaDB));
 											} catch (const std::out_of_range &oor) {
 												printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 												printf("INDIR: DB 1\n");
@@ -2060,24 +1914,29 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										/*! for DB */
 										for(unsigned int y=0; y<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.size(); y++) {
 											try {
-												float totalDenomAreaDB=0.;
 												String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
-												int yIdx = srmDB.getIndex(yLabel);
 												int areaY = dbLabels.area(yLabel);
-												for(unsigned int xIdx=0; xIdx<srmDB.size(); xIdx++) {
-													unsigned int rel_op_idx = srmDB.relation(yIdx,xIdx);
-													//for all relations
-													if(rel_op_idx>NONE && rel_op_idx!=SURR_BY) {
-														totalCountDB++; //total relations for areaUP1
-														totalDenomAreaDB += srmDB.relationArea(yIdx,xIdx).second;
-													}
+												float penaltyY = 1.0;
+												if(dbLabels.isShapeShifted(yLabel)) {
+													int shapeNumY = dbLabels.getShapeNum(yLabel);
+													int prevShapeNumY = dbLabels.getPrevShapeNum(yLabel);
+													penaltyY = shapematch.getShiftPenalty(prevShapeNumY,shapeNumY);
+													penalizedY = penaltyY;
 												}
-												int areaX=0;
 												for(unsigned int x=0; x<srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.size(); x++) {
 													String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 													String equationKey = yLabel+"<"+relOp+">"+xLabel;
 													if(srmDB.equationMap.find(equationKey)!=srmDB.equationMap.end()) {
-														areaX += dbLabels.area(xLabel);
+														float penaltyX = 1.0;
+														if(dbLabels.isShapeShifted(xLabel)) {
+															int shapeNumX = dbLabels.getShapeNum(xLabel);
+															int prevShapeNumX = dbLabels.getPrevShapeNum(xLabel);
+															penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
+															penalizedX = penaltyX;
+														}
+														int areaX = dbLabels.area(xLabel);
+														float rval = this->rVal[maxNeighborLevelDB];
+														areaDB += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 														//>for match calculations
 														sumIslandAreaDB += dbLabels.area(xLabel);
@@ -2101,8 +1960,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														contrastWeightDB += ctWt;
 													}// end if equationMap
 												}// end for x srmDB
-
-												areaDB += (areaX * weight2 * deltaArcScore2) + (areaY * weight1 * deltaArcScore1 *(areaX/totalDenomAreaDB));
 											} catch (const std::out_of_range &oor) {
 												printf("ShadeShapeRelationMatch::entropy() out of range!\n");
 												printf("INDIR: DB 2\n");
@@ -2113,8 +1970,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								}// end if countDB > 0
 							} // end for m
 
-							areaUP = areaUP * this->rVal[maxNeighborLevelUP];
-							areaDB = areaDB * this->rVal[maxNeighborLevelDB];
 							//> E-Value using count base on relArea <//
 							float countProportionUP = sumIslandAreaUP/maxIslandAreaUP;
 							float countProportionDB = sumIslandAreaDB/maxIslandAreaDB;
@@ -2150,7 +2005,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedEntropy>0) {
 								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
 								fprintf(fp,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
@@ -2174,7 +2028,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedMismatchEntropy>0) {
 								fprintf(fp2,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp2,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
 								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
@@ -2198,7 +2051,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(weightedEntropy<=0 || std::isnan(weightedEntropy)) {
 								fprintf(fp3,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
 								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp3,"TotalCountUP: %d, TotalCountDB: %d\n",totalCountUP,totalCountDB);
 								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
 								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
 								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
