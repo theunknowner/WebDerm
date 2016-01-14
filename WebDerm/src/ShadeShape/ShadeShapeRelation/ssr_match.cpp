@@ -256,6 +256,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 											int areaX = upLabels.area(xLabel); // get area
+											float relAreaX = areaX / (float)upLabels.totalArea();
 											float penaltyX = 1.0;
 											if(upLabels.isShapeShifted(xLabel)) {
 												int shapeNumX = upLabels.getShapeNum(xLabel);
@@ -276,8 +277,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedY = penaltyY;
 													}
 													int areaY = upLabels.area(yLabel);
+													float relAreaY = areaY / (float)upLabels.totalArea();
 													float rval = pow(this->rVal[maxNeighborLevelUP],m);
-													areaUP += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
+													areaUP += (relAreaY * penaltyY * weight1 * deltaArcScore1 * relAreaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 													//> for match calculations
 													sumIslandAreaUP += upLabels.area(yLabel);
@@ -328,6 +330,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 											int areaX = dbLabels.area(xLabel);
+											float relAreaX = areaX / (float)upLabels.totalArea();
 											float penaltyX = 1.0;
 											if(dbLabels.isShapeShifted(xLabel)) {
 												int shapeNumX = dbLabels.getShapeNum(xLabel);
@@ -348,8 +351,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedY = penaltyY;
 													}
 													int areaY = dbLabels.area(yLabel);
+													float relAreaY = areaY / (float)dbLabels.totalArea();
 													float rval = pow(this->rVal[maxNeighborLevelDB],m);
-													areaDB += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
+													areaDB += (relAreaY * penaltyY * weight1 * deltaArcScore1 * relAreaX * penaltyX * weight2 * deltaArcScore2 * rval);
+
 													//> used for match calculations
 													sumIslandAreaDB += dbLabels.area(yLabel);
 													maxIslandAreaDB = max(maxIslandAreaDB,dbLabels.area(yLabel));
@@ -544,6 +549,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 											int areaY = upLabels.area(yLabel);
+											float relAreaY = areaY / (float)upLabels.totalArea();
 											float penaltyY = 1.0;
 											if(upLabels.isShapeShifted(yLabel)) {
 												int shapeNumY = upLabels.getShapeNum(yLabel);
@@ -563,8 +569,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedX = penaltyX;
 													}
 													int areaX = upLabels.area(xLabel);
+													float relAreaX = areaX / (float)upLabels.totalArea();
 													float rval = pow(this->rVal[maxNeighborLevelUP],m);
-													areaUP += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
+													areaUP += (relAreaX * penaltyX * weight2 * deltaArcScore2 * relAreaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 													//> used for match calculations
 													sumIslandAreaUP += upLabels.area(xLabel);
@@ -614,6 +621,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 											int areaY = dbLabels.area(yLabel);
+											float relAreaY = areaY / (float)dbLabels.totalArea();
 											float penaltyY = 1.0;
 											if(dbLabels.isShapeShifted(yLabel)) {
 												int shapeNumY = dbLabels.getShapeNum(yLabel);
@@ -633,8 +641,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedX = penaltyX;
 													}
 													int areaX = dbLabels.area(xLabel);
+													float relAreaX = areaX / (float)dbLabels.totalArea();
 													float rval = pow(this->rVal[maxNeighborLevelDB],m);
-													areaDB += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
+													areaDB += (relAreaX * penaltyX * weight2 * deltaArcScore2 * relAreaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 													//> for match calculations
 													sumIslandAreaDB += dbLabels.area(xLabel);
@@ -696,8 +705,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							if(std::isnan(contrastWeightDB)) contrastWeightDB=0.0;
 							float contrastWeight = min(contrastWeightUP,contrastWeightDB);
 							//> ********** End (ESG) *********** <//
-							float areaVal = min(areaUP,areaDB);
-							float relArea = areaVal / maxTotalArea;
+							float relArea = min(areaUP,areaDB);
 							float weightedEntropy = relArea * entropyVal * contrastWeight;
 							totalMatchScore += weightedEntropy;
 
@@ -1104,6 +1112,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
 											int areaX = upLabels.area(xLabel); // get area
+											float relAreaX = areaX / (float)upLabels.totalArea();
 											float penaltyX = 1.0;
 											if(upLabels.isShapeShifted(xLabel)) {
 												int shapeNumX = upLabels.getShapeNum(xLabel);
@@ -1123,8 +1132,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedY = penaltyY;
 													}
 													int areaY = upLabels.area(yLabel);
+													float relAreaY = areaY / (float)upLabels.totalArea();
 													float rval = this->rVal[maxNeighborLevelUP];
-													areaUP += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
+													areaUP += (relAreaY * penaltyY * weight1 * deltaArcScore1 * relAreaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 													//> for match calculations
 													sumIslandAreaUP += upLabels.area(yLabel);
@@ -1163,6 +1173,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
 											int areaY = upLabels.area(yLabel);
+											float relAreaY = areaY / (float)upLabels.totalArea();
 											float penaltyY = 1.0;
 											if(upLabels.isShapeShifted(yLabel)) {
 												int shapeNumY = upLabels.getShapeNum(yLabel);
@@ -1182,8 +1193,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedX = penaltyX;
 													}
 													int areaX = upLabels.area(xLabel);
+													float relAreaX = areaX / (float)upLabels.totalArea();
 													float rval = this->rVal[maxNeighborLevelUP];
-													areaUP += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
+													areaUP += (relAreaX * penaltyX * weight2 * deltaArcScore2 * relAreaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 													//> for match calculations
 													sumIslandAreaUP += upLabels.area(xLabel);
@@ -1222,6 +1234,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).second.at(x);
 											int areaX = dbLabels.area(xLabel);
+											float relAreaX = areaX / (float)dbLabels.totalArea();
 											float penaltyX = 1.0;
 											if(dbLabels.isShapeShifted(xLabel)) {
 												int shapeNumX = dbLabels.getShapeNum(xLabel);
@@ -1241,8 +1254,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedY = penaltyY;
 													}
 													int areaY = dbLabels.area(yLabel);
+													float relAreaY = areaY / (float)dbLabels.totalArea();
 													float rval = this->rVal[maxNeighborLevelDB];
-													areaDB += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
+													areaDB += (relAreaY * penaltyY * weight1 * deltaArcScore1 * relAreaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 													//>for match calculations
 													sumIslandAreaDB += dbLabels.area(yLabel);
@@ -1279,6 +1293,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 										try {
 											String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(neighborNum).first.at(y);
 											int areaY = dbLabels.area(yLabel);
+											float relAreaY = areaY / (float)dbLabels.totalArea();
 											float penaltyY = 1.0;
 											if(dbLabels.isShapeShifted(yLabel)) {
 												int shapeNumY = dbLabels.getShapeNum(yLabel);
@@ -1298,8 +1313,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														penalizedX = penaltyX;
 													}
 													int areaX = dbLabels.area(xLabel);
+													float relAreaX = areaX / (float)dbLabels.totalArea();
 													float rval = this->rVal[maxNeighborLevelDB];
-													areaDB += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
+													areaDB += (relAreaX * penaltyX * weight2 * deltaArcScore2 * relAreaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 													//>for match calculations
 													sumIslandAreaDB += dbLabels.area(xLabel);
@@ -1350,8 +1366,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 							if(std::isnan(areaUP)) areaUP=0;
 							if(std::isnan(areaDB)) areaDB=0;
-							float areaVal = min(areaUP,areaDB);
-							float relArea = areaVal / maxTotalArea;
+							float relArea = min(areaUP,areaDB);
 							float weightedEntropy = relArea * entropyVal * contrastWeight;
 							totalMatchScore += weightedEntropy;
 
@@ -1741,6 +1756,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											try {
 												String xLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 												int areaX = upLabels.area(xLabel); // get area
+												float relAreaX = areaX / (float)upLabels.totalArea();
 												float penaltyX = 1.0;
 												if(upLabels.isShapeShifted(xLabel)) {
 													int shapeNumX = upLabels.getShapeNum(xLabel);
@@ -1760,8 +1776,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 															penalizedY = penaltyY;
 														}
 														int areaY = upLabels.area(yLabel);
+														float relAreaY = areaY / (float)upLabels.totalArea();
 														float rval = this->rVal[maxNeighborLevelUP];
-														areaUP += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
+														areaUP += (relAreaY * penaltyY * weight1 * deltaArcScore1 * relAreaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 														//> for match calculations
 														sumIslandAreaUP += upLabels.area(yLabel);
@@ -1800,6 +1817,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											try {
 												String yLabel = srmUP.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 												int areaY = upLabels.area(yLabel);
+												float relAreaY = areaY / (float)upLabels.totalArea();
 												float penaltyY = 1.0;
 												if(upLabels.isShapeShifted(yLabel)) {
 													int shapeNumY = upLabels.getShapeNum(yLabel);
@@ -1818,9 +1836,10 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 															penaltyX = shapematch.getShiftPenalty(prevShapeNumX,shapeNumX);
 															penalizedX = penaltyX;
 														}
-														int areaX = dbLabels.area(xLabel);
+														int areaX = upLabels.area(xLabel);
+														float relAreaX = areaX / (float)upLabels.totalArea();
 														float rval = this->rVal[maxNeighborLevelUP];
-														areaUP += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
+														areaUP += (relAreaX * penaltyX * weight2 * deltaArcScore2 * relAreaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 														//> for match calculations
 														sumIslandAreaUP += upLabels.area(xLabel);
@@ -1859,6 +1878,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											try {
 												String xLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).second.at(x);
 												int areaX = dbLabels.area(xLabel);
+												float relAreaX = areaX / (float)dbLabels.totalArea();
 												float penaltyX = 1.0;
 												if(dbLabels.isShapeShifted(xLabel)) {
 													int shapeNumX = dbLabels.getShapeNum(xLabel);
@@ -1878,8 +1898,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 															penalizedY = penaltyY;
 														}
 														int areaY = dbLabels.area(yLabel);
+														float relAreaY = areaY / (float)dbLabels.totalArea();
 														float rval = this->rVal[maxNeighborLevelDB];
-														areaDB += (areaY * penaltyY * weight1 * deltaArcScore1 * areaX * penaltyX * weight2 * deltaArcScore2 * rval);
+														areaDB += (relAreaY * penaltyY * weight1 * deltaArcScore1 * relAreaX * penaltyX * weight2 * deltaArcScore2 * rval);
 
 														//>for match calculations
 														sumIslandAreaDB += dbLabels.area(yLabel);
@@ -1916,6 +1937,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 											try {
 												String yLabel = srmDB.mergedLabelContainer.at(i).at(j).at(k).at(m).first.at(y);
 												int areaY = dbLabels.area(yLabel);
+												float relAreaY = areaY / (float)dbLabels.totalArea();
 												float penaltyY = 1.0;
 												if(dbLabels.isShapeShifted(yLabel)) {
 													int shapeNumY = dbLabels.getShapeNum(yLabel);
@@ -1935,8 +1957,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 															penalizedX = penaltyX;
 														}
 														int areaX = dbLabels.area(xLabel);
+														float relAreaX = areaX / (float)dbLabels.totalArea();
 														float rval = this->rVal[maxNeighborLevelDB];
-														areaDB += (areaX * penaltyX * weight2 * deltaArcScore2 * areaY * penaltyY * weight1 * deltaArcScore1 * rval);
+														areaDB += (relAreaX * penaltyX * weight2 * deltaArcScore2 * relAreaY * penaltyY * weight1 * deltaArcScore1 * rval);
 
 														//>for match calculations
 														sumIslandAreaDB += dbLabels.area(xLabel);
@@ -1988,8 +2011,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 							if(std::isnan(areaUP)) areaUP=0;
 							if(std::isnan(areaDB)) areaDB=0;
-							float areaVal = min(areaUP,areaDB);
-							float relArea = areaVal / maxTotalArea;
+							float relArea = min(areaUP,areaDB);
 							float weightedEntropy = relArea * entropyVal * contrastWeight;
 							totalMatchScore += weightedEntropy;
 
