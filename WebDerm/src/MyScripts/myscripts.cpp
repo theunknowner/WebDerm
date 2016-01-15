@@ -3610,6 +3610,7 @@ ShadeShape script31(String filename) {
 	unionMapLC.copyTo(maskFinal,unionMapLC);
 	unionMap.copyTo(maskFinal,unionMap);
 	imgGray.copyTo(img2,maskFinal);
+	imgshow(img2);
 
 	int peakPos = sh.getPeakClusters(img2);
 	//printf("PeakPos: %d\n",peakPos);

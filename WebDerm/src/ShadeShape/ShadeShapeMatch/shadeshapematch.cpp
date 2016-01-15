@@ -266,8 +266,8 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 
 	float prevScore = tr1ForShade(upLabelsFilled,dbLabelsFilled); //> initialize
 	prevScore = roundDecimal(prevScore,6);
-	for(int n=0; n<3; n++) {
-		for(unsigned int shadeShift=0; shadeShift<shadematch.SHIFT().size(); shadeShift++) {
+	for(int n=1; n<2; n++) {
+		for(unsigned int shadeShift=1; shadeShift<2; shadeShift++) {
 			bool isShifted = false;
 			islandVec2 = this->upIslandVec;
 			float largestResult = prevScore;
@@ -338,7 +338,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 				int ruleSize1 = ShapeMatch::shiftingRules.at(shapeNum1).size();
 				int ruleSize2 = ShapeMatch::shiftingRules.at(shapeNum2).size();
 				//! -1 = no shifting
-				for(int shapeShift1=-1; shapeShift1<ruleSize1; shapeShift1++) {
+				for(int shapeShift1=-1; shapeShift1<0; shapeShift1++) {
 					islandVec3 = islandVec2;
 					bool flag1 = false;
 					String newShape1 = "NONE";
@@ -347,7 +347,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 						int newShapeIdx1 = shapematch.getShapeIndex(newShape1);
 						flag1 = shapematch.shape_translation(islandVec3,shapeNum1,newShapeIdx1,0);
 					}
-					for(int shapeShift2=-1; shapeShift2<ruleSize2; shapeShift2++) {
+					for(int shapeShift2=-1; shapeShift2<0; shapeShift2++) {
 						try {
 							vector<vector<vector<Islands> > > islandVec4 = islandVec3;
 							bool flag2 = false;

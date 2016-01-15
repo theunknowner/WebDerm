@@ -24,7 +24,7 @@ public:
 	Esg();
 	bool importThresholds();
 	int shadeDiff(int shade1, int shade2);
-	double calculate(float dist, int shadeDiff);
+	double calculate(float dist, int shadeDiff, int dgb=0);
 
 };
 

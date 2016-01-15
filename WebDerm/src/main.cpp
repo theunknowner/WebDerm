@@ -110,17 +110,17 @@ int main(int argc,char** argv)
 		ShadeShape ss1 = Scripts::script31(name);
 	}
 /**/
-/*
-	ShadeShape ss1 = Scripts::script31("melanoma8b");
+
+	ShadeShape ss1 = Scripts::script31("psoriasis26");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	ss1.showInteractiveIslands();
+	//ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(52,69));
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 /**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -241,7 +241,7 @@ int main(int argc,char** argv)
 	FILE * fp;
 	fp = fopen("stt-count.csv","w");
 	fprintf(fp,",");
-	for(unsigned int i=0; i<8; i++) {
+	for(unsigned int i=0; i<10; i++) {
 		fprintf(fp,"%s,",spm.getShapeName(i).c_str());
 	}
 	fprintf(fp,"\n");
