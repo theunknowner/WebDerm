@@ -3610,7 +3610,7 @@ ShadeShape script31(String filename) {
 	unionMapLC.copyTo(maskFinal,unionMapLC);
 	unionMap.copyTo(maskFinal,unionMap);
 	imgGray.copyTo(img2,maskFinal);
-	imgshow(img2);
+	imgshow(imgGray);
 
 	int peakPos = sh.getPeakClusters(img2);
 	//printf("PeakPos: %d\n",peakPos);
@@ -3626,6 +3626,64 @@ ShadeShape script31(String filename) {
 	ShadeShape ss;
 	ss.extract(id,false);
 	return ss;
+}
+
+void script32(String filename) {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	Poly poly;
+	KneeCurve kc;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	Mat img, imgGray;
+	String name = filename;
+	img = imread("Looks_Like/"+name+".jpg");
+	assert(img.empty()==0);
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+	vector<int> lcVec;
+	vector<int> binVec = vector<int>(256,0);
+	vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
+	vector<int> deltaLcVec;
+	Size size(10,10);
+	int col=0,row=0;
+	while(row<(imgGray.rows-size.height-1)) {
+		while(col<(imgGray.cols-size.width-1)) {
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=0; j<(col+size.width); j++) {
+					if(i<imgGray.rows && j<imgGray.cols) {
+						int lc = imgGray.at<uchar>(i,j);
+						lcVec.push_back(lc);
+						binVec.at(lc)++;
+						ptVec.at(lc).push_back(Point(j,i));
+					}
+				}
+			}
+			sort(lcVec.begin(),lcVec.end());
+			int idxPercent5 = lcVec.size() * 0.05;
+			int idxPercent95 = lcVec.size() * 0.95;
+			int lc5 = lcVec.at(idxPercent5);
+			int lc95 = lcVec.at(idxPercent95);
+			int centerMassX5 = 0, centerMassX95=0;
+			for(unsigned int i=0; i<ptVec.at(lc5).size(); i++) {
+				centerMassX5 += ptVec.at(lc5).at(i).x;
+			}
+			for(unsigned int i=0; i<ptVec.at(lc95).size(); i++) {
+				centerMassX95 += ptVec.at(lc95).at(i).x;
+			}
+			centerMassX5 /= ptVec.at(lc5).size();
+			centerMassX95 /= ptVec.at(lc95).size();
+
+			int deltaLC = centerMassX95 > centerMassX5 ? (lc95 - lc5) : (lc5 - lc95);
+			deltaLcVec.push_back(deltaLC);
+
+			col++;
+		}
+		row++;
+	}
 }
 
 }// end namespace

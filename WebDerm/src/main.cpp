@@ -71,7 +71,7 @@ int main(int argc,char** argv)
 	Scripts::script27(name);
 	Scripts::script30(name);
 /**/
-/*
+	/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
 	ShadeShape ss1 = Scripts::script31("herpes3");
@@ -87,7 +87,7 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-/*
+	/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -110,8 +110,8 @@ int main(int argc,char** argv)
 		ShadeShape ss1 = Scripts::script31(name);
 	}
 /**/
-
-	ShadeShape ss1 = Scripts::script31("psoriasis26");
+	Scripts::script32("psoriasis26");
+	//ShadeShape ss1 = Scripts::script31("psoriasis26");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	//ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
@@ -119,8 +119,8 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(52,69));
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
-/**/
-/*
+	/**/
+	/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -221,7 +221,7 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+	/*
 	Timer time;
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);

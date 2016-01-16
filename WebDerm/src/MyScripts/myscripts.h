@@ -47,6 +47,7 @@ void script28b();
 void script29();
 void script30(String name);
 ShadeShape script31(String filename);
+void script32(String filename);
 
 void script_createTrainingLabels();
 void script_createAllTrainingLabels();
