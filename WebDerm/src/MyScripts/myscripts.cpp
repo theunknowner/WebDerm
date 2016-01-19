@@ -3629,6 +3629,8 @@ ShadeShape script31(String filename) {
 }
 
 void script32(String filename) {
+	cout << cv::getNumberOfCPUs() << endl;
+	cout << cv::getNumThreads() << endl;
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
@@ -3643,8 +3645,13 @@ void script32(String filename) {
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	cvtColor(img,imgGray,CV_BGR2GRAY);
+	Mat element = getStructuringElement(MORPH_RECT,Size(5,5));
+	Mat closeImg;
+	morphologyEx(imgGray,imgGray,MORPH_CLOSE,element);
 	vector<int> deltaLcVec;
 	Size size(10,10);
+	float lowerBound = 0.10;
+	float upperBound = 0.90;
 	int col=0,row=0;
 	while(row<=(imgGray.rows-size.height)) {
 		while(col<=(imgGray.cols-size.width)) {
@@ -3662,23 +3669,23 @@ void script32(String filename) {
 				}
 			}
 			sort(lcVec.begin(),lcVec.end());
-			int idxPercent5 = lcVec.size() * 0.05;
-			int idxPercent95 = lcVec.size() * 0.95;
-			int lc5 = lcVec.at(idxPercent5);
-			int lc95 = lcVec.at(idxPercent95);
-			int centerMassX5 = 0, centerMassX95=0;
-			for(unsigned int i=0; i<ptVec.at(lc5).size(); i++) {
-				centerMassX5 += ptVec.at(lc5).at(i).x;
+			int idxPercent25 = lcVec.size() * 0.05;
+			int idxPercent75 = lcVec.size() * 0.95;
+			int lc25 = lcVec.at(idxPercent25);
+			int lc75 = lcVec.at(idxPercent75);
+			int centerMassX25 = 0, centerMassX75=0;
+			for(unsigned int i=0; i<ptVec.at(lc25).size(); i++) {
+				centerMassX25 += ptVec.at(lc25).at(i).x;
 			}
-			for(unsigned int i=0; i<ptVec.at(lc95).size(); i++) {
-				centerMassX95 += ptVec.at(lc95).at(i).x;
+			for(unsigned int i=0; i<ptVec.at(lc75).size(); i++) {
+				centerMassX75 += ptVec.at(lc75).at(i).x;
 			}
-			centerMassX5 /= ptVec.at(lc5).size();
-			centerMassX95 /= ptVec.at(lc95).size();
+			centerMassX25 /= ptVec.at(lc25).size();
+			centerMassX75 /= ptVec.at(lc75).size();
 
-			int deltaLC = centerMassX95 > centerMassX5 ? (lc95 - lc5) : (lc5 - lc95);
+			int deltaLC = centerMassX75 > centerMassX25 ? (lc75 - lc25) : (lc25 - lc75);
 			deltaLcVec.push_back(abs(deltaLC));
-			col+=(size.height/2);
+			col+=ceil(size.height/2);
 		}
 		row++;
 		col=0;
@@ -3687,7 +3694,6 @@ void script32(String filename) {
 	int deltaLcKnee = deltaLcVec.at(kneeIdx);
 	col=0; row=0;
 	int entry=0;
-	bool disabled = false;
 	Mat result = imgGray.clone();
 	Mat blank = Mat::zeros(size.height,size.width,CV_8U);
 	namedWindow("Test",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -3710,38 +3716,44 @@ void script32(String filename) {
 				}
 			}
 			sort(lcVec.begin(),lcVec.end());
-			int idxPercent5 = lcVec.size() * 0.05;
-			int idxPercent95 = lcVec.size() * 0.95;
-			int lc5 = lcVec.at(idxPercent5);
-			int lc95 = lcVec.at(idxPercent95);
-			int centerMassX5 = 0, centerMassX95=0;
-			for(unsigned int i=0; i<ptVec.at(lc5).size(); i++) {
-				centerMassX5 += ptVec.at(lc5).at(i).x;
+			int idxPercent25 = lcVec.size() * lowerBound;
+			int idxPercent75 = lcVec.size() * upperBound;
+			int lc25 = lcVec.at(idxPercent25);
+			int lc75 = lcVec.at(idxPercent75);
+			int centerMassX25 = 0, centerMassX75=0;
+			for(unsigned int i=0; i<ptVec.at(lc25).size(); i++) {
+				centerMassX25 += ptVec.at(lc25).at(i).x;
 			}
-			for(unsigned int i=0; i<ptVec.at(lc95).size(); i++) {
-				centerMassX95 += ptVec.at(lc95).at(i).x;
+			for(unsigned int i=0; i<ptVec.at(lc75).size(); i++) {
+				centerMassX75 += ptVec.at(lc75).at(i).x;
 			}
-			centerMassX5 /= ptVec.at(lc5).size();
-			centerMassX95 /= ptVec.at(lc95).size();
+			centerMassX25 /= ptVec.at(lc25).size();
+			centerMassX75 /= ptVec.at(lc75).size();
 
-			int deltaLC = centerMassX95 > centerMassX5 ? (lc95 - lc5) : (lc5 - lc95);
-			if(!disabled) {
-				if(deltaLC>deltaLcKnee || deltaLC<=(-deltaLcKnee)) {
-					if(entry==0) {
-						entry=1;
-						disabled = true;
-						lumSkin = lc5;
-						lumCounter = lumSkin;
-					}
-					lumCounter += deltaLC;
-				} else {
-					if(entry==0) {
-						blank.copyTo(result(Rect(col,row,blank.cols,blank.rows)));
-					}
+			int deltaLC = centerMassX75 > centerMassX25 ? (lc75 - lc25) : (lc25 - lc75);
+			bool initEntry = false;
+			if(deltaLC>deltaLcKnee) {
+				if(entry==0) {
+					entry=1;
+					lumSkin = lc25;
+					lumCounter = lumSkin;
 				}
+				initEntry = true;
+				lumCounter += deltaLC;
+			} else if(deltaLC<=(-deltaLcKnee)) {
+				if(entry==0) {
+					entry=1;
+					lumSkin = lc75;
+					lumCounter = lumSkin;
+				}
+				initEntry = true;
+				lumCounter += deltaLC;
 			} else {
-				disabled = false;
+				if(entry==0) {
+					blank.copyTo(result(Rect(col,row,blank.cols,blank.rows)));
+				}
 			}
+			lumCounter = min(lumCounter,255); //caps it at 255 luminance
 			int temp = lumCounter;
 			if(lumCounter>(lumSkin*0.95) && lumCounter<(lumSkin*1.05)) {
 				if(entry==1) {
@@ -3751,12 +3763,14 @@ void script32(String filename) {
 			}
 			Mat test = imgGray.clone();
 			rectangle(test,Point(col,row),Point(col+size.width-1,row+size.height-1),Scalar(0));
-			printf("Knee: %d, LumCnt: %d, LumSkin: %d, DeltaLC: %d, ENtry: %d\n",deltaLcKnee,temp,lumSkin,deltaLC,entry);
+			printf("Knee: %d, InitEntry: %d, LumCnt: %d, LumSkin: (%.1f,%.1f), DeltaLC: %d, ENtry: %d\n",deltaLcKnee,initEntry,temp,lumSkin*0.95,lumSkin*1.05,deltaLC,entry);
+			printf("LC5: %d, LC95: %d\n",lc25,lc75);
 			imshow("Test",test);
 			imshow("Result",result);
 			waitKey(0);
 
-			col+=(size.height/2);
+			int incrementSize = initEntry==true ? size.width : ceil(size.width/2);
+			col+=incrementSize;
 		}
 		row++;
 		col=0;
