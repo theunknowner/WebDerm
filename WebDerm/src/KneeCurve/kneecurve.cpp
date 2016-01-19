@@ -115,6 +115,7 @@ int KneeCurve::kneeCurvePoint(vector<double> &vec) {
 }
 
 //! pass by reference so the original gets sorted
+//! returns the index of the knee
 int KneeCurve::kneeCurvePoint(vector<int> &vec) {
 	sort(vec.begin(),vec.end());
 	Mat vecFromFirst(vec.size(),2,CV_32F,Scalar(0));

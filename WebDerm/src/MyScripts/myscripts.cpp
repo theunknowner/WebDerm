@@ -3632,7 +3632,6 @@ void script32(String filename) {
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
-	Poly poly;
 	KneeCurve kc;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
@@ -3644,14 +3643,14 @@ void script32(String filename) {
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-	vector<int> lcVec;
-	vector<int> binVec = vector<int>(256,0);
-	vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
 	vector<int> deltaLcVec;
 	Size size(10,10);
 	int col=0,row=0;
-	while(row<(imgGray.rows-size.height-1)) {
-		while(col<(imgGray.cols-size.width-1)) {
+	while(row<=(imgGray.rows-size.height)) {
+		while(col<=(imgGray.cols-size.width)) {
+			vector<int> lcVec;
+			vector<int> binVec = vector<int>(256,0);
+			vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
 			for(int i=row; i<(row+size.height); i++) {
 				for(int j=0; j<(col+size.width); j++) {
 					if(i<imgGray.rows && j<imgGray.cols) {
@@ -3678,12 +3677,92 @@ void script32(String filename) {
 			centerMassX95 /= ptVec.at(lc95).size();
 
 			int deltaLC = centerMassX95 > centerMassX5 ? (lc95 - lc5) : (lc5 - lc95);
-			deltaLcVec.push_back(deltaLC);
-
-			col++;
+			deltaLcVec.push_back(abs(deltaLC));
+			col+=(size.height/2);
 		}
 		row++;
+		col=0;
 	}
+	int kneeIdx = kc.kneeCurvePoint(deltaLcVec);
+	int deltaLcKnee = deltaLcVec.at(kneeIdx);
+	col=0; row=0;
+	int entry=0;
+	bool disabled = false;
+	Mat result = imgGray.clone();
+	Mat blank = Mat::zeros(size.height,size.width,CV_8U);
+	namedWindow("Test",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	namedWindow("Result",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	while(row<=(imgGray.rows-size.height)) {
+		int lumSkin = 0;
+		int lumCounter = 0;
+		while(col<=(imgGray.cols-size.width)) {
+			vector<int> lcVec;
+			vector<int> binVec = vector<int>(256,0);
+			vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
+			for(int i=row; i<(row+size.height); i++) {
+				for(int j=col; j<(col+size.width); j++) {
+					if(i<imgGray.rows && j<imgGray.cols) {
+						int lc = imgGray.at<uchar>(i,j);
+						lcVec.push_back(lc);
+						binVec.at(lc)++;
+						ptVec.at(lc).push_back(Point(j,i));
+					}
+				}
+			}
+			sort(lcVec.begin(),lcVec.end());
+			int idxPercent5 = lcVec.size() * 0.05;
+			int idxPercent95 = lcVec.size() * 0.95;
+			int lc5 = lcVec.at(idxPercent5);
+			int lc95 = lcVec.at(idxPercent95);
+			int centerMassX5 = 0, centerMassX95=0;
+			for(unsigned int i=0; i<ptVec.at(lc5).size(); i++) {
+				centerMassX5 += ptVec.at(lc5).at(i).x;
+			}
+			for(unsigned int i=0; i<ptVec.at(lc95).size(); i++) {
+				centerMassX95 += ptVec.at(lc95).at(i).x;
+			}
+			centerMassX5 /= ptVec.at(lc5).size();
+			centerMassX95 /= ptVec.at(lc95).size();
+
+			int deltaLC = centerMassX95 > centerMassX5 ? (lc95 - lc5) : (lc5 - lc95);
+			if(!disabled) {
+				if(deltaLC>deltaLcKnee || deltaLC<=(-deltaLcKnee)) {
+					if(entry==0) {
+						entry=1;
+						disabled = true;
+						lumSkin = lc5;
+						lumCounter = lumSkin;
+					}
+					lumCounter += deltaLC;
+				} else {
+					if(entry==0) {
+						blank.copyTo(result(Rect(col,row,blank.cols,blank.rows)));
+					}
+				}
+			} else {
+				disabled = false;
+			}
+			int temp = lumCounter;
+			if(lumCounter>(lumSkin*0.95) && lumCounter<(lumSkin*1.05)) {
+				if(entry==1) {
+					entry=0;
+					lumCounter=0;
+				}
+			}
+			Mat test = imgGray.clone();
+			rectangle(test,Point(col,row),Point(col+size.width-1,row+size.height-1),Scalar(0));
+			printf("Knee: %d, LumCnt: %d, LumSkin: %d, DeltaLC: %d, ENtry: %d\n",deltaLcKnee,temp,lumSkin,deltaLC,entry);
+			imshow("Test",test);
+			imshow("Result",result);
+			waitKey(0);
+
+			col+=(size.height/2);
+		}
+		row++;
+		col=0;
+		entry=0;
+	}
+	imgshow(result);
 }
 
 }// end namespace
