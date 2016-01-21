@@ -30,6 +30,7 @@ public:
 	Mat colorClusters(Mat src, Mat centers, Mat labels, deque<Point> ptVec);
 
 	Mat kmeansCluster(vector<double> data_vec, int clusters=0);
+	Mat kmeansCluster(vector<int> data_vec, int clusters=0);
 	int getNumOfClusters();
 	int getSizeOfCluster(int clusterNum);
 	double getMin(int clusterNum);

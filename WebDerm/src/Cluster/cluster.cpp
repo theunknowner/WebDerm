@@ -210,6 +210,11 @@ Mat Cluster::kmeansCluster(vector<double> data_vec, int clusters) {
 	return this->centers;
 }
 
+Mat Cluster::kmeansCluster(vector<int> data_vec, int clusters) {
+	vector<double> vec(data_vec.begin(),data_vec.end());
+	return this->kmeansCluster(vec,clusters);
+}
+
 //! returns the number of points in the specified cluster
 int Cluster::getSizeOfCluster(int clusterNum) {
 	int count = 0;

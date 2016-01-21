@@ -3629,8 +3629,6 @@ ShadeShape script31(String filename) {
 }
 
 void script32(String filename) {
-	cout << cv::getNumberOfCPUs() << endl;
-	cout << cv::getNumThreads() << endl;
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
@@ -3645,56 +3643,55 @@ void script32(String filename) {
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	cvtColor(img,imgGray,CV_BGR2GRAY);
-	Mat element = getStructuringElement(MORPH_RECT,Size(5,5));
-	Mat closeImg;
-	morphologyEx(imgGray,imgGray,MORPH_CLOSE,element);
 	vector<int> deltaLcVec;
+	vector<int> prevMajorCenterVec;
+	int prevMajorCenter=0;
 	Size size(10,10);
-	float lowerBound = 0.10;
-	float upperBound = 0.90;
 	int col=0,row=0;
 	while(row<=(imgGray.rows-size.height)) {
 		while(col<=(imgGray.cols-size.width)) {
-			vector<int> lcVec;
+			vector<double> lcVec;
 			vector<int> binVec = vector<int>(256,0);
 			vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
 			for(int i=row; i<(row+size.height); i++) {
 				for(int j=0; j<(col+size.width); j++) {
 					if(i<imgGray.rows && j<imgGray.cols) {
 						int lc = imgGray.at<uchar>(i,j);
-						lcVec.push_back(lc);
+						lcVec.push_back((double)lc);
 						binVec.at(lc)++;
 						ptVec.at(lc).push_back(Point(j,i));
 					}
 				}
 			}
-			sort(lcVec.begin(),lcVec.end());
-			int idxPercent25 = lcVec.size() * 0.05;
-			int idxPercent75 = lcVec.size() * 0.95;
-			int lc25 = lcVec.at(idxPercent25);
-			int lc75 = lcVec.at(idxPercent75);
-			int centerMassX25 = 0, centerMassX75=0;
-			for(unsigned int i=0; i<ptVec.at(lc25).size(); i++) {
-				centerMassX25 += ptVec.at(lc25).at(i).x;
+			Cluster clst;
+			int clusters = 2;
+			Mat centers = clst.kmeansCluster(lcVec,clusters);
+			int largestCount = 0;
+			int majorCenter = 0;
+			for(int n=0; n<clusters; n++) {
+				int count = clst.getSizeOfCluster(n);
+				if(count>largestCount) {
+					largestCount = count;
+					majorCenter = round(clst.getCenter(n));
+				}
 			}
-			for(unsigned int i=0; i<ptVec.at(lc75).size(); i++) {
-				centerMassX75 += ptVec.at(lc75).at(i).x;
-			}
-			centerMassX25 /= ptVec.at(lc25).size();
-			centerMassX75 /= ptVec.at(lc75).size();
-
-			int deltaLC = centerMassX75 > centerMassX25 ? (lc75 - lc25) : (lc25 - lc75);
+			if(col==0) prevMajorCenter = majorCenter;
+			int deltaLC = majorCenter - prevMajorCenter;
 			deltaLcVec.push_back(abs(deltaLC));
+
+			prevMajorCenter = majorCenter;
 			col+=ceil(size.height/2);
 		}
 		row++;
 		col=0;
 	}
-	int kneeIdx = kc.kneeCurvePoint(deltaLcVec);
-	int deltaLcKnee = deltaLcVec.at(kneeIdx);
+	//Cluster kneeClst;
+	//Mat kneeCenters = kneeClst.kmeansCluster(deltaLcVec,2);
+	//int deltaLcKnee = round(kneeCenters.at<float>(0,kneeClst.getNumOfClusters()-1));
+	int deltaLcKnee = 15;
 	col=0; row=0;
 	int entry=0;
-	Mat result = imgGray.clone();
+	Mat result = Mat::zeros(imgGray.rows,imgGray.cols,CV_8U);
 	Mat blank = Mat::zeros(size.height,size.width,CV_8U);
 	namedWindow("Test",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	namedWindow("Result",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
@@ -3702,75 +3699,70 @@ void script32(String filename) {
 		int lumSkin = 0;
 		int lumCounter = 0;
 		while(col<=(imgGray.cols-size.width)) {
-			vector<int> lcVec;
+			vector<double> lcVec;
 			vector<int> binVec = vector<int>(256,0);
 			vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
 			for(int i=row; i<(row+size.height); i++) {
 				for(int j=col; j<(col+size.width); j++) {
 					if(i<imgGray.rows && j<imgGray.cols) {
 						int lc = imgGray.at<uchar>(i,j);
-						lcVec.push_back(lc);
+						lcVec.push_back((double)lc);
 						binVec.at(lc)++;
 						ptVec.at(lc).push_back(Point(j,i));
+						blank.at<uchar>(i-row,j-col) = imgGray.at<uchar>(i,j);
 					}
 				}
 			}
-			sort(lcVec.begin(),lcVec.end());
-			int idxPercent25 = lcVec.size() * lowerBound;
-			int idxPercent75 = lcVec.size() * upperBound;
-			int lc25 = lcVec.at(idxPercent25);
-			int lc75 = lcVec.at(idxPercent75);
-			int centerMassX25 = 0, centerMassX75=0;
-			for(unsigned int i=0; i<ptVec.at(lc25).size(); i++) {
-				centerMassX25 += ptVec.at(lc25).at(i).x;
+			Cluster clst;
+			int clusters = 3;
+			Mat centers = clst.kmeansCluster(lcVec,clusters);
+			int largestCount = 0;
+			int majorCenter = 0, majorCenterIdx = 0;
+			for(int n=0; n<clusters; n++) {
+				int count = clst.getSizeOfCluster(n);
+				if(count>largestCount) {
+					largestCount = count;
+					majorCenterIdx = n;
+					majorCenter = round(clst.getCenter(n));
+				}
 			}
-			for(unsigned int i=0; i<ptVec.at(lc75).size(); i++) {
-				centerMassX75 += ptVec.at(lc75).at(i).x;
-			}
-			centerMassX25 /= ptVec.at(lc25).size();
-			centerMassX75 /= ptVec.at(lc75).size();
+			if(col==0) prevMajorCenter = majorCenter;
+			int deltaLC = majorCenter - prevMajorCenter;
 
-			int deltaLC = centerMassX75 > centerMassX25 ? (lc75 - lc25) : (lc25 - lc75);
-			bool initEntry = false;
-			if(deltaLC>deltaLcKnee) {
+			lumCounter = prevMajorCenter;
+			lumCounter += deltaLC;
+			if(deltaLC>deltaLcKnee || deltaLC<=(-deltaLcKnee)) {
 				if(entry==0) {
 					entry=1;
-					lumSkin = lc25;
-					lumCounter = lumSkin;
+					lumSkin = prevMajorCenterVec.at(prevMajorCenterVec.size()-3);
 				}
-				initEntry = true;
-				lumCounter += deltaLC;
-			} else if(deltaLC<=(-deltaLcKnee)) {
-				if(entry==0) {
-					entry=1;
-					lumSkin = lc75;
-					lumCounter = lumSkin;
-				}
-				initEntry = true;
-				lumCounter += deltaLC;
+				blank.copyTo(result(Rect(col,row,blank.cols,blank.rows)));
 			} else {
-				if(entry==0) {
+				if(entry==1) {
 					blank.copyTo(result(Rect(col,row,blank.cols,blank.rows)));
 				}
 			}
 			lumCounter = min(lumCounter,255); //caps it at 255 luminance
 			int temp = lumCounter;
-			if(lumCounter>(lumSkin*0.95) && lumCounter<(lumSkin*1.05)) {
+			if(lumCounter>(lumSkin-10) && lumCounter<(lumSkin+10)) {
 				if(entry==1) {
 					entry=0;
 					lumCounter=0;
 				}
 			}
+
 			Mat test = imgGray.clone();
 			rectangle(test,Point(col,row),Point(col+size.width-1,row+size.height-1),Scalar(0));
-			printf("Knee: %d, InitEntry: %d, LumCnt: %d, LumSkin: (%.1f,%.1f), DeltaLC: %d, ENtry: %d\n",deltaLcKnee,initEntry,temp,lumSkin*0.95,lumSkin*1.05,deltaLC,entry);
-			printf("LC5: %d, LC95: %d\n",lc25,lc75);
+			printf("Knee: %d, LumCnt: %d, LumSkin: (%d,%d,%d), DeltaLC: %d, Entry: %d\n",deltaLcKnee,temp,lumSkin-10,lumSkin,lumSkin+10,deltaLC,entry);
+			printf("PrevCenter: %d, CurrCenter: %d\n",prevMajorCenter,majorCenter);
+			printf("Min: %.0f, Max: %.0f\n",clst.getMin(majorCenterIdx),clst.getMax(majorCenterIdx));
 			imshow("Test",test);
 			imshow("Result",result);
 			waitKey(0);
 
-			int incrementSize = initEntry==true ? size.width : ceil(size.width/2);
-			col+=incrementSize;
+			prevMajorCenter = majorCenter;
+			prevMajorCenterVec.push_back(prevMajorCenter);
+			col+=ceil(size.height/2);
 		}
 		row++;
 		col=0;
