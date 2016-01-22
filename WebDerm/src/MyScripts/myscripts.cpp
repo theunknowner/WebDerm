@@ -30,6 +30,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShadeShapeMatch/shadeshapematch.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/Histogram/histogram.h"
 
 namespace Scripts {
 void script1() {
@@ -3633,6 +3634,7 @@ void script32(String filename) {
 	Hsl hsl;
 	Shades sh;
 	KneeCurve kc;
+	Histogram hg;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
@@ -3653,6 +3655,7 @@ void script32(String filename) {
 	const float thresh = 3.5;
 	Vec3b skinBGR;
 	vector<float> skinLAB;
+
 	for(int i=0; i<=(smoothImg.rows-size.height); i+=size.height) {
 		int entry=0;
 		//for debugging purposes
@@ -3663,16 +3666,20 @@ void script32(String filename) {
 		///
 		for(int j=size.width; j<(smoothImg.cols-size.width); j+=size.width) {
 			Vec3b BGR = smoothImg.at<Vec3b>(i,j);
-			// Vec3b BGR0 = rgbVec.size()>=2 ? rgbVec.at(rgbVec.size()-2) :
+			//Vec3b BGR0 = rgbVec.size()>=2 ? rgbVec.at(rgbVec.size()-2) :
 			Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-size.width);
 			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
 			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
 			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
 			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
 			double dE = cie.deltaE76(LAB,LAB0);
+
 			if(dE>thresh && entry==0) {
-				skinBGR = BGR0;
-				skinLAB = LAB0;
+				//skinBGR = BGR0;
+				//skinLAB = LAB0;
+				skinBGR =  smoothImg.at<Vec3b>(i,j-(size.width*2));
+				vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
+				skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
 				entry=1;
 				entryPt = Point(j-size.width,i);
 				entry_dE = dE;
@@ -3685,8 +3692,11 @@ void script32(String filename) {
 					entry = 0;
 					exitPt = Point(j,i);
 					exit_dE = dE_Skin;
+					skinBGR =  smoothImg.at<Vec3b>(i,j+(size.width));
+					vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
+					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
 				}
-				if(i==35 && j==80) {
+				if(i==35 && j==75) {
 					printf("SkinRGB(%d,%d,%d)\n",skinBGR[2],skinBGR[1],skinBGR[0]);
 					printf("RGB0(%d,%d,%d)\n",BGR0[2],BGR0[1],BGR0[0]);
 					printf("RGB(%d,%d,%d)\n",BGR[2],BGR[1],BGR[0]);
@@ -3696,8 +3706,8 @@ void script32(String filename) {
 					printf("Exit: (%d,%d), exit_dE: %f\n",exitPt.x,exitPt.y,exit_dE);
 				}
 			}
-		}
-	}
+		} // end j
+	}// end i
 	Mat result;
 	img.copyTo(result,map);
 	imgshow(img);
