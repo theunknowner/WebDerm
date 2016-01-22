@@ -3498,12 +3498,14 @@ ShadeShape script31(String filename) {
 			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
 			HC = hc.at<float>(i,j);
 			HC0 = hc.at<float>(i,j-1);
-			int direction = HC - HC0;
+			int direction = HC - HC0; //uses int for auto floor function
 			double dE = cie.deltaE76(LAB,LAB0);
 			if(direction<0)
 				dE = -dE;
 			deltaE.push_back(dE);
 		}
+		// test code //
+
 		vector<double> oX;
 		for(unsigned int i=0; i<deltaE.size(); i++) {
 			oX.push_back(i);
@@ -3546,7 +3548,7 @@ ShadeShape script31(String filename) {
 			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
 			HC = hc.at<float>(i,j);
 			HC0 = hc.at<float>(i,j-1);
-			int direction = HC - HC0;
+			int direction = HC - HC0; //uses int for auto floor function
 			double dE = cie.deltaE76(LAB,LAB0);
 			if(direction<0)
 				dE = -dE;
@@ -3580,7 +3582,6 @@ ShadeShape script31(String filename) {
 		//imgshow(islands.at(i));
 		islands.at(i).copyTo(unionMap,islands.at(i));
 	}
-
 	ShapeColor sc;
 	cvtColor(img,imgGray,CV_BGR2GRAY);
 	Mat src = sm.prepareImage(imgGray);
@@ -3610,7 +3611,6 @@ ShadeShape script31(String filename) {
 	unionMapLC.copyTo(maskFinal,unionMapLC);
 	unionMap.copyTo(maskFinal,unionMap);
 	imgGray.copyTo(img2,maskFinal);
-	imgshow(imgGray);
 
 	int peakPos = sh.getPeakClusters(img2);
 	//printf("PeakPos: %d\n",peakPos);
@@ -3636,138 +3636,73 @@ void script32(String filename) {
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
-	Mat img, imgGray;
 	String name = filename;
-	img = imread("Looks_Like/"+name+".jpg");
+	Mat img = imread("Looks_Like/"+name+".jpg");
 	assert(img.empty()==0);
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
-	cvtColor(img,imgGray,CV_BGR2GRAY);
-	vector<int> deltaLcVec;
-	vector<int> prevMajorCenterVec;
-	int prevMajorCenter=0;
-	Size size(10,10);
-	int col=0,row=0;
-	while(row<=(imgGray.rows-size.height)) {
-		while(col<=(imgGray.cols-size.width)) {
-			vector<double> lcVec;
-			vector<int> binVec = vector<int>(256,0);
-			vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
-			for(int i=row; i<(row+size.height); i++) {
-				for(int j=0; j<(col+size.width); j++) {
-					if(i<imgGray.rows && j<imgGray.cols) {
-						int lc = imgGray.at<uchar>(i,j);
-						lcVec.push_back((double)lc);
-						binVec.at(lc)++;
-						ptVec.at(lc).push_back(Point(j,i));
-					}
+	Size size(5,5);
+	Mat smoothImg = Func::smooth(img,size,size.width,size.height);
+	Xyz xyz;
+	CieLab lab;
+	Cie cie;
+	vector<float> XYZ, XYZ0, LAB, LAB0;
+	vector<double> deltaE;
+	Mat map = Mat::zeros(img.size(),CV_8U);
+	Mat mask(size,CV_8U,Scalar(255));
+	const float thresh = 3.5;
+	Vec3b skinBGR;
+	vector<float> skinLAB;
+	for(int i=0; i<=(smoothImg.rows-size.height); i+=size.height) {
+		int entry=0;
+		//for debugging purposes
+		double entry_dE=0.0, exit_dE=0.0;
+		Point entryPt, exitPt;
+		vector<vector<Vec3b> > rgbVec;
+		vector<vector<float> > labVec;
+		///
+		for(int j=size.width; j<(smoothImg.cols-size.width); j+=size.width) {
+			Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+			// Vec3b BGR0 = rgbVec.size()>=2 ? rgbVec.at(rgbVec.size()-2) :
+			Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-size.width);
+			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+			double dE = cie.deltaE76(LAB,LAB0);
+			if(dE>thresh && entry==0) {
+				skinBGR = BGR0;
+				skinLAB = LAB0;
+				entry=1;
+				entryPt = Point(j-size.width,i);
+				entry_dE = dE;
+			}
+			if(entry==1) {
+				double dE_Skin = cie.deltaE76(skinLAB,LAB);
+				if(dE_Skin>thresh) {
+					mask.copyTo(map(Rect(j,i,mask.cols,mask.rows)));
+				} else {
+					entry = 0;
+					exitPt = Point(j,i);
+					exit_dE = dE_Skin;
+				}
+				if(i==35 && j==80) {
+					printf("SkinRGB(%d,%d,%d)\n",skinBGR[2],skinBGR[1],skinBGR[0]);
+					printf("RGB0(%d,%d,%d)\n",BGR0[2],BGR0[1],BGR0[0]);
+					printf("RGB(%d,%d,%d)\n",BGR[2],BGR[1],BGR[0]);
+					printf("dE: %f\n",dE);
+					printf("dE_Skin: %f\n",dE_Skin);
+					printf("Entry: (%d,%d), entry_dE: %f\n",entryPt.x,entryPt.y,entry_dE);
+					printf("Exit: (%d,%d), exit_dE: %f\n",exitPt.x,exitPt.y,exit_dE);
 				}
 			}
-			Cluster clst;
-			int clusters = 2;
-			Mat centers = clst.kmeansCluster(lcVec,clusters);
-			int largestCount = 0;
-			int majorCenter = 0;
-			for(int n=0; n<clusters; n++) {
-				int count = clst.getSizeOfCluster(n);
-				if(count>largestCount) {
-					largestCount = count;
-					majorCenter = round(clst.getCenter(n));
-				}
-			}
-			if(col==0) prevMajorCenter = majorCenter;
-			int deltaLC = majorCenter - prevMajorCenter;
-			deltaLcVec.push_back(abs(deltaLC));
-
-			prevMajorCenter = majorCenter;
-			col+=ceil(size.height/2);
 		}
-		row++;
-		col=0;
 	}
-	//Cluster kneeClst;
-	//Mat kneeCenters = kneeClst.kmeansCluster(deltaLcVec,2);
-	//int deltaLcKnee = round(kneeCenters.at<float>(0,kneeClst.getNumOfClusters()-1));
-	int deltaLcKnee = 15;
-	col=0; row=0;
-	int entry=0;
-	Mat result = Mat::zeros(imgGray.rows,imgGray.cols,CV_8U);
-	Mat blank = Mat::zeros(size.height,size.width,CV_8U);
-	namedWindow("Test",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	namedWindow("Result",CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
-	while(row<=(imgGray.rows-size.height)) {
-		int lumSkin = 0;
-		int lumCounter = 0;
-		while(col<=(imgGray.cols-size.width)) {
-			vector<double> lcVec;
-			vector<int> binVec = vector<int>(256,0);
-			vector<vector<Point> > ptVec = vector<vector<Point> >(256,vector<Point>(0,Point()));
-			for(int i=row; i<(row+size.height); i++) {
-				for(int j=col; j<(col+size.width); j++) {
-					if(i<imgGray.rows && j<imgGray.cols) {
-						int lc = imgGray.at<uchar>(i,j);
-						lcVec.push_back((double)lc);
-						binVec.at(lc)++;
-						ptVec.at(lc).push_back(Point(j,i));
-						blank.at<uchar>(i-row,j-col) = imgGray.at<uchar>(i,j);
-					}
-				}
-			}
-			Cluster clst;
-			int clusters = 3;
-			Mat centers = clst.kmeansCluster(lcVec,clusters);
-			int largestCount = 0;
-			int majorCenter = 0, majorCenterIdx = 0;
-			for(int n=0; n<clusters; n++) {
-				int count = clst.getSizeOfCluster(n);
-				if(count>largestCount) {
-					largestCount = count;
-					majorCenterIdx = n;
-					majorCenter = round(clst.getCenter(n));
-				}
-			}
-			if(col==0) prevMajorCenter = majorCenter;
-			int deltaLC = majorCenter - prevMajorCenter;
-
-			lumCounter = prevMajorCenter;
-			lumCounter += deltaLC;
-			if(deltaLC>deltaLcKnee || deltaLC<=(-deltaLcKnee)) {
-				if(entry==0) {
-					entry=1;
-					lumSkin = prevMajorCenterVec.at(prevMajorCenterVec.size()-3);
-				}
-				blank.copyTo(result(Rect(col,row,blank.cols,blank.rows)));
-			} else {
-				if(entry==1) {
-					blank.copyTo(result(Rect(col,row,blank.cols,blank.rows)));
-				}
-			}
-			lumCounter = min(lumCounter,255); //caps it at 255 luminance
-			int temp = lumCounter;
-			if(lumCounter>(lumSkin-10) && lumCounter<(lumSkin+10)) {
-				if(entry==1) {
-					entry=0;
-					lumCounter=0;
-				}
-			}
-
-			Mat test = imgGray.clone();
-			rectangle(test,Point(col,row),Point(col+size.width-1,row+size.height-1),Scalar(0));
-			printf("Knee: %d, LumCnt: %d, LumSkin: (%d,%d,%d), DeltaLC: %d, Entry: %d\n",deltaLcKnee,temp,lumSkin-10,lumSkin,lumSkin+10,deltaLC,entry);
-			printf("PrevCenter: %d, CurrCenter: %d\n",prevMajorCenter,majorCenter);
-			printf("Min: %.0f, Max: %.0f\n",clst.getMin(majorCenterIdx),clst.getMax(majorCenterIdx));
-			imshow("Test",test);
-			imshow("Result",result);
-			waitKey(0);
-
-			prevMajorCenter = majorCenter;
-			prevMajorCenterVec.push_back(prevMajorCenter);
-			col+=ceil(size.height/2);
-		}
-		row++;
-		col=0;
-		entry=0;
-	}
+	Mat result;
+	img.copyTo(result,map);
+	imgshow(img);
+	imgshow(smoothImg);
+	imgshow(map);
 	imgshow(result);
 }
 

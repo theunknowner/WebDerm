@@ -77,11 +77,17 @@ void imfill(Mat &img)
 //flag=0: keep window, flag=1: destroy window
 void imgshow(Mat src, int flag, String name) {
 	static int num=1;
+	static bool setName = false;
 	if(name=="") {
 		name = "img" + toString(num);
 		num++;
+		namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+	} else {
+		if(!setName) {
+			namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
+			setName = true;
+		}
 	}
-	namedWindow(name,CV_WINDOW_FREERATIO | CV_GUI_EXPANDED);
 	imshow(name,src);
 	waitKey(0);
 	if(flag==1)
@@ -515,6 +521,54 @@ void prepareImage(ImageData &id, Size size) {
 	id.extract(newImg,id.name(),0);
 	id.prevSize() = crop_img.size();
 	id.readPrevSize();
+}
+
+Mat smooth(Mat &img, Size size, int colIncr, int rowIncr) {
+	Mat results = img.clone();
+	if(img.type()==CV_8U) {
+		for(int row=0; row<=(img.rows-size.height); row+=rowIncr) {
+			for(int col=0; col<=(img.cols-size.width); col+=colIncr) {
+				int avg = 0, count=0;
+				for(int i=row; i<(img.rows+size.height); i++) {
+					for(int j=0; j<(img.cols+size.height); j++) {
+						if(i>=0 && j>=0 && i<img.rows && j<img.cols) {
+							avg += img.at<uchar>(i,j);
+							count++;
+						}
+					}
+				}
+				avg /= count;
+				Mat mask(size,img.type(),Scalar(avg));
+				mask.copyTo(results(Rect(col,row,mask.cols,mask.rows)));
+
+			} // end for col
+		} // end for row
+	} //  end if CV_8U
+	if(img.type()==CV_8UC3) {
+		for(int row=0; row<=(img.rows-size.height); row+=rowIncr) {
+			for(int col=0; col<=(img.cols-size.width); col+=colIncr) {
+				int avgRGB[3] = {0,0,0};
+				int count=0;
+				for(int i=row; i<(row+size.height); i++) {
+					for(int j=col; j<(col+size.height); j++) {
+						if(i>=0 && j>=0 && i<img.rows && j<img.cols) {
+							avgRGB[0] += img.at<Vec3b>(i,j)[2];
+							avgRGB[1] += img.at<Vec3b>(i,j)[1];
+							avgRGB[2] += img.at<Vec3b>(i,j)[0];
+							count++;
+						}
+					}
+				}
+				avgRGB[0] /= count;
+				avgRGB[1] /= count;
+				avgRGB[2] /= count;
+				Mat mask(size,img.type(),Scalar(avgRGB[2],avgRGB[1],avgRGB[0]));
+				mask.copyTo(results(Rect(col,row,mask.cols,mask.rows)));
+			} // end for col
+		} // end for row
+	} // end if CV_8UC3
+
+	return results;
 }
 
 } //end namespace

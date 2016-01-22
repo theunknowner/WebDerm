@@ -55,6 +55,7 @@ namespace Func {
 	int smallest(vector<float> vec, int rank=1);
 	Mat prepareImage(Mat input, Size size);
 	void prepareImage(ImageData &id, Size size);
+	Mat smooth(Mat &img, Size size, int colIncr=1, int rowIncr=1);
 }
 
 class Functions {
