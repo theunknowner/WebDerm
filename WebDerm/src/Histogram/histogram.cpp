@@ -4,17 +4,17 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
-
-Mat Histogram::calcHistogram(Mat src) {
+//returns a histogram using HSV
+vector<Mat> Histogram::calcHistogram(Mat src) {
 	/// Separate the image in 3 places ( B, G and R )
 	vector<Mat> bgr_planes;
 	split( src, bgr_planes );
 
 	/// Establish the number of bins
-	int histSize = 255;
+	int histSize = 256;
 
 	/// Set the ranges ( for B,G,R) )
-	float range[] = { 1, 256 } ;
+	float range[] = { 0, 256 } ; //the upper boundary is exclusive
 	const float* histRange = { range };
 
 	bool uniform = true; bool accumulate = false;
@@ -26,31 +26,32 @@ Mat Histogram::calcHistogram(Mat src) {
 	calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
 	calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
 
-	// Draw the histograms for B, G and R
+	vector<Mat> histVec = {b_hist,g_hist,r_hist};
+
+	return histVec;
+}
+
+Mat Histogram::drawHistogram(vector<Mat> histVec) {
 	int hist_w = 700; int hist_h = 512;
-	int bin_w = cvRound( (double) hist_w/histSize );
-
 	Mat histImage( hist_h, hist_w, CV_8UC3, Scalar( 0,0,0) );
+	vector<Scalar> colorVec = {Scalar(255,0,0),Scalar(0,255,0),Scalar(0,0,255)};
+	for(unsigned int n=0; n<histVec.size(); n++) {
+		cout << histVec.size() << endl;
+		int histSize = histVec.at(n).rows;
+		Mat hist = histVec.at(n);
+		normalize(hist, hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
 
-	/// Normalize the result to [ 0, histImage.rows ]
-	normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-	normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-	normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+		// Draw the histograms for B, G and R
+		int bin_w = cvRound( (double) hist_w/histSize );
 
-	/// Draw for each channel
-	for( int i = 1; i < histSize; i++ )
-	{
-		line( histImage, Point( bin_w*(i-1), hist_h - cvRound(b_hist.at<float>(i-1)) ) ,
-				Point( bin_w*(i), hist_h - cvRound(b_hist.at<float>(i)) ),
-				Scalar( 255, 0, 0), 2, 8, 0  );
-		line( histImage, Point( bin_w*(i-1), hist_h - cvRound(g_hist.at<float>(i-1)) ) ,
-				Point( bin_w*(i), hist_h - cvRound(g_hist.at<float>(i)) ),
-				Scalar( 0, 255, 0), 2, 8, 0  );
-		line( histImage, Point( bin_w*(i-1), hist_h - cvRound(r_hist.at<float>(i-1)) ) ,
-				Point( bin_w*(i), hist_h - cvRound(r_hist.at<float>(i)) ),
-				Scalar( 0, 0, 255), 2, 8, 0  );
+		/// Draw for each channel
+		for( int i = 1; i < histSize; i++ )
+		{
+			line( histImage, Point( bin_w*(i-1), hist_h - cvRound(hist.at<float>(i-1)) ) ,
+					Point( bin_w*(i), hist_h - cvRound(hist.at<float>(i)) ),
+					colorVec.at(n), 2, 8, 0  );
+		}
 	}
-
 	return histImage;
 }
 
@@ -287,4 +288,21 @@ void Histogram::lightEqualizer(Mat src, Mat &dst) {
 			dst.at<Vec3b>(i,j)[0] = RGB[2];
 		}
 	}*/
+}
+
+//compares two images' histogram
+float Histogram::compareHistogram(Mat src1, Mat src2) {
+	vector<Mat> histVec1 = this->calcHistogram(src1);
+	vector<Mat> histVec2 = this->calcHistogram(src2);
+
+	/// Apply the histogram comparison methods
+	for( int i = 0; i < 4; i++ )
+	{
+		int compare_method = i;
+		for(unsigned int n=0; n<histVec1.size(); n++) {
+			double base_base = compareHist( histVec1.at(n), histVec2.at(n), compare_method );
+			printf( " Method [%d] %d: %f\n", i, n, base_base);
+		}
+	}
+	return 0.0;
 }

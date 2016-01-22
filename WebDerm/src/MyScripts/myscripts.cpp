@@ -3565,6 +3565,8 @@ ShadeShape script31(String filename) {
 			}
 		}
 	}
+	imgshow(map);
+	exit(1);
 	ShapeMorph sm;
 	Mat map2 = sm.densityConnector(map,0.9999);
 	Mat map3 = sm.haloTransform(map2,2);
@@ -3633,8 +3635,6 @@ void script32(String filename) {
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
-	KneeCurve kc;
-	Histogram hg;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
@@ -3673,6 +3673,7 @@ void script32(String filename) {
 			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
 			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
 			double dE = cie.deltaE76(LAB,LAB0);
+			deltaE.push_back(dE);
 
 			if(dE>thresh && entry==0) {
 				//skinBGR = BGR0;
@@ -3680,40 +3681,51 @@ void script32(String filename) {
 				skinBGR =  smoothImg.at<Vec3b>(i,j-(size.width*2));
 				vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
 				skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
-				entry=1;
-				entryPt = Point(j-size.width,i);
+				entry++;
+				entryPt = Point(j,i);
 				entry_dE = dE;
 			}
-			if(entry==1) {
-				double dE_Skin = cie.deltaE76(skinLAB,LAB);
-				if(dE_Skin>thresh) {
+			/*if(i==30) {
+				printf("j:%d\n",j);
+				printf("EntryFlag: %d\n",entry);
+				printf("SkinRGB(%d,%d,%d)\n",skinBGR[2],skinBGR[1],skinBGR[0]);
+				printf("RGB0(%d,%d,%d)\n",BGR0[2],BGR0[1],BGR0[0]);
+				printf("RGB(%d,%d,%d)\n",BGR[2],BGR[1],BGR[0]);
+				printf("dE: %f\n",dE);
+			}*/
+			double dE_Skin = -1.0;
+			if(entry>=1) {
+				dE_Skin = cie.deltaE76(skinLAB,LAB);
+				if(dE_Skin>thresh || entry==1) {
 					mask.copyTo(map(Rect(j,i,mask.cols,mask.rows)));
-				} else {
+					entry++;
+				} else if(entry>1) {
 					entry = 0;
 					exitPt = Point(j,i);
 					exit_dE = dE_Skin;
 					skinBGR =  smoothImg.at<Vec3b>(i,j+(size.width));
 					vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
 					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
-				}
-				if(i==35 && j==75) {
-					printf("SkinRGB(%d,%d,%d)\n",skinBGR[2],skinBGR[1],skinBGR[0]);
-					printf("RGB0(%d,%d,%d)\n",BGR0[2],BGR0[1],BGR0[0]);
-					printf("RGB(%d,%d,%d)\n",BGR[2],BGR[1],BGR[0]);
-					printf("dE: %f\n",dE);
-					printf("dE_Skin: %f\n",dE_Skin);
-					printf("Entry: (%d,%d), entry_dE: %f\n",entryPt.x,entryPt.y,entry_dE);
-					printf("Exit: (%d,%d), exit_dE: %f\n",exitPt.x,exitPt.y,exit_dE);
+					j+=size.width;
 				}
 			}
+			/*if(i==30) {
+				printf("dE_Skin: %f\n",dE_Skin);
+				printf("Entry: (%d,%d), entry_dE: %f\n",entryPt.x,entryPt.y,entry_dE);
+				printf("Exit: (%d,%d), exit_dE: %f\n",exitPt.x,exitPt.y,exit_dE);
+				cout << "---------------------------" << endl;
+			}*/
 		} // end j
+		deltaE.clear();
 	}// end i
-	Mat result;
+	Mat result, test;
 	img.copyTo(result,map);
+	smoothImg.copyTo(test,map);
 	imgshow(img);
 	imgshow(smoothImg);
-	imgshow(map);
+	imgshow(test);
 	imgshow(result);
+	imwrite("smoothImg.png",smoothImg);
 }
 
 }// end namespace

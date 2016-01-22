@@ -1683,7 +1683,6 @@ Mat ShapeMorph::removeNoiseOnBoundary2(Mat src) {
 	KneeCurve kc;
 	int idx = kc.kneeCurvePoint(vec);
 	double thresh = vec.at(idx);
-	cout << thresh << endl;
 
 	Mat map(src.size(),CV_8U,Scalar(255));
 	for(int i=0; i<src.rows; i++) {
