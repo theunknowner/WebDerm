@@ -16,6 +16,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Pathfind/pathfind.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 
 void ShapeMorph::setDebugMode(bool mode) {
 	this->debugMode = mode;
@@ -1663,6 +1664,53 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 	}
 
 	return mapEdgeRemoval;
+}
+
+Mat ShapeMorph::removeNoiseOnBoundary2(Mat src) {
+	Hsl hsl;
+	vector<double> HSL;
+	vector<double> vec;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			Vec3b RGB = src.at<Vec3b>(i,j);
+			vector<double> HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
+			HSL.at(1) = roundDecimal(HSL.at(1),2) * 100;
+			HSL.at(2) = roundDecimal(HSL.at(2),2) * 100;
+			float val = (100.0 - HSL.at(1)) - HSL.at(2);
+			vec.push_back(val);
+		}
+	}
+	KneeCurve kc;
+	int idx = kc.kneeCurvePoint(vec);
+	double thresh = vec.at(idx);
+	cout << thresh << endl;
+
+	Mat map(src.size(),CV_8U,Scalar(255));
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			int flag = 0;
+			Vec3b RGB = src.at<Vec3b>(i,j);
+			vector<double> HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
+			HSL.at(1) = roundDecimal(HSL.at(1),2) * 100;
+			HSL.at(2) = roundDecimal(HSL.at(2),2) * 100;
+			float val = (100.0 - HSL.at(1)) - HSL.at(2);
+			for(int y=i-1; y<=i+1; y++) {
+				for(int x=j-1; x<=j+1; x++) {
+					if(y!=i && x!=j) {
+						if(x<0 || y<0 || x>=src.cols || y>=src.rows) {
+							flag = 1;
+						} else if(map.at<uchar>(y,x)==0) {
+							flag = 1;
+						}
+					}
+				}
+			}
+			if(val>thresh && flag==1) {
+				map.at<uchar>(i,j) = 0;
+			}
+		}
+	}
+	return map;
 }
 
 Mat ShapeMorph::densityDisconnector(Mat src, double q, double coeff) {

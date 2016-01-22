@@ -56,6 +56,7 @@ public:
 	vector<vector<Point> > findBoundary(Mat src);
 	int countEdgeTouching(Mat src, int sideEdgeSize, int cornerEdgeSize);
 	Mat removeNoiseOnBoundary(Mat src);
+	Mat removeNoiseOnBoundary2(Mat src);
 	Mat densityDisconnector(Mat src,double q, double coeff=1.0);
 	vector<Mat> liquidFeatureExtractionInverse(Mat src);
 
