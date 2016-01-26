@@ -110,8 +110,8 @@ int main(int argc,char** argv)
 		ShadeShape ss1 = Scripts::script31(name);
 	}
 /**/
-	Scripts::script31("lph4");
-	//ShadeShape ss1 = Scripts::script31("psoriasis26");
+	//Scripts::script33("tinea_corporis4");
+	ShadeShape ss1 = Scripts::script31("tinea_corporis4");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	//ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;

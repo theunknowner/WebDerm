@@ -3458,6 +3458,7 @@ ShadeShape script31(String filename) {
 	Shades sh;
 	Poly poly;
 	KneeCurve kc;
+	ShapeMorph sm;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
@@ -3467,6 +3468,7 @@ ShadeShape script31(String filename) {
 	assert(img.empty()==0);
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
+	//Mat nonNoiseMap = sm.removeNoiseOnBoundary2(img);
 	Xyz xyz;
 	CieLab lab;
 	Cie cie;
@@ -3565,9 +3567,6 @@ ShadeShape script31(String filename) {
 			}
 		}
 	}
-	imgshow(map);
-	exit(1);
-	ShapeMorph sm;
 	Mat map2 = sm.densityConnector(map,0.9999);
 	Mat map3 = sm.haloTransform(map2,2);
 	map3.convertTo(map3,CV_8U);
@@ -3609,11 +3608,19 @@ ShadeShape script31(String filename) {
 		//imgshow(islands.at(i));
 		islandsLC.at(i).copyTo(unionMapLC,islandsLC.at(i));
 	}
-
 	Mat maskFinal;
 	unionMapLC.copyTo(maskFinal,unionMapLC);
 	unionMap.copyTo(maskFinal,unionMap);
 	imgGray.copyTo(img2,maskFinal);
+	Mat test, test2,test3;
+	img.copyTo(test,maskFinal);
+	img.copyTo(test2,unionMap);
+	img.copyTo(test3,unionMapLC);
+	imgshow(img);
+	imgshow(test);
+	imgshow(test2);
+	imgshow(test3);
+	exit(1);
 
 	int peakPos = sh.getPeakClusters(img2);
 	//printf("PeakPos: %d\n",peakPos);
@@ -3631,10 +3638,12 @@ ShadeShape script31(String filename) {
 	return ss;
 }
 
+//! using new deltaE-max
 void script32(String filename) {
 	Rgb rgb;
 	Hsl hsl;
 	Shades sh;
+	ShapeMorph sm;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
@@ -3645,6 +3654,7 @@ void script32(String filename) {
 	img = runResizeImage(img,Size(140,140));
 	Size size(5,5);
 	Mat smoothImg = Func::smooth(img,size,size.width,size.height);
+	Mat nonNoiseMap = sm.removeNoiseOnBoundary2(smoothImg);
 	Xyz xyz;
 	CieLab lab;
 	Cie cie;
@@ -3658,74 +3668,223 @@ void script32(String filename) {
 
 	for(int i=0; i<=(smoothImg.rows-size.height); i+=size.height) {
 		int entry=0;
-		//for debugging purposes
+		/// for debugging purposes
 		double entry_dE=0.0, exit_dE=0.0;
 		Point entryPt, exitPt;
 		vector<vector<Vec3b> > rgbVec;
 		vector<vector<float> > labVec;
 		///
-		for(int j=size.width; j<(smoothImg.cols-size.width); j+=size.width) {
-			Vec3b BGR = smoothImg.at<Vec3b>(i,j);
-			//Vec3b BGR0 = rgbVec.size()>=2 ? rgbVec.at(rgbVec.size()-2) :
-			Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-size.width);
+		for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
+			if(nonNoiseMap.at<uchar>(i,j)>0) {
+				Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+				Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-size.width);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				double dE = cie.deltaE76(LAB,LAB0);
+				deltaE.push_back(dE);
+
+				if(dE>thresh && entry==0) {
+					//skinBGR = BGR0;
+					//skinLAB = LAB0;
+					skinBGR =  smoothImg.at<Vec3b>(i,j-(size.width*2));
+					vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
+					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
+					entry++;
+					entryPt = Point(j,i);
+					entry_dE = dE;
+				}
+				if(i==35) {
+					printf("j:%d\n",j);
+					printf("EntryFlag: %d\n",entry);
+					printf("SkinRGB(%d,%d,%d)\n",skinBGR[2],skinBGR[1],skinBGR[0]);
+					printf("RGB0(%d,%d,%d)\n",BGR0[2],BGR0[1],BGR0[0]);
+					printf("RGB(%d,%d,%d)\n",BGR[2],BGR[1],BGR[0]);
+					printf("dE: %f\n",dE);
+				}
+				double dE_Skin = -1.0;
+				if(entry>=1) {
+					dE_Skin = cie.deltaE76(skinLAB,LAB);
+					if(dE_Skin>thresh || entry==1) {
+						mask.copyTo(map(Rect(j,i,mask.cols,mask.rows)));
+						entry++;
+					} else if(entry>1) {
+						entry = 0;
+						exitPt = Point(j,i);
+						exit_dE = dE_Skin;
+						skinBGR =  smoothImg.at<Vec3b>(i,j+(size.width));
+						vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
+						skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
+						j+=size.width;
+					}
+				}
+				if(i==35) {
+					printf("dE_Skin: %f\n",dE_Skin);
+					printf("Entry: (%d,%d), entry_dE: %f\n",entryPt.x,entryPt.y,entry_dE);
+					printf("Exit: (%d,%d), exit_dE: %f\n",exitPt.x,exitPt.y,exit_dE);
+					cout << "---------------------------" << endl;
+				}
+			}
+		} // end j
+		deltaE.clear();
+	}// end i
+	Mat result, test, test2;
+	img.copyTo(result,map);
+	smoothImg.copyTo(test,map);
+	smoothImg.copyTo(test2,nonNoiseMap);
+	imgshow(test2);
+	//imgshow(img);
+	imgshow(smoothImg);
+	imgshow(test);
+	imgshow(result);
+	//imwrite("smoothImg.png",smoothImg);
+}
+
+void script33(String filename) {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	Poly poly;
+	KneeCurve kc;
+	ShapeMorph sm;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	String name = filename;
+	Mat img = imread("Looks_Like/"+name+".jpg");
+	assert(img.empty()==0);
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
+	Xyz xyz;
+	CieLab lab;
+	Cie cie;
+	vector<float> XYZ, XYZ0, LAB, LAB0;
+	vector<double> deltaE, HSL;
+	Mat hvec(img.size(),CV_32F,Scalar(0));
+	Mat svec(img.size(),CV_32F,Scalar(0));
+	Mat lvec(img.size(),CV_32F,Scalar(0));
+	double HC, HC0;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=0; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+			hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+			svec.at<float>(i,j) = round(HSL.at(1) * 100);
+			lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+		}
+	}
+	Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
+	vector<double> pulldown;
+	vector<double> imgRowSlope;
+	vector<double> imgRowAvg;
+	for(int i=0; i<img.rows; i++) {
+		for(int j=1; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
 			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
 			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
 			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
 			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+			HC = hc.at<float>(i,j);
+			HC0 = hc.at<float>(i,j-1);
+			int direction = HC - HC0; //uses int for auto floor function
 			double dE = cie.deltaE76(LAB,LAB0);
+			if(direction<0)
+				dE = -dE;
 			deltaE.push_back(dE);
+		}
+		// test code //
 
-			if(dE>thresh && entry==0) {
-				//skinBGR = BGR0;
-				//skinLAB = LAB0;
-				skinBGR =  smoothImg.at<Vec3b>(i,j-(size.width*2));
-				vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
-				skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
-				entry++;
-				entryPt = Point(j,i);
-				entry_dE = dE;
+		vector<double> oX;
+		for(unsigned int i=0; i<deltaE.size(); i++) {
+			oX.push_back(i);
+		}
+		vector<double> coeffs = poly.polyfit(oX,deltaE,1);
+		vector<double> oVals = poly.polyval(coeffs,oX);
+		double slope = (oVals.back() - oVals.front()) / oVals.size();
+		double avg = (oVals.front() + oVals.back()) / 2;
+		double pd=0;
+		for(unsigned int j=0; j<deltaE.size(); j++) {
+			if(slope<0.07) {
+				if(avg>=0)
+					pd = deltaE.at(j) - avg;
+				else
+					pd = deltaE.at(j) + avg;
 			}
-			/*if(i==30) {
-				printf("j:%d\n",j);
-				printf("EntryFlag: %d\n",entry);
-				printf("SkinRGB(%d,%d,%d)\n",skinBGR[2],skinBGR[1],skinBGR[0]);
-				printf("RGB0(%d,%d,%d)\n",BGR0[2],BGR0[1],BGR0[0]);
-				printf("RGB(%d,%d,%d)\n",BGR[2],BGR[1],BGR[0]);
-				printf("dE: %f\n",dE);
-			}*/
-			double dE_Skin = -1.0;
-			if(entry>=1) {
-				dE_Skin = cie.deltaE76(skinLAB,LAB);
-				if(dE_Skin>thresh || entry==1) {
-					mask.copyTo(map(Rect(j,i,mask.cols,mask.rows)));
-					entry++;
-				} else if(entry>1) {
-					entry = 0;
-					exitPt = Point(j,i);
-					exit_dE = dE_Skin;
-					skinBGR =  smoothImg.at<Vec3b>(i,j+(size.width));
-					vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
-					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
-					j+=size.width;
-				}
+			else {
+				pd = deltaE.at(j);
 			}
-			/*if(i==30) {
-				printf("dE_Skin: %f\n",dE_Skin);
-				printf("Entry: (%d,%d), entry_dE: %f\n",entryPt.x,entryPt.y,entry_dE);
-				printf("Exit: (%d,%d), exit_dE: %f\n",exitPt.x,exitPt.y,exit_dE);
-				cout << "---------------------------" << endl;
-			}*/
-		} // end j
+			pulldown.push_back(abs(pd));
+		}
+
+		imgRowSlope.push_back(slope);
+		imgRowAvg.push_back(avg);
 		deltaE.clear();
-	}// end i
-	Mat result, test;
-	img.copyTo(result,map);
-	smoothImg.copyTo(test,map);
+	}//end row
+
+	Cluster clst;
+	clst.kmeansCluster(pulldown,3);
+
+	double thresh = clst.getMin(clst.getNumOfClusters()-1) * 0.90;
+	Mat map(img.size(),CV_8U, Scalar(0));
+	for(int i=0; i<img.rows; i++) {
+		for(int j=1; j<img.cols; j++) {
+			Vec3b BGR = img.at<Vec3b>(i,j);
+			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+			HC = hc.at<float>(i,j);
+			HC0 = hc.at<float>(i,j-1);
+			int direction = HC - HC0; //uses int for auto floor function
+			double dE = cie.deltaE76(LAB,LAB0);
+			if(direction<0)
+				dE = -dE;
+			if(imgRowSlope.at(i)<0.07) {
+				if(imgRowAvg.at(i)>=0)
+					dE -= imgRowAvg.at(i);
+				else
+					dE += imgRowAvg.at(i);
+
+			}
+			if(abs(dE)>=thresh) {
+				map.at<uchar>(i,j) = 255;
+			}
+		}
+	}
+	Mat map2 = sm.densityConnector(map,0.9999,1.0,2.0);
+	Mat map3 = sm.haloTransform(map2,2);
+	map3.convertTo(map3,CV_8U);
+	map3 = (map3 - 5) * 255; //removes non-noticeable pixels
+	vector<Mat> islands = sm.liquidFeatureExtraction(map3,0,-1);
+	int maxIslandIdx = 0, maxCount = 0;
+	for(unsigned int i=0; i<islands.size(); i++) {
+		int count = countNonZero(islands.at(i));
+		if(count>maxCount) {
+			maxCount = count;
+			maxIslandIdx = i;
+		}
+	}
+	Mat mask, idxMat;
+	mask = islands.at(maxIslandIdx).clone();
+	for(int i=0; i<mask.rows; i++) {
+		cv::findNonZero(mask.row(i),idxMat);
+		if(!idxMat.empty()) {
+			Point pt1(idxMat.at<Point>(0).x,i);
+			Point pt2(idxMat.at<Point>(idxMat.total()-1).x,i);
+			cv::line(mask,pt1,pt2,Scalar(255));
+			idxMat.release();
+		}
+	}
+	Mat results;
+	img.copyTo(results,mask);
+	imgshow(islands.at(maxIslandIdx));
+	imgshow(mask);
+	imgshow(results);
 	imgshow(img);
-	imgshow(smoothImg);
-	imgshow(test);
-	imgshow(result);
-	imwrite("smoothImg.png",smoothImg);
+
 }
 
 }// end namespace

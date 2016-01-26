@@ -50,7 +50,7 @@ public:
 
 	vector<Mat> lumFilter1(Mat src, int featuresToHold=1);
 	vector<Mat> lumFilter2(Mat src, int featuresToHold=1);
-	Mat densityConnector(Mat src,double q, double coeff=1.0);
+	Mat densityConnector(Mat src,double q, double coeff=1.0, double increment=0.0);
 	Mat origFilter(Mat src, double shift=1.0);
 	Mat closeFilter(Mat src, Size elementSize, double shift=1.0);
 	vector<vector<Point> > findBoundary(Mat src);

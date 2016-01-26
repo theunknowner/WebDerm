@@ -1463,7 +1463,7 @@ Mat ShapeMorph::customFn2(Mat src) {
 
 //! Nearest neighbor connector base on density
 //! q = probability of connecting to a neighboring unit
-Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
+Mat ShapeMorph::densityConnector(Mat src, double q, double coeff, double increment) {
 	//Mat map = src.clone();
 	if(src.empty()) {
 		printf("ShapeMorph::densityConnector() src is empty\n");
@@ -1534,7 +1534,7 @@ Mat ShapeMorph::densityConnector(Mat src, double q, double coeff) {
 	}
 	//connect nearest neighbors
 	double b = fxThresh;
-	double a = pow(-coeff*log(1.0-q)/(3.14159 * b),0.5);
+	double a = pow(-coeff*log(1.0-q)/(3.14159 * b),0.5) + increment;
 	Mat result(src.rows,src.cols,CV_8U,Scalar(0));
 	row=0; col=0;
 	a = ceil(a);
@@ -1666,12 +1666,15 @@ Mat ShapeMorph::removeNoiseOnBoundary(Mat src) {
 	return mapEdgeRemoval;
 }
 
+//! returns map of image after noise removal
+//! input is a 5x5 smoothed image using Func::smooth()
 Mat ShapeMorph::removeNoiseOnBoundary2(Mat src) {
 	Hsl hsl;
 	vector<double> HSL;
 	vector<double> vec;
-	for(int i=0; i<src.rows; i++) {
-		for(int j=0; j<src.cols; j++) {
+	Size size(5,5);
+	for(int i=0; i<=(src.rows-size.height); i+=size.height) {
+		for(int j=0; j<=(src.cols-size.width); j+=size.width) {
 			Vec3b RGB = src.at<Vec3b>(i,j);
 			vector<double> HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
 			HSL.at(1) = roundDecimal(HSL.at(1),2) * 100;
@@ -1685,16 +1688,17 @@ Mat ShapeMorph::removeNoiseOnBoundary2(Mat src) {
 	double thresh = vec.at(idx);
 
 	Mat map(src.size(),CV_8U,Scalar(255));
-	for(int i=0; i<src.rows; i++) {
-		for(int j=0; j<src.cols; j++) {
+	Mat mask = Mat::zeros(size,CV_8U);
+	for(int i=0; i<=(src.rows-size.height); i+=size.height) {
+		for(int j=0; j<=(src.cols-size.width); j+=size.width) {
 			int flag = 0;
 			Vec3b RGB = src.at<Vec3b>(i,j);
 			vector<double> HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
-			HSL.at(1) = roundDecimal(HSL.at(1),2) * 100;
-			HSL.at(2) = roundDecimal(HSL.at(2),2) * 100;
+			HSL.at(1) = round(HSL.at(1) * 100);
+			HSL.at(2) = round(HSL.at(2) * 100);
 			float val = (100.0 - HSL.at(1)) - HSL.at(2);
-			for(int y=i-1; y<=i+1; y++) {
-				for(int x=j-1; x<=j+1; x++) {
+			for(int y=(i-size.height); y<=(i+size.height); y+=size.height) {
+				for(int x=(j-size.width); x<=(j+size.width); x+=size.width) {
 					if(y!=i && x!=j) {
 						if(x<0 || y<0 || x>=src.cols || y>=src.rows) {
 							flag = 1;
@@ -1705,7 +1709,7 @@ Mat ShapeMorph::removeNoiseOnBoundary2(Mat src) {
 				}
 			}
 			if(val>thresh && flag==1) {
-				map.at<uchar>(i,j) = 0;
+				mask.copyTo(map(Rect(j,i,mask.cols,mask.rows)));
 			}
 		}
 	}
