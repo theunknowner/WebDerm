@@ -3746,7 +3746,6 @@ void script33(String filename) {
 	Hsl hsl;
 	Shades sh;
 	Poly poly;
-	KneeCurve kc;
 	ShapeMorph sm;
 	rgb.importThresholds();
 	hsl.importHslThresholds();
@@ -3756,6 +3755,9 @@ void script33(String filename) {
 	assert(img.empty()==0);
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
+	Size size(5,5);
+	Mat smoothImg = Func::smooth(img,size,size.width,size.height);
+	Mat nonNoiseMap = sm.removeNoiseOnBoundary2(smoothImg);
 	Xyz xyz;
 	CieLab lab;
 	Cie cie;
@@ -3767,11 +3769,13 @@ void script33(String filename) {
 	double HC, HC0;
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
-			Vec3b BGR = img.at<Vec3b>(i,j);
-			HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
-			hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
-			svec.at<float>(i,j) = round(HSL.at(1) * 100);
-			lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+			if(nonNoiseMap.at<uchar>(i,j)>0) {
+				Vec3b BGR = img.at<Vec3b>(i,j);
+				HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+				hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+				svec.at<float>(i,j) = round(HSL.at(1) * 100);
+				lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+			}
 		}
 	}
 	Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
@@ -3780,21 +3784,22 @@ void script33(String filename) {
 	vector<double> imgRowAvg;
 	for(int i=0; i<img.rows; i++) {
 		for(int j=1; j<img.cols; j++) {
-			Vec3b BGR = img.at<Vec3b>(i,j);
-			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
-			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
-			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
-			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
-			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
-			HC = hc.at<float>(i,j);
-			HC0 = hc.at<float>(i,j-1);
-			int direction = HC - HC0; //uses int for auto floor function
-			double dE = cie.deltaE76(LAB,LAB0);
-			if(direction<0)
-				dE = -dE;
-			deltaE.push_back(dE);
+			if(nonNoiseMap.at<uchar>(i,j)>0) {
+				Vec3b BGR = img.at<Vec3b>(i,j);
+				Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				HC = hc.at<float>(i,j);
+				HC0 = hc.at<float>(i,j-1);
+				int direction = HC - HC0; //uses int for auto floor function
+				double dE = cie.deltaE76(LAB,LAB0);
+				if(direction<0)
+					dE = -dE;
+				deltaE.push_back(dE);
+			}
 		}
-		// test code //
 
 		vector<double> oX;
 		for(unsigned int i=0; i<deltaE.size(); i++) {
@@ -3824,41 +3829,40 @@ void script33(String filename) {
 	}//end row
 
 	Cluster clst;
-	clst.kmeansCluster(pulldown,3);
+	clst.kmeansCluster(pulldown,2);
 
-	double thresh = clst.getMin(clst.getNumOfClusters()-1) * 0.90;
+	double thresh = clst.getMin(clst.getNumOfClusters()-1) * 0.80;
 	Mat map(img.size(),CV_8U, Scalar(0));
 	for(int i=0; i<img.rows; i++) {
 		for(int j=1; j<img.cols; j++) {
-			Vec3b BGR = img.at<Vec3b>(i,j);
-			Vec3b BGR0 = img.at<Vec3b>(i,j-1);
-			XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
-			LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
-			XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
-			LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
-			HC = hc.at<float>(i,j);
-			HC0 = hc.at<float>(i,j-1);
-			int direction = HC - HC0; //uses int for auto floor function
-			double dE = cie.deltaE76(LAB,LAB0);
-			if(direction<0)
-				dE = -dE;
-			if(imgRowSlope.at(i)<0.07) {
-				if(imgRowAvg.at(i)>=0)
-					dE -= imgRowAvg.at(i);
-				else
-					dE += imgRowAvg.at(i);
+			if(nonNoiseMap.at<uchar>(i,j)>0) {
+				Vec3b BGR = img.at<Vec3b>(i,j);
+				Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				HC = hc.at<float>(i,j);
+				HC0 = hc.at<float>(i,j-1);
+				int direction = HC - HC0; //uses int for auto floor function
+				double dE = cie.deltaE76(LAB,LAB0);
+				if(direction<0)
+					dE = -dE;
+				if(imgRowSlope.at(i)<0.07) {
+					if(imgRowAvg.at(i)>=0)
+						dE -= imgRowAvg.at(i);
+					else
+						dE += imgRowAvg.at(i);
 
-			}
-			if(abs(dE)>=thresh) {
-				map.at<uchar>(i,j) = 255;
+				}
+				if(abs(dE)>=thresh) {
+					map.at<uchar>(i,j) = 255;
+				}
 			}
 		}
 	}
 	Mat map2 = sm.densityConnector(map,0.9999,1.0,2.0);
-	Mat map3 = sm.haloTransform(map2,2);
-	map3.convertTo(map3,CV_8U);
-	map3 = (map3 - 5) * 255; //removes non-noticeable pixels
-	vector<Mat> islands = sm.liquidFeatureExtraction(map3,0,-1);
+	vector<Mat> islands = sm.liquidFeatureExtraction(map2,0,-1);
 	int maxIslandIdx = 0, maxCount = 0;
 	for(unsigned int i=0; i<islands.size(); i++) {
 		int count = countNonZero(islands.at(i));
@@ -3878,10 +3882,52 @@ void script33(String filename) {
 			idxMat.release();
 		}
 	}
+	Mat map3 = sm.haloTransform(mask,2);
+	map3.convertTo(map3,CV_8U);
+	map3 = (map3 - 5) * 255; //removes non-noticeable pixels
+
+	//new deltaE
+	const float dE_thresh = 3.5;
+	Vec3b skinBGR;
+	vector<float> skinLAB;
+	Mat mask2 = Mat::zeros(size,CV_8U);
+	for(int i=0; i<=(smoothImg.rows-size.height); i+=size.height) {
+		int entry=0;
+		/// for debugging purposes
+		vector<vector<Vec3b> > rgbVec;
+		vector<vector<float> > labVec;
+		///
+		for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
+			if(nonNoiseMap.at<uchar>(i,j)>0 && map3.at<uchar>(i,j)>0) {
+				Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+				Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-size.width);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				double dE = cie.deltaE76(LAB,LAB0);
+
+				if(dE>dE_thresh && entry==0) {
+					skinBGR =  smoothImg.at<Vec3b>(i,j-(size.width*2));
+					vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
+					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
+					entry=1;
+				}
+				double dE_Skin = -1.0;
+				if(entry==1) {
+					dE_Skin = cie.deltaE76(skinLAB,LAB);
+					if(dE_Skin<dE_thresh) {
+						mask2.copyTo(map3(Rect(j,i,mask2.cols,mask2.rows)));
+					}
+				}
+			}
+		} // end j
+	}// end i
+
 	Mat results;
-	img.copyTo(results,mask);
+	img.copyTo(results,map3);
 	imgshow(islands.at(maxIslandIdx));
-	imgshow(mask);
+	imgshow(map3);
 	imgshow(results);
 	imgshow(img);
 
