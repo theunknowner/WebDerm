@@ -3798,9 +3798,10 @@ void script33(String filename) {
 				if(direction<0)
 					dE = -dE;
 				deltaE.push_back(dE);
+			} else {
+				deltaE.push_back(0.0);
 			}
 		}
-
 		vector<double> oX;
 		for(unsigned int i=0; i<deltaE.size(); i++) {
 			oX.push_back(i);
@@ -3822,12 +3823,10 @@ void script33(String filename) {
 			}
 			pulldown.push_back(abs(pd));
 		}
-
 		imgRowSlope.push_back(slope);
 		imgRowAvg.push_back(avg);
 		deltaE.clear();
 	}//end row
-
 	Cluster clst;
 	clst.kmeansCluster(pulldown,2);
 
@@ -3886,17 +3885,107 @@ void script33(String filename) {
 	map3.convertTo(map3,CV_8U);
 	map3 = (map3 - 5) * 255; //removes non-noticeable pixels
 
+	vector<double> deltaE2;
+	for(int i=0; i<=smoothImg.rows-size.height; i+=size.height) {
+		for(int j=size.width; j<=smoothImg.cols-size.width; j+=size.width) {
+			if(nonNoiseMap.at<uchar>(i,j)>0 && map3.at<uchar>(i,j)>0) {
+				int decrement = 0;
+				if(j-(size.width*2)>=0) decrement = size.width*2;
+				else if(j-(size.width)>=0) decrement = size.width;
+				else decrement = 0;
+				Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+				Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-decrement);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				double dE = cie.deltaE76(LAB,LAB0);
+				deltaE2.push_back(dE);
+			}
+		}
+	}
+
+	Cluster clst2;
+	clst2.kmeansCluster(deltaE2,2);
+	double t = clst2.getMin(clst2.getNumOfClusters()-1) * 0.75;
+	cout << t << endl;
+
 	//new deltaE
-	const float dE_thresh = 3.5;
+	const float dE_thresh = floor(t);
 	Vec3b skinBGR;
 	vector<float> skinLAB;
 	Mat mask2 = Mat::zeros(size,CV_8U);
+	Mat map4 = map3.clone();
 	for(int i=0; i<=(smoothImg.rows-size.height); i+=size.height) {
-		int entry=0;
 		/// for debugging purposes
+		Point entryPt;
+		float entry_dE = 0.0;
 		vector<vector<Vec3b> > rgbVec;
 		vector<vector<float> > labVec;
 		///
+		for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
+			if(nonNoiseMap.at<uchar>(i,j)>0 && map3.at<uchar>(i,j)>0) {
+				int decrement = 0;
+				if(j-(size.width*2)>=0) decrement = size.width*2;
+				else if(j-(size.width)>=0) decrement = size.width;
+				else decrement = 0;
+				Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+				Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-decrement);
+				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+				LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+				XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+				double dE = cie.deltaE76(LAB,LAB0);
+
+				vector<double> HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+				vector<double> HSL0 = hsl.rgb2hsl(BGR0[2],BGR0[1],BGR0[0]);
+				int index = hsl.getIndex(HSL[0],HSL[1],HSL[2]);
+				int index0 = hsl.getIndex(HSL0[0],HSL0[1],HSL0[2]);
+
+				int entry=0;
+				if(dE<dE_thresh && (index==index0)) {
+					entry=0;
+				} else {
+					entry = 1;
+				}
+				if(entry==1) {
+					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+				}
+				/*if(dE>dE_thresh) {
+					decrement = 0;
+					if(j-(size.width*2)>=0) decrement = size.width*2;
+					else if(j-(size.width)>=0) decrement = size.width;
+					else decrement = 0;
+
+					skinBGR =  smoothImg.at<Vec3b>(i,j-decrement);
+					vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
+					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
+					entryPt = Point(j,i);
+					entry_dE = dE;
+					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+					entry=1;
+
+				}*/
+				/*if(i==135) {
+					printf("j:%d\n",j);
+					printf("SkinRGB(%d,%d,%d)\n",skinBGR[2],skinBGR[1],skinBGR[0]);
+					printf("RGB0(%d,%d,%d)\n",BGR0[2],BGR0[1],BGR0[0]);
+					printf("RGB(%d,%d,%d)\n",BGR[2],BGR[1],BGR[0]);
+					printf("dE: %f\n",dE);
+					printf("Entry: (%d,%d), entry_dE: %f\n",entryPt.x,entryPt.y,entry_dE);
+					cout << "---------------------------" << endl;
+				}*/
+				if(entry==1) break;
+			}
+			if(j==(smoothImg.cols-size.width)) {
+				cv::rectangle(map3,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
+			}
+		} // end j
+
+		// right -> left
+		cv::flip(smoothImg,smoothImg,1);
+		cv::flip(nonNoiseMap,nonNoiseMap,1);
+		cv::flip(map3,map3,1);
 		for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
 			if(nonNoiseMap.at<uchar>(i,j)>0 && map3.at<uchar>(i,j)>0) {
 				Vec3b BGR = smoothImg.at<Vec3b>(i,j);
@@ -3907,29 +3996,55 @@ void script33(String filename) {
 				LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
 				double dE = cie.deltaE76(LAB,LAB0);
 
-				if(dE>dE_thresh && entry==0) {
-					skinBGR =  smoothImg.at<Vec3b>(i,j-(size.width*2));
+				vector<double> HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+				vector<double> HSL0 = hsl.rgb2hsl(BGR0[2],BGR0[1],BGR0[0]);
+				int index = hsl.getIndex(HSL[0],HSL[1],HSL[2]);
+				int index0 = hsl.getIndex(HSL0[0],HSL0[1],HSL0[2]);
+
+				int entry=0;
+				if(dE<dE_thresh && (index==index0)) {
+					entry=0;
+				} else {
+					entry = 1;
+				}
+				if(entry==1) {
+					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+				}
+				/*
+				if(dE>dE_thresh) {
+					int decrement = 0;
+					if(j-(size.width*2)>=0) decrement = size.width*2;
+					else if(j-(size.width)>=0) decrement = size.width;
+					else decrement = 0;
+
+					skinBGR =  smoothImg.at<Vec3b>(i,j-decrement);
 					vector<float> skinXYZ = xyz.rgb2xyz(skinBGR[2],skinBGR[1],skinBGR[0]);
 					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
+					entryPt = Point(j,i);
+					entry_dE = dE;
+					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
 					entry=1;
-				}
-				double dE_Skin = -1.0;
-				if(entry==1) {
-					dE_Skin = cie.deltaE76(skinLAB,LAB);
-					if(dE_Skin<dE_thresh) {
-						mask2.copyTo(map3(Rect(j,i,mask2.cols,mask2.rows)));
-					}
-				}
+				}*/
+				if(entry==1) break;
+			}
+			if(j==(smoothImg.cols-size.width)) {
+				cv::rectangle(map3,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
 			}
 		} // end j
+		cv::flip(smoothImg,smoothImg,1);
+		cv::flip(nonNoiseMap,nonNoiseMap,1);
+		cv::flip(map3,map3,1);
 	}// end i
 
 	Mat results;
-	img.copyTo(results,map3);
-	imgshow(islands.at(maxIslandIdx));
+	map3 = sm.densityConnector(map3,0.9999999,1.0,7.0);
+	Mat SE = sm.getStructElem(Size(5,5),ShapeMorph::CIRCLE);
+	cv::dilate(map3,map3,SE,Point(-1,-1),2);
+	smoothImg.copyTo(results,map3);
+
 	imgshow(map3);
 	imgshow(results);
-	imgshow(img);
+	imgshow(smoothImg);
 
 }
 

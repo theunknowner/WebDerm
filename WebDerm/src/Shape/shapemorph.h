@@ -22,8 +22,8 @@ public:
 	enum {RECT=0,CIRCLE=1};
 	const double circleThresh = 0.60;
 	const double randomThresh = -0.40;
-	Mat dilation(Mat src, Size size,Point anchor=Point(-1,-1));
-	Mat erosion(Mat src, Size size, Point anchor=Point(-1,-1));
+	Mat dilation(Mat src, Size size, int shape=MORPH_RECT, Point anchor=Point(-1,-1));
+	Mat erosion(Mat src, Size size, int shape=MORPH_RECT, Point anchor=Point(-1,-1));
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat origImg, Mat scaleImg);
 	Mat prepareImage(Mat src);

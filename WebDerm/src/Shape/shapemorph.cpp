@@ -462,7 +462,8 @@ vector<Mat> ShapeMorph::lumFilter2(Mat src, int featuresToHold) {
 	return matVec;
 }
 
-Mat ShapeMorph::dilation(Mat src, Size size, Point anchor) {
+//! shape={MORPH_RECT, MORPH_ELLIPSE, MORPH_CROSS}
+Mat ShapeMorph::dilation(Mat src, Size size, int shape, Point anchor) {
 	/*
 	Mat dst = Mat::zeros(src.rows,src.cols, CV_8U);
 	Functions fn;
@@ -480,12 +481,13 @@ Mat ShapeMorph::dilation(Mat src, Size size, Point anchor) {
 		row++;
 	}*/
 	Mat result;
-	Mat element = getStructuringElement(MORPH_RECT,size,anchor);
+	Mat element = getStructuringElement(shape,size,anchor);
 	dilate(src,result,element,anchor);
 	return result;
 }
 
-Mat ShapeMorph::erosion(Mat src, Size size, Point anchor) {
+//! shape={MORPH_RECT, MORPH_ELLIPSE, MORPH_CROSS}
+Mat ShapeMorph::erosion(Mat src, Size size, int shape, Point anchor) {
 	/*
 	Mat results = Mat::zeros(src.rows,src.cols, src.type());
 	Functions fn;
@@ -504,7 +506,7 @@ Mat ShapeMorph::erosion(Mat src, Size size, Point anchor) {
 	}
 	dst = results;*/
 	Mat results;
-	Mat element = getStructuringElement(MORPH_RECT,size,anchor);
+	Mat element = getStructuringElement(shape,size,anchor);
 	erode(src,results,element,anchor);
 	return results;
 }

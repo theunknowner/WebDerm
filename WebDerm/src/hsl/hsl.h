@@ -39,6 +39,7 @@ public:
 	String printHS(double *HSL);
 	int getHueDirection(double hue1, double hue2);
 	int calcHueDifference(double hue1, double hue2);
+	int getIndex(double hue, double sat, double lum);
 };
 
 #endif /* HSL_H_ */
