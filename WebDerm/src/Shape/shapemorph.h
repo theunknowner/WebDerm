@@ -27,6 +27,7 @@ public:
 	Mat getStructElem(Size size,int shape);
 	Mat elementaryDilation(Mat origImg, Mat scaleImg);
 	Mat prepareImage(Mat src);
+	bool isFeatureLighter(Mat src, Mat map);
 	Mat custAnd(Mat origImg, Mat scaleImg, Mat map=Mat());
 	Mat grayscaleReconstruct(Mat src, Mat scaleImg);
 	vector<Mat> liquidFeatureExtraction(Mat src, double lcThresh=0, int sort=0, int numOfPtsThresh=10);

@@ -3741,6 +3741,7 @@ void script32(String filename) {
 	//imwrite("smoothImg.png",smoothImg);
 }
 
+//! combines old and new deltaE-max to extract feature
 void script33(String filename) {
 	Rgb rgb;
 	Hsl hsl;
@@ -3757,7 +3758,8 @@ void script33(String filename) {
 	img = runResizeImage(img,Size(140,140));
 	Size size(5,5);
 	Mat smoothImg = Func::smooth(img,size,size.width,size.height);
-	Mat nonNoiseMap = sm.removeNoiseOnBoundary2(smoothImg);
+	Mat edgeRemovedMap = sm.removeNoiseOnBoundary2(smoothImg);
+
 	Xyz xyz;
 	CieLab lab;
 	Cie cie;
@@ -3769,7 +3771,7 @@ void script33(String filename) {
 	double HC, HC0;
 	for(int i=0; i<img.rows; i++) {
 		for(int j=0; j<img.cols; j++) {
-			if(nonNoiseMap.at<uchar>(i,j)>0) {
+			if(edgeRemovedMap.at<uchar>(i,j)>0) {
 				Vec3b BGR = img.at<Vec3b>(i,j);
 				HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
 				hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
@@ -3784,7 +3786,7 @@ void script33(String filename) {
 	vector<double> imgRowAvg;
 	for(int i=0; i<img.rows; i++) {
 		for(int j=1; j<img.cols; j++) {
-			if(nonNoiseMap.at<uchar>(i,j)>0) {
+			if(edgeRemovedMap.at<uchar>(i,j)>0) {
 				Vec3b BGR = img.at<Vec3b>(i,j);
 				Vec3b BGR0 = img.at<Vec3b>(i,j-1);
 				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
@@ -3831,10 +3833,11 @@ void script33(String filename) {
 	clst.kmeansCluster(pulldown,2);
 
 	double thresh = clst.getMin(clst.getNumOfClusters()-1) * 0.80;
+
 	Mat map(img.size(),CV_8U, Scalar(0));
 	for(int i=0; i<img.rows; i++) {
 		for(int j=1; j<img.cols; j++) {
-			if(nonNoiseMap.at<uchar>(i,j)>0) {
+			if(edgeRemovedMap.at<uchar>(i,j)>0) {
 				Vec3b BGR = img.at<Vec3b>(i,j);
 				Vec3b BGR0 = img.at<Vec3b>(i,j-1);
 				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
@@ -3860,16 +3863,13 @@ void script33(String filename) {
 			}
 		}
 	}
-	Mat map2 = sm.densityConnector(map,0.9999,1.0,2.0);
-	vector<Mat> islands = sm.liquidFeatureExtraction(map2,0,-1);
-	int maxIslandIdx = 0, maxCount = 0;
-	for(unsigned int i=0; i<islands.size(); i++) {
-		int count = countNonZero(islands.at(i));
-		if(count>maxCount) {
-			maxCount = count;
-			maxIslandIdx = i;
-		}
-	}
+	Mat nnConnectMap = sm.densityConnector(map,0.9999,1.0,2.0);
+	vector<Mat> islands = sm.liquidFeatureExtraction(nnConnectMap,0,1);
+
+	/// extract the largest island ///
+	int maxIslandIdx = 0; // islands were sorted from largest to smallest
+
+	/// connect island from left to right ///
 	Mat mask, idxMat;
 	mask = islands.at(maxIslandIdx).clone();
 	for(int i=0; i<mask.rows; i++) {
@@ -3881,14 +3881,16 @@ void script33(String filename) {
 			idxMat.release();
 		}
 	}
-	Mat map3 = sm.haloTransform(mask,2);
-	map3.convertTo(map3,CV_8U);
-	map3 = (map3 - 5) * 255; //removes non-noticeable pixels
 
+	Mat haloTransMap = sm.haloTransform(mask,2);
+	haloTransMap.convertTo(haloTransMap,CV_8U);
+	haloTransMap = (haloTransMap - 5) * 255; //removes non-noticeable pixels
+
+	/// new deltaE-max ///
 	vector<double> deltaE2;
 	for(int i=0; i<=smoothImg.rows-size.height; i+=size.height) {
 		for(int j=size.width; j<=smoothImg.cols-size.width; j+=size.width) {
-			if(nonNoiseMap.at<uchar>(i,j)>0 && map3.at<uchar>(i,j)>0) {
+			if(edgeRemovedMap.at<uchar>(i,j)>0 && haloTransMap.at<uchar>(i,j)>0) {
 				int decrement = 0;
 				if(j-(size.width*2)>=0) decrement = size.width*2;
 				else if(j-(size.width)>=0) decrement = size.width;
@@ -3908,14 +3910,12 @@ void script33(String filename) {
 	Cluster clst2;
 	clst2.kmeansCluster(deltaE2,2);
 	double t = clst2.getMin(clst2.getNumOfClusters()-1) * 0.75;
-	cout << t << endl;
 
-	//new deltaE
 	const float dE_thresh = floor(t);
 	Vec3b skinBGR;
 	vector<float> skinLAB;
 	Mat mask2 = Mat::zeros(size,CV_8U);
-	Mat map4 = map3.clone();
+	Mat map4 = haloTransMap.clone();
 	for(int i=0; i<=(smoothImg.rows-size.height); i+=size.height) {
 		/// for debugging purposes
 		Point entryPt;
@@ -3924,7 +3924,7 @@ void script33(String filename) {
 		vector<vector<float> > labVec;
 		///
 		for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
-			if(nonNoiseMap.at<uchar>(i,j)>0 && map3.at<uchar>(i,j)>0) {
+			if(edgeRemovedMap.at<uchar>(i,j)>0 && haloTransMap.at<uchar>(i,j)>0) {
 				int decrement = 0;
 				if(j-(size.width*2)>=0) decrement = size.width*2;
 				else if(j-(size.width)>=0) decrement = size.width;
@@ -3949,7 +3949,7 @@ void script33(String filename) {
 					entry = 1;
 				}
 				if(entry==1) {
-					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+					cv::rectangle(haloTransMap,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
 				}
 				/*if(dE>dE_thresh) {
 					decrement = 0;
@@ -3962,7 +3962,7 @@ void script33(String filename) {
 					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
 					entryPt = Point(j,i);
 					entry_dE = dE;
-					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+					cv::rectangle(haloTransMap,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
 					entry=1;
 
 				}*/
@@ -3978,16 +3978,15 @@ void script33(String filename) {
 				if(entry==1) break;
 			}
 			if(j==(smoothImg.cols-size.width)) {
-				cv::rectangle(map3,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
+				cv::rectangle(haloTransMap,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
 			}
 		} // end j
-
 		// right -> left
 		cv::flip(smoothImg,smoothImg,1);
-		cv::flip(nonNoiseMap,nonNoiseMap,1);
-		cv::flip(map3,map3,1);
+		cv::flip(edgeRemovedMap,edgeRemovedMap,1);
+		cv::flip(haloTransMap,haloTransMap,1);
 		for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
-			if(nonNoiseMap.at<uchar>(i,j)>0 && map3.at<uchar>(i,j)>0) {
+			if(edgeRemovedMap.at<uchar>(i,j)>0 && haloTransMap.at<uchar>(i,j)>0) {
 				Vec3b BGR = smoothImg.at<Vec3b>(i,j);
 				Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-size.width);
 				XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
@@ -4008,7 +4007,7 @@ void script33(String filename) {
 					entry = 1;
 				}
 				if(entry==1) {
-					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+					cv::rectangle(haloTransMap,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
 				}
 				/*
 				if(dE>dE_thresh) {
@@ -4022,30 +4021,47 @@ void script33(String filename) {
 					skinLAB = lab.xyz2lab(skinXYZ[0],skinXYZ[1],skinXYZ[2]);
 					entryPt = Point(j,i);
 					entry_dE = dE;
-					cv::rectangle(map3,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+					cv::rectangle(haloTransMap,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
 					entry=1;
 				}*/
 				if(entry==1) break;
 			}
 			if(j==(smoothImg.cols-size.width)) {
-				cv::rectangle(map3,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
+				cv::rectangle(haloTransMap,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
 			}
 		} // end j
 		cv::flip(smoothImg,smoothImg,1);
-		cv::flip(nonNoiseMap,nonNoiseMap,1);
-		cv::flip(map3,map3,1);
+		cv::flip(edgeRemovedMap,edgeRemovedMap,1);
+		cv::flip(haloTransMap,haloTransMap,1);
 	}// end i
 
 	Mat results;
-	map3 = sm.densityConnector(map3,0.9999999,1.0,7.0);
-	Mat SE = sm.getStructElem(Size(5,5),ShapeMorph::CIRCLE);
-	cv::dilate(map3,map3,SE,Point(-1,-1),2);
-	smoothImg.copyTo(results,map3);
+	haloTransMap = sm.densityConnector(haloTransMap,0.9999999,1.0,7.0);
+	Mat SE = sm.getStructElem(Size(7,7),ShapeMorph::CIRCLE);
+	cv::dilate(haloTransMap,haloTransMap,SE,Point(-1,-1),2);
+	smoothImg.copyTo(results,haloTransMap);
 
-	imgshow(map3);
+	ShapeColor sc;
+	Mat img2,img3;
+	cvtColor(img,img2,CV_BGR2GRAY);
+	img2 = 255 - img2;
+	img2.copyTo(img3,edgeRemovedMap);
+	Mat lcFilterMat = sc.filterKneePt(img3);
+	lcFilterMat *= 255;
+	Mat unionMask = haloTransMap.clone();
+	lcFilterMat.copyTo(unionMask,lcFilterMat);
+	islands = sm.liquidFeatureExtraction(unionMask,0,1);
+	unionMask = islands.at(0); // get largest island as mask
+	Mat results2;
+	img.copyTo(results2,unionMask);
+
+	cout << sm.isFeatureLighter(img,haloTransMap) << endl;
+	exit(1);
+
+	imgshow(haloTransMap);
 	imgshow(results);
 	imgshow(smoothImg);
-
+	imgshow(results2);
 }
 
 }// end namespace

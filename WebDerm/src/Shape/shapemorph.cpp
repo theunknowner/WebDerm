@@ -206,6 +206,46 @@ Mat ShapeMorph::prepareImage(Mat src) {
 	return result;
 }
 
+//! detects whether feature is light or dark
+//! and returns the mask of feature
+bool ShapeMorph::isFeatureLighter(Mat src, Mat map) {
+	Mat imgGray;
+	cvtColor(src,imgGray,CV_BGR2GRAY);
+	const int lumGap = 8;
+	int countLighter = 0;
+	int countDarker = 0;
+	for(int i=0; i<imgGray.rows; i++) {
+		int count = 0;
+		bool start = false;
+		for(int j=0; j<imgGray.cols; j++) {
+			if(map.at<uchar>(i,j)>0) {
+				int lc = imgGray.at<uchar>(i,j);
+				if(lc>0 && !start) {
+					start = true;
+					j++;
+				}
+				if(start && j<imgGray.cols) {
+					lc = imgGray.at<uchar>(i,j);
+					if(lc>0) {
+						int lc0 = imgGray.at<uchar>(i,j-1);
+						if((lc-lc0)>lumGap) {
+							countLighter++;
+							count++;
+						} else if((lc0-lc)>lumGap) {
+							countDarker++;
+							count++;
+						}
+					}
+				}
+				if(count>=10) break;
+			}
+		} // end j
+	}// end i
+	if(countLighter>countDarker) return true;
+
+	return false;
+}
+
 //! filter curve on original grayscale image
 Mat ShapeMorph::origFilter(Mat src, double shift) {
 	KneeCurve kc;
@@ -706,7 +746,7 @@ Mat ShapeMorph::gsReconUsingRmin2(Mat src) {
 	return result;
 }
 
-//thresh = discernible thresh; set sort = -1;1 -> Descending;Ascending
+//thresh = discernible thresh; set sort = -1;1 -> Ascending;Descending
 vector<Mat> ShapeMorph::liquidFeatureExtraction(Mat src, double lcThresh, int sort,int numOfPtsThresh) {
 	Mat map(src.rows, src.cols, CV_8U, Scalar(0));
 	deque<deque<Point> > numFeatures;
@@ -1674,20 +1714,24 @@ Mat ShapeMorph::removeNoiseOnBoundary2(Mat src) {
 	Hsl hsl;
 	vector<double> HSL;
 	vector<double> vec;
+	vector<double> lumVec;
 	Size size(5,5);
 	for(int i=0; i<=(src.rows-size.height); i+=size.height) {
 		for(int j=0; j<=(src.cols-size.width); j+=size.width) {
 			Vec3b RGB = src.at<Vec3b>(i,j);
 			vector<double> HSL = hsl.rgb2hsl(RGB[2],RGB[1],RGB[0]);
-			HSL.at(1) = roundDecimal(HSL.at(1),2) * 100;
-			HSL.at(2) = roundDecimal(HSL.at(2),2) * 100;
+			HSL.at(1) = round(HSL.at(1) * 100);
+			HSL.at(2) = round(HSL.at(2) * 100);
 			float val = (100.0 - HSL.at(1)) - HSL.at(2);
 			vec.push_back(val);
+			lumVec.push_back(HSL.at(2));
 		}
 	}
 	KneeCurve kc;
 	int idx = kc.kneeCurvePoint(vec);
 	double thresh = vec.at(idx);
+	int lumThreshIdx = kc.kneeCurvePoint(lumVec);
+	int lumThresh = lumVec.at(lumThreshIdx) * 0.90;
 
 	Mat map(src.size(),CV_8U,Scalar(255));
 	Mat mask = Mat::zeros(size,CV_8U);
@@ -1710,7 +1754,7 @@ Mat ShapeMorph::removeNoiseOnBoundary2(Mat src) {
 					}
 				}
 			}
-			if(val>thresh && flag==1) {
+			if(val>thresh && HSL.at(2)<lumThresh && flag==1) {
 				mask.copyTo(map(Rect(j,i,mask.cols,mask.rows)));
 			}
 		}
