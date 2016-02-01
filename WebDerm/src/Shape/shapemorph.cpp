@@ -211,7 +211,7 @@ Mat ShapeMorph::prepareImage(Mat src) {
 bool ShapeMorph::isFeatureLighter(Mat src, Mat map) {
 	Mat imgGray;
 	cvtColor(src,imgGray,CV_BGR2GRAY);
-	const int lumGap = 8;
+	const int lumGap = 8; // absolute thresh for the eye
 	int countLighter = 0;
 	int countDarker = 0;
 	for(int i=0; i<imgGray.rows; i++) {

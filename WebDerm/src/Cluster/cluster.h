@@ -31,6 +31,7 @@ public:
 
 	Mat kmeansCluster(vector<double> data_vec, int clusters=0);
 	Mat kmeansCluster(vector<int> data_vec, int clusters=0);
+	Mat kmeansCluster(Mat src, int clusters=0, int minVal=0, int maxVal=225);
 	int getNumOfClusters();
 	int getSizeOfCluster(int clusterNum);
 	double getMin(int clusterNum);

@@ -215,6 +215,20 @@ Mat Cluster::kmeansCluster(vector<int> data_vec, int clusters) {
 	return this->kmeansCluster(vec,clusters);
 }
 
+//! src=img, set minVal and maxVal range to include only values in between
+Mat Cluster::kmeansCluster(Mat src, int clusters, int minVal, int maxVal) {
+	vector<double> data_vec;
+	for(int i=0; i<src.rows; i++) {
+		for(int j=0; j<src.cols; j++) {
+			int val = src.at<uchar>(i,j);
+			if(val>=minVal && val <=maxVal) {
+				data_vec.push_back((double)val);
+			}
+		}
+	}
+	return this->kmeansCluster(data_vec,clusters);
+}
+
 //! returns the number of points in the specified cluster
 int Cluster::getSizeOfCluster(int clusterNum) {
 	int count = 0;

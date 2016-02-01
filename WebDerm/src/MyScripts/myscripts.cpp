@@ -4042,26 +4042,43 @@ void script33(String filename) {
 	smoothImg.copyTo(results,haloTransMap);
 
 	ShapeColor sc;
-	Mat img2,img3;
-	cvtColor(img,img2,CV_BGR2GRAY);
-	img2 = 255 - img2;
-	img2.copyTo(img3,edgeRemovedMap);
-	Mat lcFilterMat = sc.filterKneePt(img3);
-	lcFilterMat *= 255;
+	Mat imgGray,imgGrayNoiseRemoved;
+	cvtColor(img,imgGray,CV_BGR2GRAY);
+	bool isLighter = sm.isFeatureLighter(img,haloTransMap);
+	if(!isLighter) {
+		imgGray = 255 - imgGray; // invert the image
+	}
+	//cout << isLighter << endl;
+	imgGray.copyTo(imgGrayNoiseRemoved,edgeRemovedMap);
+	Cluster clst3;
+	clst3.kmeansCluster(imgGrayNoiseRemoved,3);
+	double lcThresh = clst3.getMin(clst3.getNumOfClusters()-1);
+	//cout << lcThresh << endl;
+	Mat lcFilterMat = Mat::zeros(imgGrayNoiseRemoved.size(),CV_8U);
+	for(int i=0; i<imgGrayNoiseRemoved.rows; i++) {
+		for(int j=0; j<imgGrayNoiseRemoved.cols; j++) {
+			int val = imgGrayNoiseRemoved.at<uchar>(i,j);
+			if(val>lcThresh) {
+				lcFilterMat.at<uchar>(i,j) = 255;
+			}
+		}
+	}
 	Mat unionMask = haloTransMap.clone();
 	lcFilterMat.copyTo(unionMask,lcFilterMat);
 	islands = sm.liquidFeatureExtraction(unionMask,0,1);
 	unionMask = islands.at(0); // get largest island as mask
 	Mat results2;
 	img.copyTo(results2,unionMask);
-
-	cout << sm.isFeatureLighter(img,haloTransMap) << endl;
-	exit(1);
-
+/*
+	imgshow(lcFilterMat);
 	imgshow(haloTransMap);
 	imgshow(results);
 	imgshow(smoothImg);
 	imgshow(results2);
+	*/
+	String out = "/home/jason/Desktop/Programs/Discrete_New/"+name+".png";
+	imwrite(out,results2);
+
 }
 
 }// end namespace

@@ -99,7 +99,7 @@ int main(int argc,char** argv)
 	//ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
-	/*
+
 	deque<String> files;
 	String folder = "Looks_Like/";
 	FileData fd;
@@ -107,10 +107,11 @@ int main(int argc,char** argv)
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = folder + files.at(i);
 		name = getFileName(name);
-		ShadeShape ss1 = Scripts::script31(name);
+		//ShadeShape ss1 = Scripts::script31(name);
+		Scripts::script33(name);
 	}
 /**/
-	Scripts::script33("vesicles9");
+	//Scripts::script33("psoriasis26");
 	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	//ss1.showInteractiveIslands(
