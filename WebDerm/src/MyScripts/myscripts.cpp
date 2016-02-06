@@ -4076,7 +4076,7 @@ void script33(String filename) {
 	imgshow(smoothImg);
 	imgshow(results2);
 	*/
-	String out = "/home/jason/Desktop/Programs/Discrete_New/"+name+".png";
+	String out = "/home/jason/Desktop/Programs/Discrete/"+name+".png";
 	imwrite(out,results2);
 
 }
