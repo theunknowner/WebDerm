@@ -3751,8 +3751,8 @@ void script33(String filename) {
 	rgb.importThresholds();
 	hsl.importHslThresholds();
 	sh.importThresholds();
-	String name = filename;
-	Mat img = imread("Looks_Like/"+name+".jpg");
+	String name = getFileName(filename);
+	Mat img = imread(filename);
 	assert(img.empty()==0);
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
@@ -4076,7 +4076,7 @@ void script33(String filename) {
 	imgshow(smoothImg);
 	imgshow(results2);
 	*/
-	String out = "/home/jason/Desktop/Programs/Discrete/"+name+".png";
+	String out = "/home/jason/Desktop/Programs/Discrete2/"+name+".png";
 	imwrite(out,results2);
 
 }

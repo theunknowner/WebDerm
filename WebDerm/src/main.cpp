@@ -101,12 +101,11 @@ int main(int argc,char** argv)
 /**/
 
 	deque<String> files;
-	String folder = "Looks_Like/";
+	String folder = "Looks_Like2/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		String name = folder + files.at(i);
-		name = getFileName(name);
 		//ShadeShape ss1 = Scripts::script31(name);
 		Scripts::script33(name);
 	}
