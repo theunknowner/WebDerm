@@ -251,7 +251,7 @@ Mat ShapeColor::filterKneePt(Mat src, double thresh, double shift) {
 		}
 	}
 	int bestIdx = kc.kneeCurvePoint(yVec1);
-	float percent = roundDecimal((float)bestIdx/yVec1.size(),2);
+	float percent = ip::roundDecimal((float)bestIdx/yVec1.size(),2);
 
 	if(percent<=0.05000001)
 		bestIdx = 0.25 * yVec1.size();

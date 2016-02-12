@@ -16,6 +16,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
 
+using namespace ip;
+
 const int ruleCount = 11;
 vector<int> ruleFlags(ruleCount,1);
 

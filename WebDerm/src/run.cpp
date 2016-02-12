@@ -17,6 +17,10 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Mouse/mouse.h"
 
+using namespace ip;
+
+namespace Run {
+
 void runBlurImage() {
 	String filename;
 	String input;
@@ -279,8 +283,7 @@ void runGetSkin()
 	cin >> input;
 	Mat img, img2, mask;
 	img = runResizeImage(filename,Size(700,700),0);
-	Skin::getSkin(img, mask);
-	img.copyTo(img2, mask);
+	img2 = Skin::getSkin(img);
 	if(input=="y")
 	{
 		String name = getFileName(filename);
@@ -304,8 +307,7 @@ void runAllGetSkin() {
 		for(unsigned int i=0; i<files.size(); i++) {
 			full_path = folder+files.at(i);
 			img = runResizeImage(full_path,Size(700,700),0);
-			Skin::getSkin(img, mask);
-			img.copyTo(img2, mask);
+			img2 = Skin::getSkin(img);
 			if(input=="y")
 			{
 				String name = getFileName(full_path);
@@ -335,8 +337,8 @@ void runMouseColor() {
 	img = runResizeImage(filename,Size(700,700),0);
 	cout << "Get skin? (y/n) ";
 	cin >> input;
-	if(input=="y") Skin::getSkin(img, mask);
-	img.copyTo(img2, mask);
+	if(input=="y") img2 = Skin::getSkin(img);
+	else img2 = img.clone();
 	Mouse m;
 	m.mouseColor(img2, name);
 	img.release(); img2.release(); mask.release();
@@ -412,4 +414,6 @@ Mat runColorNormalization(Mat &img) {
 	Mat img2 = c.shadeCorrection(img);
 	img2 = c.changeImageBrightness(img2,0.80,1);
 	return img2;
+}
+
 }

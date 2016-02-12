@@ -35,8 +35,8 @@ void Labels::create(vector<vector<vector<Islands> > > &islandVec, float totalAre
 			for(unsigned int k=0; k<islandVec.at(i).at(j).size(); k++) {
 				Islands &isl = islandVec.at(i).at(j).at(k);
 				String shape = this->getShapeName(i);
-				label = toString(i)+"_"+shape+"_s"+toString(j)+"_";
-				label += Func::addDigitsForLabel(k,"0",3);
+				label = ip::toString(i)+"_"+shape+"_s"+ ip::toString(j)+"_";
+				label += ip::addDigitsForLabel(k,"0",3);
 				isl.labelName() = label;
 
 				if(this->labelMap.find(label)==this->labelMap.end()) {

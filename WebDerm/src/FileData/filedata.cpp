@@ -10,6 +10,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
 
+using namespace ip;
+
 FileData::FileData(String file_path) {
 	setFilePath(file_path);
 	if(!filename.empty())

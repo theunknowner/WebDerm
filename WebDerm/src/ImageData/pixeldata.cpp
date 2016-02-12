@@ -38,8 +38,8 @@ PixelData::PixelData(Vec3b pix) {
 	Hsl hsl;
 	vector<double> HSL = hsl.rgb2hsl(r,g,b);
 	this->hslVec[0] = HSL[0];
-	this->hslVec[1] = roundDecimal(HSL[1],2);
-	this->hslVec[2] = roundDecimal(HSL[2],2);
+	this->hslVec[1] = ip::roundDecimal(HSL[1],2);
+	this->hslVec[2] = ip::roundDecimal(HSL[2],2);
 
 	Rgb rgb;
 	this->grayLevel = rgb.calcGrayLevel(r,g,b);

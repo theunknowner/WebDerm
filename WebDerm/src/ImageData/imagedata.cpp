@@ -50,7 +50,7 @@ void ImageData::extract(Mat image, String name, int option) {
 				h = pixData.hsl()[0];
 				s = pixData.hsl()[1];
 				l = pixData.hsl()[2];
-				hslStr = toString(h)+";"+toString(s)+";"+toString(l);
+				hslStr = ip::toString(h)+";"+ ip::toString(s)+";"+ ip::toString(l);
 				this->hslVec.at(i).at(j) = hslStr;
 			}
 		}
@@ -126,7 +126,7 @@ void ImageData::readPrevSize() {
 		String temp;
 		deque<String> vec;
 		while(getline(fs,temp)) {
-			getSubstr(temp,',',vec);
+			ip::getSubstr(temp,',',vec);
 			this->prevImgSize = Size(atoi(vec.at(0).c_str()),atoi(vec.at(1).c_str()));
 		}
 	}

@@ -52,7 +52,7 @@ void SubIslands::getIslandPoints(Mat &islandImg) {
 	for(unsigned int i=0; i<nonZeroCoord.total(); i++) {
 		x = nonZeroCoord.at<Point>(i).x;
 		y = nonZeroCoord.at<Point>(i).y;
-		String coords = toString(x)+","+toString(y);
+		String coords = ip::toString(x)+","+ ip::toString(y);
 		if(this->coordMap.find(coords)==this->coordMap.end()) {
 			this->coordMap[coords] = Point(x,y);
 		}

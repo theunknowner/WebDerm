@@ -15,6 +15,8 @@
 #include "../Labels/labels.h"
 #include "../ShadeShapeRelation/ssr_match.h"
 
+using namespace ip;
+
 /******************* PRIVATE FUNCTIONS ******************/
 
 //! groups the islands of a feature by shade then shape

@@ -8,11 +8,9 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "rgb/rgb.h"
-#include "test.h"
 #include "hsl/hsl.h"
 #include "Hsv/hsv.h"
 #include "skin/Skin.h"
-#include "test/testfunctions.h"
 #include "MyScripts/myscripts.h"
 #include "Math/maths.h"
 #include "FileData/filedata.h"
@@ -27,7 +25,6 @@
 #include "GridDisplay/griddisplay.h"
 #include "Poly/poly.h"
 #include "Matlab/matlab.h"
-#include "test.h"
 #include "Shape/shapecolor.h"
 #include "Colorspace/xyz.h"
 #include "Colorspace/cielab.h"
@@ -53,6 +50,8 @@
 #include "Pathfind/pathfind.h"
 #include "ShadeShape/ShadeShapeRelation/esg.h"
 #include "Shape/shapes.h"
+
+using namespace ip;
 
 int main(int argc,char** argv)
 {
@@ -99,7 +98,33 @@ int main(int argc,char** argv)
 	//ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
+	deque<String> files;
+	String folder = "Looks_Like3/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String filename = folder + files.at(i);
+		String name = ip::getFileName(filename);
+		 Mat img = Scripts::getSkinScript(filename);
+		 String out = "/home/jason/Desktop/Programs/Discrete3/"+name+"_skin.png";
+		 imwrite(out,img);
+	}
 
+	/*
+	deque<String> files;
+	String folder = "Looks_Like2/";
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String filename = folder + files.at(i);
+		String name = ip::getFileName(filename);
+		//ShadeShape ss1 = Scripts::script31(name);
+		 Mat img = Scripts::getSkinScript(filename);
+		 String out = "/home/jason/Desktop/Programs/Discrete2/"+name+"_skin.png";
+		 imwrite(out,img);
+	}
+
+	/*
 	deque<String> files;
 	String folder = "Looks_Like2/";
 	FileData fd;

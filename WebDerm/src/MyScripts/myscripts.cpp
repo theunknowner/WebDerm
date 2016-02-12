@@ -31,8 +31,50 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Histogram/histogram.h"
+#include "/home/jason/git/WebDerm/WebDerm/src/skin/Skin.h"
+
+using namespace ip;
+using namespace Run;
 
 namespace Scripts {
+
+/* Runs image through color normalization(uniform illumination)
+ * then resizes it to a set size for output.
+ */
+Mat colorNormalizationScript(String filename) {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	String name = getFileName(filename);
+	Mat img = imread(filename);
+	assert(img.empty()==0);
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
+	return img;
+}
+
+/*
+ * Skin detection script
+ */
+Mat getSkinScript(String filename) {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	String name = getFileName(filename);
+	Mat img = imread(filename);
+	assert(img.empty()==0);
+	img = runColorNormalization(img);
+	img = runResizeImage(img,Size(140,140));
+	Mat skin = Skin::getSkin(img);
+	return skin;
+}
+
 void script1() {
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
 	String out = "/home/jason/Desktop/Programs/Color Normalized Non Blur 5x5/";
@@ -57,7 +99,7 @@ ShadeShape script2(String name) {
 	Mat img = imread(name,0);
 
 	ImageData id(img,name,0);
-	Func::prepareImage(id,Size(140,140));
+	ip::prepareImage(id,Size(140,140));
 	ShadeShape ss;
 	ss.extract(id,false);
 	/*for(int i=0; i<ss.numOfFeatures(); i++) {
@@ -2275,7 +2317,7 @@ void checkAllTestData3() {
 
 		//>crop, resize feature
 		ImageData id(img,name,0);
-		Func::prepareImage(id,Size(140,140));
+		ip::prepareImage(id,Size(140,140));
 		ShadeShape ss1;
 		ss1.extract(id,false);
 		Islands island = ss1.getIslandWithPoint(pt);
@@ -3632,7 +3674,7 @@ ShadeShape script31(String filename) {
 
 	//> Testing Resizing of feature
 	ImageData id(img3,name,0);
-	Func::prepareImage(id,Size(140,140));
+	ip::prepareImage(id,Size(140,140));
 	ShadeShape ss;
 	ss.extract(id,false);
 	return ss;
@@ -3653,7 +3695,7 @@ void script32(String filename) {
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	Size size(5,5);
-	Mat smoothImg = Func::smooth(img,size,size.width,size.height);
+	Mat smoothImg = ip::smooth(img,size,size.width,size.height);
 	Mat nonNoiseMap = sm.removeNoiseOnBoundary2(smoothImg);
 	Xyz xyz;
 	CieLab lab;
@@ -3757,7 +3799,7 @@ void script33(String filename) {
 	img = runColorNormalization(img);
 	img = runResizeImage(img,Size(140,140));
 	Size size(5,5);
-	Mat smoothImg = Func::smooth(img,size,size.width,size.height);
+	Mat smoothImg = ip::smooth(img,size,size.width,size.height);
 	Mat edgeRemovedMap = sm.removeNoiseOnBoundary2(smoothImg);
 
 	Xyz xyz;
@@ -4069,16 +4111,16 @@ void script33(String filename) {
 	unionMask = islands.at(0); // get largest island as mask
 	Mat results2;
 	img.copyTo(results2,unionMask);
-/*
+	/*
 	imgshow(lcFilterMat);
 	imgshow(haloTransMap);
 	imgshow(results);
 	imgshow(smoothImg);
 	imgshow(results2);
-	*/
-	String out = "/home/jason/Desktop/Programs/Discrete2/"+name+".png";
-	imwrite(out,results2);
+	 */
 
+	String out = "/home/jason/Desktop/Programs/Discrete2/"+name+"_extract.png";
+	imwrite(out,results2);
 }
 
 }// end namespace

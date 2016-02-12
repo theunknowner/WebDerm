@@ -10,6 +10,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
+using namespace ip;
+
 deque<String> Rgb::mainColors;
 deque<String> Rgb::allColors;
 bool Rgb::THRESH_IMPORTED = false;

@@ -25,7 +25,7 @@ bool Esg::importThresholds() {
 			deque<String> vec;
 			vector<float> contrastVec;
 			while(getline(fs,temp)) {
-				getSubstr(temp,',',vec);
+				ip::getSubstr(temp,',',vec);
 				for(unsigned int i=0; i<vec.size(); i++) {
 					contrastVec.push_back(atof(vec.at(i).c_str()));
 				}
@@ -62,7 +62,7 @@ double Esg::calculate(float dist, int shadeDiff, int dbg) {
 		float eucDist = MyMath::euclideanDist(dist,shadeDiff,this->esgVec.at(i).at(0),this->esgVec.at(i).at(1));
 		distVec.push_back(eucDist);
 	}
-	int smallestIndex1 = Func::smallest(distVec,1);
+	int smallestIndex1 = ip::smallest(distVec,1);
 	float x = dist;
 	float y = shadeDiff;
 	float x0 = this->esgVec.at(smallestIndex1).at(0);

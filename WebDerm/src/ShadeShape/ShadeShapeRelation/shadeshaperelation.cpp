@@ -13,6 +13,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/State/state.h"
 #include "srm.h"
 
+using namespace ip;
+
 /******************** PUBLIC FUNCTIONS ***********************/
 
 void ShadeShapeRelation::generate_srm(ShadeShape &ss, Labels &labels, vector<vector<vector<Islands> > > &islandVec) {

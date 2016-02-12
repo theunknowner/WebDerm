@@ -23,6 +23,9 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
 
+using namespace ip;
+using namespace Run;
+
 void Entropy::runAllEntropy() {
 	String filepath;
 	deque<String> files;

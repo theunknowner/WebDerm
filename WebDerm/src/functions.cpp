@@ -17,6 +17,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
+namespace ip {
 String toString(int val)
 {
 	ostringstream stringStream;
@@ -366,12 +367,10 @@ int majority(vector<int> vec) {
 	return result;
 }
 
-namespace Func {
-
 //! adds specified digit to front of num
 //! default [length]=1 returns just the num
 String addDigitsForLabel(int num, String digit, int length) {
-	String label = toString(num);
+	String label = ip::toString(num);
 	length -= label.length();
 	for(int i=0; i<length; i++) {
 		label = digit+label;
@@ -716,7 +715,7 @@ Mat Functions::shiftImage(Mat input, int x, int y, int keepBkGnd) {
 		freq.push_back((float)val);
 		val = input.at<uchar>(input.cols-1,input.rows-1);
 		freq.push_back((float)val);
-		float most = majority(freq);
+		float most = ip::majority(freq);
 		result = (int)most;
 	}
 

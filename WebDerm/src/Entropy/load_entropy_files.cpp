@@ -18,7 +18,7 @@ bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, 
 		colorNameVec.clear();
 		getline(fs,temp);
 		while(getline(fs,temp)) {
-			getSubstr(temp,',',vec);
+			ip::getSubstr(temp,',',vec);
 			if(vec.at(vec.size()-1)=="")
 				vec.pop_back(); //removes the weird empty space at the end of deque
 			for(unsigned int i=0; i<vec.size(); i++) {

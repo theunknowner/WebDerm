@@ -1560,7 +1560,7 @@ Mat ShapeMorph::densityConnector(Mat src, double q, double coeff, double increme
 	if(fnVec.size()>0) {
 		try {
 			bestIdx = kc.kneeCurvePoint(fnVec);
-			float percent = roundDecimal((float)bestIdx/fnVec.size(),2);
+			float percent = ip::roundDecimal((float)bestIdx/fnVec.size(),2);
 			if(percent<=0.05000001)
 				bestIdx = 0.25 * fnVec.size();
 			if(percent>=0.8999999)

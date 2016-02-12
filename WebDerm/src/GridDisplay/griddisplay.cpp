@@ -54,5 +54,5 @@ void GridDisplay::drawGrid() {
 }
 
 void GridDisplay::displayGrid() {
-	imgshow(this->img);
+	ip::imgshow(this->img);
 }

@@ -37,7 +37,7 @@ bool Hsl::importHslThresholds() {
 		deque<double> thresh3;
 		getline(fsThresh,temp);
 		while(getline(fsThresh,temp)) {
-			getSubstr(temp,',',vec);
+			ip::getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
 				if(i==0) hslColors.push_back(vec.at(i));
 				if(i>=1 && i<=2) thresh.push_back(atof(vec.at(i).c_str()));
@@ -278,8 +278,8 @@ vector<int> Hsl::hsl2rgb(double hue, double sat, double lum) {
 /** printf HSL/HSP values **/
 String Hsl::printHS(double *HSL) {
 
-	HSL[1] = roundDecimal(HSL[1],2);
-	HSL[2] = roundDecimal(HSL[2],2);
+	HSL[1] = ip::roundDecimal(HSL[1],2);
+	HSL[2] = ip::roundDecimal(HSL[2],2);
 	char text[50];
 	sprintf(text,"(%.0f,%.2f,%.2f)",HSL[0],HSL[1],HSL[2]);
 	String str(text);

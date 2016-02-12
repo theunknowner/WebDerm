@@ -16,7 +16,7 @@ bool Entropy::importEntropyThresholds() {
 		String temp;
 		deque<String> vec;
 		while(getline(fsThresh,temp)) {
-			getSubstr(temp,',',vec);
+			ip::getSubstr(temp,',',vec);
 			for(unsigned int i=0; i<vec.size(); i++) {
 				if(i==1) {
 					this->colorWeights2.push_back(atof(vec.at(i).c_str()));

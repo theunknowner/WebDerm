@@ -160,7 +160,7 @@ void Histogram::outputHistogramLuminance(Mat &src, String name) {
 			g = src.at<Vec3b>(i,j)[1];
 			b = src.at<Vec3b>(i,j)[0];
 			HSL = hsl.rgb2hsl(r,g,b);
-			HSL[2] = roundDecimal(HSL[2],2);
+			HSL[2] = ip::roundDecimal(HSL[2],2);
 			lum2 = round(HSL[2]*255);
 			lum = lum2;
 			grayImg.at<uchar>(i,j) = lum;
@@ -244,7 +244,7 @@ void Histogram::lightEqualizer(Mat src, Mat &dst) {
 			dst.at<Vec3b>(i,j)[2] = RGB[0];
 			dst.at<Vec3b>(i,j)[1] = RGB[1];
 			dst.at<Vec3b>(i,j)[0] = RGB[2];
-			HSL[2] = roundDecimal(HSL[2],2)*100;
+			HSL[2] = ip::roundDecimal(HSL[2],2)*100;
 			lum = HSL[2];
 			++lumVec.at(lum);
 		}

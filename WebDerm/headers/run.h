@@ -10,6 +10,8 @@
 
 #include "global.h"
 
+namespace Run {
+
 void runBlurImage();
 void runResizeImage();
 void runResizeAllImages();
@@ -25,5 +27,7 @@ void runMouseColor();
 void runMouseOutputColor();
 void runRenameFiles();
 Mat runColorNormalization(Mat &img);
+
+}
 
 #endif /* RUN_H_ */

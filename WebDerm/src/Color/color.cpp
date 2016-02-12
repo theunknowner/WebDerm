@@ -7,6 +7,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Hsv/hsv.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
 
+using namespace ip;
+
 //check if color1 contains color2
 bool Color::containsColor(String color1, String color2)
 {

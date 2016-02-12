@@ -13,7 +13,7 @@
 
 class ImageData;
 namespace Skin {
-	void getSkin(Mat &img, Mat &mask);
+	Mat getSkin(Mat &img);
 	void getSkinUsingThresh(Mat &img, Mat &mask);
 	void getSkinUsingCorrelation(Mat &img, Mat &mask);
 

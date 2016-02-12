@@ -9,6 +9,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
 
+using namespace ip;
+
 Mat CreateTrainingData::segmentImage(Mat input, Size size) {
 	Mat segmentImg;
 	cvtColor(input,segmentImg,CV_GRAY2BGR);

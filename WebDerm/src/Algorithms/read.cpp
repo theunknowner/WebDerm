@@ -21,7 +21,7 @@ vector<vector<String> > readFromCsv(String filename) {
 	vector<String> vec;
 	vector<vector<String> > vec2d;
 	while(getline(fs,temp)) {
-		getSubstr(temp,',',vec);
+		ip::getSubstr(temp,',',vec);
 		vec2d.push_back(vec);
 	}
 	fs.close();

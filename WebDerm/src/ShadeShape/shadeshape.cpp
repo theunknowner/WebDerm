@@ -14,6 +14,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
+using namespace ip;
+
 String winName = "Interactive Islands";
 String winName2 = "Extracted";
 String winName3 = "40x40";

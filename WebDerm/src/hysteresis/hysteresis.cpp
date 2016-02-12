@@ -36,14 +36,14 @@ void hysteresis(Mat img, Size size, String name, FileData &fd) {
 			b = img.at<Vec3b>(i,j)[0];
 			HSL = hsl.rgb2hsl(r,g,b);
 			h = HSL[0];
-			s = roundDecimal(HSL[1],2);
-			l = roundDecimal(HSL[2],2);
+			s = ip::roundDecimal(HSL[1],2);
+			l = ip::roundDecimal(HSL[2],2);
 			pix = rgb.checkBlack(r,g,b);
 			if(pix=="OTHER") {
 				pix = rgb.calcColor(r,g,b);
 			}
 			colorWindow.push_back(pix);
-			hslStr = toString(h)+";"+toString(s)+";"+toString(l);
+			hslStr = ip::toString(h)+";"+ip::toString(s)+";"+ip::toString(l);
 			hslVec.push_back(hslStr);
 		}
 		fd.windowVec.push_back(colorWindow);

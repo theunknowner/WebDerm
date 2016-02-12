@@ -18,7 +18,7 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
 
-//String shadeArr[] = {"Dark1","Dark2","High1","High2","Low1","Low2","Low3","Light1","Light2","Light3","White"};
+using namespace ip;
 
 Intensity::Intensity() {
 	global_flag=0;

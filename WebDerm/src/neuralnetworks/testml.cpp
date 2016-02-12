@@ -45,7 +45,7 @@ bool TestML::importThresholds() {
 		}
 		fs.close();
 		while(getline(fs2,temp)) {
-			getSubstr(temp,',',vec);
+			ip::getSubstr(temp,',',vec);
 			TestML::img_size.width = atoi(vec.at(0).c_str());
 			TestML::img_size.height = atoi(vec.at(1).c_str());
 		}
@@ -202,7 +202,7 @@ void TestML::importLabels(String path,vector<Mat> &labels) {
 				deque<String> vec;
 				vector<float> fVec;
 				while(getline(fs2,temp)) {
-					getSubstr(temp,',',vec);
+					ip::getSubstr(temp,',',vec);
 					//starts at 1 to skip filename in first column
 					for(unsigned int i=1; i<vec.size(); i++) {
 						fVec.push_back(atof(vec.at(i).c_str()));

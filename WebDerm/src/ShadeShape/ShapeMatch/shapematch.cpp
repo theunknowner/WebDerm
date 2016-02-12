@@ -42,7 +42,7 @@ bool ShapeMatch::importThresholds() {
 			vector<String> vec2;
 			vector<float> vec3;
 			while(getline(fs,temp)) {
-				getSubstr(temp,',',vec);
+				ip::getSubstr(temp,',',vec);
 				for(unsigned int i=0; i<vec.size(); i++) {
 					if(vec.at(i)!="") {
 						if(i>0) {
@@ -55,7 +55,7 @@ bool ShapeMatch::importThresholds() {
 			}
 			getline(fs2,temp);
 			while(getline(fs2,temp)) {
-				getSubstr(temp,',',vec);
+				ip::getSubstr(temp,',',vec);
 				for(unsigned int i=0; i<vec.size(); i++) {
 					if(i>0) {
 						vec3.push_back(atof(vec.at(i).c_str()));
@@ -66,7 +66,7 @@ bool ShapeMatch::importThresholds() {
 			}
 			getline(fs3,temp);
 			while(getline(fs3,temp)) {
-				getSubstr(temp,',',vec);
+				ip::getSubstr(temp,',',vec);
 				ShapeMatch::shapeWeightsVec.push_back(atof(vec.at(1).c_str()));
 				ShapeMatch::shapeWeightsVec2.push_back(atof(vec.at(2).c_str()));
 			}

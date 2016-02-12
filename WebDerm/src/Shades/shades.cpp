@@ -36,7 +36,7 @@ bool Shades::importThresholds() {
 			deque<double> thresh;
 			getline(fsThresh,temp);
 			while(getline(fsThresh,temp)) {
-				getSubstr(temp,',',vec);
+				ip::getSubstr(temp,',',vec);
 				for(unsigned int i=0; i<vec.size(); i++) {
 					if(i==0) {
 						g_Shades.push_back(vec.at(i));
@@ -49,7 +49,7 @@ bool Shades::importThresholds() {
 			}
 			getline(fsThresh2,temp);
 			while(getline(fsThresh2,temp)) {
-				getSubstr(temp,',',vec);
+				ip::getSubstr(temp,',',vec);
 				for(unsigned int i=0; i<vec.size(); i++) {
 					if(i==0) {
 						g_Shades2.push_back(vec.at(i));

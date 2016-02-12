@@ -29,7 +29,7 @@ Mat epohTheHue(Mat &hMat, Mat &sMat, Mat &lMat) {
 			double sat = sMat.at<float>(i,j);
 			double lum = lMat.at<float>(i,j);
 			hue *= epoh(sat,lum);
-			hc.at<float>(i,j) = roundDecimal(hue,2);
+			hc.at<float>(i,j) = ip::roundDecimal(hue,2);
 		}
 	}
 	return hc;

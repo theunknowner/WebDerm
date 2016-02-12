@@ -2167,8 +2167,8 @@ void ShadeShapeRelationMatch::importDownScaleSrms(String file, pair<vector<vecto
 		vector<String> vec2;
 		while(getline(fs,temp)) {
 			if(temp.find("TotalArea")==string::npos) {
-				getSubstr(temp,separator,vec);
-				Func::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
+				ip::getSubstr(temp,separator,vec);
+				ip::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
 				for(unsigned int i=0; i<vec2.size(); i++) {
 					if(i==0 || i==2) {
 						if(srmLabels.find(vec2.at(i))==srmLabels.end()) {
@@ -2183,9 +2183,9 @@ void ShadeShapeRelationMatch::importDownScaleSrms(String file, pair<vector<vecto
 		vector<vector<vector<int> > > srmCount(srmLabels.size(),vector<vector<int> >(srmLabels.size(),vector<int>(this->rel_op.size(),0)));
 		vector<vector<vector<int> > > srmArea(srmLabels.size(),vector<vector<int> >(srmLabels.size(),vector<int>(this->rel_op.size(),0)));
 		while(getline(fs,temp)) {
-			getSubstr(temp,separator,vec);
+			ip::getSubstr(temp,separator,vec);
 			if(temp.find("TotalArea")==string::npos) {
-				Func::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
+				ip::getSubstr(vec.at(0),beginDelimit,endDelimit,vec2);
 				String labelY = vec2.at(0);
 				String labelX = vec2.at(2);
 				String relOp = vec2.at(1);

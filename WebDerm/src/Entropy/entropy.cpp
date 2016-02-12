@@ -18,6 +18,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
 
+using namespace ip;
+
 deque<deque< deque< deque<double> > > > vec;
 deque<deque< deque< deque<double> > > > vec2;
 deque<deque< deque< deque<int> > > > gTargetCellCount;

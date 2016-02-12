@@ -209,7 +209,7 @@ void Srm::downScaleSrm() {
 	map<String,pair<int,float> > merged_labels = this->mergedLabels.getMap();
 
 	vector<vector<vector<vector<map<String,int>> > > > srmMarkMap(merged_labels.size(),vector<vector<vector<map<String,int>> > >(merged_labels.size(),vector<vector<map<String,int>> >(this->rel_op.size(),vector<map<String,int>>(relOpLevelSize,map<String,int>()))));
-	this->dsSrmCount = Func::createVector4D(merged_labels.size(),merged_labels.size(),this->rel_op.size(),this->relOpLevelSize,0);
+	this->dsSrmCount = ip::createVector4D(merged_labels.size(),merged_labels.size(),this->rel_op.size(),this->relOpLevelSize,0);
 	this->dsSrmArea.resize(merged_labels.size(),vector<vector<vector<pair<int,int>> > >(merged_labels.size(),vector<vector<pair<int,int>> >(this->rel_op.size(),vector<pair<int,int>>(relOpLevelSize,std::make_pair(0,0)))));
 	this->mergedLabelContainer.resize(merged_labels.size(),vector<vector<vector<pair<vector<String>,vector<String>>> > >(merged_labels.size(),vector<vector<pair<vector<String>,vector<String>>> >(this->rel_op.size(),vector<pair<vector<String>,vector<String>>>(relOpLevelSize,std::make_pair(vector<String>(),vector<String>())))));
 	this->mergedRelationDistance.resize(merged_labels.size(),vector<vector<vector<float> > >(merged_labels.size(),vector<vector<float> >(this->rel_op.size(),vector<float>(0,0.0))));

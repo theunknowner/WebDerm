@@ -12,23 +12,21 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Cluster/cluster.h"
 
+using namespace ip;
+
 namespace Skin {
 /* Fills in holes in the image */
 void getSkinUsingThresh(Mat &img, Mat &mask)
 {
-	mask = mask.zeros(img.rows,img.cols,CV_8U);
+	mask = Mat::zeros(img.size(),CV_8U);
 	int r,g,b;
-	for(int row=0; row<img.rows; row++)
-	{
-		for(int col=0; col<img.cols; col++)
-		{
+	for(int row=0; row<img.rows; row++) {
+		for(int col=0; col<img.cols; col++) {
 			b = img.at<Vec3b>(row,col)[0];
 			g = img.at<Vec3b>(row,col)[1];
 			r = img.at<Vec3b>(row,col)[2];
-			if(r>g && g>b)
-			{
-				if((b+g)<(2*r) && ((r-g) > 20 || (r-b) > 20) && r>95 && b>55 && b<200 && g>40 && g<200)
-				{
+			if(r>g && g>b) {
+				if((b+g)<(2*r) && ((r-g) > 20 || (r-b) > 20) && r>95 && b>55 && b<200 && g>40 && g<200) {
 					mask.at<uchar>(row,col) = 255;
 				}
 			}
@@ -59,9 +57,11 @@ void getSkinUsingCorrelation(Mat &img, Mat &mask)
 	imfill(mask);
 }
 
-void getSkin(Mat &img, Mat &mask)
+//! returns skin output to mask
+Mat getSkin(Mat &img)
 {
-	double skinCount=(img.rows*img.cols)*0.2; //20% of 700x700
+	Mat mask;
+	double skinCount=(img.rows*img.cols)*0.2; //20%
 	getSkinUsingThresh(img,mask);
 	if(countNonZero(mask)<skinCount)
 	{
@@ -69,6 +69,9 @@ void getSkin(Mat &img, Mat &mask)
 		getSkinUsingCorrelation(img,mask);
 	}
 
+	Mat results;
+	img.copyTo(results,mask);
+	return results;
 }
 
 Mat getSkinUsingKmeans(ImageData &id) {

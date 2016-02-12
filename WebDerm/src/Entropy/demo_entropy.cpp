@@ -12,6 +12,8 @@
 #include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
 
+using namespace ip;
+
 void Entropy::demo_runCompareEntropy() {
 	String input, inputName, name;
 	deque<deque<double> > vec1;
@@ -88,10 +90,10 @@ void Entropy::demo_runCompareEntropy() {
 
 void Entropy::demo_showShape(String name) {
 	String file = "/home/jason/Desktop/Programs/Looks_Like/"+name+".jpg";
-	Mat img = runResizeImage(file,Size(140,140),0);
+	Mat img = Run::runResizeImage(file,Size(140,140),0);
 	ShapeMorph sm;
 	Size size(5,5);
-	img = runColorNormalization(img);
+	img = Run::runColorNormalization(img);
 	cvtColor(img,img,CV_BGR2GRAY);
 	vector<Mat> matVec = sm.lumFilter1(img);
 	//vector<Mat> matVec2 = sm.lumFilter2(img);

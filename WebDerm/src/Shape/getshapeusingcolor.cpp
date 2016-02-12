@@ -76,7 +76,7 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 				}
 			}
 			minMaxLoc(distVec,&minMaxDist[0],&minMaxDist[1],&minMaxPt[0],&minMaxPt[1]);
-			double maxDist = roundDecimal(minMaxDist[1] - minMaxDist[0],4);
+			double maxDist = ip::roundDecimal(minMaxDist[1] - minMaxDist[0],4);
 			maxRangeVec.push_back(maxDist);
 		}
 	}
@@ -108,7 +108,7 @@ void maxLocalRanges(Mat mat1, Mat mat2, Mat mat3, Mat hc, Mat noiseMap, double &
 				}
 			}
 			minMaxLoc(distVec,&minMaxDist[0],&minMaxDist[1],&minMaxPt[0],&minMaxPt[1]);
-			double maxDist = roundDecimal(minMaxDist[1] - minMaxDist[0],4);
+			double maxDist = ip::roundDecimal(minMaxDist[1] - minMaxDist[0],4);
 			if(maxDist<maxRange) {
 				_altitude.at<float>(row,col) = maxDist;
 			}

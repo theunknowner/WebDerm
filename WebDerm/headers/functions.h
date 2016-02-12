@@ -14,9 +14,11 @@ class ImageData;
 template< class T, size_t N >
 std::size_t length(const T (&)[N] )
 {
-  return N;
+	return N;
 };
 #define stringify(name) #name
+
+namespace ip {
 
 String toString(int val);
 String toString(unsigned int val);
@@ -47,15 +49,14 @@ map<int,int> frequency(vector<int> vec);
 float majority(vector<float> vec);
 int majority(vector<int> vec);
 
-namespace Func {
-	String addDigitsForLabel(int num, String digit, int length=1);
-	vector<vector<vector<vector<int> > > > createVector4D(int dim1, int dim2, int dim3, int dim4, int val);
-	void getSubstr(String str, char beginDelimit, char endDelimit, vector<String> &vec);
-	int largest(Mat input, int rank=1);
-	int smallest(vector<float> vec, int rank=1);
-	Mat prepareImage(Mat input, Size size);
-	void prepareImage(ImageData &id, Size size);
-	Mat smooth(Mat &img, Size size, int colIncr=1, int rowIncr=1);
+String addDigitsForLabel(int num, String digit, int length=1);
+vector<vector<vector<vector<int> > > > createVector4D(int dim1, int dim2, int dim3, int dim4, int val);
+void getSubstr(String str, char beginDelimit, char endDelimit, vector<String> &vec);
+int largest(Mat input, int rank=1);
+int smallest(vector<float> vec, int rank=1);
+Mat prepareImage(Mat input, Size size);
+void prepareImage(ImageData &id, Size size);
+Mat smooth(Mat &img, Size size, int colIncr=1, int rowIncr=1);
 }
 
 class Functions {
