@@ -17,6 +17,7 @@ int getPeakClusters(vector<double> &data_vec);
 
 Mat colorNormalizationScript(String filename);
 Mat getSkinScript(String filename);
+ShadeShape trScript(String filename);
 
 void script1();
 ShadeShape script2(String name);

@@ -57,7 +57,7 @@ void getSkinUsingCorrelation(Mat &img, Mat &mask)
 	imfill(mask);
 }
 
-//! returns skin output to mask
+//! returns mask of where skin is
 Mat getSkin(Mat &img)
 {
 	Mat mask;
@@ -69,9 +69,7 @@ Mat getSkin(Mat &img)
 		getSkinUsingCorrelation(img,mask);
 	}
 
-	Mat results;
-	img.copyTo(results,mask);
-	return results;
+	return mask;
 }
 
 Mat getSkinUsingKmeans(ImageData &id) {

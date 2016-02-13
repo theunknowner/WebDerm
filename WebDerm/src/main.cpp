@@ -98,16 +98,15 @@ int main(int argc,char** argv)
 	//ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
+
+	/*
 	deque<String> files;
-	String folder = "Looks_Like3/";
+	String folder = "Looks_Like4/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		String filename = folder + files.at(i);
-		String name = ip::getFileName(filename);
-		 Mat img = Scripts::getSkinScript(filename);
-		 String out = "/home/jason/Desktop/Programs/Discrete3/"+name+"_skin.png";
-		 imwrite(out,img);
+		Scripts::script33(filename);
 	}
 
 	/*
@@ -119,9 +118,6 @@ int main(int argc,char** argv)
 		String filename = folder + files.at(i);
 		String name = ip::getFileName(filename);
 		//ShadeShape ss1 = Scripts::script31(name);
-		 Mat img = Scripts::getSkinScript(filename);
-		 String out = "/home/jason/Desktop/Programs/Discrete2/"+name+"_skin.png";
-		 imwrite(out,img);
 	}
 
 	/*
@@ -135,7 +131,6 @@ int main(int argc,char** argv)
 		Scripts::script33(name);
 	}
 /**/
-	//Scripts::script33("psoriasis26");
 	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	//ss1.showInteractiveIslands(
@@ -145,12 +140,12 @@ int main(int argc,char** argv)
 	//imwrite(ss1.name()+"_strip.png",island.image());
 	//cout << island.nn_results() << endl;
 	/**/
-	/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
 		Timer time;
-		String folder = "Looks_Like/";
+		String folder = "/VMS/home/jason/Files/Webderm/Looks_Like4/";
 		deque<String> files;
 		FileData fd;
 		fd.getFilesFromDirectory(folder,files);
@@ -159,20 +154,23 @@ int main(int argc,char** argv)
 		//while(getline(fs,temp)) {
 		//	files.push_back(temp);
 		//}
-		ShadeShape ss1 = Scripts::script31(argv[1]);
+		//ShadeShape ss1 = Scripts::script31(argv[1]);
+		String filename = folder + string(argv[1]) + ".jpg";
+		ShadeShape ss1 = Scripts::trScript(filename);
 		vector<vector<float> > resultVec;
 		vector<String> nameVec;
 		vector<int> origPos;
 		//> STT counter setup <//
 		ShapeMatch spm;
-		vector<vector<int> > shapeTranslateCount(10,vector<int>(10,0)); //8 shapes
+		vector<vector<int> > shapeTranslateCount(10,vector<int>(10,0)); //10 shapes
 		///////////////////////
 		for(unsigned int i=0; i<files.size(); i++) {
-			name = folder + files.at(i);
-			name = getFileName(name);
+			String filename2 = folder + files.at(i);
+			name = ip::getFileName(filename2);
 			if(name!=argv[1]) {
 				try {
-					ShadeShape ss2 = Scripts::script31(name);
+					//ShadeShape ss2 = Scripts::script31(name);
+					ShadeShape ss2 = Scripts::trScript(filename2);
 					ShadeShapeMatch ssm;
 					if(argc>=3)
 						ssm.debug_mode(atoi(argv[2]));
