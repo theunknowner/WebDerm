@@ -6,7 +6,7 @@
  */
 
 #include "circle.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 Mat Circle::findCircles(Mat & img) {
 	Mat dst,img2;

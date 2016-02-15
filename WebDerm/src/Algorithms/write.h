@@ -8,7 +8,7 @@
 #ifndef WRITE_H_
 #define WRITE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 namespace Write {
 void writeToCsv(deque< deque<String> > &vec, String name);

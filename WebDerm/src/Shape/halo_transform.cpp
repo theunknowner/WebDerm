@@ -6,7 +6,7 @@
  */
 
 #include "shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "../Math/maths.h"
 
 //increase LC for nearby
 Mat ShapeMorph::haloTransform(Mat src, int iterations) {

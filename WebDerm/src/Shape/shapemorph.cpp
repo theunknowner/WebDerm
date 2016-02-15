@@ -6,17 +6,17 @@
  */
 
 #include "shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Cluster/cluster.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Pathfind/pathfind.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "../functions.h"
+#include "../run.h"
+#include "../Algorithms/jaysort.h"
+#include "../Math/maths.h"
+#include "../Cluster/cluster.h"
+#include "../KneeCurve/kneecurve.h"
+#include "../Poly/poly.h"
+#include "../Algorithms/write.h"
+#include "../ImageData/imagedata.h"
+#include "../Pathfind/pathfind.h"
+#include "../hsl/hsl.h"
 
 void ShapeMorph::setDebugMode(bool mode) {
 	this->debugMode = mode;

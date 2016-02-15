@@ -10,7 +10,7 @@
 
 class FileData;
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 double rule1(FileData &fd, String &newShade);
 double rule3(FileData &fd, String &newPix, String &newShade);

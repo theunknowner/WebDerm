@@ -8,7 +8,7 @@
 #ifndef KNEECURVE_H_
 #define KNEECURVE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class KneeCurve {
 	double maxDist;

@@ -8,7 +8,7 @@
 #ifndef LFE_H_
 #define LFE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 
 class LiquidFeatureExtraction {
 private:

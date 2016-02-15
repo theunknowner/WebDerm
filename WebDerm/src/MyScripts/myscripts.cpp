@@ -6,32 +6,32 @@
  */
 
 #include "myscripts.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Create/createtrainingdata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/CIE/cie.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Poly/poly.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Cluster/cluster.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/shadeshape.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShapeMatch/shapematch.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/ShadeShapeMatch/shadeshapematch.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Histogram/histogram.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/skin/Skin.h"
+#include "../hsl/hsl.h"
+#include "../functions.h"
+#include "../run.h"
+#include "../rgb/rgb.h"
+#include "../Math/maths.h"
+#include "../Color/color.h"
+#include "../Create/createtrainingdata.h"
+#include "../FileData/filedata.h"
+#include "../CIE/cie.h"
+#include "../Colorspace/cielab.h"
+#include "../Colorspace/xyz.h"
+#include "../Algorithms/write.h"
+#include "../Shades/shades.h"
+#include "../Poly/poly.h"
+#include "../KneeCurve/kneecurve.h"
+#include "../Cluster/cluster.h"
+#include "../Shape/shapemorph.h"
+#include "../Shape/shapecolor.h"
+#include "../ShadeShape/shadeshape.h"
+#include "../neuralnetworks/testml.h"
+#include "../ShadeShape/ShapeMatch/shapematch.h"
+#include "../ShadeShape/ShadeShapeMatch/shadeshapematch.h"
+#include "../Epoh/epoh.h"
+#include "../ImageData/imagedata.h"
+#include "../Histogram/histogram.h"
+#include "../skin/Skin.h"
 
 using namespace ip;
 using namespace Run;
@@ -1850,7 +1850,7 @@ void script24() {
 	FileData fd;
 	deque<String> files;
 	String folder = "/home/jason/Desktop/Programs/Looks_Like/";
-	String out = "/home/jason/Desktop/Programs/LC/";
+	String out = "/home/jason/Desktop/Programs../";
 	String out2 = "/home/jason/Desktop/Programs/DeltaE/";
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {

@@ -6,13 +6,13 @@
  */
 
 #include "features.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "../Shape/shapemorph.h"
+#include "../neuralnetworks/testml.h"
+#include "../functions.h"
+#include "../ImageData/imagedata.h"
 #include "islands.h"
 #include "shadeshape.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapes.h"
+#include "../Shape/shapes.h"
 
 /************ PRIVATE FUNCTIONS ****************/
 

@@ -6,7 +6,7 @@
  */
 
 #include "shapecolor.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "../Shades/shades.h"
 
 //input is grayscale image
 Mat ShapeColor::applyDiscreteShade(Mat input) {

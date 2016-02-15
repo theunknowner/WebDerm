@@ -5,17 +5,17 @@
  *      Author: jason
  */
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/quicksort.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/median.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/mean.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/stddev.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "functions.h"
+#include "hsl/hsl.h"
+#include "Algorithms/quicksort.h"
+#include "Algorithms/write.h"
+#include "Algorithms/median.h"
+#include "Algorithms/mean.h"
+#include "Algorithms/stddev.h"
+#include "rgb/rgb.h"
+#include "Color/color.h"
+#include "Algorithms/jaysort.h"
+#include "ImageData/imagedata.h"
 
 namespace ip {
 String toString(int val)

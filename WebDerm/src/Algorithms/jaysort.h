@@ -8,7 +8,7 @@
 #ifndef JAYSORT_H_
 #define JAYSORT_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 void jaysort(deque<double> &vec, deque<int> &origPos);
 void jaysort(deque<int> &vec, deque<int> &origPos);

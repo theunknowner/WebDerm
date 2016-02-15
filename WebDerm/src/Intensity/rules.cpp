@@ -7,14 +7,14 @@
 
 #include "rules.h"
 #include "intensity.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "../functions.h"
+#include "../FileData/filedata.h"
+#include "../rgb/rgb.h"
+#include "../hsl/hsl.h"
+#include "../Color/color.h"
+#include "../Shades/shades.h"
+#include "../Algorithms/write.h"
+#include "../Math/maths.h"
 
 using namespace ip;
 

@@ -6,9 +6,9 @@
  */
 
 #include "testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
+#include "../functions.h"
+#include "../FileData/filedata.h"
+#include "../run.h"
 
 bool TestML::THRESH_IMPORTED = false;
 String TestML::PARAM_PATH = "Thresholds/param-Excavated.xml";

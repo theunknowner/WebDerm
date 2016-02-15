@@ -6,7 +6,7 @@
  */
 
 #include "epoh.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 //! Expressive Power of Hue
 double epoh(double &sat, double &lum) {

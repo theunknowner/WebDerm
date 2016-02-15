@@ -8,7 +8,7 @@
 #ifndef SHADEMATCH_H_
 #define SHADEMATCH_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 #include "../shadeshape.h"
 #include "../islands.h"
 

@@ -8,7 +8,7 @@
 #ifndef SHAPES_H_
 #define SHAPES_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Shapes {
 protected:

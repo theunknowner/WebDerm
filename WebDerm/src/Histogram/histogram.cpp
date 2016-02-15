@@ -1,8 +1,8 @@
 
 #include "histogram.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "../functions.h"
+#include "../hsl/hsl.h"
+#include "../rgb/rgb.h"
 
 //returns a histogram using HSV
 vector<Mat> Histogram::calcHistogram(Mat src) {

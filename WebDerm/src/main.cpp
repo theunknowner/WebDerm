@@ -5,8 +5,8 @@
  *      Author: jason
  */
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/run.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "run.h"
+#include "functions.h"
 #include "rgb/rgb.h"
 #include "hsl/hsl.h"
 #include "Hsv/hsv.h"
@@ -145,7 +145,7 @@ int main(int argc,char** argv)
 	String name = "";
 	try {
 		Timer time;
-		String folder = "/VMS/home/jason/Files/Webderm/Looks_Like4/";
+		String folder = "Looks_Like4/";
 		deque<String> files;
 		FileData fd;
 		fd.getFilesFromDirectory(folder,files);
@@ -163,7 +163,7 @@ int main(int argc,char** argv)
 		//> STT counter setup <//
 		ShapeMatch spm;
 		vector<vector<int> > shapeTranslateCount(10,vector<int>(10,0)); //10 shapes
-		///////////////////////
+		///////////////////
 		for(unsigned int i=0; i<files.size(); i++) {
 			String filename2 = folder + files.at(i);
 			name = ip::getFileName(filename2);
@@ -212,7 +212,7 @@ int main(int argc,char** argv)
 			fprintf(sttCountFile,"\n");
 		}
 		fclose(sttCountFile);
-		//////////////////////////
+		////////////////////
 
 		jaysort(resultVec,origPos,1);
 		printf("%s...Done!\n",argv[1]);

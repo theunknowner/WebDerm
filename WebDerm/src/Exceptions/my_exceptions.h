@@ -8,7 +8,7 @@
 #ifndef MY_EXCEPTIONS_H_
 #define MY_EXCEPTIONS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 #include <exception>
 
 class MyExceptions : public cv::Exception {

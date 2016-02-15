@@ -6,11 +6,11 @@
  */
 
 #include "islands.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../neuralnetworks/testml.h"
+#include "../Shape/shapemorph.h"
+#include "../functions.h"
 #include "subislands.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapes.h"
+#include "../Shape/shapes.h"
 
 namespace Isl {
 void onMouseCheckSubIslands(int event, int x, int y, int flags, void* param) {

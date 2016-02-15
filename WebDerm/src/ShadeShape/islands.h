@@ -8,7 +8,7 @@
 #ifndef ISLANDS_H_
 #define ISLANDS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 #include "subislands.h"
 
 namespace Isl {

@@ -8,7 +8,7 @@ f * features.h
 #ifndef FEATURES_H_
 #define FEATURES_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 
 class Islands;

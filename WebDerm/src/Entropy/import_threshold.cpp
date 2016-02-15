@@ -6,7 +6,7 @@
  */
 
 #include "entropy.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 bool Entropy::importEntropyThresholds() {
 	String folderName = "Thresholds/";

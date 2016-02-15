@@ -8,7 +8,7 @@
 #ifndef STATSIGN_H_
 #define STATSIGN_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 
 //! Statistical signature class
 class StatSign {

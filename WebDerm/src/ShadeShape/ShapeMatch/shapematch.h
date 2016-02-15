@@ -8,10 +8,10 @@
 #ifndef SHAPEMATCH_H_
 #define SHAPEMATCH_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 #include "../shadeshape.h"
 #include "../islands.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapes.h"
+#include "../../Shape/shapes.h"
 
 class ShadeShape;
 class Islands;

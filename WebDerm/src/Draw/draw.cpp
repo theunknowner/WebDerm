@@ -6,7 +6,7 @@
  */
 
 #include "draw.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 Scalar Draw::randomColor(RNG &rng) {
 	int icolor = (unsigned) rng;

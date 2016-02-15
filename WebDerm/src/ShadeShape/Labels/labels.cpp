@@ -6,7 +6,7 @@
  */
 
 #include "labels.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../../functions.h"
 #include "../StatSign/statsign.h"
 
 /************************* PRIVATE FUNCTIONS ****************************/

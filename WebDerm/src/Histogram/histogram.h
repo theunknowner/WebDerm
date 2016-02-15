@@ -2,7 +2,7 @@
 #ifndef HISTOGRAM_H_
 #define HISTOGRAM_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Histogram {
 public:

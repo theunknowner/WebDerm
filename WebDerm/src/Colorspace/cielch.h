@@ -8,7 +8,7 @@
 #ifndef CIELCH_H_
 #define CIELCH_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class CieLch {
 public:

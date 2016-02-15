@@ -6,13 +6,13 @@
  */
 
 #include "hysteresis.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Intensity/intensity.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Intensity/rules.h"
+#include "../functions.h"
+#include "../rgb/rgb.h"
+#include "../Color/color.h"
+#include "../hsl/hsl.h"
+#include "../Intensity/intensity.h"
+#include "../FileData/filedata.h"
+#include "../Intensity/rules.h"
 
 void hysteresis(FileData &fd) {
 	hysteresis(fd.getImage(),fd.ksize,fd.filename,fd);

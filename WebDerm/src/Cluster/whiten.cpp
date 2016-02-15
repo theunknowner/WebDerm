@@ -6,7 +6,7 @@
  */
 
 #include "cluster.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/stddev.h"
+#include "../Algorithms/stddev.h"
 
 //! Normalize a group of samples(rows) on a per feature(column) basis.
 /* Each feature(column) is divided by its standard deviation across all

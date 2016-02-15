@@ -6,17 +6,17 @@
  */
 
 #include "entropy.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/stddev.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapecolor.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
+#include "../FileData/filedata.h"
+#include "../functions.h"
+#include "../Algorithms/write.h"
+#include "../Algorithms/stddev.h"
+#include "../Shape/shapemorph.h"
+#include "../neuralnetworks/testml.h"
+#include "../Shape/shapecolor.h"
+#include "../Shades/shades.h"
+#include "../rgb/rgb.h"
+#include "../hsl/hsl.h"
+#include "../Color/color.h"
 
 using namespace ip;
 

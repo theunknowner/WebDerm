@@ -8,7 +8,7 @@
 #ifndef SHADESHAPERELATION_H_
 #define SHADESHAPERELATION_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 #include "../ShapeMatch/shapematch.h"
 #include "srm.h"
 

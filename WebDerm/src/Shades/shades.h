@@ -8,7 +8,7 @@
 #ifndef SHADES_H_INCLUDED
 #define SHADES_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 #include "peakcluster.h"
 
 class Shades: public PeakCluster {

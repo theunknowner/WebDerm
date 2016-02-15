@@ -8,7 +8,7 @@
 #ifndef PARALLEL_H_
 #define PARALLEL_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 template <class type>
 

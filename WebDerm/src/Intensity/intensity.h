@@ -10,7 +10,7 @@
 
 class FileData;
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Intensity {
 private:

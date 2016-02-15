@@ -8,7 +8,7 @@
 #ifndef READ_H_
 #define READ_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 namespace Read {
 	vector<vector<String> > readFromCsv(String filename);

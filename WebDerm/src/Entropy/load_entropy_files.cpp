@@ -6,7 +6,7 @@
  */
 
 #include "entropy.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 bool Entropy::loadEntropyFiles(String filepath, deque<deque<double> > &dataMat, deque<String> &colorNameVec) {
 	fstream fs(filepath.c_str());

@@ -1,11 +1,11 @@
 
 
 #include "color.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Hsv/hsv.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "../functions.h"
+#include "../rgb/rgb.h"
+#include "../hsl/hsl.h"
+#include "../Hsv/hsv.h"
+#include "../Shades/shades.h"
 
 using namespace ip;
 

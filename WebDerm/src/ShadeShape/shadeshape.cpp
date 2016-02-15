@@ -6,13 +6,13 @@
  */
 
 #include "shadeshape.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shape/shapemorph.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "../Shape/shapemorph.h"
+#include "../functions.h"
+#include "../Math/maths.h"
 #include "islands.h"
 #include "features.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/neuralnetworks/testml.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "../neuralnetworks/testml.h"
+#include "../ImageData/imagedata.h"
 
 using namespace ip;
 

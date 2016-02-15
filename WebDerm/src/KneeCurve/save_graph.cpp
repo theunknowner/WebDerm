@@ -6,7 +6,7 @@
  */
 
 #include "kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "../Algorithms/write.h"
 
 void KneeCurve::save_graph(String out, vector<double> &vec) {
 	Write::writeToCsv(vec,out);

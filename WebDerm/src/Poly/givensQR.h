@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <math.h>
 #include <algorithm>
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 template<typename T>
 class Givens

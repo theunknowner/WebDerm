@@ -6,9 +6,9 @@
  */
 
 #include "shapecolor.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Shades/shades.h"
+#include "../functions.h"
+#include "../KneeCurve/kneecurve.h"
+#include "../Shades/shades.h"
 
 void ShapeColor::setDebugLevel(int level) {
 	this->debugLevel = level;

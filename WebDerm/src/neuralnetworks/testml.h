@@ -8,7 +8,7 @@
 #ifndef TESTML_H_
 #define TESTML_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/stdafx.h"
+#include "../stdafx.h"
 
 class TestML {
 private:

@@ -6,7 +6,7 @@
  */
 
 #include "read.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 namespace Read {
 

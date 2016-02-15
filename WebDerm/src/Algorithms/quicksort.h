@@ -8,7 +8,7 @@
 #ifndef QUICKSORT_H_
 #define QUICKSORT_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 void quicksort(deque<double> &values, int p, int r);
 void quicksort(deque<int> &values, int p,int r);

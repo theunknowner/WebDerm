@@ -6,8 +6,8 @@
  */
 
 #include "shadeshapematch.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "../../functions.h"
+#include "../../Algorithms/jaysort.h"
 #include "../ShapeMatch/shapematch.h"
 #include "../ShadeMatch/shadematch.h"
 #include "../shadeshape.h"

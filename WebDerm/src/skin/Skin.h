@@ -8,8 +8,8 @@
 #ifndef SKIN_H_
 #define SKIN_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "../global.h"
+#include "../ImageData/imagedata.h"
 
 class ImageData;
 namespace Skin {

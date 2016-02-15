@@ -6,7 +6,7 @@
  */
 
 #include "imagedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 #include "pixeldata.h"
 
 /************************* PRIVATE FUNCTIONS *****************************/

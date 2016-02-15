@@ -8,8 +8,8 @@
 #ifndef MYSCRIPTS_H_
 #define MYSCRIPTS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/shadeshape.h"
+#include "../global.h"
+#include "../ShadeShape/shadeshape.h"
 
 class ShadeShape;
 namespace Scripts {

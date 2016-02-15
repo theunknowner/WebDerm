@@ -8,7 +8,7 @@
 #ifndef EPOH_H_
 #define EPOH_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 double epoh(double &sat, double &lum);
 Mat epohTheHue(Mat &hMat, Mat &sMat, Mat &lMat);

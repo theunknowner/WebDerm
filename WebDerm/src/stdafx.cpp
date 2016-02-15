@@ -5,4 +5,4 @@
  *      Author: jason
  */
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/stdafx.h"
+#include "stdafx.h"

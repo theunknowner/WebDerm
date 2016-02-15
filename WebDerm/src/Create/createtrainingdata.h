@@ -8,7 +8,7 @@
 #ifndef CREATETRAININGDATA_H_
 #define CREATETRAININGDATA_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class CreateTrainingData {
 public:

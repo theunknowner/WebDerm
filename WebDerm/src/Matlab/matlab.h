@@ -8,7 +8,7 @@
 #ifndef MATLAB_H_
 #define MATLAB_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Matlab {
 public:

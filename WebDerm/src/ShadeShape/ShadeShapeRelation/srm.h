@@ -8,7 +8,7 @@
 #ifndef SRM_H_
 #define SRM_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 #include "../Labels/labels.h"
 
 class Labels;

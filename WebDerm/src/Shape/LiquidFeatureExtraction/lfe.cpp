@@ -6,7 +6,7 @@
  */
 
 #include "lfe.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../../functions.h"
 
 //! coded for only 2 seed maps so far
 //! code needs to be changed for more seed map comparisons

@@ -6,8 +6,8 @@
  */
 
 #include "cluster.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "../functions.h"
+#include "../Algorithms/jaysort.h"
 
 /* returns mask using kmeans clustering,
  * set maxVal>0 for custom max value of samples

@@ -6,8 +6,8 @@
  */
 
 #include "esg.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "../../functions.h"
+#include "../../Math/maths.h"
 
 vector<vector<float> > Esg::esgVec;
 bool Esg::THRESH_IMPORTED = false;

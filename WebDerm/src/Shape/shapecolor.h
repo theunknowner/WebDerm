@@ -8,7 +8,7 @@
 #ifndef SHAPECOLOR_H_
 #define SHAPECOLOR_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class ShapeColor {
 private:

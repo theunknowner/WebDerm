@@ -8,7 +8,7 @@
 #ifndef MATHS_H_
 #define MATHS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/stdafx.h"
+#include "../stdafx.h"
 
 namespace MyMath {
 	double correlationDist(double * vec1, double * vec2);

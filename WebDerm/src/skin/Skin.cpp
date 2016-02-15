@@ -6,11 +6,11 @@
  */
 
 #include "Skin.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Cluster/cluster.h"
+#include "../functions.h"
+#include "../hsl/hsl.h"
+#include "../Math/maths.h"
+#include "../ImageData/imagedata.h"
+#include "../Cluster/cluster.h"
 
 using namespace ip;
 

@@ -8,7 +8,7 @@
 #ifndef SHADESHAPE_H_
 #define SHADESHAPE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 //#include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
 #include "features.h"
 

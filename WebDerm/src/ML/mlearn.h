@@ -8,7 +8,7 @@
 #ifndef MLEARN_H_
 #define MLEARN_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class MLearn {
 public:

@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iostream>
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 template<class T>
 class matrix

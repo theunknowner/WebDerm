@@ -8,7 +8,7 @@
 #ifndef CIRCLE_H_
 #define CIRCLE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Circle {
 public:

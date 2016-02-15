@@ -10,7 +10,7 @@
 
 class FileData;
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 void hysteresis(FileData &fd);
 void hysteresis(Mat img, Size size, String name, FileData &fd);

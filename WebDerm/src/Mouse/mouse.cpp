@@ -6,10 +6,10 @@
  */
 
 #include "mouse.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/FileData/filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "../functions.h"
+#include "../FileData/filedata.h"
+#include "../rgb/rgb.h"
+#include "../hsl/hsl.h"
 
 String filename;
 

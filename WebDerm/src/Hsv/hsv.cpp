@@ -6,7 +6,7 @@
  */
 
 #include "hsv.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
+#include "../hsl/hsl.h"
 
 double * Hsv::rgb2hsv(double red, double green, double blue) {
 	Hsl hsl;

@@ -8,7 +8,7 @@
 #ifndef ESG_H_
 #define ESG_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 
 class Esg {
 private:

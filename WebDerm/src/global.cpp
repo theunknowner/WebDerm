@@ -5,7 +5,7 @@
  *      Author: jason
  */
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "global.h"
 
 String path = "/home/jason/Desktop/workspace/";
 bool debug = false;

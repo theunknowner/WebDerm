@@ -6,7 +6,7 @@
  */
 
 #include "shapes.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 vector<String> Shapes::shapeNames;
 vector<String> Shapes::shapeNames2;

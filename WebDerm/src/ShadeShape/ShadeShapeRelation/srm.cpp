@@ -7,7 +7,7 @@
 
 #include "srm.h"
 #include "../Labels/labels.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../../functions.h"
 
 /******************** PRIVATE FUNCTIONS **********************/
 

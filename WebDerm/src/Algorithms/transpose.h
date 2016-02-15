@@ -8,7 +8,7 @@
 #ifndef ALGOS_H_
 #define ALGOS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 void transpose(deque<deque<double> > &vec);
 

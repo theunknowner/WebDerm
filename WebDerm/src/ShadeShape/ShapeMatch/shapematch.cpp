@@ -7,8 +7,8 @@
 
 #include "shapematch.h"
 #include "../islands.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
+#include "../../functions.h"
+#include "../../Algorithms/jaysort.h"
 
 vector<vector<String> > ShapeMatch::shiftingRules;
 vector<vector<float> > ShapeMatch::shiftingPenalties;

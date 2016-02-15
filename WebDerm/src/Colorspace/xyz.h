@@ -8,7 +8,7 @@
 #ifndef XYZ_H_
 #define XYZ_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Xyz {
 public:

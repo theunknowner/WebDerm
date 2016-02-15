@@ -6,7 +6,7 @@
  */
 
 #include "peakcluster.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Cluster/cluster.h"
+#include "../Cluster/cluster.h"
 
 inline vector<double> PeakCluster::convert2Vec(Mat &src) {
 	vector<double> data_vec;

@@ -6,9 +6,9 @@
  */
 
 #include "filedata.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Color/color.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/rgb/rgb.h"
+#include "../functions.h"
+#include "../Color/color.h"
+#include "../rgb/rgb.h"
 
 using namespace ip;
 

@@ -6,15 +6,15 @@
  */
 
 #include "shapecolor.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/KneeCurve/kneecurve.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/CIE/cie.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/hsl/hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/xyz.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Colorspace/cielab.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Epoh/epoh.h"
+#include "../functions.h"
+#include "../KneeCurve/kneecurve.h"
+#include "../CIE/cie.h"
+#include "../hsl/hsl.h"
+#include "../Colorspace/xyz.h"
+#include "../Colorspace/cielab.h"
+#include "../Math/maths.h"
+#include "../Algorithms/write.h"
+#include "../Epoh/epoh.h"
 
 //! using delta Emax
 //! find the max deltaE distances between adjacent pixels in a 1x20 window

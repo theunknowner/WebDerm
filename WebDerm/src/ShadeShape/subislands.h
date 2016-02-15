@@ -8,7 +8,7 @@
 #ifndef SUBISLANDS_H_
 #define SUBISLANDS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 //! class is used to store the black discs subfeatures inside a feature
 class SubIslands {

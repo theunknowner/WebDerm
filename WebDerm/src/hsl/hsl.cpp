@@ -6,7 +6,7 @@
  */
 
 #include "hsl.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../functions.h"
 
 double H, S, L;
 deque<String> Hsl::hslColors;

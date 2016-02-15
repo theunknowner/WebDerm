@@ -8,7 +8,7 @@
 #ifndef LABELS_H_
 #define LABELS_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 #include "../islands.h"
 #include "../ShapeMatch/shapematch.h"
 

@@ -8,8 +8,8 @@
 #include "shadematch.h"
 #include "../shadeshape.h"
 #include "../islands.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/jaysort.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../../Algorithms/jaysort.h"
+#include "../../functions.h"
 
 vector<float> ShadeMatch::shadeWeightsVec;
 

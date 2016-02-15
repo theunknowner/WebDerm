@@ -8,7 +8,7 @@
 #ifndef SSR_MATCH_H_
 #define SSR_MATCH_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../../global.h"
 #include "shadeshaperelation.h"
 #include "../ShapeMatch/shapematch.h"
 

@@ -8,7 +8,7 @@
 #ifndef IMAGEDATA_H_
 #define IMAGEDATA_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 #include "pixeldata.h"
 
 class PixelData;

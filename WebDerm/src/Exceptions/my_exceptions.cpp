@@ -6,7 +6,7 @@
  */
 
 #include "my_exceptions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Timer/timer.h"
+#include "../Timer/timer.h"
 
 MyExceptions::MyExceptions() {
 	this->filename = "";

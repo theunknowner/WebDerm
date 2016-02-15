@@ -8,7 +8,7 @@
 #ifndef CIE_H_
 #define CIE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Cie {
 public:

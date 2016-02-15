@@ -8,7 +8,7 @@
 #ifndef NODE_H_
 #define NODE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class Node {
 	Point currPos;

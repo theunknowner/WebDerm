@@ -7,7 +7,7 @@
 #ifndef FUNCTIONS_H_INCLUDED
 #define FUNCTIONS_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "global.h"
 
 class ImageData;
 

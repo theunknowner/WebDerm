@@ -8,7 +8,7 @@
 #include "ssr_match.h"
 #include "shadeshaperelation.h"
 #include "../Labels/labels.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
+#include "../../functions.h"
 #include "../ShapeMatch/shapematch.h"
 #include "../StatSign/statsign.h"
 #include "esg.h"

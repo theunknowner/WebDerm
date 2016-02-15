@@ -6,11 +6,11 @@
  */
 
 #include "shadeshaperelation.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/ShadeShape/shadeshape.h"
-#include "/home/jason/git/WebDerm/WebDerm/headers/functions.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Math/maths.h"
+#include "../../ShadeShape/shadeshape.h"
+#include "../../functions.h"
+#include "../../Math/maths.h"
 #include "../Labels/labels.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/State/state.h"
+#include "../../State/state.h"
 #include "srm.h"
 
 using namespace ip;

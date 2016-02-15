@@ -8,7 +8,7 @@
 #ifndef STATE_H_
 #define STATE_H_
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class State {
 private:

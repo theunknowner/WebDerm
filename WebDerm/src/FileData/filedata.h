@@ -8,7 +8,7 @@
 #ifndef FILEDATA_H_INCLUDED
 #define FILEDATA_H_INCLUDED
 
-#include "/home/jason/git/WebDerm/WebDerm/headers/global.h"
+#include "../global.h"
 
 class FileData {
 private:

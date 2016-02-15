@@ -6,8 +6,8 @@
  */
 
 #include "poly.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Matlab/matlab.h"
-#include "/home/jason/git/WebDerm/WebDerm/src/Algorithms/write.h"
+#include "../Matlab/matlab.h"
+#include "../Algorithms/write.h"
 #include "matrix.h"
 #include "givensQR.h"
 
