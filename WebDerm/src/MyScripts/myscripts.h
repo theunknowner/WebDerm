@@ -13,43 +13,12 @@
 
 class ShadeShape;
 namespace Scripts {
-int getPeakClusters(vector<double> &data_vec);
 
 Mat colorNormalizationScript(String filename);
 Mat getSkinScript(String filename);
-ShadeShape trScript(String filename);
+ShadeShape discreteShadeShapeScript(String filename);
 
 void script1();
-ShadeShape script2(String name);
-void script3();
-void script4();
-void script5();
-void script6();
-void script7();
-void script8();
-void script9();
-void script10();
-void script11();
-void script12();
-void script13();
-void script14();
-void script15();
-void script16();
-void script17();
-void script18();
-void script19();
-void script20();
-void script21();
-void script22();
-void script23();
-void script24();
-void script25();
-void script26();
-void script27(String name);
-void script28a();
-void script28b();
-void script29();
-void script30(String name);
 ShadeShape script31(String filename);
 void script32(String filename);
 void script33(String filename);

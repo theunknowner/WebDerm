@@ -86,18 +86,29 @@ int main(int argc,char** argv)
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
 /**/
-	/*
+/*
 	String file = std::string(argv[1]);
 	String name = getFileName(file);
 	Mat img = imread(file,0);
 	ImageData id(img,name);
-	Func::prepareImage(id,Size(140,140));
+	ip::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id,false);
-	ss1.showInteractiveSubIslands();
-	//ss1.showInteractiveIslands();
+	//ss1.showInteractiveSubIslands();
+	ss1.showInteractiveIslands();
 	TestML::clear();
 /**/
+
+	String file = "/home/jason/Desktop/workspace/Test_Runs/herpes3_acne_vulgaris2_max_match_image_n0_shd2_shp-1-1.png";
+	String name = getFileName(file);
+	Mat img = imread(file,0);
+	ImageData id(img,name);
+	ip::prepareImage(id,Size(140,140));
+	ShadeShape ss1;
+	ss1.extract(id,false);
+	Islands island = ss1.getIslandWithPoint(Point(25,40));
+	imwrite(ss1.name()+"_strip.png",island.image());
+	cout << island.nn_results() << endl;
 
 	/*
 	deque<String> files;
@@ -119,28 +130,32 @@ int main(int argc,char** argv)
 		String name = ip::getFileName(filename);
 		//ShadeShape ss1 = Scripts::script31(name);
 	}
-
-	/*
+/**/
+/*
 	deque<String> files;
-	String folder = "Looks_Like2/";
+	String folder = "Looks_Like/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
-		String name = folder + files.at(i);
-		//ShadeShape ss1 = Scripts::script31(name);
-		Scripts::script33(name);
+		String filename = folder + files.at(i);
+		String name = ip::getFileName(filename);
+		ShadeShape ss1 = Scripts::discreteShadeShapeScript(filename);
+		String out = "/home/jason/Desktop/Programs/Discrete/" + name + "_discrete.png";
+		printf("Writing...%s\n",name.c_str());
+		imwrite(out,ss1.image());
 	}
 /**/
-	//ShadeShape ss1 = Scripts::script31("tinea_corporis4");
+/*
+	ShadeShape ss1 = Scripts::discreteShadeShapeScript("/home/jason/Desktop/Programs/Looks_Like/herpes3.jpg");
 	//cout << ss1.areaPostDensityConnector() << endl;
-	//ss1.showInteractiveIslands(
+	//ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	//Islands island = ss1.getIslandWithPoint(Point(52,69));
-	//imwrite(ss1.name()+"_strip.png",island.image());
-	//cout << island.nn_results() << endl;
+	Islands island = ss1.getIslandWithPoint(Point(25,40));
+	imwrite(ss1.name()+"_strip.png",island.image());
+	cout << island.nn_results() << endl;
 	/**/
-
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -156,7 +171,7 @@ int main(int argc,char** argv)
 		//}
 		//ShadeShape ss1 = Scripts::script31(argv[1]);
 		String filename = folder + string(argv[1]) + ".jpg";
-		ShadeShape ss1 = Scripts::trScript(filename);
+		ShadeShape ss1 = Scripts::discreteShadeShapeScript(filename);
 		vector<vector<float> > resultVec;
 		vector<String> nameVec;
 		vector<int> origPos;
@@ -170,7 +185,7 @@ int main(int argc,char** argv)
 			if(name!=argv[1]) {
 				try {
 					//ShadeShape ss2 = Scripts::script31(name);
-					ShadeShape ss2 = Scripts::trScript(filename2);
+					ShadeShape ss2 = Scripts::discreteShadeShapeScript(filename2);
 					ShadeShapeMatch ssm;
 					if(argc>=3)
 						ssm.debug_mode(atoi(argv[2]));
@@ -244,8 +259,14 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-	/*
+
+/*
 	Timer time;
+	String folder = "Looks_Like/";
+	String input1 = folder + string(argv[1]) + ".jpg";
+	String input2 = folder + string(argv[2]) + ".jpg";
+	//ShadeShape ss1 = Scripts::discreteShadeShapeScript(input1);
+	//ShadeShape ss2 = Scripts::discreteShadeShapeScript(input2);
 	ShadeShape ss1 = Scripts::script31(argv[1]);
 	ShadeShape ss2 = Scripts::script31(argv[2]);
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/pic1.png");
@@ -278,7 +299,7 @@ int main(int argc,char** argv)
 	fclose(fp);
 	/**/
 	//Scripts::script25();
-	//Scripts::script_checkAllTestData();
+	//Scripts::checkAllTestData();
 	//Scripts::script_createTestDataList();
 	//Scripts::script_checkHitRatioTestData();
 	/*
@@ -296,40 +317,10 @@ int main(int argc,char** argv)
 		rename(filename.c_str(),newFilename.c_str());
 	}
 /**/
-	/*
-	deque<String> files;
-	String folder = "/home/jason/git/Samples/Samples/Training/Strip/";
-	FileData fd;
-	TestML ml;
-	fd.getFilesFromDirectory(folder,files);
-	for(unsigned int i=0; i<files.size(); i++) {
-		String name = folder + files.at(i);
-		Mat img = imread(name,0);
-		name = getFileName(name);
-		Mat sample = img * 255;
-		sample = ml.prepareImage(sample,Size(40,40));
-		imwrite(name+".png",sample);
-	}
-/**/
-	/*
-	Mat img1 = imread("/home/jason/git/WebDerm/WebDerm/herpes3_rei_s1.png",0);
-	Mat img2 = imread("/home/jason/git/WebDerm/WebDerm/herpes12_rei_s1.png",0);
-	StatSign statSign;
-	vector<float> statSignVec1 = statSign.create(img1,0.2936);
-	vector<float> statSignVec2 = statSign.create(img2,0.002);
-	statSign.printCompare(statSignVec1,statSignVec2);
-	float result = statSign.dotProduct(statSignVec1,statSignVec2);
-	cout << result << endl;
-	cout << statSign.adjustValue(result) << endl;
-	//imgshow(img1);
-	//imgshow(img2);
-	//statSign.writeCompare("acne_vulg5-melanoma8b.csv",statSignVec1,statSignVec2);
-	/**/
 
 	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
-	/*
-	//ShadeShape ss1 = Scripts::script2("/home/jason/git/WebDerm/WebDerm/melanoma8c_strip.png");
+/*
 	ShadeShape ss1 = Scripts::script31("melanoma10");
 	//ss1.showInteractiveIslands();
 	//ss1.showInteractiveSubIslands();

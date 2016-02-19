@@ -145,7 +145,7 @@ Mat TestML::prepareImage(Mat sample, Size size) {
 	return newImg;
 }
 
-//converts single Mat into sample Mat form
+//converts vector Mat into sample Mat form
 Mat TestML::prepareMatSamples(vector<Mat> sampleVec) {
 	int rows = sampleVec.at(0).rows;
 	int cols = sampleVec.at(0).cols;

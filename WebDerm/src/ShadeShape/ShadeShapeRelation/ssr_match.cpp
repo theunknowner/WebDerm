@@ -301,7 +301,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													/*if(label1=="5_Excavated_s0" && label2=="5_Excavated_s2" && k==SURR_BY && nStr=="n1_shd1_shp1-1") {
+													if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp0-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -313,7 +313,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}*/
+													}
 												}// end of equationMap
 											} // end y mergedLabelContainer UP
 										} catch (const std::out_of_range &oor) {
@@ -375,7 +375,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
-													/*if(label1=="5_Excavated_s0" && label2=="5_Excavated_s2" && k==SURR_BY && nStr=="n1_shd1_shp1-1") {
+													if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp0-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** DB *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -387,7 +387,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
 														printf("ContrastWeightDB: %f\n",contrastWeightDB);
-													}*/
+													}
 												}// end if equationMap
 											} // end y mergedLabelContainer DB
 										} catch (const std::out_of_range &oor) {
@@ -572,12 +572,12 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													float relAreaX = areaX / (float)upLabels.totalArea();
 													float rval = pow(this->rVal[maxNeighborLevelUP],m);
 													areaUP += (relAreaX * penaltyX * weight2 * deltaArcScore2 * relAreaY * penaltyY * weight1 * deltaArcScore1 * rval);
-													if(label1=="2_Comp-Donut_s3" && label2=="9_Unknown_s0" && k==SURR_BY_INV && m==2 && nStr=="n1_shd1_shp-1-1") {
+													/*if(label1=="2_Comp-Donut_s3" && label2=="9_Unknown_s0" && k==SURR_BY_INV && m==2 && nStr=="n1_shd1_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("RelAreaX:%f x PenaltyX:%f * Weight2:%f * DArcScore2:%f\n",relAreaX,penaltyX,weight2,deltaArcScore2);
 														printf("RelAreaY:%f * PenaltyY:%f * Weight1:%f * DArcScore1:%f\n",relAreaY,penaltyY,weight1,deltaArcScore1);
 														printf("Rval: %f\n",rval);
-													}
+													}*/
 
 													//> used for match calculations
 													sumIslandAreaUP += upLabels.area(xLabel);
@@ -599,7 +599,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													if(label1=="2_Comp-Donut_s3" && label2=="9_Unknown_s0" && k==SURR_BY_INV && m==2 && nStr=="n1_shd1_shp-1-1") {
+													/*if(label1=="2_Comp-Donut_s3" && label2=="9_Unknown_s0" && k==SURR_BY_INV && m==2 && nStr=="n1_shd1_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -611,7 +611,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}
+													}*/
 												}// end if equationMap
 											}// end for x srmUP
 										} catch (const std::out_of_range &oor) {
