@@ -18,6 +18,7 @@ class ShadeShape;
 class Islands;
 class Labels;
 class ShadeShapeRelation;
+class PrintStream;
 
 class ShadeShapeMatch {
 private:
@@ -36,6 +37,8 @@ private:
 	float tr1ForShade(Labels &upLabels, Labels &dbLabels);
 	float tr1(Labels &upLabels, Labels &dbLabels);
 	vector<float> tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr="");
+
+	map<String,PrintStream> esgPS_Map;
 public:
 	void test(ShadeShape &ss);
 	float test_match(ShadeShape upSS, ShadeShape dbSS);

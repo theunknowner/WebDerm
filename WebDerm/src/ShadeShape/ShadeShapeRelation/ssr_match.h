@@ -11,9 +11,11 @@
 #include "../../global.h"
 #include "shadeshaperelation.h"
 #include "../ShapeMatch/shapematch.h"
+#include "../../PrintStream/printstream.h"
 
 class Islands;
 class Labels;
+class PrintStream;
 class ShadeShapeRelationMatch : public ShadeShapeRelation, public ShapeMatch {
 private:
 	float matchScore;
@@ -26,11 +28,15 @@ private:
 	void match(ShadeShapeRelation &ssrUP, ShadeShapeRelation &ssrDB, String nStr="");
 	float rVal[6] = {1.0,1.0,0.63,0.55,0.52,0.5};
 
+	PrintStream esgPS;
+
 public:
 	void srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr="");
 	float getMatchScore();
 	float getMismatchScore();
 	float getShapeWeight(int shape, float prop);
+
+	PrintStream& getEsgPrintStream();
 
 	void importDownScaleSrms(String file, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &labels);
 };

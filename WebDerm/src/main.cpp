@@ -50,6 +50,7 @@
 #include "Pathfind/pathfind.h"
 #include "ShadeShape/ShadeShapeRelation/esg.h"
 #include "Shape/shapes.h"
+#include "PrintStream/printstream.h"
 
 using namespace ip;
 
@@ -99,6 +100,7 @@ int main(int argc,char** argv)
 	TestML::clear();
 /**/
 
+	/*
 	String file = "/home/jason/Desktop/workspace/Test_Runs/herpes3_acne_vulgaris2_max_match_image_n0_shd2_shp-1-1.png";
 	String name = getFileName(file);
 	Mat img = imread(file,0);
@@ -260,15 +262,14 @@ int main(int argc,char** argv)
 	}
 	/**/
 
-/*
 	Timer time;
 	String folder = "Looks_Like/";
 	String input1 = folder + string(argv[1]) + ".jpg";
 	String input2 = folder + string(argv[2]) + ".jpg";
-	//ShadeShape ss1 = Scripts::discreteShadeShapeScript(input1);
-	//ShadeShape ss2 = Scripts::discreteShadeShapeScript(input2);
-	ShadeShape ss1 = Scripts::script31(argv[1]);
-	ShadeShape ss2 = Scripts::script31(argv[2]);
+	ShadeShape ss1 = Scripts::discreteShadeShapeScript(input1);
+	ShadeShape ss2 = Scripts::discreteShadeShapeScript(input2);
+	//ShadeShape ss1 = Scripts::script31(argv[1]);
+	//ShadeShape ss2 = Scripts::script31(argv[2]);
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/pic1.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/pic2.png");
 	ShadeShapeMatch ssm;

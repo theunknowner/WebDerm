@@ -14,6 +14,7 @@
 #include "../ShadeShapeRelation/shadeshaperelation.h"
 #include "../Labels/labels.h"
 #include "../ShadeShapeRelation/ssr_match.h"
+#include "../../PrintStream/printstream.h"
 
 using namespace ip;
 
@@ -186,7 +187,15 @@ vector<float> ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, 
 	ssrm.srm_match(ssrUP,upLabels,ssrDB,dbLabels,nStr);
 	float matchScore = ssrm.getMatchScore();
 	float mismatchScore = ssrm.getMismatchScore();
+
+	//store the ESG variable data to PrintStream to be printed out later
+	PrintStream esgPS = ssrm.getEsgPrintStream();
+	if(this->esgPS_Map.find(nStr)==this->esgPS_Map.end()) {
+		this->esgPS_Map[nStr] = esgPS;
+	}
+
 	vector<float> results = {matchScore,mismatchScore};
+
 	return results;
 }
 
@@ -438,6 +447,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	Labels::writeCompareLabels(labelFilename,largestLabelsUP,largestLabelsDB,1);
 	imwrite(newNameUP+"_max_match_image_"+maxNStr+".png",maxMatchImg);
 	upSS.getImageData().writePrevSize(newNameUP+"_max_match_image_"+maxNStr);
+	this->esgPS_Map.at(maxNStr).writePrintStream(newNameUP+"_ESG_"+maxNStr+".txt");
 	vector<float> vec = {maxResults,finalTR1,finalTR2_match,finalTR2_mismatch};
 	resultVec.push_back(vec);
 	return *max_element(resultVec.begin(),resultVec.end());

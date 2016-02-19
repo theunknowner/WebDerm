@@ -12,6 +12,7 @@
 #include "../ShapeMatch/shapematch.h"
 #include "../StatSign/statsign.h"
 #include "esg.h"
+#include "../../PrintStream/printstream.h"
 
 /**************************** PRIVATE FUNCTIONS ********************************/
 
@@ -67,6 +68,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	fp = fopen(filename.c_str(),"w");
 	fp2 = fopen(filename2.c_str(),"w");
 	fp3 = fopen(filename3.c_str(),"w");
+
+	this->esgPS = PrintStream(nStr);
+
 	float totalMatchScore = 0.0, totalMismatchScore=0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
 
@@ -301,7 +305,20 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
-													if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp0-1") {
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** UP *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",upLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightUP: %f\n",contrastWeightUP);
+
+													/*if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp0-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
 														printf("ShadeDiff: %d\n",shadeDiff);
@@ -313,7 +330,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
 														printf("ContrastWeightUP: %f\n",contrastWeightUP);
-													}
+													}*/
 												}// end of equationMap
 											} // end y mergedLabelContainer UP
 										} catch (const std::out_of_range &oor) {
@@ -375,6 +392,19 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** DB *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",dbLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightDB: %f\n",contrastWeightDB);
+													/*
 													if(label1=="4_Blotch_s4" && label2=="5_Excavated_s1" && k==SURR_BY && nStr=="n0_shd0_shp0-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** DB *****");
@@ -387,7 +417,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														printf("ctWt: %f\n",ctWt);
 														printf("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
 														printf("ContrastWeightDB: %f\n",contrastWeightDB);
-													}
+													}*/
 												}// end if equationMap
 											} // end y mergedLabelContainer DB
 										} catch (const std::out_of_range &oor) {
@@ -599,6 +629,19 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** UP *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",upLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightUP: %f\n",contrastWeightUP);
+
 													/*if(label1=="2_Comp-Donut_s3" && label2=="9_Unknown_s0" && k==SURR_BY_INV && m==2 && nStr=="n1_shd1_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** UP *****");
@@ -671,6 +714,19 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** DB *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",dbLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightDB: %f\n",contrastWeightDB);
+
 													/*if(label1=="2_Comp-Donut_s3" && label2=="9_Unknown_s0" && k==SURR_BY_INV && m==2 && nStr=="n1_shd1_shp-1-1") {
 														printf("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
 														printf("**** DB *****");
@@ -1162,6 +1218,19 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** UP *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",upLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightUP: %f\n",contrastWeightUP);
+
 												}// end if equationMap
 											}// end for y srmUP
 										} catch (const std::out_of_range &oor) {
@@ -1223,6 +1292,18 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmUP.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** UP *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",upLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightUP: %f\n",contrastWeightUP);
 												}// end if equationMap
 											}// end for x srmUP
 										} catch (const std::out_of_range &oor) {
@@ -1284,6 +1365,18 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** DB *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",dbLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightDB: %f\n",contrastWeightDB);
 												} //end equationMap
 											} //end y srmDB mergedContainer
 										} catch (const std::out_of_range &oor) {
@@ -1343,6 +1436,18 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													ctWt *= srmDB.relationCountPercent(index1,index2);
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
+
+													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("**** DB *****");
+													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+													this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+													this->esgPS.storeStringFormat("TotalArea: %d\n",dbLabels.totalArea());
+													this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+													this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+													this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+													this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
+													this->esgPS.storeStringFormat("ContrastWeightDB: %f\n",contrastWeightDB);
 												}// end if equationMap
 											}// end for x srmDB
 										} catch (const std::out_of_range &oor) {
@@ -1806,6 +1911,18 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														ctWt *= (4.0/24.0); // experimental
 														if(std::isnan(ctWt)) ctWt=0.0;
 														contrastWeightUP += ctWt;
+
+														this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+														this->esgPS.storeStringFormat("**** UP *****");
+														this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+														this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+														this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+														this->esgPS.storeStringFormat("TotalArea: %d\n",upLabels.totalArea());
+														this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+														this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+														this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+														this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+														this->esgPS.storeStringFormat("ContrastWeightUP: %f\n",contrastWeightUP);
 													}// end if equationMap
 												}// end for y srmUP
 											} catch (const std::out_of_range &oor) {
@@ -1867,6 +1984,18 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														ctWt *= (4.0/24.0);
 														if(std::isnan(ctWt)) ctWt=0.0;
 														contrastWeightUP += ctWt;
+
+														this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+														this->esgPS.storeStringFormat("**** UP *****");
+														this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+														this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+														this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+														this->esgPS.storeStringFormat("TotalArea: %d\n",upLabels.totalArea());
+														this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+														this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+														this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+														this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmUP.relationCountPercent(index1,index2));
+														this->esgPS.storeStringFormat("ContrastWeightUP: %f\n",contrastWeightUP);
 													}// end if equationMap
 												}// end for x srmUP
 											} catch (const std::out_of_range &oor) {
@@ -1928,6 +2057,18 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 														ctWt *= (4.0/24.0);
 														if(std::isnan(ctWt)) ctWt=0.0;
 														contrastWeightDB += ctWt;
+
+														this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+														this->esgPS.storeStringFormat("**** DB *****");
+														this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
+														this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
+														this->esgPS.storeStringFormat("RelAreaY: %.0f, RelAreaX: %.0f\n",area1,area2);
+														this->esgPS.storeStringFormat("TotalArea: %d\n",dbLabels.totalArea());
+														this->esgPS.storeStringFormat("RelArea: %f\n",relArea);
+														this->esgPS.storeStringFormat("EsgVal: %f\n",esg.esgVal);
+														this->esgPS.storeStringFormat("ctWt: %f\n",ctWt);
+														this->esgPS.storeStringFormat("RelationCountPercent: %f\n",srmDB.relationCountPercent(index1,index2));
+														this->esgPS.storeStringFormat("ContrastWeightDB: %f\n",contrastWeightDB);
 													}// end if equationMap
 												}// end for y srmDB
 											} catch (const std::out_of_range &oor) {
@@ -2111,6 +2252,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 
 	this->matchScore = totalMatchScore;
 	this->mismatchScore = totalMismatchScore;
+	this->esgPS = esgPS;
 }
 
 
@@ -2153,6 +2295,10 @@ float ShadeShapeRelationMatch::getShapeWeight(int shape, float prop) {
 		printf("ShapeWeightVec2.size(): %lu\n",ShadeShapeRelationMatch::shapeWeightsVec2.size());
 		exit(1);
 	}
+}
+
+PrintStream& ShadeShapeRelationMatch::getEsgPrintStream() {
+	return this->esgPS;
 }
 
 void ShadeShapeRelationMatch::importDownScaleSrms(String file, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &labels) {
