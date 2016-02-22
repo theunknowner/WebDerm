@@ -39,6 +39,10 @@ private:
 	vector<float> tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr="");
 
 	map<String,PrintStream> esgPS_Map;
+	map<String,PrintStream> entropyPS_Map;
+	map<String,PrintStream> mismatchEntropyPS_Map;
+	map<String,PrintStream> noEntropyPS_Map;
+
 public:
 	void test(ShadeShape &ss);
 	float test_match(ShadeShape upSS, ShadeShape dbSS);

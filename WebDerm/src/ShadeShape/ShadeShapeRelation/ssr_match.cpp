@@ -59,17 +59,11 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 	if(maxNeighborLevelDB>5) maxNeighborLevelDB = 5;
 	ShapeMatch shapematch;
 	StatSign statsign;
-	FILE * fp;
-	FILE * fp2;
-	FILE * fp3;
-	String filename = ssrUP.name() + "_entropy_output_"+nStr+".txt";
-	String filename2 = ssrUP.name() + "_mismatch_entropy_output_"+nStr+".txt";
-	String filename3 = ssrUP.name() + "_no_entropy_"+nStr+".txt";
-	fp = fopen(filename.c_str(),"w");
-	fp2 = fopen(filename2.c_str(),"w");
-	fp3 = fopen(filename3.c_str(),"w");
 
 	this->esgPS = PrintStream(nStr);
+	this->entropyPS = PrintStream(nStr);
+	this->mismatchEntropyPS = PrintStream(nStr);
+	this->noEntropyPS = PrintStream(nStr);
 
 	float totalMatchScore = 0.0, totalMismatchScore=0.0;
 	int maxTotalArea = max(upMergedLabels.totalArea(),dbMergedLabels.totalArea());
@@ -306,7 +300,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
 
-													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("[%s][%s][%s] : Level %d\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str(),m);
 													this->esgPS.storeStringFormat("**** UP *****");
 													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
 													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
@@ -393,7 +387,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
 
-													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("[%s][%s][%s] : Level %d\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str(),m);
 													this->esgPS.storeStringFormat("**** DB *****");
 													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
 													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
@@ -630,7 +624,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightUP += ctWt;
 
-													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("[%s][%s][%s] : Level %d\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str(),m);
 													this->esgPS.storeStringFormat("**** UP *****");
 													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
 													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
@@ -715,7 +709,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 													if(std::isnan(ctWt)) ctWt=0.0;
 													contrastWeightDB += ctWt;
 
-													this->esgPS.storeStringFormat("[%s][%s][%s]\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str());
+													this->esgPS.storeStringFormat("[%s][%s][%s] : Level %d\n",label1.c_str(),this->rel_op.at(k).c_str(),label2.c_str(),m);
 													this->esgPS.storeStringFormat("**** DB *****");
 													this->esgPS.storeStringFormat("ShadeDiff: %d\n",shadeDiff);
 													this->esgPS.storeStringFormat("AvgDist: %f\n",dist);
@@ -781,82 +775,82 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							totalMismatchScore += weightedMismatchEntropy;
 
 							if(weightedEntropy>0) {
-								fprintf(fp,"[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
-								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
-								fprintf(fp,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
-								fprintf(fp,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
-								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
-								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
-								fprintf(fp,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
-								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
-								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp,"----------------------------------\n");
+								this->entropyPS.storeStringFormat("[%s][%s][%s] : Level %d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m);
+								this->entropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->entropyPS.storeStringFormat("sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
+								this->entropyPS.storeStringFormat("maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
+								this->entropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->entropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->entropyPS.storeStringFormat("MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
+								this->entropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->entropyPS.storeStringFormat("RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
+								this->entropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
+								this->entropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->entropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->entropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->entropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->entropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->entropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->entropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->entropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								this->entropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->entropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->entropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->entropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
+								this->entropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
+								this->entropyPS.storeStringFormat("----------------------------------\n");
 							}
 							if(weightedMismatchEntropy>0) {
-								fprintf(fp2,"[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
-								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp2,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
-								fprintf(fp2,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
-								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp2,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
-								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp2,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
-								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
-								fprintf(fp2,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp2,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp2,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp2,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
-								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp2,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
-								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
-								fprintf(fp2,"----------------------------------\n");
+								this->mismatchEntropyPS.storeStringFormat("[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
+								this->mismatchEntropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->mismatchEntropyPS.storeStringFormat("sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
+								this->mismatchEntropyPS.storeStringFormat("maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
+								this->mismatchEntropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->mismatchEntropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->mismatchEntropyPS.storeStringFormat("MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
+								this->mismatchEntropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->mismatchEntropyPS.storeStringFormat("RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
+								this->mismatchEntropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
+								this->mismatchEntropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->mismatchEntropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->mismatchEntropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->mismatchEntropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->mismatchEntropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->mismatchEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								this->mismatchEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->mismatchEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->mismatchEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->mismatchEntropyPS.storeStringFormat("WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
+								this->mismatchEntropyPS.storeStringFormat("TotalMismatchScore: %f\n",totalMismatchScore);
+								this->mismatchEntropyPS.storeStringFormat("----------------------------------\n");
 							}
 							if(weightedEntropy<=0 || std::isnan(weightedEntropy)) {
-								fprintf(fp3,"[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
-								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp3,"sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
-								fprintf(fp3,"maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
-								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp3,"MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
-								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp3,"RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
-								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
-								fprintf(fp3,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp3,"RelArea: %f\n",relArea);
-								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp3,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp3,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp3,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp3,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
-								fprintf(fp3,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp3,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp3,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp3,"WeightedEntropy: %f\n",weightedEntropy);
-								fprintf(fp3,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp3,"----------------------------------\n");
+								this->noEntropyPS.storeStringFormat("[%s][%s][%s] : Level %d,%d\n", label1.c_str(),relOp.c_str(),label2.c_str(),m,m);
+								this->noEntropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->noEntropyPS.storeStringFormat("sumIslandAreaUP: %f, sumIslandAreaDB: %f\n",sumIslandAreaUP,sumIslandAreaDB);
+								this->noEntropyPS.storeStringFormat("maxIslandAreaUP: %d, maxIslandAreaDB: %d\n",maxIslandAreaUP,maxIslandAreaDB);
+								this->noEntropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->noEntropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->noEntropyPS.storeStringFormat("MaxNeighborLevelUP: %d, MaxNeighborLevelDB: %d\n",maxNeighborLevelUP,maxNeighborLevelDB);
+								this->noEntropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->noEntropyPS.storeStringFormat("RvalUP: %f, RvalDB: %f\n",this->rVal[maxNeighborLevelUP],this->rVal[maxNeighborLevelDB]);
+								this->noEntropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY, penalizedX);
+								this->noEntropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->noEntropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->noEntropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->noEntropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->noEntropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->noEntropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->noEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->noEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								this->noEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->noEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->noEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->noEntropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
+								this->noEntropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
+								this->noEntropyPS.storeStringFormat("----------------------------------\n");
 							}
 						} // if countUP || countDB
 					} // end for loop m
@@ -1491,73 +1485,73 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							totalMismatchScore += weightedMismatchEntropy;
 
 							if(weightedEntropy>0) {
-								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
-								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
-								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
-								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp,"----------------------------------\n");
+								this->entropyPS.storeStringFormat("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								this->entropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->entropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->entropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->entropyPS.storeStringFormat("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								this->entropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->entropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								this->entropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->entropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->entropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->entropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->entropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->entropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->entropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->entropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								this->entropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->entropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->entropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->entropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
+								this->entropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
+								this->entropyPS.storeStringFormat("----------------------------------\n");
 							}
 							if(weightedMismatchEntropy>0) {
-								fprintf(fp2,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
-								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp2,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp2,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp2,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp2,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
-								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp2,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
-								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
-								fprintf(fp2,"----------------------------------\n");
+								this->mismatchEntropyPS.storeStringFormat("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								this->mismatchEntropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->mismatchEntropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->mismatchEntropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->mismatchEntropyPS.storeStringFormat("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								this->mismatchEntropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->mismatchEntropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								this->mismatchEntropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->mismatchEntropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->mismatchEntropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->mismatchEntropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->mismatchEntropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->mismatchEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								this->mismatchEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->mismatchEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->mismatchEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->mismatchEntropyPS.storeStringFormat("WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
+								this->mismatchEntropyPS.storeStringFormat("TotalMismatchScore: %f\n",totalMismatchScore);
+								this->mismatchEntropyPS.storeStringFormat("----------------------------------\n");
 							}
 							if(weightedEntropy<=0 || std::isnan(weightedEntropy)) {
-								fprintf(fp3,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
-								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp3,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp3,"RelArea: %f\n",relArea);
-								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp3,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp3,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp3,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp3,"DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
-								fprintf(fp3,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp3,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp3,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp3,"WeightedEntropy: %f\n",weightedEntropy);
-								fprintf(fp3,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp3,"----------------------------------\n");
+								this->noEntropyPS.storeStringFormat("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								this->noEntropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->noEntropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->noEntropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->noEntropyPS.storeStringFormat("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								this->noEntropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->noEntropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								this->noEntropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->noEntropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->noEntropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->noEntropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->noEntropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->noEntropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->noEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->noEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
+								this->noEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->noEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->noEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->noEntropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
+								this->noEntropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
+								this->noEntropyPS.storeStringFormat("----------------------------------\n");
 							}
 						} // end if countUP || countDB
 					} // end if DIR
@@ -2172,73 +2166,73 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							totalMismatchScore += weightedMismatchEntropy;
 
 							if(weightedEntropy>0) {
-								fprintf(fp,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
-								fprintf(fp,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								fprintf(fp,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp,"RelArea: %f\n",relArea);
-								fprintf(fp,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp,"DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
-								fprintf(fp,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp,"WeightedEntropy: %f\n",weightedEntropy);
-								fprintf(fp,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp,"----------------------------------\n");
+								this->entropyPS.storeStringFormat("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								this->entropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->entropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->entropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->entropyPS.storeStringFormat("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								this->entropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->entropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								this->entropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->entropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->entropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->entropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->entropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->entropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->entropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->entropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
+								this->entropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->entropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->entropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->entropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
+								this->entropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
+								this->entropyPS.storeStringFormat("----------------------------------\n");
 							}
 							if(weightedMismatchEntropy>0) {
-								fprintf(fp2,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
-								fprintf(fp2,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp2,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp2,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp2,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								fprintf(fp2,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp2,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp2,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp2,"RelArea: %f\n",relArea);
-								fprintf(fp2,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp2,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp2,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp2,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp2,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp2,"DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
-								fprintf(fp2,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp2,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp2,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp2,"WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
-								fprintf(fp2,"TotalMismatchScore: %f\n",totalMismatchScore);
-								fprintf(fp2,"----------------------------------\n");
+								this->mismatchEntropyPS.storeStringFormat("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								this->mismatchEntropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->mismatchEntropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->mismatchEntropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->mismatchEntropyPS.storeStringFormat("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								this->mismatchEntropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->mismatchEntropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								this->mismatchEntropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->mismatchEntropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->mismatchEntropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->mismatchEntropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->mismatchEntropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->mismatchEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
+								this->mismatchEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->mismatchEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->mismatchEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->mismatchEntropyPS.storeStringFormat("WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
+								this->mismatchEntropyPS.storeStringFormat("TotalMismatchScore: %f\n",totalMismatchScore);
+								this->mismatchEntropyPS.storeStringFormat("----------------------------------\n");
 							}
 							if(weightedEntropy<=0 || std::isnan(weightedEntropy)) {
-								fprintf(fp3,"[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
-								fprintf(fp3,"CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
-								fprintf(fp3,"RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
-								fprintf(fp3,"EntropyVal: %f\n",entropyVal);
-								fprintf(fp3,"AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
-								fprintf(fp3,"AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
-								fprintf(fp3,"PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
-								fprintf(fp3,"MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
-								fprintf(fp3,"RelArea: %f\n",relArea);
-								fprintf(fp3,"ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
-								fprintf(fp3,"ContrastWeight: %f\n",contrastWeight);
-								fprintf(fp3,"SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
-								fprintf(fp3,"ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
-								fprintf(fp3,"ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
-								fprintf(fp3,"DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
-								fprintf(fp3,"DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								fprintf(fp3,"AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
-								fprintf(fp3,"WeightY: %f, WeightX: %f\n",weight1,weight2);
-								fprintf(fp3,"WeightedEntropy: %f\n",weightedEntropy);
-								fprintf(fp3,"TotalMatchScore: %f\n",totalMatchScore);
-								fprintf(fp3,"----------------------------------\n");
+								this->noEntropyPS.storeStringFormat("[%s][%s][%s]\n", label1.c_str(),relOp.c_str(),label2.c_str());
+								this->noEntropyPS.storeStringFormat("CountUP: %d, EntUP: %f, CountDB: %d, EntDB: %f\n",countUP,entropyUP,countDB,entropyDB);
+								this->noEntropyPS.storeStringFormat("RelativeCountUP: %f, RelativeCountDB: %f\n",countProportionUP,countProportionDB);
+								this->noEntropyPS.storeStringFormat("EntropyVal: %f\n",entropyVal);
+								this->noEntropyPS.storeStringFormat("AreaUP1: %d, AreaUP2: %d, AreaDB1: %d, AreaDB2: %d\n",areaUP1,areaUP2,areaDB1,areaDB2);
+								this->noEntropyPS.storeStringFormat("AreaUP: %f, AreaDB: %f\n",areaUP,areaDB);
+								this->noEntropyPS.storeStringFormat("PenaltyY: %f, PenaltyX: %f\n",penalizedY,penalizedX);
+								this->noEntropyPS.storeStringFormat("MaxTotalArea: (%d,%d): %d\n",upMergedLabels.totalArea(),dbMergedLabels.totalArea(),maxTotalArea);
+								this->noEntropyPS.storeStringFormat("RelArea: %f\n",relArea);
+								this->noEntropyPS.storeStringFormat("ContrastWeightUP: %f, ContrastWeightDB: %f\n",contrastWeightUP,contrastWeightDB);
+								this->noEntropyPS.storeStringFormat("ContrastWeight: %f\n",contrastWeight);
+								this->noEntropyPS.storeStringFormat("SumOfAreaUP: %f, SumOfAreaDB: %f\n",sumOfAreaUP,sumOfAreaDB);
+								this->noEntropyPS.storeStringFormat("ArcScoreUP1: %f, ArcScoreDB1: %f\n",sumArcScoreUP1,sumArcScoreDB1);
+								this->noEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
+								this->noEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
+								this->noEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
+								this->noEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
+								this->noEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
+								this->noEntropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
+								this->noEntropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
+								this->noEntropyPS.storeStringFormat("----------------------------------\n");
 							}
 						} // end if countUP || countDB
 					} // end else INDIR
@@ -2246,13 +2240,9 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 			} // end for loop k
 		} // end for loop j
 	} // end for loop i
-	fclose(fp);
-	fclose(fp2);
-	fclose(fp3);
 
 	this->matchScore = totalMatchScore;
 	this->mismatchScore = totalMismatchScore;
-	this->esgPS = esgPS;
 }
 
 
@@ -2299,6 +2289,18 @@ float ShadeShapeRelationMatch::getShapeWeight(int shape, float prop) {
 
 PrintStream& ShadeShapeRelationMatch::getEsgPrintStream() {
 	return this->esgPS;
+}
+
+PrintStream& ShadeShapeRelationMatch::getEntropyPrintStream() {
+	return this->entropyPS;
+}
+
+PrintStream& ShadeShapeRelationMatch::getMismatchEntropyPrintStream() {
+	return this->mismatchEntropyPS;
+}
+
+PrintStream& ShadeShapeRelationMatch::getNoEntropyPrintStream() {
+	return this->noEntropyPS;
 }
 
 void ShadeShapeRelationMatch::importDownScaleSrms(String file, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &labels) {

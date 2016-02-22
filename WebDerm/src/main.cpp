@@ -157,7 +157,7 @@ int main(int argc,char** argv)
 	imwrite(ss1.name()+"_strip.png",island.image());
 	cout << island.nn_results() << endl;
 	/**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -261,9 +261,9 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-
+/*
 	Timer time;
-	String folder = "Looks_Like/";
+	String folder = "Looks_Like4/";
 	String input1 = folder + string(argv[1]) + ".jpg";
 	String input2 = folder + string(argv[2]) + ".jpg";
 	ShadeShape ss1 = Scripts::discreteShadeShapeScript(input1);

@@ -193,6 +193,19 @@ vector<float> ShadeShapeMatch::tr2(ShadeShapeRelation &ssrUP, Labels &upLabels, 
 	if(this->esgPS_Map.find(nStr)==this->esgPS_Map.end()) {
 		this->esgPS_Map[nStr] = esgPS;
 	}
+	//store the entropy variable data to PrintStream to be printed out later
+	PrintStream entropyPS = ssrm.getEntropyPrintStream();
+	if(this->entropyPS_Map.find(nStr)==this->entropyPS_Map.end()) {
+		this->entropyPS_Map[nStr] = entropyPS;
+	}
+	PrintStream mismatchEntropyPS = ssrm.getMismatchEntropyPrintStream();
+	if(this->mismatchEntropyPS_Map.find(nStr)==this->mismatchEntropyPS_Map.end()) {
+		this->mismatchEntropyPS_Map[nStr] = mismatchEntropyPS;
+	}
+	PrintStream noEntropyPS = ssrm.getNoEntropyPrintStream();
+	if(this->noEntropyPS_Map.find(nStr)==this->noEntropyPS_Map.end()) {
+		this->noEntropyPS_Map[nStr] = noEntropyPS;
+	}
 
 	vector<float> results = {matchScore,mismatchScore};
 
@@ -443,11 +456,16 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 		}
 	}
 	/*****************************/
-	String labelFilename = largestLabelsUP.name()+"_"+largestLabelsDB.name()+"_tr1_max_match_labels";
-	Labels::writeCompareLabels(labelFilename,largestLabelsUP,largestLabelsDB,1);
-	imwrite(newNameUP+"_max_match_image_"+maxNStr+".png",maxMatchImg);
-	upSS.getImageData().writePrevSize(newNameUP+"_max_match_image_"+maxNStr);
-	this->esgPS_Map.at(maxNStr).writePrintStream(newNameUP+"_ESG_"+maxNStr+".txt");
+	if(maxResults>0) {
+		String labelFilename = largestLabelsUP.name()+"_"+largestLabelsDB.name()+"_tr1_max_match_labels";
+		Labels::writeCompareLabels(labelFilename,largestLabelsUP,largestLabelsDB,1);
+		imwrite(newNameUP+"_max_match_image_"+maxNStr+".png",maxMatchImg);
+		upSS.getImageData().writePrevSize(newNameUP+"_max_match_image_"+maxNStr);
+		this->esgPS_Map.at(maxNStr).writePrintStream(newNameUP+"_ESG_"+maxNStr+".txt");
+		this->entropyPS_Map.at(maxNStr).writePrintStream(newNameUP+"_entropy_output_"+maxNStr+".txt");
+		this->mismatchEntropyPS_Map.at(maxNStr).writePrintStream(newNameUP+"_mismatch_entropy_output_"+maxNStr+".txt");
+		this->noEntropyPS_Map.at(maxNStr).writePrintStream(newNameUP+"_no_entropy_"+maxNStr+".txt");
+	}
 	vector<float> vec = {maxResults,finalTR1,finalTR2_match,finalTR2_mismatch};
 	resultVec.push_back(vec);
 	return *max_element(resultVec.begin(),resultVec.end());

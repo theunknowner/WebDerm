@@ -29,6 +29,9 @@ private:
 	float rVal[6] = {1.0,1.0,0.63,0.55,0.52,0.5};
 
 	PrintStream esgPS;
+	PrintStream entropyPS;
+	PrintStream mismatchEntropyPS;
+	PrintStream noEntropyPS;
 
 public:
 	void srm_match(ShadeShapeRelation &ssrUP, Labels &upLabels, ShadeShapeRelation &ssrDB, Labels &dbLabels, String nStr="");
@@ -37,6 +40,9 @@ public:
 	float getShapeWeight(int shape, float prop);
 
 	PrintStream& getEsgPrintStream();
+	PrintStream& getEntropyPrintStream();
+	PrintStream& getMismatchEntropyPrintStream();
+	PrintStream& getNoEntropyPrintStream();
 
 	void importDownScaleSrms(String file, pair<vector<vector<vector<int> > >,vector<vector<vector<int> > >> &srmPair, Labels &labels);
 };

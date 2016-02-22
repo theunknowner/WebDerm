@@ -30,7 +30,7 @@ String PrintStream::getPrintStream() {
 //! Argument input same as printf formatting...
 //! i.e. ("%s,%s,%d\n",str1,str2,int1)
 void PrintStream::storeStringFormat(String format, ...) {
-	char buffer[60];
+	char buffer[100];
 	va_list vl;
 	va_start(vl,format);
 	vsprintf(buffer,format.c_str(),vl);
