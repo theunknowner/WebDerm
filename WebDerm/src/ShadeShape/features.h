@@ -10,6 +10,7 @@ f * features.h
 
 #include "../global.h"
 #include "/home/jason/git/WebDerm/WebDerm/src/ImageData/imagedata.h"
+#include "islands.h"
 
 class Islands;
 class ImageData;

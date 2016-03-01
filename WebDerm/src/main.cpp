@@ -51,11 +51,14 @@
 #include "ShadeShape/ShadeShapeRelation/esg.h"
 #include "Shape/shapes.h"
 #include "PrintStream/printstream.h"
+#include "Tools/tools.h"
 
 using namespace ip;
 
 int main(int argc,char** argv)
 {
+	Scripts::test_statsign_script();
+	//tools::clickShowIslands(string(argv[1]));
 	//Entropy en;
 	//en.importEntropyThresholds();
 	//en.runAllEntropy();
@@ -86,18 +89,6 @@ int main(int argc,char** argv)
 	//ssm.test(ss1);
 	//Islands island = ss1.getIslandWithPoint(Point(48,68));
 	//imwrite("comp_disc.png",island.image());
-/**/
-/*
-	String file = std::string(argv[1]);
-	String name = getFileName(file);
-	Mat img = imread(file,0);
-	ImageData id(img,name);
-	ip::prepareImage(id,Size(140,140));
-	ShadeShape ss1;
-	ss1.extract(id,false);
-	//ss1.showInteractiveSubIslands();
-	ss1.showInteractiveIslands();
-	TestML::clear();
 /**/
 
 	/*
@@ -147,6 +138,16 @@ int main(int argc,char** argv)
 		imwrite(out,ss1.image());
 	}
 /**/
+	/*
+	String file = "/home/jason/Desktop/workspace/Test_Runs/herpes3_photo6a_max_match_image_n0_shd1_shp-1-1.png";
+	String name = getFileName(file);
+	Mat img = imread(file,0);
+	ImageData id(img,name);
+	ip::prepareImage(id,Size(140,140));
+	ShadeShape ss1;
+	ss1.extract(id,false);
+	Islands isl1 = ss1.getIslandWithPoint(Point(44,13));
+	imwrite("herpes3_nn_image.png",isl1.nn_image());
 /*
 	ShadeShape ss1 = Scripts::discreteShadeShapeScript("/home/jason/Desktop/Programs/Looks_Like/herpes3.jpg");
 	//cout << ss1.areaPostDensityConnector() << endl;
@@ -158,6 +159,7 @@ int main(int argc,char** argv)
 	cout << island.nn_results() << endl;
 	/**/
 
+/*
 	MyExceptions ex;
 	String name = "";
 	try {
@@ -243,6 +245,7 @@ int main(int argc,char** argv)
 		fclose(fp);
 		output = std::string(argv[1]) + "_matches_sorted_"+time.getEndTime()+".csv";
 		fp = fopen(output.c_str(),"w");
+		fprintf(fp,"Name,Results,TR1,TR2,TR2 Mismatch\n");
 		for(unsigned int i=0; i<resultVec.size(); i++) {
 			try {
 				fprintf(fp,"%s,%f,%f,%f,%f\n",nameVec.at(origPos.at(i)).c_str(),resultVec.at(i).at(0),resultVec.at(i).at(1),resultVec.at(i).at(2),resultVec.at(i).at(3));

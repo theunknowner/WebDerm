@@ -34,5 +34,7 @@ void checkAllTestData3();
 void script_createTestDataList();
 void script_checkHitRatioTestData();
 
+void test_statsign_script();
+
 }
 #endif /* MYSCRIPTS_H_ */

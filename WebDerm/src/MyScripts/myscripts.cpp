@@ -32,6 +32,7 @@
 #include "../ImageData/imagedata.h"
 #include "../Histogram/histogram.h"
 #include "../skin/Skin.h"
+#include "../ShadeShape/StatSign/statsign.h"
 
 using namespace ip;
 using namespace Run;
@@ -1448,6 +1449,35 @@ void script33(String filename) {
 
 	//String out = "/home/jason/Desktop/Programs/Discrete3/"+name+"_extract.png";
 	//imwrite(out,results2);
+}
+
+void test_statsign_script() {
+	String file = "/home/jason/Desktop/workspace/Test_Runs/herpes3_photo6a_max_match_image_n0_shd1_shp-1-1.png";
+	String name = getFileName(file);
+	Mat img = imread(file,0);
+	ImageData id(img,name);
+	ip::prepareImage(id,Size(140,140));
+	ShadeShape ss1;
+	ss1.extract(id,false);
+	Islands isl1 = ss1.getIslandWithPoint(Point(44,13));
+
+	String file2 = "/home/jason/Desktop/Programs/Discrete/photo6a_discrete.png";
+	String name2 = getFileName(file2);
+	Mat img2 = imread(file2,0);
+	ImageData id2(img2,name);
+	ip::prepareImage(id2,Size(140,140));
+	ShadeShape ss2;
+	ss2.extract(id2,false);
+	Islands isl2 = ss2.getIslandWithPoint(Point(96,95));
+	StatSign statsign;
+	float relArea1 = isl1.area() / (float)ss1.area();
+	float relArea2 = isl2.area() / (float)ss2.area();
+	vector<float> statSignVec1 = statsign.create(isl1.nn_image(),relArea1);
+	vector<float> statSignVec2 = statsign.create(isl2.nn_image(),relArea2);
+	statsign.printCompare(statSignVec1,statSignVec2);
+	float result = statsign.dotProduct(statSignVec1,statSignVec2);
+	cout << result << endl;
+	cout << statsign.adjustValue(result) << endl;
 }
 
 }// end namespace
