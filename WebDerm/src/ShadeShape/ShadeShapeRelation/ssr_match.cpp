@@ -2277,7 +2277,7 @@ float ShadeShapeRelationMatch::getShapeWeight(int shape, float prop) {
 			return ShadeShapeRelationMatch::shapeWeightsVec2.at(shape);
 		}
 		float shapeWt = ShadeShapeRelationMatch::shapeWeightsVec2.at(shape);
-		float weight = (0.13 + (0.87 * prop)) * shapeWt;
+		float weight = (0.05 + (0.95 * prop)) * shapeWt;
 		return weight;
 	} catch (const std::out_of_range &oor) {
 		printf("ShadeShapeRelationMatch::getShapeWeight() out of range!\n");
