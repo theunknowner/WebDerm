@@ -41,14 +41,15 @@ vector<float> StatSign::create(Mat img, float relArea) {
 	}
 	for(unsigned int i=1; i<statSignVec.size(); i++) {
 		int mul = i>40 ? (i-40) : i;
-		mul = ceil(mul/5.0);
-		statSignVec.at(i) *= pow(2.5,mul) * relArea;
-		int urnNum = ceil(i/5.0);
-		statSignVec2.at(urnNum) += statSignVec.at(i);
+//		mul = ceil(mul/5.0);
+//		statSignVec.at(i) *= pow(2.5,mul) * relArea;
+//		int urnNum = ceil(i/5.0);
+//		statSignVec2.at(urnNum) += statSignVec.at(i);
+		statSignVec.at(i) *=mul;
 	}
 	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0.0);
 	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0.0);
-	return statSignVec2;
+	return statSignVec;
 }
 
 //! scheme 1 for comparing statistical signature
@@ -60,16 +61,20 @@ float StatSign::dotProduct(vector<float> statSignVec1, vector<float> statSignVec
 	}
 	vector<float> statSignVecF1(statSignVec1.size(),0.0);
 	vector<float> statSignVecF2(statSignVec2.size(),0.0);
+	vector<float> statSignVecF11(statSignVec1.size(),0.0);
+	vector<float> statSignVecF22(statSignVec2.size(),0.0);
 	//> relative proportions of the balls
 	for(unsigned int i=1; i<statSignVec1.size(); i++) {
 		statSignVecF1.at(i) = statSignVec1.at(i) / statSignVec1.at(0);
 		statSignVecF2.at(i) = statSignVec2.at(i) / statSignVec2.at(0);
+		statSignVecF11.at(i) = statSignVec1.at(i) / max(statSignVec1.at(0),statSignVec2.at(0));
+		statSignVecF22.at(i) = statSignVec2.at(i) / max(statSignVec1.at(0),statSignVec2.at(0));
 	}
 	float numerSum = 0.0;
 	float denomSumUP = 0.0;
 	float denomSumDB = 0.0;
 	for(unsigned int i=1; i<statSignVecF1.size(); i++) {
-		numerSum += (statSignVecF1.at(i) * statSignVecF2.at(i));
+		numerSum += (statSignVecF11.at(i) * statSignVecF22.at(i));
 		denomSumUP += pow(statSignVecF1.at(i),2);
 		denomSumDB += pow(statSignVecF2.at(i),2);
 	}
@@ -132,8 +137,11 @@ void StatSign::printCompare(vector<float> statSignVec1, vector<float> statSignVe
 	for(unsigned int i=1; i<statSignVec1.size(); i++) {
 		float porp1 = statSignVec1.at(i) / statSignVec1.at(0);
 		float porp2 = statSignVec2.at(i) / statSignVec2.at(0);
+		float porp11 = statSignVec1.at(i) / max(statSignVec1.at(0),statSignVec2.at(0));
+		float porp22 = statSignVec2.at(i) / max(statSignVec1.at(0),statSignVec2.at(0));
 		try {
-			printf("L%d: %0.f(%f) | L%d: %0.f(%f)\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+			int urn = i>40 ? i-40 : i;
+			printf("L%d: %0.f(%f)(%f) | L%d: %0.f(%f)(%f)\n",urn,statSignVec1.at(i),porp1,porp11,urn,statSignVec2.at(i),porp2,porp22);
 		} catch(const std::out_of_range &oor) {
 			printf("statSignVec1.size(): %lu\n",statSignVec1.size());
 			printf("statSignVec2.size(): %lu\n",statSignVec2.size());
