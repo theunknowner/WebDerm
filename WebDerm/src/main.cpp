@@ -57,7 +57,7 @@ using namespace ip;
 
 int main(int argc,char** argv)
 {
-	Scripts::test_statsign_script();
+	//Scripts::test_statsign_script();
 	//tools::clickShowIslands(string(argv[1]));
 	//Entropy en;
 	//en.importEntropyThresholds();
@@ -68,12 +68,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-	//Scripts::script3();
-	/*
-	String name = "melanoma7";
-	Scripts::script27(name);
-	Scripts::script30(name);
-/**/
+
 	/*
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
 	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
@@ -148,17 +143,30 @@ int main(int argc,char** argv)
 	ss1.extract(id,false);
 	Islands isl1 = ss1.getIslandWithPoint(Point(44,13));
 	imwrite("herpes3_nn_image.png",isl1.nn_image());
-/*
-	ShadeShape ss1 = Scripts::discreteShadeShapeScript("/home/jason/Desktop/Programs/Looks_Like/herpes3.jpg");
+/**/
+	/*
+	ShadeShape ss1 = Scripts::discreteShadeShapeScript("/home/jason/Desktop/Programs/Looks_Like4/herpes12.jpg");
 	//cout << ss1.areaPostDensityConnector() << endl;
 	//ss1.showInteractiveIslands();
 	//ShadeShapeMatch ssm;
 	//ssm.test(ss1);
-	Islands island = ss1.getIslandWithPoint(Point(25,40));
+	Islands island = ss1.getIslandWithPoint(Point(37,23));
 	imwrite(ss1.name()+"_strip.png",island.image());
 	cout << island.nn_results() << endl;
 	/**/
-
+	/*
+	String filename = "/home/jason/Desktop/workspace/Test_Runs/herpes3_eczema5_max_match_image_n0_shd1_shp-1-1.png";
+	String name = ip::getFileName(filename);
+	Mat img = imread(filename,0);
+	ImageData id(img,name);
+	ip::prepareImage(id,Size(140,140));
+	ShadeShape ss1;
+	ss1.extract(id,false);
+	Islands island = ss1.getIslandWithPoint(Point(60,5));
+	imgshow(island.nn_image());
+	imwrite(ss1.name()+"_strip.png",island.image());
+	cout << island.nn_results() << endl;
+	/**/
 /*
 	MyExceptions ex;
 	String name = "";
@@ -168,11 +176,6 @@ int main(int argc,char** argv)
 		deque<String> files;
 		FileData fd;
 		fd.getFilesFromDirectory(folder,files);
-		//fstream fs("test_list.csv");
-		//String temp;
-		//while(getline(fs,temp)) {
-		//	files.push_back(temp);
-		//}
 		//ShadeShape ss1 = Scripts::script31(argv[1]);
 		String filename = folder + string(argv[1]) + ".jpg";
 		ShadeShape ss1 = Scripts::discreteShadeShapeScript(filename);
@@ -264,13 +267,28 @@ int main(int argc,char** argv)
 		ex.writeErrorToFile(e);
 	}
 	/**/
-/*
+
+	ShadeShape ss1 = Scripts::test_discrete_script("/home/jason/Desktop/workspace/lph4.png");
+	ShadeShape ss2 = Scripts::test_discrete_script("/home/jason/Desktop/workspace/lph7.png");
+	//ss1.showInteractiveIslands();
+	ss2.showInteractiveIslands();
+//	Islands island = ss1.getIslandWithPoint(Point(14,37));
+//	imgshow(island.nn_image());
+//	imwrite(ss1.name()+"_strip.png",island.image());
+//	cout << island.nn_results() << endl;
+/**/
+	/*
 	Timer time;
 	String folder = "Looks_Like4/";
-	String input1 = folder + string(argv[1]) + ".jpg";
-	String input2 = folder + string(argv[2]) + ".jpg";
-	ShadeShape ss1 = Scripts::discreteShadeShapeScript(input1);
-	ShadeShape ss2 = Scripts::discreteShadeShapeScript(input2);
+//	String input1 = folder + string(argv[1]) + ".jpg";
+//	String input2 = folder + string(argv[2]) + ".jpg";
+//	ShadeShape ss1 = Scripts::discreteShadeShapeScript(input1);
+//	ShadeShape ss2 = Scripts::discreteShadeShapeScript(input2);
+	folder = "/home/jason/Desktop/workspace/";
+	String input1 = folder + string(argv[1]) + ".png";
+	String input2 = folder + string(argv[2]) + ".png";
+	ShadeShape ss1 = Scripts::test_discrete_script(input1);
+	ShadeShape ss2 = Scripts::test_discrete_script(input2);
 	//ShadeShape ss1 = Scripts::script31(argv[1]);
 	//ShadeShape ss2 = Scripts::script31(argv[2]);
 	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/pic1.png");
@@ -281,8 +299,14 @@ int main(int argc,char** argv)
 		ssm.debug_mode(atoi(argv[3]));
 	vector<float> results = ssm.match(ss1,ss2);
 	ssm.countShapeTranslations(shapeTranslateCount);
+	String outFile = string(argv[1])+"_"+string(argv[2])+"_results.txt";
+	FILE * fpResults;
+	fpResults = fopen(outFile.c_str(),"w");
 	printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
 	printf("TR2 Mismatch: %f]\n",results.at(3));
+	fprintf(fpResults,"TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
+	fprintf(fpResults,"TR2 Mismatch: %f]\n",results.at(3));
+	fclose(fpResults);
 	time.end();
 	time.printTimer();
 	ShapeMatch spm;
@@ -324,17 +348,6 @@ int main(int argc,char** argv)
 
 	//Scripts::checkAllTestData3();
 	//Scripts::checkAllTestData2();
-/*
-	ShadeShape ss1 = Scripts::script31("melanoma10");
-	//ss1.showInteractiveIslands();
-	//ss1.showInteractiveSubIslands();
-	Islands island = ss1.getIslandWithPoint(Point(75,94));
-	//SubIslands subIsland = island.getSubIslandWithPoint(Point(84,108));
-	//imwrite(ss1.name()+"_sample.png",island.nn_image());
-	imwrite(ss1.name()+"_sample.png",island.image());
-	//Mat results = island.nn_results();
-	//cout << results << endl;
-	/**/
 	/*
 	TestML ml;
 	String param = TestML::PARAM_PATH;

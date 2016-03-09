@@ -17,6 +17,7 @@ namespace Scripts {
 Mat colorNormalizationScript(String filename);
 Mat getSkinScript(String filename);
 ShadeShape discreteShadeShapeScript(String filename);
+void generateDiscreteImagesScript();
 
 void script1();
 ShadeShape script31(String filename);
@@ -35,6 +36,7 @@ void script_createTestDataList();
 void script_checkHitRatioTestData();
 
 void test_statsign_script();
+ShadeShape test_discrete_script(String filename);
 
 }
 #endif /* MYSCRIPTS_H_ */

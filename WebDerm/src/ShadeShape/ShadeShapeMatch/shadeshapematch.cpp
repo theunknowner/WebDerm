@@ -400,7 +400,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 								//printf("%s\n",nStr.c_str());
 								//printf("TR1: %f x TR2: %f = %f\n",tr1_score,tr2_scores.at(0),results);
 								String labelFilename = upLabelsFilled.name()+"_"+dbLabelsFilled.name()+"_labels_"+nStr;
-								Labels::writeCompareLabels(labelFilename,upLabelsFilled,dbLabelsFilled,1);
+								Labels::writeCompareLabels(labelFilename,upLabelsFilled,dbLabelsFilled,tr1_score,1);
 
 								if(results>maxResults) {
 									maxResults = results;
@@ -458,7 +458,7 @@ vector<float> ShadeShapeMatch::match(ShadeShape upSS, ShadeShape dbSS) {
 	/*****************************/
 	if(maxResults>0) {
 		String labelFilename = largestLabelsUP.name()+"_"+largestLabelsDB.name()+"_tr1_max_match_labels";
-		Labels::writeCompareLabels(labelFilename,largestLabelsUP,largestLabelsDB,1);
+		Labels::writeCompareLabels(labelFilename,largestLabelsUP,largestLabelsDB,-1,1);
 		imwrite(newNameUP+"_max_match_image_"+maxNStr+".png",maxMatchImg);
 		upSS.getImageData().writePrevSize(newNameUP+"_max_match_image_"+maxNStr);
 		this->esgPS_Map.at(maxNStr).writePrintStream(newNameUP+"_ESG_"+maxNStr+".txt");

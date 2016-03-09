@@ -522,6 +522,8 @@ void prepareImage(ImageData &id, Size size) {
 	id.readPrevSize();
 }
 
+//! Smoooths the image using a mask window.
+//! Mask window moves base on the column and row increments arguments.
 Mat smooth(Mat &img, Size size, int colIncr, int rowIncr) {
 	Mat results = img.clone();
 	if(img.type()==CV_8U) {

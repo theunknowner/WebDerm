@@ -392,7 +392,327 @@ ShadeShape discreteShadeShapeScript(String filename) {
 	ShadeShape ss;
 	ss.extract(id,false);
 	return ss;
+}
 
+void generateDiscreteImagesScript() {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	Poly poly;
+	ShapeMorph sm;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	String folder = "Looks_Like4/";
+	deque<String> files;
+	FileData fd;
+	fd.getFilesFromDirectory(folder,files);
+	for(unsigned int i=0; i<files.size(); i++) {
+		String filename = folder + files.at(i);
+		String name = getFileName(filename);
+		Mat img = imread(filename);
+		assert(img.empty()==0);
+		img = runColorNormalization(img);
+		img = runResizeImage(img,Size(140,140));
+		//Mat mask_skin = Skin::getSkin(img);
+		Size size(5,5);
+		Mat smoothImg = ip::smooth(img,size,size.width,size.height);
+		Mat edgeRemovedMap = sm.removeNoiseOnBoundary2(smoothImg);
+		Xyz xyz;
+		CieLab lab;
+		Cie cie;
+		vector<float> XYZ, XYZ0, LAB, LAB0;
+		vector<double> deltaE, HSL;
+		Mat hvec(img.size(),CV_32F,Scalar(0));
+		Mat svec(img.size(),CV_32F,Scalar(0));
+		Mat lvec(img.size(),CV_32F,Scalar(0));
+		double HC, HC0;
+		for(int i=0; i<img.rows; i++) {
+			for(int j=0; j<img.cols; j++) {
+				if(edgeRemovedMap.at<uchar>(i,j)>0) {
+					Vec3b BGR = img.at<Vec3b>(i,j);
+					if(BGR.val[0]>0 && BGR.val[1]>0 && BGR.val[2]>0) {
+						HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+						hvec.at<float>(i,j) = HSL.at(0) - floor(HSL.at(0)/180.) * 360.;
+						svec.at<float>(i,j) = round(HSL.at(1) * 100);
+						lvec.at<float>(i,j) = round(HSL.at(2) * 100);
+					}
+				}
+			}
+		}
+		Mat hc = epohTheHue(hvec,svec,lvec); // for direction of up or down the mtn
+		vector<double> pulldown;
+		vector<double> imgRowSlope;
+		vector<double> imgRowAvg;
+		for(int i=0; i<img.rows; i++) {
+			for(int j=1; j<img.cols; j++) {
+				if(edgeRemovedMap.at<uchar>(i,j)>0) {
+					Vec3b BGR = img.at<Vec3b>(i,j);
+					Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+					if(BGR.val[0]>0 && BGR.val[1]>0 && BGR.val[2]>0) {
+						XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+						LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+						XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+						LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+						HC = hc.at<float>(i,j);
+						HC0 = hc.at<float>(i,j-1);
+						int direction = HC - HC0; //uses int for auto floor function
+						double dE = cie.deltaE76(LAB,LAB0);
+						if(direction<0)
+							dE = -dE;
+						deltaE.push_back(dE);
+					}
+				} else {
+					deltaE.push_back(0.0);
+				}
+			}
+			vector<double> oX;
+			for(unsigned int i=0; i<deltaE.size(); i++) {
+				oX.push_back(i);
+			}
+			vector<double> coeffs = poly.polyfit(oX,deltaE,1);
+			vector<double> oVals = poly.polyval(coeffs,oX);
+			double slope = (oVals.back() - oVals.front()) / oVals.size();
+			double avg = (oVals.front() + oVals.back()) / 2;
+			double pd=0;
+			for(unsigned int j=0; j<deltaE.size(); j++) {
+				if(slope<0.07) {
+					if(avg>=0)
+						pd = deltaE.at(j) - avg;
+					else
+						pd = deltaE.at(j) + avg;
+				}
+				else {
+					pd = deltaE.at(j);
+				}
+				pulldown.push_back(abs(pd));
+			}
+			imgRowSlope.push_back(slope);
+			imgRowAvg.push_back(avg);
+			deltaE.clear();
+		}//end row
+		Cluster clst;
+		clst.kmeansCluster(pulldown,2);
+
+		double thresh = clst.getMin(clst.getNumOfClusters()-1) * 0.80;
+
+		Mat map(img.size(),CV_8U, Scalar(0));
+		for(int i=0; i<img.rows; i++) {
+			for(int j=1; j<img.cols; j++) {
+				if(edgeRemovedMap.at<uchar>(i,j)>0) {
+					Vec3b BGR = img.at<Vec3b>(i,j);
+					Vec3b BGR0 = img.at<Vec3b>(i,j-1);
+					if(BGR.val[0]>0 && BGR.val[1]>0 && BGR.val[2]>0) {
+						XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+						LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+						XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+						LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+						HC = hc.at<float>(i,j);
+						HC0 = hc.at<float>(i,j-1);
+						int direction = HC - HC0; //uses int for auto floor function
+						double dE = cie.deltaE76(LAB,LAB0);
+						if(direction<0)
+							dE = -dE;
+						if(imgRowSlope.at(i)<0.07) {
+							if(imgRowAvg.at(i)>=0)
+								dE -= imgRowAvg.at(i);
+							else
+								dE += imgRowAvg.at(i);
+
+						}
+						if(abs(dE)>=thresh) {
+							map.at<uchar>(i,j) = 255;
+						}
+					}
+				}
+			}
+		}
+		Mat nnConnectMap = sm.densityConnector(map,0.9999,1.0,2.0);
+		vector<Mat> islands = sm.liquidFeatureExtraction(nnConnectMap,0,1);
+
+		/// extract the largest island ///
+		int maxIslandIdx = 0; // islands were sorted from largest to smallest
+
+		/// connect island from left to right ///
+		Mat mask, idxMat;
+		mask = islands.at(maxIslandIdx).clone();
+		for(int i=0; i<mask.rows; i++) {
+			cv::findNonZero(mask.row(i),idxMat);
+			if(!idxMat.empty()) {
+				Point pt1(idxMat.at<Point>(0).x,i);
+				Point pt2(idxMat.at<Point>(idxMat.total()-1).x,i);
+				cv::line(mask,pt1,pt2,Scalar(255));
+				idxMat.release();
+			}
+		}
+
+		Mat haloTransMap = sm.haloTransform(mask,2);
+		haloTransMap.convertTo(haloTransMap,CV_8U);
+		haloTransMap = (haloTransMap - 5) * 255; //removes non-noticeable pixels
+
+		/// new deltaE-max ///
+		vector<double> deltaE2;
+		for(int i=0; i<=smoothImg.rows-size.height; i+=size.height) {
+			for(int j=size.width; j<=smoothImg.cols-size.width; j+=size.width) {
+				if(edgeRemovedMap.at<uchar>(i,j)>0 && haloTransMap.at<uchar>(i,j)>0) {
+					int decrement = 0;
+					if(j-(size.width*2)>=0) decrement = size.width*2;
+					else if(j-(size.width)>=0) decrement = size.width;
+					else decrement = 0;
+					Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+					Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-decrement);
+					XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+					LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+					XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+					LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+					double dE = cie.deltaE76(LAB,LAB0);
+					deltaE2.push_back(dE);
+				}
+			}
+		}
+
+		Cluster clst2;
+		clst2.kmeansCluster(deltaE2,2);
+		double t = clst2.getMin(clst2.getNumOfClusters()-1) * 0.75;
+
+		const float dE_thresh = floor(t);
+		Vec3b skinBGR;
+		vector<float> skinLAB;
+		Mat mask2 = Mat::zeros(size,CV_8U);
+		Mat map4 = haloTransMap.clone();
+		for(int i=0; i<=(smoothImg.rows-size.height); i+=size.height) {
+			/// for debugging purposes
+			Point entryPt;
+			float entry_dE = 0.0;
+			vector<vector<Vec3b> > rgbVec;
+			vector<vector<float> > labVec;
+			///
+			for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
+				if(edgeRemovedMap.at<uchar>(i,j)>0 && haloTransMap.at<uchar>(i,j)>0) {
+					int decrement = 0;
+					if(j-(size.width*2)>=0) decrement = size.width*2;
+					else if(j-(size.width)>=0) decrement = size.width;
+					else decrement = 0;
+					Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+					Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-decrement);
+					XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+					LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+					XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+					LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+					double dE = cie.deltaE76(LAB,LAB0);
+
+					vector<double> HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+					vector<double> HSL0 = hsl.rgb2hsl(BGR0[2],BGR0[1],BGR0[0]);
+					int index = hsl.getIndex(HSL[0],HSL[1],HSL[2]);
+					int index0 = hsl.getIndex(HSL0[0],HSL0[1],HSL0[2]);
+
+					int entry=0;
+					if(dE<dE_thresh && (index==index0)) {
+						entry=0;
+					} else {
+						entry = 1;
+					}
+					if(entry==1) {
+						cv::rectangle(haloTransMap,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+					}
+					if(entry==1) break;
+				}
+				if(j==(smoothImg.cols-size.width)) {
+					cv::rectangle(haloTransMap,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
+				}
+			} // end j
+			// right -> left
+			cv::flip(smoothImg,smoothImg,1);
+			cv::flip(edgeRemovedMap,edgeRemovedMap,1);
+			cv::flip(haloTransMap,haloTransMap,1);
+			for(int j=size.width; j<=(smoothImg.cols-size.width); j+=size.width) {
+				if(edgeRemovedMap.at<uchar>(i,j)>0 && haloTransMap.at<uchar>(i,j)>0) {
+					Vec3b BGR = smoothImg.at<Vec3b>(i,j);
+					Vec3b BGR0 = smoothImg.at<Vec3b>(i,j-size.width);
+					XYZ = xyz.rgb2xyz(BGR[2],BGR[1],BGR[0]);
+					LAB = lab.xyz2lab(XYZ[0],XYZ[1],XYZ[2]);
+					XYZ0 = xyz.rgb2xyz(BGR0[2],BGR0[1],BGR0[0]);
+					LAB0 = lab.xyz2lab(XYZ0[0],XYZ0[1],XYZ0[2]);
+					double dE = cie.deltaE76(LAB,LAB0);
+
+					vector<double> HSL = hsl.rgb2hsl(BGR[2],BGR[1],BGR[0]);
+					vector<double> HSL0 = hsl.rgb2hsl(BGR0[2],BGR0[1],BGR0[0]);
+					int index = hsl.getIndex(HSL[0],HSL[1],HSL[2]);
+					int index0 = hsl.getIndex(HSL0[0],HSL0[1],HSL0[2]);
+
+					int entry=0;
+					if(dE<dE_thresh && (index==index0)) {
+						entry=0;
+					} else {
+						entry = 1;
+					}
+					if(entry==1) {
+						cv::rectangle(haloTransMap,Point(0,i),Point(j-1,i+size.height-1),Scalar(0),CV_FILLED);
+					}
+					if(entry==1) break;
+				}
+				if(j==(smoothImg.cols-size.width)) {
+					cv::rectangle(haloTransMap,Point(0,i),Point(smoothImg.cols-1,i+size.height-1),Scalar(0),CV_FILLED);
+				}
+			} // end j
+			cv::flip(smoothImg,smoothImg,1);
+			cv::flip(edgeRemovedMap,edgeRemovedMap,1);
+			cv::flip(haloTransMap,haloTransMap,1);
+		}// end i
+
+		Mat results;
+		haloTransMap = sm.densityConnector(haloTransMap,0.9999999,1.0,7.0);
+		Mat SE = sm.getStructElem(Size(7,7),ShapeMorph::CIRCLE);
+		cv::dilate(haloTransMap,haloTransMap,SE,Point(-1,-1),2);
+		smoothImg.copyTo(results,haloTransMap);
+
+		ShapeColor sc;
+		Mat imgGray,imgGrayNoiseRemoved;
+		cvtColor(img,imgGray,CV_BGR2GRAY);
+		bool isLighter = sm.isFeatureLighter(img,haloTransMap);
+		if(!isLighter) {
+			imgGray = 255 - imgGray; // invert the image
+		}
+		//cout << isLighter << endl;
+		imgGray.copyTo(imgGrayNoiseRemoved,edgeRemovedMap);
+		Cluster clst3;
+		clst3.kmeansCluster(imgGrayNoiseRemoved,3);
+		double lcThresh = clst3.getMin(clst3.getNumOfClusters()-1);
+		//cout << lcThresh << endl;
+		Mat lcFilterMat = Mat::zeros(imgGrayNoiseRemoved.size(),CV_8U);
+		for(int i=0; i<imgGrayNoiseRemoved.rows; i++) {
+			for(int j=0; j<imgGrayNoiseRemoved.cols; j++) {
+				int val = imgGrayNoiseRemoved.at<uchar>(i,j);
+				if(val>lcThresh) {
+					lcFilterMat.at<uchar>(i,j) = 255;
+				}
+			}
+		}
+		Mat unionMask = haloTransMap.clone();
+		lcFilterMat.copyTo(unionMask,lcFilterMat);
+		islands = sm.liquidFeatureExtraction(unionMask,0,1);
+		unionMask = islands.at(0); // get largest island as mask
+		//Mat results2;
+		//img.copyTo(results2,unionMask);
+
+		Mat img2;
+		cvtColor(img,imgGray,CV_BGR2GRAY);
+		imgGray.copyTo(img2,unionMask);
+
+		int peakPos = sh.getPeakClusters(img2);
+		//printf("PeakPos: %d\n",peakPos);
+		Mat img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
+		img2 = sh.removeShadeOutliers(img3,img2,0.001);
+		if(sh.isOutliersRemoved==true) {
+			img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
+		}
+
+		String out = "/home/jason/Desktop/Programs/Discrete2/"+name+".png";
+		String out2 = "/home/jason/Desktop/Programs/Discrete2/"+name+"_discrete.png";
+		cv::imwrite(out,img2);
+		cv::imwrite(out2,img3);
+		cout << "Writing..." << name << endl;
+	}
 }
 
 //! Generates Uniform Illuminated Images
@@ -1478,6 +1798,35 @@ void test_statsign_script() {
 	float result = statsign.dotProduct(statSignVec1,statSignVec2);
 	cout << result << endl;
 	cout << statsign.adjustValue(result) << endl;
+}
+
+ShadeShape test_discrete_script(String filename) {
+	Rgb rgb;
+	Hsl hsl;
+	Shades sh;
+	ShapeMorph sm;
+	ShapeColor sc;
+	rgb.importThresholds();
+	hsl.importHslThresholds();
+	sh.importThresholds();
+	String name = ip::getFileName(filename);
+	Mat img = imread(filename);
+	Mat img2;
+	cvtColor(img,img2,CV_BGR2GRAY);
+	int peakPos = sh.getPeakClusters(img2);
+	//printf("PeakPos: %d\n",peakPos);
+	Mat img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
+	img2 = sh.removeShadeOutliers(img3,img2,0.001);
+	if(sh.isOutliersRemoved==true) {
+		img3 = sc.applyDiscreteShade(img2,sh.minVal,sh.maxVal,peakPos);
+	}
+
+	//> Testing Resizing of feature
+	ImageData id(img3,name,0);
+	ip::prepareImage(id,Size(140,140));
+	ShadeShape ss;
+	ss.extract(id,false);
+	return ss;
 }
 
 }// end namespace

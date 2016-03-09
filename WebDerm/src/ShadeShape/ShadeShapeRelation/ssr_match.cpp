@@ -96,8 +96,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
 						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1=0.0, weight2 = 0.0;
-						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
-						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
+						vector<float> sumStatSignUP1(StatSign::getUrnSize(),0), sumStatSignUP2(StatSign::getUrnSize(),0), sumStatSignDB1(StatSign::getUrnSize(),0), sumStatSignDB2(StatSign::getUrnSize(),0);
 						//> used for constrast weight
 						double contrastWeightUP = 0.0, contrastWeightDB = 0.0;
 						float sumOfAreaUP = 0.0, sumOfAreaDB = 0.0;
@@ -874,8 +873,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
 						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1 = 1.0, weight2 = 1.0;
-						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
-						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
+						vector<float> sumStatSignUP1(StatSign::getUrnSize(),0), sumStatSignUP2(StatSign::getUrnSize(),0), sumStatSignDB1(StatSign::getUrnSize(),0), sumStatSignDB2(StatSign::getUrnSize(),0);
 						//> for contrast weight
 						double contrastWeightUP=0.0, contrastWeightDB=0.0;
 						float sumOfAreaUP = 0.0, sumOfAreaDB = 0.0;
@@ -1576,8 +1574,7 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
 						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1 = 1.0, weight2 = 1.0;
-						vector<float> sumStatSignUP1(17,0), sumStatSignUP2(17,0), sumStatSignDB1(17,0), sumStatSignDB2(17,0);
-						vector<float> statSignUP1(17,0.0), statSignUP2(17,0.0), statSignDB1(17,0.0), statSignDB2(17,0.0);
+						vector<float> sumStatSignUP1(StatSign::getUrnSize(),0), sumStatSignUP2(StatSign::getUrnSize(),0), sumStatSignDB1(StatSign::getUrnSize(),0), sumStatSignDB2(StatSign::getUrnSize(),0);
 						//> for contrast weight
 						float contrastWeightUP=0.0, contrastWeightDB=0.0;
 						float sumOfAreaUP = 0.0, sumOfAreaDB = 0.0;

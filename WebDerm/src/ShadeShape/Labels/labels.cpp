@@ -218,7 +218,8 @@ vector<float> Labels::getStatSign(String label) {
 	if(this->labelStatSignMap.find(label)!=this->labelStatSignMap.end()) {
 		return this->labelStatSignMap.at(label);
 	}
-	return vector<float>();
+	vector<float> vec(StatSign::getUrnSize(),0);
+	return vec;
 }
 
 map<String,vector<float>>& Labels::getStatSignMap() {
@@ -230,7 +231,7 @@ Islands& Labels::getIsland(String label) {
 	return this->labelIslandMap.at(label);
 }
 
-void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifted) {
+void Labels::printCompareLabels(Labels &labels1, Labels &labels2, float score, int markShifted) {
 	auto labelMap1 = labels1.getMap();
 	auto labelMap2 = labels2.getMap();
 	for(auto it1=labelMap1.begin(), it2=labelMap2.begin(); it1!=labelMap1.end(), it2!=labelMap2.end(); it1++, it2++) {
@@ -241,9 +242,12 @@ void Labels::printCompareLabels(Labels &labels1, Labels &labels2, int markShifte
 		else
 			printf("%d) *%s: %d(%f) | %s: %d(%f)\n",i,it1->first.c_str(),it1->second.first,it1->second.second,it2->first.c_str(),it2->second.first,it2->second.second);
 	}
+	if(score>=0) {
+		printf("Results: %f\n",score);
+	}
 }
 
-void Labels::writeCompareLabels(String name, Labels &labels1, Labels &labels2, int markShifted) {
+void Labels::writeCompareLabels(String name, Labels &labels1, Labels &labels2, float score, int markShifted) {
 	String file = name+".txt";
 	FILE * fp;
 	fp = fopen(file.c_str(),"w");
@@ -258,6 +262,9 @@ void Labels::writeCompareLabels(String name, Labels &labels1, Labels &labels2, i
 			int prevShape = labels1.getPrevShapeNum(it1->first);
 			fprintf(fp,"%d) %d->%s: %d(%f) | %s: %d(%f)\n",i,prevShape,it1->first.c_str(),it1->second.first,it1->second.second,it2->first.c_str(),it2->second.first,it2->second.second);
 		}
+	}
+	if(score>=0) {
+		fprintf(fp,"Results: %f\n",score);
 	}
 	fclose(fp);
 }

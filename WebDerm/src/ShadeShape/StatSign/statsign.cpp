@@ -7,14 +7,16 @@
 
 #include "statsign.h"
 
+int StatSign::urnSize;
+
 //! creates a statistical signature of a NN3 40x40 image
 //! vector size is 81
 //! pos[0] = total
 //! pos[1] -> pos[40] = White
 //! pos[41] -> pos[80] = Black
 vector<float> StatSign::create(Mat img, float relArea) {
-	vector<float> statSignVec(81,0);
-	vector<float> statSignVec2(17,0); //> 80/5 = 16
+	vector<float> statSignVec(urnSize1,0);
+	vector<float> statSignVec2(urnSize2,0); //> 80/5 = 16
 	for(int y=0; y<img.rows; y++) {
 		int countConsecWhite = 0;
 		int countConsecBlack = 0;
@@ -49,12 +51,14 @@ vector<float> StatSign::create(Mat img, float relArea) {
 	}
 	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0.0);
 	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0.0);
+	StatSign::urnSize = statSignVec.size();
 	return statSignVec;
 }
 
 //! scheme 1 for comparing statistical signature
 float StatSign::dotProduct(vector<float> statSignVec1, vector<float> statSignVec2) {
-	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
+	assert(statSignVec1.size()>0);
+	assert(statSignVec2.size()>0);
 	assert(statSignVec1.size()==statSignVec2.size());
 	if(statSignVec1.at(0)==0 || statSignVec2.at(0)==0) {
 		return 0.0;
@@ -116,6 +120,10 @@ float StatSign::adjustValue(float value) {
 	return result;
 }
 
+int StatSign::getUrnSize() {
+	return StatSign::urnSize;
+}
+
 void StatSign::print(vector<float> statSignVec) {
 	assert(statSignVec.size()>0);
 	for(unsigned int i=1; i<statSignVec.size(); i++) {
@@ -142,6 +150,7 @@ void StatSign::printCompare(vector<float> statSignVec1, vector<float> statSignVe
 		try {
 			int urn = i>40 ? i-40 : i;
 			printf("L%d: %0.f(%f)(%f) | L%d: %0.f(%f)(%f)\n",urn,statSignVec1.at(i),porp1,porp11,urn,statSignVec2.at(i),porp2,porp22);
+			fflush(stdout);
 		} catch(const std::out_of_range &oor) {
 			printf("statSignVec1.size(): %lu\n",statSignVec1.size());
 			printf("statSignVec2.size(): %lu\n",statSignVec2.size());

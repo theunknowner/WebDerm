@@ -55,8 +55,8 @@ public:
 	vector<float> getStatSign(String label);
 	map<String,vector<float>>& getStatSignMap();
 	Islands& getIsland(String label);
-	static void printCompareLabels(Labels &labels1, Labels &labels2, int markShifted=0);
-	static void writeCompareLabels(String name, Labels &labels1, Labels &labels2, int markShifted=0);
+	static void printCompareLabels(Labels &labels1, Labels &labels2, float score=-1.0, int markShifted=0);
+	static void writeCompareLabels(String name, Labels &labels1, Labels &labels2, float score=-1.0, int markShifted=0);
 	static void printCompareStatSign(Labels &labels1, Labels &labels2, String label);
 	static void writeCompareStatSign(Labels &labels1, Labels &labels2, String label, String fileType="txt");
 };
