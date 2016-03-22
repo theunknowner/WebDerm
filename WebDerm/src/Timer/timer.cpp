@@ -27,6 +27,7 @@ void Timer::end() {
 	time (&rawtime);
 	timeinfo = localtime (&rawtime);
 	this->end_time = std::string(asctime(timeinfo));
+	std::replace(this->end_time.begin(),this->end_time.end(),'\n','_');
 
 	this->seconds = round(this->btimer.elapsed());
 	if(this->seconds>=60) {

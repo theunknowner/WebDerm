@@ -1772,23 +1772,23 @@ void script33(String filename) {
 }
 
 void test_statsign_script() {
-	String file = "/home/jason/Desktop/workspace/Test_Runs/herpes3_photo6a_max_match_image_n0_shd1_shp-1-1.png";
+	String file = "/home/jason/Desktop/workspace/Test_Runs/tinea_corporis4_melanoma8b_max_match_image_n0_shd0_shp-1-1.png";
 	String name = getFileName(file);
 	Mat img = imread(file,0);
 	ImageData id(img,name);
 	ip::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id,false);
-	Islands isl1 = ss1.getIslandWithPoint(Point(44,13));
+	Islands isl1 = ss1.getIslandWithPoint(Point(46,28));
 
-	String file2 = "/home/jason/Desktop/Programs/Discrete/photo6a_discrete.png";
+	String file2 = "/home/jason/Desktop/Programs/Crop_Features/melanoma8b_discrete.png";
 	String name2 = getFileName(file2);
 	Mat img2 = imread(file2,0);
 	ImageData id2(img2,name);
 	ip::prepareImage(id2,Size(140,140));
 	ShadeShape ss2;
 	ss2.extract(id2,false);
-	Islands isl2 = ss2.getIslandWithPoint(Point(96,95));
+	Islands isl2 = ss2.getIslandWithPoint(Point(49,38));
 	StatSign statsign;
 	float relArea1 = isl1.area() / (float)ss1.area();
 	float relArea2 = isl2.area() / (float)ss2.area();

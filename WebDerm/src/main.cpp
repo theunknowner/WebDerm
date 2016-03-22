@@ -68,24 +68,7 @@ int main(int argc,char** argv)
 	//runHysteresis();
 	//runMouseColor();
 	//runResizeAllImages();
-
-	/*
-	//ShadeShape ss1 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test6.png");
-	//ShadeShape ss2 = Scripts::script2("/home/jason/Desktop/workspace/Test_Base_NN/test7.png");
-	ShadeShape ss1 = Scripts::script31("herpes3");
-	ShadeShape ss2 = Scripts::script31("herpes12");
-	ShadeShapeMatch ssm;
-	//ssm.test(ss1);
-	//ssm.debug_mode(1);
-	//ss1.showInteractiveIslands();
-	cout << ssm.test_match(ss1,ss2) << endl;
-	//vector<float> results = ssm.match(ss1,ss2);
-	//printf("TR1: %f x TR2: %f = %f]\n",results.at(1),results.at(2),results.at(0));
-	//ssm.test(ss1);
-	//Islands island = ss1.getIslandWithPoint(Point(48,68));
-	//imwrite("comp_disc.png",island.image());
-/**/
-
+	//Scripts::test_statsign_script();
 	/*
 	String file = "/home/jason/Desktop/workspace/Test_Runs/herpes3_acne_vulgaris2_max_match_image_n0_shd2_shp-1-1.png";
 	String name = getFileName(file);
@@ -97,28 +80,20 @@ int main(int argc,char** argv)
 	Islands island = ss1.getIslandWithPoint(Point(25,40));
 	imwrite(ss1.name()+"_strip.png",island.image());
 	cout << island.nn_results() << endl;
-
-	/*
+/**/
+/*
 	deque<String> files;
-	String folder = "Looks_Like4/";
-	FileData fd;
-	fd.getFilesFromDirectory(folder,files);
-	for(unsigned int i=0; i<files.size(); i++) {
-		String filename = folder + files.at(i);
-		Scripts::script33(filename);
-	}
-
-	/*
-	deque<String> files;
-	String folder = "Looks_Like2/";
+	String folder = "/home/jason/Desktop/Programs/Crop_Features/";
 	FileData fd;
 	fd.getFilesFromDirectory(folder,files);
 	for(unsigned int i=0; i<files.size(); i++) {
 		String filename = folder + files.at(i);
 		String name = ip::getFileName(filename);
-		//ShadeShape ss1 = Scripts::script31(name);
+		ShadeShape ss1 = Scripts::test_discrete_script(filename);
+		String out = folder + name +"_discrete.png";
+		//imwrite(out,ss1.image());
+		cout << name << endl;
 	}
-/**/
 /*
 	deque<String> files;
 	String folder = "Looks_Like/";
@@ -167,18 +142,19 @@ int main(int argc,char** argv)
 	imwrite(ss1.name()+"_strip.png",island.image());
 	cout << island.nn_results() << endl;
 	/**/
-/*
+
 	MyExceptions ex;
 	String name = "";
 	try {
 		Timer time;
-		String folder = "Looks_Like4/";
+		String folder = "Crop_Features/";
 		deque<String> files;
 		FileData fd;
 		fd.getFilesFromDirectory(folder,files);
 		//ShadeShape ss1 = Scripts::script31(argv[1]);
-		String filename = folder + string(argv[1]) + ".jpg";
-		ShadeShape ss1 = Scripts::discreteShadeShapeScript(filename);
+		String filename = folder + string(argv[1]) + ".png";
+		//ShadeShape ss1 = Scripts::discreteShadeShapeScript(filename);
+		ShadeShape ss1 = Scripts::test_discrete_script(filename);
 		vector<vector<float> > resultVec;
 		vector<String> nameVec;
 		vector<int> origPos;
@@ -191,8 +167,8 @@ int main(int argc,char** argv)
 			name = ip::getFileName(filename2);
 			if(name!=argv[1]) {
 				try {
-					//ShadeShape ss2 = Scripts::script31(name);
-					ShadeShape ss2 = Scripts::discreteShadeShapeScript(filename2);
+					//ShadeShape ss2 = Scripts::discreteShadeShapeScript(filename2);
+					ShadeShape ss2 = Scripts::test_discrete_script(filename2);
 					ShadeShapeMatch ssm;
 					if(argc>=3)
 						ssm.debug_mode(atoi(argv[2]));
@@ -268,6 +244,7 @@ int main(int argc,char** argv)
 	}
 	/**/
 
+	/*
 	ShadeShape ss1 = Scripts::test_discrete_script("/home/jason/Desktop/workspace/lph4.png");
 	ShadeShape ss2 = Scripts::test_discrete_script("/home/jason/Desktop/workspace/lph7.png");
 	//ss1.showInteractiveIslands();
@@ -277,14 +254,13 @@ int main(int argc,char** argv)
 //	imwrite(ss1.name()+"_strip.png",island.image());
 //	cout << island.nn_results() << endl;
 /**/
-	/*
+/*
 	Timer time;
-	String folder = "Looks_Like4/";
+	String folder = "Crop_Features/";
 //	String input1 = folder + string(argv[1]) + ".jpg";
 //	String input2 = folder + string(argv[2]) + ".jpg";
 //	ShadeShape ss1 = Scripts::discreteShadeShapeScript(input1);
 //	ShadeShape ss2 = Scripts::discreteShadeShapeScript(input2);
-	folder = "/home/jason/Desktop/workspace/";
 	String input1 = folder + string(argv[1]) + ".png";
 	String input2 = folder + string(argv[2]) + ".png";
 	ShadeShape ss1 = Scripts::test_discrete_script(input1);
