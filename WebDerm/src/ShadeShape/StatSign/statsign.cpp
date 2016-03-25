@@ -47,7 +47,7 @@ vector<float> StatSign::create(Mat img, float relArea) {
 //		statSignVec.at(i) *= pow(2.5,mul) * relArea;
 //		int urnNum = ceil(i/5.0);
 //		statSignVec2.at(urnNum) += statSignVec.at(i);
-		statSignVec.at(i) *=mul;
+		statSignVec.at(i) *= pow(mul,2);
 	}
 	statSignVec.at(0) = std::accumulate(statSignVec.begin(),statSignVec.end(),0.0);
 	statSignVec2.at(0) = std::accumulate(statSignVec2.begin(),statSignVec2.end(),0.0);
@@ -175,12 +175,21 @@ void StatSign::printCompare(vector<float> statSignVec1, vector<float> statSignVe
 void StatSign::writeCompare(String name, vector<float> statSignVec1, vector<float> statSignVec2) {
 	assert(statSignVec1.size()>0 && statSignVec2.size()>0);
 	assert(statSignVec1.size()==statSignVec2.size());
+	//> sum of the max of the urns
+	float sumOfMaxes = 0.0;
+	for(unsigned int i=1; i<statSignVec1.size(); i++) {
+		sumOfMaxes += max(statSignVec1.at(i),statSignVec2.at(i));
+	}
 	FILE * fp;
 	fp = fopen(name.c_str(),"w");
 	for(unsigned int i=1; i<statSignVec1.size(); i++) {
-		float porp1 = (float)statSignVec1.at(i) / statSignVec1.at(0);
-		float porp2 = (float)statSignVec2.at(i) / statSignVec2.at(0);
-		fprintf(fp,"L%d,%0.f,%f,L%d,%0.f,%f\n",i,statSignVec1.at(i),porp1,i,statSignVec2.at(i),porp2);
+		float porp1 = statSignVec1.at(i) / statSignVec1.at(0);
+		float porp2 = statSignVec2.at(i) / statSignVec2.at(0);
+		float porp11 = statSignVec1.at(i) / sumOfMaxes;
+		float porp22 = statSignVec2.at(i) / sumOfMaxes;
+		int urn = i>40 ? i-40 : i;
+		fprintf(fp,"L%d,%0.f,(%f),(%f),,L%d,%0.f,(%f),(%f)\n",urn,statSignVec1.at(i),porp1,porp11,urn,statSignVec2.at(i),porp2,porp22);
 	}
 	fprintf(fp,"Total,%0.f,Total,%0.f\n",statSignVec1.at(0), statSignVec2.at(0));
+	fprintf(fp,"SumOfMaxes: %0.f\n",sumOfMaxes);
 }

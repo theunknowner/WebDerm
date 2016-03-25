@@ -94,7 +94,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float deltaArcScore1=1.0, deltaArcScore2 = 1.0;
 						//> used for dot product calculation
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
-						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1=0.0, weight2 = 0.0;
 						vector<float> sumStatSignUP1(StatSign::getUrnSize(),0), sumStatSignUP2(StatSign::getUrnSize(),0), sumStatSignDB1(StatSign::getUrnSize(),0), sumStatSignDB2(StatSign::getUrnSize(),0);
 						//> used for constrast weight
@@ -235,16 +234,14 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								//> StatSign using Dot Product (Scheme I) <//
 								if(label1Condition) {
 									dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-									adjustedDP1 = statsign.adjustValue(dotProduct1);
 
 								}
 								if(label2Condition) {
 									dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-									adjustedDP2 = statsign.adjustValue(dotProduct2);
 								}
 								//> ************ End StatSign ************ <//
-								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
-								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
+								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
+								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
 								deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 								deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 								//for UP
@@ -555,15 +552,13 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								//> StatSign using Dot Product (Scheme I) <//
 								if(label1Condition){
 									dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-									adjustedDP1 = statsign.adjustValue(dotProduct1);
 								}
 								if(label2Condition) {
 									dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-									adjustedDP2 = statsign.adjustValue(dotProduct2);
 								}
 								//> ************ End StatSign ************ <//
-								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
-								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
+								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
+								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
 								deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 								deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 								// for UP
@@ -793,7 +788,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->entropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->entropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								this->entropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->entropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->entropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->entropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
 								this->entropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
@@ -819,7 +813,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->mismatchEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								this->mismatchEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->mismatchEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->mismatchEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->mismatchEntropyPS.storeStringFormat("WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								this->mismatchEntropyPS.storeStringFormat("TotalMismatchScore: %f\n",totalMismatchScore);
@@ -845,7 +838,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->noEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->noEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								this->noEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->noEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->noEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->noEntropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
 								this->noEntropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
@@ -871,7 +863,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float deltaArcScore1=1.0, deltaArcScore2=1.0;
 						//> for dot product and weights
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
-						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1 = 1.0, weight2 = 1.0;
 						vector<float> sumStatSignUP1(StatSign::getUrnSize(),0), sumStatSignUP2(StatSign::getUrnSize(),0), sumStatSignDB1(StatSign::getUrnSize(),0), sumStatSignDB2(StatSign::getUrnSize(),0);
 						//> for contrast weight
@@ -1146,15 +1137,13 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 							//> StatSign using Dot Product (Scheme I) <//
 							if(label1Condition){
 								dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-								adjustedDP1 = statsign.adjustValue(dotProduct1);
 							}
 							if(label2Condition) {
 								dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-								adjustedDP2 = statsign.adjustValue(dotProduct2);
 							}
 							//> ************ End StatSign ************ <//
-							weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
-							weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
+							weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
+							weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
 							deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 							deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 
@@ -1499,7 +1488,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->entropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->entropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								this->entropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->entropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->entropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->entropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
 								this->entropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
@@ -1522,7 +1510,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->mismatchEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								this->mismatchEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->mismatchEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->mismatchEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->mismatchEntropyPS.storeStringFormat("WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								this->mismatchEntropyPS.storeStringFormat("TotalMismatchScore: %f\n",totalMismatchScore);
@@ -1545,7 +1532,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->noEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->noEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n",deltaArcScore1,deltaArcScore2);
 								this->noEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->noEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->noEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->noEntropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
 								this->noEntropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
@@ -1572,7 +1558,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 						float deltaArcScore1=1.0, deltaArcScore2=1.0;
 						//> for dot products and weights
 						float dotProduct1 = 1.0, dotProduct2 = 1.0;
-						float adjustedDP1 = 1.0, adjustedDP2 = 1.0;
 						float weight1 = 1.0, weight2 = 1.0;
 						vector<float> sumStatSignUP1(StatSign::getUrnSize(),0), sumStatSignUP2(StatSign::getUrnSize(),0), sumStatSignDB1(StatSign::getUrnSize(),0), sumStatSignDB2(StatSign::getUrnSize(),0);
 						//> for contrast weight
@@ -1837,15 +1822,13 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								//> StatSign using Dot Product (Scheme I) <//
 								if(label1Condition) {
 									dotProduct1 = statsign.dotProduct(sumStatSignUP1,sumStatSignDB1);
-									adjustedDP1 = statsign.adjustValue(dotProduct1);
 								}
 								if(label2Condition) {
 									dotProduct2 = statsign.dotProduct(sumStatSignUP2,sumStatSignDB2);
-									adjustedDP2 = statsign.adjustValue(dotProduct2);
 								}
 								//> ************ End StatSign ************ <//
-								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),adjustedDP1);
-								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),adjustedDP2);
+								weight1 = this->getShapeWeight(upMergedLabels.getShapeNum(label1),dotProduct1);
+								weight2 = this->getShapeWeight(upMergedLabels.getShapeNum(label2),dotProduct2);
 								deltaArcScore1 = this->calculateArcScore(sumArcScoreUP1,sumArcScoreDB1);
 								deltaArcScore2 = this->calculateArcScore(sumArcScoreUP2,sumArcScoreDB2);
 							}
@@ -2179,7 +2162,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->entropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->entropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
 								this->entropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->entropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->entropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->entropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
 								this->entropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);
@@ -2202,7 +2184,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->mismatchEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->mismatchEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
 								this->mismatchEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->mismatchEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->mismatchEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->mismatchEntropyPS.storeStringFormat("WeightedMismatchEntropy: %f\n",weightedMismatchEntropy);
 								this->mismatchEntropyPS.storeStringFormat("TotalMismatchScore: %f\n",totalMismatchScore);
@@ -2225,7 +2206,6 @@ void ShadeShapeRelationMatch::match(ShadeShapeRelation &ssrUP, ShadeShapeRelatio
 								this->noEntropyPS.storeStringFormat("ArcScoreUP2: %f, ArcScoreDB2: %f\n",sumArcScoreUP2,sumArcScoreDB2);
 								this->noEntropyPS.storeStringFormat("DeltaArcScore1: %f, DeltaArcScore2: %f\n", deltaArcScore1,deltaArcScore2);
 								this->noEntropyPS.storeStringFormat("DotProduct1: %f, DotProduct2: %f\n",dotProduct1,dotProduct2);
-								this->noEntropyPS.storeStringFormat("AdjustedDP1: %f, AdjustedDP2: %f\n",adjustedDP1,adjustedDP2);
 								this->noEntropyPS.storeStringFormat("WeightY: %f, WeightX: %f\n",weight1,weight2);
 								this->noEntropyPS.storeStringFormat("WeightedEntropy: %f\n",weightedEntropy);
 								this->noEntropyPS.storeStringFormat("TotalMatchScore: %f\n",totalMatchScore);

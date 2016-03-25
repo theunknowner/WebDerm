@@ -69,6 +69,7 @@ int main(int argc,char** argv)
 	//runMouseColor();
 	//runResizeAllImages();
 	//Scripts::test_statsign_script();
+
 	/*
 	String file = "/home/jason/Desktop/workspace/Test_Runs/herpes3_acne_vulgaris2_max_match_image_n0_shd2_shp-1-1.png";
 	String name = getFileName(file);
@@ -91,7 +92,7 @@ int main(int argc,char** argv)
 		String name = ip::getFileName(filename);
 		ShadeShape ss1 = Scripts::test_discrete_script(filename);
 		String out = folder + name +"_discrete.png";
-		//imwrite(out,ss1.image());
+		imwrite(out,ss1.image());
 		cout << name << endl;
 	}
 /*

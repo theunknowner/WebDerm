@@ -1772,23 +1772,23 @@ void script33(String filename) {
 }
 
 void test_statsign_script() {
-	String file = "/home/jason/Desktop/workspace/Test_Runs/tinea_corporis4_melanoma8b_max_match_image_n0_shd0_shp-1-1.png";
+	String file = "/home/jason/Desktop/Programs/Crop_Features/herpes3_discrete.png";
 	String name = getFileName(file);
 	Mat img = imread(file,0);
 	ImageData id(img,name);
 	ip::prepareImage(id,Size(140,140));
 	ShadeShape ss1;
 	ss1.extract(id,false);
-	Islands isl1 = ss1.getIslandWithPoint(Point(46,28));
+	Islands isl1 = ss1.getIslandWithPoint(Point(69,10));
 
-	String file2 = "/home/jason/Desktop/Programs/Crop_Features/melanoma8b_discrete.png";
+	String file2 = "/home/jason/Desktop/Programs/Crop_Features/herpes12_discrete.png";
 	String name2 = getFileName(file2);
 	Mat img2 = imread(file2,0);
 	ImageData id2(img2,name);
 	ip::prepareImage(id2,Size(140,140));
 	ShadeShape ss2;
 	ss2.extract(id2,false);
-	Islands isl2 = ss2.getIslandWithPoint(Point(49,38));
+	Islands isl2 = ss2.getIslandWithPoint(Point(55,31));
 	StatSign statsign;
 	float relArea1 = isl1.area() / (float)ss1.area();
 	float relArea2 = isl2.area() / (float)ss2.area();
@@ -1798,6 +1798,8 @@ void test_statsign_script() {
 	float result = statsign.dotProduct(statSignVec1,statSignVec2);
 	cout << result << endl;
 	cout << statsign.adjustValue(result) << endl;
+	imgshow(isl1.nn_image());
+	imgshow(isl2.nn_image());
 }
 
 ShadeShape test_discrete_script(String filename) {
